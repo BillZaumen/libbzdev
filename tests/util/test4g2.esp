@@ -1,0 +1,5 @@
+var rv = new GaussianRV(0.0, 1.0);
+var stats = new BasicStats.Population();
+
+rv.stream(50000000).forEach(stats::add);
+void

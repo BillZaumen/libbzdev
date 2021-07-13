@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="500" height="382">
+    <imageURI>doc-files/drama.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="drama" type="PATH_START" key="module"  description="Actor-Based Simulation Module"/>
+       <row type="MOVE_TO" x="-1.0" y="381.0" xp="-1.0" yp="1.0"/>
+       <row type="SEG_END" x="111.0" y="359.0" xp="111.0" yp="23.0"/>
+       <row type="PATH_END"/>
+       <row varname="common" type="PATH_START" key="package" link="drama/common" description="Actor-Based Simulation Shared-Class Package"/>
+       <row type="MOVE_TO" x="45.0" y="264.0" xp="45.0" yp="118.0"/>
+       <row type="SEG_END" x="207.0" y="239.0" xp="207.0" yp="143.0"/>
+       <row type="PATH_END"/>
+       <row varname="generic" type="PATH_START" key="package" link="drama/generic" description="Generic Actor-Based Simulation Package"/>
+       <row type="MOVE_TO" x="285.0" y="264.0" xp="285.0" yp="118.0"/>
+       <row type="SEG_END" x="457.0" y="234.0" xp="457.0" yp="148.0"/>
+       <row type="PATH_END"/>
+       <row varname="drama2" type="PATH_START" key="package" link="drama" description="Drama Simulation Package"/>
+       <row type="MOVE_TO" x="200.0" y="116.0" xp="200.0" yp="266.0"/>
+       <row type="SEG_END" x="321.0" y="89.0" xp="321.0" yp="293.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

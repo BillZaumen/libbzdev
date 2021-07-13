@@ -1,0 +1,2 @@
+Main-Class: MultiTest
+Class-Path: libbzdev.jar

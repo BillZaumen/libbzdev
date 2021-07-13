@@ -1,0 +1,137 @@
+/*
+* Basically a copy of tests/util/test.ep
+*/
+
+import(java.lang, [Math, StringBuilder]);
+import(org.bzdev.lang, MathOps);
+
+var testq = function (t) { (t < 180)? 1.1: 2.0}
+
+
+var temp1 = ({a: 10, b: 30}["a"] + [10, 20, 30, 40][0]) / tan(20);
+
+function plus(a, b) {a + b}
+
+var result1 = plus(10, 20);
+
+function plus3(a, b, c) {var x = plus(a, b); x + c}
+
+var result2 = plus3(10, 20, 30);
+
+var obj = {x: 10.0, y: 20.0,
+    distTo(x1, y1) {
+       // dx and dy used to avoid computing subexpressions twice
+      var dx = x1 - this.get("x");
+      var dy = y1 - this.get("y");
+      sqrt(dx*dx + dy*dy)
+    }
+};
+
+var result3 = obj.distTo(20.0, 30.0);
+
+var result4 = IntStream.rangeClosed(1, 100)
+    .reduce(0, function(a, b) {asInt(a + b)});
+
+var result5 = LongStream.rangeClosed(1, 1000000)
+	    .reduce(0, function(a, b) {asLong(a + b)});
+
+var result6 = global.isObject(obj);
+
+var array = ["a", "b", "c", "d"];
+
+var result7 = global.isArray(array);
+
+var result8 = array.stream().reduce("", function(a,b) {a + b});
+
+
+
+var result8a = array.stream()
+	     .reduce(new StringBuilder(),
+		     function(sb,s) {sb.append(s); sb})
+	     .toString();
+
+global.set("result8b", global.get("result8") + global.get("result8a"));
+var result9 = global.get("obj", "x") + obj.get("y");
+
+var result10  = 20;
+
+result10 = 30;
+
+
+array[2] = "C";
+
+var result11 = array[2];
+
+obj["y"] = 30.0;
+var result12 = obj["y"];
+
+var iarray = [1, 2, 4];
+
+iarray[2] = 3;
+
+var result13 = iarray[2];
+
+var result14 = MathOps.class;
+
+var result15 = global.typeof(obj);
+var result15a = global.ESPObjectType();
+var result15b = result15 == result15a;
+var result15c = global.isObject(obj);
+
+var result16 = global.typeof(array);
+var result16a = global.ESPArrayType();
+var result16b = result16 == result16a;
+var result16c = global.isESPArray(array);
+var result16d = global.isArray(array);
+
+var result17 = global.typeof(iarray);
+var result17a = global.isJavaArray(iarray);
+var result17b = global.isArray(iarray);
+var result17c = global.getGlobal("org.bzdev.test");
+var result17d = global.getGlobal("org.bzdev.none");
+var result17e = global.getGlobal("org.bzdev.test", "<empty>");
+var result17f = global.getGlobal("org.bzdev.none", "<empty>");
+var result17g = global.globals();
+
+var obj2 = {a: 10,
+	    getA() {this.a},
+	    setA(x){this.a = x}
+	   };
+
+var result18 = obj2.getA();
+var result19 = obj2.setA(20);
+var result20 = obj2.getA();
+
+var objget = obj2["getA"];
+var objset = obj2["setA"];
+
+var result21 = objset(30);
+var result22 = objget();
+
+var count = 0;
+synchronized function incr() {
+    count = count + 1
+}
+
+incr();
+incr();
+incr();
+incr();
+incr();
+var result23 = count;
+
+var results = ["result1", "result2", "result3", "result4", "result5",
+	    "result6", "result7", "result8", "result8a", "result8b",
+	    "result9", "result10", "result11", "result13", "result14",
+	    "result15", "result15a", "result15b", "result15c", "result16",
+	    "result16a", "result16b", "result16c", "result16d", "result17",
+	    "result17a", "result17b", "result17c", "result17d", "result17e",
+	    "result17f", "result17g", "result18", "result19", "result20",
+	       "result21", "result22", "result23"];
+
+var out = global.getWriter();
+
+results.stream().forEach(function (name) {
+    out.println(name + " = " + global.get(name));
+    void
+});

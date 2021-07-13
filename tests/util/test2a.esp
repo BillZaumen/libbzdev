@@ -1,0 +1,7 @@
+var count = 0;
+
+synchronized function incr() {
+    var start = count;
+    count = count + 1;
+    asInt(count - start)
+}

@@ -1,0 +1,57 @@
+%YAML 1.2
+---
+  dirname: WellTemperedClavier
+  label: Phillips
+  album: Preludes and Fugues from the Well Tempered Clavier (Book 1)
+  performer: John Lewis
+  composer: J.S.Bach
+  tracks:
+
+    - tracknumber: 1
+      filename: Prelude1
+      title: Prelude No. 1
+
+    - tracknumber: 2
+      filename: Fugue1
+      title: Fugue No. 1
+
+    - tracknumber: 3
+      filename: Prelude2
+      title:  Prelude No. 2
+
+    - tracknumber: 4
+      filename:  Fugue2
+      title:  Fugue No. 2
+
+    - tracknumber: 5
+      filename: Prelude3
+      title:  Prelude No. 3
+
+    - tracknumber: 6
+      filename:  Fugue3
+      title:  Fugue No. 3
+
+    - tracknumber: 7
+      filename: Prelude4
+      title:  Prelude No. 4
+
+    - tracknumber: 8
+      filename: Fugue4
+      title:  Fugue No. 4
+
+    - tracknumber: 9
+      filename: Prelude5
+      title:  Prelude No. 5
+
+    - tracknumber: 10
+      filename: Fugue5
+      title:  Fugue No. 5
+
+    - tracknumber: 11
+      filename: Prelude6
+      title:  Prelude No.6
+
+    - tracknumber: 12
+      filename: Fugue6
+      title:  Fugue No. 6
+...

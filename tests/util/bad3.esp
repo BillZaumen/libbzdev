@@ -1,0 +1,5 @@
+var obj = {foo (a, b) {a + b},
+ bar () {
+   this.foo(1);
+ }};
+obj.bar()

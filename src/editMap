@@ -1,0 +1,26 @@
+#!/bin/sh
+(cd .. ; make src/doc-files/modules.png) > /dev/null
+(cd .. ; make src/doc-files/modules2.png) > /dev/null
+(cd .. ; make src/doc-files/base.png) > /dev/null
+(cd .. ; make src/doc-files/desktop.png) > /dev/null
+(cd .. ; make src/doc-files/devqsim.png) > /dev/null
+(cd .. ; make src/doc-files/drama.png) > /dev/null
+(cd .. ; make src/doc-files/ejws.png) > /dev/null
+(cd .. ; make src/doc-files/graphics.png) > /dev/null
+(cd .. ; make src/doc-files/math.png) > /dev/null
+(cd .. ; make src/doc-files/rest.png) > /dev/null
+
+
+if [ $# = 0 ]
+then
+    epts modules.epts
+else
+    if [ -f "$1.epts" ]
+    then
+	epts $1.epts
+    else
+	echo $1.epts does not exit 1>&2
+	exit 1
+    fi
+fi
+exit 0

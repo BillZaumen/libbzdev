@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+  execute:
+    - var sim = new Simulation();
+
+  factories:
+    - context: [ "sim", "org.bzdev.devqsim" ]
+      sf: SimFunctionFactory
+
+  create:
+     - var: simF
+       name: "simF"
+       factory: sf
+       configuration:
+         - fName: sin
+         - fpName: cos
+     - var: simF2
+       name: "simF2"
+       factory: sf
+       configuration:
+         - fName: asin
+         - fpName: acos
+         - fppName: asin
+...

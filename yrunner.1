@@ -1,0 +1,517 @@
+.TH YRUNNER "1" "Mar 2021" "libbzdev-util VERSION" "User Commands"
+.SH NAME
+yrunner \- run libbzdev Java code using YAML for scripting
+.SH SYNOPSIS
+.B yrunner
+\fB[\fIOPTION\fB]... \fILAUNCHERS\fB [\fIFILE\fB]...\fR
+.br
+.B yrunner
+\fB[\fIOPTION\fB]...
+.B \-\-listLaunchers
+.br
+.B yrunner
+\fB[\fIOPTION\fB]...
+.B \-\-listCodeBase
+.br
+.B yrunner
+\fB[\fIOPTION\fB]...
+.BI \-\-generateDocs\ [--apiURL\ \fIURLs\fB\ ]...\   LAUNCHERS
+.br
+.SH DESCRIPTION
+.PP
+YRUNNER (YAML Runner) uses a stylized YAML file to run an
+application, typically a simulation or animation. For the first form
+of the command, the argument
+.I LAUNCHERS
+is a comma-separated list whose first entry is the name of a provider
+for a launcher and whose remaining entries are the names for providers
+of configuration data for additional classes that may be returned or may
+appear as arguments in expressions. The
+.B \-\-listLaunchers
+option will list the available names. Each input file
+.I IFILE
+is the name of a file in YAML format describing the input for the
+application.
+When "\fB\-\fR" is used to denote standard input, the options should be
+terminated with "\fB\-\-\fR". Input files are processed in the order in
+and use the YAML syntax described in the manual page
+.BR yrunner  (5).
+Expressions and related statements in the file are evaluated once and
+in lexical order. Expressions use the syntax recognized by the Java
+class org.bzdev.util.ExpressionParser. The API documentation for that
+class has the full syntax. The program
+.B yrunner
+configures expression parsers so that scripting mode, import mode, and
+global mode are disabled. In this case, an expression can be a variable
+definition, a function definition, or an expression that starts with
+the character "=".
+.PP
+Expressions can define variables, but two are predefined:
+.B out
+and
+.BR err ,
+which by default are bound to instances of the class java.io.PrintWriter
+that use standard output and standard error respectively. Options described
+below can alter these variables and set up additional IO streams.
+.PP
+.SH OPTIONS
+.TP
+.B \-\-
+End of options.
+.TP
+.B \-\-listCodebase
+List all the URLs provided in
+.B \-\-codebase
+and/or
+.B \-\-classpathCodebase
+options and then exit.
+.TP
+.B \-\-listLaunchers
+List the names for launchers and launcher-data additions available and
+then exit. The names listed depend on the
+.B \-\-codebase
+and/or
+.B \-\-classpathCodebase
+options.  If the
+.B \-verbose
+option is added, each name will be paired with a description. For each
+launcher or launcher-data name, there is a corresponding set of Java classes
+that indicate the types of the values that methods and constructors can
+return, the types of arguments, the whose static methods are treated as
+functions, the classes whose instance methods are available, and the
+classes that provide constants (static, final fields or enumeration types).
+.TP
+.B \-\-verbose
+Modify the behavior of the
+.B \-\-listLaunchers
+option so that each launcher and launcher-data name will be followed by
+a dash and a description of the launcher or launcher data.
+.TP
+.BI \-\-generateDocs
+Generate documentation for classes, functions, methods, and constants
+that can be used in ESP statements embedded in YAML files. This is
+dependent on the
+.I LAUNCHERS
+specified at the end of the command line. One or more
+.B \-\-link
+options will be required to point to the appropriate API
+documentation. At a minimum, the URLs must reference the documentation for
+the standard Java class libraries and the documentation for the BZDev
+class library. The
+.B \-\-codebase
+and/or
+.B \-\-classpathCodebase
+options are also needed: otherwise the launchers may not be
+found.
+.B yrunner
+will exit after the documentation is generated. The documentation will
+be sent to standard output, and will be an HTML file.  Classes whose
+API documentation is not available will not be shown.
+.TP
+.BI \-\-add\-modules\  MODULES
+Add a common-separated list
+.I MODULES
+of module names to any existing list, or create a new list if there
+is no existing list. The
+.B \-\-add\-modules
+option is needed when there are no module dependencies that would make
+the specified modules accessible. An example is a module that is used
+in a script but that does not provide implementations of the class
+org.bzdev.obnaming.NamedObjectFactory.
+.TP
+.BI \-\-classpathCodebase\  URLPATH
+.TQ
+.BI \-\-codebase\  URLPATH
+Specifies directories and jar files for the class path (for the
+.B \-\-classpathCodebase
+option) and  the module path (for the
+.B \-\-codebase
+option).
+.I URLPATH
+may be a URL giving the location of the classes or a path name in the
+local file system.  The character "|" is used as a path separator,
+with the sequence "||" interpreted as a literal "|", so that for an
+odd number of "|" characters in a row, only the final one is treated
+as a path separator.  If file name must start with "|", use a "file"
+URL and encode the "|" as %7C.  If the starting sequence of a path
+component contains a ":" (the first one if there are more than one),
+and that sequence of characters is syntactically valid at the start of
+a URL, the path component is treated as a URL. Otherwise it is a file
+name.  This rule implies that Windows file names such as C:mycode.jar
+will be confused with a URL, so a URL should be used instead.  If a
+file name is not absolute, it is interpreted relative to the current
+working directory. The directory "..." refers the directory in which
+the BZDev library's JAR files resides (on Debian Linux systems, this
+directory is /usr/share/java, the standard location for Java
+libraries.)  Multiple
+.B \-\-codebase
+and
+.B \-\-classpathCodebase
+options are allowed. For file names, a leading "~" followed by the
+name separator ("/" for Unix) is expanded to the user\'s home
+directory, a file name consisting of only "~" is replaced with the
+user\'s home directory, a leading "~~" is replaced with "~", and a
+leading "..." followed by the name separator ("/" for Unix) is
+replaced by the directory in which the BZDev class library's JAR file
+is located.  For the
+.B \-\-classpathCodebase
+case, a component can be any could appear in a Java
+.B \-classpath
+option, with the exception that a '|' has to be escaped.  If a codebase
+has classes in the unnamed package, the
+.B \-\-classpathCodebase
+option must be used as all code bases on the module path must contain
+classes in named packages.
+.TP
+.BI \-D NAME\fB=\fIVALUE
+Define the name of a Java property and give it a value.  See the java
+command for details.  The syntax for this argument is the same as that
+defined for the similarly named option for the
+.B java
+command.  The properties "java.system.class.loader", "java.security.manager",
+"scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
+option (or the corresponding
+.B \-J
+option).  If those must be changed, add a
+.B \-D
+option before the
+.B \-p
+option in the
+.B yrunner
+shell script (or alternatively, create a new script).
+.TP
+.BI \-d: VAR\ DIRNAME
+.TQ
+.BI \-d: VAR\fB:\fIDIRNAME
+Binds a scripting language variable named
+.I VAR
+to a directory accessor (an instance of org.bzdev.io.DirectoryAccessor)
+for the directory
+.IR DIRNAME .
+The directory accessor allows one to read and create files in
+.I DIRNAME
+or a subdirectory of
+.I DIRNAME
+using methods described in the DirectoryAccessor documentation.
+.I VAR
+may not be
+.B our
+or
+.BR err .
+
+.TP
+.B \-\-dryrun
+Prints the java command that would be executed but does not actually
+execute it.
+.TP
+.B \-\-exit
+When the scripts provided as arguments to yrunner have been run and
+if there are no exceptions that have not been caught, yrunner will
+exit with a status of 0.  Without this option, yrunner will not exit
+if currently running threads have not run to completion.
+.TP
+.BI \-i: VAR\ \fIFILENAME
+.TQ
+.BI \-i: VAR\fB:\fIFILENAME
+Opens
+.I FILENAME
+for reading and defines a script variable
+.I VAR
+bound to the input stream for that file.
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.BI \-J \-JOPTION
+Causes a single-argument option
+.I \-JOPTION
+to be used by the java launcher that
+.B yrunner
+invokes (there is an analogous option used by
+.BR javac .)
+.TP
+.BI \-\-module\-path\  PATH
+.TQ
+.BI \-p\  PATH
+Add a colon-separated list of directories or modular JAR files to
+the module path.  This option may appear multiple times. While the
+path separator is a colon on Linux/Unix systems, it is a semicolon
+on Windows systems.  Unlike the
+.B \-\-codebase
+option, a component of the path may not be a URL. Whether to use a
+.B \-p
+option or a
+B. \-\-codebase
+option is a matter of style.  One might prefer  the
+.B \-p
+option when the module path contains directories. Unlike Java, multiple
+.B \-p
+or
+.B \-\-module-path
+options may be provided. If so, the paths are combined.
+.TP
+.BI \-o\  OUTPUTFILE
+Specify a file
+.I OUTPUTFILE
+for output from scripts.  A value of "\-" indicates standard output,
+which is the default. Standard output can be specified only once for
+the "\fB\-o\fR" and "\fB\-o:\fR" options.  The name of the output file
+in expressions is
+.BR out ,\
+and it is set to an instance of the Java class PrintWriter, configured
+so that each line is flushed.
+.TP
+.BI \-o: VAR\ \fIFILENAME
+.TQ
+.BI \-o: VAR\fB:\fIFILENAME
+Opens
+.I FILENAME
+for writing and defines a script variable
+.I VAR
+bound to the output stream for that file.  If
+.I FILENAME
+is "\fB\-\fR", standard output is used.  Standard output can be specified
+only once for the "\fB\-o\fR" and "\fB\-o:\fR" options with one exception:
+the variable
+.B err
+can also be set to either standard output or to a file  This option may
+not be used to specify the value for the variable
+.BR out .
+The variable
+.B err
+will be set to an instance of the Java class PrintWriter and configured
+so that each line is automatically flushed.
+.TP
+.B \-r
+Maximize the quality of the random number generator provided by
+org.bzdev.util.StaticRandom.
+.TP
+.BI \-r: VARNAME\ IFILENAME
+.TQ
+.BI \-rw: VARNAME\ IFILENAME
+.TQ
+.BI \-rws: VARNAME\ IFILENAME
+.TQ
+.BI \-rwd: VARNAME\ IFILENAME
+.TQ
+.BI \-r: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rw: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rws: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rwd: VARNAME\fB:\fIFILENAME
+Assign a random access file to the scripting-language variable
+.IR VARNAME .
+The object created will be an instance of java.io.RandomAccessFile,
+constructed using a file
+.I FILENAME
+and a mode that is either
+.BR r ,
+.BR rw ,
+.BR rs ,
+or
+.B rd .
+.I VARNAME
+may not be
+.B our
+or
+.BR err .
+.TP
+.B \-\-stackTrace
+Print a stack trace if an error occurs when running scripts.
+.TP
+.B \-\-trustLevel=\fIN\fB
+The value
+.I N
+can be 0 (the default) or 2.  When 0, after command-line arguments
+are processes, the Java security manager (java.lang.SecurityManager) will
+be installed. When 2, no security manager will be installed.  The value
+1 is used by
+.B scrunner
+and is not appropriate for
+.BR yrunner .
+.TP
+.BI \-vS: VAR\ VALUE
+.TQ
+.BI \-vS: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the string
+.IR VALUE .
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.BI \-vB: VAR\ VALUE
+.TQ
+.BI \-vB: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the boolean
+.IR VALUE ,
+which must have the values
+.B true
+or
+.BR false .
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.BI \-vI: VAR\ VALUE
+.TQ
+.BI \-vI: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as an integer.
+.I VALUE
+may be followed (with no intermediate spaces) by the letters 'h' (hecto), 'k'
+(kilo), 'M' (mega), or 'G' (giga), which multiply the value by 
+1000, 1,000,000, or 1,000,000,000 respectively.
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.BI \-vL: VAR\ VALUE
+.TQ
+.BI \-vL: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as a long integer.
+.I VALUE
+may be followed (with no intermediate spaces) by the 
+letters 'h' (hecto) 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
+(peta), or 'E' (exa), which multiply
+.I VALUE
+by 100, 1000, 1,000,000, 1e9, 1e12, 1e15, 1e18 respectively.
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.BI \-vD: VAR\ VALUE
+.TQ
+.BI \-vD: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as a double-precision floating-point number.
+.I VALUE
+may be followed (with no intermediate spaces) by the
+letters 'y' (yocto), 'z' (zepto), 'a' (atto), 'f' (femto), 'p'
+(pica), 'n' (nano), 'u' (micro), 'm' (milli), 'c' (centi), 'h'
+(hecto), 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
+(peta), 'E' (exa), 'Z' (zetta), or 'Y' (yotta), which multiply
+.I VALUE
+by 1.0e\-24, 1.0e\-21, 1.0e\-18, 1.0e\-15, 1.0e\-12, 1.0e\-9, 1.0e\-6,
+1.0e\-3, 1.0e\-3, 1.0e2, 1.0e3, 1.0e6, 1.0e9, 1.0e12, 1.0e15, 1.0e18,
+1.0e21, or 1.e24 respectively.
+.I VAR
+may not be
+.B our
+or
+.BR err .
+.TP
+.B \-\-versions
+Print the URL of each JAR file in
+.BR yrunner \'s
+class path, including entries added via the
+.BR \-\-codebase
+option, followed by an indented line containing the specification version
+for the JAR file and then the implementation version.  If either is
+missing, a "\-" is printed in its place.
+.TP
+.BI \-\-apiURL\  URLs
+Provide URLs for API documentation. The
+.I URLs
+are a '|' separated list for which each URL
+must point to the directory containing this documentation. On Linux
+systems, typical values for the mandatory URLs (the ones for Java libraries
+that are always provided) are
+.B file:/usr/share/doc/openjdk-11-doc/api/
+and
+.BR file:/usr/share/doc/libbzdev-doc/api/ .
+Pairs of the character '|' are replaced with single '|' in order to
+allow the character '|' to appear in a URL. If a URL does not have a
+protocol, it is assumed to be a file name. The
+.B \-\-generateDocs
+option will use these to set up links to API documentation included in
+these directories and their subdirectories.
+.PP
+.SH ERROR MESSAGES AND PITFALLS
+.PP
+When an error occurs,
+.B yrunner
+will try to indicate the line at which the error occurred. The line number
+will be closest when the error is a YAML syntax error. For some errors
+(for example, an inappropriate use of an alias), the text of the error
+message is the best guide as to what failed.  When the error is due to
+the evaluation of an expression, the error message may include some of
+the source code surrounding the error and a caret ("^") pointing to the
+location where the error was detected. If a line number cannot be determined,
+.B yrunner
+will try to provide a location represented as a sequence of numbers and
+property keys. The numbers represent list elements, indexed from 1, and
+the keys are the keywords preceding a colon in some YAML statement. The
+sequence is in the order in which YAML statements are nested.
+.PP
+Some errors that appear to be syntax errors are actually caught when
+expressions are evaluated. For example
+.IP
+- create:
+\ \ \ \ - var: foo,
+\ \ \ \ \ factory f,
+\ \ \ \ \ ...
+.PP
+would actually create a variable named "foo," and reference a factory
+whose "f," instead of the desired value "f" because YAML's syntax does
+not require quotation marks around strings in this case.
+
+.SH FILES
+.TP 
+.I /etc/bzdev/scrunner.conf\ \fRor\fI\ /etc/opt/bzdev/scrunner.conf
+System configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used. The form starting with
+/etc/opt may be used on some systems (e.g. Solaria).
+.TP
+.I ~/.config/bzdev/scrunner.conf
+User configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used.  property definitions in this
+file override those in the system configuration file.
+.SH SEE ALSO
+.BR scrunner.conf (5)
+.br
+.BR scrunner (1)
+.br
+.BR yrunner (5)
+.br
+https://en.wikipedia.org/wiki/YAML
+.br
+https://yaml.org/spec/1.2/spec.html
+
+\"  LocalWords:  YRUNNER libbzdev util yrunner fB fIOPTION fIFILE fR
+\"  LocalWords:  fILAUNCHERS br listLaunchers listCodeBase apiURL TP
+\"  LocalWords:  generateDocs fIURL YAML IFILE parsers listCodebase
+\"  LocalWords:  codebase classpathCodebase BZDev URLPATH TQ fIVALUE
+\"  LocalWords:  classpath scrunner sysconf usrconf DIRNAME fIDIRNAME
+\"  LocalWords:  accessor subdirectory DirectoryAccessor dryrun javac
+\"  LocalWords:  fIFILENAME JOPTION listScriptingLanguages fILANGUAGE
+\"  LocalWords:  OUTPUTFILE VARNAME IFILENAME rw rws rwd stackTrace
+\"  LocalWords:  trustLevel fIN vS vB boolean vI hecto giga vL tera
+\"  LocalWords:  peta exa vD yocto zepto atto femto nano milli centi
+\"  LocalWords:  zetta yotta subdirectories YAML's fRor fI config
+\"  LocalWords:  conf PrintWriter fIURLs

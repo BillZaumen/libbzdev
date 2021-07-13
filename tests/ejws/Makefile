@@ -1,0 +1,160 @@
+JAVA = java -classpath ../../BUILD/libbzdev.jar:classes
+
+all:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) UtilTest "./"
+	cat junk
+	@echo -------------------------
+	zip -r example.zip example
+	$(JAVA) UtilTest example.zip example/
+	rm example.zip
+	cat junk
+	@echo -------------------------
+	$(JAVA) WebMapTest
+	@echo -------------------------
+	$(JAVA) WebxmlParserTest example junk
+	rm junk
+
+test:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test
+
+stest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) -Djavax.net.debug=ssl STest
+
+stest1:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) STest1
+
+stest3a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) -Djavax.net.debug=ssl STest3 SSL
+
+stest3b:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) -Djavax.net.debug=ssl STest3 TLS
+
+
+test2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test2
+
+test3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test3
+
+test4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test4
+
+
+test5:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test5
+
+test6:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test6
+
+test7:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	rm -f example.zip
+	(cd example; zip -r ../example.zip *)
+	$(JAVA) Test7
+	rm example.zip
+
+test8:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	rm -f example.zip
+	(cd example; zip -r ../example.zip *)
+	$(JAVA) Test8
+	rm example.zip
+
+test9:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test9
+
+test10:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test10
+
+test11:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test11
+
+htest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) HTest
+
+
+test12:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test12
+
+test0:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test0
+
+test0a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test0a
+
+
+etest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	mkdir -p classes/manual
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	cp ewstest/epts.html classes/manual
+	cp ewstest/*.png classes/manual
+	$(JAVA) ETest
+
+wmtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) WebMapTest
+
+clean:
+	rm -rf classes

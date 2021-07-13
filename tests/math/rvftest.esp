@@ -1,0 +1,12 @@
+import(java.lang.Math);
+import(org.bzdev.math.RealValuedFunction);
+
+function f(x)   {Math.sin(x)};
+function fp(x)  {Math.cos(x)};
+function fpp(x) {-Math.sin(x)};
+
+new RealValuedFunction(scripting, {
+    valueAt: function(x) {Math.sin(x)},
+    derivAt: function(x) {Math.cos(x)},
+    secondDerivAt: function(x) {-Math.sin(x)}
+});

@@ -1,0 +1,44 @@
+import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectOps,
+			    NamedObjectFactory]);
+import(org.bzdev.anim2d, [Animation2D, AnimationObject2D,
+			  AnimationLayer2D,
+			  AnimationLayer2DFactory]);
+import(java.util, [Set, SortedSet]);
+
+var out = scripting.getWriter();
+
+var a2d = new Animation2D(scripting, 1920, 1080, 10000.0, 400);
+var scalefactor = 1080.0/15.0;
+a2d.setRanges(0.0, 0.0, 0.35, 0.0, scalefactor, scalefactor);
+
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory" 
+});
+###
+var layer = alf.createObject("layer", [
+    {zorder: 0, visible: true},
+    {withPrefix: "object", withIndex: [
+	[{type: "TEXT", text: "Sample Text 1"},
+	 {x: 10, y: 20},
+	 {withPrefix: "fontParms", config: [
+	     {name: "SANS_SARIF"},
+	     {withPrefix: "color", 
+	      red: 2120, blue: 44, green: 174}
+	 ]}
+	],
+	{type: "TEXT", config: [
+	    {text: "Sample Test 2"},
+	    {x: 10, y: 20},
+	    {withPrefix: "fontParms", config: [
+		{name: "SANS_SARIF"},
+		{withPrefix: "color", 
+		 red: 212, blue: 44, green: 174}
+	    ]}
+	]}
+    ]}
+]);
+
+a2d.getObjectsByZorder().forEach(function (obj) {
+    out.println(obj.getName());
+    void
+    });

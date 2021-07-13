@@ -1,0 +1,326 @@
+.TH YRUNNER.CONF "5" "Nov 2014" "yrunner VERSION" "File Formats and Conventions"
+.SH NAME
+yrunner \- yrunner input file
+.SH DESCRIPTION
+.PP
+The input files the program
+.B yrunner
+uses are YAML (version 1.2) files, with the preferred file-name
+extension "yaml" or "yml".  Each file should start with the
+sequence
+.IP
+.B %YAML 1.2
+.br
+.B \-\-\-
+.P
+followed a list of objects, each with a single key, and ending
+with the line
+.IP
+.B ...
+.PP
+As a reminder, YAML syntax describes nested lists and objects with
+indentation used to denote the level of nesting. List elements always
+start with a '-' followed by a space. Objects are key-value pairs. If
+the key is not an identifier, it must be quoted. Keys are case sensitive,
+and are always followed by a colon and then a space. List elements and
+object values can be other lists or objects, but also strings, numbers,
+and various special values (
+.BR true ,
+.BR false ,
+.BR null ).
+YAML also allows lists to be written as comma-separated values
+delimited by
+.B [
+and
+.BR ] ,
+and allows object to be written as a comma-separated sequence of
+key-value pairs, with the object itself delimited by
+.B {
+and
+.BR } ,
+where each key-value pair consists of an identifier, a colon, and
+a value. For example,
+.IP
+[10, 20, 30]
+.PP
+and
+.IP
+{a: 10, b: 20, c: 30}
+.PP
+are equivalent to
+.IP
+- 10
+.br
+- 20
+.br
+- 30
+.PP
+and
+.IP
+a: 10
+.br
+b: 20
+.br
+c: 30
+.PP
+respectively. Which form to us uses is a matter of personal preference or
+convenience.
+.PP
+.SH TOP-LEVEL LIST-ELEMENT KEYS
+.PP
+For
+.BR yrunner ,
+the allowed keys in the top-level lists' objects are
+.BR execute ,
+.BR factories ,
+.BR define ,
+and
+.BR create .
+Each can appear multiple times in any desired order.
+.TP
+.B execute
+This key's value is either a string containing an expression-parser statement
+or a list of expression-parser statements, one statement per list element.
+The syntax used for expression-parser statements is described below.
+At a minimum, the first key in the file will be an
+.B execute
+key and it will define a variable and initialize it so that it's value
+is an animation, simulation, or some similar object that implements
+the object-namer interface
+.BR org.bzdev.obnaming.ObjectNamerOps .
+For example,
+.IP
+\ \ - execute:
+.br
+\ \ \ \ \ \ \ - var a2d = new Animation2D(1920, 1080, 10000.0, 400)
+.br
+\ \ \ \ \ \ \ - var scaleF = 1080.0/100.0
+.br
+\ \ \ \ \ \ \ - = a2d.setRanges(0.0, 0.0, 0.35, 0.0, scaleF, scaleF)
+.br
+.TP
+.B factories
+The value for this key is an object with a mandatory key named
+.B context
+whose value is a list with two elements. The first element is a string
+providing the variable name for an object namer, and the second element
+is a string containing a package name in which to find factory classes.
+The remaining items are key-value pairs where the key is used as the
+name of a variable whose value is a factory, and the second is the
+simple class name of the factory, which must be in the  package specified
+in the
+.B context
+element.  For example:
+.IP
+\ \ - factories:
+.br
+\ \ \ \ \ \ \ context: ["a2d", "org.bzdev.anim2d"]
+.br
+\ \ \ \ \ \ \ alf: AnimationLayer2DFactory
+.br
+.TP
+.B define
+The value for this key is a single value or a list of values, and each
+value is expected to have a YAML anchor - an identifier preceded by an
+ampersand (&). For example,
+.IP
+\ \ - define:
+.br
+\ \ \ \ \ \ - &font {withPrefix: "fontParms", config: [
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {name: "SANS_SARIF"},
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {withPrefix: "color",
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ red: 212, blue: 44, green: 174}]}
+.br
+.IP
+With this definition, the alias
+.B *font
+can be used later to insert the defined object at any desired location,
+reducing the amount of repetition that would otherwise be needed. Aside
+from defining anchors.  All the objects in a
+.B define
+key's value are ignored unless referenced with an alias.
+.TP
+.B create
+The value for this key is either a single object or a list of objects,
+with each value specifying an object created by a factory. There are
+four keys: the value for the key
+.B var
+provides a name for the object that will be created for use in an expression;
+the value for the key
+.B name
+provides a print name for the object; the value for the key
+.B factory
+provides the factory to use to create the object; the value for the key
+.B configuration
+is a possibly nested list or object that specifies the configuration.
+The syntax is factory dependent and there should be documentation for each
+factory (there is for each in the BZDev library). Documentation for the
+class
+.B org.bzdev.obnaming.NamedObjectFactory
+contains an overview appropriate for yrunner, and for scrunner when using the
+scripting language ESP or ECMAScript. For example,
+.IP
+\ \ - create:
+.br
+\ \ \ \ \ \ \ - var:\ layer
+.br
+\ \ \ \ \ \ \ \ \ name: layer
+.br
+\ \ \ \ \ \ \ \ \ factory: alf
+.br
+\ \ \ \ \ \ \ \ \ configuration:
+.br
+\ \ \ \ \ \ \ \ \ \ \ - {zorder: 0, visible: true}
+.br
+\ \ \ \ \ \ \ \ \ \ \ - withPrefix: object
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ withIndex:
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - # first text line
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - type: TEXT
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ text: Sample Text 1
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - {x: 10, y: 20}
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - *font
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - # second text line
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - type: TEXT
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config:
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - text: Sample Test 2
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - {x: 10, y: 40}
+.br
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ - *font
+.br
+.IP
+The crosshatch
+.B #
+starts a comment that terminates at the end of the line containing it.
+The list element
+.B *font
+is an alias (the use of aliases is described above). Typically a
+top-level
+.B execute
+key will appear after factories are created to continue processing
+by (for example)  running a simulation or animation. For example,
+.IP
+\ \ - execute:
+.br
+\ \ \ \ \ \ - var maxFrames = a2d.estimateFrameCount(1.0);
+.br
+\ \ \ \ \ \ - = a2d.initFrames(maxFrames, isw);
+.br
+\ \ \ \ \ \ - = a2d.scheduleFrames(0, maxFrames);
+.br
+\ \ \ \ \ \ - = a2d.run();
+.br
+\ \ \ \ \ \ - = isw.close();
+.br
+.PP
+.SH EXPRESSION SYNTAX
+.PP
+The documentation for
+.B org.bzdev.util.ExpressionParser
+describes the syntax used in expressions.
+The program
+.B yrunner
+configures expression parsers so that scripting mode, import mode, and
+global mode are disabled. An expression is restricted to
+the following:
+.TP
+.BI var\  NAME\ =\ EXPRESSION
+.TP
+For this case,
+.I NAME
+is the name of a variable that must not have been defined previously
+and
+.I EXPRESSION
+is an expression recognized by
+.BR ExpressionParser .
+The order of evaluation is the lexical ordering of the expressions, and
+.B yrunner
+will evaluate an expression only once. For example, when an anchor is defined,
+any expressions referenced by the anchor will be evaluated where the anchor
+was defined, not at the points where a corresponding alias references that
+anchor.
+.TP
+.BI var\  NAME\  ?=\  EXPRESSION
+For this case,
+.I NAME
+is the name of a variable that may (or may not) have been defined
+previously and
+.I EXPRESSION
+is an expression, recognized by
+.BR ExpressionParser ,
+that will be evaluated if
+.I NAME
+has not been previously defined.
+.TP
+.BI var\  NAME\  ??=\  EXPRESSION
+For this case,
+.I NAME
+is the name of a variable that may (or may not) have been defined
+previously and
+.I EXPRESSION
+is an expression, recognized by
+.BR ExpressionParser ,
+that will be evaluated if
+.I NAME
+either has not been previously defined or has the value
+.BR null .
+.TP
+.BI function\  NAME\  ( ARGUMENTS )\ { EXPRESSIONS }
+For this case,
+.B NAME
+is the name of a function (a previously defined function or variable
+with that name must not exist),
+.I ARGUMENTS
+is  a comma-separated list of identifiers, and
+.I EXPRESSIONS
+is a semicolon-separated list of expressions using the syntax
+defined in the
+.B ExpressionParser
+documentation.  The value of the last expression in the list is the
+value returned by the function.
+.TP
+.BI =\  EXPRESSION
+For this case,
+.I EXPRESSION
+is evaluated.
+.PP
+The syntax for an identifier or name is the same that Java uses for
+identifiers.
+.SH PREDEFINED and RESERVED VARIABLES
+.PP
+The following variables are reserved in expressions:
+.TP
+.B out
+is the variable for standard output. It will always be an instance of
+the Java class PrintWriter, and will flush its output after each line.
+.TP
+.B err
+is the variable for standard error. It will always be an instance of
+the Java class PrintWriter, and will flush its output after each line.
+.SH SEE ALSO
+.PP
+.BR yrunner (1)
+.br
+https://en.wikipedia.org/wiki/YAML
+.br
+https://yaml.org/spec/1.2/spec.html
+
+
+\"  LocalWords:  YRUNNER CONF yrunner YAML yaml yml br TP namer alf
+\"  LocalWords:  scaleF AnimationLayer DFactory withPrefix fontParms
+\"  LocalWords:  config SARIF BZDev scrunner zorder withIndex isw
+\"  LocalWords:  maxFrames initFrames scheduleFrames parsers
+\"  LocalWords:  ExpressionParser PrintWriter

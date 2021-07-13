@@ -1,0 +1,15 @@
+import(org.bzdev.devqsim, [TaskThread]);
+import (org.bzdev.drama.DramaSimulation);
+import (org.bzdev.lang.MathOps);
+
+var sim = new DramaSimulation(scripting);
+sim.scheduleTaskObject({run: function() {
+    IntStream.range(0,5).forEachOrdered(function(i) {
+	    global.getWriter().println("task is at simulation time "
+                                     + sim.currentTicks()
+                                     + " [i= " + i +"]");
+	    TaskThread.pause(10);
+	});
+    }
+}, asLong(10));
+sim.run()

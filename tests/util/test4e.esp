@@ -1,0 +1,36 @@
+var x = true? function(){10}(): 20/30;
+var y = false? function(){10}(): 20/30;
+
+var spacing ?= null;
+
+function() {
+    var a2dtest = (a2d == null);
+    var plainBackground = (a2dtest && (!var.epts || epts == null));
+    var scalef = a2dtest?
+	function() {
+	    var sf = userdist/gcsdist;
+	    a2d = null;
+	    sf
+	}():
+	(a2d.getWidth() - a2d.getXLowerOffset() -  a2d.getXUpperOffset())
+            / (a2d.getXUpper() - a2d.getXLower());
+
+    spacing = (spacing == null)?
+	function() {
+	    // By default, arrange so that there are roughly 10 lines
+	    // in the shortest direction, with the constraint that the
+	    // graph coordinate space values are powers of 10 in graph
+	    // coordinate space
+	    var s = ((frameWidth > frameHeight)? frameHeight: frameWidth)
+		/ scalef;
+	    s = Math.floor(Math.log10(s/10));
+	    (s > -0.1)?
+		Math.round(Math.pow(10.0, ((s < 0.0)? 0.0: s))):
+		1.0 / Math.round(Math.pow(10.0, s))
+	}(): spacing;
+    plainBackground? function() {
+	void
+    }(): void;
+}();
+void
+

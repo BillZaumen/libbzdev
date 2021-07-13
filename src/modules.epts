@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="475" height="306">
+    <imageURI>doc-files/modules.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="p3d" type="PATH_START"   description="3D Printing Module"/>
+       <row type="MOVE_TO" x="347.0" y="306.0" xp="347.0" yp="0.0"/>
+       <row type="SEG_END" x="439.0" y="284.0" xp="439.0" yp="22.0"/>
+       <row type="PATH_END"/>
+       <row varname="drama" type="PATH_START"   description="Actor-Based Simulation Module"/>
+       <row type="MOVE_TO" x="100.0" y="234.0" xp="100.0" yp="72.0"/>
+       <row type="SEG_END" x="204.0" y="207.0" xp="204.0" yp="99.0"/>
+       <row type="PATH_END"/>
+       <row varname="anim2d" type="PATH_START"   description="2D Animation Module"/>
+       <row type="MOVE_TO" x="220.0" y="234.0" xp="220.0" yp="72.0"/>
+       <row type="SEG_END" x="334.0" y="210.0" xp="334.0" yp="96.0"/>
+       <row type="PATH_END"/>
+       <row varname="devqsim" type="PATH_START"   description="Discrete Event Simulation Module"/>
+       <row type="MOVE_TO" x="49.0" y="157.0" xp="49.0" yp="149.0"/>
+       <row type="SEG_END" x="177.0" y="127.0" xp="177.0" yp="179.0"/>
+       <row type="PATH_END"/>
+       <row varname="desktop" type="PATH_START"   description="Desktop (GUI) Module"/>
+       <row type="MOVE_TO" x="310.0" y="162.0" xp="310.0" yp="144.0"/>
+       <row type="SEG_END" x="440.0" y="135.0" xp="440.0" yp="171.0"/>
+       <row type="PATH_END"/>
+       <row varname="obnaming" type="PATH_START"   description="Object Naming Module"/>
+       <row type="MOVE_TO" x="0.0" y="105.0" xp="0.0" yp="201.0"/>
+       <row type="SEG_END" x="120.0" y="73.0" xp="120.0" yp="233.0"/>
+       <row type="PATH_END"/>
+       <row varname="graphics" type="PATH_START"   description="Graphics Module"/>
+       <row type="MOVE_TO" x="220.0" y="108.0" xp="220.0" yp="198.0"/>
+       <row type="SEG_END" x="348.0" y="74.0" xp="348.0" yp="232.0"/>
+       <row type="PATH_END"/>
+       <row varname="math" type="PATH_START"   description="Math Module"/>
+       <row type="MOVE_TO" x="112.0" y="57.0" xp="112.0" yp="249.0"/>
+       <row type="SEG_END" x="223.0" y="30.0" xp="223.0" yp="276.0"/>
+       <row type="PATH_END"/>
+       <row varname="ejws" type="PATH_START"   description="Embedded  Web Server Module"/>
+       <row type="MOVE_TO" x="381.0" y="70.0" xp="381.0" yp="236.0"/>
+       <row type="SEG_END" x="475.0" y="44.0" xp="475.0" yp="262.0"/>
+       <row type="PATH_END"/>
+       <row varname="base" type="PATH_START"   description="Base Module"/>
+       <row type="MOVE_TO" x="211.0" y="18.0" xp="211.0" yp="288.0"/>
+       <row type="SEG_END" x="318.0" y="1.0" xp="318.0" yp="305.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

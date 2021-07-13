@@ -1,0 +1,223 @@
+.TH SCRUNNER.CONF "5" "Nov 2014" "scrunner VERSION" "File Formats and Conventions"
+.SH NAME
+scrunner.conf \- scrunner configuration file
+.SH DESCRIPTION
+The files 
+.I /etc/scrunner.conf
+and 
+.I ~/.config/bzdev/scrunner.conf
+contain information used to configure the scrunner command. The format is
+identical for both files.  These configuration files specify a java command,
+java system properties, and classpath entries in a
+.B %java
+directive,
+.B %defs
+section, a
+.B %modulepath.components
+section, and a
+.B %classpath.components
+section.
+A section is terminated by any of the above directives or by a line containing
+.B %end
+with no preceding or following characters other than whitespace.
+Each section and directive is optional.
+After leading and trailing whitespace is deleted,
+lines that start with
+.B #
+and all empty lines are ignored. Each section of the configuration file
+has its own syntax.
+.SH SYNTAX FOR THE %java DIRECTIVE
+The %java directive consists of the string
+.B %java
+followed by whitespace and then a file name.
+.TP
+.B 
+.B %java
+.I FILENAME
+.br
+This entry is optional.  If not present a default value for
+.I FILENAME
+is used to give the location of the java command.
+Normally this directive is not needed. Exceptions include testing a
+version of java not yet installed.
+
+.SH SYNTAX FOR THE %defs SECTION
+This section contains java property definitions and directives indicating
+that definitions apply only for a specific scripting language. Excluding
+comments and blank lines, each line consists of one of the following two
+alternatives.
+.TP
+.I NAME\ \fB=\fI\ VALUE
+.br
+The identifier
+.I NAME
+is given a value specified by
+.IR VALUE .
+As a convenience, if 
+.I VALUE
+starts with
+.B ~~
+then
+.B ~~
+is replaced with a single
+.BR ~ .
+Otherwise if VALUE starts with
+.BR ~ ,
+then
+.B ~
+is replaced with the user\'s home directory.
+.BR ~/ .
+All other characters are kept as is.  There is an exception
+when
+.I NAME
+has the value
+.BR java.ext.dirs :
+in this case, the value is a path and the substitution for
+.B ~
+described above applies to each component of the path.
+.TP
+.BI %lang\  NAME
+.br
+This denotes the start of a scripting-language-specific subsection, which
+continues until the next
+.B %lang
+directive, another top-level directive, or until a terminating
+.B %end
+directive is seen.  For the
+.B %lang
+directive,
+.I NAME
+is the "official" name of the scripting language as defined in the Java
+specifications.
+.SH SYNTAX FOR THE %modulepath.components SECTION
+Each line (excluding comments and blank lines) contains a component of
+a module path, either a directory or a jar file.  If the line starts with
+.B ~~
+then
+.B ~~
+is replaced with a single
+.BR ~ .
+Otherwise if VALUE starts with
+.BR ~ ,
+then
+.B ~
+is replaced with the user\'s home directory.
+.BR ~/ ..B ~/
+In addition, if VALUE starts with
+.B ...
+followed by the file separator ("\fB/\fR" on Unix or Linux) then
+.B ...
+is replaced with the directory in which the Bzdev class library\'s JAR
+file is located.
+.P
+Modulepath components can be scripting-language dependent. As in the
+.B %defs
+section, a line of the form
+.br
+.IP
+.B %lang
+.I NAME
+.br
+.PP
+indicates the start of a set of module path components (one per line) that
+are to be included in the module path when the official name of the scripting
+language is
+.IR Name .
+Each language-specific sequence is terminated by either a top-level directive,
+an
+.B %end
+line, or another
+.B %lang
+line. Libraries needed to install to determine if a scripting language is
+supported, its aliases, etc., should not be in a language-specific part of
+the classpath-components section.
+.SH SYNTAX FOR THE %classpath.components SECTION
+Each line (excluding comments and blank lines) contains a pathname entry,
+either a directory or a jar file.  If the line starts with
+.B ~~
+then
+.B ~~
+is replaced with a single
+.BR ~ .
+Otherwise if VALUE starts with
+.BR ~ ,
+then
+.B ~
+is replaced with the user\'s home directory.
+.BR ~/ ..B ~/
+In addition, if VALUE starts with
+.B ...
+followed by the file separator ("\fB/\fR" on Unix or Linux) then
+.B ...
+is replaced with the directory in which the Bzdev class library\'s JAR
+file is located.
+If the last component in a path name is
+.B *
+preceded by a file separator ("\fB/\fR" on Unix or Linux), then the entry
+denotes all jar files in that directory preceding the last file separator
+character on the line.
+.P
+Classpath components can be scripting-language dependent. As in the
+.B %defs
+section, a line of the form
+.br
+\ \ \ \ 
+.B %lang
+.I NAME
+.br
+indicates the start of a set of class path components (one per line) that
+are to be included in the class path when the official name of the scripting
+language is
+.IR Name .
+Each language-specific sequence is terminated by either a top-level directive,
+an
+.B %end
+line, or another
+.B %lang
+line. Libraries needed to install to determine if a scripting language is
+supported, its aliases, etc., should not be in a language-specific part of
+the classpath-components section.
+.SH SEARCH ORDER
+Configuration files are searched
+in a particular order: 
+.B /etc/bzdev/scrunner.conf
+followed by
+.B ~/.config/bzdev/scrunner.conf
+(both files are optional in that missing ones are skipped).
+.SH EXAMPLE
+The following directives can be used to configure
+.B scrunner
+to support Python, using the Jython implementation (the configuration
+shown is for a Debian Linux system and assumes a particular version of
+Jython):
+.br
+.br
+    %defs
+.br
+    %lang python
+.br
+        python.cachedir = ~/.jython-cachedir
+.br
+    %end
+.br
+    %classpath.components
+.br
+        /usr/share/java/jython-engine.jar
+.br
+        /usr/share/java/jython.jar
+.br
+    %end
+.br
+.SH FILES
+.TP
+.I /etc/bzdev/scrunner.conf
+System configuration file, read by all users. On some systems (e.g.,
+Solaris), the path is
+.I /etc/opt/bzdev/scrunner.conf
+.TP
+.I ~/.conf/bzdev/scrunner.conf
+User configuration file, where "~" represents the user\'s home directory,
+read by the current user only.
+.SH SEE ALSO
+.BR scrunner (1)
+.BR lsnof (1)

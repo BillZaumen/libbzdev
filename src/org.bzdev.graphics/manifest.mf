@@ -1,0 +1,3 @@
+Class-Path: ./libbzdev-base.jar
+  ./libbzdev-obnaming.jar
+  ./libbzdev-math.jar

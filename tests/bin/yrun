@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# java -classpath ../../BUILD/scrunner.jar \
+#     -Dscrunner.usrconf=test.conf \
+#     org.bzdev.bin.scrunner.SCRunnerCmd "$@"
+
+java -p ../../BUILD -m org.bzdev.yrunner "$@"

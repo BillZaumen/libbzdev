@@ -1,0 +1,5 @@
+#!/bin/sh
+java -classpath ../../BUILD/scrunner.jar \
+      -Djava.security.policy=../../BUILD/libbzdev.policy \
+      -Djava.class.loader=org.bzdev.lang.DMClassLoader \
+       org.bzdev.bin.scrunner.SCRunnerCmd "$@"

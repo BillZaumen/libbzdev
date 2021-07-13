@@ -1,0 +1,156 @@
+import(org.bzdev.anim2d, [Animation2D, AnimationPath2DFactory,
+			    GraphViewFactory, AnimationLayer2DFactory]);
+import(org.bzdev.util.units.MKS);
+
+var err ?= global.getErrorWriter();
+var out ?= global.getWriter();
+var tmpdir ?= throw "tmpdir undefined (need scrunner -d tmpdir:TMP option)";
+
+var a2d = new Animation2D(scripting, 1920, 1080, 10000.0, 400);
+
+var pathf = a2d.createFactory("org.bzdev.anim2d.AnimationPath2DFactory");
+var gvf = a2d.createFactory("org.bzdev.anim2d.GraphViewFactory");
+var alf = a2d.createFactory("org.bzdev.anim2d.AnimationLayer2DFactory");
+
+var scaleFactor = 1080.0/MKS.feet(60.0);
+a2d.setRanges(0.0, 0.0, 0.0, 0.5,
+	      scaleFactor, scaleFactor);
+
+var YELLOW = {red: 255, green: 255, blue: 0};
+var GREEN = {green: 255, red: 0, blue: 0};
+var BLUE = {red: 0, green: 0, blue: 255};
+var DARKGRAY = {red: 96, green: 96, blue: 96};
+var LIGHTGRAY = {red: 160, green: 160, blue: 160};
+var BLACK = {red: 0, green: 0, blue: 0};
+var WHITE = {red: 255, green: 255, blue: 255};
+
+var SQUARE6 = {gcsMode: true,
+	       cap: "SQUARE",
+	       width: MKS.inches(6.0)};
+
+var vpath = pathf.createObject("vpath", [
+    {zorder: 10, visible: false},
+    {withPrefix: "color", config: BLUE},
+    {withPrefix: "stroke",
+     config: {width: 2.0, gcsMode: false}},
+    {withPrefix: "cpoint", withIndex: [
+	{type: "MOVE_TO", x: 1.0, y: 0.0},
+	{type: "SEG_END", x: 70.0, y: 0.0}]}]);
+
+var gv = gvf.createObject("view", [
+    {initialX: 1.0, initialY: 0.0},
+    {xFrameFraction: 0.0, yFrameFraction: 0.5},
+    {scaleX: scaleFactor, scaleY: scaleFactor},
+    {withPrefix: "timeline", withIndex: [
+	{time: 0.0, path: vpath, u0: 0.0, velocity: 0,
+	 acceleration: MKS.mphPerSec(5)},
+	{time: 3.0, acceleration: 0.0},
+	{time: 7.7, acceleration: -MKS.mphPerSec(7.5)},
+	{time: 9.7, velocity: 0, acceleration: 0}]}]);
+
+alf.createObject("background", [
+    {visible: true},
+    {zorder: 0},
+    {withPrefix: "object", withIndex: [
+	[{type: "RECTANGLE",
+	  refPoint: "CENTER_LEFT",
+	  width: 120.0,  height: 20.0,
+	  x: 0.0, y: 0.0},
+	 {withPrefix: "fillColor", config: DARKGRAY},
+	 {withPrefix: "drawColor", config: DARKGRAY},
+	 {withPrefix: "stroke",
+	  config: {width: 1.0, dashPattern: "-",
+		   dashPhase: 0.0,
+		   dashIncrement: 1.0}},
+	 {fill: true, draw: true}],
+	[{type: "RECTANGLE",
+	  refPoint: "LOWER_LEFT",
+	  x: 0.0, y: MKS.feet(36.0/2),
+	  width: 120.0, height: 10.0},
+	 {withPrefix: "fillColor", config: GREEN},
+	 {fill: true}],
+	[{type: "ROUND_RECTANGLE",
+	  refPoint: "UPPER_LEFT",
+	  x: 0.0, y: -MKS.feet(36.0/2),
+	  width: 70.0, height: 10.0,
+	  arcwidth: MKS.feet(5),
+	  archeight: MKS.feet(5)},
+	 {withPrefix: "fillColor", config: GREEN},
+	 {fill: true}],
+	[{type: "RECTANGLE",
+	  refPoint: "UPPER_LEFT",
+	  width: 70.0, height: MKS.feet(6),
+	  x: 0.0, y: -MKS.feet(36.0/2.0 + 3.0)},
+	 {withPrefix: "fillColor", config: LIGHTGRAY},
+	 {fill: true}],
+	[{type: "RECTANGLE",
+	  refPoint: "UPPER_RIGHT",
+	  width: MKS.feet(6), height: MKS.feet(10.0),
+	  x: 70.0 - MKS.feet(3),
+	  y: -MKS.feet(36.0/2.0 + 3.0 + 5.9)},
+	 {withPrefix: "fillColor", config: LIGHTGRAY},
+	 {fill: true}],
+	[{type: "ROUND_RECTANGLE",
+	  refPoint: "UPPER_LEFT",
+	  x: 70.0 + MKS.feet(36), y: -MKS.feet(36.0/2),
+	  width: 50.0 - MKS.feet(36), height: 10.0,
+	  arcwidth: MKS.feet(5),
+	  archeight: MKS.feet(5)},
+	 {withPrefix: "fillColor", config: GREEN},
+	 {fill: true}],
+	[{type: "RECTANGLE",
+	  refPoint: "UPPER_LEFT",
+	  width: 50.0 - MKS.feet(36),
+	  height: MKS.feet(6),
+	  x: 70.0 + MKS.feet(36),
+	  y: -MKS.feet(36.0/2.0 + 3.0)},
+	 {withPrefix: "fillColor", config: LIGHTGRAY},
+	 {fill: true}],
+	[{type: "LINE",
+	  x: 0.0, y: 0.0,
+	  xend: 120.0, yend: 0.0},
+	 {withPrefix: "stroke",
+	  config: {gcsMode: true,
+		   cap: "SQUARE",
+		   width: MKS.inches(3.0),
+		   dashIncrement: MKS.feet(1.0),
+		   dashPhase: 0.0,
+		   dashPattern: "----  "}},
+	 {withPrefix: "drawColor",
+	  config: {red: 255, green: 255, blue: 0.0}},
+	 {draw: true}],
+	[{type: "LINE",
+	  x: 0.0, y: MKS.feet(12),
+	  xend: 120.0, yend: MKS.feet(12)},
+	 {withPrefix: "stroke", config: SQUARE6},
+	 {withPrefix: "drawColor", config: WHITE},
+	 {draw: true}],
+	[{type: "LINE",
+	  x: 0.0, y: -MKS.feet(12),
+	  xend: 50.0, yend: -MKS.feet(12)},
+	 {withPrefix: "stroke", config: SQUARE6},
+	 {withPrefix: "drawColor", config: WHITE},
+	 {draw: true}],
+	[{type: "LINE",
+	  x: 50, y: -MKS.feet(12),
+	  xend: 65.0, yend: -MKS.feet(12)},
+	 {withPrefix: "stroke",
+	  config: [SQUARE6, {dashIncrement: MKS.feet(1.0),
+			     dashPhase: 0.0, dashPattern: "--  "}]},
+	 {withPrefix: "drawColor", config: WHITE},
+	 {draw: true}],
+	[{type: "LINE",
+	  x: 70 + MKS.feet(36), y: -MKS.feet(12),
+	  "xend": 200.0, "yend": -MKS.feet(12)},
+	 {withPrefix: "stroke", config: SQUARE6},
+	 {withPrefix: "drawColor", config: WHITE},
+	 {draw: true}]]}]);
+
+tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
+
+var maxFrames = a2d.estimateFrameCount(10.0);
+out.println("maxFrames = " + maxFrames);
+a2d.initFrames(maxFrames, "col-", "png", tmpdir);
+a2d.scheduleFrames(0, maxFrames);
+
+a2d.run();

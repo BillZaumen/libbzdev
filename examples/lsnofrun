@@ -1,0 +1,3 @@
+#!/bin/sh
+java -Dscrunner.sysconf=scrun.conf -Dscrunner.usrconf=-none- \
+    -jar ../BUILD/lsnof.jar "$@"

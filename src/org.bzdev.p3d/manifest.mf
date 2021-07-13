@@ -1,0 +1,5 @@
+Class-Path: ./libbzdev-base
+  ./libbzdev-anim2d
+  ./libbzdev-obnaming
+  ./libbzdev-desktop
+  ./libbzdev-devqsim

@@ -1,0 +1,5 @@
+%YAML 1.2
+---
+ - execute:
+    - var line = new Path2D.Double()
+...

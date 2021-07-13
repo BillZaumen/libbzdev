@@ -1,0 +1,3 @@
+import (org.bzdev.math.Functions);
+
+var x = factorial(-10);

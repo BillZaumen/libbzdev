@@ -1,0 +1,4 @@
+// test a syntax error.
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationLayer2DFactory
+			  CartesianGrid2DFactory]);

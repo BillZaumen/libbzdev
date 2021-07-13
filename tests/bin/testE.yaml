@@ -1,0 +1,19 @@
+%YAML 1.2
+---
+ - create:
+    - var: p1
+      name: p1
+      factory: pathf
+      configuration: = inner
+
+    - var: p2
+      name: p2
+      factory: pathf
+      configuration: = outer
+
+ - execute:
+     - = out.println(var.p1? "p1 exists": "p1 missing");
+     - = out.println(var.p2? "p2 exists": "p2 missing");
+     - = out.println("" + (p1 instanceof AnimationPath2D));
+     - = out.println("" + (p2 instanceof AnimationPath2D));
+...

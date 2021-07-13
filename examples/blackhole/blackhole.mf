@@ -1,0 +1,2 @@
+Main-Class: BlackHole
+Class-Path: libbzdev.jar

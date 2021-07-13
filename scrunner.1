@@ -1,0 +1,453 @@
+.TH SCRUNNER "1" "Nov 2014" "libbzdev-util VERSION" "User Commands"
+.SH NAME
+scrunner \- run libbzdev Java code from a scripting language
+.SH SYNOPSIS
+.B scrunner
+\fB[\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
+.br
+.B scrunner
+.B \-\-listScriptingLanguages
+.B [\fILANGUAGE\fB]...
+.br
+.B scrunner
+.B \-\-supportsLanguage
+.I LANGUAGE
+.br
+.SH DESCRIPTION
+.PP
+SCRUNNER (Scripting Context Runner) uses a scripting language to run an
+application, typically a simulation or animation. For the first form
+of the command, each input file
+.I IFILE
+is the name of a file containing a script, with a file name of "\fB\-\fR"
+denoting standard input. If preceded by a
+.B \-t
+command-line argument, the script has elevated privileges when the
+.B \-\-trustLevel
+option is not 0.
+.B Scrunner
+will try to guess the scripting language from the file extension, but
+the language can be set by using the
+.B \-L
+option. The scripts that are provided are in effect the script produced
+by concatenating the input files  in the order in which they appear.
+When "\fB\-\fR" is used to denote standard input, the options should be
+terminated with "\fB\-\-\fR".
+.PP
+Initially, the scripting environment contains a single variable named
+.B scripting
+which should be used as the parent of any subclass of
+org.bzdev.scripting.ScriptingContext that is created. These subclasses
+included org.bzdev.devqsim.Simulation, org.bzdev.anim2d.Animation2D, and
+org.bzdev.drama.DramaSimulation.  These subclasses implement the interface
+org.bzdev.ObjectNamerOps, which includes a createFactory method. The factories
+created with this method can then be used to create simulation objects. While
+.B scrunner
+loads the factories from the BZDev class library, one may need other factories
+as well. Factories are expected to be packaged as modular JAR files that
+provide implementations of the class org.bzdev.obnaming.NamedObjectFactory.
+.PP
+Due to a bug in some versions of Javascript, "new" cannot always be used to
+create a simulation. For these cases (Simulation, Animation2D, and
+DramaSimulation are included), the object
+.B scripting
+has a series of methods named
+.B create
+the first argument of which is the class or the name of the class whose
+instance is to be created. This method is overloaded and can take up to
+11 additional arguments.
+.PP
+It is often useful to import classes from java packages so that they
+can be named using a simple identifier. The
+.B
+scripting
+object has a number of methods named
+.B importClass
+that will assign a class to a variable with the same name. For inner
+classes, a period (".") is replaced with a dollar sign ("$") in the
+class name.  These names exclude the package names. The first argument
+to
+.B importClass
+is a string containing the name of a java package (for example, "java.util").
+The second argument is a class name.  A third argument, which is optional,
+is a boolean argument that, when true, indicates that a class' inner
+classes should also be imported, and a fourth optional argument indicates
+that the inner class search is recursive. An additional method
+named
+.B importClasses
+provides "syntactic sugar" to simplify the use of the
+.B importClass
+methods.  The first argument to
+.B importClasses
+is a package name and the second argument is an object in the
+scripting language. For ECMAScript, this object will have property
+names that correspond to ECMAScript variables and property values that
+are strings giving the name of the factory class to be created. This
+name should be a simple name - one without the package (the package is
+provided by the first argument). The use of these methods eliminates a
+dependency on which script engine is in use for a given scripting
+language.
+.PP
+The variable
+.B scripting
+also provides the methods
+.BR getReader ,
+.BR getWriter,
+and
+.BR getErrorWriter ,
+all called with no arguments. These methods return
+.B scrunner \'s
+input stream, output stream, and error stream respectively. The
+objects returned are instances of java.io.Writer for output streams
+and java.io.Reader for input streams. For portability, these methods
+should be used instead of script-engine dependent functions. As an
+example, the Rhino javascript engine that comes with Java-7 provides
+the functions.
+.B print
+and
+.BR println .
+The function
+.B print
+does not terminate each call with a newline character. For the Nashorn
+javascript engine that comes with Java-8, the
+.B println
+function is not implemented, and the
+.B print
+function terminates each string printed with a newline character.
+Because of the variations between various implementations of ECMAScript,
+the use of
+.B print
+and
+.B println
+is discouraged (both are vendor extensions not specified by the
+ECMAScript specification).
+.SH OPTIONS
+.TP
+.B \-\-
+End of options.
+.TP
+.B \-\-listCodeBase
+List all the URLs provided in
+.B \-\-codebase
+options and then exit.
+.TP
+.BI \-\-add\-modules\  MODULES
+Add a common-separated list
+.I MODULES
+of module names to any existing list, or create a new list if there
+is no existing list. The
+.B \-\-add\-modules
+option is needed when there are no module dependencies that would make
+the specified modules accessible. An example is a module that is used
+in a script but that does not provide implementations of the class
+org.bzdev.obnaming.NamedObjectFactory.
+.TP
+.BI \-\-classpathCodebase\  URLPATH
+.TQ
+.BI \-\-codebase\  URLPATH
+Specifies directories and jar files for the class path (for the
+.B \-\-classpathCodebase
+option) and  the module path (for the
+.B \-\-codebase
+option).
+.I URLPATH
+may be a URL giving the location of the classes or a path name in the
+local file system.  The character "|" is used as a path separator,
+with the sequence "||" interpreted as a literal "|", so that for an
+odd number of "|" characters in a row, only the final one is treated
+as a path separator.  If file name must start with "|", use a "file"
+URL and encode the "|" as %7C.  If the starting sequence of a path
+component contains a ":" (the first one if there are more than one),
+and that sequence of characters is syntactically valid at the start of
+a URL, the path component is treated as a URL. Otherwise it is a file
+name.  This rule implies that Windows file names such as C:mycode.jar
+will be confused with a URL, so a URL should be used instead.  If a
+file name is not absolute, it is interpreted relative to the current
+working directory. The directory "..." refers the directory in which
+the BZDev library's JAR files resides (on Debian Linux systems, this
+directory is /usr/share/java, the standard location for Java
+libraries.)  Multiple
+.B \-\-codebase
+and
+.B \-\-classpathCodebase
+options are allowed. For file names, a leading "~" followed by the
+name separator ("/" for Unix) is expanded to the user\'s home
+directory, a file name consisting of only "~" is replaced with the
+user\'s home directory, a leading "~~" is replaced with "~", and a
+leading "..." followed by the name separator ("/" for Unix) is
+replaced by the directory in which the bzdev class library's JAR file
+is located.  For the
+.B \-\-classpathCodebase
+case, a component can be any could appear in a Java
+.B \-classpath
+option, with the exception that a '|' has to be escaped.  If a codebase
+has classes in the unnamed package, the
+.B \-\-classpathCodebase
+option must be used as all code bases on the module path must contain
+classes in named packages.
+.TP
+.BI \-D NAME\fB=\fIVALUE
+Define the name of a Java property and give it a value.  See the java
+command for details.  The syntax for this argument is the same as that
+defined for the similarly named option for the
+.B java
+command.  The properties "java.system.class.loader", "java.security.manager",
+"scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
+option (or the corresponding
+.B \-J
+option).  If those must be changed, add a
+.B \-D
+option before the
+.B \-jar
+option in the
+.B scrunner
+shell script (or alternatively, create a new script).
+.TP
+.BI \-d: VAR\ DIRNAME
+.TQ
+.BI \-d: VAR\fB:\fIDIRNAME
+Binds a scripting language variable named
+.I VAR
+to a directory accessor (an instance of org.bzdev.io.DirectoryAccessor)
+for the directory
+.IR DIRNAME .
+The directory accessor allows one to read and create files in
+.I DIRNAME
+or a subdirectory of
+.I DIRNAME
+using methods described in the DirectoryAccessor documentation.
+.TP
+.B \-\-dryrun
+Prints the java command that would be executed but does not actually
+execute it.
+.TP
+.B \-\-exit
+When the scripts provided as arguments to scrunner have been run and
+if there are no exceptions that have not been caught, scrunner will
+exit with a status of 0.  Without this option, scrunner will not exit
+if currently running threads have not run to completion.
+.TP
+.BI \-i: VAR\ \fIFILENAME
+.TQ
+.BI \-i: VAR\fB:\fIFILENAME
+Opens
+.I FILENAME
+for reading and defines a script variable
+.I VAR
+bound to the input stream for that file.
+.TP
+.BI \-J \-JOPTION
+Causes a single-argument option
+.I \-JOPTION
+to be used by the java launcher that
+.B scrunner
+invokes.
+.TP
+.BI \-L\  LANGUAGE
+Specifies the scripting language
+.I LANGUAGE
+ in use.
+.TP
+.B \-\-listScriptingLanguages\ [\fILANGUAGE\fB]...
+Lists the available scripting languages when no languages are provided,
+using the languages standard name.
+When
+.I LANGUAGE
+is provided (perhaps multiple times) additional details about the language
+are listed including file-name extensions, and aliases for the language.
+This must be the first and only option when used. If only a single language
+is provided, and that language is not supported,
+.B scrunner
+terminates with an exit code of 1, which  is useful in shell scripts and
+makefiles for determining if a specific language is supported.
+.TP
+.BI \-\-module\-path\  PATH
+.TQ
+.BI \-p\  PATH
+Add a colon-separated list of directories or modular JAR files to
+the module path.  This option may appear multiple times. While the
+path separator is a colon on Linux/Unix systems, it is a semicolon
+on Windows systems.  Unlike the
+.B \-\-codebase
+option, a component of the path may not be a URL. Whether to use a
+.B \-p
+option or a
+B. \-\-codebase
+option is a matter of style.  One might prefer  the
+.B \-p
+option when the module path contains directories. Unlike Java, multiple
+.B \-p
+or
+.B \-\-module-path
+options may be provided. If so, the paths are combined.
+.TP
+.BI \-o\  OUTPUTFILE
+Specify a file
+.I OUTPUTFILE
+for output from scripts.  A value of "\-" indicates standard output,
+which is the default. Standard output can be specified only once for
+the "\fB\-o\fR" and "\fB\-o:\fR" options.
+.TP
+.BI \-o: VAR\ \fIFILENAME
+.TQ
+.BI \-o: VAR\fB:\fIFILENAME
+Opens
+.I FILENAME
+for writing and defines a script variable
+.I VAR
+bound to the output stream for that file.  If
+.I FILENAME
+is "\fB\-\fR", standard output is used.  Standard output can be specified
+only once for the "\fB\-o\fR" and "\fB\-o:\fR" options.
+
+.TP
+.B \-r
+Maximize the quality of the random number generator provided by
+org.bzdev.util.StaticRandom.
+.TP
+.BI \-r: VARNAME\ IFILENAME
+.TQ
+.BI \-rw: VARNAME\ IFILENAME
+.TQ
+.BI \-rws: VARNAME\ IFILENAME
+.TQ
+.BI \-rwd: VARNAME\ IFILENAME
+.TQ
+.BI \-r: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rw: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rws: VARNAME\fB:\fIFILENAME
+.TQ
+.BI \-rwd: VARNAME\fB:\fIFILENAME
+Assign a random access file to the scripting-language variable
+.IR VARNAME .
+The object created will be an instance of java.io.RandomAccessFile,
+constructed using a file
+.I FILENAME
+and a mode that is either
+.BR r ,
+.BR rw ,
+.BR rs ,
+or
+.B rd .
+.TP
+.B \-\-stackTrace
+Print a stack trace if an error occurs when running scripts.
+.TP
+.B \-\-supportsLanguage\ \fILANGUAGE\fB
+Exit with exit code 0 if the scripting language
+.I LANGUAGE
+is supported and with exit code 1 if
+.I LANGUAGE
+is not supported.  This option is provided to simply writing shell
+scripts that can test if a particular scripting language is supported.
+The name
+.I LANGUAGE
+must be the standard name for the language, not an alias.
+.TP
+.B \-\-trustLevel=\fIN\fB
+The value
+.I N
+can be 0 (the default), 1, or 2.  When 0, after command-line arguments
+are processes, the Java security manager (java.lang.SecurityManager) will
+be installed. When 1, the security manager
+(org.bzdev.scripting.ScriptingSecurityManager) will be installed so that
+Java code will be trusted but scripts will not be trusted (nor java code
+called from a script).  When 2, no security manager will be installed.
+.TP
+.BI \-t \ FILE
+Treat
+.I File
+as trusted (as described above), and end the options.
+.TP
+.BI \-vS: VAR\ VALUE
+.TQ
+.BI \-vS: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the string
+.IR VALUE .
+.TP
+.BI \-vB: VAR\ VALUE
+.TQ
+.BI \-vB: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the boolean
+.IR VALUE ,
+which must have the values
+.B true
+or
+.BR false .
+.TP
+.BI \-vI: VAR\ VALUE
+.TQ
+.BI \-vI: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as an integer.
+.I VALUE
+may be followed (with no intermediate spaces) by the letters 'h' (hecto), 'k'
+(kilo), 'M' (mega), or 'G' (giga), which multiply the value by 
+1000, 1,000,000, or 1,000,000,000 respectively.
+.TP
+.BI \-vL: VAR\ VALUE
+.TQ
+.BI \-vL: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as a long integer.
+.I VALUE
+may be followed (with no intermediate spaces) by the 
+letters 'h' (hecto) 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
+(peta), or 'E' (exa), which multiply
+.I VALUE
+by 100, 1000, 1,000,000, 1e9, 1e12, 1e15, 1e18 respectively.
+.TP
+.BI \-vD: VAR\ VALUE
+.TQ
+.BI \-vD: VAR\fB:\fIVALUE
+Set the variable
+.I VAR
+to the number
+.IR VALUE ,
+which is treated as a double-precision floating-point number.
+.I VALUE
+may be followed (with no intermediate spaces) by the
+letters 'y' (yocto), 'z' (zepto), 'a' (atto), 'f' (femto), 'p'
+(pica), 'n' (nano), 'u' (micro), 'm' (milli), 'c' (centi), 'h'
+(hecto), 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
+(peta), 'E' (exa), 'Z' (zetta), or 'Y' (yotta), which multiply
+.I VALUE
+by 1.0e\-24, 1.0e\-21, 1.0e\-18, 1.0e\-15, 1.0e\-12, 1.0e\-9, 1.0e\-6,
+1.0e\-3, 1.0e\-3, 1.0e2, 1.0e3, 1.0e6, 1.0e9, 1.0e12, 1.0e15, 1.0e18,
+1.0e21 or 1.e24 respectively.
+.TP
+.B \-\-versions
+Print the URL of each JAR file in
+.BR scrunner \'s
+class path, including entries added via the
+.BR \-\-codebase
+option, followed by an indented line containing the specification version
+for the JAR file and then the implementation version.  If either is
+missing, a "\-" is printed in its place.
+.SH FILES
+.TP 
+.I /etc/bzdev/scrunner.conf\ \fRor\fI\ /etc/opt/bzdev/scrunner.conf
+System configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used. The form starting with
+/etc/opt may be used on some systems (e.g. Solaris).
+.TP
+.I ~/.config/bzdev/scrunner.conf
+User configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used.  property definitions in this
+file override those in the system configuration file.
+.SH SEE ALSO
+.BR scrunner.conf (5)
+.br
+.BR lsnof (1)

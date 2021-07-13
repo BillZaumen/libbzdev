@@ -1,0 +1,6 @@
+// exception expected
+var a = 10;
+function f(x) {
+    b + function (y) {y+b}(x);
+    var b = x + a
+}

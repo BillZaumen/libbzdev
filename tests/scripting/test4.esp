@@ -1,0 +1,20 @@
+import ("", [ScriptingTest4, ScriptingTest4.Adapter,
+	     ScriptingTest4.Hub, ScriptingTest4.TripDataAdapter]);
+
+var out ?= global.getWriter();
+
+var listener = new ScriptingTest4.Adapter(scripting,
+   {method1: function(str, val) { out.println("hi");}});
+
+var tl = new ScriptingTest4.TripDataAdapter(scripting, {
+    tripStarted: function(tripID, time, ticks, hub) {
+	out.println("tripStarted at " + hub.getName() + ": time = " + time);
+    },
+    tripEnded: function (tripID, time, ticks, hub) {
+	out.println("tripEnded at " + hub.getName() +": time = " + time);
+    },
+    tripFailedAtStart: function(tripID, time, ticks, hub) {
+	out.println("tripFailedAtStart at " + hub.getName() +": time = "
+		    + time);
+    }
+});

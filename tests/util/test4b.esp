@@ -1,0 +1,27 @@
+import(java.lang.Math);
+var s = 1;
+s;
+Math.round(Math.pow(10.0, ((s < 0.0)? 0.0: s)));
+s
+/*
+(s > -0.1)?
+    Math.round(Math.pow(10.0, ((s < 0.0)? 0.0: s))):
+    1.0 / Math.round(Math.pow(10.0, s))
+
+
+function() {
+    spacing = (spacing == null)?
+	function() {
+	    // By default, arrange so that there are roughly 10 lines
+	    // in the shortest direction, with the constraint that the
+	    // graph coordinate space values are powers of 10 in graph
+	    // coordinate space
+	    var s = ((frameWidth > frameHeight)? frameHeight: frameWidth)
+		/ scalef;
+	    s = Math.floor(Math.log10(s/10));
+	    (s > -0.1)?
+		Math.round(Math.pow(10.0, ((s < 0.0)? 0.0: s))):
+		1.0 / Math.round(Math.pow(10.0, s))
+	}(): spacing;
+}
+*/

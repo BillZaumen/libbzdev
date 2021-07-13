@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="700" height="558">
+    <imageURI>doc-files/base.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="base" type="PATH_START" key="module"  description="Base Module"/>
+       <row type="MOVE_TO" x="3.0" y="556.0" xp="3.0" yp="2.0"/>
+       <row type="SEG_END" x="81.0" y="538.0" xp="81.0" yp="20.0"/>
+       <row type="PATH_END"/>
+       <row varname="lang" type="PATH_START" key="package" link="lang" description="Java Lang Extension Package"/>
+       <row type="MOVE_TO" x="155.0" y="515.0" xp="155.0" yp="43.0"/>
+       <row type="SEG_END" x="247.0" y="480.0" xp="247.0" yp="78.0"/>
+       <row type="PATH_END"/>
+       <row varname="io" type="PATH_START" key="package" link="io" description="IO Package"/>
+       <row type="MOVE_TO" x="339.0" y="519.0" xp="339.0" yp="39.0"/>
+       <row type="SEG_END" x="422.0" y="477.0" xp="422.0" yp="81.0"/>
+       <row type="PATH_END"/>
+       <row varname="scripting" type="PATH_START" key="package" link="scripting" description="Scripting Support Package"/>
+       <row type="MOVE_TO" x="252.0" y="471.0" xp="252.0" yp="87.0"/>
+       <row type="SEG_END" x="369.0" y="436.0" xp="369.0" yp="122.0"/>
+       <row type="PATH_END"/>
+       <row varname="util" type="PATH_START" key="package" link="util" description="Utility Package"/>
+       <row type="MOVE_TO" x="286.0" y="400.0" xp="286.0" yp="158.0"/>
+       <row type="SEG_END" x="374.0" y="362.0" xp="374.0" yp="196.0"/>
+       <row type="PATH_END"/>
+       <row varname="units" type="PATH_START" key="package" link="units" description="Units Package"/>
+       <row type="MOVE_TO" x="416.0" y="400.0" xp="416.0" yp="158.0"/>
+       <row type="SEG_END" x="542.0" y="361.0" xp="542.0" yp="197.0"/>
+       <row type="PATH_END"/>
+       <row varname="annotations1" type="PATH_START" key="package" link="lang/annotations" description="Dynamic Method Annotations Package"/>
+       <row type="MOVE_TO" x="71.0" y="342.0" xp="71.0" yp="216.0"/>
+       <row type="SEG_END" x="229.0" y="301.0" xp="229.0" yp="257.0"/>
+       <row type="PATH_END"/>
+       <row varname="net" type="PATH_START" key="package" link="net" description="Networking Package"/>
+       <row type="MOVE_TO" x="282.0" y="331.0" xp="282.0" yp="227.0"/>
+       <row type="SEG_END" x="371.0" y="287.0" xp="371.0" yp="271.0"/>
+       <row type="PATH_END"/>
+       <row varname="protocols" type="PATH_START" key="package" link="protocols" description="Protocols Package"/>
+       <row type="MOVE_TO" x="386.0" y="327.0" xp="386.0" yp="231.0"/>
+       <row type="SEG_END" x="501.0" y="289.0" xp="501.0" yp="269.0"/>
+       <row type="PATH_END"/>
+       <row varname="annotations2" type="PATH_START" key="package" link="obnaming/annotations" description="Factory Annotations Package"/>
+       <row type="MOVE_TO" x="78.0" y="203.0" xp="78.0" yp="355.0"/>
+       <row type="SEG_END" x="252.0" y="164.0" xp="252.0" yp="394.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

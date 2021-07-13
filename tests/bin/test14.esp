@@ -1,0 +1,18 @@
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationLayer2DFactory,
+			  AnimationPath2DFactory]);
+
+var out = global.getWriter();
+
+var a2d = new Animation2D(scripting);
+out.println ("created a2d");
+
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    apf: "AnimationPath2DFactory"
+});
+###
+
+out.println("list factories created");
+out.println(alf);
+out.println(apf)

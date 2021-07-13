@@ -1,0 +1,45 @@
+%YAML 1.2
+---
+  - execute:
+       - var isw = new ImageSequenceWriter(output);
+       - var a2d = new Animation2D(1920, 1080, 10000.0, 400)
+       - var scaleFactor = 1080.0/100.0
+       - = a2d.setRanges(0.0 0.0, 0.35, 0.0, scaleFactor, scaleFactor)
+
+  - factories:
+       context: ["a2d", "org.bzdev.anim2d"]
+       alf: AnimationLayer2DFactory
+
+  - define:
+       - &font {withPrefix: "fontParms", config: [
+                {name: "SANS_SARIF"},
+		{withPrefix: "color",
+		 red: 212, blue: 44, green: 174}]}
+
+  - create:
+       - var: layer
+         name: layer
+	 factory: alf
+	 configuration:
+	   - {zorder: 0, visible: true}
+	   - withPrefix: object
+	     withIndex:
+	       - # first text line
+	         - type: TEXT
+	           text: Sample Text 1
+		 - {x: 10, y: 20}
+	         - *font
+	       - # second text line
+         	 - type: TEXT
+		   config:
+		     - text: Sample Test 2
+		     - {x: 10, y: 40}
+		     - *font
+
+  - execute:
+      - var maxFrames = a2d.estimateFrameCount(1.0);
+      - = a2d.initFrames(maxFrames, isw);
+      - = a2d.scheduleFrames(0, maxFrames);
+      - = a2d.run();
+      - = isw.close();
+...

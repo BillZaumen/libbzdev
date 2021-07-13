@@ -1,0 +1,2 @@
+// generate an error due to an uninitialized variable
+var x = y

@@ -1,0 +1,10 @@
+import (org.bzdev.devqsim.Simulation);
+import (java.security, [ProtectionDomain, CodeSource]);
+import (java.lang.Class);
+import (java.net.URL);
+
+var err ?= scripting.getErrorWriter();
+var out ?= scripting.getWriter();
+
+var sc = global.typeof(new Simulation(scripting));                                                                                                                                                                                                                                                                                                                                                  
+out.println(sc.getProtectionDomain().getCodeSource().getLocation().toString());

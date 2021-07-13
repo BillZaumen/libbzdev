@@ -1,0 +1,6 @@
+import (java.lang.Thread.State);
+
+global.getWriter().println(BLOCKED);
+var BLOCKED = 10;
+global.getWriter().println(BLOCKED);
+global.getWriter().println(State.BLOCKED);

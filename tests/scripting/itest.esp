@@ -1,0 +1,4 @@
+scripting.importClass("ImportTest");
+scripting.finishImport();
+###
+ImportTest.getOne()

@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="500" height="414">
+    <imageURI>doc-files/devqsim.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="devqsim" type="PATH_START" key="module"  description="Discrete Event Simulation Module"/>
+       <row type="MOVE_TO" x="2.0" y="413.0" xp="2.0" yp="1.0"/>
+       <row type="SEG_END" x="139.0" y="393.0" xp="139.0" yp="21.0"/>
+       <row type="PATH_END"/>
+       <row varname="rv" type="PATH_START" key="package" link="devqsim/rv" description="Named Random Variable Package"/>
+       <row type="MOVE_TO" x="163.0" y="133.0" xp="163.0" yp="281.0"/>
+       <row type="SEG_END" x="336.0" y="99.0" xp="336.0" yp="315.0"/>
+       <row type="PATH_END"/>
+       <row varname="devqsim2" type="PATH_START" key="package" link="devqsim" description="Discrete Event Simulation Package"/>
+       <row type="MOVE_TO" x="173.0" y="299.0" xp="173.0" yp="115.0"/>
+       <row type="SEG_END" x="325.0" y="266.0" xp="325.0" yp="148.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

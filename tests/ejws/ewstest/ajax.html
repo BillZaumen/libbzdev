@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+	  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<TITLE>AJAX Test</TITLE>
+</HEAD>
+<BODY>
+<span id="ajaxButton" style="cursor: pointer; text-decoration: underline">
+	  Make a request
+</span>
+<br>
+(Use with 'make test9')
+
+<script type="text/javascript">
+  (function() {
+      var httpRequest;
+      document.getElementById("ajaxButton").onclick = function() {
+	  makeRequest("test.txt");
+      };
+
+      function makeRequest(url) {
+	  httpRequest = null;
+	  try {
+	      httpRequest = new XMLHttpRequest();
+	  }  catch (e) {}
+	  if (!httpRequest) {
+	      alert('Giving up -- Cannot create an XMLHTTP instance');
+	      return false;
+	  }
+	  httpRequest.onreadystatechange = alertContents;
+	  httpRequest.open('GET', url);
+	  httpRequest.send();
+      }
+      
+      function alertContents() {
+	  if (httpRequest.readyState === 4) {
+	      if (httpRequest.status === 200) {
+	          alert(httpRequest.responseText);
+	      } else {
+	          alert("There was a problem with the request: status = "
+			+ httpRequest.status);
+	      }
+	  }
+      }
+  })();
+	</script>
+</BODY>
+</HTML>

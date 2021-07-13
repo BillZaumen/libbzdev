@@ -1,0 +1,19 @@
+%YAML 1.2
+---
+ - execute:
+    # Start the second bike several seconds after the first.
+    - var tb2 = 4.0
+    - var tb2end = tb2 + KinematicOps2D.timeGivenDVA(120.0, MKS.mph(15.0), 0.0)
+
+ - create:
+    - var: bike2
+      name: bicycle2
+      factory: bf
+      configuration:
+        - {zorder: 2, visible: "false"}
+        - *bikeConfig
+        -  {withPrefix: "timeline", withIndex: [
+             {time: !bzdev!esp "= tb2", path: "bpath", u0: 0,
+              velocity: !bzdev!esp "MKS.mph(15.0)", visible: true},
+             {time: !bzdev!esp "= tb2end", visible: false}]}
+...

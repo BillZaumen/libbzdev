@@ -1,0 +1,2 @@
+Main-Class: LockPart
+Class-Path: libbzdev.jar

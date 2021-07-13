@@ -1,0 +1,19 @@
+dmtests:
+	/bin/rm -rf ourclasses ourclasses1 tmpsrc
+	mkdir -p ourclasses tmpsrc ourclasses1
+	javac -d ourclasses1 -s tmpsrc \
+	      -classpath ../../../BUILD/libbzdev.jar:ourclasses1 \
+	      dmtest/a/*.java
+	jar cf ourclasses1.jar -C ourclasses1 dmtest/a
+	chmod a-r dmtest/a
+	javac -d ourclasses -s tmpsrc \
+	  -classpath ../../../BUILD/libbzdev.jar:ourclasses1.jar:ourclasses \
+	  dmtest/b/*.java
+	chmod a+r dmtest/a
+	@echo --- complilation complete ---
+	chmod u+x run
+	for i in `grep -l main dmtest/b/*.java` ; do echo $$i ; \
+		./run dmtest.b.`basename $$i .java` ; done
+
+clean:
+	rm -rf ourclasses tmpsrc ourclasses1

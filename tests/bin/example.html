@@ -1,0 +1,1164 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+  <BODY>
+    <H2>API Documentation for yrunner anim2d,desktop</H2>
+    <P>
+    With the launcher and add-ons specified by <STRONG>anim2d,desktop</STRONG>,
+    only specific Java classes may be used. These are grouped into several
+    sections:
+    <UL>
+      <LI><A HREF="#retvals">Return Values</A>. This section lists the
+	classes whose constructors can be used and that can be the
+	values of functions or methods.
+      <LI><A HREF="#args">Arguments</A>. This section lists the
+	classes that can be used as arguments for functions or
+	methods.
+      <LI><A HREF="#constrs">Constructors</A>. This section lists
+	constructors.
+      <LI><A HREF="#functs">Functions</A>. This section lists functions
+	(static methods that are used as functions).
+      <LI><A HREF="#methods">Methods</A>. This section lists instance
+	methods.
+      <LI><A HREF="#consts">Constants</A>. This section lists constants,
+	including enumerations.
+    </UL>
+    Each section contains links to the API documentation for the corresponding
+    classes, methods, and fields.
+
+    <H2><A NAME="retvals">Return-Value Classes</A></H2>
+    <P>
+      <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html">java.awt.Color</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html">java.io.PrintWriter</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html">java.io.Reader</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html">java.lang.Boolean</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html">java.lang.Double</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html">java.lang.Integer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html">java.lang.Long</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html">java.lang.Number</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Object.html">java.lang.Object</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Runnable.html">java.lang.Runnable</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html">java.lang.String</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/nio/charset/Charset.html">java.nio.charset.Charset</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html">java.util.Collection</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Comparator.html">java.util.Comparator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html">java.util.Map.Entry</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiConsumer.html">java.util.function.BiConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiFunction.html">java.util.function.BiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BinaryOperator.html">java.util.function.BinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Consumer.html">java.util.function.Consumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleBinaryOperator.html">java.util.function.DoubleBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleConsumer.html">java.util.function.DoubleConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleFunction.html">java.util.function.DoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html">java.util.function.DoublePredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleSupplier.html">java.util.function.DoubleSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleToIntFunction.html">java.util.function.DoubleToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleToLongFunction.html">java.util.function.DoubleToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleUnaryOperator.html">java.util.function.DoubleUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Function.html">java.util.function.Function</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntBinaryOperator.html">java.util.function.IntBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntConsumer.html">java.util.function.IntConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntFunction.html">java.util.function.IntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html">java.util.function.IntPredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntSupplier.html">java.util.function.IntSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntToDoubleFunction.html">java.util.function.IntToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntToLongFunction.html">java.util.function.IntToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntUnaryOperator.html">java.util.function.IntUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongBinaryOperator.html">java.util.function.LongBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongConsumer.html">java.util.function.LongConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongFunction.html">java.util.function.LongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html">java.util.function.LongPredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongSupplier.html">java.util.function.LongSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongToDoubleFunction.html">java.util.function.LongToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongToIntFunction.html">java.util.function.LongToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongUnaryOperator.html">java.util.function.LongUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjDoubleConsumer.html">java.util.function.ObjDoubleConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjIntConsumer.html">java.util.function.ObjIntConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjLongConsumer.html">java.util.function.ObjLongConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html">java.util.function.Predicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Supplier.html">java.util.function.Supplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleBiFunction.html">java.util.function.ToDoubleBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleFunction.html">java.util.function.ToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntBiFunction.html">java.util.function.ToIntBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntFunction.html">java.util.function.ToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongBiFunction.html">java.util.function.ToLongBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongFunction.html">java.util.function.ToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/UnaryOperator.html">java.util.function.UnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html">java.util.stream.Collector</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html">java.util.stream.Collectors</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html">java.util.stream.DoubleStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html">java.util.stream.IntStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html">java.util.stream.LongStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html">java.util.stream.Stream</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html">org.bzdev.anim2d.Animation2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2D.html">org.bzdev.anim2d.AnimationLayer2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2DFactory.html">org.bzdev.anim2d.AnimationLayer2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html">org.bzdev.anim2d.AnimationPath2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2DFactory.html">org.bzdev.anim2d.AnimationPath2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2D.html">org.bzdev.anim2d.AnimationShape2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2DFactory.html">org.bzdev.anim2d.AnimationShape2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2D.html">org.bzdev.anim2d.CartesianGrid2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2DFactory.html">org.bzdev.anim2d.CartesianGrid2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphView.html">org.bzdev.anim2d.GraphView</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphViewFactory.html">org.bzdev.anim2d.GraphViewFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGrid.html">org.bzdev.anim2d.PolarGrid</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGridFactory.html">org.bzdev.anim2d.PolarGridFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueue.html">org.bzdev.devqsim.FifoTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueueFactory.html">org.bzdev.devqsim.FifoTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueue.html">org.bzdev.devqsim.LifoTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueueFactory.html">org.bzdev.devqsim.LifoTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTQFactory.html">org.bzdev.devqsim.PriorityTQFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.html">org.bzdev.devqsim.PriorityTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.PriorityParam.html">org.bzdev.devqsim.PriorityTaskQueue.PriorityParam</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClock.html">org.bzdev.devqsim.ProcessClock</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClockFactory.html">org.bzdev.devqsim.ProcessClockFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html">org.bzdev.devqsim.Simulation</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimulationEvent.html">org.bzdev.devqsim.SimulationEvent</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSet.html">org.bzdev.devqsim.TraceSet</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSetFactory.html">org.bzdev.devqsim.TraceSetFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueue.html">org.bzdev.devqsim.WaitTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueueFactory.html">org.bzdev.devqsim.WaitTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html">org.bzdev.gio.ISWriterOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html">org.bzdev.gio.ImageSequenceWriter</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.BLineP.html">org.bzdev.graphs.Graph.BLineP</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.ImageType.html">org.bzdev.graphs.Graph.ImageType</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.Just.html">org.bzdev.graphs.Graph.Just</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/NamedObjectFactory.html">org.bzdev.obnaming.NamedObjectFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/NamedObjectOps.html">org.bzdev.obnaming.NamedObjectOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/ObjectNamerOps.html">org.bzdev.obnaming.ObjectNamerOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html">org.bzdev.swing.AnimatedPanelGraphics</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.ExitAccessor.html">org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html">org.bzdev.swing.AnimatedPanelGraphics.Mode</A>
+
+
+    <H2><A NAME="args">Argument Classes</A></H2>
+    <P>
+      <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html">java.awt.Color</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/InputStream.html">java.io.InputStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/OutputStream.html">java.io.OutputStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html">java.io.PrintStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html">java.io.PrintWriter</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html">java.io.Reader</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html">java.lang.Boolean</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html">java.lang.Double</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html">java.lang.Integer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html">java.lang.Long</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html">java.lang.Number</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Object.html">java.lang.Object</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Runnable.html">java.lang.Runnable</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html">java.lang.String</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/nio/charset/Charset.html">java.nio.charset.Charset</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html">java.util.Collection</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Comparator.html">java.util.Comparator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html">java.util.Map.Entry</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiConsumer.html">java.util.function.BiConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiFunction.html">java.util.function.BiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BinaryOperator.html">java.util.function.BinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Consumer.html">java.util.function.Consumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleBinaryOperator.html">java.util.function.DoubleBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleConsumer.html">java.util.function.DoubleConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleFunction.html">java.util.function.DoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html">java.util.function.DoublePredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleSupplier.html">java.util.function.DoubleSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleToIntFunction.html">java.util.function.DoubleToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleToLongFunction.html">java.util.function.DoubleToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleUnaryOperator.html">java.util.function.DoubleUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Function.html">java.util.function.Function</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntBinaryOperator.html">java.util.function.IntBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntConsumer.html">java.util.function.IntConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntFunction.html">java.util.function.IntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html">java.util.function.IntPredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntSupplier.html">java.util.function.IntSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntToDoubleFunction.html">java.util.function.IntToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntToLongFunction.html">java.util.function.IntToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntUnaryOperator.html">java.util.function.IntUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongBinaryOperator.html">java.util.function.LongBinaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongConsumer.html">java.util.function.LongConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongFunction.html">java.util.function.LongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html">java.util.function.LongPredicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongSupplier.html">java.util.function.LongSupplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongToDoubleFunction.html">java.util.function.LongToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongToIntFunction.html">java.util.function.LongToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongUnaryOperator.html">java.util.function.LongUnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjDoubleConsumer.html">java.util.function.ObjDoubleConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjIntConsumer.html">java.util.function.ObjIntConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ObjLongConsumer.html">java.util.function.ObjLongConsumer</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html">java.util.function.Predicate</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Supplier.html">java.util.function.Supplier</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleBiFunction.html">java.util.function.ToDoubleBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleFunction.html">java.util.function.ToDoubleFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntBiFunction.html">java.util.function.ToIntBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntFunction.html">java.util.function.ToIntFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongBiFunction.html">java.util.function.ToLongBiFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongFunction.html">java.util.function.ToLongFunction</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/UnaryOperator.html">java.util.function.UnaryOperator</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html">java.util.stream.Collector</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html">java.util.stream.Collectors</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html">java.util.stream.DoubleStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html">java.util.stream.IntStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html">java.util.stream.LongStream</A>
+<A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html">java.util.stream.Stream</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html">org.bzdev.anim2d.Animation2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2D.html">org.bzdev.anim2d.AnimationLayer2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2D.Type.html">org.bzdev.anim2d.AnimationLayer2D.Type</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2DFactory.html">org.bzdev.anim2d.AnimationLayer2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html">org.bzdev.anim2d.AnimationPath2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2DFactory.html">org.bzdev.anim2d.AnimationPath2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2D.html">org.bzdev.anim2d.AnimationShape2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2DFactory.html">org.bzdev.anim2d.AnimationShape2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2D.html">org.bzdev.anim2d.CartesianGrid2D</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2DFactory.html">org.bzdev.anim2d.CartesianGrid2DFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphView.html">org.bzdev.anim2d.GraphView</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphView.ZoomMode.html">org.bzdev.anim2d.GraphView.ZoomMode</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphViewFactory.html">org.bzdev.anim2d.GraphViewFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PlacedObject2DFactory.RefPointMode.html">org.bzdev.anim2d.PlacedObject2DFactory.RefPointMode</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGrid.html">org.bzdev.anim2d.PolarGrid</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGridFactory.html">org.bzdev.anim2d.PolarGridFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueue.html">org.bzdev.devqsim.FifoTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueueFactory.html">org.bzdev.devqsim.FifoTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueue.html">org.bzdev.devqsim.LifoTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueueFactory.html">org.bzdev.devqsim.LifoTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTQFactory.html">org.bzdev.devqsim.PriorityTQFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.html">org.bzdev.devqsim.PriorityTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.PriorityParam.html">org.bzdev.devqsim.PriorityTaskQueue.PriorityParam</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClock.html">org.bzdev.devqsim.ProcessClock</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClockFactory.html">org.bzdev.devqsim.ProcessClockFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/QueueDeletePolicy.html">org.bzdev.devqsim.QueueDeletePolicy</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html">org.bzdev.devqsim.Simulation</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimulationEvent.html">org.bzdev.devqsim.SimulationEvent</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TaskQueue.ReleasePolicy.html">org.bzdev.devqsim.TaskQueue.ReleasePolicy</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSet.html">org.bzdev.devqsim.TraceSet</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSetFactory.html">org.bzdev.devqsim.TraceSetFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSetMode.html">org.bzdev.devqsim.TraceSetMode</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueue.html">org.bzdev.devqsim.WaitTaskQueue</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueueFactory.html">org.bzdev.devqsim.WaitTaskQueueFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/geom/SplinePathBuilder.CPointType.html">org.bzdev.geom.SplinePathBuilder.CPointType</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html">org.bzdev.gio.ISWriterOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.AnimationParameters.html">org.bzdev.gio.ISWriterOps.AnimationParameters</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html">org.bzdev.gio.ImageSequenceWriter</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.BLineP.html">org.bzdev.graphs.Graph.BLineP</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.ImageType.html">org.bzdev.graphs.Graph.ImageType</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/graphs/Graph.Just.html">org.bzdev.graphs.Graph.Just</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedFileInputStream.html">org.bzdev.io.DelayedFileInputStream</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedFileOutputStream.html">org.bzdev.io.DelayedFileOutputStream</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedRandomAccessFile.html">org.bzdev.io.DelayedRandomAccessFile</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html">org.bzdev.io.DirectoryAccessor</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/FileAccessor.html">org.bzdev.io.FileAccessor</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/NamedObjectFactory.html">org.bzdev.obnaming.NamedObjectFactory</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/NamedObjectOps.html">org.bzdev.obnaming.NamedObjectOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.obnaming/org/bzdev/obnaming/ObjectNamerOps.html">org.bzdev.obnaming.ObjectNamerOps</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/obnaming/misc/BasicStrokeParm.Cap.html">org.bzdev.obnaming.misc.BasicStrokeParm.Cap</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/obnaming/misc/BasicStrokeParm.Join.html">org.bzdev.obnaming.misc.BasicStrokeParm.Join</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/obnaming/misc/GraphFontParm.FontStyle.html">org.bzdev.obnaming.misc.GraphFontParm.FontStyle</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html">org.bzdev.swing.AnimatedPanelGraphics</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.ExitAccessor.html">org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html">org.bzdev.swing.AnimatedPanelGraphics.Mode</A>
+
+
+    <H2><A NAME="constrs">Constructors</A></H2>
+    <P>
+      Constructors are available for the following classes:
+      <A HREF="#constr-java.awt.Color">java.awt.Color</A>
+      <A HREF="#constr-java.lang.String">java.lang.String</A>
+      <A HREF="#constr-org.bzdev.anim2d.Animation2D">org.bzdev.anim2d.Animation2D</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationLayer2D">org.bzdev.anim2d.AnimationLayer2D</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationLayer2DFactory">org.bzdev.anim2d.AnimationLayer2DFactory</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationPath2D">org.bzdev.anim2d.AnimationPath2D</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationPath2DFactory">org.bzdev.anim2d.AnimationPath2DFactory</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationShape2D">org.bzdev.anim2d.AnimationShape2D</A>
+      <A HREF="#constr-org.bzdev.anim2d.AnimationShape2DFactory">org.bzdev.anim2d.AnimationShape2DFactory</A>
+      <A HREF="#constr-org.bzdev.anim2d.CartesianGrid2D">org.bzdev.anim2d.CartesianGrid2D</A>
+      <A HREF="#constr-org.bzdev.anim2d.CartesianGrid2DFactory">org.bzdev.anim2d.CartesianGrid2DFactory</A>
+      <A HREF="#constr-org.bzdev.anim2d.GraphView">org.bzdev.anim2d.GraphView</A>
+      <A HREF="#constr-org.bzdev.anim2d.GraphViewFactory">org.bzdev.anim2d.GraphViewFactory</A>
+      <A HREF="#constr-org.bzdev.anim2d.PolarGrid">org.bzdev.anim2d.PolarGrid</A>
+      <A HREF="#constr-org.bzdev.anim2d.PolarGridFactory">org.bzdev.anim2d.PolarGridFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.FifoTaskQueue">org.bzdev.devqsim.FifoTaskQueue</A>
+      <A HREF="#constr-org.bzdev.devqsim.FifoTaskQueueFactory">org.bzdev.devqsim.FifoTaskQueueFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.LifoTaskQueue">org.bzdev.devqsim.LifoTaskQueue</A>
+      <A HREF="#constr-org.bzdev.devqsim.LifoTaskQueueFactory">org.bzdev.devqsim.LifoTaskQueueFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.PriorityTQFactory">org.bzdev.devqsim.PriorityTQFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.PriorityTaskQueue">org.bzdev.devqsim.PriorityTaskQueue</A>
+      <A HREF="#constr-org.bzdev.devqsim.ProcessClock">org.bzdev.devqsim.ProcessClock</A>
+      <A HREF="#constr-org.bzdev.devqsim.ProcessClockFactory">org.bzdev.devqsim.ProcessClockFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.Simulation">org.bzdev.devqsim.Simulation</A>
+      <A HREF="#constr-org.bzdev.devqsim.SimulationEvent">org.bzdev.devqsim.SimulationEvent</A>
+      <A HREF="#constr-org.bzdev.devqsim.TraceSet">org.bzdev.devqsim.TraceSet</A>
+      <A HREF="#constr-org.bzdev.devqsim.TraceSetFactory">org.bzdev.devqsim.TraceSetFactory</A>
+      <A HREF="#constr-org.bzdev.devqsim.WaitTaskQueue">org.bzdev.devqsim.WaitTaskQueue</A>
+      <A HREF="#constr-org.bzdev.devqsim.WaitTaskQueueFactory">org.bzdev.devqsim.WaitTaskQueueFactory</A>
+      <A HREF="#constr-org.bzdev.gio.ImageSequenceWriter">org.bzdev.gio.ImageSequenceWriter</A>
+      <A HREF="#constr-org.bzdev.swing.AnimatedPanelGraphics">org.bzdev.swing.AnimatedPanelGraphics</A>
+      <A HREF="#constr-org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor">org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor</A>.
+    <P>
+      The constructors are are shown with links to the API documentation:
+    <UL>
+      <LI><A NAME="constr-java.awt.Color"><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#&lt;init&gt;(int)">java.awt.Color</A></A>(int)
+<LI><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#&lt;init&gt;(int,boolean)">java.awt.Color</A>(int,boolean)
+<LI><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#&lt;init&gt;(int,int,int)">java.awt.Color</A>(int,int,int)
+<LI><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#&lt;init&gt;(int,int,int,int)">java.awt.Color</A>(int,int,int,int)
+<LI><A NAME="constr-java.lang.String"><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#&lt;init&gt;()">java.lang.String</A></A>()
+<LI><A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#&lt;init&gt;(java.lang.String)">java.lang.String</A>(java.lang.String)
+<LI><A NAME="constr-org.bzdev.anim2d.Animation2D"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#&lt;init&gt;()">org.bzdev.anim2d.Animation2D</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#&lt;init&gt;(double,long)">org.bzdev.anim2d.Animation2D</A>(double,long)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#&lt;init&gt;(int,int)">org.bzdev.anim2d.Animation2D</A>(int,int)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#&lt;init&gt;(int,int,double,long)">org.bzdev.anim2d.Animation2D</A>(int,int,double,long)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationLayer2D"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2D.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.AnimationLayer2D</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationLayer2DFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2DFactory.html#&lt;init&gt;()">org.bzdev.anim2d.AnimationLayer2DFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationLayer2DFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.AnimationLayer2DFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationPath2D"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.AnimationPath2D</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationPath2DFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2DFactory.html#&lt;init&gt;()">org.bzdev.anim2d.AnimationPath2DFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2DFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.AnimationPath2DFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationShape2D"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2D.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.AnimationShape2D</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.AnimationShape2DFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2DFactory.html#&lt;init&gt;()">org.bzdev.anim2d.AnimationShape2DFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationShape2DFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.AnimationShape2DFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.anim2d.CartesianGrid2D"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2D.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.CartesianGrid2D</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.CartesianGrid2DFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2DFactory.html#&lt;init&gt;()">org.bzdev.anim2d.CartesianGrid2DFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/CartesianGrid2DFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.CartesianGrid2DFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.anim2d.GraphView"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphView.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.GraphView</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.GraphViewFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphViewFactory.html#&lt;init&gt;()">org.bzdev.anim2d.GraphViewFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/GraphViewFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.GraphViewFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.anim2d.PolarGrid"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGrid.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)">org.bzdev.anim2d.PolarGrid</A></A>(org.bzdev.anim2d.Animation2D,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.anim2d.PolarGridFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGridFactory.html#&lt;init&gt;()">org.bzdev.anim2d.PolarGridFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/PolarGridFactory.html#&lt;init&gt;(org.bzdev.anim2d.Animation2D)">org.bzdev.anim2d.PolarGridFactory</A>(org.bzdev.anim2d.Animation2D)
+<LI><A NAME="constr-org.bzdev.devqsim.FifoTaskQueue"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,boolean)">org.bzdev.devqsim.FifoTaskQueue</A></A>(org.bzdev.devqsim.Simulation,boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.FifoTaskQueue</A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.FifoTaskQueueFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueueFactory.html#&lt;init&gt;()">org.bzdev.devqsim.FifoTaskQueueFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/FifoTaskQueueFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.FifoTaskQueueFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.devqsim.LifoTaskQueue"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,boolean)">org.bzdev.devqsim.LifoTaskQueue</A></A>(org.bzdev.devqsim.Simulation,boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.LifoTaskQueue</A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.LifoTaskQueueFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueueFactory.html#&lt;init&gt;()">org.bzdev.devqsim.LifoTaskQueueFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/LifoTaskQueueFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.LifoTaskQueueFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.devqsim.PriorityTQFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTQFactory.html#&lt;init&gt;()">org.bzdev.devqsim.PriorityTQFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTQFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.PriorityTQFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.devqsim.PriorityTaskQueue"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,boolean)">org.bzdev.devqsim.PriorityTaskQueue</A></A>(org.bzdev.devqsim.Simulation,boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/PriorityTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.PriorityTaskQueue</A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.ProcessClock"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClock.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,boolean)">org.bzdev.devqsim.ProcessClock</A></A>(org.bzdev.devqsim.Simulation,boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClock.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.ProcessClock</A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.ProcessClockFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClockFactory.html#&lt;init&gt;()">org.bzdev.devqsim.ProcessClockFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/ProcessClockFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.ProcessClockFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.devqsim.Simulation"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#&lt;init&gt;()">org.bzdev.devqsim.Simulation</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#&lt;init&gt;(double)">org.bzdev.devqsim.Simulation</A>(double)
+<LI><A NAME="constr-org.bzdev.devqsim.SimulationEvent"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimulationEvent.html#&lt;init&gt;()">org.bzdev.devqsim.SimulationEvent</A></A>()
+<LI><A NAME="constr-org.bzdev.devqsim.TraceSet"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSet.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.TraceSet</A></A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.TraceSetFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSetFactory.html#&lt;init&gt;()">org.bzdev.devqsim.TraceSetFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/TraceSetFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.TraceSetFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.devqsim.WaitTaskQueue"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,boolean)">org.bzdev.devqsim.WaitTaskQueue</A></A>(org.bzdev.devqsim.Simulation,boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueue.html#&lt;init&gt;(org.bzdev.devqsim.Simulation,java.lang.String,boolean)">org.bzdev.devqsim.WaitTaskQueue</A>(org.bzdev.devqsim.Simulation,java.lang.String,boolean)
+<LI><A NAME="constr-org.bzdev.devqsim.WaitTaskQueueFactory"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueueFactory.html#&lt;init&gt;()">org.bzdev.devqsim.WaitTaskQueueFactory</A></A>()
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/WaitTaskQueueFactory.html#&lt;init&gt;(org.bzdev.devqsim.Simulation)">org.bzdev.devqsim.WaitTaskQueueFactory</A>(org.bzdev.devqsim.Simulation)
+<LI><A NAME="constr-org.bzdev.gio.ImageSequenceWriter"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#&lt;init&gt;(java.io.OutputStream)">org.bzdev.gio.ImageSequenceWriter</A></A>(java.io.OutputStream)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#&lt;init&gt;(java.lang.String)">org.bzdev.gio.ImageSequenceWriter</A>(java.lang.String)
+<LI><A NAME="constr-org.bzdev.swing.AnimatedPanelGraphics"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#&lt;init&gt;(boolean)">org.bzdev.swing.AnimatedPanelGraphics</A></A>(boolean)
+<LI><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#&lt;init&gt;(boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)">org.bzdev.swing.AnimatedPanelGraphics</A>(boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)
+<LI><A NAME="constr-org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor"><A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.ExitAccessor.html#&lt;init&gt;()">org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor</A></A>()
+
+    </UL>
+
+    <H2><A NAME="functs">Functions</A></H2>
+    <P>
+      Functions are provided by the following classes:
+      <A HREF="#funct-java.io.Reader">java.io.Reader</A>
+      <A HREF="#funct-java.lang.Boolean">java.lang.Boolean</A>
+      <A HREF="#funct-java.lang.Double">java.lang.Double</A>
+      <A HREF="#funct-java.lang.Integer">java.lang.Integer</A>
+      <A HREF="#funct-java.lang.Long">java.lang.Long</A>
+      <A HREF="#funct-java.lang.Math">java.lang.Math</A>
+      <A HREF="#funct-java.lang.String">java.lang.String</A>
+      <A HREF="#funct-java.util.Map.Entry">java.util.Map.Entry</A>
+      <A HREF="#funct-java.util.stream.Collectors">java.util.stream.Collectors</A>
+      <A HREF="#funct-java.util.stream.DoubleStream">java.util.stream.DoubleStream</A>
+      <A HREF="#funct-java.util.stream.IntStream">java.util.stream.IntStream</A>
+      <A HREF="#funct-java.util.stream.LongStream">java.util.stream.LongStream</A>
+      <A HREF="#funct-java.util.stream.Stream">java.util.stream.Stream</A>
+      <A HREF="#funct-org.bzdev.anim2d.KinematicOps2D">org.bzdev.anim2d.KinematicOps2D</A>
+      <A HREF="#funct-org.bzdev.swing.AnimatedPanelGraphics">org.bzdev.swing.AnimatedPanelGraphics</A>.
+    <P>
+      The functions are shown with links to the API documentation:
+    <UL>
+      <LI>class <A NAME="funct-java.io.Reader">java.io.Reader</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#nullReader()">nullReader</A>()
+<LI>class <A NAME="funct-java.lang.Boolean">java.lang.Boolean</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#compare(boolean,boolean)">compare</A>(boolean,boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#getBoolean(java.lang.String)">getBoolean</A>(java.lang.String)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#hashCode(boolean)">hashCode</A>(boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#logicalAnd(boolean,boolean)">logicalAnd</A>(boolean,boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#logicalOr(boolean,boolean)">logicalOr</A>(boolean,boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#logicalXor(boolean,boolean)">logicalXor</A>(boolean,boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#parseBoolean(java.lang.String)">parseBoolean</A>(java.lang.String)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#toString(boolean)">toString</A>(boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#valueOf(boolean)">valueOf</A>(boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#valueOf(java.lang.String)">valueOf</A>(java.lang.String)
+<LI>class <A NAME="funct-java.lang.Double">java.lang.Double</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#compare(double,double)">compare</A>(double,double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#doubleToLongBits(double)">doubleToLongBits</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#doubleToRawLongBits(double)">doubleToRawLongBits</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#hashCode(double)">hashCode</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#isFinite(double)">isFinite</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#isInfinite(double)">isInfinite</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#isNaN(double)">isNaN</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#longBitsToDouble(long)">longBitsToDouble</A>(long)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#max(double,double)">max</A>(double,double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#min(double,double)">min</A>(double,double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#parseDouble(java.lang.String)">parseDouble</A>(java.lang.String)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#sum(double,double)">sum</A>(double,double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#toHexString(double)">toHexString</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#toString(double)">toString</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#valueOf(double)">valueOf</A>(double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#valueOf(java.lang.String)">valueOf</A>(java.lang.String)
+<LI>class <A NAME="funct-java.lang.Integer">java.lang.Integer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#bitCount(int)">bitCount</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#compare(int,int)">compare</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#compareUnsigned(int,int)">compareUnsigned</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#decode(java.lang.String)">decode</A>(java.lang.String)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#divideUnsigned(int,int)">divideUnsigned</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#getInteger(java.lang.String)">getInteger</A>(java.lang.String)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#getInteger(java.lang.String,int)">getInteger</A>(java.lang.String,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#getInteger(java.lang.String,int)">getInteger</A>(java.lang.String,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#hashCode(int)">hashCode</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#highestOneBit(int)">highestOneBit</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#lowestOneBit(int)">lowestOneBit</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#max(int,int)">max</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#min(int,int)">min</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#numberOfLeadingZeros(int)">numberOfLeadingZeros</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#numberOfTrailingZeros(int)">numberOfTrailingZeros</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#parseInt(java.lang.String)">parseInt</A>(java.lang.String)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#parseInt(java.lang.String,int)">parseInt</A>(java.lang.String,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#parseUnsignedInt(java.lang.String)">parseUnsignedInt</A>(java.lang.String)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#parseUnsignedInt(java.lang.String,int)">parseUnsignedInt</A>(java.lang.String,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#remainderUnsigned(int,int)">remainderUnsigned</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#reverse(int)">reverse</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#reverseBytes(int)">reverseBytes</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#rotateLeft(int,int)">rotateLeft</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#rotateRight(int,int)">rotateRight</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#signum(int)">signum</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#sum(int,int)">sum</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toBinaryString(int)">toBinaryString</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toHexString(int)">toHexString</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toOctalString(int)">toOctalString</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toString(int)">toString</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toString(int,int)">toString</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toUnsignedLong(int)">toUnsignedLong</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toUnsignedString(int)">toUnsignedString</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toUnsignedString(int,int)">toUnsignedString</A>(int,int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#valueOf(int)">valueOf</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#valueOf(java.lang.String)">valueOf</A>(java.lang.String)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#valueOf(java.lang.String,int)">valueOf</A>(java.lang.String,int)
+<LI>class <A NAME="funct-java.lang.Long">java.lang.Long</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#bitCount(long)">bitCount</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#compare(long,long)">compare</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#compareUnsigned(long,long)">compareUnsigned</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#decode(java.lang.String)">decode</A>(java.lang.String)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#divideUnsigned(long,long)">divideUnsigned</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#getLong(java.lang.String)">getLong</A>(java.lang.String)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#getLong(java.lang.String,long)">getLong</A>(java.lang.String,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#getLong(java.lang.String,long)">getLong</A>(java.lang.String,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#hashCode(long)">hashCode</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#highestOneBit(long)">highestOneBit</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#lowestOneBit(long)">lowestOneBit</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#max(long,long)">max</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#min(long,long)">min</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#numberOfLeadingZeros(long)">numberOfLeadingZeros</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#numberOfTrailingZeros(long)">numberOfTrailingZeros</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#parseLong(java.lang.String)">parseLong</A>(java.lang.String)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#parseLong(java.lang.String,int)">parseLong</A>(java.lang.String,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#parseUnsignedLong(java.lang.String)">parseUnsignedLong</A>(java.lang.String)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#parseUnsignedLong(java.lang.String,int)">parseUnsignedLong</A>(java.lang.String,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#remainderUnsigned(long,long)">remainderUnsigned</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#reverse(long)">reverse</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#reverseBytes(long)">reverseBytes</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#rotateLeft(long,int)">rotateLeft</A>(long,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#rotateRight(long,int)">rotateRight</A>(long,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#signum(long)">signum</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#sum(long,long)">sum</A>(long,long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toBinaryString(long)">toBinaryString</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toHexString(long)">toHexString</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toOctalString(long)">toOctalString</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toString(long)">toString</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toString(long,int)">toString</A>(long,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toUnsignedString(long)">toUnsignedString</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toUnsignedString(long,int)">toUnsignedString</A>(long,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#valueOf(java.lang.String)">valueOf</A>(java.lang.String)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#valueOf(java.lang.String,int)">valueOf</A>(java.lang.String,int)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#valueOf(long)">valueOf</A>(long)
+<LI>class <A NAME="funct-java.lang.Math">java.lang.Math</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#IEEEremainder(double,double)">IEEEremainder</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#abs(double)">abs</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#abs(int)">abs</A>(int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#abs(long)">abs</A>(long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#acos(double)">acos</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#addExact(int,int)">addExact</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#addExact(long,long)">addExact</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#asin(double)">asin</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#atan(double)">atan</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#atan2(double,double)">atan2</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#cbrt(double)">cbrt</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#ceil(double)">ceil</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#copySign(double,double)">copySign</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#cos(double)">cos</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#cosh(double)">cosh</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#decrementExact(int)">decrementExact</A>(int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#decrementExact(long)">decrementExact</A>(long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#exp(double)">exp</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#expm1(double)">expm1</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floor(double)">floor</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorDiv(int,int)">floorDiv</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorDiv(long,int)">floorDiv</A>(long,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorDiv(long,long)">floorDiv</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorMod(int,int)">floorMod</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorMod(long,int)">floorMod</A>(long,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#floorMod(long,long)">floorMod</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#fma(double,double,double)">fma</A>(double,double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#getExponent(double)">getExponent</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#hypot(double,double)">hypot</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#incrementExact(int)">incrementExact</A>(int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#incrementExact(long)">incrementExact</A>(long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#log(double)">log</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#log10(double)">log10</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#log1p(double)">log1p</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#max(double,double)">max</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#max(int,int)">max</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#max(long,long)">max</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#min(double,double)">min</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#min(int,int)">min</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#min(long,long)">min</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#multiplyExact(int,int)">multiplyExact</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#multiplyExact(long,int)">multiplyExact</A>(long,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#multiplyExact(long,long)">multiplyExact</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#multiplyFull(int,int)">multiplyFull</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#multiplyHigh(long,long)">multiplyHigh</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#negateExact(int)">negateExact</A>(int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#negateExact(long)">negateExact</A>(long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#nextAfter(double,double)">nextAfter</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#nextDown(double)">nextDown</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#nextUp(double)">nextUp</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#pow(double,double)">pow</A>(double,double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#random()">random</A>()
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#rint(double)">rint</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#round(double)">round</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#scalb(double,int)">scalb</A>(double,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#signum(double)">signum</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#sin(double)">sin</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#sinh(double)">sinh</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#sqrt(double)">sqrt</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#subtractExact(int,int)">subtractExact</A>(int,int)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#subtractExact(long,long)">subtractExact</A>(long,long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#tan(double)">tan</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#tanh(double)">tanh</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#toDegrees(double)">toDegrees</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#toIntExact(long)">toIntExact</A>(long)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#toRadians(double)">toRadians</A>(double)
+<LI>class java.lang.Math &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Math.html#ulp(double)">ulp</A>(double)
+<LI>class <A NAME="funct-java.lang.String">java.lang.String</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#format(java.lang.String,[Ljava.lang.Object;)">format</A>(java.lang.String,[Ljava.lang.Object;)
+<LI>class java.lang.String &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#valueOf(boolean)">valueOf</A>(boolean)
+<LI>class java.lang.String &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#valueOf(double)">valueOf</A>(double)
+<LI>class java.lang.String &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#valueOf(int)">valueOf</A>(int)
+<LI>class java.lang.String &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#valueOf(java.lang.Object)">valueOf</A>(java.lang.Object)
+<LI>class java.lang.String &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/String.html#valueOf(long)">valueOf</A>(long)
+<LI>class <A NAME="funct-java.util.Map.Entry">java.util.Map.Entry</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#comparingByKey()">comparingByKey</A>()
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#comparingByKey(java.util.Comparator)">comparingByKey</A>(java.util.Comparator)
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#comparingByValue()">comparingByValue</A>()
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#comparingByValue(java.util.Comparator)">comparingByValue</A>(java.util.Comparator)
+<LI>class <A NAME="funct-java.util.stream.Collectors">java.util.stream.Collectors</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#averagingDouble(java.util.function.ToDoubleFunction)">averagingDouble</A>(java.util.function.ToDoubleFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#averagingInt(java.util.function.ToIntFunction)">averagingInt</A>(java.util.function.ToIntFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#averagingLong(java.util.function.ToLongFunction)">averagingLong</A>(java.util.function.ToLongFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#collectingAndThen(java.util.stream.Collector,java.util.function.Function)">collectingAndThen</A>(java.util.stream.Collector,java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#counting()">counting</A>()
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#filtering(java.util.function.Predicate,java.util.stream.Collector)">filtering</A>(java.util.function.Predicate,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#flatMapping(java.util.function.Function,java.util.stream.Collector)">flatMapping</A>(java.util.function.Function,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingBy(java.util.function.Function)">groupingBy</A>(java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingBy(java.util.function.Function,java.util.function.Supplier,java.util.stream.Collector)">groupingBy</A>(java.util.function.Function,java.util.function.Supplier,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingBy(java.util.function.Function,java.util.stream.Collector)">groupingBy</A>(java.util.function.Function,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingByConcurrent(java.util.function.Function)">groupingByConcurrent</A>(java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingByConcurrent(java.util.function.Function,java.util.function.Supplier,java.util.stream.Collector)">groupingByConcurrent</A>(java.util.function.Function,java.util.function.Supplier,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#groupingByConcurrent(java.util.function.Function,java.util.stream.Collector)">groupingByConcurrent</A>(java.util.function.Function,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#joining()">joining</A>()
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#mapping(java.util.function.Function,java.util.stream.Collector)">mapping</A>(java.util.function.Function,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#maxBy(java.util.Comparator)">maxBy</A>(java.util.Comparator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#minBy(java.util.Comparator)">minBy</A>(java.util.Comparator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#partitioningBy(java.util.function.Predicate)">partitioningBy</A>(java.util.function.Predicate)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#partitioningBy(java.util.function.Predicate,java.util.stream.Collector)">partitioningBy</A>(java.util.function.Predicate,java.util.stream.Collector)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#reducing(java.lang.Object,java.util.function.BinaryOperator)">reducing</A>(java.lang.Object,java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#reducing(java.lang.Object,java.util.function.Function,java.util.function.BinaryOperator)">reducing</A>(java.lang.Object,java.util.function.Function,java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#reducing(java.util.function.BinaryOperator)">reducing</A>(java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summarizingDouble(java.util.function.ToDoubleFunction)">summarizingDouble</A>(java.util.function.ToDoubleFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summarizingInt(java.util.function.ToIntFunction)">summarizingInt</A>(java.util.function.ToIntFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summarizingLong(java.util.function.ToLongFunction)">summarizingLong</A>(java.util.function.ToLongFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summingDouble(java.util.function.ToDoubleFunction)">summingDouble</A>(java.util.function.ToDoubleFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summingInt(java.util.function.ToIntFunction)">summingInt</A>(java.util.function.ToIntFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#summingLong(java.util.function.ToLongFunction)">summingLong</A>(java.util.function.ToLongFunction)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toCollection(java.util.function.Supplier)">toCollection</A>(java.util.function.Supplier)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toConcurrentMap(java.util.function.Function,java.util.function.Function)">toConcurrentMap</A>(java.util.function.Function,java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toConcurrentMap(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)">toConcurrentMap</A>(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toConcurrentMap(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator,java.util.function.Supplier)">toConcurrentMap</A>(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator,java.util.function.Supplier)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toList()">toList</A>()
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toMap(java.util.function.Function,java.util.function.Function)">toMap</A>(java.util.function.Function,java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toMap(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)">toMap</A>(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toMap(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator,java.util.function.Supplier)">toMap</A>(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator,java.util.function.Supplier)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toSet()">toSet</A>()
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toUnmodifiableList()">toUnmodifiableList</A>()
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toUnmodifiableMap(java.util.function.Function,java.util.function.Function)">toUnmodifiableMap</A>(java.util.function.Function,java.util.function.Function)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toUnmodifiableMap(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)">toUnmodifiableMap</A>(java.util.function.Function,java.util.function.Function,java.util.function.BinaryOperator)
+<LI>class java.util.stream.Collectors &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toUnmodifiableSet()">toUnmodifiableSet</A>()
+<LI>class <A NAME="funct-java.util.stream.DoubleStream">java.util.stream.DoubleStream</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#concat(java.util.stream.DoubleStream,java.util.stream.DoubleStream)">concat</A>(java.util.stream.DoubleStream,java.util.stream.DoubleStream)
+<LI>class java.util.stream.DoubleStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#empty()">empty</A>()
+<LI>class java.util.stream.DoubleStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#generate(java.util.function.DoubleSupplier)">generate</A>(java.util.function.DoubleSupplier)
+<LI>class java.util.stream.DoubleStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#iterate(double,java.util.function.DoublePredicate,java.util.function.DoubleUnaryOperator)">iterate</A>(double,java.util.function.DoublePredicate,java.util.function.DoubleUnaryOperator)
+<LI>class java.util.stream.DoubleStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#iterate(double,java.util.function.DoubleUnaryOperator)">iterate</A>(double,java.util.function.DoubleUnaryOperator)
+<LI>class java.util.stream.DoubleStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/DoubleStream.html#of(double)">of</A>(double)
+<LI>class <A NAME="funct-java.util.stream.IntStream">java.util.stream.IntStream</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#concat(java.util.stream.IntStream,java.util.stream.IntStream)">concat</A>(java.util.stream.IntStream,java.util.stream.IntStream)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#empty()">empty</A>()
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#generate(java.util.function.IntSupplier)">generate</A>(java.util.function.IntSupplier)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#iterate(int,java.util.function.IntPredicate,java.util.function.IntUnaryOperator)">iterate</A>(int,java.util.function.IntPredicate,java.util.function.IntUnaryOperator)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#iterate(int,java.util.function.IntUnaryOperator)">iterate</A>(int,java.util.function.IntUnaryOperator)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#of([I)">of</A>([I)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#of(int)">of</A>(int)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#range(int,int)">range</A>(int,int)
+<LI>class java.util.stream.IntStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/IntStream.html#rangeClosed(int,int)">rangeClosed</A>(int,int)
+<LI>class <A NAME="funct-java.util.stream.LongStream">java.util.stream.LongStream</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#concat(java.util.stream.LongStream,java.util.stream.LongStream)">concat</A>(java.util.stream.LongStream,java.util.stream.LongStream)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#empty()">empty</A>()
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#generate(java.util.function.LongSupplier)">generate</A>(java.util.function.LongSupplier)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#iterate(long,java.util.function.LongPredicate,java.util.function.LongUnaryOperator)">iterate</A>(long,java.util.function.LongPredicate,java.util.function.LongUnaryOperator)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#iterate(long,java.util.function.LongUnaryOperator)">iterate</A>(long,java.util.function.LongUnaryOperator)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#of([J)">of</A>([J)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#of(long)">of</A>(long)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#range(long,long)">range</A>(long,long)
+<LI>class java.util.stream.LongStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/LongStream.html#rangeClosed(long,long)">rangeClosed</A>(long,long)
+<LI>class <A NAME="funct-java.util.stream.Stream">java.util.stream.Stream</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#concat(java.util.stream.Stream,java.util.stream.Stream)">concat</A>(java.util.stream.Stream,java.util.stream.Stream)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#empty()">empty</A>()
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#generate(java.util.function.Supplier)">generate</A>(java.util.function.Supplier)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#iterate(java.lang.Object,java.util.function.Predicate,java.util.function.UnaryOperator)">iterate</A>(java.lang.Object,java.util.function.Predicate,java.util.function.UnaryOperator)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#iterate(java.lang.Object,java.util.function.UnaryOperator)">iterate</A>(java.lang.Object,java.util.function.UnaryOperator)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#of([Ljava.lang.Object;)">of</A>([Ljava.lang.Object;)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#of(java.lang.Object)">of</A>(java.lang.Object)
+<LI>class java.util.stream.Stream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Stream.html#ofNullable(java.lang.Object)">ofNullable</A>(java.lang.Object)
+<LI>class <A NAME="funct-org.bzdev.anim2d.KinematicOps2D">org.bzdev.anim2d.KinematicOps2D</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#accelGivenDVV(double,double,double)">accelGivenDVV</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#accelGivenTVV(double,double,double)">accelGivenTVV</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#distGivenTVA(double,double,double)">distGivenTVA</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#distGivenTVV(double,double,double)">distGivenTVV</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#distGivenVVA(double,double,double)">distGivenVVA</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#timeGivenDVA(double,double,double)">timeGivenDVA</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#timeGivenDVV(double,double,double)">timeGivenDVV</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#timeGivenVVA(double,double,double)">timeGivenVVA</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#vGivenDVA(double,double,double)">vGivenDVA</A>(double,double,double)
+<LI>class org.bzdev.anim2d.KinematicOps2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/KinematicOps2D.html#vGivenTVA(double,double,double)">vGivenTVA</A>(double,double,double)
+<LI>class <A NAME="funct-org.bzdev.swing.AnimatedPanelGraphics">org.bzdev.swing.AnimatedPanelGraphics</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#newFramedInstance(int,int,double,java.lang.String,boolean,boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)">newFramedInstance</A>(int,int,double,java.lang.String,boolean,boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#newFramedInstance(int,int,double,java.lang.String,boolean,org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor,org.bzdev.swing.AnimatedPanelGraphics.Mode)">newFramedInstance</A>(int,int,double,java.lang.String,boolean,org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor,org.bzdev.swing.AnimatedPanelGraphics.Mode)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#newFramedInstance(org.bzdev.gio.ISWriterOps.AnimationParameters,java.lang.String,boolean,boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)">newFramedInstance</A>(org.bzdev.gio.ISWriterOps.AnimationParameters,java.lang.String,boolean,boolean,org.bzdev.swing.AnimatedPanelGraphics.Mode)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#newFramedInstance(org.bzdev.gio.ISWriterOps.AnimationParameters,java.lang.String,boolean,org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor,org.bzdev.swing.AnimatedPanelGraphics.Mode)">newFramedInstance</A>(org.bzdev.gio.ISWriterOps.AnimationParameters,java.lang.String,boolean,org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor,org.bzdev.swing.AnimatedPanelGraphics.Mode)
+
+    </UL>
+
+    <H2><A NAME="methods">Methods</A></H2>
+    <P>
+      Instance methods are provided by the following classes:
+      <A HREF="#method-java.awt.Color">java.awt.Color</A>
+      <A HREF="#method-java.io.PrintStream">java.io.PrintStream</A>
+      <A HREF="#method-java.io.PrintWriter">java.io.PrintWriter</A>
+      <A HREF="#method-java.io.Reader">java.io.Reader</A>
+      <A HREF="#method-java.lang.Boolean">java.lang.Boolean</A>
+      <A HREF="#method-java.lang.Double">java.lang.Double</A>
+      <A HREF="#method-java.lang.Integer">java.lang.Integer</A>
+      <A HREF="#method-java.lang.Long">java.lang.Long</A>
+      <A HREF="#method-java.lang.Number">java.lang.Number</A>
+      <A HREF="#method-java.util.Collection">java.util.Collection</A>
+      <A HREF="#method-java.util.Map.Entry">java.util.Map.Entry</A>
+      <A HREF="#method-java.util.function.BiConsumer">java.util.function.BiConsumer</A>
+      <A HREF="#method-java.util.function.BinaryOperator">java.util.function.BinaryOperator</A>
+      <A HREF="#method-java.util.function.Consumer">java.util.function.Consumer</A>
+      <A HREF="#method-java.util.function.DoubleBinaryOperator">java.util.function.DoubleBinaryOperator</A>
+      <A HREF="#method-java.util.function.DoubleConsumer">java.util.function.DoubleConsumer</A>
+      <A HREF="#method-java.util.function.DoublePredicate">java.util.function.DoublePredicate</A>
+      <A HREF="#method-java.util.function.DoubleSupplier">java.util.function.DoubleSupplier</A>
+      <A HREF="#method-java.util.function.DoubleUnaryOperator">java.util.function.DoubleUnaryOperator</A>
+      <A HREF="#method-java.util.function.Function">java.util.function.Function</A>
+      <A HREF="#method-java.util.function.IntBinaryOperator">java.util.function.IntBinaryOperator</A>
+      <A HREF="#method-java.util.function.IntConsumer">java.util.function.IntConsumer</A>
+      <A HREF="#method-java.util.function.IntPredicate">java.util.function.IntPredicate</A>
+      <A HREF="#method-java.util.function.IntSupplier">java.util.function.IntSupplier</A>
+      <A HREF="#method-java.util.function.IntUnaryOperator">java.util.function.IntUnaryOperator</A>
+      <A HREF="#method-java.util.function.LongBinaryOperator">java.util.function.LongBinaryOperator</A>
+      <A HREF="#method-java.util.function.LongConsumer">java.util.function.LongConsumer</A>
+      <A HREF="#method-java.util.function.LongPredicate">java.util.function.LongPredicate</A>
+      <A HREF="#method-java.util.function.LongSupplier">java.util.function.LongSupplier</A>
+      <A HREF="#method-java.util.function.LongUnaryOperator">java.util.function.LongUnaryOperator</A>
+      <A HREF="#method-java.util.function.Predicate">java.util.function.Predicate</A>
+      <A HREF="#method-java.util.function.Supplier">java.util.function.Supplier</A>
+      <A HREF="#method-java.util.function.ToDoubleBiFunction">java.util.function.ToDoubleBiFunction</A>
+      <A HREF="#method-java.util.function.ToDoubleFunction">java.util.function.ToDoubleFunction</A>
+      <A HREF="#method-java.util.function.ToIntBiFunction">java.util.function.ToIntBiFunction</A>
+      <A HREF="#method-java.util.function.ToIntFunction">java.util.function.ToIntFunction</A>
+      <A HREF="#method-java.util.function.ToLongBiFunction">java.util.function.ToLongBiFunction</A>
+      <A HREF="#method-java.util.function.ToLongFunction">java.util.function.ToLongFunction</A>
+      <A HREF="#method-java.util.function.UnaryOperator">java.util.function.UnaryOperator</A>
+      <A HREF="#method-java.util.stream.Collector">java.util.stream.Collector</A>
+      <A HREF="#method-java.util.stream.Collectors">java.util.stream.Collectors</A>
+      <A HREF="#method-org.bzdev.anim2d.Animation2D">org.bzdev.anim2d.Animation2D</A>
+      <A HREF="#method-org.bzdev.anim2d.AnimationPath2D">org.bzdev.anim2d.AnimationPath2D</A>
+      <A HREF="#method-org.bzdev.devqsim.SimObject">org.bzdev.devqsim.SimObject</A>
+      <A HREF="#method-org.bzdev.devqsim.Simulation">org.bzdev.devqsim.Simulation</A>
+      <A HREF="#method-org.bzdev.gio.ISWriterOps">org.bzdev.gio.ISWriterOps</A>
+      <A HREF="#method-org.bzdev.gio.ImageSequenceWriter">org.bzdev.gio.ImageSequenceWriter</A>
+      <A HREF="#method-org.bzdev.io.DelayedFileInputStream">org.bzdev.io.DelayedFileInputStream</A>
+      <A HREF="#method-org.bzdev.io.DelayedFileOutputStream">org.bzdev.io.DelayedFileOutputStream</A>
+      <A HREF="#method-org.bzdev.io.DelayedRandomAccessFile">org.bzdev.io.DelayedRandomAccessFile</A>
+      <A HREF="#method-org.bzdev.io.DirectoryAccessor">org.bzdev.io.DirectoryAccessor</A>
+      <A HREF="#method-org.bzdev.swing.AnimatedPanelGraphics">org.bzdev.swing.AnimatedPanelGraphics</A>
+    <P>
+      The methods are shown with links to the API documentation:
+    <UL>
+      <LI>class <A NAME="method-java.awt.Color">java.awt.Color</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#brighter()">brighter</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#darker()">darker</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getAlpha()">getAlpha</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getBlue()">getBlue</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getGreen()">getGreen</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getRGB()">getRGB</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getRed()">getRed</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#getTransparency()">getTransparency</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#hashCode()">hashCode</A>()
+<LI>class java.awt.Color &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.desktop/java/awt/Color.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.io.PrintStream">java.io.PrintStream</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#checkError()">checkError</A>()
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#close()">close</A>()
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#flush()">flush</A>()
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(boolean)">print</A>(boolean)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(double)">print</A>(double)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(int)">print</A>(int)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(java.lang.Object)">print</A>(java.lang.Object)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(java.lang.String)">print</A>(java.lang.String)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#print(long)">print</A>(long)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println()">println</A>()
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(boolean)">println</A>(boolean)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(double)">println</A>(double)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(int)">println</A>(int)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(java.lang.Object)">println</A>(java.lang.Object)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(java.lang.String)">println</A>(java.lang.String)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#println(long)">println</A>(long)
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#toString()">toString</A>()
+<LI>class java.io.PrintStream &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintStream.html#write(int)">write</A>(int)
+<LI>class <A NAME="method-java.io.PrintWriter">java.io.PrintWriter</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#checkError()">checkError</A>()
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#close()">close</A>()
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#flush()">flush</A>()
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#format(java.lang.String,[Ljava.lang.Object;)">format</A>(java.lang.String,[Ljava.lang.Object;)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(boolean)">print</A>(boolean)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(double)">print</A>(double)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(int)">print</A>(int)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(java.lang.Object)">print</A>(java.lang.Object)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(java.lang.String)">print</A>(java.lang.String)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#print(long)">print</A>(long)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#printf(java.lang.String,[Ljava.lang.Object;)">printf</A>(java.lang.String,[Ljava.lang.Object;)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println()">println</A>()
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(boolean)">println</A>(boolean)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(double)">println</A>(double)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(int)">println</A>(int)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(java.lang.Object)">println</A>(java.lang.Object)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(java.lang.String)">println</A>(java.lang.String)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#println(long)">println</A>(long)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#toString()">toString</A>()
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#write(int)">write</A>(int)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#write(java.lang.String)">write</A>(java.lang.String)
+<LI>class java.io.PrintWriter &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/PrintWriter.html#write(java.lang.String,int,int)">write</A>(java.lang.String,int,int)
+<LI>class <A NAME="method-java.io.Reader">java.io.Reader</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#close()">close</A>()
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#mark(int)">mark</A>(int)
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#markSupported()">markSupported</A>()
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#read()">read</A>()
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#ready()">ready</A>()
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#reset()">reset</A>()
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#skip(long)">skip</A>(long)
+<LI>class java.io.Reader &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/io/Reader.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.lang.Boolean">java.lang.Boolean</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#booleanValue()">booleanValue</A>()
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#compareTo(boolean)">compareTo</A>(boolean)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#compareTo(java.lang.Object)">compareTo</A>(java.lang.Object)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#hashCode()">hashCode</A>()
+<LI>class java.lang.Boolean &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Boolean.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.lang.Double">java.lang.Double</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#compareTo(java.lang.Double)">compareTo</A>(java.lang.Double)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#compareTo(java.lang.Object)">compareTo</A>(java.lang.Object)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#doubleValue()">doubleValue</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#hashCode()">hashCode</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#intValue()">intValue</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#isInfinite()">isInfinite</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#isNaN()">isNaN</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#longValue()">longValue</A>()
+<LI>class java.lang.Double &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Double.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.lang.Integer">java.lang.Integer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#compareTo(int)">compareTo</A>(int)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#compareTo(java.lang.Object)">compareTo</A>(java.lang.Object)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#doubleValue()">doubleValue</A>()
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#hashCode()">hashCode</A>()
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#intValue()">intValue</A>()
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#longValue()">longValue</A>()
+<LI>class java.lang.Integer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Integer.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.lang.Long">java.lang.Long</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#compareTo(java.lang.Object)">compareTo</A>(java.lang.Object)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#compareTo(long)">compareTo</A>(long)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#doubleValue()">doubleValue</A>()
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#hashCode()">hashCode</A>()
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#intValue()">intValue</A>()
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#longValue()">longValue</A>()
+<LI>class java.lang.Long &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Long.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.lang.Number">java.lang.Number</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html#doubleValue()">doubleValue</A>()
+<LI>class java.lang.Number &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html#intValue()">intValue</A>()
+<LI>class java.lang.Number &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html#longValue()">longValue</A>()
+<LI>class java.lang.Number &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/lang/Number.html#toString()">toString</A>()
+<LI>class <A NAME="method-java.util.Collection">java.util.Collection</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#add(java.lang.Object)">add</A>(java.lang.Object)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#addAll(java.util.Collection)">addAll</A>(java.util.Collection)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#clear()">clear</A>()
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#contains(java.lang.Object)">contains</A>(java.lang.Object)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#containsAll(java.util.Collection)">containsAll</A>(java.util.Collection)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#forEach(java.util.function.Consumer)">forEach</A>(java.util.function.Consumer)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#hashCode()">hashCode</A>()
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#isEmpty()">isEmpty</A>()
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#parallelStream()">parallelStream</A>()
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#remove(java.lang.Object)">remove</A>(java.lang.Object)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#removeAll(java.util.Collection)">removeAll</A>(java.util.Collection)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#removeIf(java.util.function.Predicate)">removeIf</A>(java.util.function.Predicate)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#retainAll(java.util.Collection)">retainAll</A>(java.util.Collection)
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#size()">size</A>()
+<LI>class java.util.Collection &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Collection.html#stream()">stream</A>()
+<LI>class <A NAME="method-java.util.Map.Entry">java.util.Map.Entry</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#equals(java.lang.Object)">equals</A>(java.lang.Object)
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#getKey()">getKey</A>()
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#getValue()">getValue</A>()
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#hashCode()">hashCode</A>()
+<LI>class java.util.Map.Entry &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/Map.Entry.html#setValue(java.lang.Object)">setValue</A>(java.lang.Object)
+<LI>class <A NAME="method-java.util.function.BiConsumer">java.util.function.BiConsumer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiConsumer.html#accept(java.lang.Object,java.lang.Object)">accept</A>(java.lang.Object,java.lang.Object)
+<LI>class java.util.function.BiConsumer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BiConsumer.html#andThen(java.util.function.BiConsumer)">andThen</A>(java.util.function.BiConsumer)
+<LI>class <A NAME="method-java.util.function.BinaryOperator">java.util.function.BinaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BinaryOperator.html#andThen(java.util.function.Function)">andThen</A>(java.util.function.Function)
+<LI>class java.util.function.BinaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/BinaryOperator.html#apply(java.lang.Object,java.lang.Object)">apply</A>(java.lang.Object,java.lang.Object)
+<LI>class <A NAME="method-java.util.function.Consumer">java.util.function.Consumer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Consumer.html#accept(java.lang.Object)">accept</A>(java.lang.Object)
+<LI>class java.util.function.Consumer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Consumer.html#andThen(java.util.function.Consumer)">andThen</A>(java.util.function.Consumer)
+<LI>class <A NAME="method-java.util.function.DoubleBinaryOperator">java.util.function.DoubleBinaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleBinaryOperator.html#applyAsDouble(double,double)">applyAsDouble</A>(double,double)
+<LI>class <A NAME="method-java.util.function.DoubleConsumer">java.util.function.DoubleConsumer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleConsumer.html#accept(double)">accept</A>(double)
+<LI>class java.util.function.DoubleConsumer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleConsumer.html#andThen(java.util.function.DoubleConsumer)">andThen</A>(java.util.function.DoubleConsumer)
+<LI>class <A NAME="method-java.util.function.DoublePredicate">java.util.function.DoublePredicate</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html#and(java.util.function.DoublePredicate)">and</A>(java.util.function.DoublePredicate)
+<LI>class java.util.function.DoublePredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html#negate()">negate</A>()
+<LI>class java.util.function.DoublePredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html#or(java.util.function.DoublePredicate)">or</A>(java.util.function.DoublePredicate)
+<LI>class java.util.function.DoublePredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoublePredicate.html#test(double)">test</A>(double)
+<LI>class <A NAME="method-java.util.function.DoubleSupplier">java.util.function.DoubleSupplier</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleSupplier.html#getAsDouble()">getAsDouble</A>()
+<LI>class <A NAME="method-java.util.function.DoubleUnaryOperator">java.util.function.DoubleUnaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleUnaryOperator.html#andThen(java.util.function.DoubleUnaryOperator)">andThen</A>(java.util.function.DoubleUnaryOperator)
+<LI>class java.util.function.DoubleUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleUnaryOperator.html#applyAsDouble(double)">applyAsDouble</A>(double)
+<LI>class java.util.function.DoubleUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/DoubleUnaryOperator.html#compose(java.util.function.DoubleUnaryOperator)">compose</A>(java.util.function.DoubleUnaryOperator)
+<LI>class <A NAME="method-java.util.function.Function">java.util.function.Function</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Function.html#andThen(java.util.function.Function)">andThen</A>(java.util.function.Function)
+<LI>class java.util.function.Function &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Function.html#apply(java.lang.Object)">apply</A>(java.lang.Object)
+<LI>class java.util.function.Function &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Function.html#compose(java.util.function.Function)">compose</A>(java.util.function.Function)
+<LI>class <A NAME="method-java.util.function.IntBinaryOperator">java.util.function.IntBinaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntBinaryOperator.html#applyAsInt(int,int)">applyAsInt</A>(int,int)
+<LI>class <A NAME="method-java.util.function.IntConsumer">java.util.function.IntConsumer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntConsumer.html#accept(int)">accept</A>(int)
+<LI>class java.util.function.IntConsumer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntConsumer.html#andThen(java.util.function.IntConsumer)">andThen</A>(java.util.function.IntConsumer)
+<LI>class <A NAME="method-java.util.function.IntPredicate">java.util.function.IntPredicate</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html#and(java.util.function.IntPredicate)">and</A>(java.util.function.IntPredicate)
+<LI>class java.util.function.IntPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html#negate()">negate</A>()
+<LI>class java.util.function.IntPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html#or(java.util.function.IntPredicate)">or</A>(java.util.function.IntPredicate)
+<LI>class java.util.function.IntPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntPredicate.html#test(int)">test</A>(int)
+<LI>class <A NAME="method-java.util.function.IntSupplier">java.util.function.IntSupplier</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntSupplier.html#getAsInt()">getAsInt</A>()
+<LI>class <A NAME="method-java.util.function.IntUnaryOperator">java.util.function.IntUnaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntUnaryOperator.html#andThen(java.util.function.IntUnaryOperator)">andThen</A>(java.util.function.IntUnaryOperator)
+<LI>class java.util.function.IntUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntUnaryOperator.html#applyAsInt(int)">applyAsInt</A>(int)
+<LI>class java.util.function.IntUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/IntUnaryOperator.html#compose(java.util.function.IntUnaryOperator)">compose</A>(java.util.function.IntUnaryOperator)
+<LI>class <A NAME="method-java.util.function.LongBinaryOperator">java.util.function.LongBinaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongBinaryOperator.html#applyAsLong(long,long)">applyAsLong</A>(long,long)
+<LI>class <A NAME="method-java.util.function.LongConsumer">java.util.function.LongConsumer</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongConsumer.html#accept(long)">accept</A>(long)
+<LI>class java.util.function.LongConsumer &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongConsumer.html#andThen(java.util.function.LongConsumer)">andThen</A>(java.util.function.LongConsumer)
+<LI>class <A NAME="method-java.util.function.LongPredicate">java.util.function.LongPredicate</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html#and(java.util.function.LongPredicate)">and</A>(java.util.function.LongPredicate)
+<LI>class java.util.function.LongPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html#negate()">negate</A>()
+<LI>class java.util.function.LongPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html#or(java.util.function.LongPredicate)">or</A>(java.util.function.LongPredicate)
+<LI>class java.util.function.LongPredicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongPredicate.html#test(long)">test</A>(long)
+<LI>class <A NAME="method-java.util.function.LongSupplier">java.util.function.LongSupplier</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongSupplier.html#getAsLong()">getAsLong</A>()
+<LI>class <A NAME="method-java.util.function.LongUnaryOperator">java.util.function.LongUnaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongUnaryOperator.html#andThen(java.util.function.LongUnaryOperator)">andThen</A>(java.util.function.LongUnaryOperator)
+<LI>class java.util.function.LongUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongUnaryOperator.html#applyAsLong(long)">applyAsLong</A>(long)
+<LI>class java.util.function.LongUnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/LongUnaryOperator.html#compose(java.util.function.LongUnaryOperator)">compose</A>(java.util.function.LongUnaryOperator)
+<LI>class <A NAME="method-java.util.function.Predicate">java.util.function.Predicate</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html#and(java.util.function.Predicate)">and</A>(java.util.function.Predicate)
+<LI>class java.util.function.Predicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html#negate()">negate</A>()
+<LI>class java.util.function.Predicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html#or(java.util.function.Predicate)">or</A>(java.util.function.Predicate)
+<LI>class java.util.function.Predicate &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Predicate.html#test(java.lang.Object)">test</A>(java.lang.Object)
+<LI>class <A NAME="method-java.util.function.Supplier">java.util.function.Supplier</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/Supplier.html#get()">get</A>()
+<LI>class <A NAME="method-java.util.function.ToDoubleBiFunction">java.util.function.ToDoubleBiFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleBiFunction.html#applyAsDouble(java.lang.Object,java.lang.Object)">applyAsDouble</A>(java.lang.Object,java.lang.Object)
+<LI>class <A NAME="method-java.util.function.ToDoubleFunction">java.util.function.ToDoubleFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToDoubleFunction.html#applyAsDouble(java.lang.Object)">applyAsDouble</A>(java.lang.Object)
+<LI>class <A NAME="method-java.util.function.ToIntBiFunction">java.util.function.ToIntBiFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntBiFunction.html#applyAsInt(java.lang.Object,java.lang.Object)">applyAsInt</A>(java.lang.Object,java.lang.Object)
+<LI>class <A NAME="method-java.util.function.ToIntFunction">java.util.function.ToIntFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToIntFunction.html#applyAsInt(java.lang.Object)">applyAsInt</A>(java.lang.Object)
+<LI>class <A NAME="method-java.util.function.ToLongBiFunction">java.util.function.ToLongBiFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongBiFunction.html#applyAsLong(java.lang.Object,java.lang.Object)">applyAsLong</A>(java.lang.Object,java.lang.Object)
+<LI>class <A NAME="method-java.util.function.ToLongFunction">java.util.function.ToLongFunction</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/ToLongFunction.html#applyAsLong(java.lang.Object)">applyAsLong</A>(java.lang.Object)
+<LI>class <A NAME="method-java.util.function.UnaryOperator">java.util.function.UnaryOperator</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/UnaryOperator.html#andThen(java.util.function.Function)">andThen</A>(java.util.function.Function)
+<LI>class java.util.function.UnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/UnaryOperator.html#apply(java.lang.Object)">apply</A>(java.lang.Object)
+<LI>class java.util.function.UnaryOperator &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/function/UnaryOperator.html#compose(java.util.function.Function)">compose</A>(java.util.function.Function)
+<LI>class <A NAME="method-java.util.stream.Collector">java.util.stream.Collector</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html#accumulator()">accumulator</A>()
+<LI>class java.util.stream.Collector &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html#combiner()">combiner</A>()
+<LI>class java.util.stream.Collector &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html#finisher()">finisher</A>()
+<LI>class java.util.stream.Collector &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collector.html#supplier()">supplier</A>()
+<LI>class <A NAME="method-java.util.stream.Collectors">java.util.stream.Collectors</A> &mdash; <A HREF="file:/usr/share/doc/openjdk-11-doc/api/java.base/java/util/stream/Collectors.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.anim2d.Animation2D">org.bzdev.anim2d.Animation2D</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#addObjectNamer(org.bzdev.obnaming.ObjectNamerOps)">addObjectNamer</A>(org.bzdev.obnaming.ObjectNamerOps)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#advance(long)">advance</A>(long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#allowSetStackTraceMode(boolean,boolean)">allowSetStackTraceMode</A>(boolean,boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#allowsSetStackTraceMode()">allowsSetStackTraceMode</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#allowsSetStackTraceModeTS()">allowsSetStackTraceModeTS</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#callScriptFunction(java.lang.String,[Ljava.lang.Object;)">callScriptFunction</A>(java.lang.String,[Ljava.lang.Object;)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#callScriptMethod(java.lang.Object,java.lang.String,[Ljava.lang.Object;)">callScriptMethod</A>(java.lang.Object,java.lang.String,[Ljava.lang.Object;)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#checkAltList(org.bzdev.obnaming.ObjectNamerOps)">checkAltList</A>(org.bzdev.obnaming.ObjectNamerOps)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#configureFactory(org.bzdev.obnaming.NamedObjectFactory,java.lang.Object)">configureFactory</A>(org.bzdev.obnaming.NamedObjectFactory,java.lang.Object)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#configureFactorySupported()">configureFactorySupported</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#containsScriptObject(java.lang.String)">containsScriptObject</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#createFactories(java.lang.String,java.lang.Object)">createFactories</A>(java.lang.String,java.lang.Object)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#createFactory(java.lang.String)">createFactory</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#createFactory(java.lang.String,java.lang.String,java.lang.String)">createFactory</A>(java.lang.String,java.lang.String,java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#currentTicks()">currentTicks</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#currentTime()">currentTime</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#currentTimeFrom(long)">currentTimeFrom</A>(long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#descheduleEvent(org.bzdev.devqsim.SimulationEvent)">descheduleEvent</A>(org.bzdev.devqsim.SimulationEvent)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#enableTracing(boolean)">enableTracing</A>(boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#estimateFrameCount(double)">estimateFrameCount</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#evalScript(java.io.Reader)">evalScript</A>(java.io.Reader)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#evalScript(java.lang.String)">evalScript</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#evalScript(java.lang.String,java.io.Reader)">evalScript</A>(java.lang.String,java.io.Reader)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getCurrentTime()">getCurrentTime</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getCurrentTimePriority()">getCurrentTimePriority</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getFramePriority()">getFramePriority</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getFrameRate()">getFrameRate</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getHeight()">getHeight</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getHeightAsInt()">getHeightAsInt</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getImageType()">getImageType</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getNextEventInterval()">getNextEventInterval</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getObject(java.lang.String)">getObject</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getObjects()">getObjects</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getObjects(java.lang.String)">getObjects</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getParent()">getParent</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getReader()">getReader</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getRequestAlpha()">getRequestAlpha</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getScriptLanguage()">getScriptLanguage</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getScriptObject(java.lang.String)">getScriptObject</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getStackTraceMode()">getStackTraceMode</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicks(double)">getTicks</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicksCeil(double)">getTicksCeil</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicksFloor(double)">getTicksFloor</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicksPerFrame()">getTicksPerFrame</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicksPerSecond()">getTicksPerSecond</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTicksPerUnitTime()">getTicksPerUnitTime</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getTime(long)">getTime</A>(long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getWidth()">getWidth</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getWidthAsInt()">getWidthAsInt</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getXLower()">getXLower</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getXLowerOffset()">getXLowerOffset</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getXUpper()">getXUpper</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getXUpperOffset()">getXUpperOffset</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getYLower()">getYLower</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getYLowerOffset()">getYLowerOffset</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getYUpper()">getYUpper</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#getYUpperOffset()">getYUpperOffset</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#hasScriptEngine()">hasScriptEngine</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#initFrames(int,java.lang.String,java.lang.String)">initFrames</A>(int,java.lang.String,java.lang.String)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#initFrames(int,java.lang.String,java.lang.String,org.bzdev.io.DirectoryAccessor)">initFrames</A>(int,java.lang.String,java.lang.String,org.bzdev.io.DirectoryAccessor)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#initFrames(int,java.lang.String,org.bzdev.gio.ISWriterOps)">initFrames</A>(int,java.lang.String,org.bzdev.gio.ISWriterOps)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#initFrames(int,org.bzdev.gio.ISWriterOps)">initFrames</A>(int,org.bzdev.gio.ISWriterOps)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#isTracingEnabled()">isTracingEnabled</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#isTrusted()">isTrusted</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#moreEventsScheduled()">moreEventsScheduled</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#nullPath()">nullPath</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#pauseTask(long)">pauseTask</A>(long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#pauseTask(long,double)">pauseTask</A>(long,double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#putScriptObject(java.lang.String,java.lang.Object)">putScriptObject</A>(java.lang.String,java.lang.Object)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#requestAlpha(boolean)">requestAlpha</A>(boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#rescheduleEvent(org.bzdev.devqsim.SimulationEvent,long)">rescheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#rescheduleEvent(org.bzdev.devqsim.SimulationEvent,long,double)">rescheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long,double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#run()">run</A>()
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#run(long)">run</A>(long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#scheduleEvent(org.bzdev.devqsim.SimulationEvent,long)">scheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#scheduleEvent(org.bzdev.devqsim.SimulationEvent,long,double)">scheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long,double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#scheduleFrames(long,int)">scheduleFrames</A>(long,int)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setBackgroundColor(java.awt.Color)">setBackgroundColor</A>(java.awt.Color)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setClearByFillMode(boolean)">setClearByFillMode</A>(boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setFontAngle(double)">setFontAngle</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setFontBaseline(org.bzdev.graphs.Graph.BLineP)">setFontBaseline</A>(org.bzdev.graphs.Graph.BLineP)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setFontColor(java.awt.Color)">setFontColor</A>(java.awt.Color)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setFontJustification(org.bzdev.graphs.Graph.Just)">setFontJustification</A>(org.bzdev.graphs.Graph.Just)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setFramePriority(double)">setFramePriority</A>(double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setImageType(org.bzdev.graphs.Graph.ImageType)">setImageType</A>(org.bzdev.graphs.Graph.ImageType)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setOffsets(int,int)">setOffsets</A>(int,int)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setOffsets(int,int,int,int)">setOffsets</A>(int,int,int,int)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setRanges(double,double,double,double)">setRanges</A>(double,double,double,double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setRanges(double,double,double,double,double,double)">setRanges</A>(double,double,double,double,double,double)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setReader(java.io.Reader)">setReader</A>(java.io.Reader)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setStackTraceMode(boolean)">setStackTraceMode</A>(boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#setSupplyGraphicsContexts(boolean)">setSupplyGraphicsContexts</A>(boolean)
+<LI>class org.bzdev.anim2d.Animation2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/Animation2D.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.anim2d.AnimationPath2D">org.bzdev.anim2d.AnimationPath2D</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#addTraceSet(org.bzdev.devqsim.TraceSet)">addTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#canDelete()">canDelete</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#clearTraceSets()">clearTraceSets</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#curvature(double)">curvature</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#d2xDu2(double)">d2xDu2</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#d2yDu2(double)">d2yDu2</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#delete()">delete</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#deletePending()">deletePending</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#dsDu(double)">dsDu</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#dxDu(double)">dxDu</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#dyDu(double)">dyDu</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getColor()">getColor</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getDistance(double,double)">getDistance</A>(double,double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getGcsMode()">getGcsMode</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getInversionLimit()">getInversionLimit</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getMaxParameter()">getMaxParameter</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getName()">getName</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getPathLength()">getPathLength</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getPathLength(double,double)">getPathLength</A>(double,double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getX(double)">getX</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getY(double)">getY</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#getZorder()">getZorder</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#initPath()">initPath</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#isClosed()">isClosed</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#isDeleted()">isDeleted</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#isInterned()">isInterned</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#isVisible()">isVisible</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printConfiguration()">printConfiguration</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printConfiguration(java.io.PrintStream)">printConfiguration</A>(java.io.PrintStream)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printConfiguration(java.lang.String)">printConfiguration</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printConfiguration(java.lang.String,java.io.PrintStream)">printConfiguration</A>(java.lang.String,java.io.PrintStream)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printConfiguration(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)">printConfiguration</A>(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printState()">printState</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printState(java.io.PrintStream)">printState</A>(java.io.PrintStream)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printState(java.lang.String)">printState</A>(java.lang.String)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printState(java.lang.String,java.io.PrintStream)">printState</A>(java.lang.String,java.io.PrintStream)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#printState(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)">printState</A>(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#removeTraceSet(org.bzdev.devqsim.TraceSet)">removeTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#s(double)">s</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setColor(java.awt.Color)">setColor</A>(java.awt.Color)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setGcsMode(boolean)">setGcsMode</A>(boolean)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setInversionLimit(double)">setInversionLimit</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setVisible(boolean)">setVisible</A>(boolean)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setZorder(long)">setZorder</A>(long)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#setZorder(long,boolean)">setZorder</A>(long,boolean)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#showSegments(boolean,double)">showSegments</A>(boolean,double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#toString()">toString</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#u(double)">u</A>(double)
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#update()">update</A>()
+<LI>class org.bzdev.anim2d.AnimationPath2D &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.anim2d/org/bzdev/anim2d/AnimationPath2D.html#usesTraceSet(org.bzdev.devqsim.TraceSet)">usesTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class <A NAME="method-org.bzdev.devqsim.SimObject">org.bzdev.devqsim.SimObject</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#addTraceSet(org.bzdev.devqsim.TraceSet)">addTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#canDelete()">canDelete</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#clearTraceSets()">clearTraceSets</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#delete()">delete</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#deletePending()">deletePending</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#getName()">getName</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#isDeleted()">isDeleted</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#isInterned()">isInterned</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printConfiguration()">printConfiguration</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printConfiguration(java.io.PrintStream)">printConfiguration</A>(java.io.PrintStream)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printConfiguration(java.lang.String)">printConfiguration</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printConfiguration(java.lang.String,java.io.PrintStream)">printConfiguration</A>(java.lang.String,java.io.PrintStream)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printConfiguration(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)">printConfiguration</A>(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printState()">printState</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printState(java.io.PrintStream)">printState</A>(java.io.PrintStream)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printState(java.lang.String)">printState</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printState(java.lang.String,java.io.PrintStream)">printState</A>(java.lang.String,java.io.PrintStream)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#printState(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)">printState</A>(java.lang.String,java.lang.String,boolean,java.io.PrintWriter)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#removeTraceSet(org.bzdev.devqsim.TraceSet)">removeTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#toString()">toString</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#update()">update</A>()
+<LI>class org.bzdev.devqsim.SimObject &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/SimObject.html#usesTraceSet(org.bzdev.devqsim.TraceSet)">usesTraceSet</A>(org.bzdev.devqsim.TraceSet)
+<LI>class <A NAME="method-org.bzdev.devqsim.Simulation">org.bzdev.devqsim.Simulation</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#addObjectNamer(org.bzdev.obnaming.ObjectNamerOps)">addObjectNamer</A>(org.bzdev.obnaming.ObjectNamerOps)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#advance(long)">advance</A>(long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#allowSetStackTraceMode(boolean,boolean)">allowSetStackTraceMode</A>(boolean,boolean)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#allowsSetStackTraceMode()">allowsSetStackTraceMode</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#allowsSetStackTraceModeTS()">allowsSetStackTraceModeTS</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#callScriptFunction(java.lang.String,[Ljava.lang.Object;)">callScriptFunction</A>(java.lang.String,[Ljava.lang.Object;)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#callScriptMethod(java.lang.Object,java.lang.String,[Ljava.lang.Object;)">callScriptMethod</A>(java.lang.Object,java.lang.String,[Ljava.lang.Object;)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#checkAltList(org.bzdev.obnaming.ObjectNamerOps)">checkAltList</A>(org.bzdev.obnaming.ObjectNamerOps)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#configureFactory(org.bzdev.obnaming.NamedObjectFactory,java.lang.Object)">configureFactory</A>(org.bzdev.obnaming.NamedObjectFactory,java.lang.Object)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#configureFactorySupported()">configureFactorySupported</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#containsScriptObject(java.lang.String)">containsScriptObject</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#createFactories(java.lang.String,java.lang.Object)">createFactories</A>(java.lang.String,java.lang.Object)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#createFactory(java.lang.String)">createFactory</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#createFactory(java.lang.String,java.lang.String,java.lang.String)">createFactory</A>(java.lang.String,java.lang.String,java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#currentTicks()">currentTicks</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#currentTime()">currentTime</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#currentTimeFrom(long)">currentTimeFrom</A>(long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#descheduleEvent(org.bzdev.devqsim.SimulationEvent)">descheduleEvent</A>(org.bzdev.devqsim.SimulationEvent)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#enableTracing(boolean)">enableTracing</A>(boolean)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#evalScript(java.io.Reader)">evalScript</A>(java.io.Reader)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#evalScript(java.lang.String)">evalScript</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#evalScript(java.lang.String,java.io.Reader)">evalScript</A>(java.lang.String,java.io.Reader)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getCurrentTime()">getCurrentTime</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getCurrentTimePriority()">getCurrentTimePriority</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getNextEventInterval()">getNextEventInterval</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getObject(java.lang.String)">getObject</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getObjects()">getObjects</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getObjects(java.lang.String)">getObjects</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getParent()">getParent</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getReader()">getReader</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getScriptLanguage()">getScriptLanguage</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getScriptObject(java.lang.String)">getScriptObject</A>(java.lang.String)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getStackTraceMode()">getStackTraceMode</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getTicks(double)">getTicks</A>(double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getTicksCeil(double)">getTicksCeil</A>(double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getTicksFloor(double)">getTicksFloor</A>(double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getTicksPerUnitTime()">getTicksPerUnitTime</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#getTime(long)">getTime</A>(long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#hasScriptEngine()">hasScriptEngine</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#isTracingEnabled()">isTracingEnabled</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#isTrusted()">isTrusted</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#moreEventsScheduled()">moreEventsScheduled</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#pauseTask(long)">pauseTask</A>(long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#pauseTask(long,double)">pauseTask</A>(long,double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#putScriptObject(java.lang.String,java.lang.Object)">putScriptObject</A>(java.lang.String,java.lang.Object)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#rescheduleEvent(org.bzdev.devqsim.SimulationEvent,long)">rescheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#rescheduleEvent(org.bzdev.devqsim.SimulationEvent,long,double)">rescheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long,double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#run()">run</A>()
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#run(long)">run</A>(long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#scheduleEvent(org.bzdev.devqsim.SimulationEvent,long)">scheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#scheduleEvent(org.bzdev.devqsim.SimulationEvent,long,double)">scheduleEvent</A>(org.bzdev.devqsim.SimulationEvent,long,double)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#setReader(java.io.Reader)">setReader</A>(java.io.Reader)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#setStackTraceMode(boolean)">setStackTraceMode</A>(boolean)
+<LI>class org.bzdev.devqsim.Simulation &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.devqsim/org/bzdev/devqsim/Simulation.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.gio.ISWriterOps">org.bzdev.gio.ISWriterOps</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#addMetadata(int,int,double)">addMetadata</A>(int,int,double)
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#addMetadata(int,int,java.lang.String)">addMetadata</A>(int,int,java.lang.String)
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#addMetadata(int,int,java.lang.String,double,java.lang.String)">addMetadata</A>(int,int,java.lang.String,double,java.lang.String)
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#addMetadata(int,int,java.lang.String,java.lang.String)">addMetadata</A>(int,int,java.lang.String,java.lang.String)
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#close()">close</A>()
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#getFrameHeight()">getFrameHeight</A>()
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#getFrameWidth()">getFrameWidth</A>()
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#setEstimatedFrameCount(int)">setEstimatedFrameCount</A>(int)
+<LI>class org.bzdev.gio.ISWriterOps &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ISWriterOps.html#setEstimatedFrameCount(long)">setEstimatedFrameCount</A>(long)
+<LI>class <A NAME="method-org.bzdev.gio.ImageSequenceWriter">org.bzdev.gio.ImageSequenceWriter</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#addMetadata(int,int,double)">addMetadata</A>(int,int,double)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#addMetadata(int,int,java.lang.String)">addMetadata</A>(int,int,java.lang.String)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#addMetadata(int,int,java.lang.String,double,java.lang.String)">addMetadata</A>(int,int,java.lang.String,double,java.lang.String)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#addMetadata(int,int,java.lang.String,java.lang.String)">addMetadata</A>(int,int,java.lang.String,java.lang.String)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#close()">close</A>()
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#getFrameHeight()">getFrameHeight</A>()
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#getFrameWidth()">getFrameWidth</A>()
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#metadataAdded()">metadataAdded</A>()
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#repeatFile(java.lang.String)">repeatFile</A>(java.lang.String)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#setEstimatedFrameCount(int)">setEstimatedFrameCount</A>(int)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#setEstimatedFrameCount(long)">setEstimatedFrameCount</A>(long)
+<LI>class org.bzdev.gio.ImageSequenceWriter &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.graphics/org/bzdev/gio/ImageSequenceWriter.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.io.DelayedFileInputStream">org.bzdev.io.DelayedFileInputStream</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedFileInputStream.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.io.DelayedFileOutputStream">org.bzdev.io.DelayedFileOutputStream</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedFileOutputStream.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.io.DelayedRandomAccessFile">org.bzdev.io.DelayedRandomAccessFile</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DelayedRandomAccessFile.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.io.DirectoryAccessor">org.bzdev.io.DirectoryAccessor</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#allowsReading()">allowsReading</A>()
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#allowsWriting()">allowsWriting</A>()
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#canRead(java.lang.String)">canRead</A>(java.lang.String)
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#canWrite(java.lang.String)">canWrite</A>(java.lang.String)
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#delete(java.lang.String)">delete</A>(java.lang.String)
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#exists(java.lang.String)">exists</A>(java.lang.String)
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#isDirectory(java.lang.String)">isDirectory</A>(java.lang.String)
+<LI>class org.bzdev.io.DirectoryAccessor &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.base/org/bzdev/io/DirectoryAccessor.html#toString()">toString</A>()
+<LI>class <A NAME="method-org.bzdev.swing.AnimatedPanelGraphics">org.bzdev.swing.AnimatedPanelGraphics</A> &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#addMetadata(int,int,double)">addMetadata</A>(int,int,double)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#addMetadata(int,int,java.lang.String)">addMetadata</A>(int,int,java.lang.String)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#addMetadata(int,int,java.lang.String,double,java.lang.String)">addMetadata</A>(int,int,java.lang.String,double,java.lang.String)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#addMetadata(int,int,java.lang.String,java.lang.String)">addMetadata</A>(int,int,java.lang.String,java.lang.String)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#adjust(int)">adjust</A>(int)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#close()">close</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#getBackground()">getBackground</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#getEstimatedFrameCount()">getEstimatedFrameCount</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#getFrameHeight()">getFrameHeight</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#getFrameWidth()">getFrameWidth</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#isLoaded()">isLoaded</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#isVisible()">isVisible</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#play()">play</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#setBackground(java.awt.Color)">setBackground</A>(java.awt.Color)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#setEstimatedFrameCount(int)">setEstimatedFrameCount</A>(int)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#setEstimatedFrameCount(long)">setEstimatedFrameCount</A>(long)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#setVisible(boolean)">setVisible</A>(boolean)
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#stop()">stop</A>()
+<LI>class org.bzdev.swing.AnimatedPanelGraphics &mdash; <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.html#toString()">toString</A>()
+
+    </UL>
+
+    <H2><A NAME="consts">Constants</A></H2>
+    <P>
+      <A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#AUTO_RUN">org.bzdev.swing.AnimatedPanelGraphics.Mode.AUTO_RUN</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#AUTO_RUN_NO_CONTROLS">org.bzdev.swing.AnimatedPanelGraphics.Mode.AUTO_RUN_NO_CONTROLS</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#AUTO_RUN_REPLAYABLE">org.bzdev.swing.AnimatedPanelGraphics.Mode.AUTO_RUN_REPLAYABLE</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#START_PAUSED">org.bzdev.swing.AnimatedPanelGraphics.Mode.START_PAUSED</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#START_PAUSED_REPLAYABLE">org.bzdev.swing.AnimatedPanelGraphics.Mode.START_PAUSED_REPLAYABLE</A>
+<A HREF="file:/usr/share/doc/libbzdev-doc/api/org.bzdev.desktop/org/bzdev/swing/AnimatedPanelGraphics.Mode.html#START_PAUSED_SELECTABLE">org.bzdev.swing.AnimatedPanelGraphics.Mode.START_PAUSED_SELECTABLE</A>
+
+
+  </BODY>
+</HTML>

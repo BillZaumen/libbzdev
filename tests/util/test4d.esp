@@ -1,0 +1,6 @@
+var epts;
+var a2d ?= null;
+var subspacing = (10 == 0)? 1: 10;
+var frameWidth ??= (a2d == null)?
+    (!var.epts || epts == null)? 1920: epts.getWidth():
+    a2d.getWidthAsInt();

@@ -1,0 +1,502 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+<H2>The BZDev Class Library</H2>
+<P>
+The BZDev class library is partitioned into 8 modules as shown
+in the following diagram (also shown on the
+<A HREF="../index.html">OVERVIEW</A> page):
+<center>
+<img src="modules2.png" width="600px" height="auto" usemap="#modules2">
+</center>
+<MAP NAME="modules2">
+<AREA SHAPE="rect" coords="447,0,547,15" href="#rest" alt="3D Printing Module">
+<AREA SHAPE="rect" coords="126,94,260,123" href="#drama" alt="Actor-Based Simulation Module">
+<AREA SHAPE="rect" coords="277,88,418,120" href="#rest" alt="Animation Module">
+<AREA SHAPE="rect" coords="67,188,216,222" href="#devqsim" alt="Discrete Event Simulation Module">
+<AREA SHAPE="rect" coords="397,184,554,213" href="#desktop" alt="Desktop (GUI) Module">
+<AREA SHAPE="rect" coords="0,263,149,294" href="#rest" alt="Object Naming Module">
+<AREA SHAPE="rect" coords="284,257,434,285" href="#graphics" alt="Graphics Module">
+<AREA SHAPE="rect" coords="144,314,272,340" href="#math" alt="Math Module">
+<AREA SHAPE="rect" coords="486,300,609,327" href="#ejws" alt="Embedded Web Server Module">
+<AREA SHAPE="rect" coords="272,364,394,388" href="#base" alt="Base Module">
+</MAP>
+<P>
+<P>
+All of these modules are dependent on the module org.bzdev.base, but
+only some dependencies are shown explicitly to reduce clutter: just
+enough so that the diagram will show at least an indirect dependency.
+Two  modules, org.bzdev.dmethods and org.bzdev.parmproc, are not shown
+as these are used only for annotation processing.
+
+<H2><A NAME="base">The module org.bzdev.base</A></H2>
+The module <CODE>org.bzdev.base</CODE> provides basic operations. The
+following diagram shows the packages this module contains:
+<P>
+<center>
+  <img src="base.png" width="700px" height="auto", usemap="#baseMap">
+</center>
+<MAP NAME="baseMap">
+<AREA SHAPE="rect" coords="3,2,81,20" href="../org.bzdev.base/module-summary.html" alt="Base Module">
+<AREA SHAPE="rect" coords="155,43,247,78" href="../org.bzdev.base/org/bzdev/lang/package-summary.html" alt="Java Lang Extension Package">
+<AREA SHAPE="rect" coords="339,39,422,81" href="../org.bzdev.base/org/bzdev/io/package-summary.html" alt="IO Package">
+<AREA SHAPE="rect" coords="252,87,369,122" href="../org.bzdev.base/org/bzdev/scripting/package-summary.html" alt="Scripting Support Package">
+<AREA SHAPE="rect" coords="286,158,374,196" href="../org.bzdev.base/org/bzdev/util/package-summary.html" alt="Utility Package">
+<AREA SHAPE="rect" coords="416,158,542,197" href="../org.bzdev.base/org/bzdev/util/units/package-summary.html" alt="Units Package">
+<AREA SHAPE="rect" coords="71,216,229,257" href="../org.bzdev.base/org/bzdev/lang/annotations/package-summary.html" alt="Dynamic Method Annotations Package">
+<AREA SHAPE="rect" coords="282,227,371,271" href="../org.bzdev.base/org/bzdev/net/package-summary.html" alt="Networking Package">
+<AREA SHAPE="rect" coords="386,231,501,269" href="../org.bzdev.base/org/bzdev/protocols/package-summary.html" alt="Protocols Package">
+<AREA SHAPE="rect" coords="78,355,252,394" href="../org.bzdev.base/org/bzdev/obnaming/annotations/package-summary.html" alt="Factory Annotations Package">
+</MAP>
+</P>
+The packages in this module provide the following:
+<UL>
+  <li> org.bzdev.lang provides support for dynamic methods - methods in
+       which dispatching based on argument types is performed at run time
+       instead of compile time.  It also provides an interface named
+       Callable that is analogous to java.lang.Runnable, but is intended
+       for code that should be called rather than run in new thread. A
+       Callable has a method named call() that takes no arguments and
+       does not return a value or throw a checked exception.  Related
+       interfaces all the 'call' method to return a value, declare
+       exceptions, and declare arguments. The class MathOps is a
+       "utility class" that provides simple operations involving Java's
+       primitive types and is effectively a trivial extension of the
+       Java package java.lang.Math.
+  <li> org.bzdev.scripting allows scripts to be run in a sandbox while
+       normal Java code is not.
+  <li> org.bzdev.io provides some IO-related classes. These include a
+    Writer class that can write to an Appendable, some classes that
+    allow opening of files or directories to be specified before a
+    security manager restricts access and actually opened afterwards,
+    and classes for reading and writing files in some specialized formats.
+  <li> org.bzdev.net and org.bzdev.protocols provide networking classes:
+       <ul>
+         <li> org.bzdev.net contains classes to augment the java.net package.
+         <li> org.bzdev.protocols contains additional protocol handlers.
+       </ul>
+  <li> org.bzdev.util provides some utility classes.
+  <li> org.bzdev.util.units provides classes for converting from one
+       set of units to another.
+</UL>
+<H2><A NAME="math">The module org.bzdev.math</A></H2>
+The module <CODE>org.bzdev.math</CODE> provides special functions,
+various numerical algorithms, random variables, and statistics.
+ The
+following diagram shows the packages this module contains:
+<P>
+<center>
+  <img src="math.png" width="700px" height="auto" usemap="#mathMap">
+</center>
+<MAP NAME="mathMap">
+<AREA SHAPE="rect" coords="1,2,89,16" href="../org.bzdev.math/module-summary.html" alt="Math Module">
+<AREA SHAPE="rect" coords="231,136,325,158" href="../org.bzdev.math/org/bzdev/math/package-summary.html" alt="Math Package">
+<AREA SHAPE="rect" coords="483,225,603,248" href="../org.bzdev.math/org/bzdev/math/spi/package-summary.html" alt="Math SPI Package">
+<AREA SHAPE="rect" coords="43,246,162,270" href="../org.bzdev.math/org/bzdev/math/rv/package-summary.html" alt="Random Variable Package">
+<AREA SHAPE="rect" coords="291,246,422,271" href="../org.bzdev.math/org/bzdev/math/stats/package-summary.html" alt="Statistics Package">
+</MAP>
+
+</P>
+The packages in this module provide the following:
+<UL>
+  <li> org.bzdev.math provides some special functions and numerical-analysis
+       algorithms. These are useful in general, but are also needed to
+       support the org.bzdev.geom package.
+  <li> org.bzdev.math.stats provides basic support for statistics: a
+       few statistical tests and statistical distributions. It also
+       includes classes that use numerically stable algorithms for
+       computing means and standard deviations.
+  <li> org.bzdev.math.rv provides a collection of classes implementing
+       random variables.
+  <li> org.bzdev.math.spi contains service-provider interfaces for the
+       org.bzdev.math package.
+  <li> org.bzdev.providers.math.fft contains a default service-provider for
+       an FFT (Fast Fourier Transform).
+</UL>
+
+<H2><A NAME="graphics">The module org.bzdev.graphics</A></H2>
+
+The module <CODE>org.bzdev.graphics</CODE> provides graphs and IO operatios
+involving geometry, graphics-based IO operations, graphs, and packages that
+support factory classes for simulations, animations, etc.
+The following diagram shows the packages this module contains:
+<P>
+<center>
+  <img src="graphics.png" width="700px" height="auto" usemap="#graphicsMap">
+</center>
+<MAP NAME="graphicsMap">
+<AREA SHAPE="rect" coords="0,1,103,16" href="../org.bzdev.graphics/module-summary.html" alt="Graphics Module">
+<AREA SHAPE="rect" coords="168,41,255,68" href="../org.bzdev.graphics/org/bzdev/geom/package-summary.html" alt="Geometry Package">
+<AREA SHAPE="rect" coords="281,46,364,68" href="../org.bzdev.graphics/org/bzdev/gio/package-summary.html" alt="Graphics IO Package">
+<AREA SHAPE="rect" coords="461,103,565,125" href="../org.bzdev.graphics/org/bzdev/imageio/package-summary.html" alt="Image-IO Operations Package">
+<AREA SHAPE="rect" coords="44,129,143,154" href="../org.bzdev.graphics/org/bzdev/graphs/package-summary.html" alt="Graphs Package">
+<AREA SHAPE="rect" coords="357,152,462,175" href="../org.bzdev.graphics/org/bzdev/gio/spi/package-summary.html" alt="Graphics IO SPI Package">
+<AREA SHAPE="rect" coords="359,226,496,251" href="../org.bzdev.graphics/org/bzdev/obnaming/misc/package-summary.html" alt="Named Object Factory Support Package">
+<AREA SHAPE="rect" coords="112,182,235,204" href="../org.bzdev.graphics/org/bzdev/graphs/spi/package-summary.html" alt="Graphs SPI Package">
+</MAP>
+</P>
+The packages in this module provide the following:
+<UL>
+  <li> org.bzdev.graph provides a graph-plotting package stressing ease of
+       use rather than a large number of features.  This package is also
+       used to support the org.bzdev.anim2d package described below.
+  <li> org.bzdev.geom provides information about paths and subclasses of
+       java.awt.geom.Path2D to support B&eacute;zier splines.
+  <li> org.bzdev.gio provides a service for creating image files,
+       including postscript files, while using an API similar to that
+       for a BufferedImage. An SPI (Service Provider Interface) allows
+       additional image types to be created. If the Apache Batik SVG
+       jar files are installed with batik.jar on the class path, the
+       creation of SVG files will be enabled. This package also provides
+       a convenient interface for printing.
+  <li> org.bzdev.imageio provides a class that can scale images and a class
+       to obtain MIME type information about image formats.
+  <li> org.bzdev.obnaming.misc contains classes that can be used with
+       named-object factory annotations, handling colors, strokes, and
+       fonts.
+</UL>
+
+<H2><a NAME="desktop">The module org.bzdev.desktop</A></H2>
+
+The module <CODE>org.bzdev.base</CODE> provides graphics and desktop
+operations. The following diagram shows the packages this module contains:
+<P>
+<center>
+  <img src="desktop.png" width="700px" height="auto" usemap="#desktopMap">
+</center>
+<MAP NAME="desktopMap">
+<AREA SHAPE="rect" coords="2,1,116,20" href="../org.bzdev.desktop/module-summary.html" alt="Desktop Module">
+<AREA SHAPE="rect" coords="256,173,369,197" href="../org.bzdev.desktop/org/bzdev/swing/package-summary.html" alt="GUI Components Package">
+<AREA SHAPE="rect" coords="76,249,254,276" href="../org.bzdev.desktop/org/bzdev/swing/proxyconf/package-summary.html" alt="Proxy-Configuration GUI Component">
+<AREA SHAPE="rect" coords="246,318,382,346" href="../org.bzdev.desktop/org/bzdev/swing/io/package-summary.html" alt="IO-related Swing Support Package">
+<AREA SHAPE="rect" coords="245,370,392,396" href="../org.bzdev.desktop/org/bzdev/swing/keys/package-summary.html" alt="Name-to-Virtual-Key Package">
+<AREA SHAPE="rect" coords="247,422,392,451" href="../org.bzdev.desktop/org/bzdev/swing/text/package-summary.html" alt="Document-related Swing-Support Module">
+</MAP>
+</P>
+The packages in this module provide the following:
+<UL>
+  <li> org.bzdev.swing provides swing components.
+  <li> org.bzdev.swing.io contains a Reader that can extract text from
+       a Document (the class Reader is in the java.io package and the
+       class Document is in javax.swing.text).
+  <li> org.bzdev.swing.keys contains a class that can look up virtual
+       keys by name. This is useful in conjunction with a GUI.
+  <li> org.bzdev.swing.proxyconf allows proxies to be configured.
+  <li> org.bzdev.swing.text provides thread-safe versions of some
+       classes in javax.swing.text, plus some classes that are useful
+       for validating user input and limiting the characters that can
+       be entered into a text component.
+</ul>
+
+<H2><A NAME="devqsim">The module org.bzdev.devqsim</A></H2>
+
+The module <CODE>org.bzdev.devqsim</CODE> provides discrete event
+and queuing simulation.  The folloowing diagram shows the packages
+this module contains:
+<center>
+  <img src="devqsim.png" width="500px" height="auto" usemap="#devqsimMap">
+</center>
+<MAP NAME="devqsimMap">
+<AREA SHAPE="rect" coords="2,1,139,21" href="../org.bzdev.devqsim/module-summary.html" alt="Discrete Event Simulation Module">
+<AREA SHAPE="rect" coords="163,281,336,315" href="../org.bzdev.devqsim/org/bzdev/devqsim/rv/package-summary.html" alt="Named Random Variable Package">
+<AREA SHAPE="rect" coords="173,115,325,148" href="../org.bzdev.devqsim/org/bzdev/devqsim/package-summary.html" alt="Discrete Event Simulation Package">
+</MAP>
+<P>
+The package
+<UL>
+  <LI> org.bzdev.devqsim provides a scriptable discrete
+    event queue simulation library with support for queues of
+    various types.  Users of this library will define instances of
+    the interface org.bzdev.Callable to create code that can be run
+    at specified simulation times via a method call. For instances
+    of java.lang.runnable, a thread will be started at specified
+    simulation times. Threads (instances of
+    org.bzdev.devqsim.TaskThread) can also be run at specific
+    simulation times and may pause when desired. The library also
+    supports various types of queues.
+  <LI> org.bzdev.devqsim.rv provides random variables that
+    are 'named objects' that a simulation can recognize, with factory
+    methods for creating them.
+</UL>
+
+<H2><A NAME="drama">The module org.bzdev.drama</A></H2>
+
+The module <CODE>org.bzdev.drama</CODE> provides discrete event
+simulations using a message-passing paradigm. The following diagram
+shows the packages this module contains:
+<center>
+  <img src="drama.png" width="500px" height="auto" usemap="#dramaMap">
+</center>
+<MAP NAME="dramaMap">
+<AREA SHAPE="rect" coords="-1,1,111,23" href="../org.bzdev.drama/module-summary.html" alt="Actor-Based Simulation Module">
+<AREA SHAPE="rect" coords="45,118,207,143" href="../org.bzdev.drama/org/bzdev/drama/common/package-summary.html" alt="Actor-Based Simulation Shared-Class Package">
+<AREA SHAPE="rect" coords="285,118,457,148" href="../org.bzdev.drama/org/bzdev/drama/generic/package-summary.html" alt="Generic Actor-Based Simulation Package">
+<AREA SHAPE="rect" coords="200,266,321,293" href="../org.bzdev.drama/org/bzdev/drama/package-summary.html" alt="Drama Simulation Package">
+</MAP>
+<P>
+The package
+<UL>
+  <li> org.bzdev.drama (whose classes extend the classes in
+    org.bzdev.drama.generic) provides simulations in which entities
+    called actors communicate by passing messages to each
+    other. The drama package is really a trivial extension of the
+    org.bzdev.drama.generic package. For the most part, it just provides
+    concrete names and eliminates the need for most of the
+    type parameters used by org.bzdev.drama.generic.
+  <li> org.bzdev.drama.generic provides the basic operations provided
+    by the org.bzdev.drama package, but uses generic types so that
+    multiple "flavors" of drama-like simulation libraries can be
+    created. For example, in some application domains, the term Agent
+    is preferable to Actor, and each agent may have some additional
+    methods beyond those provided by the corresponding class in
+    org.bzdev.drama.generic.
+  <li> org.bzdev.drama.common contains classes that are useful for all
+    flavors of drama-like simulations.
+</UL>
+
+<H2><A NAME="ejws">The module org.bzdev.ejws</A></H2>
+
+The module <CODE>org.bzdev.base</CODE> provides an embedded web server
+based on the Java package com.sun.net.httpserver that is part of the
+standard Java release. The following diagram shows the packages this
+module contains:
+<P>
+<center>
+  <img src="ejws.png" width="300px" height="auto" usemap="#ejwsMap">
+</center>
+<MAP NAME="ejwsMap">
+<AREA SHAPE="rect" coords="6,0,97,17" href="../org.bzdev.ejws/module-summary.html" alt="Embedded Web Server Module">
+<AREA SHAPE="rect" coords="91,102,201,127" href="../org.bzdev.ejws/org/bzdev/ejws/package-summary.html" alt="Embedded Web Server Pacakge">
+<AREA SHAPE="rect" coords="76,216,218,243" href="../org.bzdev.ejws/org/bzdev/ejws/maps/package-summary.html" alt="EJWS URL-Mapping Package">
+</MAP>
+<P>
+These packages are described below:
+<UL>
+  <LI> org.bzdev.ejws simplifies configuring an HttpServer or HttpsServer
+    provided by the com.sun.net.httpserver packages. It includes an
+    HttpHandler class (FileHandler) that uses classes defined in the
+    package org.bzdev.ejws.map to map URLs into objects that can be
+    used to satisfy an HTTP request.
+  <LI> org.bzdev.ejws.map contains a collection of classes that map
+    a URL to resource and allow that resource to be read.
+  <LI>
+</UL>
+
+
+<H2><A NAME="rest">The remaining modules</A></H2>
+
+The remaining modules are ones with one package (sometimes a substantial
+package) per module. The following diagram shows these modules and their
+packages:
+<P>
+<center>
+  <img src="rest.png" width="500px" height="auto" usemap="#restMap">
+</center>
+<MAP NAME="restMap">
+<AREA SHAPE="rect" coords="-1,2,121,20" href="../org.bzdev.anim2d/module-summary.html" alt="2D Animation Module">
+<AREA SHAPE="rect" coords="286,1,423,22" href="../org.bzdev.obnaming/module-summary.html" alt="Object Naming Module">
+<AREA SHAPE="rect" coords="3,245,98,263" href="../org.bzdev.p3d/module-summary.html" alt="3D Printing Module">
+<AREA SHAPE="rect" coords="48,93,176,122" href="../org.bzdev.anim2d/org/bzdev/anim2d/package-summary.html" alt="2D Animation Package">
+<AREA SHAPE="rect" coords="317,97,467,125" href="../org.bzdev.obnaming/org/bzdev/obnaming/package-summary.html" alt="Object Naming Package">
+<AREA SHAPE="rect" coords="57,344,166,373" href="../org.bzdev.p3d/org/bzdev/p3d/package-summary.html" alt="3D Printing Package">
+</P>
+<UL>
+  <li> org.bzdev.anim2d provides support for simple, 2D animations based on
+       the org.bzdev.devqsim package, the org.bzdev.graph package, and the
+       org.bzdev.geom package.
+  <li> org.bzdev.obnaming provides a service in which an object namer
+       allows named objects to be looked up by name. Generics allow the
+       types for named objects and object namers to be specified, and
+       a framework for creating factories to generate named objects is
+       also provided.  An annotation processor simplifies the creation
+       of factories. Some classes useful for building factories when
+       using annotations are in the package org.bzdev.obnaming.misc, and
+       are used in the org.bzdev.anim2d package (see below).
+  <li> org.bzdev.p3d provides support for 3D printing. This package provides
+    classes that allow a 3D model to be shown in an animation (using the
+    org.bzdev.anim2d package) that rotates an object so it can be viewed
+    from multiple angles. It can also use classes in the org.bzdev.geom
+    package for generating complex shapes, and it can use the org.bzdev.graph
+    class to create images.
+</UL>
+<H2><A name="compile">Compilation</A></H2>
+<P>
+The following instructions are appropriate for Debian Linux and
+other distributions that put libraries in the same locations.
+The procedure depends on whether Java modules are used or not.
+<P>
+To compile without modules and without annotation processors,
+assuming the compiled classes will be put in the directory classes
+<BLOCKQUOTE><CODE><PRE>
+      javac -d classes -classpath /usr/share/java/libbzdev.jar \
+             JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+To compile without modules and with annotation processors, add a
+directory tmpsrc to hold the generated source-code files:
+<BLOCKQUOTE><CODE><PRE>
+      javac -d classes -classpath /usr/share/java/libbzdev.jar \
+             -s tmpsrc JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+In both cases JAVA_FILE should be a path whose components reflect the
+package hierarchy. For example, the class com.foo.pkg.Foo will be in
+the file com/foo/pkg/Foo.java.
+<P>
+To compile with modules and without annotations, the source file
+should be in subdirectories of a directory traditionally named
+src. These subdirectories should have names matching a module name
+(for example, com.foo.mod). The compiled code goes into similar
+subdirectories of a directory named mods:
+<BLOCKQUOTE><CODE><PRE>
+      javac -d mods/com.foo.mod -p /usr/share/bzdev JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+In this example, src/com.foo.mod must contain a file named
+module-info.java:
+<BLOCKQUOTE><CODE><PRE>
+      module com.foo.mod {
+        ....
+      }
+</PRE></CODE></BLOCKQUOTE>
+In addition, a Java source file for the class com.foo.pkg.Foo.java
+in the module com.foo.mod must be in the directory
+src/com.foo.mod/com/foo/pkg/Foo.java, with all modules and packages
+being compiled following this pattern.
+<P>
+To compile with modules and with annotation, the javac command above
+should be changed to
+<BLOCKQUOTE><CODE><PRE>
+      javac -d mods/com.foo.mod -p /usr/share/bzdev \
+          -s tmpsrc/com.foo.mod \
+          --processor-module-path /usr/share/bzdev \
+          src/com.foo.mod/module-info.java JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+<P>
+When javadoc is used to generate API documentation, the command for
+the previous example without modules when annotation processing is not
+used is:
+<BLOCKQUOTE><CODE><PRE>
+      javadoc -d APIDIR -sourcepath . \
+          -classpath classes JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+When annotation processing is used, this command becomes
+<BLOCKQUOTE><CODE><PRE>
+      javadoc -d APIDIR -sourcpath .:tmpsrc \
+          -classpath classes JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+where APIDIR is the directory that will contain the API documentation.
+Similarly, when modules are used without annotation processing, the
+javadoc command is
+<BLOCKQUOTE><CODE><PRE>
+      javadoc -d APIDIR --module-path JARDIR \
+          --add-modules com.foo.mod \
+          --module com.foo.mod JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+where JARDIR is a directory that contains the JAR files for the modules.
+When annotations are used, this becomes
+<BLOCKQUOTE><CODE><PRE>
+      javadoc -d APIDIR --module-path JARDIR \
+          --module-source-path src:tmpsrc \
+          --add-modules com.foo.mod \
+          --module com.foo.mod JAVA_FILE...
+</PRE></CODE></BLOCKQUOTE>
+<P>
+There is a minor detail to watch: the options <CODE>--module-path</CODE>,
+<CODE>module-source-path</CODE>, and <CODE>--add-modules</CODE> allow
+multiple objects to be listed, separated by a colon.  The
+<CODE>--module</CODE> option requires that the module names be separated
+by a comma.
+<P>
+Finally, when named object factories are used, the factories can describe
+their parameters.  The program <CODE>lsnof</CODE> can generate documentation
+describing a factory's parameters. When modules are not used the command
+is
+
+<BLOCKQUOTE><CODE><PRE>
+      lsnof -d APIDIR --classpathCodebase JARFILE CLASSNAME...
+</PRE></CODE></BLOCKQUOTE>
+and when modules are used, the command is
+<BLOCKQUOTE><CODE><PRE>
+      lsnof -d APIDIR --module-path JARDIR CLASSNAME...
+</PRE></CODE></BLOCKQUOTE>
+While fully-qualified class names can be provided explicitly, lsnof
+also supports a wildcard syntax described in the lsnof man page and
+elsewhere.  In both cases, the documentation will appear in a
+subdirectory of APIDIR named <CODE>factories-api</CODE> (the hyphen is
+used to prevent collisions with Java package names). If a factory's
+fully qualified class name is <CODE>org.foo.pkg.Factory</CODE>, one
+can place the parameter documentation in an IFRAME by using an IFRAME
+whose source attribute is
+<BLOCKQUOTE><CODE><PRE>
+   SRC="{@docRoot}/factories-api/org/foo.pkg/Factory.html"
+</PRE></CODE></BLOCKQUOTE>
+The javadoc program will replace <CODE>{@docRoot}</CODE> with the API
+directory (APIDIR in this example).
+
+<H2><A name="libraries">Libraries</A></H2>
+
+The JAR files for the libbzdev modules should be available in a single
+directory.  On Debian Linux systems, unless modified by a package
+maintainer, the files are in /usr/share/java. Typically an application
+will set up symbolic links to these files (there are some files in
+/usr/share/java that interact pooly with Java modules, making it
+problematic to put /usr/share/java on a module path). The JAR files for
+the lsnof and scrunner commands are located in /usr/share/bzdev and
+when these are installed (the Debian package is libbzdev-util), symbolic
+links to /usr/share/java from /usr/share/bzdev will be set up as well.
+<P>
+Normally, just setting the module path to include /usr/share/bzdev
+is sufficient. However, if an application has to run on a device with
+tight memory/storage constraints, or if jlink is used to create a
+custom JVM for a specific application, it may be desirable to include
+a subset of these Jar files. The following table lists the JAR file
+for each module with the dependencies on other libbzdev modules.
+<P>
+<CENTER>
+  <TABLE border="1" summary="libbzdev modules and JAR files"
+	 style="background-color: rgb(235,235,255); width=75%" >
+  <CAPTION><B><EM>Modules and their JAR files</EM></B></CAPTION>
+  <TR><TH>Module</TH><TH>JAR File and Dependencies</TH></TR>
+  <TR><TD>org.bzdev</TD><TD>libbzdev.jar<BR>(special case
+      that includes other modules but does not provide any
+      code)</TD></TR>
+  <TR><TD>org.bzdev.animd2d</TD><TD>libbzdev-anim2d.jar<BR>org.bzdev.base,
+      org.bzdev.devqsim, org.bzdev.graphics, org.bzdev.math,
+      org.bzdev.obnaming</TD></TR>
+  <TR><TD>org.bzdev.base</TD><TD>libbzdev-base.jar<BR>(no dependencies
+      on org.bzdev packages)</TD></TR>
+  <TR><TD>org.bzdev.desktop</TD><TD>libbzdev-desktop.jar<BR>org.bzdev.base,
+      org.bzdeb.graphics</TD></TR>
+  <TR><TD>org.bzdev.devqsim</TD><TD>libbzdev-devqsim.jar<BR>org.bzdev.base,
+      org.bzdev.math, org.bzdev.obnaming</TD></TR>
+  <TR><TD>org.bzdev.dmethods</TD><TD>libbzdev-dmethods.jar<BR>org.bzdev.base
+      (used for annotation processing)</TD></TR>
+  <TR><TD>org.bzdev.ejws</TD><TD>libbzdev-ejws.jar<BR>org.bzdev.base</TD></TR>
+  <TR><TD>org.bzdev.graphics</TD><TD>libbzdev-graphics.jar<BR>org.bzdev.base,
+      org.bzdev.math, org.bzdev.obnaming</TD></TR>
+  <TR><TD>org.bzdev.math</TD><TD>libbzdev-math.jar<BR>org.bzdev.base</TD></TR>
+  <TR><TD>org.bzdev.obnaming</TD><TD>libbzdev-obnaming.jar<BR>org.bzdev.base,
+      org.bzdev.math</TD></TR>
+  <TR><TD>org.bzdev.p3d</TD><TD>libbzdev-p3d.jar<BR>org.bzdev.anim2d,
+      org.bzdev.base, org.bzdev.devqsim, org.bzdev.graphics,
+      org.bzdev.math, org.bzdev.obnaming</TD></TR>
+  <TR><TD>org.bzdev.parmproc</TD><TD>libbzdev-parmproc.jar<BR>org.bzdev.base
+      (used for annotation processing)</TD></TR>
+  <TR><TH colspan="2">Modules and Jar files for Commands</TH></TR>
+  <TR><TD>org.bzdev.lsnof</TD><TD>libbzdev-lsnof.jar<BR>org.bzdev.base,
+      org.bzdev.obnaming</TD></TR>
+  <TR><TD>org.bzdev.scrunner</TD><TD>libbzdev-scrunner.jar<BR>org.bzdev.base,
+      org.bzdev.math, org.bzdev.obnaming</TD></TR>
+</TABLE>
+</CENTER>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  BZDev MathOps Appendable subpackages subclasses io
+ -->
+<!--  LocalWords:  zier BufferedImage SPI SVG HttpServer HttpsServer
+ -->
+<!--  LocalWords:  HttpHandler FileHandler scriptable namer namers
+ -->
+<!--  LocalWords:  tmpsrc subdirectories src javac javadoc APIDIR
+ -->
+<!--  LocalWords:  JARDIR lsnof subdirectory IFRAME
+ -->

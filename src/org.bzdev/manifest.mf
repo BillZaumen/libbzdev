@@ -1,0 +1,13 @@
+Class-Path: ./libbzdev-base.jar
+  ./libbzdev-dmethods.jar
+  ./libbzdev-esp.jar
+  ./libbzdev-math.jar
+  ./libbzdev-obnaming.jar
+  ./libbzdev-parmproc.jar
+  ./libbzdev-graphics.jar
+  ./libbzdev-desktop.jar
+  ./libbzdev-devqsim.jar
+  ./libbzdev-drama.jar
+  ./libbzdev-anim2d.jar
+  ./libbzdev-p3d.jar
+  ./libbzdev-ejws.jar

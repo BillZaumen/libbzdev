@@ -1,0 +1,25 @@
+var out ?= scripting.getWriter();
+scripting.importClass("org.bzdev.anim2d", "Animation2D");
+scripting.finishImport();
+###
+out.print(Animation2D.class);
+out.print("\n");
+var a2d = new Animation2D(scripting);
+out.print(global.typeof (a2d));
+out.print("\n");
+
+scripting.importClass("org.bzdev.graphs.Graph");
+scripting.finishImport();
+###
+out.print("typeof(Graph) = " + Graph.class);
+out.print("\n");
+out.print("typeof(Graph.Axis) = " +  Graph.Axis.class);
+out.print("\n");
+
+scripting.importClass("java.util.Locale.Category");
+scripting.finishImport();
+###
+out.print("typeof(Category) = " + Category.class);
+out.print("\n");
+out.print(Category.DISPLAY);
+out.print("\n");

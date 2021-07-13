@@ -1,0 +1,6 @@
+var err ?= scripting.getErrorWriter();
+var out ?= scripting.getWriter();
+
+out.print("foo = ");
+out.println(foo);
+

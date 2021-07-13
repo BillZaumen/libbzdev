@@ -1,0 +1,9 @@
+var array = [30, 40];
+var x = -10;
+#+T #+S
+var y = -x;
+x = -y;
+array[0] = -x;
+30 + 40;
+###
+#-S #-T

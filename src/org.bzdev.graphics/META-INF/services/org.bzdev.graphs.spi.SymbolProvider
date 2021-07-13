@@ -1,0 +1,8 @@
+org.bzdev.graphs.symbols.EmptyCircleProvider
+org.bzdev.graphs.symbols.SolidCircleProvider
+org.bzdev.graphs.symbols.EmptySquareProvider
+org.bzdev.graphs.symbols.SolidSquareProvider
+org.bzdev.graphs.symbols.EmptyHourglassProvider
+org.bzdev.graphs.symbols.SolidHourglassProvider
+org.bzdev.graphs.symbols.EmptyBowtieProvider
+org.bzdev.graphs.symbols.SolidBowtieProvider

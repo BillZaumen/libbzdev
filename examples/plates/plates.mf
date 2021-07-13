@@ -1,0 +1,2 @@
+Main-Class: Plates
+Class-Path: libbzdev.jar

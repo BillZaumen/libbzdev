@@ -1,0 +1,5 @@
+// Test of error handling.
+
+foo = 10;
+bar = 20;
+

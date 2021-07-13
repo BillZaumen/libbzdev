@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+  configuration1: {}
+  configuration2: []
+  configuration3: hello
+  list:
+    - foo1: 10
+      bar2: []
+    - foo1: 20
+      bar2: []
+...

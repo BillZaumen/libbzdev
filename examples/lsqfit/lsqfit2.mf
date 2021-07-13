@@ -1,0 +1,2 @@
+Main-Class: FitTest2
+Class-Path: libbzdev.jar libosgbatik.jar

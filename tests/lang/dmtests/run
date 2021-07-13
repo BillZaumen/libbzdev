@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Do not set java.system.class.loader because Java 11 does not let you
+# do this when using archived non-system classes.
+#
+# java  -classpath ../../../BUILD/lib/libbzdev.jar:ourclasses1/:ourclasses/ \
+#    -Djava.system.class.loader=org.bzdev.lang.DMClassLoader \
+#    "$@"
+
+java  -classpath ../../../BUILD/libbzdev.jar:ourclasses1/:ourclasses/ "$@"

@@ -1,0 +1,15 @@
+// test syntax error detection
+[{"value1": 10, 
+  "value6" = "OPT1",
+  "value7": ["OPT2", "OPT3"],
+  "peer": "peer1",
+  "others": ["peer2", "peer3"]},
+ {withPrefix: "unkeyed",
+  config: {"Value1": 20}},
+ {withPrefix: "keyed",
+  "config": [{"withKey": "peer1", "config": {"Value7": ["OPT1"]}},
+	     {"withKey": "peer2", "config": {"Value7": ["OPT2", "OPT3"]}}]},
+ {withPrefix: "intkeyed",
+   withIndex: [{"Value1": 50}, {"Value1": 60},
+		 {"Value1": 70}, {"Value1": 80}]}
+]

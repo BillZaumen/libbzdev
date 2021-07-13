@@ -1,0 +1,2 @@
+Main-Class: ZipViewer
+Class-Path: ./libbzdev.jar

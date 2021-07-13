@@ -1,0 +1,131 @@
+if (typeof(err) == "undefined") {
+    err = java.lang.System.err;
+}
+if (typeof(out) == "undefined") {
+    out = java.lang.System.out;
+}
+
+out.println("... testScript.js started");
+
+try {load("nashorn:mozilla_compat.js");} catch (error) {}
+
+importPackage(org.bzdev.math.rv);
+
+rvrv = new UniformIntegerRVRV(new UniformIntegerRV(0,10),
+			      new UniformIntegerRV(10, 15));
+
+factory.configure({value1: 10, value2: 20, value3: rvrv,
+		   value4: 20.0, value5: new UniformDoubleRV(0.0, 5.0),
+		   value6: "OPT2"});
+
+// factory.configure([{value7: "OPT1"}, {value7: "OPT2"}]);
+factory.configure({value7: ["OPT1", "OPT2"]});
+
+sobj1 = factory.createObject("scriptCreated1");
+out.println("created object " +sobj1.getName());
+
+out.println("    sobj1 value1 = " + sobj1.getValue1());
+out.println("    sobj1 value2 = " + sobj1.getValue2());
+out.println("    sobj1 value3 = " + sobj1.getValue3());
+out.println("    sobj1 value3 = " + sobj1.getValue3());
+out.println("    sobj1 value3 = " + sobj1.getValue3());
+out.println("    sobj1 value3 = " + sobj1.getValue3());
+out.println("    sobj1 value4 = " + sobj1.getValue4());
+out.println("    sobj1 value5 = " + sobj1.getValue5());
+out.println("    sobj1 value6 = " + sobj1.getDefaultOption());
+out.println("    sobj1 value7 values:");
+iterator = sobj1.getOptions().iterator();
+while (iterator.hasNext()) out.println("\t" + iterator.next());
+
+sobj2 = factory.createObject("scriptCreated2");
+sobj3 = factory.createObject("scriptCreated3");
+
+// factory.configure({peer: "scriptCreated1"});
+factory.configure([{peer: sobj1, others: [sobj2, sobj3]},
+		{withKey: sobj1, config: {"keyed.Value1": 10,
+					  "keyed.Value2":
+					 new UniformIntegerRV(11, 20)}},
+		{"keyed.Others": "scriptCreated1.scriptCreated2"},
+		{withKey: sobj1, config: {"keyed.Others": sobj3}},
+		{withKey: sobj1, config: {"keyed.Value7": ["OPT1", "OPT2"]}}
+		  ]);
+
+sobj4 = factory.createObject("scriptCreated4");
+
+factory.printKeyedValue7(sobj1);
+
+out.println("sobj4: peer = "  + sobj4.getPeer().getName());
+iterator = sobj1.others().iterator();
+while (iterator.hasNext()) out.println("\t" + iterator.next());
+
+
+factory.clear();
+factory.configure({withIndex: [{"intkeyed.Value4": 21.0,
+				"intkeyed.Others": [sobj1, sobj2]},
+			       {"intkeyed.Value4": 22.0},
+			       {"intkeyed.Value4": 23.0}]});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+factory.clear();
+factory.configure({withIndex: {"intkeyed.Value4": 24.0,
+			       "intkeyed.Others": [sobj1, sobj2]}});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+out.println("trying withPrefix case");
+factory.clear();
+factory.configure({withPrefix: "intkeyed",
+		   config: {withIndex: [{"Value4": 21.0,
+					 "Others": [sobj1, sobj2]},
+					{"Value4": 22.0},
+					{"Value4": 23.0}]}});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+out.println("trying withPrefix case combined with withIndex");
+factory.clear();
+factory.configure({withPrefix: "intkeyed",
+		   withIndex: [{"Value4": 21.0,
+				"Others": [sobj1, sobj2]},
+			       {"Value4": 22.0},
+			       {"Value4": 23.0}]});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+out.println("trying withPrefix case combined with withKey");
+factory.clear();
+factory.configure({withPrefix: "intkeyed", withKey: 0,
+		   config: {"Value4": 21.0,
+			    "Others": [sobj1, sobj2]}});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+factory.clear();
+
+out.println("trying withPrefix case combined with withKey, no configs");
+factory.configure({withPrefix: "intkeyed", withKey: 0,
+		   "Value4": 21.0,
+		   "Others": [sobj1, sobj2]});
+factory.printIntkeyedValue4();
+factory.printIntkeyedOthers();
+
+factory.clear();
+
+
+out.println("kprim1 test:");
+factory.configure([{withKey: sobj1, kprim1: 1, kprim4: 1.1},
+		   {withKey: sobj2, kprim1: 2, kprim4: 2.2}]);
+factory.printKprims();
+
+out.println("unkeyed test:");
+factory.configure({withPrefix: "unkeyed",
+		   config: {Value1: 100, Value4: 200.0}});
+factory.printUnkeyed();
+
+out.println("unkeyed test, no config:");
+factory.configure({withPrefix: "unkeyed",
+		   Value1: 100, Value4: 200.0});
+factory.printUnkeyed();
+
+out.println("... testScript.js ended");

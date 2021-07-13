@@ -1,0 +1,2 @@
+Bad syntax example:
+$(val )

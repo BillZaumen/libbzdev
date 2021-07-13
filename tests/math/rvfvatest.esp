@@ -1,0 +1,51 @@
+import(java.lang.Math);
+import(org.bzdev.math.RealValuedFunctionVA);
+
+function f(args) {
+    var x = args[0];
+    var y = args[1];
+    Math.sin(x) * Math.cos(y)
+}
+
+function fp(i, args)  {
+    var x = args[0];
+    var y = args[1];
+    (i == 0)? Math.cos(x) * Math.cos(y):
+    (i == 1)? -Math.sin(x) * Math.cos(y):
+      throw "bad first argument: " + i
+}
+
+function fpp(i, j, args) {
+    var x = args[0];
+    var y = args[1];
+    (i == 0 && j == 0)? -Math.sin(x) *  Math.cos(y):
+    (i == 0 && j == 1)? -Math.cos(x) * Math.sin(y):
+    (i == 1 && j == 0)? -Math.cos(x) * Math.sin(y):
+    (i == 1 && j == 1)? -Math.sin(x) * Math.cos(y):
+       throw "bad first or second arguments"
+}
+
+new RealValuedFunctionVA(2,2, scripting, {
+    valueAt: function(args) {
+	var x = args[0];
+	var y = args[1];
+	Math.sin(x) * Math.cos(y);
+    },
+    derivAt: function(i,args) {
+	var x = args[0];
+	var y = args[1];
+	(i == 0)? Math.cos(x) * Math.cos(y):
+	(i == 1)? -Math.sin(x) * Math.cos(y):
+	  throw "Illegal Argument"
+
+    },
+    secondDerivAt: function(i,j,args) {
+	var x = args[0];
+	var y = args[1];
+	(i == 0 && j == 0)? -Math.sin(x) *  Math.cos(y):
+	(i == 0 && j == 1)? -Math.cos(x) * Math.sin(y):
+	(i == 1 && j == 0)? -Math.cos(x) * Math.sin(y):
+	(i == 1 && j == 1)? -Math.sin(x) * Math.cos(y):
+	    throw "Illegal Argument"
+    }
+});

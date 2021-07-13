@@ -1,0 +1,11 @@
+#!/bin/sh
+# java -classpath ../../BUILD/scrunner.jar \
+#      -Djava.security.policy=../../BUILD/libbzdev.policy \
+#      -Dscrunner.usrconf=test.conf \
+#       org.bzdev.bin.scrunner.SCRunnerCmd "$@"
+java -p ../../BUILD \
+     -Djava.security.policy=../../BUILD/libbzdev.policy \
+     -Dscrunner.usrconf=test.conf \
+     -m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
+     "$@"
+

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<HTML>
+<BODY>
+<B>The BZDev class library</B>
+<P>
+The BZDev class library supports discrete-event simulation, graphs and
+plotting, mathematical functions and numerical algorithms, 2D
+animation, 3D printing, writing graphics to output streams,
+integration of scripting with applications, additional Swing
+components, etc. The library uses 'factory' classes for configuring
+simulations and animations. An annotation processor makes it
+relatively easy to create a factory class.  The code is partitioned
+into several modules. The dependencies are shown in the following
+graph:
+<center><!-- width is the actual image width -->
+<img src="doc-files/modules.png" width="475px" height="auto" usemap="#modules">
+</center>
+<MAP NAME="modules">
+<AREA SHAPE="rect" coords="347, 0, 439, 22" href="./org.bzdev.p3d/module-summary.html">
+<AREA SHAPE="rect" coords="100, 72, 204, 99" href="./org.bzdev.drama/module-summary.html">
+<AREA SHAPE="rect" coords="220, 72, 334, 96" href="./org.bzdev.anim2d/module-summary.html">
+<AREA SHAPE="rect" coords="49, 149, 177, 179" href="./org.bzdev.devqsim/module-summary.html">
+<AREA SHAPE="rect" coords="310, 144, 440, 171" href="./org.bzdev.desktop/module-summary.html">
+<AREA SHAPE="rect" coords="0, 201, 120, 233" href="./org.bzdev.obnaming/module-summary.html">
+<AREA SHAPE="rect" coords="220, 198, 348, 232" href="./org.bzdev.graphics/module-summary.html">
+<AREA SHAPE="rect" coords="112, 249, 223, 276" href="./org.bzdev.math/module-summary.html">
+<AREA SHAPE="rect" coords="381, 236, 475, 262" href="./org.bzdev.ejws/module-summary.html">
+<AREA SHAPE="rect" coords="211, 288, 318, 305" href="./org.bzdev.base/module-summary.html">
+</MAP>
+<P>
+All of these modules are dependent on the module org.bzdev.base, but
+only some dependencies are shown explicitly to reduce clutter: just
+enough so that the diagram will show at least an indirect dependency.
+Two  modules, org.bzdev.dmethods and org.bzdev.parmproc, are not shown
+as these are used only for annotation processing.
+<P>
+<B>For a more detailed description of this library, please use the following
+links</B>
+<UL>
+  <LI><A HREF="doc-files/description.html"><B>Library description</B></A>
+    (includes <A HREF="doc-files/description.html#compile">
+      <B>compilation instructions</B></A> and a <A HREF="doc-files/description.html#libraries">
+      <B>module/library list</B></A>).
+  <LI><A HREF="factories-api/index.html" target="_top"><B>Factory API</B></A>.
+</UL>
+<B>and the following books:</B>
+<UL>
+  <LI>An Introduction to the BZDev Java class library.
+  <LI>A Scripting Guide for the BZDev class library.
+  <LI>Programming named-objectes and their factories.
+  <LI>A scripting guide for the org.bzdev.roadanim package.
+  <LI>Bicycle-sharing simulation---programming and scripting.
+</UL>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  BZDev subclasses
+ -->

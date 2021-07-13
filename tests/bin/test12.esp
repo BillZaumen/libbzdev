@@ -1,0 +1,7 @@
+var out = global.getWriter();
+import (org.bzdev.anim2d.Animation2D);
+import (org.bzdev.graphs.Graph);
+
+out.println(Animation2D.class);
+out.println("typeof(Graph) = " + Graph.class);
+out.println("typeof(Graph.Axis) = " + Graph.Axis.class);

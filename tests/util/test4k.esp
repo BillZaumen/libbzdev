@@ -1,0 +1,4 @@
+
+import (org.bzdev.obnaming.misc.BasicStrokeParm.Cap);
+
+var r = ROUND;

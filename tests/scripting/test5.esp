@@ -1,0 +1,10 @@
+import("", [ScriptingTest4, ScriptingTest4.Adapter]);
+
+var listener = new Packages.ScriptingTest4$Adapter
+                     (scripting, {method1: function(str, val) {
+				      file = new
+				      java.io.FileOutputStream("test5.out");
+				      file.close();
+				 }});
+
+var tl = new java.lang.String("test string");

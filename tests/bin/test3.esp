@@ -1,0 +1,6 @@
+import (java.io, [InputStreamReader, LineNumberReader]);
+var err ?= scripting.getErrorWriter();
+var out ?= scripting.getWriter();
+var input = new java.io.InputStreamReader(is, "UTF8");
+var reader = new java.io.LineNumberReader(input);
+out.println(reader.readLine());

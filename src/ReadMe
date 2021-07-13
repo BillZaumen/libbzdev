@@ -1,0 +1,77 @@
+This directory contains two scripts used to maintain the image
+maps in the file description.html.  The first script is named
+editMap and is used to edit image maps (adjusting the area on
+the map that is active for each URL in the map)
+
+    ./editMap
+	Edit the image map for the 'modules' image map in overview.html
+
+    ./editMap modules2
+        Edit the image map for 'modules2' in description.html
+
+    ./editMap base
+        Edit the image map for 'base' in description.html
+
+    ./editMap desktop
+        Edit the image map for 'desktop' in description.html
+
+    ./editMap devqsim
+        Edit the image map for 'devqsim' in description.html
+
+    ./editMap drama
+        Edit the image map for 'drama' in description.html
+
+    ./editMap ejws
+        Edit the image map for 'ejws' in description.html
+
+    ./editMap graphics
+        Edit the image map for 'graphics' in description.html
+
+    ./editMap math
+        Edit the image map for 'math' in description.html
+
+    ./editMap rest
+        Edit the image map for 'rest' in description.html
+
+The .editMap command starts the program epts with appropriate arguments.
+
+The next step uses the script createMap to create image maps for a specified
+case:
+
+    ./createMap
+	Create a map for 'modules' to be placed in the file overview.html
+
+    ./createMap modules2
+    	Create a map for 'modules2' to be placed in the file description.html
+
+    ./createMap base
+    	Create a map for 'base' to be placed in the file description.html
+
+    ./createMap desktop
+    	Create a map for 'desktop' to be placed in the file description.html
+
+    ./createMap devqsim
+    	Create a map for 'devqsim' to be placed in the file description.html
+
+    ./createMap drama
+    	Create a map for 'drama' to be placed in the file description.html
+
+    ./createMap ejws
+    	Create a map for 'ejws' to be placed in the file description.html
+
+    ./createMap graphics
+    	Create a map for 'graphics' to be placed in the file description.html
+
+    ./createMap math
+    	Create a map for 'math' to be placed in the file description.html
+
+    ./createMap rest
+    	Create a map for 'rest' to be placed in the file description.html
+	(this contains a map listing the modules that contain a single
+	package).
+
+The createMap script will print the map on standard output, and that can
+be easily pasted into the appropriate HTML file.
+
+Both scripts use the program epts (an application that uses this class library)
+to edit and generate the image maps.

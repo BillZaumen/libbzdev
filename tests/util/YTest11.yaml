@@ -1,0 +1,12 @@
+%YAML 1.2
+---
+ - returnTypes: &list
+    - org.bzdev.devqsim.rv.SimBinomialBooleanRV
+    - org.bzdev.devqsim.rv.SimBinomialBooleanRVRV
+
+ - argumentTypes:
+    *list
+
+ - methodClasses:
+    *list
+...

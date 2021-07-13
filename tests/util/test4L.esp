@@ -1,0 +1,58 @@
+import (org.bzdev.math.LUDecomp);
+import (org.bzdev.math.MatrixOps);
+import (org.bzdev.math.VectorOps);
+
+var dp = VectorOps.dotProduct(v1,v2);
+var cp = VectorOps.crossProduct(v1,v2);
+var lud = new LUDecomp(matrix);
+var x = lud.solve(y);
+var det = lud.det();
+var inverse = lud.getInverse();
+
+var v1c = v1.toESPArray();
+var v1p = v1c.toArray(double.class);
+var matrixc = matrix.toESPMatrix();
+var matrixp = matrixc.toMatrix(double.class);
+
+var a1 = [1.0, 2.0, 3.0].toArray(double.class);
+
+var s1 = ["hello", "goodbye", "ok"].toArray(String.class);
+var s2 = ["hello", "goodbye", "ok"].toArray();
+
+var ia = [1, 2, 3];
+var iarray = ia.toArray(int.class);
+var larray = ia.toArray(long.class);
+
+var m1 = [[1.0, 2.0, 3.0],
+       	  [4.0, 5.0, 6.0]].toMatrix(double.class);
+var m2 = [[1.0, 2.0, 3.0],
+       	  [4.0, 5.0, 6.0]].toMatrix();
+
+var sm1 = [["a", "b", "c"],
+    	   ["d", "e", "f"]].toMatrix(String.class);
+
+var im = [[1, 2, 3],
+       	  [4, 5, 6]];
+
+var imatrix = im.toMatrix(int.class);
+var lmatrix = im.toMatrix(long.class);
+
+function printArray(array) {
+    var out = global.getWriter();
+    (out != null) || throw "out is null";
+    var len = array.size();
+    IntStream.range(0, len).forEachOrdered(function (index) {
+        (index == 0)? out.print("[" + array.get(index)):
+            out.print(", " + array.get(index));
+    });                                                        
+    out.print("]");
+    out.flush();
+    void
+};
+
+global.getWriter().print("ia = ");
+printArray(ia);
+global.getWriter().println();
+global.getWriter().print("iarray = ");
+printArray(iarray);
+global.getWriter().println();

@@ -1,0 +1,6 @@
+import (ExprScriptTest5);
+
+obj.vatest(1, 10.0, 20.0, 30.0);
+
+var array = [10.0, 20.0, 30.0].toArray(double.class);
+obj.vatest(2, array);

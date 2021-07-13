@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="300" height="315">
+    <imageURI>doc-files/ejws.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="epts" type="PATH_START" key="module"  description="Embedded Web Server Module"/>
+       <row type="MOVE_TO" x="6.0" y="737.0" xp="6.0" yp="0.0"/>
+       <row type="SEG_END" x="97.0" y="298.0" xp="97.0" yp="17.0"/>
+       <row type="PATH_END"/>
+       <row varname="ejws2" type="PATH_START" key="package" link="ejws" description="Embedded Web Server Pacakge"/>
+       <row type="MOVE_TO" x="91.0" y="213.0" xp="91.0" yp="102.0"/>
+       <row type="SEG_END" x="201.0" y="188.0" xp="201.0" yp="127.0"/>
+       <row type="PATH_END"/>
+       <row varname="maps" type="PATH_START" key="package" link="ejws/maps" description="EJWS URL-Mapping Package"/>
+       <row type="MOVE_TO" x="76.0" y="99.0" xp="76.0" yp="216.0"/>
+       <row type="SEG_END" x="218.0" y="72.0" xp="218.0" yp="243.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

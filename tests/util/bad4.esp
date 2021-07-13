@@ -1,0 +1,7 @@
+var obj = {foo (a, b) {a + b},
+ foobar(x) {global.getWriter().println(x)},
+ bar () {
+   [10, 20, 30].stream().forEachOrdered(this.foobar);
+   [10, 20, 30].stream().forEachOrdered(this.foo);
+ }};
+obj.bar()

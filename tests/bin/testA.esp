@@ -1,0 +1,7 @@
+out.println("hello");
+x = 10.0;
+y = 20.0;
+out.format("x = %g, y = %g\n", x, y);
+var array;
+array = [x, y];
+out.format("x = %g, y = %g\n", array.toArray());

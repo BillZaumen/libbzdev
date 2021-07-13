@@ -1,0 +1,22 @@
+global.importClasses("org.bzdev.math", ["Functions"]);
+global.finishImport();
+
+function test (namer, package, spec) {
+    var f = function(entry) {
+        namer.println(entry.getKey() + ": " + package + "." + entry.getValue());
+	void
+    };
+    spec.properties().forEach(f);
+    void
+};
+
+test(global.getWriter(),"org.bzdev.anim2d",
+		     {foo: "AnimationLayer2DFactory",
+		      bar: "AnimationLayer2DFactory"});
+
+var vtest;
+var vtest1, vtest2;
+
+global.getWriter().println(vtest + " " + vtest1 + " " + vtest2);
+
+J(0, 0.0)	// compute a Bessel function of order 0 at 0.0.

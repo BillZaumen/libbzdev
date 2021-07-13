@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+	  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<META http-equiv="Content-Style-Type" content="text/css">
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type="text/javascript" charset="UTF-8" src="controls/params.js"></SCRIPT>
+<SCRIPT type="text/javascript" charset="UTF-8" src="controls/slideshow1.js"></SCRIPT>
+<TITLE>Photos</TITLE>
+</HEAD>
+<BODY  style="background-color: lightgray"
+       onload="configure()" id="body" class="webnailIndexHTML">
+<P> See <A HREF="foo.txt">foo.txt</A>.
+<P>The  web page was created by a program that sets up HTML, image, and
+Javascript files.  It has significant advantages over photo-sharing web sites for
+some niche applications, but is not a replacement for such sites.
+</P><TABLE id="imagesTable">
+<TR>
+<TD valign="top">
+  <TABLE border=1 frame="border" id="thumbnailTable">
+    <TR><TD>
+	<IFRAME marginwidth=10 marginheight=10 width=150 height=570
+		frameborder=0
+		name ="thumbnails" src="thumbnails/index.html">
+	</IFRAME>
+    </TD></TR>
+  </TABLE>
+</TD>
+<TD>
+  <TABLE width=545 id="imageTable">
+    <NOSCRIPT>
+      <TR>
+	<TD align="center">
+	  <TABLE>
+	    <TR>
+	      <TD style="color: red" id="noJavascriptMsg">
+		(Javascript required for nagivation controls)
+	      </TD>
+	    </TR>
+	  </TABLE>
+	</TD>
+      </TR>
+    </NOSCRIPT>
+    <SCRIPT type="text/javascript">
+      createControls(); 
+    </Script>
+    <TR>
+      <TD>
+	<SCRIPT type="text/javascript">
+	  createImageIframe();
+	</SCRIPT>
+	<NOSCRIPT>
+	<IFRAME marginwidth=10 marginheight=10 width=550 height=510
+		frameborder=0
+		src="controls/initial.html" name="images">
+	</IFRAME>
+	</NOSCRIPT>
+      </TD>
+    </TR>
+  </TABLE>
+</TD>
+</TR>
+</TABLE>
+<TABLE marginwidth=10 width=670 id="titleDescrTable">
+  <TR>
+    <TD width=150></TD>
+    <TD align="center" colspan=2>
+      <span style="font-size: larger; font-weight: bold" id="title">
+	Sample Webnail
+      </span>
+    </TD>
+  </TR>
+  <TR>
+    <TD width=150><IMG src="controls/strut.gif" width=2 height="20"></TD>
+    <TD align="center" valign="top" id="descr"></TD>
+  </TR>
+</TABLE>
+<H2>Advantages</H2>
+<P>Just for starters,</P>
+<ul>
+<li> The webnail can be placed behind a firewall or on a password-protected web
+server when confidentiality is important.  For example, pictures of a product
+development team could be useful to a competitor if the members of the team
+can be identified.  If you can find data on their past experience, that might suggest
+something about the product they are working on.
+<li>The web pages are useable with Javascript turned off - it is still possible to see
+all the webnail, although some navigation facilities will be missing, and a "slideshow"
+mode will not be available
+<li>When webnail are changed, the document object model can be modified easily.
+This provides considerable flexibility.
+<li> New page layouts can be added.
+<li> Multiple image formats can be used (e.g., PNG for some webnail).
+</ul>
+<H2>Outstanding Issues</H2>
+<ul>
+<li>The javascript works properly with Mozilla and Safari,
+but not with Internet Explorer - issues with Internet Explorer, related to it not
+following certain W3C standards, have not be fixed at this point.
+</ul>
+<SCRIPT type="text/javascript" charset="UTF-8" src="controls/slideshow2.js"></SCRIPT>
+</BODY>
+</HTML>

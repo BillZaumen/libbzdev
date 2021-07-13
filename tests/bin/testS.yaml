@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+ - execute:
+    - var a2d = new Animation2D(1920, 1080, 10000.0, 400)
+    - = a2d.setRanges(0.0, 0.0, 0.0, 0.0, 1.0, 1.0)
+
+ - factories:
+    - context: ["a2d", "org.bzdev.anim2d"]
+      pathf: AnimationPath2DFactory
+      alf: AnimationLayer2DFactory
+...

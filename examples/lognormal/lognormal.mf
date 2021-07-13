@@ -1,0 +1,2 @@
+Main-Class: LogNormalAnim
+Class-Path: libbzdev.jar

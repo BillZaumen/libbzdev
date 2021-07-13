@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="500" height="458">
+    <imageURI>doc-files/rest.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="anim2d" type="PATH_START" key="rect" link="../org.bzdev.anim2d/module-summary.html" description="2D Animation Module"/>
+       <row type="MOVE_TO" x="-1.0" y="456.0" xp="-1.0" yp="2.0"/>
+       <row type="SEG_END" x="121.0" y="438.0" xp="121.0" yp="20.0"/>
+       <row type="PATH_END"/>
+       <row varname="obnaming" type="PATH_START" key="rect" link="../org.bzdev.obnaming/module-summary.html" description="Object Naming Module"/>
+       <row type="MOVE_TO" x="286.0" y="457.0" xp="286.0" yp="1.0"/>
+       <row type="SEG_END" x="423.0" y="436.0" xp="423.0" yp="22.0"/>
+       <row type="PATH_END"/>
+       <row varname="p3d" type="PATH_START" key="rect" link="../org.bzdev.p3d/module-summary.html" description="3D Printing Module"/>
+       <row type="MOVE_TO" x="3.0" y="213.0" xp="3.0" yp="245.0"/>
+       <row type="SEG_END" x="98.0" y="195.0" xp="98.0" yp="263.0"/>
+       <row type="PATH_END"/>
+       <row varname="anim2d2" type="PATH_START" key="rect" link="../org.bzdev.anim2d/org/bzdev/anim2d/package-summary.html" description="2D Animation Package"/>
+       <row type="MOVE_TO" x="48.0" y="365.0" xp="48.0" yp="93.0"/>
+       <row type="SEG_END" x="176.0" y="336.0" xp="176.0" yp="122.0"/>
+       <row type="PATH_END"/>
+       <row varname="obnaming2" type="PATH_START" key="rect" link="../org.bzdev.obnaming/org/bzdev/obnaming/package-summary.html" description="Object Naming Package"/>
+       <row type="MOVE_TO" x="317.0" y="361.0" xp="317.0" yp="97.0"/>
+       <row type="SEG_END" x="467.0" y="333.0" xp="467.0" yp="125.0"/>
+       <row type="PATH_END"/>
+       <row varname="p3d2" type="PATH_START" key="rect" link="../org.bzdev.p3d/org/bzdev/p3d/package-summary.html" description="3D Printing Package"/>
+       <row type="MOVE_TO" x="57.0" y="114.0" xp="57.0" yp="344.0"/>
+       <row type="SEG_END" x="166.0" y="85.0" xp="166.0" yp="373.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

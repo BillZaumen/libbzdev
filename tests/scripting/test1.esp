@@ -1,0 +1,12 @@
+import (java.awt.Color);
+import (org.bzdev.graphs.Colors);
+
+var err ?= global.getErrorWriter();
+var out ?= global.getWriter();
+
+out.println("testing script in test1.js ...");
+out.println("create a color");
+var black = java.awt.Color.BLACK;
+var green = getColorBysRGB(0.0, 1.0, 0.0);
+
+out.println("done");

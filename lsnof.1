@@ -1,0 +1,401 @@
+.TH LSNOF "1" "December 2018" "libbzdev-util VERSION" "User Commands"
+.SH NAME
+lsnof \- run libbzdev Java code from a scripting language
+.SH SYNOPSIS
+.B lsnof \fB[\fIOPTION\fB]... [\fICLASSNAME\fB]...\fR
+.SH DESCRIPTION
+.PP
+.B lsnof
+(LS Named Object Factory) provide data about subclasses of
+NamedObjectFactory.  If no
+.I CLASSNAME
+arguments are provided, the output describes all factories listed
+in META\-INF/servcies/org.bzdev.obnaming.NamedObjectFactory resources
+in both libbzdev.jar and  code bases provided via the
+.B \-\-codebase
+option. Otherwise the output describes only the factories associated
+with each
+.I CLASSNAME
+argument.  These classname arguments are regular expressions that match
+the fully qualified class name of a factory. The character
+.B *
+matches all the characters in a class name except '.', which separates
+package names. The character
+.B (
+indicates the start of a group and
+.B )
+indicates the end of a group. The character
+.B |
+indicates alternatives (usually these will be inside groups). As a
+special case
+.BR **
+matches any sequence of characters, including ones of length 0, but
+must appear only at the end of a pattern.
+All other characters are treated normally.
+If the argument is literally
+.B *
+with no preceding package name, the pattern matches the class name
+of any class in the unnamed package.
+.PP
+If no output format option is provided, the output is plain text.
+For each factory, the factory name will be listed, followed by a colon.
+A series of indented entries follows.  Each starts with the word
+.B Parameter
+followed by a label in parentheses suitable for use by a GUI for giving
+the parameter a suitable name.  The label component is followed by a colon.
+With additional indentation, a series of values are shown presented by a
+name, followed by an equal sign, followed by a value.  The names are
+.BR Defining\ Factory\ Class ,
+.BR Type ,
+.BR Range ,
+.BR Random\-Variable\ Mode ,
+.BR Key\ Type ,
+and
+.BR Description .
+The defining factory class is the factory that defined a parameter,
+and may be a superclass of the factory being listed. The type is the
+type of the parameter's value. The range (which may be empty)
+specifies range constraints on the parameter's value. The key type is the
+type of the parameter's key for parameters that have keys. Finally, the
+description if a textual description of the parameter suitable for use by a
+GUI for a tool tip.
+.PP
+.B lsnof
+uses the class org.bzdev.util.TemplateProcessor to process templates.
+The syntax used by the template processor can be found in the javadoc
+documentation for org.bzdev.util.TemplateProcessor.  The key map used
+by the template processor is defined in the javadoc documentation for
+the method getTemplateKeyMap in the class
+org.bzdev.obnaming.NamedObjectFactory.
+.SH COMMON OPTIONS
+.PP
+These options are shared by all uses of this command. Most of
+these options indicate where
+.B lsnof
+should find binaries (e.g., JAR files or modular JAR files).
+.TP
+.B \-\-
+End of options.
+.TP
+.BI \-\-add\-modules\   MODULES
+Add a common-separated list
+.I MODULES
+of module names to any existing list, or create a new list if there
+is no existing list. This option determines which modules will be
+visible to
+.BR lsnof .
+By default, all the BZDev library modules are visible and do not have
+to be added.
+.TP
+.BI \-\-classpathCodebase\  URLPATH
+.TQ
+.BI \-\-codebase\  URLPATH
+Defines directories and jar files for the class path (for the
+.B \-\-classpathCodebase
+option) and for the module path (for the
+.B \-\-codebase
+option).
+.I URLPATH
+may be a URL giving the location of the classes or a path name in the
+local file system.  The character "|" is used as a path separator,
+with the sequence "||" interpreted as a literal "|", so that for an
+odd number of "|" characters in a row, only the final one is treated
+as a path separator.  If file name must start with "|", use a "file"
+URL and encode the "|" as %7C. If the starting sequence of a path
+component contains a ":" (the first one if there are more than one),
+and that sequence of characters is syntactically valid at the start of
+a URL, the path component is treated as a URL. Otherwise it is a file
+name.  This rule implies that Windows file names such as C:mycode.jar
+will be confused with a URL, so a URL should be used instead.  If a
+file name is not absolute, it is interpreted relative to the current
+working directory. The directory "..." refers the directory in which
+the BZDev library's JAR files resides (on Debian Linux systems, this
+directory is /usr/share/java, the standard location for Java libraries.)
+Multiple
+.B \-\-codebase
+and
+.B \-\-classpathCodebase
+options are allowed. For file names, a leading "~" followed by the
+name separator ("/" for Unix) is expanded to the user\'s home
+directory, a file name consisting of only "~" is replaced with the
+user\'s home directory, a leading "~~" is replaced with "~", and a
+leading "..." followed by the name separator ("/" for Unix) is
+replaced by the directory in which the bzdev class library's JAR file
+is located.  For the
+.B \-\-classpathCodebase
+case, a component can be any could appear in a Java
+.B \-classpath
+option, with the exception that a '|' has to be escaped. If a codebase
+has classes in the unnamed package, the
+.B \-\-classpathCodebase
+option must be used as all code bases on the module path must contain
+classes in named packages.
+.TP
+.B \-\-dryrun
+Prints the java command that would be executed but does not actually
+execute it.
+.TP
+.BI \-J \-JOPTION
+Causes a single-argument option
+.I \-JOPTION
+to be used by the java launcher that lsnof invokes.
+.TP
+.BI \-L\  LANGUAGE
+.TP
+Set the scripting language to
+.IR LANGUAGE .
+While scripting is not used, this option affects the values read when
+configuration files are processed.
+.TP
+.BI \-\-module\-path\  PATH
+.TQ
+.BI \-p\  PATH
+Add a colon-separated list of directories or modular JAR files to
+the module path.  This option may appear multiple times. While the
+path separator is a colon on Linux/Unix systems, it is a semicolon
+on Windows systems.  Unlike the
+.B \-\-codebase
+option, a component of the path may not be a URL. Whether to use a
+.B \-p
+option or a
+.B \-\-codebase
+option is a matter of style.  One might prefer  the
+.B \-p
+option when the module path contains directories. Unlike Java, multiple
+.B \-p
+or
+.B \-\-module-path
+options may be provided. If so, the paths are combined.
+.TP
+.B \-\-stackTrace
+Print a stack trace if an error occurs while processing factories.
+.TP
+.B \-\-trusted
+Do not install a security manager as the code bases are trusted.
+.SH API-DOCUMENTATION OPTIONS
+.PP
+.TP
+.BI \-\-baseURL\ URL
+Provides a base URL representing a common URL path for determining
+relative URLs. This is used in conjunction with the
+.B \-d
+option for cases in which multiple sets of API documentation will
+be in subdirectories of a common directory.
+.TP
+.BI \-d\  DIRNAME
+Causes a directory tree whose root is a directory named
+.B factories-api in the directory
+.I DIRNAME
+to be created. This will be similar to the Javadoc tree with a toplevel
+index.html file and an overview.html file, plus subdirectories for
+packages containing factories that should be documented. Factory
+class-names or regular expressions must be provided after the options.
+This option is intended for generating Javadoc-like documentation for
+factory parameters. Options indicating the location for Javadoc
+documentation for code bases should be provided. The
+.B \-d
+option itself provides one such API directory (which must exist before
+.B lsnof
+is run and should document the packages for the factories specified as
+the non-option arguments). For additional API directories, use the
+.B \-\-link
+or
+.B \-\-link-offline
+options.
+.TP
+.BI \-\-link\  URLs
+Specifies a Javadoc API directory to which links may be created. Multiple
+.B \-\- link options may be used. For each option,
+.I URLs
+is a '|' separated list of URLs. Pairs of '|' characters are replaced
+with single '|' characters to allow a '|' to appear in a URL. If a URL
+does not have a protocol, it is assumed to be a file name.
+.TP
+.BI \-\-link\-offline\  URL1 URL2
+Specifies a Javadoc API directory to which links may be created. Multiple
+.B \-\- link options may be used.  Links are made to
+.IR URL1 ,
+whereas package and module information is read from
+.IR URL2 .
+This option is useful for cases in which
+.I URL1
+is not currently accessible.
+.TP
+.BI \-\-overview\ URL
+Use the resource referenced by
+.I URL
+as the overview page that will be displayed when the factory documentation's
+index.html file is opened by a browser.  The
+.B \-\-overview
+option is used only with the
+.B \-d
+option. If the URL does not start with a protocol followed by a colon, it
+is assumed to be a file name.
+.TP
+.BI \-\-target\  name
+provides a target name for use in <A> elements. This is used in key maps
+containing the key
+.BR factoryDoc ,
+which contains HTML code that will generate the name of a factory as a link
+to the corresponding parameter documentation.
+.SH TEMPLATE OPTIONS
+.TP
+.BI \-\-charset\  CHARSET
+Set the character set used for input to
+.IR CHARSET .
+The default is
+.BR UTF-8 .
+This option is useful when templates are read from external files or
+from resources accessed via a URL and where the content type is not known.
+.PP
+The remaining template options are mutually exclusive. The options
+.BR \-\-templateResource ,
+.BR \-\-templateURL ,
+and
+.B \-\-templateFile
+specify specific templates explicitly. The rest use a resource bundle
+to find a template that is the closest match to the current locale.
+.TP
+.B \-\-definingClass
+The output will list the class names of factories, the names of the
+factories' parameters, and the class in which each parameter is defined.
+The values are separated by a tab, with each parameter appearing on its
+own line.
+.TP
+.B \-\-definingClassHTML
+The output contains the same fields as those provided by the
+.B definingClass
+option, but in HTML format.
+.TP
+.B \-\-html
+The output is in HTML format.
+.TP
+.B \-\-list
+Just list the factories that were found, one per line.
+.TP
+.BI \-\-templateFile\  FILENAME
+The input template is obtained from a file named
+.IR FILENAME .
+.TP
+.B \-\-templateResource\  RESOURCENAME
+The input template is obtained from a resource named
+.IR RESOURCENAME .
+The resource must be in a package that a Java module declares to
+be open.
+.TP
+.B \-\-templateURL\  URL
+The input template is referenced by a URL
+.IR URL .
+For some protocols (.e.g., HTTP) the charset to use is provided
+as a content type.  If this is wrong or missing, the
+.B charset
+option can be used to set the character set explicitly.
+.SH MISCELLANEOUS OPTIONS
+.TP
+.B \-\-listCodeBase
+List the code bases that were configured, one per line, starting with
+the code base for the BZDev class library. The code base for the standard
+Java library is not shown.  The code bases shown are those explicitly
+passed to
+.B \-\-codebase
+and
+.B \-\-classpathCodebase
+options.
+.SH EXAMPLES
+Assume there is a build directory named BUILD, and that
+BUILD/bzdev/doc/api is a symbolic link to the BZDev API directory
+(/usr/share/doc/libbzdev\-doc/api on Debian Linux systems), and
+that a directory named BUILD/roadanim/doc/api has been created by
+the
+.B javadoc
+program.  For non-Linux systems, we will assume the documentation
+for the BZDev class library will be in a subdirectory bzdev/doc/api of some
+system directory and that the documentation for the org.bzdev.roadanim package
+(this package is an add-on package with its own JAR file)
+will be in a subdirectory rdanim/doc/api of the same system directory.
+To create a set of HTML pages for this case, one can use the following
+command:
+.br
+.RS
+lsnof \-\-baseURL BUILD \\
+.RS
+\-\-link http://docs.oracle.com/javase/11/docs/api/ \\
+.br
+\-\-codebase BUILD/librdanim.jar \\
+.br
+\-d BUILD/rdanim/doc/api 'org.bzdev.roadanim.*'
+.RE
+.RE
+The documentation for the standard Java class library will then
+be obtained from Oracle's web server, and the documentation for
+the BZDev class library and the org.bzdev.roadanim package can
+then be copied into the appropriate subdirectories.  The directory
+name BUILD never appears in a link because the
+.B \-baseURL
+options causes relative URLs and paths to be used.
+.PP
+To create documentation for Debian systems, where the standard
+installation locations are known, one can use the following:
+.RS
+lsnof \-p BUILD \-\-add\-modules org.bzdev.roadanim \\
+.RS
+\-\-link file:///usr/share/doc/openjdk\-11\-doc/api/ \\
+.br
+\-\-link file:///usr/share/doc/libbzdev\-doc/api/ \\
+.br
+\-d BUILD/api/factories 'org.bzdev.roadanim.*'
+.RE
+.RE
+Assuming that the Javadoc documentation was created in BUILD/api, the
+files created can be tested as relative links will be used between the
+API and factory documentation for the roadanim package itself as the
+the factories subdirectory is a subdirectory of the corresponding API
+directory.
+.PP
+To find all the factories that are available, use the command
+.RS
+lsnof \-\-codebase ... \-p ... \-add\-modules ... \-\-list
+.RE
+To show documentation for a factory as plain text, use
+.RS
+lsnof \-\-codebase ...  \-p ... \-add\-modules ... FACTORY
+.RE
+where FACTORY is the fully qualified class name of a factory.
+Multiple factories can be listed and wildcards can be used as
+described above:
+.RS
+lsnof \-p BUILD \-\-add\-modules org.bzdev.roadanim 'org.bzdev.roadanim.*'
+.RE
+will print documentation as plain text for all factories in
+the package org.bzdev.roadanim.
+.SH FILES
+.B lsnof
+uses the same configuration files as
+.BR scrunner (1)
+so that factories listed in the configuration file for scrunner will
+be used by
+.BR lsnof .
+.TP 
+.I /etc/bzdev/scrunner.conf\ \fRor\fI\ /etc/opt/bzdev/scrunner.conf
+System configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used. The form starting with
+/etc/opt may be used on some systems (e.g. Solaris).
+.TP
+.I ~/.config/bzdev/scrunner.conf
+User configuration file that allows a specific Java launcher, class-path
+entries, and property definitions to be used.  Property definitions in this
+file override those in the system configuration file.
+.SH SEE ALSO
+.BR scrunner.conf (5)
+.br
+.BR scrunner (1)
+
+\"  LocalWords:  fIOPTION fICLASSNAME fR subclasses CLASSNAME javadoc
+\"  LocalWords:  NamedObjectFactory codebase classname superclass TP
+\"  LocalWords:  getTemplateKeyMap BZDev URLPATH dryrun JOPTION TQ br
+\"  LocalWords:  stackTrace baseURL subdirectories DIRNAME api html
+\"  LocalWords:  toplevel factoryDoc charset CHARSET UTF templateURL
+\"  LocalWords:  templateResource templateFile definingClass bzdev fI
+\"  LocalWords:  definingClassHTML RESOURCENAME listCodeBase rdanim
+\"  LocalWords:  subdirectory roadanim scrunner fRor Solaris config
+\"  LocalWords:  conf

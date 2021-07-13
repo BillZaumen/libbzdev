@@ -1,0 +1,6 @@
+import (ExprScriptTest4);
+
+var x = obj.foo;
+var y = obj.bar;
+var z = obj.foobar;
+void

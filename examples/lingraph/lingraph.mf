@@ -1,0 +1,2 @@
+Main-Class: LinearGraph
+Class-Path: libbzdev.jar

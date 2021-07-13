@@ -1,0 +1,68 @@
+var err ?= scripting.getErrorWriter();
+var out ?= scripting.getWriter();
+
+out.println("started script");
+
+
+import (org.bzdev.drama, [DramaSimulation, BooleanConditionFactory,
+			  DoubleConditionFactory, IntegerConditionFactory,
+			  DomainFactory, LongConditionFactory,
+			  BooleanCondition, DoubleCondition, LongCondition,
+			  IntegerCondition]);
+
+import (org.bzdev.drama.common.SimulationAdapter);
+import ([TestActor, TestActorFactory]);
+
+out.println("finished imports");
+var sim = new DramaSimulation();
+
+var dcf = sim.createFactory("org.bzdev.drama.DoubleConditionFactory");
+var icf = sim.createFactory(IntegerConditionFactory.class);
+var lcf = sim.createFactory("org.bzdev.drama.LongConditionFactory");
+var bcf = sim.createFactory(BooleanConditionFactory.class);
+var df = sim.createFactory( "org.bzdev.drama.DomainFactory");
+var taf = sim.createFactory(TestActorFactory.class);
+
+out.println("created factories");
+
+icf.configure({initialValue: 2});
+var ic = icf.createObject("integerCondition");
+
+var lc = lcf.createObject("longCondition", {initialValue: 3});
+var dc = dcf.createObject("doubleCondition", {initialValue: 1.0} );
+var bc = bcf.createObject("booleanCondition", true, {initialValue: true});
+
+out.println(dc.getName() + ": value = " + dc.getValue());
+out.println(ic.getName() + ": value = " + ic.getValue());
+out.println(lc.getName() + ": value = " + lc.getValue());
+out.println(bc.getName() + ": value = " + bc.getValue());
+
+var a1 = taf.createObject("a1");
+var a2 = taf.createObject("a2");
+
+a1.sendNewMsg(a2, 10);
+
+var adapter = sim.createAdapter({
+    simulationStart: function(s) {out.println("simulation started")},
+    simulationStop: function(s) {out.println("simulation stopped")},
+    messageReceiveStart: function(s,f,t,msg) {
+	out.println("starting msg " + msg)},
+    messageReceiveEnd: function(s,f,t,msg) {
+	out.println("ending msg " + msg)}});
+
+var adapter2 = new SimulationAdapter({
+    simulationStart: function(s) {out.println("SIMULATION STARTED")},
+    simulationStop: function(s) {out.println("SIMULATION STOPPED")}});
+
+sim.addSimulationListener(adapter);
+sim.addSimulationListener(adapter2);
+a2.addSimulationListener(adapter);
+sim.run();
+
+sim.getObjects(TestActor.class).stream().forEach(function (x) {
+    out.println(x.getName())});
+
+out.println("-----");
+
+sim.getObjects("org.bzdev.drama.Actor").stream().forEach(function (x) {
+    out.println(x.getName())});

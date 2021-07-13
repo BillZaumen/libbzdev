@@ -1,0 +1,81 @@
+// This file can be run using scrunner. The two ESP
+// methods are copied from the SplinePathBuilder.xml file
+// so that these functions can be tested independently. One
+// should double check that the copies in this file are up to
+// date before running a test.
+
+import (java.awt.geom.Path2D);
+import (java.awt.geom.Path2D.Double);
+import (org.bzdev.geom.SplinePathBuilder);
+import (org.bzdev.geom.SplinePathBuilder.WindingRule);
+import (org.bzdev.geom.SplinePathBuilder.CPoint);
+import (org.bzdev.geom.SplinePathBuilder.CPointType);
+var pbc = {
+    configurePathBuilderAux(pb, spec) {
+	var i = -1;
+	global.isESPArray(spec)?
+	    spec.stream().forEachOrdered(function (elem) {
+		i = i + 1;
+		global.isESPArray(elem)?
+		    this.configurePathBuilderAux(pb, elem):
+		    function (e, ind) {
+			var etype = e["type"];
+			(etype == "CLOSE" || etype == pb.constantCLOSE())?
+			    pb.append(pb.createCPointClose()):
+			(etype == "MOVE_TO" || etype == pb.constantMOVE_TO())?
+			    pb.append(pb.createCPointMoveTo(e["x"], e["y"])):
+			(etype == "SEG_END" || etype == pb.constantSEG_END())?
+			    pb.append(pb.createCPointSegEnd(e["x"], e["y"])):
+			(etype == "CONTROL" || etype == pb.constantCONTROL())?
+			    pb.append(pb.createCpointControl(e["x"], e["y"])):
+			(etype == "SPLINE" || etype == pb.constantSPLINE())?
+			    pb.append(pb.createCpointSpline(e["x"], e["y"])):
+			    throw "bad type: " +  etype + "at index" + ind;
+			void
+		    }(elem, i);
+		void
+	    }): void;
+    },
+    configurePathBuilder (pb, windingRule, spec) {
+      var wr = 
+	  (windingRule == "WIND_EVEN_ODD" || windingRule == Path2D.WIND_EVEN_ODD
+	   || windingRule == pb.constantWIND_RULE_NON_ZERO())?
+	     pb.constantWIND_EVEN_ODD():
+	  (windingRule == "WIND_NON_ZERO" ||
+	   windingRule == java.awt.geom.Path2D.WIND_NON_ZERO ||
+	   windingRule == pb.constantWIND_NON_ZERO())?
+	     pbconstantWIND_NON_ZERO():
+	     throw "bad winding rule: " + windingRule;
+      pb.initPath(wr);
+      this.configurePathBuilderAux(pb, spec);
+  }
+};
+
+import (org.bzdev.geom.Path2DInfo);
+
+var path1 = [
+    {type: "MOVE_TO", x: 20.0, y: 30.0},
+    {type: "SEG_END", x: 50.0, y: 60.0}];
+
+var path2 = [
+    {type: "MOVE_TO", x: 120.0, y: 130.0},
+    {type: "SEG_END", x: 150.0, y: 160.0}];
+
+var pathspec = [path1, path2];
+
+var pb = new org.bzdev.geom.SplinePathBuilder();
+pbc.configurePathBuilder(pb, "WIND_EVEN_ODD", pathspec);
+
+var path = pb.getPath();
+org.bzdev.geom.Path2DInfo.printSegments(path);
+
+var out = scripting.getWriter();
+
+// now test the actual implementation
+out.println();
+out.println("Now use PathBuilder");
+out.println();
+pb = new org.bzdev.geom.SplinePathBuilder(scripting);
+pb.configure("WIND_EVEN_ODD", pathspec);
+path = pb.getPath();
+org.bzdev.geom.Path2DInfo.printSegments(path);

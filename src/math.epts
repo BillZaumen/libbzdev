@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="700" height="450">
+    <imageURI>doc-files/math.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="math" type="PATH_START" key="module"  description="Math Module"/>
+       <row type="MOVE_TO" x="1.0" y="448.0" xp="1.0" yp="2.0"/>
+       <row type="SEG_END" x="89.0" y="434.0" xp="89.0" yp="16.0"/>
+       <row type="PATH_END"/>
+       <row varname="math2" type="PATH_START" key="package" link="math" description="Math Package"/>
+       <row type="MOVE_TO" x="231.0" y="314.0" xp="231.0" yp="136.0"/>
+       <row type="SEG_END" x="325.0" y="292.0" xp="325.0" yp="158.0"/>
+       <row type="PATH_END"/>
+       <row varname="mathspi" type="PATH_START" key="package" link="math/spi" description="Math SPI Package"/>
+       <row type="MOVE_TO" x="483.0" y="225.0" xp="483.0" yp="225.0"/>
+       <row type="SEG_END" x="603.0" y="202.0" xp="603.0" yp="248.0"/>
+       <row type="PATH_END"/>
+       <row varname="rv" type="PATH_START" key="package" link="math/rv" description="Random Variable Package"/>
+       <row type="MOVE_TO" x="43.0" y="204.0" xp="43.0" yp="246.0"/>
+       <row type="SEG_END" x="162.0" y="180.0" xp="162.0" yp="270.0"/>
+       <row type="PATH_END"/>
+       <row varname="stats" type="PATH_START" key="package" link="math/stats" description="Statistics Package"/>
+       <row type="MOVE_TO" x="291.0" y="204.0" xp="291.0" yp="246.0"/>
+       <row type="SEG_END" x="422.0" y="179.0" xp="422.0" yp="271.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

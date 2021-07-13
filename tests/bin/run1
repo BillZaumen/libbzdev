@@ -1,0 +1,4 @@
+#!/bin/sh
+java -classpath ../../BUILD/libbzdev.jar:../../BUILD/lsnof.jar \
+     -Dscrunner.usrconf=test.conf \
+      org.bzdev.bin.lsnof.FactoryPrinter "$@"

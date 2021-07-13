@@ -1,0 +1,2 @@
+Main-Class: P5Graph
+Class-Path: libbzdev.jar

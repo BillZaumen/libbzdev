@@ -1,0 +1,32 @@
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-base.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-obnaming.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-desktop.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-devqsim.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-drama.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-anim2d.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/../../BUILD/libbzdev-p3d.jar" {
+      permission java.security.AllPermission;
+};
+
+grant codebase "file:${user.dir}/classes/" {
+      permission org.bzdev.scripting.ScriptingContextPermission
+      		 "ATestNamer";
+};

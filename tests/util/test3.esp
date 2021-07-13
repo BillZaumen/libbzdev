@@ -1,0 +1,36 @@
+import(Foo);
+import (java.awt.geom.Path2D.Float);
+
+var foo = new Foo();
+
+var out ?= null;
+var out1 ?= global.getWriter();
+var out2 = global.getWriter();
+
+out.println(Foo.class);
+out.println(java.awt.geom.Path2D.Float.class);
+out.println(Path2D.Float.class);
+out.println("foo.getI() = " + foo.getI());
+out.flush();
+
+var bar1 ?= 10;
+var bar2 ??= 10;
+var bar3 ??= 20;
+var bar4 ??= 30;
+out.println("bar1 = " + bar1);
+out.println("bar2 = " + bar2);
+out.println("bar3 = " + bar3);
+out.println("bar4 = " + bar4);
+out.flush();
+
+var count = 0;
+
+function incrementer(incr) {
+    synchronized function (x) {
+	count = asInt(count + 1);
+	x + incr
+    }
+}
+var f = incrementer(10);
+
+f(20)

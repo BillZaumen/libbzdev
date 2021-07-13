@@ -1,0 +1,6 @@
+%YAML 1.2
+---
+ - define:
+    - &BLUE {red: 0, green: 0, blue: 255}
+    - &pathConfig [ {withPrefix: "color", config: *BLUE}]
+...

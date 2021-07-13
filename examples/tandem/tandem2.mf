@@ -1,0 +1,3 @@
+Main-Class: Tandem2
+Class-Path: libbzdev.jar
+

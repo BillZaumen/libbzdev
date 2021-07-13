@@ -1,0 +1,12 @@
+%YAML 1.2
+---
+  - execute:
+      - var gout ?= null
+      - var osg = null;
+  - execute:
+      - = (gout != null)? void:
+           function() {
+	     osg = OutputStreamGraphics.newInstance(gout, 800, 600, "png");
+	     void
+	   }()
+...

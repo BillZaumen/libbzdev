@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="700" height="513">
+    <imageURI>doc-files/desktop.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="desktop" type="PATH_START" key="module"  description="Desktop Module"/>
+       <row type="MOVE_TO" x="2.0" y="512.0" xp="2.0" yp="1.0"/>
+       <row type="SEG_END" x="116.0" y="493.0" xp="116.0" yp="20.0"/>
+       <row type="PATH_END"/>
+       <row varname="swing" type="PATH_START" key="package" link="swing" description="GUI Components Package"/>
+       <row type="MOVE_TO" x="256.0" y="340.0" xp="256.0" yp="173.0"/>
+       <row type="SEG_END" x="369.0" y="316.0" xp="369.0" yp="197.0"/>
+       <row type="PATH_END"/>
+       <row varname="proxyconf" type="PATH_START" key="package" link="swing/proxyconf" description="Proxy-Configuration GUI Component"/>
+       <row type="MOVE_TO" x="76.0" y="264.0" xp="76.0" yp="249.0"/>
+       <row type="SEG_END" x="254.0" y="237.0" xp="254.0" yp="276.0"/>
+       <row type="PATH_END"/>
+       <row varname="io" type="PATH_START" key="package" link="swing/io" description="IO-related Swing Support Package"/>
+       <row type="MOVE_TO" x="246.0" y="195.0" xp="246.0" yp="318.0"/>
+       <row type="SEG_END" x="382.0" y="167.0" xp="382.0" yp="346.0"/>
+       <row type="PATH_END"/>
+       <row varname="keys" type="PATH_START" key="package" link="swing/keys" description="Name-to-Virtual-Key Package"/>
+       <row type="MOVE_TO" x="245.0" y="143.0" xp="245.0" yp="370.0"/>
+       <row type="SEG_END" x="392.0" y="117.0" xp="392.0" yp="396.0"/>
+       <row type="PATH_END"/>
+       <row varname="text" type="PATH_START" key="package" link="swing/text" description="Document-related Swing-Support Module"/>
+       <row type="MOVE_TO" x="247.0" y="91.0" xp="247.0" yp="422.0"/>
+       <row type="SEG_END" x="392.0" y="62.0" xp="392.0" yp="451.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

@@ -1,0 +1,48 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="700" height="309">
+    <imageURI>doc-files/graphics.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="graphics" type="PATH_START" key="module"  description="Graphics Module"/>
+       <row type="MOVE_TO" x="0.0" y="308.0" xp="0.0" yp="1.0"/>
+       <row type="SEG_END" x="103.0" y="293.0" xp="103.0" yp="16.0"/>
+       <row type="PATH_END"/>
+       <row varname="geom" type="PATH_START" key="package" link="geom" description="Geometry Package"/>
+       <row type="MOVE_TO" x="168.0" y="268.0" xp="168.0" yp="41.0"/>
+       <row type="SEG_END" x="255.0" y="241.0" xp="255.0" yp="68.0"/>
+       <row type="PATH_END"/>
+       <row varname="gio" type="PATH_START" key="package" link="gio" description="Graphics IO Package"/>
+       <row type="MOVE_TO" x="281.0" y="263.0" xp="281.0" yp="46.0"/>
+       <row type="SEG_END" x="364.0" y="241.0" xp="364.0" yp="68.0"/>
+       <row type="PATH_END"/>
+       <row varname="imageio" type="PATH_START" key="package" link="imageio" description="Image-IO Operations Package"/>
+       <row type="MOVE_TO" x="461.0" y="206.0" xp="461.0" yp="103.0"/>
+       <row type="SEG_END" x="565.0" y="184.0" xp="565.0" yp="125.0"/>
+       <row type="PATH_END"/>
+       <row varname="graphs" type="PATH_START" key="package" link="graphs" description="Graphs Package"/>
+       <row type="MOVE_TO" x="44.0" y="180.0" xp="44.0" yp="129.0"/>
+       <row type="SEG_END" x="143.0" y="155.0" xp="143.0" yp="154.0"/>
+       <row type="PATH_END"/>
+       <row varname="giospi" type="PATH_START" key="package" link="gio/spi" description="Graphics IO SPI Package"/>
+       <row type="MOVE_TO" x="357.0" y="157.0" xp="357.0" yp="152.0"/>
+       <row type="SEG_END" x="462.0" y="134.0" xp="462.0" yp="175.0"/>
+       <row type="PATH_END"/>
+       <row varname="misc" type="PATH_START" key="package" link="obnaming/misc" description="Named Object Factory Support Package"/>
+       <row type="MOVE_TO" x="359.0" y="83.0" xp="359.0" yp="226.0"/>
+       <row type="SEG_END" x="496.0" y="58.0" xp="496.0" yp="251.0"/>
+       <row type="PATH_END"/>
+       <row varname="graphsspi" type="PATH_START" key="package" link="graphs/spi" description="Graphs SPI Package"/>
+       <row type="MOVE_TO" x="112.0" y="127.0" xp="112.0" yp="182.0"/>
+       <row type="SEG_END" x="235.0" y="105.0" xp="235.0" yp="204.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

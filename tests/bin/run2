@@ -1,0 +1,6 @@
+#!/bin/sh
+#java -classpath ../../BUILD/libbzdev.jar:../../BUILD/lsnof.jar \
+#     -Djava.class.loader=org.bzdev.lang.DMClassLoader \
+#     org.bzdev.bin.lsnof.FactoryPrinter "$@"
+
+java -p ../../BUILD -m org.bzdev.lsnof "$@"

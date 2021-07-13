@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ $# = 0 ]
+then
+    epts -o - --template modules.tpl --mapName modules modules.epts
+else
+    case $1 in
+	modules2)
+	    epts -o - --template:HTMLImageMap --mapName modules2 modules2.epts
+	    ;;
+	rest)
+	    epts -o - --template:HTMLImageMap --mapName restMap rest.epts
+	    ;;
+	*)
+	    epts -o - --template pkgmap.tpl --mapName $1 $1.epts
+	    ;;
+    esac
+fi

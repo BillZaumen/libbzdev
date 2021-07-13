@@ -1,0 +1,131 @@
+import("org.bzdev.devqsim.Simulation");
+import("org.bzdev.devqsim.SimFunctionFactory");
+import("org.bzdev.devqsim.SimFunctionTwoFactory");
+import("org.bzdev.devqsim.SimFunction");
+import("org.bzdev.devqsim.SimFunctionTwo");
+// import(org.bzdev.obnaming.NamedFunctionOps);
+// import(org.bzdev.math.RealValuedFunctOps);
+import("java.lang.Math");
+
+var err ?= global.getErrorWriter();
+var output ?= global.getWriter();
+
+output.println(scripting);
+output.println(global.typeof (scripting));
+
+// var sim = new Simulation(scripting);
+
+var sff = sim.createFactory("org.bzdev.devqsim.SimFunctionFactory");
+
+function f(x) {Math.sin(x)}
+function fp(x) {Math.cos(x)}
+
+sff.set("fName", "f");
+sff.set("fpName", "fp");
+
+var sf1a = sff.createObject("fs1");
+output.println(global.typeof(sf1a));
+output.println("f(0.0) = " + f(0.0));
+
+output.println("sf1a.valueAt(0) = " + sf1a.valueAt(0.0));
+output.println("sf1a.derivAt(0) = " + sf1a.derivAt(0.0));
+
+sff.clear();
+
+var tst = ({valueAt: function(x) {Math.sin(x)},
+	    derivAt: function (x) {Math.cos(x)}});
+output.println("tst.valueAt(0.0) = " + tst.valueAt(0.0));
+output.println("tst.derivAt(0.0) = " + tst.derivAt(0.0));
+output.flush();
+
+sff.set("object", {valueAt: function(x) {Math.sin(x)},
+		   derivAt: function(x) {Math.cos(x)}});
+
+var sf1b = sff.createObject("fs2");
+
+output.println("sf1b.valueAt(0) = " + sf1b.valueAt(0));
+output.println("sf1b.derivAt(0) = " + sf1b.derivAt(0));
+
+sff.clear();
+
+
+sff.set("object", "({valueAt: function(x) {Math.sin(x)},"
+	+ "derivAt: function (x) {Math.cos(x)}})");
+
+var sf1c = sff.createObject("sf1c");
+output.println("sf1c.valueAt(0) = " + sf1c.valueAt(0));
+output.println("sf1c.derivAt(0) = " + sf1c.derivAt(0));
+
+var sf2f = sim.createFactory(org.bzdev.devqsim.SimFunctionTwoFactory.class);
+
+function f2(x,y) {Math.sin(x)*Math.cos(y)}
+function f2d1(x,y) {Math.cos(x)*Math.cos(y)}
+function f2d2(x,y) {-Math.sin(x)*Math.sin(y)}
+
+function f2d11(x,y){-Math.sin(x)*Math.cos(y)}
+function f2d12(x,y) {-Math.cos(x)*Math.sin(y)};
+function f2d21(x,y) {-Math.cos(x)*Math.sin(y)};
+function f2d22(x,y) {-Math.sin(x)*Math.cos(y)}
+
+sf2f.set("fName", "f2");
+sf2f.set("f1Name", "f2d1");
+sf2f.set("f2Name", "f2d2");
+sf2f.set("f11Name", "f2d11");
+sf2f.set("f12Name", "f2d12");
+sf2f.set("f21Name", "f2d21");
+sf2f.set("f22Name", "f2d22");
+
+var sf2a = sf2f.createObject("sf2a");
+
+var xx = Math.PI/4.0;
+var yy = xx;
+output.println("xx = "  + xx);
+output.println("yy = "  + yy);
+output.println("f2d2(xx, yy) = " + f2d2(xx,yy));
+
+output.println("sf2a.valueAt(x,y) = " + sf2a.valueAt(xx, yy));
+output.println("sf2a.deriv1At(x,y) = " + sf2a.deriv1At(xx, yy));
+output.println("sf2a.deriv2At(x,y) = " + sf2a.deriv2At(xx, yy));
+output.println("sf2a.deriv11At(x,y) = " + sf2a.deriv11At(xx, yy));
+output.println("sf2a.deriv12At(x,y) = " + sf2a.deriv12At(xx, yy));
+output.println("sf2a.deriv21At(x,y) = " + sf2a.deriv21At(xx, yy));
+output.println("sf2a.deriv22At(x,y) = " + sf2a.deriv22At(xx, yy));
+
+
+sf2f.clear();
+sf2f.set("object", {valueAt: function(x, y) {f2(x, y)},
+		    deriv1At: function(x, y){f2d1(x, y)},
+		    deriv2At: function(x, y){f2d2(x, y)},
+		    deriv11At: function(x, y){f2d11(x, y)},
+		    deriv12At: function(x, y){f2d12(x, y)},
+		    deriv21At: function(x, y){f2d21(x, y)},
+		    deriv22At: function(x, y){f2d22(x, y)}});
+
+var sf2b = sf2f.createObject("sf2b");
+
+output.println("sf2b.valueAt(x,y) = " + sf2b.valueAt(xx, yy));
+output.println("sf2b.deriv1At(x,y) = " + sf2b.deriv1At(xx, yy));
+output.println("sf2b.deriv2At(x,y) = " + sf2b.deriv2At(xx, yy));
+output.println("sf2b.deriv11At(x,y) = " + sf2b.deriv11At(xx, yy));
+output.println("sf2b.deriv12At(x,y) = " + sf2b.deriv12At(xx, yy));
+output.println("sf2b.deriv21At(x,y) = " + sf2b.deriv21At(xx, yy));
+output.println("sf2b.deriv22At(x,y) = " + sf2b.deriv22At(xx, yy));
+
+sf2f.clear();
+sf2f.set("object", "({valueAt: function(x, y) {f2(x, y)},"
+		   + "deriv1At: function(x, y){f2d1(x, y)},"
+		   + "deriv2At: function(x, y){f2d2(x, y)},"
+		   + "deriv11At: function(x, y){f2d11(x, y)},"
+		   + "deriv12At: function(x, y){f2d12(x, y)},"
+		   + "deriv21At: function(x, y){f2d21(x, y)},"
+		   + "deriv22At: function(x, y){f2d22(x, y)}})");
+var sf2c = sf2f.createObject("sf2c");
+
+output.println("sf2c.valueAt(x,y) = " + sf2c.valueAt(xx, yy));
+output.println("sf2c.deriv1At(x,y) = " + sf2c.deriv1At(xx, yy));
+output.println("sf2c.deriv2At(x,y) = " + sf2c.deriv2At(xx, yy));
+output.println("sf2c.deriv11At(x,y) = " + sf2c.deriv11At(xx, yy));
+output.println("sf2c.deriv12At(x,y) = " + sf2c.deriv12At(xx, yy));
+output.println("sf2c.deriv21At(x,y) = " + sf2c.deriv21At(xx, yy));
+output.println("sf2c.deriv22At(x,y) = " + sf2c.deriv22At(xx, yy));
+ 

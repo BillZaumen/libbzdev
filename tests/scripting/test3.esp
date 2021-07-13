@@ -1,0 +1,8 @@
+import (org.bzdev.devqsim.Simulation);
+import (org.bzdev.drama.DramaSimulation);
+
+var err ?= global.getErrorWriter();
+var out ?= global.getWriter();
+
+var sim = new Simulation(root);
+var dsim = new DramaSimulation(root);

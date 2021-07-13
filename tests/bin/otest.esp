@@ -1,0 +1,5 @@
+import (OutTest);
+
+var ot = new OutTest();
+
+ot.print();

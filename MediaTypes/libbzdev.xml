@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="image/vnd.bzdev.image-sequence+zip">
+    <comment>Video Image-Sequence Format</comment>
+    <sub-class-of type="application/zip" />
+      <magic priority="80">
+	<match type="little16" offset="26" value="9">
+	  <match type="little16" offset="28" value="38">
+	    <match type="string" offset="30" value="META-INF/">
+	      <match type="little16" offset="39" value="0xFACE">
+		<match type="little16" offset="41" value="34">
+		  <match type="string" offset="43"
+			 value="image/vnd.bzdev.image-sequence+zip">
+		  </match>
+		</match>
+	      </match>
+	    </match>
+	  </match>
+	</match>
+      </magic>
+      <glob pattern="*.isq"/>
+  </mime-type>
+</mime-info>

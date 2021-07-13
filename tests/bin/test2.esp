@@ -1,0 +1,12 @@
+// import (org.bzdev.scripting.ExtendedScriptingContext);
+// import (org.bzdev.scripting.ScriptingContext);
+// import (java.util.Set);
+var err ?= scripting.getErrorWriter();
+var out ?= scripting.getWriter();
+out.println("type of scripting = " + global.typeof(scripting));
+var output = scripting.getScriptObject("out");
+output.println("hello");
+scripting.getNames().stream().forEach(function(name) {
+	out.println("next iteration: " + name);
+	void
+    });

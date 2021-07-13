@@ -1,0 +1,19 @@
+JAVAC = javac -p ../../../BUILD --add-modules org.bzdev \
+		--processor-path ../../../BUILD/libbzdev.jar
+
+dmtests:
+	/bin/rm -r ourclasses ourclasses1
+	mkdir -p ourclasses tmpsrc ourclasses1
+	$(JAVAC) -d ourclasses1 -s tmpsrc  \
+	      -classpath ourclasses1 \
+	      dmtest/a/*.java	
+	$(JAVAC) -d ourclasses -s tmpsrc  \
+	      -classpath ourclasses1:ourclasses \
+	      dmtest/b/*.java
+	@echo --- complilation complete ---
+	chmod u+x run
+	for i in `grep -l main dmtest/b/*.java` ; do echo $$i ; \
+		./run dmtest.b.`basename $$i .java` ; done
+
+clean:
+	rm -rf ourclasses tmpsrc ourclasses1

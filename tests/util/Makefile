@@ -1,0 +1,211 @@
+# JAVA = java -classpath ../../BUILD/lib/libbzdev.jar:classes
+JAVA = java -p ../../BUILD -classpath classes --add-modules org.bzdev \
+	-Djava.security.policy=../../BUILD/libbzdev.policy
+
+all: compile
+	@echo -------- ClassTest ---------
+	@$(JAVA) ClassTest
+	@echo -------- TemplateProcessorTest ---------
+	@$(JAVA) TemplateProcessorTest
+	@echo -------- TemplateProcessorTest with useKeyMap ---------
+	@$(JAVA) TemplateProcessorTest useKeyMap
+	@echo -------- TemplateProcessorTest with useKeyMapList ---------
+	@$(JAVA) TemplateProcessorTest useKeyMapList
+	@echo -------- StaticRandomTest ---------
+	$(JAVA) StaticRandomTest -m
+	@echo -------- SetTest ---------
+	@$(JAVA) SetTest
+	@echo -------- CollectionScannerTest ---------
+	@$(JAVA) CollectionScannerTest
+	@echo -------- EncapIteratorTest ---------
+	@$(JAVA) EncapIteratorTest
+	@echo -------- SciFormatterTest --------
+	@$(JAVA) SciFormatterTest
+	@echo -------- SciFormatter Script Test ----------
+	chmod u+x scrun
+	@./scrun SciFormatterTest.js
+	@./scrun SciFormatterTest.esp
+	chmod u-x scrun
+	@echo -------- SafeFormatterTest --------
+	@$(JAVA) SafeFormatterTest
+	@echo --------- Clone Test --------
+	@$(JAVA) CloneTest
+	@echo --------- Copy Test --------
+	@$(JAVA) CopyTest
+	(cd rv; make)
+	(cd units; make)
+	@echo --------- PoissonTable Test ----------
+	@$(JAVA) PTableTest
+	@echo ----- Enumeration/Iterator Test ------
+	@$(JAVA) IETest
+	@echo ----- PrimArrayTest -----
+	@$(JAVA) PrimArrayTest
+	@echo ----- SuffixArrayTest ------
+	@$(JAVA) SuffixArrayTest
+	@echo ----- UnsignedSATest ------
+	@$(JAVA) UnsignedSATest
+	@echo ----- LcplrTest ------
+	@$(JAVA) LcplrTest
+	@echo ----- LcplrTiming ------
+	@$(JAVA) LcplrTest
+	@echo ------ VarFormatter Test ----
+	@$(JAVA) VarFormatterTest
+	@echo ------- JavaIdents Test -------
+	@$(JAVA) JavaIdentsTest
+	@echo ----- EventList Test -------
+	@$(JAVA) EventListTest
+	@echo ----- JSTest ------
+	@$(JAVA) JSTest
+	@echo ----- ExpressionParser Test -------
+	@$(JAVA) ExpressionTest
+	@echo ----- ExpressionParser Script Test -------
+	@$(JAVA) ExprScriptTest
+	@echo ----- ExpressionParser Script Test '(sandboxed)' -------
+	@$(JAVA) ExprScriptTest -s
+	@echo ----- ExpressionParser Test '(multithreading)'  -------
+	@$(JAVA) ExprScriptTest2
+	@echo ----- ExpressionParser Test '(lexical scoping)' -------
+	@$(JAVA) ExprScriptTest3
+	@echo ---- try some ESP runtime errors
+	chmod u+x scrun
+	./scrun bad1.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+	@echo ----- UniTreeNode Test -------
+	@$(JAVA) UniTreeNodeTest
+
+compile:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -p ../../BUILD  --add-modules org.bzdev *.java
+
+badesp:
+	chmod u+x scrun
+	./scrun bad1.esp || echo EXCEPTION EXPECTED
+	./scrun bad2.esp || echo EXCEPTION EXPECTED
+	./scrun  bad3.esp || echo EXCEPTION EXPECTED
+	./scrun  bad4.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+ctest: compile
+	@$(JAVA) ClassTest
+
+patest: compile
+	@$(JAVA) PrimArrayTest
+
+jstest: compile
+	@$(JAVA) JSTest
+
+ytest: compile
+	@echo ---- YTest -----
+	@$(JAVA) YTest
+
+
+lcplr: compile
+	@$(JAVA) LcplrTest
+
+lcptiming: compile
+	@$(JAVA) LcplrTiming
+
+
+satest: compile
+	@$(JAVA) SuffixArrayTest
+
+satest2: compile
+	@$(JAVA) SuffixArrayTest2
+
+samtest: compile
+	@$(JAVA) SAMergeTest
+
+unsigned: compile
+	@$(JAVA) UnsignedSATest
+
+idents: compile
+	@$(JAVA) JavaIdentsTest
+
+
+ietest: compile
+	@$(JAVA) IETest
+
+ptabletest: compile
+	@$(JAVA) PTableTest
+
+clonetest: compile
+	$(JAVA) CloneTest
+
+sctest:
+	(cd ../.. ; make jarfile)
+	chmod u+x scrun
+	@./scrun --stackTrace SciFormatterTest.js
+	chmod u-x scrun
+
+scftest: compile
+	echo ------ SciFormatterTest -----
+	$(JAVA) SciFormatterTest
+
+vartest: compile
+	@echo ------ VarFormatter Test ----
+	@$(JAVA) VarFormatterTest
+
+ttest: compile
+	@echo --- template test ---
+	@$(JAVA) TemplateProcessorTest
+
+tbad: compile
+	@echo --- bad template test ---
+	@$(JAVA) TemplateProcessorTest2
+
+ical: compile
+	@echo ---- ICalBuilder Test ------
+	@$(JAVA) ICalBuilderTest
+
+elist: compile
+	@echo ----- EventList Test -------
+	@$(JAVA) EventListTest
+
+otest: compile
+	@echo ----- ObjectParser Test -------
+	@$(JAVA) OTest
+
+etest: compile
+	@echo ----- ExpressionParser Test -------
+	@$(JAVA) ExpressionTest
+
+estest: compile
+	@echo ----- ExpressionParser Test '(script)' -------
+	@$(JAVA) ExprScriptTest
+
+estest-s: compile
+	@echo ----- ExpressionParser Test '(sandboxed script)' -------
+	@$(JAVA) ExprScriptTest -s
+
+estest2: compile
+	@echo ----- ExpressionParser Test '(multithreading)'  -------
+	@$(JAVA) ExprScriptTest2
+
+estest3: compile
+	@echo ----- ExpressionParser Test '(lexical scoping)' -------
+	@$(JAVA) ExprScriptTest3
+
+estest4: compile
+	@echo ----- ExpressionParser Test '(issues from EPTS)' -------
+	@$(JAVA) ExprScriptTest4
+
+estest5: compile
+	@echo ----- ExpressionParser Test '(va list)' -------
+	@$(JAVA) ExprScriptTest5
+
+
+unitree: compile
+	@echo ----- UniTreeNode Test -------
+	@$(JAVA) UniTreeNodeTest
+
+emsgtest: compile
+	@echo ---- Exception  Message Test ----
+	@$(JAVA) EOLTest
+
+clean:
+	rm -rf classes
+	(cd rv ; make clean)
+	(cd units ; make clean)
+	rm -f sequence.txt
+

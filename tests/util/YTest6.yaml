@@ -1,0 +1,41 @@
+%YAML 1.2
+---
+ - create:
+    - var: cpath2
+    - name: cpath2
+    - configuration:
+       - {zorder: 10, visible: false}
+       # - *pathConfig
+       - withPrefix: cpoint
+         withIndex:
+          - type: "MOVE_TO"
+            x: 0.0
+            y: = -MKS.feet(2)
+          - type: "SEG_END"
+            x: = s2 - 6
+            y: = -MKS.feet(2)
+          - type: "CONTROL"
+            x: = s2 - 3
+            y: = -MKS.feet(2)
+          - type: "CONTROL"
+            x: = s2 - 3
+            y: = MKS.feet(4)
+          - type: "SEG_END"
+            x: = s2
+            y: = MKS.feet(4)
+          - type: "SEG_END"
+            x: = s2 + 3
+            y: = MKS.feet(4)
+          - type: "CONTROL"
+            x: = s2 + 6
+            y: = MKS.feet(4)
+          - type: "CONTROL"
+            x: = s2 + 6
+            y: = -MKS.feet(2)
+          - type: "SEG_END"
+            x: = s2 + 9
+            y: = -MKS.feet(2)
+          - type: "SEG_END"
+            x: 120
+            y: = -MKS.feet(2)
+...
