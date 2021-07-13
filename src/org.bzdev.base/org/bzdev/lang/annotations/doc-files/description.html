@@ -1,0 +1,517 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The package org.bzdev.lang.annotations</H2>
+
+Please see
+<UL>
+  <LI> <A HREF="#intro">Introduction</A>. This section provides an
+    overview of these annotations.
+  <LI><A HREF="#example">An example</A>. This section provides a coding
+    exmaple.
+  <LI><A HREF="#background">Background</A>. This section contains background
+    material and an example using the visitor design pattern.
+</UL>
+
+<H3>Introduction</H3>
+
+Normally Java looks up an object&apos;s method at run time but bases the
+lookup on the method&apos;s signature (specifically the types of the
+method&apos;s arguments), which is determined at compile time. While
+this restriction is desirable for performance reasons, it is
+sometimes easier to develop software if dynamic methods are
+supported, in which the argument types are determined at run time.
+The org.bzdev.lang package supports dynamic methods by using
+annotations (staring with release 6 of the JDK, annotations are
+supported by the Java compiler). The mechanism is efficient, but
+with two restrictions: dynamic methods cannot be static methods and
+the use of generic types is not supported. The primary reason for
+not allowing generic types is that type-erasure is not compatible
+with the dispatch methods provided by "helper" classes.
+<P>
+Dynamic methods are supported by 6 annotation types (only 3 or 4 are needed
+for the simplest cases).  The necessary types are
+<ul>
+<li> {@link DynamicMethod}. This
+  annotation tags a method specified in a class or an interface as a
+  dynamic method, proving the most general type for the methods (which
+  can have return values and throw exceptions as desired). It takes
+  the class name of a "helper" class as its argument (the helper class
+  will be generated automatically).  A dynamic method may not be a
+  static method.
+<li> {@link DMethodImpl}. This annotation
+  tags a method as being one that implements a dynamic method for
+  specific argument types, and takes the name of the helper class used
+  in the {@link DynamicMethod} annotation
+  as an argument (the class name serves as a key to match dynamic
+  method implementations with the corresponding dynamic method). These
+  methods may be declared to be static.
+<li> {@link DMethodContext} or
+  {@link DMethodContexts}. Each class
+  that implements a dynamic method needs a "local helper" class for
+  that dynamic method.
+  A {@link DMethodContext} annotates the
+  class that implements a dynamic method and, using the dynamic
+  method&apos;s helper class as a key, provides the corresponding
+  local helper class.  If a class implements multiple dynamic methods,
+  The {@link DMethodContexts} method
+  should be used, which takes an array
+  of {@link DMethodContext} annotations
+  as its argument.  A class annotated
+  with {@link DMethodContext} or
+  {@link DMethodContexts} must be
+  declared to be static if the class is an inner class.
+</ul>
+<p>
+The two remaining annotations provide additional control:
+<ul>
+<li> {@link DMethodOptions} allows one to
+  control the locking used by the helper class, to allow optimizations
+  for single-threaded programs, to adjust cache sizes, and to enable
+  tracing of method searches.  The locking-mode values allow one to
+  specify no locking, a mutex lock, a read-write lock, or a system
+  default (normally a mutex but this can be changed at compile time).
+<li> {@link DMethodOrder} is used when
+  dynamic methods are dispatched based on multiple arguments.  It
+  controls the search order for arguments and determines which
+  arguments should use compile-time types rather than run-time types.
+</ul>
+<p>
+The implementation of a dynamic method should call its helper&apos;s dispatch
+method, returning a value of the return type is not void. The first argument
+to <code>dispatch</code> must be <code>this</code>, followed by the arguments
+declared in the method. Each class that implements a dynamic method has
+a DMethodContext annotation, specifying a local helper, for that method,
+and must call the local helper&apos;s <code>register</code> method in a static
+initializer, calling <code>register</code> with no arguments.
+
+<H3><A NAME="example">An example</A></H3>
+
+An example for the use of a dynamic method when the dynamic method is
+specified in a class is the following (note: when referring to a helper
+in a different package, the fully qualified class name must be used):
+<code><pre>
+public class Foo {
+     {@literal @}DynamicMethod("FooIncrHelper")
+     public  Number incr(Number x) throws Exception {
+        return FooIncrHelper.dispatch(this, x);
+     }
+ }
+ {@literal @}DMethodContext(helper="FooIncrHelper", localHelper="BarIncrHelper")
+public class Bar extends Foo {
+
+    {@literal @}DMethodImpl("FooIncrHelper")
+    public Number doIncr(Integer x) thows Exception {
+        return Integer.valueOf(x + 1);
+    }
+}
+</pre></code>
+The call to dispatch will throw a runtime exception named
+{@link org.bzdev.lang.MethodNotPresentException}
+if no method that matches the arguments is found. This exception can be
+caught to implement the default behavior for the dispatch method and is
+located in the org.bzdev.lang package.
+<P>
+If <code>incr</code> was declared in an interface, an implementation must
+appear in the least specific class(es) that implement that interface.
+For example:
+<code><pre>
+public interface Incrementer {
+     {@literal @}DynamicMethod("FooIncrementerHelper")
+     public Number incr(Number x) throws Exception;
+}
+
+ {@literal @}DMethodContext(helper="FooIncrementerHelper",
+                 localHelper="FooIncrHelper")
+public class Foo implements Incrementer {
+
+    public Number incr(Number x) {
+        return FooIncrementerHelper.dispatch(this, x);
+    }
+    {@literal @}DMethodImpl("IncrementerHelper")
+    public Number doIncr(Integer x) thows Exception {
+        return Integer.valueOf(x + 1);
+    }
+}
+
+ {@literal @}DMethodContext(helper="IncrementerHelper", localHelper="BarIncrHelper")
+public class Bar extends Foo {
+    {@literal @}DMethodImpl("IncrementerHelper")
+    public Number doIncr(Bar x) thows Exception {
+        return Integer.valueOf(x + 1);
+    }
+}
+</pre></code>
+<P>
+For compilation please follow the procedures outlined in
+<A HREF="../../../../../../doc-files/description.html#compile">the BZDev class library description</A>.
+<H3><A NAME="background">Background</A></H3>
+<p> Several other approaches have been used to create similar
+capabilities.
+<p>
+One approach that is used when dynamic methods are not supported
+in a language is to use the visitor design pattern. The idea is to define
+two interfaces such as <code>Visitor</code> and <code>Visitable</code>
+defined as follows:
+<pre><code>
+    interface Visitor {
+      void visit(Foo obj);
+      void visit(Bar obj);
+    }
+    interface Visitable {
+        void accept(Visitor arg);
+    }
+</code></pre>
+then <code>Foo</code> is defined as follows:
+<pre><code>
+    class Foo implements Visitable {
+      void accept(Visitor arg) {
+          arg.visit(this);
+      }
+    }
+
+    class Bar extends Foo {
+      void accept(Visitor arg) {
+          arg.visit(this);
+      }
+    }
+
+    class SomeVisitor implements Visitor {
+       void visit(Foo obj) {
+         ...
+       }
+
+       void visit(Bar obj) {
+         ...
+       }
+    }
+</code></pre>
+For mimicking dynamic methods, the <code>accept</code> method is
+written as given above: it merely calls the visit method with an
+argument of <code>this</code>, whose type matches the type of the
+class in which the <code>accept</code>method is defined.  The
+<code>accept</code> method is defined in all subclasses as well
+(subclasses of <code>Foo</code> in this example), so that the type
+at run time is known in the call to <code>visit</code>.  When
+<code>accept</code> is called on an object of type Foo, even if
+referenced by a variable declared to be <code>Visitable</code>, the
+<code>accept</code> method that is called is the one defined for
+<code>Foo</code>. The <code>accept</code> method of
+<code>Foo</code> then calls its argument&apos;s <code>visit</code>
+method, passing it an argument of type <code>Foo</code>.
+<p>
+The downside to the use of this design pattern is that every time a
+new class that implements <code>Visitable</code> is defined, one
+must add a method to the <code>Visitor</code> interface and all
+<code>Visitor</code> classes must then implement that new method,
+even if there is really nothing for the method to do.  In addition,
+as mentioned above, an accept method must be defined in all classes
+that implement Visitable and their subclasses, which is tedious
+when there are a number of subclasses.  In addition, the interface
+and class definitions are typically in separate files.  Attempts to
+mitigate these limitations have included the use of the Java
+reflection API
+<a href="http://www.cs.ucla.edu/~palsberg/paper/compsac98.pdf">
+(Jens Palsberg and C. Barry Jay, "The Essence of the Visitor
+Pattern")<a>; however, the run-time cost is substantial: what would
+take 1.17 seconds using the visitor design pattern took 4 minutes,
+59.93 seconds using the reflection API, an increase in running time
+of about a factor of 300 for trivial methods.
+<p>
+An alternative approach, which generates byte codes at runtime and
+loads those into the Java virtual machine, has also been proposed
+<a href="http://www.jot.fm/issues/issue_2005_12/article3/">
+(R&eacute;mi Fora, Etienne Duris, and Gilles Roussel,
+"Reflection-based implementation of Java extensions: the
+double-dispatch use-case")</a>.  This latter approach is far more
+efficient (and comparable to the approach described below) but may
+fail when a sandbox security model is in use due to restrictions on
+generating new classes at run time (e.g., in applets and assuming no
+changes to the Java language).
+<p>
+The <code>DynamicMethod</code> annotation and some related
+annotations provides a design pattern that addresses some of these
+issues by allowing method look-up to be performed more efficiently
+at run time, with all the application code created at compile time
+so that there are no issues with security managers.  A simple
+design pattern must be followed. One declares a dynamic method
+using a <code>DynamicMethod</code> annotation: for example,
+<pre><code>
+ public class Foo {
+     {@literal @}DynamicMethod("FooIncrHelper")
+     public  Number incr(Number x) throws Exception {
+        return FooIncrHelper.dispatch(this, x);
+     }
+ }
+</code></pre>
+This annotation declares that a generated class named FooIncrHelper will provide
+a method called dispatch that implements a dynamic method. The arguments for
+dispatch in the helper class are <code>this</code> to indicate the current
+instance, followed by the  arguments for the method <code>incr</code>.
+If the DynamicMethod annotation appeared in an interface declaration, then a
+class implementing the method and calling the helper&apos;s dispatch method
+must appear in the first subclass of Object implementing the interface.
+<p>
+A subclass of Foo that implements the dynamic method <code>incr</code> will
+then use a DMethodImpl annotation to tag a method implementing the dynamic
+method for particular argument types (the dynamic method implementing incr
+will have a different name). The subclass itself will be annotated with a
+DMethodContext annotation, which provides the name of a subclass-specific
+helper class (the localHelper attribute) and associates it with the helper
+for the dynamic method incr.  For example,
+<pre><code>
+{@literal @}DMethodContext(helper="FooIncrHelper", localHelper="BarIncrHelper")
+public class Bar extends Foo {
+    {@literal @}DMethodImpl("FooIncrHelper")
+    public Number doIncr(Integer x) throws Exception {
+        return Integer.valueOf(x + 1);
+    }
+}
+</code></pre>
+If class Foo also provided a method annotated with
+<code>{@literal @}DMethodImpl("FooIncrHelper")</code>,
+Foo itself would have to have a DMethodContext annotation with its
+helper attribute set to <code>FooIncrHelper</code> and its
+localHelper attribute set to some other class name.  When multiple
+{@literal @}DMethodContext annotations are needed for a class, the
+annotation {@literal @}DMethodContexts should be used -
+{@literal @}DMethodContexts has a single 'value' defined - an array of
+{@literal @}DMethodContext. The design decision to annotate the
+class with the local helper data rather than the individual method
+was due in part for supporting the class loader
+{@link org.bzdev.lang.DMClassLoader DMClassLoader}, which removes the
+need for the static initializers that call register() methods of
+the local helper classes.
+<P>
+The look-up can be based on more than one
+argument, and the default behavior is to do nothing, which
+eliminates the coding required when using the visitor design
+pattern when a change to the <code>Visitor</code> interface is
+made. The order in which argument types are searched can be controlled
+with a DMethodOrder annotation, applied to method definition or
+declaration annotated by the DynamicMethod annotation.
+In addition, One may use a <code>throws</code> clause in the method
+definitions and declarations.
+<p>
+For the single argument case, the overhead over a trivial implementation
+(a couple of method calls, and an <code>if</code> statement using the
+<code>instanceof</code> operator) is roughly a factor of 15, which can
+be reduced to a factor of 10 by setting an option to turn off locking
+for cases in which objects using a specific class are accessed by only
+one thread at a time. This assumes the method called performs a trivial
+operation - the overhead will not be noticeable if the method called
+does anything substantial.  The implementation uses "helper"
+classes to dispatch method calls at run-time.  These classes are
+automatically generated by the java compiler via an annotation processor.
+For the two-argument case, the overhead is approximately factor of 34
+with locking and 29 without locking (in both cases, the running time is
+higher than in the single-argument case).
+<p>
+The equivalent of the visitor design pattern example above can be
+implemented using dynamic methods.  For example:
+<pre><code>
+    interface Visitor {
+        {@literal @}DynamicMethod("VisitorHelper")
+        void visit(Object arg);
+    }
+
+    {@literal @}DMethodContext(helper = "VistorHelper",
+                    localHelper = "SomeVisitorHelper")
+    class SomeVisitor implements Visitor {
+
+        void visit(Object arg) {
+          VisitorHelper.getHelper().dispatch(this, arg);
+        }
+
+        {@literal @}DMethodImpl("VisitorHelper")
+        void doVisit1(Foo arg) {
+            ...
+        }
+
+        {@literal @}DMethodImpl("VisitorHelper")
+        void doVisit2(Bar arg) {
+            ...
+        }
+    }
+</code></pre>
+The <code>Visitable</code> interface is not needed, and explicit
+methods can be added only for those argument classes (<code>Foo</code>
+and <code>Bar</code> in this example) for which some action is needed.
+The <code>Visitor</code> interface does not have to be modified, and
+the <code>visit</code> method is not defined in subclasses of
+<code>SomeVisitor</code>. The method <code>doVisit(Foo)</code>
+does not have to be defined in subclasses of <code>SomeVisitor</code>
+unless it has to be coded differently in the subclass.
+If a default action is needed, one can add a declaration such as
+<pre><code>
+        {@literal @}DMethodImpl("VisitorHelper")
+        void doVisit(Object arg) {
+            return;		// do nothing.
+        }
+</code></pre>
+that will match any object passed as an argument.  Alternatively, one
+may change the implementation of the <code>visit</code> method to
+catch an exception that indicates that the dispatch mechanism could
+not find a method to invoke:
+<pre><code>
+        void visit(Object arg) {
+          try {
+              VisitorHelper.getHelper().dispatch(this, arg);
+          } catch (MethodNotPresentException e) {
+          }
+        }
+</code></pre>
+It is better in this case to define the <code>doVisit</code> method
+with an argument of type <code>Object</code>, as one of the
+<code>doVisit</code> methods may call a different dynamic method
+that throws <code>MethodNotPresentException</code> due to a
+programming error, in which case the partial execution of some
+methods may put the application into an illegal state.
+<p>
+ The example above
+assumes the use of a dynamic-method-aware class loader such as
+{@link org.bzdev.lang.DMClassLoader org.bzdev.lang.DMClassLoader}. If
+such a class loader is not used, then a static initializer has to be
+added to the SomeVisitor class:
+<pre><code>
+    {@literal @}DMethodContext(helper = "VistorHelper",
+                    localHelper = "SomeVisitorHelper")
+    class SomeVisitor implements Visitor {
+        static {
+             SomeVisitorHelper.register();
+        }
+        ...
+    }
+</code></pre>
+The call to the register() simply forces the SomeVisitorHelper class
+to be initialized: during initialization, SomeVisitorHelper will
+register itself with VisitorHelper to create tables that allow the
+correct method to be looked up at run time.  The general rule is that
+whenever a class is annotated with a {@literal @}DMethodContext or
+{@literal @}DMethodContexts annotation, for each localHelper attribute
+provided, there must be call to each helper&apos;s static method register()
+in the class&apos;s initializer.
+<p>
+In the example above, if all classes for which <code>visit</code>
+can be called are subclasses of <code>SomeVisitor</code>, then
+the interface definition is not needed and the code can be written
+as follows:
+<pre><code>
+    {@literal @}DMethodContext(helper = "VistorHelper",
+                    localHelper = "SomeVisitorHelper")
+    class SomeVisitor {
+
+        {@literal @}DynamicMethod("VisitorHelper")
+        void visit(Object arg) {
+          VisitorHelper.getHelper().dispatch(this, arg);
+        }
+
+        {@literal @}DMethodImpl("VisitorHelper")
+        void doVisit(Foo arg) {
+            ...
+        }
+
+        {@literal @}DMethodImpl("VisitorHelper")
+        void doVisit(Bar arg) {
+            ...
+        }
+    }
+</code></pre>
+Subclasses can implement <code>doVisit</code> methods, annotated
+with <code>{@literal @}DMethodImpl("VisitorHelper")</code>, and
+subclasses that implement this method must of course have a
+<code>{@literal @}DMethodContext</code> annotation for the subclass with
+a unique <code>localHelper</code> class name.  For a similar example
+where a register() is called explicitly, one might define the
+interface  (the complete file is shown)
+<pre><code>
+package dmtest;
+import org.bzdev.lang.annotations.*;
+
+public interface Visitor {
+    {@literal @}DynamicMethod("VisitorHelper")
+    void visit(Object arg);
+}
+</code></pre>
+
+<pre><code>
+package dmtest.a;
+import org.bzdev.lang.annotations.*;
+
+{@literal @}DMethodContext(helper="VisitorHelper", localHelper="SomeVisitorHelper")
+public class SomeVisitor implements Visitor {
+
+    static {
+        SomeVisitorHelper.register();
+    }
+
+    public void visit(Object arg) {
+        VisitorHelper.getHelper().dispatch(this, arg);
+    }
+
+    {@literal @}DMethodImpl("VisitorHelper")
+    void doVisit1(Double arg) {
+        System.out.println("double = " + arg.toString());
+    }
+
+    {@literal @}DMethodImpl("VisitorHelper")
+    void doVisit2(Integer arg) {
+        System.out.println("integer = " + arg.toString());
+    }
+
+    public static void main(String argv[]) {
+        Object obj1 = Double.valueOf(10.0);
+        Object obj2 = Integer.valueOf(20);
+
+        SomeVisitor sv = new SomeVisitor();
+
+        sv.visit(obj1);
+        sv.visit(obj2);
+    }
+}
+</code></pre>
+The output when the program is run is
+<pre><code>
+double = 10.0
+integer = 20
+</code></pre>
+By contrast,  the following program will fail at compile time:
+<pre><code>
+package dmtest.a;
+import org.bzdev.lang.annotations.*;
+
+public class SomeVisitor2 {
+    public void visit(Double arg) {
+        System.out.println("double = " + arg.toString());
+    }
+    public void visit(Integer arg) {
+        System.out.println("integer = " + arg.toString());
+    }
+
+    public static void main(String argv[]) {
+        Object obj1 = Double.valueOf(10.0);
+        Object obj2 = Integer.valueOf(20);
+
+        SomeVisitor sv = new SomeVisitor();
+
+        sv.visit(obj1);
+        sv.visit(obj2);
+    }
+}
+</code></pre>
+Without dynamic methods, one would have to add a method such as
+<pre><code>
+    public void visit(Object arg) {
+        if (arg instanceof Double) visit((Double) arg);
+        else if (arg instanceof Integer) visit((Integer) arg);
+    }
+</code></pre>
+which is error prone due to the need to make a change in multiple
+places.
+</div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  DOCTYPE
+ -->

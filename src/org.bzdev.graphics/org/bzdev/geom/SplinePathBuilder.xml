@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+The arguments for the function configPathBuilder(pb, windingRule, spec)
+are as follows:
+    pb -- an instance of org.bzdev.geom.SplinePathBuilder or
+          an instance of org.bzdev.geom.BasicSplinePathBuilder.
+    windingRule -- Either a string, "WIND_EVEN_ODD" or "WIND_NON_ZERO",
+                   or the constants java.awt.geom.Path2D.WIND_EVEN_ODD
+		   or java.awt.geom.Path2D.WIND_NON_ZERO.
+    spec -- An array of objects, where each object in the array can be
+            another 'spec' array or an object with the following field:
+         type -- A either a string whose value is "CLOSE",
+	         "MOVE_TO", "SEG_END", "CONTROL", or "SPLINE",
+		 or the enumeration constants
+		 org.bzdev.org.bzdev.geom.SplinePathBuilder.CPointType.CLOSE,
+		 org.bzdev.org.bzdev.geom.SplinePathBuilder.CPointType.MOVE_TO,
+		 org.bzdev.org.bzdev.geom.SplinePathBuilder.CPointType.SEG_END,
+		 org.bzdev.org.bzdev.geom.SplinePathBuilder.CPointType.CONTROL,
+		 or
+		 org.bzdev.org.bzdev.geom.SplinePathBuilder.CPointType.SPLINE.
+         x -- the X coordinate for the corresponding point
+	      (a double-precision number). This is ignored (and may be
+	      omitted) if the type is CLOSE.
+	 y -- the Y coordinate fo the corresponding point
+	      (a double-precision number). This is ignored (and may be
+	      omitted) if the type is CLOSE.
+
+Nested arrays can be used to concatenate paths. For example, if
+one has the following definitions
+
+    var path1 = [
+        {type: "MOVE_TO", x: 20.0, y: 30.0},
+        {type: "SEG_END", x: 50.0, y: 60.0}];
+
+    var path2 = [
+        {type: "MOVE_TO", x: 120.0, y: 130.0},
+        {type: "SEG_END", x: 150.0, y: 160.0}];
+
+Then one can concatenate these two paths using
+the following definition:
+
+    var path = [path1, path2]
+
+This is useful in the case where the paths are closed paths and
+one wishes to create a shape with a hole in it.    
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+    ({configPathBuilderAux: function (pb, spec) {
+	if (Array.isArray(spec)) {
+	    for (var i = 0; i < spec.length; i++) {
+		if (Array.isArray(spec[i])) {
+		    this.configPathBuilderAux(pb, spec[i]);
+		} else if (spec[i].type == "CLOSE" || spec[i].type
+			   == pb.constantCLOSE()) {
+		    pb.append(pb.createCPointClose());
+		} else if (spec[i].type == "MOVE_TO" || spec[i].type
+			   == pb.constantMOVE_TO()){
+		    pb.append(pb.createCPointMoveTo(spec[i].x, spec[i].y));
+		} else if (spec[i].type == "SEG_END" || spec[i].type
+			   == pb.constantSEG_END()){
+		    pb.append(pb.createCPointSegEnd(spec[i].x, spec[i].y));
+		} else if (spec.type == "CONTROL" || spec[i].type
+			   == pb.constantCONTROL()){
+		    pb.append(pb.createCPointControl(spec[i].x, spec[i].y));
+		} else if (spec.type == "SPLINE" || spec[i].type
+			   == pb.constantSPLINE()) {
+		    pb.append(pb.createCPointSpline(spec[i].x, spec[i].y));
+		} else {
+		    throw "bad type: " + spec.type + " at index " +i;
+		}
+	    }
+	}
+    },
+  configurePathBuilder: function(pb, windingRule, spec) {
+      var wr = 0;
+      if (windingRule == "WIND_EVEN_ODD" ||
+	  windingRule == java.awt.geom.Path2D.WIND_EVEN_ODD ||
+	  windingRule == pb.constantWIND_EVEN_ODD()) {
+	  wr = pb.constantWIND_EVEN_ODD();
+      } else if (windingRule == "WIND_NON_ZERO" ||
+		 windingRule == java.awt.geom.Path2D.WIND_NON_ZERO ||
+		 windingRule == pb.constantWIND_NON_ZERO()) {
+	  wr = pb.constantWIND_NON_ZERO();
+      } else {
+	  throw "bad winding rule: " + windingRule;
+      }
+      pb.initPath(wr);
+      this.configPathBuilderAux(pb, spec);
+  }})
+]]></entry>
+<entry key="ESP">
+<![CDATA[
+import (java.awt.geom.Path2D);
+import (java.awt.geom.Path2D.Double);
+import (org.bzdev.geom.SplinePathBuilder);
+import (org.bzdev.geom.SplinePathBuilder.CPoint);
+import (org.bzdev.geom.SplinePathBuilder.CPointType);
+
+{
+    configurePathBuilderAux(pb, spec) {
+	var i = -1;
+	global.isESPArray(spec)?
+	    spec.stream().forEachOrdered(function (elem) {
+		i = i + 1;
+		global.isESPArray(elem)?
+		    this.configurePathBuilderAux(pb, elem):
+		    function (e, ind) {
+			var etype = e["type"];
+			(etype == "CLOSE" || etype == pb.constantCLOSE())?
+			    pb.append(pb.createCPointClose()):
+			(etype == "MOVE_TO" || etype == pb.constantMOVE_TO())?
+			    pb.append(pb.createCPointMoveTo(e["x"], e["y"])):
+			(etype == "SEG_END" || etype == pb.constantSEG_END())?
+			    pb.append(pb.createCPointSegEnd(e["x"], e["y"])):
+			(etype == "CONTROL" || etype == pb.constantCONTROL())?
+			    pb.append(pb.createCpointControl(e["x"], e["y"])):
+			(etype == "SPLINE" || etype == pb.constantSPLINE())?
+			    pb.append(pb.createCpointSpline(e["x"], e["y"])):
+			    throw "bad type: " +  etype + "at index" + ind;
+			void
+		    }(elem, i);
+		void
+	    }): void;
+    },
+    configurePathBuilder (pb, windingRule, spec) {
+      var wr =
+	  (windingRule == "WIND_EVEN_ODD"
+	   || windingRule == Path2D.WIND_EVEN_ODD
+	   || windingRule == pb.constantWIND_RULE_NON_ZERO())?
+	     pb.constantWIND_EVEN_ODD():
+	  (windingRule == "WIND_NON_ZERO" ||
+	   windingRule == java.awt.geom.Path2D.WIND_NON_ZERO ||
+	   windingRule == pb.constantWIND_NON_ZERO())?
+	     pbconstantWIND_NON_ZERO():
+	     throw "bad winding rule: " + windingRule;
+      pb.initPath(wr);
+      this.configurePathBuilderAux(pb, spec);
+  }
+}
+]]></entry>
+<entry key="python">
+<![CDATA[
+class ___Config_SplinePathBuilder_For_BZDev_Org:
+    def configPathBuilderAux(self, pb, spec):
+      if isinstance(spec, list):
+        for element in spec:
+            if isinstance(spec, list):
+                self.configPathBuilderAux(pb, element)
+            elif element["type"] == "CLOSE" or element[type] == pb.constantCLOSE():
+                pb.append(pb.createCPointClose())
+            elif element["type"] == "MOVE_TO" or element[type] == pb.constantMOVE_TO():
+                pb.append(pb.createCPointMoveTo(element["x"], element["y"]))
+            elif element["type"] == "SEG_END" or element[type] == pb.constantSEG_END():
+                pb.append(pb.createCPointSegEnd(element["x"], element["y"]))
+            elif element["type"] == "CONTROL" or element[type] == pb.constantCONTROL():
+                pb.append(pb.createCPointControl(element["x"], element["y"]))
+            elif element["type"] == "SPLINE" or element[type] == pb.constantSPLINE():
+                pb.append(pb.createCPointSpline(element["x"], element["y"]))
+            else:
+		raise Exception("bad type: "+ element["type"])
+    def configPathBuilder(self, pb, windingRule, spec):
+        wr = 0
+        if windingRule == "WIND_EVEN_ODD" or windingRule == java.awt.geom.Path2D.WIND_EVEN_ODD or windingRule == pb.consantWIND_EVEN_ODD():
+            wr = pb.constantWIND_EVEN_ODD()
+        elif windingRule == "WIND_NON_ZERO" or windingRUle == java.awt.geom.Path2D.WIND_NON_ZERO or windingRule == pb.constantWIND_NON_ZERO():
+            wr = pb.constantWIND_NON_ZERO()
+        else:
+            raise Exception("bad winding rule: "  + windingRule)
+        pb.initPath(wr)
+        self.configPathBuilderAux(pb, spec);
+    def finishup(self):
+        del ___Config_SplinePathBuilder_For_BZDev_Org.finishup
+        del ___Config_SplinePathBuilder_For_BZDev_Org
+        return self
+    
+___Config_SplinePathBuilder_For_BZDev_Org().finishup()
+]]></entry>
+</properties>

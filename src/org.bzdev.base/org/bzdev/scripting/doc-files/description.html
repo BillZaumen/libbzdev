@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.scripting package</H2>
+
+This package provides several classes shown in the following UML
+diagram:
+<P style="text-align: center">
+<img src="scripting.png">
+<P>
+<UL>
+  <LI>ScriptingContext provides protected methods for specifying a script
+    engine,the default bindings to use (the scope is the one specified
+    the <CODE>javax.script.ScriptContext</CODE> field
+    <CODE>ENGINE_SCOPE</CODE>),the script language (which should be
+    the official name such as ECMAScript for JavaScript).  Subclasses
+    should implement these methods unless configured to use a parent
+    ScriptingContext, in which case the parent's script and bindings
+    are used.
+    A ScriptingContext can have a parent scripting context.  The parent
+    will provide the actual scripting operations, but may have a different
+    trust level (see below).
+  <LI>{@link ScriptingSecurityManager}
+    recognizes two modes that affect the execution of threads:
+    normal mode and sandboxed mode. The mode will be set to an appropriate
+    value when an instance of
+    {@link ScriptingContext} invokes a
+    script. A thread in normal mode has all permissions, while a
+    thread in sandbox modes has just those permissions allowed by
+    the standard Java security manager (java.lang.SecurityManager).
+    A third mode,
+    privileged mode, is in effect only when specific ScriptingContext
+    methods are used, and allows scripts to be run, and code to be
+    executed, with the permissions granted to a ScriptingContext's
+    code base provided a specific permission has been granted.
+    If a thread is created at some point, it's initial mode (normal or
+     sandboxed) is that of the thread that created it. Thread created
+     when an application starts are initially in normal mode.
+  <LI>{@link ScriptingContextPermission}
+    is used to specify the permissions that subclasses of
+    ScriptingContext are granted.  For this permission, the target is the
+    fully qualified class name of a ScriptingContext subclass.  The
+    actions are comma-separated tokens consisting of the following:
+    <UL>
+      <li> "trusted".  This grants permissions for a scripting context
+	to be created with the boolean constructor argument named
+	"trusted" in the ScriptingContext documentation set to true.
+	When trusted, scripts are evaluated with no additional access
+	control. When not trusted, scripts are evaluated with no
+	permissions.
+      <li> "swapbindings". This grants permission needed by subclasses
+	of ScriptingContext that support multi-threaded applications
+	in which only a single thread out of a collection of threads
+	is active at any one time.  The org.bzdev.devqsim package is
+	an example - the Simulation class in that package is a
+	subclass of ScriptingContext, and calls createBindingSwapper
+	when scheduling a new thread implementing a simulation task
+	(only one thread runs at at time due to event-queue constraints).
+      <li> "privileged". This grants permission to a subclass of
+	ScriptingContext to run certain protected methods with the
+	permissions granted to the ScriptingContext subclass' code base.
+    </UL>
+  <LI>{@link Scripting} is a class containing
+    only static methods and allows one to look up information about
+    the scripting languages that a Java implementation supports (this
+    may depend on the class path or module path).
+</UL>
+<P>
+<P>
+The class ScriptingContext itself does not directly enable
+scripting: several methods need to be implemented to enable it.
+This can be done by the class DefaultScriptingContext, which allows one
+to create a ScriptingContext given just the scripting-language
+name.  A second class, ExtendedScriptingContext, provides methods
+for creating Java arrays and for calling Java constructors (a
+bug/feature in at least one older scripting-language implementation
+prevented a script from creating an instance of a class that is a
+subclass of ScriptingContext, so a work-around was needed for this
+case).
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  UML ScriptingContext Subclasses sandboxed boolean
+ -->
+<!--  LocalWords:  ScriptingSecurityManager ScriptingContext's
+ -->
+<!--  LocalWords:  ScriptingContextPermission subclasses swapbindings
+ -->
+<!--  LocalWords:  createBindingSwapper DefaultScriptingContext
+ -->
+<!--  LocalWords:  ExtendedScriptingContext
+ -->

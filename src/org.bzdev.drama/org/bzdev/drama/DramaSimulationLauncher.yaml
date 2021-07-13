@@ -1,0 +1,42 @@
+%YAML 1.2
+---
+  define: &common
+    - org.bzdev.drama.Actor
+    - org.bzdev.drama.BooleanCondition
+    - org.bzdev.drama.Condition
+    - org.bzdev.drama.Domain
+    - org.bzdev.drama.DomainMember
+    - org.bzdev.drama.DoubleCondition
+    - org.bzdev.drama.DramaSimMonitor
+    - org.bzdev.drama.DramaSimObject
+    - org.bzdev.drama.DramaSimulation
+    - org.bzdev.drama.Group
+    - org.bzdev.drama.IntegerCondition
+    - org.bzdev.drama.LongCondition
+    - org.bzdev.drama.MsgForwardingInfo
+    - org.bzdev.drama.common.CommDomainInfo
+    - org.bzdev.drama.common.CommDomainType
+    - org.bzdev.drama.common.CompoundMessageFilter
+    - org.bzdev.drama.common.MessageFilter
+    - org.bzdev.drama.common.SimulationAdapter
+
+  returnTypes:
+    - *common
+    - org.bzdev.drama.BooleanConditionFactory
+    - org.bzdev.drama.DomainFactory
+    - org.bzdev.drama.DomainMemberFactory
+    - org.bzdev.drama.DoubleConditionFactory
+    - org.bzdev.drama.DramaFactory
+    - org.bzdev.drama.IntegerConditionFactory
+    - org.bzdev.drama.LongConditionFactory
+
+  argumentTypes: *common
+
+  fieldClasses:
+    - org.bzdev.drama.common.MessageFilter
+
+  functionClasses:
+    - org.bzdev.drama.common.CommDomainType
+
+  methodClasses: *common
+...

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.drama.common package</H2>
+
+Simulation <i>flavors</i> are simulation packages that are optimized
+for particular application domains but that share an underlying
+architecture.  Flavors are supported via the use of Java generics.
+One flavor is provided by the org.bzdev.drama package, which more or
+less mechanically reproduces the org.bzdev.drama.generic package
+using similar names for objects and adding no additional functionality.
+By contrast, a network-simulation package could define a class named
+Node that extends GenericActor and a class named Link that extends
+GenericGroup: the subclasses can be named to match particular classes
+of simulations.
+<P>
+This package provides classes common to drama-based simulation flavors.
+The core functionality for these simulation flavors are in the
+org.bzdev.drama.generic package, whose public classes are all abstract
+classes.  Classes that are likely to be needed by multiple simulation
+flavors appear in the current package (org.bzdev.drama.common). The
+classes, enumerations, and interfaces for org.bzdev.drama.common are
+illustrated in the following diagram:
+The classes
+<p style="ext-align: center">
+<img src="commondrama.png">
+<p>
+The class shown in blue is in the org.bzdev.drama.generic package.
+<p>
+The following interfaces and enumerations are defined in this package:
+<ul>
+ <li> ConditionObserver is an interface implemented by classes that
+      wish to be notified of changes in conditions.
+ <li> ConditionMode is an enumeration that describes the events that
+      cause a condition-change notification to be sent.
+ <li> DramaSimStateEventType is an enumeration providing the event types
+      that the org.bzdev.drama.generic package adds to those defined by the
+      org.bzdev.devqsim package's enumeration SimulationStateEvent.Type.
+</ul>
+The following classes are defined in this package:
+<ul>
+ <li> The class {@link CommDomainInfo} is
+   used for finding domains of interest when domains are used to
+   determine message delays and message filters.
+ <li> The class {@link CommDomainType}
+   defines a type of communication domain and allows these to be
+   looked up by name. It is provided so that communication domain
+   types can be compared using '==' instead of a string comparison.
+ <li> The class {@link GroupInfo} is a common
+   base class for simulation-specific classes that allow a group or
+   actor to keep additional data about groups it has joined. That
+   additional data is defined by a subclass.
+ <li> The class {@link CondObserverImpl}
+   provides an implementation for a condition observer.
+ <li> The class {@link MessageRecipient}
+   provides methods common to all message recipients (instances of
+   Actor and Group in the org.bzdev.drama package). It is provided
+   because the class SimulationAdapter needs it.
+ <li> The class {@link SimulationAdapter}
+   provides a default implementation for handling simulation state
+   events.  The defaults do nothing (unless a constructor specifying a
+   scripting context and script object are used) and one can override
+   specific methods to obtain data about specific events.
+ <li> The class {@link MessageFilter}
+   provides the ability to manipulate messages while in transit,
+   either dropping the message or modifying it in some way.
+ <li> The
+   class {@link CompoundMessageFilter}
+   is a message filter that concatenates the effects of several
+   message filters.
+</ul>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  GenericActor GenericGroup subclasses ConditionMode
+ -->
+<!--  LocalWords:  ConditionObserver DramaSimStateEventType GroupInfo
+ -->
+<!--  LocalWords:  SimulationStateEvent CommDomainInfo CommDomainType
+ -->
+<!--  LocalWords:  CondObserverImpl MessageRecipient MessageFilter
+ -->
+<!--  LocalWords:  SimulationAdapter CompoundMessageFilter
+ -->

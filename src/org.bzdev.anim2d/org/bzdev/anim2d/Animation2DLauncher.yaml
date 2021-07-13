@@ -1,0 +1,44 @@
+%YAML 1.2
+---
+  define: &common
+    - java.awt.Color
+    - org.bzdev.anim2d.Animation2D
+    - org.bzdev.anim2d.AnimationLayer2D
+    - org.bzdev.anim2d.AnimationPath2D
+    - org.bzdev.anim2d.AnimationShape2D
+    - org.bzdev.anim2d.CartesianGrid2D
+    - org.bzdev.anim2d.GraphView
+    - org.bzdev.anim2d.PolarGrid
+    - org.bzdev.gio.ISWriterOps
+    - org.bzdev.gio.ISWriterOps
+    - org.bzdev.gio.ImageSequenceWriter
+    - org.bzdev.io.DirectoryAccessor
+    - org.bzdev.io.FileAccessor
+
+  returnTypes:
+    - *common
+    - org.bzdev.anim2d.AnimationLayer2DFactory
+    - org.bzdev.anim2d.AnimationPath2DFactory
+    - org.bzdev.anim2d.AnimationShape2DFactory
+    - org.bzdev.anim2d.CartesianGrid2DFactory
+    - org.bzdev.anim2d.GraphViewFactory
+    - org.bzdev.anim2d.PolarGridFactory
+    
+  argumentTypes:
+    - *common
+    - java.io.OutputStream
+
+  fieldClasses:
+    - org.bzdev.anim2d.AnimationLayer2D.Type
+    - org.bzdev.anim2d.GraphView.ZoomMode
+    - org.bzdev.anim2d.PlacedObject2DFactory.RefPointMode
+
+  functionClasses:
+    - org.bzdev.anim2d.KinematicOps2D
+
+  methodClasses:
+    - org.bzdev.anim2d.Animation2D
+    - org.bzdev.anim2d.AnimationPath2D
+    - org.bzdev.gio.ISWriterOps
+    - org.bzdev.gio.ImageSequenceWriter
+...

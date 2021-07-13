@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.drama package</H2>
+
+Please see
+<UL>
+  <LI><A HREF="#intro">the introduction</A> for an overview.
+  <LI><A HREF="#examples">the examples</A> for coding examples.
+</UL>
+
+<H3><A NAME="intro">Introduction</A></H3>
+
+This package provides a simulation flavor that essentially
+instantiates the {@link org.bzdev.drama.generic} package but with no extra
+capabilities.  The class hierarchy is a minor extension of the class
+hierarchy used in the generic simulation package, as the following UML
+diagram shows (the classes in org.bzdev.drama.generic are shown in
+blue):
+<P style="text-align:center">
+<img src="drama.png">
+<P>
+The classes {@link DramaSimObject}
+and {@link AbstractTaskObject} are
+provided in case it is necessary to create simulations with new types
+of objects that should not be subclasses of
+{@link Actor}, {@link Group},
+{@link Domain},
+{@link DomainMember}, or
+{@link Condition}.
+<P>
+Similarly {@link org.bzdev.obnaming.NamedObjectFactory named-object factories}
+are subclasses of the corresponding factories defined in
+org.bzdev.drama.generic.  These are shown in the following diagram:
+<P style="text-align:center">
+<img src="dfactories.png">
+<P>
+All the named-object factories that are direct subclasses of the
+factory classes in {@link org.bzdev.drama.generic} are abstract
+classes. When the corresponding simulation object is not an abstract
+class, there is also a factory that can create it.
+<P>
+The {@link org.bzdev.drama} package provides all the capabilities
+provided by the {@link org.bzdev.devqsim} package. It's main addition
+is the {@link org.bzdev.drama.Actor Actor} class, which provides for one
+actor to send messages to another actor, with the delivery delayed by
+some specified or computed time. The {@link org.bzdev.drama.Actor Actor}
+class is supported by several other classes:
+<UL>
+  <LI> {@link org.bzdev.drama.Condition Condition}. Conditions represent
+    some global condition that can affect multiple actors. When the state
+    of a condition changes, it can notify various domains and
+    actors.
+  <LI> {@link org.bzdev.drama.Group Group}. A group is basically a
+    distribution list with the capabilities of forwarding a message to
+    actors that have joined the group or other groups that have joined
+    the group.
+  <LI> {@link org.bzdev.drama.Domain Domain}. A domain is a collection
+    of actors. It can add conditions, in which case the domain's actors
+    will receive a notification when a condition changes.  A domain can
+    also be configured as a communication domain, in which case an instance
+    of {@link org.bzdev.drama.MsgForwardingInfo MsgForwardingInfo} will
+    allow message-delivery times to be computed, and will allow messages
+    to be filtered (transformed in some way or dropped as appropriate).
+  <LI> {@link org.bzdev.drama.MsgForwardingInfo MsgForwardingInfo}.
+    This class will typically be subclassed to provide an appropriate delay
+    or {@link org.bzdev.drama.common.MessageFilter message filter}. A
+    message filter allows a message to be dropped or modified (e.g., to
+    model bit errors that might occur during transmission of a message over
+    some communication channel).
+  <LI> {@link org.bzdev.drama.DomainMember DomainMember}. A Domain member
+    is an object that will join a domain on behalf of a series of actors.
+    Its purpose is partly to simply configurations where a large number of
+    actors will have the same domains, In some cases, its use improves
+    performance.
+</UL>
+<H3><A NAME="examples">Examples</A></H3>
+As a coding example, a trivial simulation using this package might
+create a subclass of {@link org.bzdev.drama.Actor} as follows:
+<BLOCKQUOTE><CODE><PRE>
+import org.bzdev.devqsim.*;
+import org.bzdev.drama.*;
+import org.bzdev.lang.*;
+import org.bzdev.lang.annotations.*;
+
+{@literal @}DMethodContext(helper = "org.bzdev.drama.DoReceive"
+                           localHelpter = "TestActorDoRecieve")
+public class TestActor extends Actor {
+
+    static {
+      TestActorDoReceive.register();
+    }
+
+    public TestActor(DramaSimulation sim, String name, boolen intern) {
+        super(sim, name, intern);
+    }
+
+    public void sendHello(Actor dest) {
+        send("Hello", dest);
+    }
+
+    {@literal @}DMethodImpl("org.bzdev.drama.DoReceive")
+    protected void doReceiveImpl(String msg, Actor source, boolean wasQueued) {
+        System.out.format("at time %g, \"%s\" received by %s &amp; sent by %s\n",
+                           getSimulation().currentTime(),
+                           msg,
+                           getName(),
+                           source.getName());
+    }
+}
+</PRE></CODE></BLOCKQUOTE>
+This actor has a method that causes it to send a message to another
+actor. Because a delay was not specified, the delay will be determined
+by looking at the actor's communication domains.  Dynamic methods are
+used to handle messages that have been received.
+<P>
+The example also creates a communication domain:
+<BLOCKQUOTE><CODE><PRE>
+import org.bzdev.drama.*:
+public class TestDomain extends Domain {
+    public TestDomain(DramaSimulation sim, String name, int priority) {
+        super(sim, name, true, priority);
+        configureAsCommunicationDOmain("network");
+    }
+}
+</PRE></CODE></BLOCKQUOTE>
+
+A subclass of MsgForwardingInfo is also created. This determines
+the delays when messages are routed though communication domains:
+<BLOCKQUOTE><CODE><PRE>
+import org.bzdev.drama.*:
+public class TestMsgForwardingInfo extends MsgForwardingInfo {
+    DramaSimulation sim;
+    public TestMsgForwardingInfo(DramaSimulation sim, String name,
+                                 boolean intern)
+    {
+       this.sim = sim;
+    }
+    protected long localDelay(Domain domain, Actor src,
+                              Object msg, Actor dest)
+    {
+        return sim.getTicks(1.0);
+    }
+    // There are 8 similar localDelay methods
+    ...
+
+}
+</PRE></CODE></BLOCKQUOTE>
+<P>
+Finally a main program creates a simulation, a domain, provides the
+domain with a MsgForwardingInfo object so it can determine the appropriate
+delays, creates two actors, and places them in the domain.
+One actor's sendHello method is used to generate a message
+and the simulation is then run.
+<BLOCKQUOTE><CODE><PRE>
+import org.bzdev.drama.*;
+public class Test {
+    public static void main(String argv[]) throws Exception {
+        DramaSimulation sim = new DramaSimulation();
+        Domain d = new Domain(sim, "d", true, 0);
+        MsgForwardingInfo mfi = new TestMsgForwardingInfo(sim, "mfi", true);
+        d.setMsgForwardingInfo(mfi);
+
+        TestActor a1 = new TestActor(sim, "a1", true);
+        TestActor a2 = new TestActor(sim, "a2", true);
+        a1.joinDomain(d);
+        a2.joinDomain(d);
+
+        a1.sendHello(a2);
+
+        sim.run();
+    }
+}
+</PRE></CODE></BLOCKQUOTE>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  UML DramaSimObject AbstractTaskObject subclasses
+ -->
+<!--  LocalWords:  DomainMember MsgForwardingInfo subclassed
+ -->
+<!--  LocalWords:  sendHello
+ -->

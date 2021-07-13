@@ -1,0 +1,19 @@
+%YAML 1.2
+---
+  returnTypes:
+    - org.bzdev.swing.AnimatedPanelGraphics
+    - org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor
+    
+  argumentTypes:
+    - org.bzdev.gio.ISWriterOps.AnimationParameters
+    - org.bzdev.swing.AnimatedPanelGraphics.ExitAccessor
+
+  functionClasses:
+    - org.bzdev.swing.AnimatedPanelGraphics
+
+  fieldClasses:
+    - org.bzdev.swing.AnimatedPanelGraphics.Mode
+
+  methodClasses:
+    - org.bzdev.swing.AnimatedPanelGraphics
+...

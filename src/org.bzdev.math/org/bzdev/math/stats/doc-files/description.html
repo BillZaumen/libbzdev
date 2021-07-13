@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.math.stats package</H2>
+
+This package contains several statistics-related classes.
+The class hierarchy is shown in the following diagram:
+<P style="text-align: center">
+<img src="stats.png">
+<P>
+One will typically use the stats package as follows:
+<UL>
+   <LI> In the simplest case, a program such as a simulation
+     will produce data providing a mean value and standard
+     deviation for quantities such as queue lengths. The class
+     {@link BasicStats} or
+     {@link BasicStatsMV} can be used to
+     record this data and then compute the mean and standard
+     deviation.  A table of means and standard deviations can then be
+     used as the input for a least-squares fit.
+   <LI> If an application produces an array of non-deterministic
+        values, computing this array multiple times, the class
+        {@link CovarianceMatrix} can be
+        used to compute the covariance matrix.  One of two subclasses
+        will be used:
+        <UL>
+           <LI> {@link CovarianceMatrix.Population}
+                when the data sets represent the full population.
+           <LI> {@link CovarianceMatrix.Sample}
+                when the data sets are a representative sample.
+        </UL>
+        In both cases, the data can be collected and then passed to
+        a constructor the data can be added incrementally.
+   <LI> For hypothesis testing, the standard terminology refers to
+        a null hypothesis (denoted H<sub>0</sub>) and an alternate
+        hypothesis, (denoted as H<sub>A</sub> or possibly H<sub>1</sub>,
+        etc. as there may be several).  The null hypothesis is a
+        hypothesis one attempts to disprove (the word "null" is used
+        because "nullify" is used as a synonym for "disprove"). For
+        example, the null hypothesis might be that the mean value of
+        some quantity is zero, while the alternate hypothesis may be
+        that the mean is larger than some value &mu;. The test makes
+        use of a statistic - a real-valued function of the data. Often
+        the statistic is chosen so that its value is zero when the
+        probability of rejecting the null hypothesis is at its minimum
+        value. A statistic has an associated probability distribution
+        that represents the probability that a random variable will
+        produce a specific outcome when the null hypothesis is in fact
+        true. The following quantities are used with respect to the
+        null hypothesis:
+        <UL>
+           <LI> The p value is the probability that the random variable
+                associated with a statistic will have a value at least
+                as extreme (e.g., as far from zero).  The term "extreme"
+                can refer to deviations from zero in one or both
+                directions.
+           <LI> The symbol &alpha; is typically used to indicate a cutoff
+                value for the p value.  For example if &alpha;=0.01, there
+                is a one percent chance of the random variable generating
+                a value at least this extreme. The value of &alpha; is
+                the probability of a type I error, defined as the probability
+                that the null hypothesis is in fact true when the test
+                indicated that it is false.
+           <LI> For a given value of &alpha;, the statistic's critical
+                value is the value of the statistic for which the
+                p value would be numerically equal to &alpha;.  depending
+                on the situation, one may use one or two critical values.
+                (two values allows for deviations in both directions from
+                zero).
+        </UL>
+        The probability distribution for the alternate hypothesis
+        can also be computed by providing a noncentrality
+        parameter.  This parameter, when it exists, is used to
+        initialize the probability distribution for the alternate
+        hypothesis, and its definition is dependent on the
+        statistic and distribution used. Methods that help compute
+        the noncentrailty parameter exist but these methods may
+        throw an UnsupportedOperationException if the
+        statistic's distribution does not have a noncentrality
+        parameter or if the specific method is not appropriate.
+        Each statistic that supports such a method should document
+        the use of such methods.  The use of a noncentral
+        distribution allows the same statistic to be used for both
+        hypotheses. The following quantities are used with respect
+        to the alternate hypothesis:
+        <UL>
+            <LI> The value &beta; is the integral of the
+                 probability density of a statistic for the
+                 probability distribution associated with an
+                 alternate hypothesis, with the limits of
+                 integration equal to the critical values for the
+                 null hypothesis.  This measures the probability of
+                 the null hypothesis being accepted when the
+                 alternate hypothesis is in fact true. Such an
+                 outcome is referred to as a type II error.
+            <LI> The statistical power is defined as 1 - &beta; and
+                 indicates the probability that the null hypothesis
+                 has not been falsely rejected given that the null
+                 hypothesis has been rejected.
+            <LI> The alternate hypothesis is sometimes
+                 characterized by providing the mean value of some
+                 quantity or its difference from the value assumed
+                 by the null hypothesis.  The value of &beta; is a
+                 function of this quantity.
+        </UL>
+        When using this package for hypothesis testing, one will typically
+        do the following:
+        <OL>
+            <LI> Create an instance of a subclass of Statistic, choosing
+                 the subclass that matches the statistic one chooses to use.
+            <LI> Add data to the statistic, either when the constructor is
+                 called or by calling various methods whose name starts with
+                 the string "add".
+            <LI> The method
+                 {@link org.bzdev.math.stats.Statistic#getValue()}
+                 will return the value of the statistic given the
+                 data provided.
+            <LI> The method
+                 {@link org.bzdev.math.stats.Statistic#getPValue(org.bzdev.math.stats.Statistic.PValueMode)}
+                 will determine the statistic's p value. This method's
+                 argument will determine if a one-sided or two-sided value
+                 is desired.  There are options for the one-sided case that
+                 specify whether more extreme values are positive or
+                 negative.
+            <LI> One may also use methods to obtain critical values,
+                 a distribution for an alternate hypothesis, and to
+                 compute the quantity &beta; for a given alternate
+                 hypothesis.  These methods are described in the
+                 documentation for {@link org.bzdev.math.stats.Statistic}.
+                 and its subclasses.
+        </OL>
+   <LI> For testing if a data set follows a particular distribution,
+        one may use the class
+        {@link org.bzdev.math.stats.KSStat}, which provides a
+        Kolmogorov-Smirnov test to see if a data set can be
+        described by a specified probability distribution. This
+        test requires that the distribution does not make use of
+        parameters that were calculated from the data set.
+        A good use is to test new random number generators to
+        verify that they follow the desired probability distribution.
+</UL>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  BasicStats BasicStatsMV CovarianceMatrix getValue
+ -->
+<!--  LocalWords:  subclasses noncentrality noncentrailty noncentral
+ -->
+<!--  LocalWords:  UnsupportedOperationException getPValue Kolmogorov
+ -->
+<!--  LocalWords:  Smirnov
+ -->

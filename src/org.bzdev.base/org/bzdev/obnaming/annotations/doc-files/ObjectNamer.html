@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+  <STYLE TYPE="text/css">
+    BODY {
+	margin 2ex 2ex 2ex 2ex;
+    }
+  </STYLE>
+<BODY>
+    <div style="margin-left: 2em">
+<H2>ObjectNamer Description</H2>
+
+An object-namer class is paired with a corresponding named-object
+class that is a common superclass of all named objects that can be
+handled by a specific object namer.
+<P>
+A "helper class" providing the implementation is spliced into the
+class hierarchy.  The class annotated with this annotation provides
+the object namer, while the helper class will not be visible
+outside of its package.  A similar annotation provides a helper for
+the named-object class.  The object-namer class must extend the
+helper class, which can be configured to extend another class.
+<p>
+As a simple example, to add an object-namer capability to a class
+that must extend ScriptingContext and that uses TestObject as its
+named-object class, one would use the following class definition:
+<pre><code>
+@ObjectNamer(helperClass = "NHelper",
+             helperSuperclass = "org.bzdev.scripting.ScriptingContext",
+             objectClass = "TestObject",
+             objectHelperClass = "OHelper")
+public class TestNamer extends NHelper implements ObjectNamerOps&lt;TestObject&gt; {
+  ...
+}
+</code></pre>
+where the named-object class TestObject uses the class OHelper as its
+helper class.
+<P>
+For a more complex example, suppose the superclass uses type parameters
+and has multiple constructors, some of which may throw exceptions:
+<pre><code>
+@ObjectNamer(helperClass = "NHelper",
+             helperSuperclass = "NumberStore",
+             helperSuperclassTypeParms = "&lt;Integer&gt;"
+             helperSuperclassConstrTypes =
+             {
+               @ObjectNamer.ConstrTypes({"int"}),
+               @ObjectNamer.ConstrTypes(
+                   values = {"int", "float"},
+                   exceptions = {"IllegalArgumentException"}),
+             objectClass = "TestObject",
+             objectHelperClass = "OHelper")
+public class TestNamer extends NHelper implements ObjectNamerOps&lt;TestObject&gt; {
+   ...
+   public TestNamer(int initialCapacity) {
+       super(initialCapacity);
+       ...
+   }
+   public TestNamer(int initialCapacity, float loadFactor)
+      throws IllegalArgumentException
+   {
+      super(initialCapacity, loadFactor);
+      ...
+   }
+}
+</code></pre>
+The helper class' superclass will be NumberStore&lt;Integer&gt; and the
+helper class will have two constructors, the first of which has
+an argument that is an int, and the second of which has two arguments
+(an int and a double).  The class TestNamer's constructor will have
+to have constructors that call its superclass' constructors with
+the arguments defined in the @ObjectNamer annotation.
+Finally, ObjectNamerOps is provided so that javadocs will document
+public methods for object namers.  Its use is not mandatory.
+<P>
+Recommended options for the java compiler (we assume the
+command-line syntax used in Sun Microsystem's implementation)
+for non-modular jar files are
+<pre><code>
+ javac -d CLASSES -s TMPSRC \
+        -classpath /usr/lib/libbzdev/libbzdev.jar:CLASSES \
+        FILES...
+</code></pre>
+where <code>CLASSES</code> is the name of a directory containing
+the class files (with subdirectories matching the package
+hierarchy), <code>TMPSRC</code> is a directory for files created by
+the annotation processor, and <code>SRC</code> is a directory (or
+search path) containing source files (again with subdirectories
+matching the package hierarchy).  Without <code>CLASSES</code> in
+the class path, you may get a warning about implicitly compiled
+files. Without the '-s' flag, automatically generated java files
+will appear in the CLASSES directory.
+<p>
+During compilation, the JAR file containing the org.bzdev.base
+module must be accessible from the class path, as must the file
+<blockquote>
+META-INF/services/javax.annotation.processing.Processor
+</blockquote>
+(the libbzdev.jar file contains both).  For separate compilation,
+the class files corresponding to the helper files are needed.
+<P>
+When modules are used, one will typically create a directory named
+mods and a subdirectory mods/MODULE where MODULE is the name of the
+module (e.g., com.foo.bar). One will also create a directory tmpsrc
+and a corresponding subdirectory tmpsrc/MODULE.  A typical compiler
+command, assuming the source code is in a directory src, is
+<BLOCKQUOTE><CODE><PRE>
+   javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE \
+         --processor-module-path /usr/share/bzdev \
+         src/MODULE/module-info.java src/MODULE/DIR/*.java
+</PRE></CODE></BLOCKQUOTE>
+where DIR is the directory corresponding to a package name
+following the usual Java conventions (e.g., com/foo/bar for the
+package com.foo.bar). Placing generated source files in
+tmpsrc/MODULE and the source tree in src/MODULE will make it easy
+to use javadoc to generate documentation: for javadoc the
+options
+<BLOCKQUOTE><CODE><PRE>
+   -d TARGET
+   --module-path PATH
+   --module-source-path src:tmpsrc
+   --add-modules MODULES
+   --module MODULE
+</PRE></CODE></BLOCKQUOTE>
+and possibly
+<BLOCKQUOTE><CODE><PRE>
+   --exclude PACKAGES
+</PRE></CODE></BLOCKQUOTE>
+are useful. For these options,
+<UL>
+  <LI> TARGET is the directory that will hold the API documentation
+  <LI> PATH is a list of directories separate by the path separator
+      (":" for Linux or Unix, ';' for Windows), with each containing
+      modular JAR files.
+  <LI> MODULES is a comma-separated list of modules that should be
+       included in the documentation.
+  <LI> PACKAGES is a colon-separated list of package names listing
+       packages that should be excluded (Fully qualified package
+       names are necessary). The BZDev class library has a number
+       of packages for which the last component of their names is
+       "lpack". These packages contain Java "properties" files and
+       are used for localization. As such, they should not be documented.
+ </UL>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  ObjectNamer namer superclass ScriptingContext src
+ -->
+<!--  LocalWords:  TestObject OHelper NumberStore TestNamer's namers
+ -->
+<!--  LocalWords:  ObjectNamerOps javadocs Microsystem's libbzdev
+ -->
+<!--  LocalWords:  subdirectories subdirectory tmpsrc javadoc BZDev
+ -->
+<!--  LocalWords:  lpack
+ -->

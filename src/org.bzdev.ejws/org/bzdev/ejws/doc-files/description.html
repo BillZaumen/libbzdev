@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.ejws package</H2>
+
+The {@link org.bzdev.ejws} package provides a class for
+configuring instances of {@link com.sun.net.httpserver.HttpServer}
+or {@link com.sun.net.httpserver.HttpsServer}, and several classes
+that are useful for implementing an embedded web server:
+<ul>
+  <li> The class {@link org.bzdev.ejws.EmbeddedWebServer} will
+    configure an HttpServer or HttpsServer, including setting up a
+    thread pool. One can add instances of
+    {@link com.sun.net.httpserver.HttpHandler} using methods
+    that bind a prefix (the initial part of a URL's path) to a
+    context, which contains an instance of {@link
+    com.sun.net.httpserver.HttpHandler}, which in turn handles an HTTP
+    request.  These methods are
+    <ul>
+      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,Class,Object,com.sun.net.httpserver.Authenticator,boolean,boolean,boolean)},
+        which creates an instance of {@link org.bzdev.ejws.FileHandler},
+        specifying a subclass of {@link org.bzdev.ejws.WebMap}
+        by class.
+      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,com.sun.net.httpserver.HttpHandler,com.sun.net.httpserver.Authenticator)},
+	whose arguments contain an instance of
+	{@link com.sun.net.httpserver.HttpHandler}.
+      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,String,Object,com.sun.net.httpserver.Authenticator,boolean,boolean,boolean)},
+        which creates an instance of {@link org.bzdev.ejws.FileHandler},
+        specifying a subclass of {@link org.bzdev.ejws.WebMap} by name.
+    </ul>
+  <li> The class {@link org.bzdev.ejws.FileHandler}, a subclass of
+    {@link com.sun.net.httpserver.HttpHandler}, contains constructors that
+    provide the the class or class name for a subclass of
+    WebMap, an argument for that WebMap's constructor, several
+    boolean flags, and a string giving the protocol (HTTP or
+    HTTPS) for use in error pages.  The FileHandler class will
+    handle errors, check the HTTP ACCEPT header, etc.
+  <li> The class {@link org.bzdev.ejws.WebMap} is used by
+    {@link org.bzdev.ejws.FileHandler} to determine how the file
+    handler maps paths to resources. A WebMap is usually not
+    created directly: instead a FileHandler calls
+    WebMap.newInstance, which creates the appropriate subclass.
+  <li> The subclass of {@link org.bzdev.ejws.WebMap} helps process
+    HTTP or HTTPS requests by returning an instance of
+    {@link org.bzdev.ejws.WebMap.Info}, which provides a stream
+    for the content of the resource and some additional information.
+</ul>
+<P>
+This package also includes partial support for WAR (Web ARchive)
+files and JSP (Java Server Pages).  For WAR files, the
+WEB-INF/web.xml file is processed to find encodings for pages,
+media-types (MIME types) for file-name extensions, error pages for
+particular error codes or exceptions, and a welcome-file list.  The
+use of the web.xml file is describe in the documentation for
+{@link org.bzdev.ejws.WebMap}. JSP support is really minimal and is
+restricted to processing error messages.  This is also describe in
+the documentation for {@link org.bzdev.ejws.WebMap}.
+<P>
+For a simple coding example based on code in the EPTS program,
+consider the case of a web server embedded in an application for
+providing on-line help.  The first step is to create an embedded web
+server:
+<BLOCkQUOTE><CODE><PRE>
+        EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, false);
+</PRE></CODE></BLOCKQUOTE>
+The argument 8080 is the TCP port number to use, 48 is the TCP backlog,
+2 is the number of threads the server uses, and 'false' indicates that
+HTTP is used rather than HTTPS.  The next step is to map a path to
+some service.
+
+<BLOCkQUOTE><CODE><PRE>
+        ews.add("/", ResourceWebMap.class, "org/bzdev/epts/manual/",
+                null, true, false, true);
+</PRE></CODE></BLOCKQUOTE>
+For these arguments, <CODE>"/"</CODE> indicates the common portion of
+the URL paths for the resources being added,
+<CODE>{@link org.bzdev.ejws.maps.ResourceWebMap ResourceWebMap}.class</CODE>
+and the following argument
+specify a mapping class that will find classes whose paths in the
+application's code base start
+with <CODE>org/bzdev.epts/manual/</CODE>, null indicates that an
+authenticator is not used, the first <CODE>true</CODE> indicates that
+a web.xml file should not be used , <CODE>false</CODE> indicates that
+the server should not display directories, and the
+final <CODE>true</CODE> indicates that any WEB-INF directory should
+not be visible.
+<P>
+The sequence of statements 
+<BLOCkQUOTE><CODE><PRE>
+        WebMap wmap = epts.getWebMap("/");
+        wmap.addWelcome("index.html");
+	webmap.addMapping("html", "text/html; charset=utf-8");
+</PRE></CODE></BLOCKQUOTE>
+looks up a web map for the context "<CODE>/</CODE>", configures the
+web map so that "index.html" is the 'welcome' page, and configures the
+web map so that files ending in the suffix "html" will have a media type
+of "text/html; charset=utf-8".
+<P>
+Finally
+<BLOCkQUOTE><CODE><PRE>
+        ews.start();
+</PRE></CODE></BLOCKQUOTE>
+will start the web server. The URL <CODE>http://localhost:8080/</CODE>
+can be typed into a browser to view this web page on the same computer
+as the server.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  HttpServer HttpsServer URL's boolean WebMap HTTPS
+ -->
+<!--  LocalWords:  WebMap's FileHandler newInstance ARchive JSP xml
+ -->
+<!--  LocalWords:  encodings EPTS TCP authenticator html charset utf
+ -->

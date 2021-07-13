@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+({recordProperties: function(methods, object) {
+    for (var name in object) {
+        methods.add(name);
+    }
+    return;
+}})
+]]>
+  </entry>
+  <entry key="ESP">
+<![CDATA[
+{recordProperties: function(method, object) {
+    object.propertyNames().forEach(function(name) {method.add(name); void});
+    null
+}}
+]]>
+  </entry>
+  <entry key="python">
+<![CDATA[
+class ___ListPropertyScript_For_BZDev_Org:
+  def recordProperites(self,methods, object):
+    for name in object.iterkeys():
+       methods.add(name)
+    return
+  def finishup(self):
+    del ___ListPropertyScript_For_BZDev_Org.finishup
+    del ___ListPropertyScript_For_BZDev_Org
+    return self
+___ListPropertyScript_For_BZDev_Org().finishup()
+]]>
+  </entry>
+</properties>

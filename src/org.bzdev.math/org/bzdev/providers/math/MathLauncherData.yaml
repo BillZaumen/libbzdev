@@ -1,0 +1,27 @@
+%YAML 1.2
+---
+  returnTypes: &list
+    - org.bzdev.math.Adder
+    - org.bzdev.math.Adder.Kahan
+    - org.bzdev.math.GLQuadrature
+    - org.bzdev.math.RealValuedFunctOps
+    - org.bzdev.math.RealValuedFunctTwoOps
+    - org.bzdev.math.RealValuedFunction
+    - org.bzdev.math.RealValuedFunctionTwo
+    - org.bzdev.math.RungeKutta
+    - org.bzdev.math.SimpsonsRule
+
+  argumentTypes: *list
+
+  functionClasses:
+    - org.bzdev.math.Binomial
+    - org.bzdev.math.Functions
+    - org.bzdev.math.GLQuadrature
+    - org.bzdev.math.RungeKutta
+    - org.bzdev.math.SimpsonsRule
+
+  fieldClasses:
+    - org.bzdev.math.Constants
+
+  methodClasses: *list
+...

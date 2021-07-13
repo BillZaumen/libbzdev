@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.geom package</H2>
+
+This package augments the java.awt.geom package and additionally
+provides some classes for 3D geometry.
+The class hierarchy is shown in the following diagram, with a class
+from the java.awt.geom package shown in blue.
+<P>
+<P style="text-align:center">
+<IMG SRC="geom.png">
+<P>
+For the classes in this package associated with two-dimensional
+graphics, the class
+<ul>
+ <li> {@link Path2DInfo} provides information
+   about instances of java.awt.geom.Path2D.  This includes the values
+   of ds/du and d<sup>2</sup>s/du<sup>2</sup> at a given value of u,
+   the length of a path segment, and a list of entries describing the
+   segments of a path, where each entry contains
+   <ul>
+     <li> an index indicating the segment's position in the path.
+     <li> the starting point of the segment.
+     <li> the ending point of the segment.
+     <li> the length of the segment.
+     <li> the coordinates of the segment (the x and y positions of
+       the end points and the control points)
+     <li> the type of the segment
+     <li> a string representation of the type of a segment (useful
+       for printing debugging information)
+   </ul>
+ <li> {@link SplinePath2D} extends
+      Path2D.Double to provide a B&eacute;zier splines connecting a
+      sequence of points, implemented as a sequence of cubic
+      B&eacute;zier path segments. The user provides a sequence of end
+      points and a splineTo method computes the locations of the
+      control points for each segment.
+ <li> {@link BasicSplinePath2D}
+   extends {@link SplinePath2D} by
+   providing a parameterized curve whose parameter u covers the range
+   [0.0, 1.0) for the first segment, [1.0, 2.0) for the second
+   segment, etc.  The curve must be continuous: only one MOVE_TO
+   operation is allowed and only the last segment may be closed.  This
+   class provides methods for computing a point along the curve given
+   its parameter. First and second derivatives can also be
+   computed. Additional methods compute the length of the path between
+   two values of the parameter and allow the parameter to be computed
+   given the length from the start of the curve.  The path length will
+   be negative if the final value of the path parameter is smaller
+   than its initial value.  For closed paths, there is no upper limit
+   on the parameter - one may traverse the path as many times as
+   desired.
+ <li> {@link SplinePathBuilder}
+   simplifies the creation of
+   a {@link SplinePath2D} and is used by
+   some of the factory classes in the anim2d package.
+ <li> {@link BasicSplinePathBuilder}
+   simplifies the creation of a
+   {@link BasicSplinePath2D} and is
+   used by some of the factory classes in the anim2d package.
+</ul>
+<p>
+For the classes in this package associated with three-dimensional
+graphics, there are four interfaces:
+<UL>
+ <li> {@link PathIterator3D}. This
+   interface provides a set of methods for iterating over the segments
+   that make up a path.  The interface is nearly identical to that
+   provided by java.awt.geom.PathIterator. The differences are
+   that there is no method to get a winding rule (because a winding
+   rule does not make sense in a three dimensional space), and the
+   documentation for the currentSegment methods differs as the array
+   size is larger for three dimensions than for two dimensions.
+ <li> {@link Shape3D}. This interface provides
+   common methods for two-dimensional shapes that are embedded in a
+   three-dimensional space.  These methods produce a bounding box and
+   and an iterator.
+ <li> {@link SurfaceIterator}.  This
+   interface provides the methods needed to iterate over a surface
+   embedded in a three-dimensional space.
+ <li> {@link Transform3D}. This interface
+   provides the methods needed to apply a transform plus a method to
+   generate an affine transform that approximates the transform in a
+   sufficiently small neighborhood of a specified point.
+</UL>
+The classes associated with three-dimensional graphics are:
+<UL>
+ <li> {@link AffineTransform3D}. This
+   class provides affine transformations in a three dimensional
+      space, analogous to the affine transforms provided by
+      java.awt.geom.AffineTransform.
+ <li> {@link Path3DInfo}. This class provides
+      a similar set of methods as {@link Path2DInfo},
+      but for a three-dimensional space rather than a two-dimensional
+      space.
+ <li> {@link Path3D}.  This class provides paths
+   in a three-dimensional space that consist of segments of straight
+   lines, quadratic B&eacute;zier curves, and cubic B&eacute;zier
+   curves.  As with the class java.awt.geom.Path2D, a path may
+   consist of several separate components (separated by MOVETO
+   operations), and a component may be open or closed.
+ <li> {@link Point3D}. This class provides a
+   representation of points in a three-dimensional space.  The
+   subclasses Point3D.Float and Point3D.Double store the points using
+   single and double precision floating point numbers respectively.
+ <li> {@link Rectangle3D}. This class
+   provides a cuboid whose edges are lines for which either X and Y, Y
+   and Z, or X and Z coordinates are constant.
+ <li> {@link Surface3D}. This class represents
+   two-dimensional surfaces embedded in a three-dimensional space.
+   The subclasses {@link Surface3D.Float}
+   and {@link Surface3D.Double} store
+   data describing the surface using single and double precision
+   floating point numbers respectively.
+</UL>
+These classes and interfaces, to the extend possible, mimic the API
+provide by similar classes in the package java.awt.geom in order to
+reduce the learning curve for programmers - those using these classes
+are likely to be familiar with the classes in java.awt.geom.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  DInfo ds du SplinePath zier splineTo anim affine
+ -->
+<!--  LocalWords:  BasicSplinePath SplinePathBuilder PathIterator
+ -->
+<!--  LocalWords:  BasicSplinePathBuilder currentSegment MOVETO
+ -->
+<!--  LocalWords:  SurfaceIterator AffineTransform subclasses
+ -->

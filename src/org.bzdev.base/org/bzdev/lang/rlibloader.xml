@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+
+<libloaderspec>
+
+<archfamily>
+    <arch cname="amd64"/>
+    <arch cname="x86_64"/>
+</archfamily>
+
+
+<archfamily>
+    <arch cname="x86_64"/>
+    <arch cname="i386"/>
+</archfamily>
+
+
+<archfamily>
+    <arch cname="i686"/>
+    <arch cname="i386"/>
+</archfamily>
+
+<osinfo name="Linux" prefix="lib" suffix=".so">
+  <version pattern="2\.4\..*" replacement="2.4"/>
+  <version pattern="2\.5\..*" replacement="2.5"/>
+  <version pattern="2\.6\..*" replacement="2.6"/>
+  <version pattern="3\.0\..*" replacement="3.0"/>
+  <version pattern="3\.1\..*" replacement="3.1"/>
+  <version pattern="3\.2\..*" replacement="3.2"/>
+  <version pattern="3\.3\..*" replacement="3.3"/>
+  <version pattern="3\.4\..*" replacement="3.4"/>
+  <version pattern="3\.5\..*" replacement="3.5"/>
+  <version pattern="3\.6\..*" replacement="3.6"/>
+  <version pattern="3\.7\..*" replacement="3.7"/>
+  <version pattern="3\.8\..*" replacement="3.8"/>
+  <version pattern="3\.9\..*" replacement="3.9"/>
+  <version pattern="3\.10\..*" replacement="3.10"/>
+  <version pattern="3\.11\..*" replacement="3.11"/>
+  <version pattern="3\.12\..*" replacement="3.12"/>
+  <version pattern="3\.13\..*" replacement="3.13"/>
+  <version pattern="3\.14\..*" replacement="3.14"/>
+  <version pattern="3\.15\..*" replacement="3.15"/>
+  <version pattern="3\.16\..*" replacement="3.16"/>
+  <version pattern="3\.17\..*" replacement="3.17"/>
+  <version pattern="3\.18\..*" replacement="3.18"/>
+  <version pattern="3\.19\..*" replacement="3.19"/>
+  <version pattern="4\.0\..*" replacement="4.0"/>
+  <version pattern="4\.1\..*" replacement="4.1"/>
+  <version pattern="4\.2\..*" replacement="4.2"/>
+  <version pattern="4\.3\..*" replacement="4.3"/>
+  <version pattern="4\.4\..*" replacement="4.4"/>
+  <version pattern="4\.5\..*" replacement="4.5"/>
+  <version pattern="4\.6\..*" replacement="4.6"/>
+  <version pattern="4\.7\..*" replacement="4.7"/>
+  <version pattern="4\.8\..*" replacement="4.8"/>
+  <version pattern="4\.9\..*" replacement="4.9"/>
+  <version pattern="4\.10\..*" replacement="4.10"/>
+  <version pattern="4\.11\..*" replacement="4.11"/>
+  <version pattern="4\.12\..*" replacement="4.12"/>
+  <version pattern="4\.13\..*" replacement="4.13"/>
+  <version pattern="4\.14\..*" replacement="4.14"/>
+
+
+</osinfo>
+
+</libloaderspec>

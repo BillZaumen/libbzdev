@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The discrete-event simulation package</H2>
+
+Please see
+<UL>
+  <LI><A HREF="#intro">the introduction</A> for an overview.
+  <LI><A HREF="#examples">the examples</A> for some coding examples.
+</UL>
+
+<H3><A NAME="intro">Introduction</A></H3>
+
+This package provides the basic mechanisms needed for scheduling
+calls and tasks, managing simulation time, and for queuing
+calls and tasks.  Calls are instances of the interface
+org.bzdev.lang.Callable, which provides a method with no argument
+and no return value named call().  Typically a Callable is implemented
+using an anonymous class.  Tasks are represented by threads. For threads
+associated with a simulation, only one thread will run at a time.
+<P>
+The Simulation class handles the scheduling of events where a
+specific time to wait is given.  It also manages a name space for
+all instances of SimulationObject, so that objects used in a
+simulation can be referenced via string giving the object's name.
+In addition, the class Simulation allows the user to schedule calls
+and tasks implemented as scripts. To enable scripting, the user
+must implement the protected methods getScriptEngine and
+getScriptLanguage, inherited from the class
+org.bzdev.scripting.ScriptingContext.  The user should implement
+the protected method getDefaultBindings(). Additional
+<P>
+The following diagram shows a high-level view of the structure of
+this package, except for "factory" classes, emphasizing the classes
+used to write simulations:
+<P style="text-align: center">
+<img src="devqsim.png">
+<P>
+A Callable can be scheduled directly.  For a task thread, one normally
+schedules a Runnable and the simulation will then create the task thread.
+The subclasses of DefaultSimObject shown in the diagram above have
+implementations that interact with the Simulation's event queue, and
+allow tasks and instances of Callable to be put onto queues and processed
+in a queue-specific order.  The ProcessClock class is used to handle the
+case in which a single entity interleaves several activities but can only
+do one at a time - this is similar to what happens when multiple threads
+run on a single CPU.
+<P>
+When a simulation is run, one may either specify the duration for
+which it is run or one can implement the interface SimulationMonitor
+to determine dynamically when a simulation should stop. In addition,
+a SimulationListener can be added to the simulation, which responds
+to instances of SimulationStateEvent, used to indicate what the
+simulation is currently doing.  A SimulationListener may be used for
+debugging, but it can also be used if a GUI needs to track a simulation
+for purposes of updating the contents of a window.  These classes and
+how they interact is shown in the following figure:
+<P style="text-align: center">
+<img src="monitoring.png">
+<P>
+The class DefaultSimAdapter implements SimulationListener but
+provide defaults to make it easy to write a listener that responds
+to particular types of events.  The class DefaultSimAdapter also
+allows its behavior to be specified via scripts.
+<P>
+In addition, it is possible to tag events with a stack trace relevant
+to when the event was created.  This is a relatively expensive operation,
+and should normally be disabled (it is by default), but can be useful
+for debugging.  It is handled by the method
+{@link Simulation#setStackTraceMode(boolean)}.
+<P>
+The implementation of the Simulation class uses instances of the
+class SimulationEvent to handle scheduling events, whether events
+associated with a Callable, a TaskThread, a queue, or events
+defined by packages that implement extensions of the current
+package for specific kinds of simulations.  The class hierarchy for
+simulation events is shown in the following figure:
+<P style="text-align: center">
+<img src="events.png">
+<ul>
+  <li> The class {@link SimulationEvent}
+    can be subclassed to add more types of events.  This is done in
+    the org.bzdev.drama and org.bzdev.drama.generic packages to allows
+    simulation objects called actors to send messages to each other.
+  <li> The
+    class {@link TaskSimulationEvent}
+    is the common superclass for scheduling method calls (via
+    instances of the class org.bzdev.lang.Callable) and instances of
+    TaskThread (the class that handles Simulation-specific threads).
+  <li> The class TaskObjectSimEvent is not public, and is used to schedule
+    a Callable and in the creation of an unscheduled TaskThread.
+  <li> {@link TaskThreadSimEvent}
+    handles the case of a TaskThread pausing
+    for some amount of simulation time.
+  <li> {@link TaskQueueSimEvent}
+    allows a TaskThread or a Callable to be placed on a TaskQueue.  It
+    is used internally as queues used to store instances of TaskThread
+    and Callable have elements of this type, but the class is public
+    so that other packages can create subclasses of TaskQueue. The
+    constructor, however, is not public.
+ <li> TaskQueuePauseSimEvent is not public and is used when a running
+      task that is being serviced by the queue has pause, but without
+      freeing resources that would allow another queued task to run.
+</ul>
+<P>
+Simulations may have a parent.  The parent must be a scripting context
+(the class {@link org.bzdev.devqsim.Simulation} extends
+{@link org.bzdev.scripting.ScriptingContext})
+and the case in which a parent is itself a Simulation is treated
+specially.  When a simulation has a parent, the parent's scripting
+context is shared by the simulation's scripting context: both use the
+same script engine and default bindings unless explicitly overridden.
+When the parent is a simulation, the parent's event queue is shared.
+The parent's name space is also used to find simulation objects. One
+use of a parent simulation occurs when one has an existing simulation
+and would like to add an animation to it.  The org.bzdev.anim2d
+package defines the Animation2D as a subclass of Simulation, so one
+can constuct an Animation2D with a parent simulation. Since both
+share the same event queue, one can easily generate animation frames
+in sync with a simulation. This also helps keep the simulation code
+separate from the animation code.
+<P>
+Factory classes can be used to configure simulation objects. The
+class hierarchy is shown in the following diagram:
+<P style="text-align: center">
+<img src="dqfactories.png">
+<P>
+The class hierarchy follows the guidelines suggested for the
+org.bzdev.obnaming package. where abstract factory classes with
+type parameters follow the class hierarchy for the objects the
+factories create, and non-abstract subclasses of these allow
+objects to be created.
+<H3><A NAME="examples">Examples</A></H3>
+As an example, the following program
+<BLOCKQUOTE><CODE><PRE>
+import org.bzdev.devqsim.Simulation;
+import org.bzdev.devqsim.TaskThread;
+
+public class stest {
+    public static void main(String argv[]) throws Exception {
+	Simulation sim = new Simulation(1000.0);
+
+	sim.scheduleCall(() -&gt; {
+		System.out.println("time = " + sim.currentTime());
+	    }, sim.getTicks(4.0));
+
+	sim.scheduleCall(() -&gt; {
+		System.out.println("time = " + sim.currentTime());
+	    }, sim.getTicks(2.0));
+
+	sim.scheduleTask(() -&gt; {
+		for (int i = 0; i &lt; 5; i++) {
+		    System.out.println("time = " + sim.currentTime());
+		    TaskThread.pause(sim.getTicks(0.1));
+		}
+	    }, sim.getTicks(3.0));
+
+	sim.run();
+    }
+}
+</BLOCKQUOTE></PRE></CODE>
+will create a simulation that schedules several events. The scheduleCall
+method's first argument is an object whose type is
+{@link org.bzdev.lang.Callable}, which provides a single method named 'call'.
+This interface is a functional interface, so the first argument for
+schedulCall can be a lambda expression. The scheduleTask method's first
+argument has the type {@link java.lang.Runnable} and is also a functional
+method. It will schedule a task that will run in a separate thread, starting
+at a particular simulation time. In the example, there is a loop that
+prints a statement at successive times. The call to
+{@link org.bzdev.devqsim.TaskThread#pause(long)} will make the thread wait
+for a specified amount of simulation time.
+<P>
+The corresponding program when scripting is used is shown below. The
+program must be run by using the scrunner command, which predefines
+the variable <CODE>scripting</CODE>, an instance of
+{@link org.bzdev.scripting.ExtendedScriptingContext}.
+<BLOCKQUOTE><CODE><PRE>
+scripting.importClass("org.bzdev.devqsim.Simulation");
+scripting.importClass("org.bzdev.devqsim.TaskThread");
+
+var out = scripting.getWriter();
+
+sim = new Simulation(scripting, 1000.0);
+
+sim.scheduleCall(function() {
+    out.println("time = " + sim.currentTime());
+}, sim.getTicks(4.0));
+
+sim.scheduleCall(function() {
+    out.println("time = " + sim.currentTime());
+}, sim.getTicks(2.0));
+
+sim.scheduleTaskObject(function() {
+    for (var i = 0; i &lt; 5; i++) {
+        out.println("time = " + sim.currentTime());
+        TaskThread.pause(sim.getTicks(0.1));
+    }
+}, sim.getTicks(3.0));
+
+sim.run();
+</BLOCKQUOTE></PRE></CODE>
+Because of the use of a task thread, scrunner should use the
+option <CODE>--trustLevel=2</CODE>.
+<P>
+More complex examples would define subclasses of
+{@link org.bzdev.devqsim.SimObject}.  One can override the protected method
+{@link org.bzdev.devqsim.SimObject#update(double,long)} if the object's
+state is explicitly dependent on time so that every call to
+{@link org.bzdev.devqsim.SimObject#update()} will change the object's
+state to what it should be at the current simulation time.  One can
+also create various queues and place instances of
+{@link org.bzdev.lang.Callable}, {@link java.lang.Runnable}, or
+{@link org.bzdev.devqsim.TaskThread} on them (for a TaskThread, placing
+it on a queue automatically causes the thread to pause).
+For example,
+<BLOCKQUOTE><CODE><PRE>
+scripting.importClass("org.bzdev.devqsim.Simulation");
+scripting.importClass("org.bzdev.devqsim.TaskThread");
+
+var out = scripting.getWriter();
+
+sim = new Simulation(scripting, 1000.0);
+
+sim.createFactories("org.bzdev.devqsim",
+		    {fifof: "FifoTaskQueueFactory"});
+
+var fifo = fifof.createObject("fifo");
+
+sim.scheduleTask(function() {
+    out.println("time for task = " + sim.currentTime());
+    fifo.addCurrentTask(sim.getTicks(1.0));
+    out.println("time for task = " + sim.currentTime());
+    fifo.addCurrentTask(sim.getTicks(1.0));
+    out.println("time for task = " + sim.currentTime());
+    fifo.addCurrentTask(sim.getTicks(1.0));
+    out.println("time for task = " + sim.currentTime());
+});
+
+var count = 0;
+var callable = {
+    call: function() {
+	out.println("time for call = " + sim.currentTime());
+	if (count++ == 3) return;
+	fifo.addCallObject(callable, sim.getTicks(1.0));
+    }
+};
+
+sim.scheduleCallObject(callable, 0.0);
+
+sim.run();
+</BLOCKQUOTE></PRE></CODE>
+<P>
+In this example, the call to <CODE>createFactories</CODE> creates a
+factory named <CODE>fifof</CODE>. Its first argument is a package name
+and its second argument is an ECMAScript object whose property keys
+are treated as variable names and whose values are the simple class
+name of a class in the package provided by its first argument. The
+simulation task pauses when it calls the method
+<CODE>addCurrentTask</CODE> and places itself on the queue
+<CODE>fifo</CODE>. Similarly, the call to the
+method <CODE>addCallObject</CODE> restarts the <CODE>Callable</CODE> that
+invokes method <CODE>call</CODE> defined by the ECMAScript object
+<CODE>callable</CODE> by queuing this <CODE>Callable</CODE> with a
+specified service time. A test using the variable <CODE>count</CODE>
+terminates the sequence.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  SimulationObject getScriptEngine getScriptLanguage
+ -->
+<!--  LocalWords:  getDefaultBindings Runnable subclasses boolean
+ -->
+<!--  LocalWords:  DefaultSimObject ProcessClock SimulationMonitor
+ -->
+<!--  LocalWords:  SimulationListener SimulationStateEvent TaskThread
+ -->
+<!--  LocalWords:  DefaultSimAdapter setStackTraceMode subclassed
+ -->
+<!--  LocalWords:  SimulationEvent TaskSimulationEvent superclass
+ -->
+<!--  LocalWords:  TaskObjectSimEvent TaskThreadSimEvent TaskQueue
+ -->
+<!--  LocalWords:  TaskQueueSimEvent TaskQueuePauseSimEvent
+ -->
+<!--  LocalWords:  constuct scheduleCall schedulCall scheduleTask
+ -->
+<!--  LocalWords:  scrunner predefines
+ -->

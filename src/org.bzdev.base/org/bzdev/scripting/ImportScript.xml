@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+    The importClasses script takes three arguments: a scripting context,
+    a package name, and a specification of the classes from that package
+    that should be imported.
+
+    For ECMAScript (e.g., Javascript), the scripting context
+    must be an instance of org.bzdev.scripting.ExtendedScriptingContext),
+    the package name must be a string, and the classes are specified by
+    an array of strings or a single string (which is treated as an array
+    with a single element that is a string).
+
+    For Python, the specification is a list, with same properties as the
+    arrays used by ECMAScript.
+
+    When scrunner is used, the variable scripting is predefined. Users
+    should call scripting.importClasses(PACKAGE_NAME, SPEC), where
+    PACKAGE_NAME is a string giving the package name and SPEC is the
+    class-name specification described above.
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+({importClasses: function(scripting, packageName, classNames) {
+	   if (Array.isArray(classNames)) {
+	       for(var i = 0; i < classNames.length; i++) {
+	          var spec = classNames[i];
+		  scripting.importClass(packageName, spec);
+	       }
+	   } else {
+	       // if it is not an array, it is supposed to be
+	       // a string, if not, the method will not be found.
+	       scripting.importClass(packageName, classNames);
+	   }
+	   return;
+	 }
+})
+]]>
+  </entry>
+  <entry key="ESP">
+<![CDATA[
+{importClasses: function(scripting, packageName, classNames) {
+    global.importClasses(packageName, classNames);
+}}
+]]>
+  </entry>
+  <entry key="python">
+<![CDATA[
+class ___ImportScript_For_BZDev_Org:
+	def importClasses(self, scripting, packageName, classNames):
+	  if type(classNames) == list:
+	    for spec in classNames:
+		if type(spec) == list:
+		    if len(spec) == 0:
+			raise SyntaxError("emptySubarray")
+		    elif len(spec) == 1:
+			scripting.importClass(packageName, spec[0])
+		    else:
+			raise SyntaxError("subArrayTooLong")
+		else:
+		    scripting.importClass(packageName, spec)
+	  return
+	def finishup(self):
+	  del ___ImportScript_For_BZDev_Org.finishup
+	  del ___ImportScript_For_BZDev_Org
+	  return self
+___ImportScript_For_BZDev_Org().finishup()
+]]>
+  </entry>
+</properties>

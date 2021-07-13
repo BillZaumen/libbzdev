@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<HEAD>
+  <TITLE>Description for org.bzdev.math</TITLE>
+</HEAD>
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.math package</H2>
+
+As stated in the package summary, the package org.bzdev.math
+contains implementations of special functions,
+algorithms for numerical quadrature, solutions to differential
+equations, etc.
+<P>
+The class hierarchy is shown in the following diagrams. The
+diagram
+<P style="text-align: center">
+<img src="math1.png">
+<P>
+shows the class hierarchy for numerical quadrature, root finding,
+solving first-order differential equations, numerically stable
+addition, matrix and vector operations, special functions, and
+mathematical constants. The diagram
+<P>
+<P style="text-align: center">
+<img src="math2.png">
+<P>
+shows the class hierarchy for classes that represent
+double-precision real valued functions and functions that create
+arrays of double-precision real numbers.  For the Functions class,
+dependencies on its nested classes are shown.
+<P>
+For numerical quadrature, one class implements Gauss-Legendre
+quadrature, and another implements Simpson's rule. Each is an
+abstract class for which a function to integrate must be defined.
+If the function's values are known at evenly-spaced points,
+Simpson's rule may be used. If the function is well approximated by
+a polynomial and can be evaluated at any arbitrary point,
+Gauss-Legendre quadrature is very efficient as it requires
+relatively few function evaluations.
+<P>
+The Runge-Kutta classes allow non-linear, first-order differential
+equations to be solved numerically.  The class RungeKutta uses the
+fourth order algorithm (often called the Runge-Kutta method as this
+is the one most frequently used) to solve y' = f(t,y). The class
+RungeKuttaMV replaces y with a vector (i.e., a Java array) to allow
+systems of first-order differential equations to be solved.
+<P>
+The Functions class provides methods for computing various elementary and
+special functions. This class has nested classes associated with
+particular special functions.  The one for Legendre polynomials,
+for example, has a method for calculating a polynomial's roots
+and for computing a value for a particular argument for all
+degrees up to some limit (this can be done efficiently due to a
+recursion relationship).  Some constants are needed by the Functions
+class.  These are defined by the class Constants, as they have additional
+uses.  The functions provided are:
+<UL>
+ <li> Airy functions and their derivatives (while Airy functions can
+      be computed by using Bessel functions of order 1/3, the
+      implementation uses an infinite series that requires less
+      computation).
+ <li> Bernstein polynomials. These are used for B&eacute;zier curves
+      and surface, and can also be used for interpolation methods.
+ <li> Bessel functions (including spherical Bessel functions and
+      modified Bessel functions) of the first and second kind, and
+      their derivatives.  For spherical Bessel functions, the order
+      is integer valued; otherwise the order can be either an integer
+      or a double-precision number.
+ <li> the Beta function.
+ <li> binomial coefficients.  Methods allow long-integer values,
+      double-precision values, and BigInteger values to be computed.
+      When a long integer is returned, the time complexity is O(1).
+      When a double-precision number is returned, the time complexity
+      for computing C(n,m) is O(1) for n &lt; 512; otherwise it is
+      O(1) for large m but O(m) for m &lt; 20. For the BigInteger case,
+      BigInteger arrays are returned, one for each value of n.
+ <li> factorials.  Methods include ones for returning double-precision
+      values, long-integer values, and BigInteger values. An additional
+      method computes the logarithm of a factorial. With the exception
+      of the BigInteger case, the time complexity is 0(1) due to the use
+      of table look-up and asymptotic expansions.
+ <li> the gamma function and the digamma function.
+ <li> inverse hyperbolic functions.
+ <li> Laguerre polynomials and associated Laguerre polynomials, plus
+      their derivatives.
+ <li> Legendre polynomials and associated Legendre functions, plus
+      their derivatives.
+ <li> Spherical harmonics. As these are complex-valued functions,
+      the values computed are multiplied by e<sup>-im&phi;</sup> so
+      that the value returned is a real number.
+ <li> the Riemann zeta function.
+</UL>
+The choice of functions is geared towards those used in classical
+electrodynamics and elementary quantum mechanics: basically ones
+that are used in solutions to certain ordinary and partial differential
+equations.
+<P>
+The Binomial class provides static methods for computing binomial
+coefficients. The method C returns C(n,m) as a long integer. The
+method 'coefficient' computes C(n,m) as a double-precision real number.
+The method logC computes the logarithm of C(n, m). The methods named
+coefficients allow a table of binomial coefficients to be computed,
+with the results represented as long integers.  The methods named
+exactC allow a table of binomial coefficients to be computed with
+the results represented by instances of BigInteger.  Normally users
+will use the methods named 'C' or 'coefficient' - the implementation
+is efficient due to the use of precomputed values and asymptotic
+expansions.
+<P>
+The RootFinder class finds roots of functions given their derivatives
+and for a function f(x), can solve the equation y = f(x) for x given
+y (as the solution is the root of the equation g(x) = f(x) - y).
+It has two nested classes, one using Newton's method and the other
+using Halley's method.
+ *<P>
+The class RealValuedFunctionVA provides real-valued functions
+(These return the primitive type <code>double</code>) that take an
+arbitrary number of arguments (the constructors can provide upper
+and lower bounds on the number of arguments). The methods allow
+bother value of the function and the values of its first and second
+derivatives to be computed. This class is useful when a function
+should be passed as an argument. There are constructors that allow
+the value and its derivatives to be defined via a scripting
+language when that is convenient.  The class RealValuedFunction is
+a subclass of RealValuedFunctionVA that allows functions of a
+single argument.  The class RealValuedFunctionTwo is similarly a
+subclass of RealValuedFunctionVA but represents functions with two
+arguments. RealValuedFunctionTwo has two subclasses,
+BicubicInterpolator and BicubicTriangleInterp both used to
+interpolate values within a small region.  One class represents a
+special case: RealValuedFunctionVA.Linear is a real-valued function
+that is a linear combination of instances of RealValuedFunction. The
+first argument is passed to each RealValuedFunction. The other
+arguments provide factors by which the values for each of these
+functions of one argument are multiplied. One use of
+RealValuedFunction.Linear is for least-square fits.
+<P>
+The classes RealValuedFunction, RealValuedFunctionTwo, and
+RealValuedFunctionThree implement the interfaces
+RealValuedFunctOps, RealValuedFunctTwoOps, and RealValuedFunctThreeOps
+respectively. These interfaces provide a single method that
+computes a function's value given its arguments. These allow the
+corresponding functions to be specified using lambda expressions.
+In cases where a function's derivatives are not used or where one
+will not try to determine if a function's arguments are in its
+domain, the BZDev class library will use these interfaces instead
+of the classes that implement them so that lambda expressions can
+be used if desired.
+<P>
+The classes CubicSpline, CubicSpline1, and CubicSpline2 provide
+a facility for creating cubic splines. A cubic spline is a subclass
+of RealValuedFunction so that a function and a spline representation
+can be used interchangeably. When an inverse exists, the CubicSpline
+class can compute it (the algorithm uses a binary search to find
+the interval over which a specific cubic polynomial applies and then
+computes the inverse using the closed-form solution for the polynomial's
+roots). CubicSpline itself is an abstract class: users will create
+instances of CublicSpline1 or CubicSpline2.  CubicSpline1 uses an
+evenly spaced set of values in the function's domain, whereas CubicSpline2
+uses a variably spaced set of values.
+<P>
+The class BSpline allows one to create B-splines (Basis splines).
+While B-splines are used in computer graphics applications, they can
+also be used for curve fitting and other applications. The BSpline class
+supports both periodic an non-periodic splines.  The implementation
+includes constructing a BSpline by using a least-squares fits to data points.
+Similarly, the class BSplineArray produces arrays for a given argument,
+where each component can be represented as a BSpline  The class NurbsArray
+creates a NURBS (Non-Uniform Rational B-Spline). This is essentially a
+B-spline in homogeneous coordinates where the component for the extra
+dimension is also a function of the curve's parameter.
+<P>
+A series of classes are provided for computing least square fits.
+LeastSquaresFit itself is an abstract class, with subclasses handling
+various cases: fits to polynomials, fits to a linear combination of
+functions (i.e., basis functions), and fits in which the functions are
+not linear functions of their parameters.  The non linear fits use the
+class LMA, which implements the Levenberg-Marquardt algorithm for
+minimizing a sum of squares.
+<P>
+The class {@link StaticRandom} provides an
+application-wide random number generator. The quality of the random
+numbers produced can be changed at run time. The class
+{@link PoissonTable} provides an efficient mechanism for generating
+Poisson-distributed values for relatively small values of the parameter
+&lambda;.
+<P>
+Finally, the TridiagonalSolver class solves a linear system of
+equations that can be represented by matrices with non-zero
+elements on only the diagonal and adjacent to the diagonal.  The
+LUDecomp class implements LU Decomposition, used to invert matrices
+and solve systems of linear equations, the Permutation class
+represents permutation matrices in an efficient form, the Adder
+class and its inner classes implement Kahan's summation algorithm
+and the pairwise algorithm for summing a series of numbers so as to
+mitigate floating-point errors, and the VectorOps class implements
+some vector-algebra operations.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  Runge Kutta RungeKutta RungeKuttaMV zier digamma
+ -->
+<!--  LocalWords:  BigInteger Laguerre im logC exactC precomputed LMA
+ -->
+<!--  LocalWords:  RootFinder RealValuedFunctionVA RealValuedFunction
+ -->
+<!--  LocalWords:  RealValuedFunctionTwo subclasses BZDev CubicSpline
+ -->
+<!--  LocalWords:  BicubicInterpolator BicubicTriangleInterp BSpline
+ -->
+<!--  LocalWords:  RealValuedFunctionThree RealValuedFunctOps NURBS
+ -->
+<!--  LocalWords:  RealValuedFunctTwoOps RealValuedFunctThreeOps
+ -->
+<!--  LocalWords:  CublicSpline BSplineArray NurbsArray Levenberg
+ -->
+<!--  LocalWords:  LeastSquaresFit Marquardt StaticRandom LUDecomp
+ -->
+<!--  LocalWords:  PoissonTable TridiagonalSolver Kahan's VectorOps
+ -->

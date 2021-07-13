@@ -1,0 +1,98 @@
+The FFT service provider bzdevFTT, which is implemented by the class
+DefaultFFT, is based on a public-domain FFT implementation. The source
+code for this public domain implementation can be found at
+https://stackoverflow.com/questions/3287518/reliable-and-fast-fft-in-java
+and contains a comment from that author, Orlando Selenu: "It's in the
+Public Domain so you can use those functions everywhere (personal or
+business projects too). Just cite me in the credits and send me just a
+link of your work, and you're ok."  The original is a class named
+FFTbase, which just contains static methods.  That implementation was
+modified significantly:
+
+    1. Several portions of the computation were moved to a
+    constructor.  The rationale is that computations such as
+    convolutions will require multiple FFTs performed on vectors of
+    the same size.  The sine, cosine, and bit-reversal operations
+    account for well over 2/3 of the processing for just one
+    transform, so doing this part once provides a significant speed
+    improvement.  The computation in the constructor will use multiple
+    threads when multiple processors are available, significantly
+    reducing the time for this step.
+
+    2. The direction of the transform was reversed from FFTbase: a
+    test confirmed that FFTbase's 'direct' transform computes the sum
+    with respect to n of x_n * exp(i*2*pi*n*k/N) instead of x_n *
+    exp(-i*2*pi*n*k/N), where N is the length of the vector being
+    transformed.  There are multiple conventions used for Fourier
+    transforms. The one DefaultFFT uses is consistent with the
+    description in the Wikipedia article, and with the most common
+    definitions of a Fourier transform.
+
+    3. How the results are normalized is now an option. The choice in
+    FFTbase preserves norms by including a division by sqrt(N). If
+    computing something like power per unit frequency, this is a good
+    choice.  It is not a good choice for convolutions, as one will
+    need some additional scaling, adding a little more computation and
+    slightly reducing the accuracy due to the need for an extra
+    multiplication.
+
+    4. The method bitreverseReference(arg, nu) was eliminated and
+    replaced with the in-line expression (Integer.reverse(arg)>>>ttmnu)
+    where ttmnu = (32 - nu).  The original bitreverseReference
+    is faster for nu = 1 and nu = 2, but the values for these cases
+    are cached.  For nu = 3, the in-line expression is slightly faster
+    and for nu = 30, over 6 times faster.
+
+    5. A computation of log_2 (n) was changed to one using shifts and
+    a test for a low-order bit to make sure that n is a power of 2.
+
+    6. For values of n from 1 to 32768, the tables normally computed
+    by a constructor are cached.
+
+    7. Instead of returning an array containing alternating real and
+    imaginary values, the caller has to provide separate arrays to
+    store both.  This increases the maximum value of n that can be
+    used, but is also convenient for uses such as computing convolutions,
+    where the results of two Fourier transforms are combined and
+    an inverse transform is then computed to get the results.
+
+As an example of performance differences between DefaultFFT and
+FFTbase, the following table gives the times in nanoseconds for
+a test run (Base refers to the time FFTbase.transform takes,
+FFT setup refers to the time spent in DefaultFFT's constructor,
+and FFT transform refers to the time spent using DefaultFFT's
+'transform' method after an instance of DefaultFFT is constructed:
+
+For n = 1, Base: 452, FFT setup: 794, FFT transform: 294
+For n = 2, Base: 558, FFT setup: 411, FFT transform: 354
+For n = 4, Base: 899, FFT setup: 300, FFT transform: 391
+For n = 8, Base: 1305, FFT setup: 167, FFT transform: 455
+For n = 16, Base: 2950, FFT setup: 194, FFT transform: 527
+For n = 32, Base: 8495, FFT setup: 352, FFT transform: 1228
+For n = 64, Base: 33808, FFT setup: 279, FFT transform: 1902
+For n = 128, Base: 65467, FFT setup: 211, FFT transform: 2556
+For n = 256, Base: 80231, FFT setup: 201, FFT transform: 5191
+For n = 512, Base: 180544, FFT setup: 280, FFT transform: 9929
+For n = 1024, Base: 414291, FFT setup: 281, FFT transform: 20660
+For n = 2048, Base: 920873, FFT setup: 347, FFT transform: 43609
+For n = 4096, Base: 2001431, FFT setup: 351, FFT transform: 91301
+For n = 8192, Base: 4389438, FFT setup: 398, FFT transform: 226030
+For n = 16384, Base: 10183499, FFT setup: 1767, FFT transform: 514241
+For n = 32768, Base: 21897694, FFT setup: 136874, FFT transform: 1234126
+For n = 65536, Base: 46371603, FFT setup: 27830347, FFT transform: 2665763
+For n = 131072, Base: 100084600, FFT setup: 47616475, FFT transform: 5707904
+For n = 262144, Base: 213526064, FFT setup: 93490488, FFT transform: 13149293
+For n = 524288, Base: 469862352, FFT setup: 201279057, FFT transform: 39971804
+For n = 1048576, Base: 1010348760, FFT setup: 419516148, FFT transform: 84991062
+For n = 2097152, Base: 2120535070, FFT setup: 893125345,
+      FFT transform: 192694581
+For n = 4194304, Base: 4553581101, FFT setup: 1859050814,
+      FFT transform: 509833191
+For n = 8388608, Base: 9700585075, FFT setup: 3893261762,
+      FFT transform: 1087641159
+
+The values for FFT setup will be a bit higher when an FFT newInstance
+method is used.  As a "real world" example, a convolution can be
+computed by performing three FFTs. For n = 8388608 and using FFTbase,
+the time for these FFTs is approximately 29 seconds. Using DefaultFFT,
+the time is aproximately 7 seconds: about 4 times faster.

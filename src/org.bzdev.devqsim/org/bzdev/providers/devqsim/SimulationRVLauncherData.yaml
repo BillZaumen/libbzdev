@@ -1,0 +1,86 @@
+%YAML 1.2
+---
+ returnTypes: &list
+    - org.bzdev.devqsim.rv.SimBinomialBooleanRV
+    - org.bzdev.devqsim.rv.SimBinomialBooleanRVRV
+    - org.bzdev.devqsim.rv.SimBinomialDoubleRV
+    - org.bzdev.devqsim.rv.SimBinomialDoubleRVRV
+    - org.bzdev.devqsim.rv.SimBinomialIATimeRV
+    - org.bzdev.devqsim.rv.SimBinomialIATimeRVRV
+    - org.bzdev.devqsim.rv.SimBinomialIntegerRV
+    - org.bzdev.devqsim.rv.SimBinomialIntegerRVRV
+    - org.bzdev.devqsim.rv.SimBinomialLongRV
+    - org.bzdev.devqsim.rv.SimBinomialLongRVRV
+    - org.bzdev.devqsim.rv.SimBooleanRVFactory
+    - org.bzdev.devqsim.rv.SimBooleanRV
+    - org.bzdev.devqsim.rv.SimBooleanRVRVFactory
+    - org.bzdev.devqsim.rv.SimBooleanRVRV
+    - org.bzdev.devqsim.rv.SimDetermBooleanRV
+    - org.bzdev.devqsim.rv.SimDetermDoubleRV
+    - org.bzdev.devqsim.rv.SimDetermIATimeRV
+    - org.bzdev.devqsim.rv.SimDetermIntegerRV
+    - org.bzdev.devqsim.rv.SimDetermLongRV
+    - org.bzdev.devqsim.rv.SimDoubleRVFactory
+    - org.bzdev.devqsim.rv.SimDoubleRV
+    - org.bzdev.devqsim.rv.SimDoubleRVRVFactory
+    - org.bzdev.devqsim.rv.SimDoubleRVRV
+    - org.bzdev.devqsim.rv.SimExpDistrRV
+    - org.bzdev.devqsim.rv.SimExpDistrRVRV
+    - org.bzdev.devqsim.rv.SimFixedBooleanRV
+    - org.bzdev.devqsim.rv.SimFixedBooleanRVRV
+    - org.bzdev.devqsim.rv.SimFixedDoubleRV
+    - org.bzdev.devqsim.rv.SimFixedDoubleRVRV
+    - org.bzdev.devqsim.rv.SimFixedIATimeRV
+    - org.bzdev.devqsim.rv.SimFixedIATimeRVRV
+    - org.bzdev.devqsim.rv.SimFixedIntegerRV
+    - org.bzdev.devqsim.rv.SimFixedIntegerRVRV
+    - org.bzdev.devqsim.rv.SimFixedLongRV
+    - org.bzdev.devqsim.rv.SimFixedLongRVRV
+    - org.bzdev.devqsim.rv.SimGaussianIATimeRV
+    - org.bzdev.devqsim.rv.SimGaussianIATimeRVRV
+    - org.bzdev.devqsim.rv.SimGaussianRV
+    - org.bzdev.devqsim.rv.SimGaussianRVRV
+    - org.bzdev.devqsim.rv.SimIATimeRVFactory
+    - org.bzdev.devqsim.rv.SimIATimeRVRVFactory
+    - org.bzdev.devqsim.rv.SimIntegerRVFactory
+    - org.bzdev.devqsim.rv.SimIntegerRV
+    - org.bzdev.devqsim.rv.SimIntegerRVRVFactory
+    - org.bzdev.devqsim.rv.SimIntegerRVRV
+    - org.bzdev.devqsim.rv.SimInterarrivalTimeRV
+    - org.bzdev.devqsim.rv.SimInterarrivalTimeRVRV
+    - org.bzdev.devqsim.rv.SimLogNormalRV
+    - org.bzdev.devqsim.rv.SimLogNormalRVRV
+    - org.bzdev.devqsim.rv.SimLongRVFactory
+    - org.bzdev.devqsim.rv.SimLongRV
+    - org.bzdev.devqsim.rv.SimLongRVRVFactory
+    - org.bzdev.devqsim.rv.SimLongRVRV
+    - org.bzdev.devqsim.rv.SimPoissonDoubleRV
+    - org.bzdev.devqsim.rv.SimPoissonDoubleRVRV
+    - org.bzdev.devqsim.rv.SimPoissonIATimeRV
+    - org.bzdev.devqsim.rv.SimPoissonIATimeRVRV
+    - org.bzdev.devqsim.rv.SimPoissonIntegerRV
+    - org.bzdev.devqsim.rv.SimPoissonIntegerRVRV
+    - org.bzdev.devqsim.rv.SimPoissonLongRV
+    - org.bzdev.devqsim.rv.SimPoissonLongRVRV
+    - org.bzdev.devqsim.rv.SimRandomVariable
+    - org.bzdev.devqsim.rv.SimRandomVariableRV
+    - org.bzdev.devqsim.rv.SimRandomVariableRVN
+    - org.bzdev.devqsim.rv.SimRVFactory
+    - org.bzdev.devqsim.rv.SimRVRVFactory
+    - org.bzdev.devqsim.rv.SimUniformBooleanRV
+    - org.bzdev.devqsim.rv.SimUniformBoolRVFactory
+    - org.bzdev.devqsim.rv.SimUniformDoubleRV
+    - org.bzdev.devqsim.rv.SimUniformDoubleRVRV
+    - org.bzdev.devqsim.rv.SimUniformIATimeRV
+    - org.bzdev.devqsim.rv.SimUniformIATimeRVRV
+    - org.bzdev.devqsim.rv.SimUniformIntegerRV
+    - org.bzdev.devqsim.rv.SimUniformIntegerRVRV
+    - org.bzdev.devqsim.rv.SimUniformLongRV
+    - org.bzdev.devqsim.rv.SimUniformLongRVRV
+
+ argumentTypes:
+    *list
+
+ methodClasses:
+    *list
+...

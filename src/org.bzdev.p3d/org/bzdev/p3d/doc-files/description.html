@@ -1,0 +1,209 @@
+}<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+  <H2>The org.bzdev.p3d package</H2>
+Please see
+<UL>
+  <LI><A HREF="#intro">the introduction</A> for an overview.
+  <LI><A HREF="#examples">the examples</A> for coding examples.
+</UL>
+
+<H3><A NAME="intro">Introduction</A></H3>
+
+The class {@link Model3D} creates 3D images.  The images consist of a
+set of triangles in which the order of the vertices determines the
+direction of a normal vector pointing outwards, based on the
+right-hand rule.  In addition, a vertex must not intersect an edge
+unless it terminates the edge. One can create triangles directly by
+calling {@link Model3D} methods named addTriangle: {@link
+Model3D#addTriangle(Triangle)}, {@link
+Model3D#addTriangle(double,double,double,double,double,double,double,double,double)},
+{@link
+Model3D#addTriangle(double,double,double,double,double,double,double,double,double,java.awt.Color)},
+{@link
+Model3D#addTriangle(double,double,double,double,double,double,double,double,double,java.awt.Color)},
+and {@link
+Model3D#addTriangle(double,double,double,double,double,double,double,double,double,java.awt.Color,Object)},
+There are similar methods named addFlippedTriangle that reverse the
+triangle's orientation given the same arguments.  One can also call
+the {@link Model3D} method {@link Model3D#addModel(Model3D)} or {@link
+Model3D#addModel(Model3D,Object)} to import all the triangles from
+another model.  One can additionally set transforms to modify the
+objects being created.  For example, if a model contains a circular
+disk, one can set a transform to change the scale in (for example) the
+Y direction so that the imported object will be an elliptical
+disk. Details are provided in the documentation for the methods {@link
+Model3D#pushParms()} and {@link
+Model3D#pushTransform(org.bzdev.geom.Transform3D)}.
+<P>
+The class {@link BinarySTLParser}
+adds objects to a {@link Model3D} by reading the
+objects from an external source with the objects encoded using the
+STL standard.  The external source may be a file or input stream.
+This can be done in order to create an image or animation of a
+model, but also to re-use a model for which only an STL file is
+available.
+<P>
+For 3D printing, the triangles must form a closed, two dimensional
+manifold that is embedded in a Euclidean 3 dimensional space. That
+is, the surfaces must not have an edge and the surfaces must not
+intersect themselves.  Each edge must be in precisely two
+triangles, and using the vertex (node) ordering, the edge must be
+traversed in each direction only once.
+<P>
+Methods exist for creating models, verifying that models are
+2D manifolds embedded in a three dimensional space, rendering
+images of models and writing files.  The class Model3D.Image
+provides a subclass of BufferedImage with support for 3D models
+including the ability to rotate and translate images and positioning
+a light source.
+<P>
+A typical use of this package is as follows:
+<OL>
+  <LI> One will create an instance of Model3D
+       (the constructor does not take any arguments). For
+       debugging, one may wish to call the method
+       {@link Model3D#setStackTraceMode(boolean)}
+       with the argument <code>true</code> so that each triangle is
+       tagged with the stack traces that exists when that triangle was
+       created.  This may be done selectively.
+  <LI> One will then call the method
+       {@link Model3D#addTriangle(double,double,double,double,double,double,double,double,double)}
+       repeatedly to create the triangles that  make up the model.
+       The orientation of this triangle is determined by a right-hand rule
+       with the direction implied by the rule pointing outwards from the
+       surface (i.e., the 2D manifold that the model creates).
+       The corresponding method
+       {@link Model3D#addFlippedTriangle(double,double,double,double,double,double,double,double,double)}
+       can be used when the orientation of a triangle should be
+       reversed. One may also add a line segment, which will appear in
+       images as a reference line but are not included when a 3D model
+       is written to an output file.  Methods also exist for adding a
+       previously created model.
+  <LI> One should then verify the model by using the methods
+       {@link Model3D#verifyClosed2DManifold()} and
+       {@link Model3D#verifyEmbedded2DManifold()}.
+       As a short cut, one can use the methods
+       {@link Model3D#printable()},
+       {@link Model3D#printable(Appendable)},
+       {@link Model3D#notPrintable()}, and
+       {@link Model3D#notPrintable(Appendable)}
+       to combine the two 'verify' methods and to handle the display
+       of error messages (for those with an argument).
+  <LI> To generate an image of a model, first create an instance of
+       {@link Model3D.Image}. Its constructors are
+       modeled after
+       those used by java.awt.image.BufferedImage, but one
+       may also provide a
+       {@link org.bzdev.graphs.Graph} whose
+       buffered image or output-stream graphics will be used, or
+       one can provide an instance of
+       {@link org.bzdev.gio.OutputStreamGraphics} as this class
+       will allow various image types, including postscript, to be
+       used.
+  <LI> To generate an animation of the model, showing it in various
+    orientations, create an animation and then an instance of
+    {@link Model3DView} associated with that
+    animation.  The documentation
+    for {@link Model3DView} describes how
+    this class is used to create animations.
+  <LI> To create an output file for 3D printing, use the Model3D methods named
+    writeSTL (for STL files) or writeX3D (for X3D files):
+    <UL>
+      <LI> {@link Model3D#writeSTL(java.lang.String,java.lang.String)}
+      <LI> {@link Model3D#writeSTL(java.lang.String,java.io.OutputStream)}
+      <LI> {@link Model3D#writeSTL(java.lang.String,java.io.File)}
+      <LI> {@link Model3D#writeSTL(java.lang.String,java.nio.channels.WritableByteChannel)}
+      <LI> {@link Model3D#writeX3D(java.lang.String,java.lang.String,java.lang.String,java.lang.String)}
+      <LI> {@link Model3D#writeX3D(java.lang.String,java.lang.String,java.lang.String,java.io.OutputStream)}
+      <LI> {@link Model3D#writeX3D(java.lang.String,java.lang.String,java.lang.String,java.io.File)}
+    </UL>
+    By default, X3D files are configured so that dimensions are
+    represented in millimeters.  For other units, use the method
+    {@link Model3D#setUnitScaleX3D(double)}.  There are some
+    additional writeX3D methods that are not shown: these allow one to
+    specify the use of an X3D 'full' profile and request the use of
+    file compression.
+  <LI> To obtain information about a model, use the following methods:
+       <UL>
+          <LI>{@link Model3D#size()} to count
+              the number of triangles in the model.
+          <LI>{@link Model3D#volume()} to
+	    determine the volume of a model.
+          <LI>{@link Model3D#area()} to
+              determine the surface area of a model.
+          <LI>{@link Model3D#numberOfComponents()}
+              to count the number of components (disjoint surfaces) in
+              a model.
+          <LI>{@link Model3D#notHollow()} to
+              determine that a model is not hollow.
+       </UL>
+  <LI> To handle some common cases, the class P3d and its inner
+    classes provide utility methods that handle special cases
+    (e.g., rectangles, so that a single call will produce all of
+    the triangles for a rectangle). Other classes such
+    as {@link SteppedGrid} and {@link SteppedGrid.Builder} make it easier
+    to construct models that fit particular design patterns.
+    
+</OL>
+
+<H3><A NAME="examples">Examples</A></H3>
+
+The following program, which uses {@link SteppedGrid.Builder}
+to simplify constructing a 3D model, will create a file suitable for a 3D
+printer and will provide a sequence of images showing the object from
+various viewpoints:
+<BLOCKQUOTE><CODE><PRE>
+import java.io.FileOutputStream;      
+import org.bzdev.p3d.*;
+
+public class Example {
+    public static void main(String argv[]) throws Exception {      
+        Model3D m3d = new Model3D();
+
+        // useful for debugging.
+        m3d.setStackTraceMode(true);
+
+        SteppedGrid.Builder sgb = new SteppedGrid.Builder(m3d, 10.0, 0.0);
+
+        sgb.addRectangles(0.0, 0.0, 100.0, 100.0, 0.0, 0.0);
+        sgb.addRectangles(10.0, 10.0, 80.0, 80.0, 10.0, 0.0);
+        sgb.removeRectangles(20.0, 20.0, 60.0, 60.0);
+        sgb.create();
+
+        System.out.println("m3d.size() = " + m3d.size());
+        if (m3d.notPrintable(System.out)) {
+            System.exit(1);
+        }
+
+        m3d.createImageSequence(new FileOutputStream("example.isq"),
+                                "png", 8, 4, 0.0, 0.3, 0.01, true);
+	// Now create  an STL file suitable for 3D printing
+	m3d.writeSTL("Example STL File", "example.stl");
+    }
+}
+</PRE></CODE></BLOCKQUOTE>
+The arguments
+for {@link org.bzdev.p3d.SteppedGrid.Builder#addRectangles(double,double,double,double,double,double) addRectangles},
+{@link org.bzdev.p3d.SteppedGrid.Builder#removeRectangles(double,double,double,double) removeRectangles},
+and {@Link org.bzdev.p3d.Model3D#createImageSequence(java.io.OutputStream,String,int,int,double,double,double,double,boolean) createImageSequence}
+are described in the API documentation for this package.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  addTriangle addFlippedTriangle addModel pushParms
+ -->
+<!--  LocalWords:  pushTransform BinarySTLParser STL BufferedImage
+ -->
+<!--  LocalWords:  setStackTraceMode boolean verifyClosed DManifold
+ -->
+<!--  LocalWords:  verifyEmbedded Appendable notPrintable DView
+ -->
+<!--  LocalWords:  writeSTL writeX setUnitScaleX numberOfComponents
+ -->
+<!--  LocalWords:  notHollow SteppedGrid addRectangles
+ -->
+<!--  LocalWords:  removeRectangles createImageSequence
+ -->

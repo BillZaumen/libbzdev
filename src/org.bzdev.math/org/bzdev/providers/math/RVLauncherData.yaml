@@ -1,0 +1,73 @@
+%YAML 1.2
+---
+  returnTypes: &list
+   - org.bzdev.math.rv.RandomVariableOps
+   - org.bzdev.math.rv.RandomVariableRVOps
+   - org.bzdev.math.rv.RandomVariable
+   - org.bzdev.math.rv.RandomVariableRV
+   - org.bzdev.math.rv.IntegerRandomVariable
+   - org.bzdev.math.rv.LongRandomVariable
+   - org.bzdev.math.rv.DoubleRandomVariable
+   - org.bzdev.math.rv.IntegerRandomVariableRV
+   - org.bzdev.math.rv.LongRandomVariableRV
+   - org.bzdev.math.rv.DoubleRandomVariableRV
+   - org.bzdev.math.rv.BinomialBooleanRV
+   - org.bzdev.math.rv.BinomialDoubleRV
+   - org.bzdev.math.rv.BinomialIATimeRV
+   - org.bzdev.math.rv.BinomialIntegerRV
+   - org.bzdev.math.rv.BinomialLongRV
+   - org.bzdev.math.rv.BinomialBooleanRVRV
+   - org.bzdev.math.rv.BinomialDoubleRVRV
+   - org.bzdev.math.rv.BinomialIATimeRVRV
+   - org.bzdev.math.rv.BinomialIntegerRVRV
+   - org.bzdev.math.rv.BinomialLongRVRV
+   - org.bzdev.math.rv.DetermBooleanRV
+   - org.bzdev.math.rv.DetermDoubleRV
+   - org.bzdev.math.rv.DetermIATimeRV
+   - org.bzdev.math.rv.DetermIntegerRV
+   - org.bzdev.math.rv.DetermLongRV
+   - org.bzdev.math.rv.ExpDistrRV
+   - org.bzdev.math.rv.ExpDistrRVRV
+   - org.bzdev.math.rv.FixedBooleanRV
+   - org.bzdev.math.rv.FixedDoubleRV
+   - org.bzdev.math.rv.FixedIATimeRV
+   - org.bzdev.math.rv.FixedIntegerRV
+   - org.bzdev.math.rv.FixedLongRV
+   - org.bzdev.math.rv.FixedBooleanRVRV
+   - org.bzdev.math.rv.FixedDoubleRVRV
+   - org.bzdev.math.rv.FixedIATimeRVRV
+   - org.bzdev.math.rv.FixedIntegerRVRV
+   - org.bzdev.math.rv.FixedLongRVRV
+   - org.bzdev.math.rv.GaussianRV
+   - org.bzdev.math.rv.GaussianRVRV
+   - org.bzdev.math.rv.GaussianIATimeRV
+   - org.bzdev.math.rv.GaussianIATimeRVRV
+   - org.bzdev.math.stats.CovarianceMatrix
+   - org.bzdev.math.rv.GaussianRVs
+   - org.bzdev.math.rv.LogNormalRV
+   - org.bzdev.math.rv.LogNormalRVRV
+   - org.bzdev.math.rv.PoissonDoubleRV
+   - org.bzdev.math.rv.PoissonIATimeRV
+   - org.bzdev.math.rv.PoissonIntegerRV
+   - org.bzdev.math.rv.PoissonLongRV
+   - org.bzdev.math.rv.PoissonDoubleRVRV
+   - org.bzdev.math.rv.PoissonIATimeRVRV
+   - org.bzdev.math.rv.PoissonIntegerRVRV
+   - org.bzdev.math.rv.PoissonLongRVRV
+   - org.bzdev.math.rv.UniformBooleanRV
+   - org.bzdev.math.rv.UniformDoubleRV
+   - org.bzdev.math.rv.UniformIATimeRV
+   - org.bzdev.math.rv.UniformIntegerRV
+   - org.bzdev.math.rv.UniformLongRV
+   - org.bzdev.math.rv.UniformDoubleRVRV
+   - org.bzdev.math.rv.UniformIATimeRVRV
+   - org.bzdev.math.rv.UniformIntegerRVRV
+   - org.bzdev.math.rv.UniformLongRVRV
+
+  argumentTypes: *list
+
+  functionClasses:
+   - org.bzdev.math.rv.LogNormalRV
+
+  methodClasses: *list
+...

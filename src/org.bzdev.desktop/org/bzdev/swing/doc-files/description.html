@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.swing package</H2>
+
+This package contains additional swing components and
+various support classes as shown in the following
+two  UML diagrams.  The first diagram, the more complex of the
+two, contains most of the classes and interfaces in this package:
+<P style="text-align: center">
+<img src="swing1.png">
+<P>
+The second diagram shows various "button" classes and transfer
+handlers that support Drag and Drop (D&amp;D):
+<P style="text-align: center">
+<img src="swing2.png">
+ *<P>
+The classes contained in this package can be grouped as
+follows:
+<UL>
+ <LI> classes that display graphics and animations. These classes,
+      are not swing components, but have a swing component associated
+      with each instance. The use of these classes for creating
+      graphics is thread safe. These classes are
+      <UL>
+        <LI>{@link AnimatedPanelGraphics}.
+          This class can be used by
+	  {@link org.bzdev.anim2d.Animation2D}
+	  to display animations directly without having to first
+	  create a series of frames and then use video editors or
+	  programs such as ffmpeg to create a standard video
+	  format. It implements the {@link org.bzdev.gio.ISWriterOps}
+	  interface, so that it can be used interchangeably with
+	  {@link org.bzdev.gio.ImageSequenceWriter}, which implements
+	  the same interface.
+        <LI>{@link PanelGraphics}. This
+          class can be used to display a graph directly. It implements
+          the {@link org.bzdev.gio.OSGraphicsOps}
+          interface, which
+	  {@link org.bzdev.gio.OutputStreamGraphics}
+          also implements. For cases such as simulations with long
+          running times, {@link PanelGraphics}
+          supports incremental updating of graphs by "flushing" a
+          partially completed display.
+      </UL>
+ <LI> classes that help implement transfer handlers to
+      support D&amp;D with some allowing
+      JLists to be reordered. These are
+      <UL>
+        <LI> {@link ExtObjTransferHandler}.
+	  This transfer handler can be used to implement a target for
+	  drag and drop operations.  The objects transferred are
+	  identified by file names or by URLs.
+        <LI> {@link ExtObjListTransferHandler}.
+	  This is similar to
+	  {@link ExtObjTransferHandler},
+	  but the target
+	  is a JList, and D&amp;D can be used to reorder that
+	  JList. If the objects are defined to be subclasses of
+	  ImageIcon, an image can be displayed in the JList.
+        <LI> {@link ReorderListTransferHandler}.
+	  This TransferHandler allows a JList to be reordered, but
+	  does not provide support for inserting elements into that
+	  JList: insertions have to be handle by another mechanism
+	  (e.g. a "new item" button or menu item).
+        <LI> {@link URLListTransferHandler}.
+	  This transfer handler allows URLs and file names to be
+	  dragged into a JList and allows that JList to be reordered.
+        <LI> {@link DebugTransferHandler}.
+	  This transfer handler is a wrapper for other transfer
+	  handlers and simply adds tracing support for various
+	  methods. Experience with some JDK/Desktop implementations
+	  has shown that the data flavors in drag and drop operations
+	  may be dependent on both the OS, the window system, and the
+	  JDK.  For debugging purposes, determining what data flavors
+	  are actually being used is useful.
+      </UL>
+ <LI> classes that provide thread-safe components. These are
+      <UL>
+        <LI> {@link SimpleJTextPane}.
+	  This provides a text pane with simple formatting options
+	  (e.g., font colors and a choice of text styles including
+	  bold and italic). It is meant for console-like input and can
+	  be configured to be thread safe.
+        <LI> {@link SimpleConsole}.  A
+	  console that can be displayed on demand and that includes a
+	  method for creating a menu item that will make the console
+	  visible.
+      </UL>
+ <LI> classes that provide components with restricted inputs.
+      These are
+      <UL>
+        <LI> {@link VTextField}. A text field that verifies its input and
+             only replaces an old value if the new value is acceptable.
+        <LI> {@link WholeNumbTextField}.
+	  A text field that allows only whole numbers to be entered.
+        <LI> {@link PortTextField}.  A
+	  text field whose legal values are the legal values for TCP
+	  or UDP port numbers.
+        <LI> {@link TimeTextField}.  A
+	  text field representing time intervals and accepting a
+	  variety of input formats.
+      </UL>
+ <LI> classes to support internationalized menus.  These are
+      <UL>
+        <LI> {@link IMenu}. A menu whose label
+	  adjusts to a specified locale.
+        <LI> {@link IMenuItem}.  A whose
+	  properties adjust to a specified locale.
+        <LI> {@link ProxyMenuItem}.  A
+	  menu item for configuring proxies, with support for
+	  internationalization.
+        <LI> {@link HelpMenuItem}.  A menu
+	  item for creating simple on-line help with support for
+	  internationalization.
+        <LI> {@link StackTraceMenuItem}.
+	  A menu item for turning on and off stack traces when using
+	  the ErrorMessage class for printing errors.
+        <LI>
+      </UL>
+ <LI> classes that provide buttons to open dialog boxes for
+      inputting text. These are
+      <UL>
+        <LI> {@link TextAreaButton}.  A
+	  button that will bring up a text area for input.
+        <LI> {@link TextFieldButton}.  A
+	  button that will bring up a text field for input.
+        <LI> {@link URLTextAreaButton}.
+	  A button that will bring up a text field for input possibly
+	  obtaining the text by downloading text specified by a URL.
+      </UL>
+ <LI> classes that map named JTree entries to objects. These are
+      <UL>
+        <LI> {@link ObjTocPane}.  This
+	  component provides a hierarchical table of contents for a
+	  set of objects. Action listeners are used to track changes
+	  in selections.
+        <LI> {@link UrlTocPane}.  This
+	  component extends ObjTocPane by specializing it so that the
+	  objects it manages are URLs. It's action listeners can
+	  detect which URL was selected and respond in some
+	  appropriate way.
+      </UL>
+ <LI> a class {@link HtmlWithTocPane}
+   that combine a JTree with a JEditorPane for displaying HTML
+   document.
+ <LI> A class {@link AuthenticationPane}
+   for password authentication, with an option of showing text as a
+   password is typed or hiding text.
+ <LI> A class {@link HtmlPane} for displaying
+   HTML text with navigation controls.
+ <LI> A {@link SwingErrorMessage} class that
+   can send messages to various destinations including an instance of
+   {@link SimpleConsole}.  System.err,
+   etc., are also supported.
+</UL>
+In addition there are four related packages:
+<UL>
+  <LI> {@link org.bzdev.swing.io}.
+    This contains a Reader that can read from instances of
+    java.swing.text.Document.
+  <LI> {@link org.bzdev.swing.keys}.
+    This contains a class that provides only static methods and that
+    can look up key events by name.
+  <LI> {@link org.bzdev.swing.text}.
+    This contains a DocumentFilter, and two tread-safe Document
+    classes.
+  <LI> {@link org.bzdev.swing.proxyconf}.
+    This contains classes for configuring network proxies.
+</UL>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  UML AnimatedPanelGraphics ffmpeg PanelGraphics JDK
+ -->
+<!--  LocalWords:  JLists ExtObjTransferHandler JList subclasses TCP
+ -->
+<!--  LocalWords:  ExtObjListTransferHandler ImageIcon SimpleConsole
+ -->
+<!--  LocalWords:  ReorderListTransferHandler TransferHandler UDP
+ -->
+<!--  LocalWords:  URLListTransferHandler DebugTransferHandler IMenu
+ -->
+<!--  LocalWords:  SimpleJTextPane VTextField WholeNumbTextField
+ -->
+<!--  LocalWords:  PortTextField TimeTextField IMenuItem HelpMenuItem
+ -->
+<!--  LocalWords:  ProxyMenuItem StackTraceMenuItem ErrorMessage
+ -->
+<!--  LocalWords:  TextAreaButton TextFieldButton URLTextAreaButton
+ -->
+<!--  LocalWords:  JTree ObjTocPane UrlTocPane HtmlWithTocPane
+ -->
+<!--  LocalWords:  JEditorPane AuthenticationPane HtmlPane
+ -->
+<!--  LocalWords:  SwingErrorMessage DocumentFilter
+ -->

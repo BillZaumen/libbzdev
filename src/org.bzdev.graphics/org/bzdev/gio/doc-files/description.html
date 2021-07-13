@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.gio package</H2>
+
+This package provides classes to generate graphics in various
+output formats and  write them to an output stream. The constructor for
+{@link OutputStreamGraphics}
+cannot be called directly. Instead, the method
+{@link OutputStreamGraphics#newInstance(java.io.OutputStream,int,int,java.lang.String)}
+should be used.  This will create an instance of a subclass of
+{@link OutputStreamGraphics} based
+on image's type.  After an instance is created, a user will typically
+call {@link OutputStreamGraphics#createGraphics}
+to get a Graphics2D object for drawing and will perform a series of
+drawing operations using multiple graphics contexts if necessary or
+convenient.  When done, the user will call the method
+{@link OutputStreamGraphics#imageComplete()}
+and the image will be written to the output stream in the appropriate
+format.
+<P>
+The image formats recognized by Java (e.g., PNG and JPEG) are handled
+by creating a BufferedImage, using Graphics2D operations to create the
+image, and then using ImageIO methods to write to the output stream.
+For Postscript graphics and other formats, Java uses mechanisms
+associated with printing, and the objects appearing in the output may
+have to be printed multiple times.  The basic functionality for this
+is handled by the
+class {@link ThreadedOSGraphics}.
+The class {@link Graphics2DRecorder}
+allows this to be done by replaying the Graphics2D operations as many
+times as needed. The
+interface {@link GraphicsCreator}
+specifies a single method (createGraphics) in order to provide a
+standard interface for generating new instances of Graphics2D.
+<P>
+A class diagram is shown below (non-public classes are shown in blue):
+<P style="text-align:center">
+<IMG SRC="gio.png">
+<P>
+The class RecordingGraphics2D (which is not public)
+is an inner class of
+{@link Graphics2DRecorder} and is the
+Graphics2D object used when subclasses of ThreadedOSGraphics, or other
+classes that require the same image to be produced multiple times, are
+used.  These classes requires the user to provide a "paint" method and
+the implementation will provide a graphics context. ThreadedOSGraphics
+provides the threads and hides the multiple calls to the paint method
+from the user of these classes.
+<P>
+The class {@link PrinterGraphics}
+provides Graphics2D operations that will produce output for a
+printer. The
+interface {@link OSGraphicsOps} provides
+the methods needed to use most of the classes in this package. The
+typical sequence of operations is to call the method
+{@link OSGraphicsOps#createGraphics()}
+in order to obtain an instance of java.awt.Graphics2D, use
+that instance to draw the desired graphics, and then finally call
+{@link OSGraphicsOps#imageComplete()} }
+to draw the graphics on an the output file or device. When the output
+is written to an output stream, one will typically use one of the
+OutputStreamGraphics methods named newInstance to create the
+appropriate subclass of OutputStreamGraphics.  For printing, one must
+use the constructor for the class
+{@link PrinterGraphics}.  The
+class {@link org.bzdev.swing.PanelGraphics}
+implements the {@link OSGraphicsOps}
+interface and can be used to draw objects so that they will appear in
+a panel.  {@link org.bzdev.swing.PanelGraphics}
+has some static methods that will create window containing this panel,
+with optionally some buttons that will allow the contents to be
+written to a file or printed.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  OutputStreamGraphics newInstance createGraphics
+ -->
+<!--  LocalWords:  imageComplete PNG BufferedImage ImageIO DRecorder
+ -->
+<!--  LocalWords:  ThreadedOSGraphics GraphicsCreator subclasses
+ -->
+<!--  LocalWords:  RecordingGraphics PrinterGraphics OSGraphicsOps
+ -->

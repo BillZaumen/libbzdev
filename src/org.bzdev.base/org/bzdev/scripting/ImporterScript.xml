@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+    The importClasses script takes three arguments: a scripting context,
+    a package name, and a specification of the classes from that package
+    that should be imported. The names of inner classes replace a period
+    with a dollar sign. I.e., the inner class Foo.Bar is named "Foo$Bar",
+    following the normal Java convention.
+
+    For ECMAScript (e.g., Javascript), the scripting context
+    must be an instance of org.bzdev.scripting.ExtendedScriptingContext),
+    the package name must be a string, and the classes are specified by
+    an array.  Each element of the array must be a string naming
+    a class.
+
+    For Python, the specification is a list, with same properties as the
+    arrays used by ECMAScript.
+
+    When scrunner is used, the variable scripting is predefined. Users
+    should call scripting.importClasses(PACKAGE_NAME, SPEC), where
+    PACKAGE_NAME is a string giving the package name and SPEC is the
+    class-name specification described above.
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+new (function (global) {
+    this.global = global;
+    this.Packages =  (function(){
+	try {
+	    return Packages;
+	} catch (err) {
+	    return null;
+	}
+    })();
+    this.JavaImporter = (function(){
+	try {
+	    return JavaImporter;
+	} catch (err) {
+	    return null;
+	}
+    })();
+    this.Java = (function(){
+	try {
+	    return Java;
+	} catch (err) {
+	    return null;
+	}
+    })();
+    this.doImport = function(sc, varname, pkg, name, rest) {
+	if (this.Java != null) {
+            var path = (pkg == null)? "": String(pkg) + ".";
+	    path = String(path);
+	    var obj = this.Java.type(String(path+name));
+	    for (var i = 0; i < rest.length; i++) {
+		name = String(rest[i]);
+		obj = obj[name];
+	    }
+	    global[varname] = obj;
+	} else if (this.Packages != null && this.JavaImporter != null) {
+	    var obj;
+	    if (pkg == null) {
+		obj = new this.JavaImporter(this.Packages);
+	    } else {
+		obj = new this.JavaImporter(this.Packages[String(pkg)]);
+	    }
+	    obj = obj[String(name)];
+	    for (var i = 0; i < rest.length; i++) {
+		name = String(rest[i]);
+		obj = obj[name];
+	    }
+	    global[varname] = obj;
+	}
+    }
+})(this);
+]]>
+  </entry>
+  <entry key="ESP">
+<![CDATA[
+import(org.bzdev.io.FileAccessor);
+import(org.bzdev.io.DirectoryAccessor);
+{doImport: function(sc, varname, pkg, name, rest) {
+    var result = name;
+    global.importClasses(pkg, name);
+    rest.forEach(function(x) {
+	result = result + "." + x;
+	global.importClasses(pkg, result);
+	void
+    });
+    null
+}}
+]]>
+  </entry>
+</properties>

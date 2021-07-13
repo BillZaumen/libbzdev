@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<TITLE>Proxy Configuration</TITLE>
+</HEAD>
+<BODY>
+<H1><A name="proxies">Proxy Configuration</A></H1>
+<P>
+The proxy-configuration window can be used to configure proxies and
+to store the configuration for subsequent use:
+</P>
+<BR>
+<IMG SRC="sresource:/org/bzdev/swing/proxyconf/lpack/gui-proxy.png"
+     WIDTH="600" HEIGHT="442">
+<P>
+The controls are described below:
+</P>
+<DL>
+  <DT><STRONG>Use System Proxies</STRONG><DD>is a check box that, when
+      selected, allows a system-specific proxy configuration file to
+      be used to set up proxies.  Java documentation claims this has
+      been done for Windows and the Gnome desktop. If a system does
+      not support this option, the proxies can be manually set (the
+      remaining configuration options apply only when this check box is
+      not selected).
+  <DT><STRONG>Configure HTTP Proxy</STRONG><DD>is a check box that,
+      when selected and enabled, indicates that a proxy should be used
+      for HTTP. The HTTP Proxy Host option must then
+      be filled in.
+  <DT><STRONG>HTTP Proxy Host</STRONG><DD>is a text field that
+      contains the domain name of the HTTP proxy.
+  <DT><STRONG>HTTP Proxy Port</STRONG><DD>is a text field that
+      contains port that the HTTP proxy is configured to use.  The
+      default value is 80.  If left empty, the default value is used.
+  <DT><STRONG>Configure HTTPS Proxy</STRONG><DD>is a check box that,
+      when selected and enabled, indicates that a proxy should be used
+      for HTTPS. The HTTPS Proxy Host option must then be filled in.
+  <DT><STRONG>HTTPS Proxy Host</STRONG><DD>is a text field that
+      contains the domain name of the HTTPS proxy.
+  <DT><STRONG>HTTPS Proxy Port</STRONG><DD>is a text field that
+      contains port that the HTTPS proxy is configured to use. The
+      default value is 443. If left empty, the default value is used.
+  <DT><STRONG>Exclude from HTTP[S] Proxy</STRONG><DD>specifies hosts
+      that do not use an HHTP or HTTPS proxy. Multiple hosts can be
+      specified by separating them with the character "|". In addition
+      a wildcard character "*" can be used to indicate an arbitrary
+      host: for example, "*.foo.com" would indicate any host whose
+      domain name ends in ".foo.com".
+  <DT><STRONG>Configure FTP Proxy</STRONG><DD>is a check box that,
+      when selected and enabled, indicates that a proxy should be used
+      for FTP. The FTP Proxy Host option must then be filled in.
+  <DT><STRONG>FTP Proxy Host</STRONG><DD>is a text field that contains
+      the domain name of the FTP proxy.
+  <DT><STRONG>FTP Proxy Port</STRONG><DD>is a text field that contains
+      port that the FTP proxy is configured to use. The default value
+      is 80 (in the Java implementation, HTTP is used to contact the
+      proxy). If left empty, the default value is used.
+  <DT><STRONG>Exclude from FTP Proxy</STRONG><DD>specifies hosts that
+      do not use an HHTP or HTTPS proxy. Multiple hosts can be
+      specified by separating them with the character "|". In addition
+      a wildcard character "*" can be used to indicate an arbitrary
+      host: for example, "*.foo.com" would indicate any host whose
+      domain name ends in ".foo.com".
+  <DT><STRONG>Configure SOCKS Proxy</STRONG><DD>is a check box that,
+      when selected and enabled, indicates that a proxy should be used
+      for SOCKS. The SOCKS Proxy Host and Proxy Port options must then
+      be filled in.
+  <DT><STRONG>SOCKS Proxy Host</STRONG><DD>is a text field that
+      contains the domain name of the SOCKS proxy.
+  <DT><STRONG>SOCKS Proxy Port</STRONG><DD>is a text field that
+      contains port that the SOCKS proxy is configured to use.
+  <DT><STRONG>Save &amp; Accept Preferences</STRONG><DD>when clicked,
+      the current configuration is saved an used.
+  <DT><STRONG>Accept Preferences</STRONG><DD>when clicked, the current
+      configuration is used but not saved permanently.
+  <DT><STRONG>Cancel Preference Changes</STRONG><DD>when clicked,
+      cancels the changes since the window became visible.
+</DL>
+</BODY>
+
+<!--  LocalWords:  DOCTYPE
+ -->

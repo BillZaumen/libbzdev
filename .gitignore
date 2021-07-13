@@ -111,5 +111,5 @@ src/org.bzdev.base/org/bzdev/math/doc-files/DefaultFFT.txt
 /tests/ejws/*.jks
 diagrams/overlay.svg
 diagrams/modules.png
-org/
+/org/
 local-files/

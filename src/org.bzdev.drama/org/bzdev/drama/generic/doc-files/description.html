@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.drama.generic package</H2>    
+
+This package provides the core functionality common to a number of
+simulation <i>flavors</i> - simulation packages that are optimized
+for particular application domains but that share an underlying
+architecture.  Flavors are supported via the use of Java generics.
+One flavor is provided by the org.bzdev.drama package, which more or
+less mechanically reproduces the org.bzdev.drama.generic package
+using similar names for objects and adding no additional functionality.
+By contrast, a network-simulation package could define a class named
+Node that extends GenericActor and a class named Link that extends
+GenericGroup: the subclasses can be named to match particular classes
+of simulations.
+<p>
+Because the use of generics is rather complex, a simplified
+illustration of the design pattern that simulation flavors makes
+use of should be helpful. Suppose we define two classes,
+GenericFoo and GenericBar as follows:
+<code><pre>
+abstract class 
+GenericFoo&lt;F extends GenericFoo&lt;F,B&gt;,B extends GenericBar&lt;F,B&gt;&gt;
+{
+  F getFoo() {returns null;}
+  B getBar() {returns null;}
+}
+abstract class
+GenericBar&lt;F extends GenericFoo&lt;F,B&gt;,B extends GenericBar&lt;F,B&gt;&gt;
+{
+  F getFoo() {returns null;}
+  B getBar() {returns null;}
+}
+</pre></code>
+To make use of these classes, it is necessary to create subclasses
+of the corresponding generic classes (both of them, not just one).
+For example
+<code><pre>
+class Foo extends GenericFoo&lt;Foo,Bar&gt; {}
+class Bar extends GenericFoo&lt;Foo,Bar&gt; {}
+</pre></code>
+Then for Foo and Bar, even though the methods are actually
+implemented by their superclasses, getFoo() will return a
+value of type Foo and getBar() will return a value of type Bar.
+Had we returned AbstractFoo and AbstractBar instead, type casts
+or reimplementations of various methods would have been required,
+making the code less reliable. The full declarations use the following
+pattern:
+<blockquote><pre>
+   class OurClass&lt;S extends GenericSimulation&lt;S,A,C,D,DM,F,G&gt;,
+                  A extends GenericActor&lt;S,A,C,D,DM,F,G&gt;,
+                  C extends GenericCondition&lt;S,A,C,D,DM,F,G&gt;,
+                  D extends GenericDomain&lt;S,A,C,D,DM,F,G&gt;,
+                  DM extends GenericDomainMember&lt;S,A,C,D,DM,F,G&gt;,
+                  F extends GenericFactory&lt;S,A,C,D,DM,F,G&gt;,
+                  G extends GenericGroup&lt;S,A,C,D,DM,F,G&gt;&gt; ...
+</pre></blockquote>
+We will abbreviate the generic type declarations as
+<blockquote><pre>
+        S..G:&lt;&lt;std&gt;&gt;
+</pre></blockquote>
+in diagrams shown below.
+<p>
+The org.bzdev.devqsim package defines a Simulation class and a
+SimObject class at the top of the class hierarchy, as illustrated
+in the following UML class diagram:
+<p style="ext-align: center">
+<img src="genericdrama.png">
+<p>
+With a few exceptions
+(e.g., {@link GenericSimulation}),
+classes in this package inherit
+from {@link GenericSimObject}, which is
+necessary for any class that can be looked up by name from the
+simulation's tables.  The
+class {@link GenericFactory} provides a
+standard interface to allow
+the {@link GenericSimulation} class to
+create objects it needs. While subclasses may extend it, in this
+package it is used to create instances of domain members (generally a
+subclass
+of {@link GenericDomainMember},
+created by the simulation for use by
+the {@link GenericDomain} class and the
+{@link GenericActor} class).
+<P>
+The subclasses of {@link GenericSimObject}
+and {@link GenericTaskObject}
+can be described as follows:
+<ul>
+  <li> {@link GenericActor} is the base
+    class for objects that are the basic entities in the simulation -
+    the objects that interact with each other.  They can be members of
+    domains, can join groups, and can send messages, either directly
+    to other actors or via groups.  Actors can also observe
+    conditions.  When configured to do that, they will receive
+    notifications when a condition changes.
+  <li> {@link GenericGroup} is the base
+    class for classes that distribute messages between actors,
+    possibly relaying the messages through multiple groups.  A
+    GenericGroup can be a member of a domain. Such a domain, if it is
+    a communication domain, is used to determine the delay when
+    messages are sent to that group without specifying the delay
+    explicitly
+  <li> {@link GenericDomain} is the base
+    class for classes that represent sets of actors and can directly
+    observe conditions. A domain can also provide actors or groups
+    with propagation delays for the transmission or relaying of
+    messages, and can provide a message filter to modify messages
+    (e.g., to account for noise or to drop messages due to random
+    errors in a communication medium). Domains that do this must be
+    configured as communication domains by specifying a
+    communication-domain type.  Domains can also observe conditions,
+    with condition changes relayed to actors that are members of the
+    domain and that are configured to receive condition-change updates
+    from that domain.
+  <li> {@link GenericCondition} the the
+    base class for classes representing conditions - values that
+    effect the actors in domains that "observe" a condition, and
+    actors that directly observe conditions. A condition might, for
+    example represent an error rate in communication channels that
+    changes values at various times, or it could simply be
+    software-related and do things such as controlling debugging via
+    messages printed on a console.  Objects that might need to observe
+    conditions without depending on a domain should implement the
+    ConditionObserver interface and use the class
+    ConditionObserverImpl to provide the implementation.  The
+    documentation for ConditionObserverImpl contains the details.
+  <li> {@link GenericMsgFrwdngInfo}
+    is the base class for classes that allow delays and message
+    filters to be looked up when a message is being sent.
+ <li> Messages are simply subclasses of java.lang.Object and their
+   interpretation is defined by each simulation.
+</ul>
+<p>
+The {@link GenericTaskObject} class
+provides some methods that create a thread or a default method to call
+at some scheduled time.  For the thread, the implementation ensures
+that only one instance of it runs at a time.  The subclasses of
+{@link GenericTaskObject} are
+{@link GenericDomain},
+{@link GenericCondition},
+{@link GenericActor},
+{@link GenericGroup}
+, and
+{@link GenericMsgRecipient}
+(which is merely a common superclass of
+{@link GenericActor}
+and {@link GenericGroup}). The relationship
+between these classes in important for understanding the simulation.
+<p>
+Domains can assert an interest in conditions (the "has condition"
+association in the UML diagram) and will be notified when a
+condition changes.  These notifications are forwarded, eventually
+reaching those actors that have joined a domain and asked to be
+notified of condition changes.  Domains implement the CondObserver
+interface, which allows a domain to be notified of condition
+changes.  While domains are the only condition observers provided
+in this package, it is easy to create other condition observers
+(e.g., for use in statistics gathering).
+<p>
+Actors are the only entities in the simulations that can initiate sending
+messages to message recipients, which can be either actors or
+groups.  Groups forward the messages they receive to other groups
+or a set if actors. The following state-transition diagram shows
+the process for the case in which messages are sent directly,
+specifying a delay to account for propagation time:
+<P style="text-align:center">
+<img src="message1.png">
+<P>
+If a delay is not provided,  a domain is used to obtain the
+delay. The domain can be provided explicitly.  In addition
+to the delay, a message filter may also be provided by the
+domain or a group. A message filter can modify messages or
+drop them, and is provided to represent noisy communication
+channels. This process
+is illustrated by the following state-transition diagram:
+<P style="text-align:center">
+<img src="message2.png">
+<P>
+The corresponding methods defined
+by {@link GenericActor} are named "send"
+but do not include a delay as an argument.  A message may pass through
+multiple groups before reaching a destination.  When a "send" method
+is called, the method will typically create an event of type
+MessageSimulationEvent (used internally in this package)
+and post that on the event queue.  The class structure is illustrated
+in the following diagram:
+<P style="text-align:center">
+<IMG SRC="gevents.png">
+<P>
+The classes shown in gray and light blue are classes from the
+org.bzdev.devqsim package.  The classes in the org.bzdev.drama.generic
+package are shown in black for public classes and blue for classes
+visible only within the org.bzdev.drama.generic package and for classes
+that are in the org.bzdev.drama.common package.
+<P>
+Finally, a number of abstract classes provide support for factories,
+as shown in the following diagram:
+<P style="text-align:center">
+<IMG SRC="gdfactories.png">
+<P>
+These can be subclassed to create various factories. See
+{@link org.bzdev.devqsim.SimObjectFactory} and
+{@link org.bzdev.obnaming.NamedObjectFactory}
+for details.
+<P>
+Classes in this package will generally not have to be imported
+by users of this class library: the classes needed are in the
+org.bzdev.drama and org.bzdev.drama.common packages.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  GenericActor GenericGroup subclasses GenericFoo DM
+ -->
+<!--  LocalWords:  GenericBar superclasses getFoo getBar AbstractFoo
+ -->
+<!--  LocalWords:  AbstractBar reimplementations OurClass SimObject
+ -->
+<!--  LocalWords:  GenericSimulation GenericCondition GenericDomain
+ -->
+<!--  LocalWords:  GenericDomainMember GenericFactory UML superclass
+ -->
+<!--  LocalWords:  GenericSimObject GenericTaskObject CondObserver
+ -->
+<!--  LocalWords:  ConditionObserver ConditionObserverImpl subclassed
+ -->
+<!--  LocalWords:  GenericMsgFrwdngInfo GenericMsgRecipient
+ -->
+<!--  LocalWords:  MessageSimulationEvent
+ -->

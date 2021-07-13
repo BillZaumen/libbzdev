@@ -1,0 +1,44 @@
+%YAML 1.2
+---
+  returnTypes: &list
+    -  org.bzdev.math.stats.BasicStats
+    -  org.bzdev.math.stats.BasicStats.Population
+    -  org.bzdev.math.stats.BasicStats.Sample
+    -  org.bzdev.math.stats.BasicStatsMV
+    -  org.bzdev.math.stats.BasicStatsMV.Population
+    -  org.bzdev.math.stats.BasicStatsMV.Sample
+    -  org.bzdev.math.stats.ChiSquareDistr
+    -  org.bzdev.math.stats.ChiSquareStat
+    -  org.bzdev.math.stats.CovarianceMatrix
+    -  org.bzdev.math.stats.CovarianceMatrix.Sample
+    -  org.bzdev.math.stats.CovarianceMatrix.Population
+    -  org.bzdev.math.stats.FDistr
+    -  org.bzdev.math.stats.GaussianDistr
+    -  org.bzdev.math.stats.KDistr
+    -  org.bzdev.math.stats.LeveneStat
+    -  org.bzdev.math.stats.ProbDistribution
+    -  org.bzdev.math.stats.Statistic
+    -  org.bzdev.math.stats.StudentsTDistr
+    -  org.bzdev.math.stats.StudentsTStat
+    -  org.bzdev.math.stats.StudentsTStat.Mean1
+    -  org.bzdev.math.stats.StudentsTStat.Mean2
+    -  org.bzdev.math.stats.StudentsTStat.PairedDiff
+    -  org.bzdev.math.stats.StudentsTStat.Slope
+    -  org.bzdev.math.stats.WelchsTStat
+
+  argumentTypes: *list
+
+  functionClasses:
+    -  org.bzdev.math.stats.BasicStats
+    -  org.bzdev.math.stats.BasicStats.Population
+    -  org.bzdev.math.stats.BasicStats.Sample
+    -  org.bzdev.math.stats.BasicStatsMV.Population
+    -  org.bzdev.math.stats.BasicStatsMV.Sample
+ 
+
+  fieldClasses:
+    -  org.bzdev.math.stats.LeveneStat.Mode
+    -  org.bzdev.math.stats.Statistic.PValueMode
+
+  methodClasses: *list
+...

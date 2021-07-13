@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+    The configureFactory script takes two arguments: a factory and a
+    specification of how the factory should be configured. The factory
+    must be an instance of a subclass of
+
+    	org.bzdev.obnaming.NamedObjectFactory. 
+
+    The format of the specification is scripting-language dependent,
+    but in all cases, a scripting-language function with two arguments named
+    configureFactory will be called.  This function's first argument is
+    the factory and its second argument is the configuration specification.
+    The specification is typically a tree that will be traversed. During
+    the traversal, various factory methods will be called to configure the
+    factory.
+
+    For JavaScript: the specification was designed so that JSON is
+    compatible with it.  At the top level, it is either an object or
+    an array of objects. For an array, configureFactory simply
+    iterates over the elements of the array, processing each as a new
+    specification.  Otherwise, with a few exceptions, the objects
+    consist of properties that match the names passed to a factory's
+    'set' or 'add' method, and the value for the property is the value
+    of the object to set or add.  When an 'add' method is applicable,
+    the value may be a single object or an array. When it is an array,
+    each element of the array is added.
+    The exceptions mentioned above are the properties "withKey" and
+    "withIndex", "withPrefix", and "config".
+
+    The "config" property's value is either a single object (as a
+    special case) or an array, either of which allow a configuration
+    object to be nested.
+
+    The "withPrefix"  property sets a prefix defining a subparameter.
+    These are combined following the nesting order with a "." separating
+    each subparameter.  Thus,
+
+        {withPrefix: "object", config: {
+          withPrefix: "color", config {
+	  "red": 128, "blue": 255, "green": 128}}
+
+    is equivalent to
+
+        {"object.color.red": 128,
+          "object.color.blue": 255,
+	  "object.color.green": 128}
+
+    The "withKey" property sets a key and is used with properties
+    that expect keys in addition to values. The implementation
+    does not explicitly support compound keys, so
+
+       {withKey: 10, config: {
+         withKey: 20, foo: 10}}
+
+    and
+
+       {withKey: 20, config: {foo: 10}}
+
+    is equivalent to
+
+       {withKey: 20, foo: 10}
+
+and
+
+    {withKey: 20, config: {foo: 10}}
+
+    For the 'withIndex' case, the argument is an array and for each
+    element of that array is treated as the object {withKey: INDEX,
+    config: ARRAY[INDEX]}, where ARRAY is the array and INDEX is the
+    array index.
+
+      {withPrefix: "item",
+       withIndex: [
+          {foo: 10, bar: 20},
+          {foo: 30, bar: 40}]}
+
+    is equivalent to
+
+       {withPrefix: "item",
+        config: [
+	  {foo: 10, bar: 20, withKey 0},
+          {foo: 30, bar: 40, withKey 1}]}
+
+    which in turn is equivalent to
+
+       [{withKey: 0, "item.foo": 10, "item.bar": 20},
+        {withKey: 1, "item.foo": 30, "item.bar": 40}]
+
+    
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+({configureFactoryAux: function(prefix, key, factory, spec) {
+    if (Array.isArray(spec)) {
+	for (var j = 0; j < spec.length; j++) {
+	    this.configureFactoryAux(prefix, key, factory, spec[j]);
+	}
+    } else {
+	if (spec.propertyIsEnumerable("withPrefix")) {
+	    prefix = prefix + spec.withPrefix + ".";
+	}
+	if (spec.propertyIsEnumerable("withIndex")) {
+	    if (spec.propertyIsEnumerable("withKey")) {
+		throw new Error("withkey & withIndex");
+	    }
+	    var newspec = spec.withIndex;
+	    if (Array.isArray(newspec)) {
+		for (var j = 0; j < newspec.length; j++) {
+		    this.configureFactoryAux(prefix, j, factory, newspec[j]);
+		}
+	    } else {
+		this.configureFactoryAux(prefix, 0, factory, newspec);
+	    }
+	}
+	if (spec.propertyIsEnumerable("withKey")) {
+	    key = spec.withKey;
+	}
+	if (spec.propertyIsEnumerable("config")) {
+	    var newspec = spec.config;
+	    this.configureFactoryAux(prefix, key, factory, newspec);
+	}
+	if (key == null) {
+            for (var name in spec) {
+		if (name == "withIndex" || name == "withKey"
+		    || name == "withPrefix" || name == "config") {
+		    continue;
+		}
+		var value = spec[name];
+		if (Array.isArray(value)) {
+		    for (var k = 0; k < value.length; k++) {
+			var val = value[k];
+			factory.add(prefix+name, val);
+		    }
+		} else if (factory.mustAdd(prefix+name)) {
+		    factory.add(prefix+name, value);
+		} else {
+		    factory.set(prefix+name, value);
+		}
+	    }
+	} else {
+	    for (var name in spec) {
+		if (name == "withIndex" || name == "withKey"
+		    || name == "withPrefix" || name == "config") {
+		    continue;
+		}
+		var value = spec[name];
+		if (Array.isArray(value)) {
+		    for (var kk = 0; kk < value.length; kk++) {
+			factory.add(prefix+name, key, value[kk]);
+		    }
+		} else if (factory.canAdd3(prefix+name)) {
+		    factory.add(prefix+name, key, value);
+		} else {
+		    factory.set(prefix+name, key, value);
+		}
+	    }
+        }
+    }
+    return;
+  },
+  configureFactory: function(factory, spec) {
+    this.configureFactoryAux("", null, factory, spec);
+    return;
+}})
+]]>
+  </entry>
+  <entry key="python">
+<![CDATA[
+class ___FactoryConfigScript_For_Bzdev_Org:
+  def configureFactoryAux(self, prefix, key, factory, spec):
+    if type(spec) == list:
+      for item in spec:
+	self.configureFactoryAux(prefix, key, factory, item)
+    elif 'withPrefix' in spec:
+	newprefix = prefix  + spec['withPrefix'] + "."
+	if 'withIndex' in spec:
+	    newspec = spec['withIndex']
+	    j = 0
+	    if type(newspec) == list:
+		for element in newspec:
+		   self.configureFactoryAux(newprefix, j, factory, element)
+		   j = j + 1
+	    else:
+		self.configureFactoryAux(newprefix, j, factgory, newspec)
+	elif 'withKey' in spec:
+	    newkey = spec['withKey']
+	    newspec = spec['config']
+	    self.configureFactoryAux(newprefix, newkey, factory, newspec)
+	else:
+	    newspec = spec['config']
+	    self.configureFactoryAux(newprefix, key, factory, newspec)
+    elif 'withIndex' in spec:
+	newspec = spec['withIndex']
+	j = 0
+	if type(newspec) == list:
+	    for element in newspec:
+		self.configureFactoryAux(prefix, j, factory, newspec)
+		j = j + 1
+	else:
+	    self.configureFactoryAux(prefix, j, factory, newspec
+    elif 'withKey' in spec:
+	newkey = spec['withKey']
+	newspec = spec['config']
+	self.configureFactoryAux(prefix, newkey, factory, newspec)
+    else:
+	if key == None:
+	    for name, value in spec.iteritems():
+		if type(value) == list:
+		    for val in value:
+			factory.add(prefix+name, val)
+		elif factory.mustAdd(prefix+name):
+		    factory.add(prefix+name, value)
+		else:
+		    factor.set(prefix+name, value)
+	else:
+	    for name, value in spec.iteritems():
+		if type(value) == list:
+		    for val in value:
+			factory.add(prefix+name, key, val)
+		elif factory.canAdd3(prefix+name):
+		    factory.add(prefix+name, key, value)
+		else:
+		    factor.set(prefix+name, key, value)
+    return
+
+  def configureFactory(self,factory, spec):
+    self.configureFactoryAux("", None, factory, spec)
+    return
+  def finishup(self):
+     del ___FactoryConfigScript_For_Bzdev_Org..finishup
+     del ___FactoryConfigScript_For_Bzdev_Org
+     return self
+___FactoryConfigScript_For_Bzdev_Org().finishup()
+]]>
+  </entry>
+</properties>

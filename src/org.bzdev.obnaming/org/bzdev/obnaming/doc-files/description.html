@@ -1,0 +1,415 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.obnaming package</H2>
+
+The following topics are described below:
+<UL>
+  <LI><A HREF="#namers">object namers and named objects</A>.
+  <LI><A HREF="#factories">factories for named objects</A>.
+  <LI><A HREF="#namerExamples">examples for object namers</A>.
+  <LI><A HREF="#factoryExamples">examples for named-object factories</A>.
+</UL>
+
+<H3><A NAME="namers">Object namers and named objects</A></H3>
+
+It is sometimes useful to be able to look up objects by name, and it
+is also useful to be able to find the names of those objects, perhaps
+filtered by their class or one of their superclasses.  This package
+provides such a service.  There are default implementations that can
+simply be subclassed and additionally there are annotations recognized
+by an annotation processor that will generate helper classes to allow
+a named-object service to be spiced into an existing class hierarchy.
+The objects handled are ones in the current process. By contrast, the
+class java.rmi.Naming provides a facility for referencing remote
+objects, and the javax.naming package allows various devices to be
+looked up by name (e.g, printers).
+<P>
+The service consists of an object namer and a named object that is
+the common superclass of all objects recognized by the object namer.
+There are two cases:
+<ul>
+<li> The object namer and named object base classes do not need to
+     have a superclass (other than Object). In this case "default"
+     classes can be used.
+<li> The object namer and named object base classes both need specific
+     superclasses.  In this case, Java annotations specify how to
+     build helper classes for an object namer and named object, and
+     an annotation processor creates these classes at compile time.
+     When an object namer is a subclass of ScriptingContext, the
+     object namer will by default be able to use a scripting language
+     to configure factories, using a convenient syntax. This is
+     described in the {@link org.bzdev.obnaming.NamedObjectFactory}
+     documentation.
+</ul>
+Both object-namer cases are shown in the following figure (the helper
+classes created by an annotation processor are shown in blue).
+<P style="text-align: center">
+  <img src="obnaming.png">
+<P>
+The figure above indicates that named objects are registered with
+object namers (via operations that occur when constructors are called),
+and that the helpers, when used, are specified by annotations.
+
+<H3><A NAME="factories">Factories for named objects</A></H3>
+
+In addition, this package provides a framework for creating
+factories to configure named objects.  This framework provides common
+methods for setting values, creating objects, and obtaining information
+about the factory.
+The following figure shows the relationship between various classes
+related to factories:
+<P style="text-align: center">
+ <img src="factory.png">
+<P>
+The class {@link NamedObjectFactory}
+is a generic class.  A subclass will use its own class name as the
+first type parameter, followed by the class names of the object namer,
+the matching named object class, and finally the specific class whose
+instance the factory will create. Each value that can be set is
+referenced by name, and that name and some other information is
+provided by the {@link Parm} class.  When the
+constructor for a {@link Parm} instance is called,
+it requires an instance of {@link ParmParser}
+as one of its arguments.  This instance is typically an anonymous
+class: {@link ParmParser}
+defines methods for parsing various types of objects
+and these will throw an UnsupportedOperationException unless
+overridden.  The ones that are overridden are used to store the values
+that were parsed.  These values are primitive types (int, long,
+double, and boolean), strings, and random variables.  If the desired
+type is that of a named object, the object is referenced by name and
+the object namer is used to find the object itself.
+
+<H3><A NAME="namerExamples">Examples for object namers</A></H3>
+
+As an example, if an object namer does not have a superclass, one
+can simply extend the classes
+{@link DefaultObjectNamer} and
+{@link DefaultNamedObject}.  In the
+following code, the object namer will be called Namer and the common
+superclass for named objects will be OurNamedObject:
+<pre><code>
+public class Namer extends DefaultObjectNamer&lt;OurNamedObject&gt; {
+     public Namer() {
+         super(OurNamedObject.class);
+     }
+}
+
+abstract public class OurNamedObject
+     extends DefaultNamedObject&lt;OurNamedObject&gt;
+{
+     ...
+     public OurNamedObject(Namer namer, String name, boolean intern) {
+          super(namer, name, intern);
+     }
+}
+</code></pre>
+A factory class can also be defined:
+<pre><code>
+abstract public class OurNamedObjectFactory&lt;OBJ extends OurNamedObject&gt;
+     extends DefaultNOFactory&lt;Namer,OurNamedObject,OBJ&gt;
+{
+    protected OurNamedObjectFactory(Namer namer) {
+        super(namer);
+    }
+}
+</code></pre>
+For the class
+<code>{@link DefaultNOFactory}</code>,
+there are three type parameters that must be provided: the type of the
+object namer, the type of the base class for all named objects, and a
+type parameter OBJ that is constrained so that it must extend the
+named object class. The example above defining the
+class <code>OurNamedObjectFactory</code> does this.  Subclasses
+of <code>OurNamedObjectFactory</code> will then have a single type
+parameter, the name of the corresponding class.
+<P>
+Additional classes can be defined for specific subclasses of
+named objects:
+<pre><code>
+public class Foo extends OurNamedObject {
+        public Foo(Namer namer, String name) {
+            super(namer, name, true);
+        }
+        ...
+}
+public class Foo1 extends Foo {
+        ...
+}
+</code></pre>
+The following code then creates an object namer and implicitly
+adds two instances of Foo1 to it (which is handled by the constructor,
+specifically the constructor for DefaultNamedObject):
+<pre><code>
+   Namer namer = new Namer();
+   Foo1 x = new Foo1(namer, "x");
+   Foo2 y = new Foo1(namer, "y"); 
+</code></pre>
+
+If an object namer needs to extend a superclass, this can be done
+using annotations.  The annotations define a helper class that
+provides the namer implementation and arranges for this helper
+class to extend some other class.  For example, suppose we want to
+create a class TestNamer that extends a class named NumberStore,
+which has two constructors, one of which may throw an
+IllegalArgumentException.  We can use an ObjectNamer annotation as
+follows:
+<pre><code>
+public class NumberStore&lt;T extends Number&gt; {
+    ...
+    public NumberStore(int initialCapacity) {
+       ...
+    }
+    public NumberStore(int initialCapacity, float loadFactor) {
+       ...
+    }
+}
+
+{@literal @}ObjectNamer(helperClass = "NHelper",
+             helperSuperclass = "NumberStore",
+             helperSuperclassTypeParms = "&lt;Integer&gt;"
+             helperSuperclassConstrTypes =
+             {
+               {@literal @}ObjectNamer.ConstrTypes({"int"}),
+               {@literal @}ObjectNamer.ConstrTypes(
+                   values = {"int", "float"},
+                   exceptions = {"IllegalArgumentException"}),
+             objectClass = "TestObject",
+             objectHelperClass = "OHelper")
+public class TestNamer extends NHelper
+             implements ObjectNamerOps&lt;TestObject&gt;
+{
+   ...
+   public TestNamer(int initialCapacity) {
+       super(initialCapacity);
+       ...
+   }
+   public TestNamer(int initialCapacity, float loadFactor)
+      throws IllegalArgumentException
+   {
+      super(initialCapacity, loadFactor);
+      ...
+   }
+}
+</code></pre>
+The object namer will be configures so that the common superclass
+of all named objects is TestObject. The annotation describes the
+constructors of the helper's superclass (NumberStore), which has 
+similar constructors.  TestNamer must extend the helper class (NHelper)
+and may implement ObjectNamerOps<TestObject> so that Javadocs can
+obtain documentation about various methods.
+Meanwhile TestObject is defined as follows:
+<pre><code>
+{@literal @}NamedObject(helperClass="OHelper",
+             helperSuperclass = "OurObject",
+             helperSuperclassTypeParms = "&lt;Integer, Double&gt;",
+             helperSuperclassConstrTypes = {
+                 {@literal @}NamedObject.ConstrTypes({}),
+                 {@literal @}NamedObject.ConstrTypes(
+                     value = {"int", "float"},
+                     exceptions = {"NegativeArraySizeException"}),
+             namerHelperClass="NHelper",
+             namerClass="TestNamer")
+public class TestObject extends OHelper implements NamedObjectOps {
+      ...
+      public TestObject(TestNamer namer, String name, boolean intern)
+           throws IllegalArgumentException
+      {
+           super(namer, name, intern);
+      }
+
+      public TestObject(TestNamer namer, String name, boolean intern,
+                        int ind, float scale)
+           throws IllegalArgumentException, NegativeArraySizeException
+      {
+           super(namer, name, intern, ind, scale);
+      }
+     ...
+}
+</code></pre>
+Other named object classes used by TestNamer must extend TestObject.
+The namerClass method is not actually needed, but is required for
+documentation reasons. It makes it easier to find the corresponding
+object namer.
+
+<H3><A NAME="factoryExamples">Examples for named-object factories</A></H3>
+
+Factory classes will typically be arranged in a specific class
+hierarchy, a convention that is useful but not mandatory. For
+example, suppose (as described above) one creates an object namer
+together with a named-object class, UserNamedObject, and two
+subclasses of UserNamedObject, Foo and Bar.  Also assume that Bar
+is a subclass of Foo. One will typically create factories for each
+of these classes: a set of abstract factories that are paired with
+these classes and additional factories to create specific objects.
+This is illustrated by the following UML diagram:
+<P style="text-align: center">
+<img src="example.png">
+<P>
+In this example, the non-abstract factory classes will create the actual
+objects, while the abstract factories will perform initializations
+appropriate for the class each abstract factory configures.
+<P>
+<P>
+When coded directly, the documentation for
+{@link org.bzdev.obnaming.NamedObjectFactory NamedObjectFactory} and
+{@link org.bzdev.obnaming.Parm Parm} provides the necessary details.
+If annotations are used, suppose we have already defined a named object
+class TestObject and an object named TestNamer, and that we want to create
+a factory for a TestObject2, which is a subclass of TestObject. Assume
+TestObject2 is defined as follows:
+<blockquote><pre>
+ import org.bzdev.math.rv.IntegerRandomVariable;
+
+ public class TestObject2 extends TestObject {
+    private int value1;
+    public void setValue1(int x) {
+      value1 = x;
+    }
+    public int getValue1() {return value1;}
+
+    private int value2;
+    public void setValue2(int x) {
+       value2 = x;
+    }
+    public int getValue2() {return value2;}
+
+    private IntegerRandomVariable value3;
+
+    public void setValue3(IntegerRandomVariable rv) {
+       value3 = rv;
+    }
+    public int getValue3() {
+       return value3.next();
+    }
+
+    TestObject2(TestNamer namer, String name, boolean intern) {
+       super(namer, name, intern);
+    }
+}
+</pre></blockquote>
+This class contains three variables. Two are integer-valued and one
+has a value that is an IntegerRandomVariable.
+<P>
+A factory to create this class can be written as follows:
+<blockquote><code><pre>
+import org.bzdev.obnaming.*;
+import org.bzdev.bzdev.math.rv.*;
+
+{@literal @}FactoryParmManager("TestObject2ParmManager")
+public class TestObject2Factory
+  extends NamedObjectFactory
+         &lt;TestObject2Factory, TestNamer, TestObject, TestObject2&gt;
+{
+    {@literal @}PrimitiveParm("value1")
+       int value1 = 0;
+
+    {@literal @}PrimitiveParm(value="value2", rvmode=true)
+       IntegerRandomVariable value2 = new UniformIntegerRV(0, 10);
+
+    {@literal @}PrimitiveParm(value="value3", rvmode = true)
+       IntegerRandomVariableRV<IntegerRandomVariable> value3 =
+       new FixedIntegerRVRV(new UniformIntegerRV(0, 10));
+
+    TestObject2ParmManager pm;
+
+    public TestObject2Factory(TestNamer namer) {
+       super(namer);
+       pm = new TestObject2ParmManager(this);
+       initParms(pm, TestObject2Factory.class);
+    }
+
+    public void clear() {
+       pm.setDefaults(this);
+       super.clear();
+    }
+
+    protected TestObject2 newObject(String name) {
+       return new TestObject2(getObjectNamer(), name, willIntern());
+    }
+
+    protected void initObject(TestObject2 object) {
+       object.setValue1(value1);
+       object.setValue2(value2.next());
+       object.setValue3(value3.next());
+    }
+ }
+</pre></code></blockquote>
+The {@link org.bzdev.obnaming.annotations.PrimitiveParm} annotations
+give the name of the parameter. The type of the parameter is
+determined by the type of the field being annotated.  When rvmode() is
+false (the default), the type of the parameter is the type of the
+field; otherwise it is the type of the values a random number generate
+produces by calling the random generator's next() method.  The
+corresponding {@link Parm} is automatically
+initialized. The factory class' constructor is expected to create
+a {@link ParmManager} object when
+annotations are used, and use
+the {@link ParmManager} to initialize the
+factory's parameters.  The method named clear() should use the
+{@link ParmManager}
+{@link ParmManager#setDefaults(org.bzdev.obnaming.NamedObjectFactory)} method to
+restore parameters to their default values. Finally the factory must
+implement methods such as newObject and initObject to actually create
+objects and initialize them.  The details are in the documentation for
+{@link NamedObjectFactory} Parameters
+that are not readily handled by
+a {@link ParmManager} can be provided
+directly. In either case, a method named initParms is used to add one
+or more Parm instances to the factory.
+<P>
+Regardless of whether annotation processing is used, the fully
+qualified class name of factories that are not abstract classes
+should appear in a file named
+META-INF/services/org.bzdev.obnaming.NamedObjectFactory and
+included in the same jar file as the factory, and in a module-info.java
+file when modules are used, where the module-info.java file contains
+the statement that matches the pattern
+<code><pre>
+     provides org.bzdev.obnaming.NamedObjectFactory with
+        FACTORY[, FACTORY]*;
+</pre></code>
+where each instance of FACTORY is replaced with the fully-qualified
+path name of a factory class. For example,
+<BLOCKQUOTE><CODE><PRE>
+    module com.foo {
+      exports com.foo.pkg;
+      requires org.bzde.base;
+      requires org.bzdev.obnaming;
+      provides org.bzdev.obnaming.NamedObjectFactory with
+         com.foo.pkg.Factory1,
+         com.foo.pkg.Factory2,
+         com.foo.pkg.Factory3;
+    }
+</PRE></CODE></BLOCKQUOTE>
+Using both forms allows the JAR file to be used with and without
+modules.
+<P>
+Advice regarding compilation is provided in
+<A HREF="../../../../../doc-files/description.html#compile">the BZDev library description</A>.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  namers superclasses subclassed javax namer Parm rv
+ -->
+<!--  LocalWords:  superclass ScriptingContext NamedObjectFactory UML
+ -->
+<!--  LocalWords:  ParmParser UnsupportedOperationException boolean
+ -->
+<!--  LocalWords:  DefaultObjectNamer DefaultNamedObject Subclasses
+ -->
+<!--  LocalWords:  OurNamedObject subclasses TestNamer NumberStore
+ -->
+<!--  LocalWords:  IllegalArgumentException ObjectNamer TestObject
+ -->
+<!--  LocalWords:  NHelper ObjectNamerOps Javadocs namerClass rvmode
+ -->
+<!--  LocalWords:  UserNamedObject initializations setValue getValue
+ -->
+<!--  LocalWords:  IntegerRandomVariable ParmManager setDefaults
+ -->
+<!--  LocalWords:  newObject initObject initParms BZDev
+ -->

@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>The org.bzdev.util package</H2>
+  
+The package org.bzdev.util contains a number of 'utility'
+classes.
+<P>
+The class {@link CopyUtilities} contains
+code for copying files, resources, and objects referenced by URLs to a
+file, output stream or ZIP stream. Copying to a ZIP stream directly is
+complicated as for a 'stored' entry, the size of the entry must be
+known in advance.
+<P>
+The class {@link TemplateProcessor}
+allows a file or output stream to be created given a template
+accessible via a URL, resource, character array, or Reader. The
+templates consist of ordinary text and directives that consist of a
+'$', an open delimiter, a keyword, and a closing delimiter. The
+keyword is used to look up a replacement (there is a variant to this
+syntax for iteration and comments). The template processor is
+initialized with maps that indicate how to handle each directive.
+<P>
+There are several iterator classes:
+<UL>
+   <LI> {@link EncapsulatingIterator}
+     provides a class that takes an iterator whose values have a type
+     T and maps those values to ones of a different type E.  For
+     example, if one has an iterator that provides a sequence of
+     strings and a method whose argument is an iterator that produces
+     a series of string lengths, one can use an EncapsulatingIterator
+     to create an iterator that will generate a sequence of string
+     lengths.
+   <LI> {@link FilteringIterator}
+     provides an iterator that filters the values provided by a
+     different iterator by removing specified values from the
+     iteration.
+   <LI> {@link EnumerationIterator}
+     and {@link IteratorEnumeration}
+     are essentially inverses of each other: these classes can be used
+     to turn an Iterator into an Enumeration and vice versa. The
+     Iterator interface was added to Java after the Enumeration
+     interface was added, and Iterator is the preferred choice, but
+     existing code that used the Enumeration interface was not changed
+     so applications may have to handle a mixture of the two.
+   <LI> {@link CollectionScanner}
+     provides an iterator that can iterate over the concatenation of
+     multiple collections.
+</UL>
+<P>
+There are several formatter classes:
+<UL>
+  <LI> {@link SafeFormatter} extends
+    Formatter by including exception-handling code that will replace
+    formatting directives with "%s" directives as a way of handling
+    errors. It is useful for formatting Exception messages where it is
+    better to recover from a formatting error by doing something
+    sensible rather than throwing another exception.  Use of this
+    class can make exception handling more robust.
+  <LI> {@link SciFormatter} extends the
+    Formatter class by allowing floating point numbers to be printed
+    in scientific notation.
+  <LI> {@link VarArgsFormatter} works
+    like the usual Formatter class, but has explicit methods for up to
+    11 formatted arguments. This is intended to simply the use of
+    scripting languages that do not recognize Java&apos;s use of variable
+    arguments.
+</UL>
+<P>
+There are a number of miscellaneous classes:
+<UL>
+  <LI> The class {@link Cloner} provides type-safe
+    cloning. {@link ArrayMerger} is a class with
+    only static methods. It allows one to take a sequence of arrays and
+    return a single array that interleaves their
+    values. {@link ClassSorter} and
+    {@link ClassArraySorter} allows classes
+    and arrays of classes to be sorted in a particular order (needed by
+    the dynamic method code but other uses are possible).  The class
+    {@link DisjointSetsUnion}
+    and {@link DisjointSortedSetsUnion}
+    provide the union of disjoint sets.
+  <LI> The interfaces {@link ByteComparator},
+    {@link CharComparator},
+    {@link DoubleComparator},
+    {@link FloatComparator},
+    {@link IntComparator},
+    {@link LongComparator}, and
+    {@link ShortComparator}
+    provide a
+    comparator whose argument types are primitive types.  The class
+    {@link PrimArrays} uses these comparators for
+    binary searches and sorting.
+  <LI> The class {@link SuffixArray}
+    provides an O(N) computation of a suffix array and will
+    additionally compute the longest common prefix array. These can be
+    used for efficient searching of long sequences. The class
+    {@link SuffixArray} is an abstract class.
+    Its inner classes are the ones that will be instantiated:
+    <UL>
+      <LI> {@link SuffixArray.Array} for
+	arrays of type T (where T is a type parameter)
+      <LI> {@link SuffixArray.Byte} for
+	arrays of bytes.
+      <LI> {@link SuffixArray.Char} for
+	arrays of chararacters (primative type 'char').
+      <LI> {@link SuffixArray.Integer}
+	for arrays of integers (primative type 'int').
+      <LI> {@link SuffixArray.Short}
+	for arrays of short integers.
+      <LI> {@link SuffixArray.String}
+	for strings.
+      <LI> {@link SuffixArray.UnsignedByte}
+	for arrays of the primitive type 'byte' where the values are
+	treated as unsigned bytes.
+      <LI> {@link SuffixArray.UnsignedShort}
+	for arrays of the primitive type 'short' where the values are
+	treated as unsigned shorts.
+      <LI> {@link SuffixArray.UTF} for
+	arrays of bytes where the bytes represent UTF-8 encoded
+	characters.
+    </UL>
+</UL>
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  CopyUtilities TemplateProcessor StaticRandom
+ -->
+<!--  LocalWords:  EncapsulatingIterator FilteringIterator formatter
+ -->
+<!--  LocalWords:  EmumerationIterator IteratorEnumeration Cloner
+ -->
+<!--  LocalWords:  CollectionScanner SafeFormatter SciFormatter
+ -->
+<!--  LocalWords:  VarArgsFormatter VirtualKeys ArrayMerger IntArray
+ -->
+<!--  LocalWords:  ClassSorter ClassArraySorter DisjointSetsUnion
+ -->
+<!--  LocalWords:  DisjointSortedSetsUnion IntComparator comparator
+ -->
+<!--  LocalWords:  PoissonTable SuffixArray
+ -->

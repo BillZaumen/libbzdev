@@ -1,0 +1,378 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<HEAD>
+  <TITLE>Description - org.bzdev.anim2d</TITLE>
+</HEAD>
+<BODY>
+    <div style="margin-left: 2em">
+<P>
+<H2>The org.bzdev.anim2d package</H2>
+
+Please see the <A HREF="#scripting">scripting example</A> section for
+an example.
+
+<H3>Introduction</H3>
+
+As described in the
+<A HREF="../package-summary.html">package summary</A>, this package,
+which is based on the devqsim package, provides support for two
+dimensional animations, typically "stick figures" or simple graphics
+although any level of complexity is possible.  The class hierarchy is
+illustrated in the following diagram:
+<P style="text-align: center">
+<img src="anim2d.png">
+<P>
+Factory classes are mostly abstract and make use of generics
+with a type parameter named Obj that extends the class paired
+with the factory.  The classes that are not abstract add a
+method that allows an object to be created. When new types
+of animation objects  (subclasses of AnimationObject2D) are
+added, the abstract factories can be extended, thus reducing
+the amount of coding necessary to implement a factory.
+<P>
+To create an animation, one will create an instance of
+Animation2D, specifying a frame rate, frame dimensions, and
+some other parameters. The frame is represented by a graph in
+graph coordinate space (as defined in the package org.bzdev.graphs),
+and objects in the animation are typically described in graph
+coordinate space, thus allowing units appropriate for an
+application to be used directly.
+<P>
+All objects that appear in the animation will be instances of
+AnimationObject2D, which defines a 'z-order' value to set the
+stacking order of objects, and a boolean flag to indicate if the
+object is currently visible when within the frame.  The class
+AnimationLayer2D allows layers to be added to a frame.  These are
+static unless a subclass overrides the default behavior.
+<P>
+Movable objects can be coded directly, or as subclasses of
+DirectedObject2D or PlacedObject2D. A special subclass of
+DirectedObject2D exists called GraphView.  This sets the
+position of a frame in graph coordinate space, and allows the
+frame to follow a path and zoom in or out.  Only one instance
+of GraphView should be used at a time. Two other special-purpose
+classes are CartesianGrid2D and PolarGrid, which add a grid to
+an animation, often as a reference aid while an animation is being
+developed.
+
+<H3><A NAME="scripting">Scripting example</A></H3>
+
+When scripting is used, animation objects are typically created
+using factories: a concise notation using scripting-language objects
+allows these to be created easily. A description of how to configure a
+factory is in the documentation for
+{@link org.bzdev.obnaming.NamedObjectFactory}.
+<P>
+For example the following script, which is assumed to be
+executed by the program scrunner, will create an animation.
+When scrunner executes a script, it predefines a variable
+named <CODE>scripting</CODE>, which is an instance of the
+class {@link org.bzdev.scripting.ExtendedScriptingContext}.
+<CODE>ExtendedScriptingContext</CODE> contains methods
+for importing classes: how to do this varies from one
+scripting-language implementation to another, even for the
+same language, so having a standard method makes scripts
+more portable. It is also useful to set a variable that will
+allow one to write to standard output, again for similar reasons:
+<BLOCKQUOTE><CODE><PRE>
+scripting.importClass("org.bzdev.anim2d.Animation2D");
+scripting.importClass("org.bzdev.anim2d.KinematicOps2D");
+scripting.importClass("org.bzdev.swing.AnimatedPanelGraphics");
+scripting.importClass("org.bzdev.util.units.MKS");
+var out = scripting.getWriter();
+</PRE></CODE></BLOCKQUOTE>
+If the ESP scripting language is used, the 'scripting' statements
+should be followed by
+<BLOCKQUOTE><CODE><PRE>
+###
+</PRE></CODE></BLOCKQUOTE>
+so that the imports are processed before the rest of the file is
+scanned.  Alternatively, for ESP, one may use its 'import' statement:
+<BLOCKQUOTE><CODE><PRE>
+import (org.bzdev.anim2d.Animation2D);
+import (org.bzdev.anim2d.KinematicOps2D);
+import (org.bzdev.swing.AnimatedPanelGraphics);
+import (org.bzdev.util.units.MKS);
+var out = scripting.getWriter();
+</PRE></CODE></BLOCKQUOTE>
+in which case the line with '###' is not needed.
+<P>
+The next step is to create an animation. The construct uses the
+frame dimensions, the number of ticks per second, and the
+number of ticks per frame. Dividing the number of ticks per second
+by the number of ticks per frame yields the frame rate (the number
+of frames per second), which in this case is 25 frames per second.
+To further configure the frame, we need define the mapping between
+user space and graph coordinate space (these are defined in the
+documentation for {@link org.bzdev.graphs.Graph}). This mapping is
+set up by calling
+{@link org.bzdev.anim2d.Animation2D#setRanges(double,double,double,double,double,double)}:
+<UL>
+  <LI> the first argument is the X coordinate for the origin in graph
+    coordinates space units.
+  <LI>the second argument is the Y coordinate for the origin in graph
+    coordinates space units.
+  <LI> the third argument is the fractional distance in the frame from
+    left (0.0) to right (1.0) for  the origin.
+  <LI> the fourth argument is the fractional distance in the frame from
+    bottom (0.0) to top (1.0) for the origin.
+  <LI> The fifth argument is the scale factor in the X direction. This
+    scale factor is the ratio of the user-space distance to the
+    corresponding distance in graph coordinate space.
+  <LI> The sixth argument is the scale factor in the Y direction. This
+    scale factor is also the ratio of the user-space distance to the
+    corresponding distance in graph coordinate space units.
+</UL>
+When scale factors are measured off of an image, the program EPTS can
+be used to determine the distances in user space between two points whose
+separation in graph-coordinate space is known.
+<BLOCKQUOTE><CODE><PRE>
+
+
+var frameWidth= 656.0;
+var frameHeight = 569.0;
+
+var a2d = new Animation2D(scripting, frameWidth, frameHeight, 1000.0, 40);
+var idist = 76.8542;
+var dist = MKS.feet(23.0);
+var scalef = idist / dist;
+
+a2d.setRanges(0.0, 0.0, 0.0, 0.0, scalef, scalef);
+</PRE></CODE></BLOCKQUOTE>
+The variable <CODE>da</CODE>, when set, will usually be set by the scrunner
+program based on a command-line argument.  Its value will be a
+directory accessor. Normally scrunner's security manager blocks
+any attempt to open a file.  If a directory accessor is defined,
+however, that directory can be used to open a file. The following code
+handles the case where <CODE>da</CODE> is not defined by a variable
+<CODE>apg</CODE> that will open a window that will display an animation
+(such an animation, however, cannot be saved in a video format).
+The class {@link org.bzdev.swing.AnimatedPanelGraphics} provides a GUI
+component in which an animation can be displayed. The ECMAScript code
+is
+<BLOCKQUOTE><CODE><PRE>
+
+if (typeof da === 'undefined') {
+    var apg = AnimatedPanelGraphics.newFramedInstance(a2d,
+						      "Roundabout",
+						      true, true, null);
+}
+</PRE></CODE></BLOCKQUOTE>
+whereas the corresponding ESP code is
+<BLOCKQUOTE><CODE><PRE>
+
+var apg = var.da? null:
+    AnimatedPanelGraphics.newFramedInstance(a2d, "Roundabout",
+				            true, true, null);
+</PRE></CODE></BLOCKQUOTE>
+
+To configure an animation, one will need several factories. The
+following code creates factories by using the method
+{@link org.bzdev.anim2d.Animation2D#createFactories(String,Object)}.
+The first argument to <CODE>createFactories</CODE> is a package name
+and the second is a scripting-language object. For ECMAScript, this
+object consists of a series of properties, where a property's name is
+the name of an ECMAScript variable that will reference the factor and
+where the property's value is a string giving a simple name for the
+class.
+
+<BLOCKQUOTE><CODE><PRE>
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    pathf: "AnimationPath2DFactory"
+});
+
+a2d.createFactories("org.bzdev.roadanim", {
+    cf: "CarFactory",
+});
+</PRE></CODE></BLOCKQUOTE>
+Because the createFactories method creates new scripting-language
+variables, when using ESP these statements should be followed by
+<BLOCKQUOTE><CODE><PRE>
+###
+</PRE></CODE></BLOCKQUOTE>
+in order to create the variables before proceeding.
+<P>
+Next the factories are used to create objects that will appear in the
+animation.  It is convenient to define a couple of variables
+first: <CODE>BLUE</CODE> is an object used to specify the color blue
+and <CODE>iscale</CODE> is a number that tells how an image should be
+scaled.  Its value is the ratio of a dimension in graph coordinate
+space to a corresponding distance in image space (basically user space
+when the image is displayed on a screen). In this
+example, <CODE>iscale</CODE> is the inverse of <CODE>fscale</CODE>
+so that each pixel of the image has a width and height of 1/72".
+The code then creates a background image using a PNG file with the
+appropriate scaling. The URL searches for a resource given a search
+path containing directories and/or JAR files that is set up on the
+<CODE>scrunner</CODE> command line.
+<BLOCKQUOTE><CODE><PRE>
+var BLUE = {red: 0, green: 0, blue: 255};
+var iscale = (dist/idist);
+
+alf.createObject("background", [
+    {visible: true},
+    {zorder: 0},
+    {withPrefix: "object", withIndex: [
+	{type: "IMAGE",
+	 imageURL: "resource:ross2.png",
+	 refPoint: "LOWER_LEFT", x: 0.0, y: 0.00,
+	 imageScaleX: iscale, imageScaleY: iscale}
+]}]);
+
+</PRE></CODE></BLOCKQUOTE>
+A path that an object will follow is defined as well: the
+variable <CODE>path1pts</CODE> contains the path specification
+and is used by a factory to create the actual path.  In addition,
+some variables are defined for common configuration options that
+will be used later.
+<BLOCKQUOTE><CODE><PRE>
+var pathConfig = [
+    {withPrefix: "color", config: BLUE},
+    {withPrefix: "stroke", config: {width: 2.0, gcsMode: false}}
+];
+
+var carConfig = [
+    {zorder: 3, visible: false},
+    {refPointMode: "BY_NAME", refPointName: "UPPER_RIGHT"},
+    {withPrefix: "color", config: BLUE}];
+
+var path1pts = [
+    {type: "MOVE_TO", x: 22.3025, y: 0.0912169},
+    {type: "SPLINE", x: 24.0813, y: 4.65206},
+    {type: "SPLINE", x: 26.9090, y: 13.3633},
+    {type: "SPLINE", x: 28.7789, y: 17.7873},
+    {type: "SPLINE", x: 30.5577, y: 20.1133},
+    {type: "SPLINE", x: 34.1607, y: 22.7586},
+    {type: "SPLINE", x: 36.3499, y: 25.9056},
+    {type: "SPLINE", x: 36.3499, y: 30.2840},
+    {type: "SPLINE", x: 35.2097, y: 32.0627},
+    {type: "SPLINE", x: 34.4344, y: 34.8448},
+    {type: "SPLINE", x: 34.8905, y: 37.0341},
+    {type: "SPLINE", x: 37.4445, y: 44.6507},
+    {type: "SEG_END", x: 39.7706, y: 51.8112},
+    {type: "SEG_END", x: 49.7706,
+     y: 51.8112 + 10*(51.8112 - 44.6507)/(39.7707-37.4445)}
+    ];
+
+var path1 = pathf.createObject("path1", [
+    {zorder: 10, visible: false},
+    pathConfig,
+    {withPrefix: "cpoint", withIndex: path1pts}]);
+
+</PRE></CODE></BLOCKQUOTE>
+The next step is to create an animation object named <CODE>car</CODE>
+a few useful variables are defined, and are used in the <CODE>car</CODE>
+object's timeline.  Timelines are used to configure an object so that
+the object's properties change at a specific time.
+
+<BLOCKQUOTE><CODE><PRE>
+var toff = 0.2
+var t1 = 0.2;
+
+var tau = KinematicOps2D.timeGivenDVV(MKS.feet(50.0),
+				      MKS.mph(25.0),
+				      MKS.mph(10.0));
+
+var accel = KinematicOps2D.accelGivenDVV(MKS.feet(50.0),
+					 MKS.mph(25.0),
+					 MKS.mph(10.0));
+
+cf.createObject("car1", [
+    carConfig,
+    {withPrefix: "timeline", withIndex: [
+	{time: t1, path: path1, velocity: MKS.mph(25.0), visible: true,
+	 acceleration: accel},
+	{time: t1+tau, acceleration: 0.0, velocity: MKS.mph(10)},
+	{time: t1+tau+toff, acceleration: -accel},
+	{time: t1+2*tau+toff, acceleration: 0.0, velocity: MKS.mph(25)}
+    ]}
+]);
+</PRE></CODE></BLOCKQUOTE>
+Finally, some methods are used to estimate the number of frames
+needed, the simulation is configured to accept that many frames,
+and the frames are added to the simulation. If the variable
+<CODE>apg</CODE> was defined (which is the case when <CODE>da</CODE>
+is not defined), the corresponding object is closed.  Closing it
+indicates that all the frames it needs are ready so the animation can
+start running.  The ECMAScript code is
+<BLOCKQUOTE><CODE><PRE>
+var itau = 20.0;
+var maxframes = a2d.estimateFrameCount(itau);
+if (typeof da === 'undefined') {
+    a2d.initFrames(maxframes, apg);
+} else {
+    a2d.initFrames(maxframes, "img", "png", da);
+}
+a2d.scheduleFrames(0, maxframes);
+
+a2d.run();
+
+if (!(typeof apg === 'undefined')) {
+    apg.close();
+}
+</PRE></CODE></BLOCKQUOTE>
+whereas the ESP code is
+<BLOCKQUOTE><CODE><PRE>
+var itau = 20.0;
+var maxframes = a2d.estimateFrameCount(itau);
+var.da? a2d.initFrames(maxframes, "img", "png", da):
+    a2d.initFrames(maxframes, apg);
+
+a2d.scheduleFrames(0, maxframes);
+
+a2d.run();
+
+var.da? void: apg.close();
+</PRE></CODE></BLOCKQUOTE>
+<P>
+To run this script, use
+<BLOCKQUOTE><CODE><PRE>
+	scrunner -Dorg.bzdev.protocols.resource.path=images \
+		 --codebase .../librdanim.jar  <U>FILE</U>
+</PRE></CODE></BLOCKQUOTE>
+or
+<BLOCKQUOTE><CODE><PRE>
+      mkdir -p tmp2
+      rm -r tmp2/*.png
+      scrunner -Dorg.bzdev.protocols.resource.path=images \
+		 --codebase .../librdanim.jar -d:da tmp2  <U>FILE</U>
+</PRE></CODE></BLOCKQUOTE>
+where <CODE><U>FILE</U></CODE> is video2.js if ECMAScript is used or
+video2.esp if ESP is used.
+The first option runs the animation without a directory accessor.
+The second option provides a directory accessor (the <CODE>-d:da tmp2</CODE>
+argument), and the specified directory will contain a number of PNG files
+named in a way that allows the sequence to be determined.  The naming
+convention used is recognized by VLC, ffmpeg, and similar programs,
+allowing an animation in a standard format to be created.
+<P>
+<A HREF="https://youtu.be/yHJ0RCk62gE">A youtube video</A> shows a
+more complete animation. The code above is a stripped-down version.
+It was written as an experiment. At the time, the citizenry of a town
+in California about 50 km south of San Francisco were up in arms about
+a roundabout being installed to replace the four-way stop signs at an
+intersection. In a city with nearly as many amateur traffic engineers
+as citizens, the outcry was more like what one would expect after a
+disaster of Biblical proportions. So the author put this animation up
+on youtube to see if actually seeing how the thing works would reduce
+the outcry.  It is not clear if it did&mdash;the more vocal people
+tended to see only what fit their preconceptions&mdash;but after the
+project was complete and people had actual experiences with the new
+facility, the complaints evaporated. The model for vehicles was
+written as the result of a minor fender bender. An animation helped an
+insurance company's representative understand exactly what a
+customer meant and why it was obviously the other driver's fault.
+    </div>
+</BODY>
+
+<!--  LocalWords:  devqsim subclasses AnimationObject boolean EPTS
+ -->
+<!--  LocalWords:  AnimationLayer DirectedObject PlacedObject PNG VLC
+ -->
+<!--  LocalWords:  GraphView CartesianGrid PolarGrid scrunner ffmpeg
+ -->
+<!--  LocalWords:  predefines setRanges accessor scrunner's youtube
+ -->
+<!--  LocalWords:  createFactories
+ -->

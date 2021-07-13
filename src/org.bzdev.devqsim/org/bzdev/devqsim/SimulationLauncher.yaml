@@ -1,0 +1,37 @@
+%YAML 1.2
+---
+  define1: &classes
+    - org.bzdev.devqsim.Simulation
+    - org.bzdev.devqsim.FifoTaskQueue
+    - org.bzdev.devqsim.LifoTaskQueue
+    - org.bzdev.devqsim.PriorityTaskQueue
+    - org.bzdev.devqsim.PriorityTaskQueue.PriorityParam
+    - org.bzdev.devqsim.ProcessClock
+    - org.bzdev.devqsim.SimulationEvent
+    - org.bzdev.devqsim.TraceSet
+    - org.bzdev.devqsim.WaitTaskQueue
+
+  define2: &enums
+    - org.bzdev.devqsim.QueueDeletePolicy
+    - org.bzdev.devqsim.TaskQueue.ReleasePolicy
+    - org.bzdev.devqsim.TraceSetMode
+
+  returnTypes:
+    - *classes
+    - *enums
+    - org.bzdev.devqsim.FifoTaskQueueFactory
+    - org.bzdev.devqsim.LifoTaskQueueFactory
+    - org.bzdev.devqsim.PriorityTQFactory
+    - org.bzdev.devqsim.ProcessClockFactory
+    - org.bzdev.devqsim.TraceSetFactory
+    - org.bzdev.devqsim.WaitTaskQueueFactory
+
+  argumentTypes:
+    - *classes
+    - *enums
+
+  fieldClasses: *enums
+
+  methodClasses: *classes
+
+...

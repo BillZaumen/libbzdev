@@ -1,0 +1,26 @@
+%YAML 1.2
+---
+  returnTypes: &list
+    - org.bzdev.p3d.Model3DOps
+    - org.bzdev.p3d.Model3D
+    - org.bzdev.p3d.Model3DView
+    - org.bzdev.p3d.ManifoldComponents
+    - org.bzdev.p3d.SteppedGrid
+    - org.bzdev.geom.SurfaceOps
+    - org.bzdev.geom.Surface3D
+    - org.bzdev.geom.Shape3D
+    - org.bzdev.geom.Transform3D
+    - org.bzdev.geom.Point3D
+    - org.bzdev.geom.Transform3D
+    - org.bzdev.geom.Transform3D
+    - org.bzdev.geom.BezierCap
+    - org.bzdev.geom.BezierGrid
+    - org.bzdev.geom.AffineTransform3D
+
+  argumentClasses: *list
+
+  functionClasses:
+    - org.bzdev.p3d.P3d
+
+  methodClasses: *list
+...

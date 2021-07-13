@@ -1,0 +1,7 @@
+<!ELEMENT toc (node) >
+<!ELEMENT node (node)*>
+<!ATTLIST node title CDATA #IMPLIED
+          uri CDATA #IMPLIED
+	  href CDATA #IMPLIED
+>
+

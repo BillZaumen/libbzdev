@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+    The createFactories script takes three arguments: an object namer,
+    a package name, and a specification object.  The specification
+    object contains properties whose names are the names of variables
+    that will be created or set and whose values are the names of
+    factory classes, excluding their package names.  All factory classes
+    must be from the same package.
+    The factory classes must be a subclass of
+
+    	org.bzdev.obnaming.NamedObjectFactory. 
+
+    The format of the specification is scripting-language dependent,
+    but in all cases, a scripting-language function with three arguments 
+    and named createFactory will be called.  
+    
+    As an example for EMCAScript, if a2d is an Animation2D instance
+    (which must have a parent that enables scripting), the following
+    code will create two factories and store them in the variables
+    lf and pf:
+
+         a2d.createFactories("org.bzdev.anim2d", {
+	     lf: "AnimationLayer2DFactory",
+	     pf: "AnimationPath2DFactory"
+	 });
+
+     The Animation2D method createFactories will invoke the script
+     with an ANimation2D instance as the script''s first argument,
+     followed by the package name and object as the second and third
+     arguments respectively.
+
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+({createFactories: function(namer, package, spec) {
+    for (var vname in spec) {
+       namer.createFactory(vname, package, spec[vname]);
+    }
+    return;
+}})
+]]>
+  </entry>
+  <entry key="ESP">
+<![CDATA[
+import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
+{createFactories: function (namer, package, spec) {
+    spec.properties().forEach(function(entry) {
+        namer.createFactory(entry.getKey(), package, entry.getValue());
+	void
+    });
+    void
+}}
+]]>
+  </entry>
+  <entry key="python">
+<![CDATA[
+class ___FactoryCreateScript_For_BZDev_Org:
+  def createFactories(self,namer, package, spec):
+    for name, value in spec.iteritems()
+       namer.createFactory(name, package, value);
+    return
+  def finishup(self):
+    del ___FactoryCreateScript_For_BZDev_Org.finishup
+    del  ___FactoryCreateScript_For_BZDev_Org
+    return self
+___FactoryCreateScript_For_BZDev_Org().finishup()
+]]>
+  </entry>
+</properties>

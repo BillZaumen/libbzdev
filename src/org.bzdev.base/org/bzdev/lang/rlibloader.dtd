@@ -1,0 +1,52 @@
+<?xml version=1.0 encoding="UTF-8"?>
+
+<!-- Toplevel element. This DTD defines the format of
+     XML files used to configure a resourceLibLoader.
+-->
+<!ELEMENT libloaderspec (archdef | archfamily | osinfo)*>
+
+<!-- element to map and architecture name that the java
+     property os.arch might provide into a cannonical name.
+-->
+<!ELEMENT archdef EMPTY>
+<!ATTLIST archdef
+          name CDATA #REQUIRED
+          cname CDATA #REQUIRED>
+
+<!-- define the sequence of architectures that make up a
+     family. Listed in order of newest first, with code
+     compiled for older architectures assumed to be useable
+     on newer architectures.
+-->
+<!ELEMENT archfamily (arch)*>
+
+<!-- provide a specfic architecture (listed by cannonical name). -->
+<!ELEMENT arch  EMPTY>
+<!ATTLIST arch
+          cname CDATA #REQUIRED>
+
+<!-- provide OS information.  The name should be a name
+     matching the Java property os.name.  A suffix for
+     a library may be provided.  The default suffix is
+     ".so" except when os.name starts with "Windows", in
+     which case it is ".dll"
+-->
+<!ELEMENT osinfo (version)*>
+<!ATTLIST osinfo
+          name  CDATA #REQUIRED
+	  prefix CDATA #IMPLIED
+	  suffix CDATA #IMPLIED>
+
+
+<!-- Some operating systems (e.g., Linux) vary their
+     version numbers very rapidly as the kernel changes,
+     with user-level APIs changing far more slowly. For
+     these operating systems, one may wish to replace
+     ranges of version numbers.  For example, 2.4.19-20
+     with 2.4.  The pattern is a Java regular express
+     and the replacement is a string.
+-->
+<!ELEMENT version EMPTY>
+<!ATTLIST version
+          pattern CDATA #REQUIRED
+          replacement CDATA #REQUIRED>

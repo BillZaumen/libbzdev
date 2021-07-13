@@ -1,0 +1,2064 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+  <BODY>
+    <div style="margin-left: 2em">
+  <H2>ExpressionParser and the ESP scripting language</H2>
+  <P>
+    The class {@link ExpressionParser} is an instance of
+    {@link ObjectParser} that was originally written to allow strings
+    that contain expressions to be parsed.  These strings might appear
+    in text fields or as part of a YAML file. {@link ExpressionParser}
+    also provides the implementation for the ESP (Expression Sequence Parser)
+    scripting language. For ease of learning, the syntax is similar to
+    that used by ECMA script, although with fewer constructs and some
+    minor additions and changes, most adopted from Java. The following
+    sections provide full descriptions of the ESP scripting language
+    and how it is configured:
+    <UL>
+      <LI><A HREF="#overview">Overview</A>.
+      <LI><A HREF="#constructors">Constructors</A>.
+      <LI><A HREF="#syntax">ESP Syntax</A>.
+      <LI><A HREF="#iteration">Iteration</A>.
+      <LI><A HREF="#threading">Threading</A>.
+      <LI><A HREF="#bindings">Bindings</A>.
+      <LI><A HREF="#api">The ESP API</A>.
+      <LI><A HREF="#helpers">Helper Classes</A>.
+      <LI><A HREF="#examples">Examples</A>.
+      <LI><A HREF="#notes">Implementation Notes</A>.
+    </UL>
+  <P>
+    In the simplest use case, ESP provides a very high level of
+    security, even without the use of a security manager. The
+    constructor for this case is
+    {@link ExpressionParser#ExpressionParser(Class...)},
+    and for each of this constructor&apos;s arguments, the public
+    static methods whose return type is a double, int, long, boolean,
+    or void, and whose arguments types are int, long, boolean, Number,
+    Integer, Long, or Boolean, are made accessible as functions. A
+    series of built-in classes can also be used as return values or
+    arguments by default. These are classes defined in the packages
+    java.util.stream and java.util.function and are listed explicitly
+    below. Each string that is parsed is either
+    <UL>
+      <LI> an expression, prefaced by an <STRONG>=</STRONG>
+	character. This use of an <STRONG>=</STRONG> for an expression
+	that is to be validated is common in spreadsheets, but also
+	simplifies the use of {@link ExpressionParser} with YAML by
+	making it easy to distinguish expressions from strings or
+	numbers.
+      <LI> a variable definition.  These start with the keyword
+	<STRONG>var</STRONG>, followed by Java identifier, followed by
+	an <STRONG>=</STRONG>.
+      <LI> a function definition.  These start with the keyword
+	<STRONG>function</STRONG>, followed by a Java identifier
+	providing a function name, followed by a parameter list, a
+	<STRONG>{</STRONG> a series of semicolon-separated statements, and
+	finally a <STRONG>}</STRONG>. A statement in a function definition
+	can be either an expression, an assignment statement, or a
+	variable definition, with the variable definition defining a
+	local variable. In a function definition, a semicolon
+	immediately before the final closing brace is ignored (when
+	switching between writing code in Java and ESP, it is easy to
+	type a semicolon at the end of every statement, including the
+	last, as this is always done in Java).
+    </UL>
+    Examples of classes that might be passed as the arguments to
+    {@link ExpressionParser}&apos;s constructor are {@link java.lang.Math},
+    {@link org.bzdev.lang.MathOps}, and {@link org.bzdev.math.Functions}.
+    ESP also provides objects and arrays/lists, using the same notation
+    as that used by ECMAScript. For more fine-grained control over how
+    classes are handled, the constructor
+    {@link ExpressionParser#ExpressionParser(Class[],Class[],Class[],Class[],Class[])}
+    can be used.
+  <P>
+    An instance of ExpressionParser can be configured by setting up to
+    five modes:
+    <UL>
+      <LI> {@link ExpressionParser#setScriptingMode()}. An input
+	string can contain multiple statements, separated by
+	semicolons, and an input string must not contain an initial
+	"=".
+      <LI> {@link ExpressionParser#setPrefixMode()}. This mode is
+	meaningful when scripting mode is enabled. Prefix mode requires
+	that each top-level statement start with either an '=' or the
+	keywords "var", "function", or "synchronized" followed by "function".
+	The class {@link org.bzdev.obnaming.ObjectNamerLauncher} enables this
+	mode.
+      <LI> {@link ExpressionParser#setImportMode()}. When import mode
+	is set, classes can be added after scripts have been run, provided
+	that two scripts have not been running concurrently. To add a class,
+	use the method {@link ExpressionParser#addClasses(Class...)}. Unless
+	script import mode is set, the methods that are accessible are those
+	whose value types and argument types are already known. When
+	{@link ExpressionParser#addClasses(Class...)} is called, all the
+	classes provided as arguments are added to the value-type and
+	argument-type tables before determining which methods are accessible.
+	In this case, a class and its superclasses and/or interfaces have to
+	be provided as arguments explicitly.
+      <LI> {@link ExpressionParser#setScriptImportMode()}. When script import
+	mode is set, the parser will recognize an "import" statement that
+	will allow scripts to specify classes to add using a syntax described
+	below. Import mode must also be set.  script import mode looses the
+	restrictions on methods. When script import mode is set and
+	{@link ExpressionParser#addClasses(Class...)} is called, superclasses
+	and interfaces are also added to the value-type and argument-type
+	tables, as are the return types and parameter types of methods. The
+	effect is that all of these methods become accessible.
+      <LI> {@link ExpressionParser#setGlobalMode()}. When global mode is set,
+	the parser will have a predefined variable named "global" that
+	provides various methods described below. When global mode is set,
+	the global object provides access to a {@link java.io.Reader} and
+	A {@link java.io.Writer}, one writer for normal output and one for
+	error output.  These readers and writers can be set by using the
+	following methods:
+	<UL>
+	  <LI> {@link ExpressionParser#setReader(java.io.Reader)}.
+	  <LI> {@link ExpressionParser#setWriter(java.io.PrintWriter)}.
+	  <LI> {@link ExpressionParser#setErrorWriter(java.io.PrintWriter)}.
+	  <LI> {@link ExpressionParser#setReaderTL(java.io.Reader)}.
+	  <LI> {@link ExpressionParser#setWriterTL(java.io.PrintWriter)}.
+	  <LI> {@link ExpressionParser#setErrorWriterTL(java.io.PrintWriter)}.
+	</UL>
+	The variants whose names end in TL set thread-specific readers
+	and writers. The remainder set thread-independent values. When
+	both are present, the thread-specific values are preferred.
+    </UL>
+    When used to provide a scripting language one would generally enable
+    all of these modes.  If merely parsing a line of text containing an
+    expression to be evaluated, none of these modes has to be set. ESP
+    has a  service provider for the javax.scripting module, and that
+    provide enables all of the five modes except prefix mode.
+  <P>
+    Finally, an instance of {@link ExpressionParser} can manipulate
+    expression-parser variables and evaluate expressions or statements
+    by using the following methods:
+    <UL>
+      <LI> {@link ExpressionParser#exists(String)} &mdash; determine
+	if a variable exists.
+      <LI> {@link ExpressionParser#get(String)} &mdash; get the value
+	of a variable. If the variable's value is a "typed null", the
+	constant <STRONG>null</STRONG> is returned.
+      <LI> {@link ExpressionParser#set(String,Object)} &mdash; set the
+	value of a variable
+      <LI> {@link ExpressionParser#parse(String)} &mdash; process
+	a string and return a value.
+    </UL>
+    See the {@link ExpressionParser} documentation for additional methods,
+    including ones used to help generate documentation for the classes
+    that a given instance has available.
+
+    <H2><A NAME="overview">Overview</A></H2>
+  <P>
+    Programmers familiar with Java and ECMAScript can learn how to use
+    ESP with very little effort, and those familiar with ECMAScript
+    and Java can learn to read code written in ESP in a couple
+    minutes: ESP&apos;s syntax is borrowed from elements of both
+    languages, with only a few additions: the <STRONG>?=</STRONG>
+    operator (which assigns a value to a variable if it does not
+    already exist), the <STRONG>??=</STRONG> operator (which assigns a
+    value to a variable if it does not exist or has the value
+    <STRONG>null</STRONG>), and the sequence
+    <STRONG>var . </STRONG><EM>IDENTIFIER</EM>, which tests if the
+    identifier <EM>IDENTIFIER</EM> exists, and the <STRONG>###</STRONG>
+    delimiter, which results in previous statements being immediately
+    executed.
+    <P>
+    The following provides an overview of the differences.
+    <UL>
+      <LI> Variables must be declared or defined before they are use.
+	A declaration or definition starts with the keyword var. For a
+	definition, the keyword <STRONG>var</STRONG> is followed by an
+	identifier, which is followed by either <STRONG>=</STRONG>,
+	<STRONG>?=</STRONG>, or <STRONG>??=</STRONG>, which is
+	followed by an expression.  For a declaration, the
+	keyword <STRONG>var</STRONG> is followed by a comma separated
+	list of identifiers. A declaration indicates that a variable
+	was defined externally or as a side effect of some other
+	operation.
+      <LI> A variable definition can use the <STRONG>?=</STRONG>
+	operator to provide an expression giving its value for the
+	case where the variable is not already defined. If the
+	variable is already defined, the expression is not evaluated.
+	This allows default values to be readily provided: the ESP
+	statement
+	<BLOCKQUOTE><CODE><PRE>
+var out ?= global.getWriter();
+	</PRE></CODE></BLOCKQUOTE>
+	is equivalent to the ECMAScript statements
+	<BLOCKQUOTE><CODE><PRE>
+if (typeof(out) == "undefined") {
+    out = scripting.getWriter();
+}
+	</PRE></CODE></BLOCKQUOTE>
+	(The scrunner command will run a script with a predefined
+	variable named <STRONG>scripting</STRONG>.)
+      <LI> A variable definition can use the <STRONG>??=</STRONG> operator to
+	provide an expression giving its value for the case where either the
+	variable is not already defined or the variable has the value of
+	null.  Aside from an additional test, this operator behave the
+	same as the <STRONG>?=</STRONG> operator.
+      <LI> Java method references may be used as method or function
+	arguments, and may be assigned to variables.
+      <LI> a class name, followed by <STRONG>::</STRONG>;, followed by
+	<STRONG>null</STRONG>; denotes the value null but with an associated
+	type.  This value may be assigned to variables or used as
+	function, method, or constructor arguments. It in effect casts
+	the value null to a particular type and that type is used in
+	looking up the appropriate Java method or constructor. Null values
+	returned by Java methods are handled in this way as well.
+      <LI> ESP functions that provided by Java are static methods of
+	Java classes. The name of such a method can be used by itself
+	when unambiguous; otherwise the last components of the class
+	name must appear before the method name, separated from the
+	method name by a period. Only enough of the class name has to
+	be provided for the class to be unambiguous.
+      <LI> The Java <STRONG>instanceof</STRONG> operator may be used.
+	The value <STRONG>null</STRONG>, if typed, can result in the
+	<STRONG>instanceof</STRONG> operator recognizes typed null
+	values but not untyped null values:
+	<UL>
+	  <LI><STRONG>null instanceof String</STRONG> returns
+	    <STRONG>false</STRONG>.
+	  <LI><STRONG>String::null instanceof String</STRONG> returns
+	    <STRONG>true</STRONG>.
+	  <LI><STRONG>Number::null instanceof String</STRONG> returns
+	    <STRONG>false</STRONG>.
+	  <LI><STRONG>x instanceof String</STRONG> returns
+	    <STRONG>true</STRONG> when <STRONG>x</STRONG> has the
+	    value <STRONG>String::null</STRONG> and return
+	    <STRONG>false</STRONG> when <STRONG>x</STRONG> has the
+	    value <STRONG>Number::null</STRONG> and return
+	</UL>
+	Java methods that return <STRONG>null</STRONG> return typed
+	null values, with the type set to the type returned by the
+	Java method called.
+      <LI> Objects use ECMAScript syntax with some semantic differences.
+	When a method is defined by providing a method name followed by a
+	parentheses-delimited argument list, the reserved identifier
+	<STRONG>this</STRONG> is an implicit parameter for a method and
+	allows access to the method&apos;s properties. When the value of a
+	property is a lambda expression, there is not an implicit parameter
+	named <STRONG>this</STRONG>.
+      <LI> Functions and methods may be synchronized by using the
+	<STRONG>synchronized</STRONG> keyword before a function definition,
+	a method definition, or a lambda expression. For example,
+	<BLOCKQUOTE><CODE><PRE>
+var x = 0;
+synchronized function increment() {
+    x = x + 1
+}
+	</PRE></CODE></BLOCKQUOTE>
+	will define a function named <CODE>increment</CODE> that can be
+	used concurrently in multiple threads to increment the variable
+	<CODE>x</CODE>.  The function will be synchronized on the
+	expression parser itself. Similarly
+	<BLOCKQUOTE><CODE><PRE>
+var obj = {
+    x: 0,
+    synchronized increment() {
+        this.x = this.x + 1
+    }
+}
+	</PRE></CODE></BLOCKQUOTE>
+	will define a synchronized method that will modify the property
+	<CODE>x</CODE> belonging to the object <CODE>obj</CODE>.
+      <LI> The expression <STRONG>var.</STRONG><I>IDENTIFIER</I> tests
+	if a variable named <I>IDENTIFIER</I> exists.
+      <LI> The keyword <STRONG>void</STRONG> can be used as the final
+	expression in a function&apos;s body.  This is equivalent to
+	<STRONG>null</STRONG> but indicates that the function may not
+	be called to provide an argument for a function or method.
+      <LI> At the top level of a script, the token <STRONG>###</STRONG>
+	indicates that portion of the script preceding this token is to
+	be processed before continuing.  Otherwise ESP will read the whole
+	script before actually executing anything. Using
+	<STRONG>###</STRONG> is convenient when variables are defined as
+	a side effect of some operation: if that operation has not yet
+	been performed, an undefined-variable error can occur.
+      <LI> There is an explicit syntax for importing variables (ECMAScript
+	leaves that to each implementation).
+      <LI> There is a global object named <STRONG>global</STRONG>, but
+	in ESP, this object merely provides some standard methods.
+      <LI> Operator precedence and associativity is the same in ESP
+	as in Java, but there are fewer operators. Unlike ECMAScript, there
+	is no <STRONG>===</STRONG> operator. The ESP operator
+	<STRONG>==</STRONG> works like the <STRONG>equal</STRONG> method
+	in Java (or <STRONG>==</STRONG> for primitive types).
+      <LI>A class name followed by <STRONG>.class</STRONG> denotes a
+	class object (i.e., an instance of {@link java.lang.Class}).
+	Arrays are not allowed (for example, <STRONG>double[].class</STRONG>,
+	but the  primitive classes <STRONG>double.class</STRONG>,
+	<STRONG>long.class</STRONG>, <STRONG>int.class</STRONG>
+	and <STRONG>boolean.class</STRONG> are allowed.
+      <LI>ESP objects are not much more than dictionaries. Unlike ECMAScript,
+	there is not a prototype chain, explicit constructors, inheritance,
+	etc.  ECMAScript keywords such as <STRONG>class</STRONG> or
+	<STRONG>let</STRONG> are not supported by ESP. ESP objects can,
+	however, be used to implement Java interfaces.
+      <LI>ESP does not provide any control-flow constructs other than a
+	ternary operator (<STRONG>?</STRONG> followed by <STRONG>:</STRONG>),
+	<STRONG>?=</STRONG> assignment, and <STRONG>??=</STRONG> assignment. For
+	iteration, ESP makes use of the {@link java.util.stream} package.
+
+    </UL>
+    Finally, ESP is not intended to be a full replacement for ECMAScript.
+    Rather it is intended for cases where a script will use lists and
+    object to represent a tree (or a directed acyclic graph)
+    defining various configurations, were some simple computation may be
+    desired.
+
+    <H2><A NAME="constructors">Constructors</A></H2>
+    {@link ExpressionParser} has two constructors:
+    <UL>
+      <LI> {@link ExpressionParser#ExpressionParser(Class...)} creates an
+	{@link ExpressionParser} configured for parsing expressions with
+	predefined functions. The functions are static methods of the
+	argument classes. The type of the value returned
+	by a method and used as arguments are strings, booleans, numbers
+	(doubles, integers, and long integers) and streams-related classes.
+      <LI> {@link ExpressionParser#ExpressionParser(Class[],Class[],Class[],Class[],Class[])}
+	creates an {@link ExpressionParser} with explicit values for
+	<UL>
+	  <LI> the classes of objects that can be returned by
+	    functions and methods, and the types of the objects that
+	    are created by explicitly called constructors.
+	  <LI> the classes of objects that can be used as arguments to
+	    functions, methods, or constructors.
+	  <LI> The classes whose static methods can be used to as functions.
+	  <LI> The classes whose instance  methods can be used.
+	  <LI> The classes whose public, static, and final fields may be used.
+	    The values of these fields must be an enumeration constant,
+	    a string, or the primitive type boolean, int, double, or long.
+	</UL> 
+    </UL>
+  <P>
+    The method {@link ExpressionParser#addClasses(Class...)} will
+    behave as if each class in its argument list was added to each
+    class arrays in the
+    {@link ExpressionParser#ExpressionParser(Class[],Class[],Class[],Class[],Class[])}
+    constructor. unless {@link ExpressionParser#setImportMode()} was
+    called, calls to to {@link ExpressionParser#addClasses(Class...)}
+    must be made before a script is run.
+  <P>
+    After the constructor is called, more classes can be added by using
+    the method {@link ExpressionParser#addClasses(Class...)}. Typically
+    one should use a single call to this method rather than multiple calls:
+    In determining which methods are accessible, the allowed return types
+    and argument type are extended to include these classes, and that is
+    done before tables for methods and constructors are extended.
+    {@link ExpressionParser#addClasses(Class...)} must not be called after
+    a script has executed an expression, however, unless
+    {@link ExpressionParser#setImportMode()} has been called before any
+    script has been executed.
+
+    <H2><A NAME="syntax">ESP Syntax</A></H2>
+  <P>
+    ESP&apos;s syntax is described in the following subsections:
+    <UL>
+      <LI> <A HREF="#comments">Comments</A>.
+      <LI> <A HREF="#primitiveValues">Primitive Values</A>
+      <LI> <A HREF="#constants">Constants</A>
+      <LI> <A HREF="#operators">Operators</A>
+      <LI> <A HREF="#statements">Statements</A>
+      <LI> <A HREF="#expressions">Expressions</A>
+      <LI> <A HREF="#vardefs">Variable Definitions</A>
+      <LI> <A HREF="#functdefs">Function Definitions</A>
+      <LI> <A HREF="#assignment">Assignment Statement</A>
+      <LI> <A HREF="#import">Import Statement</A>
+      <LI> <A HREF="#objects">Objects</A>
+      <LI> <A HREF="#arrays">Arrays</A>
+      <LI> <A HREF="#global">The global object</A>
+      <LI> <A HREF="#tracing">Tracing Options</A>
+    </UL>
+
+    <H3><A NAME="comments">Comments</A></H3>
+  <P>
+    Two types of comments are recognized in scripting mode. One
+    starts with the token &apos;//&apos; (unless within a string), and continues
+    until the end of a line or the end of the input. The other
+    starts with the sequence &apos;/*&apos; and ends with the sequence &apos;*/&apos;.
+    This is the same convention used by Java and ECMAScript.
+  <P>
+    If scripting mode is not in effect, a comment must not appear
+    before
+    <UL>
+      <LI> an &apos;=&apos; at the start of a top-level expression.
+      <LI> the first &apos;=&apos; in a variable definition.
+      <LI> the starting &apos;{&apos; in a function definition.
+    </UL>
+    so that the method {ExpressionParser#matches(String)} will return
+    quickly when there is not a match.
+
+    <H3><A NAME="primitiveValues">Primitive Values</A></H3>
+  <P>
+    ESP recognizes several types of primitive values:
+    <UL>
+      <LI> Integers. These use Java syntax but with no support for
+	octal or hexadecimal numbers.
+      <LI> Long Integers.These use Java syntax but with no support for
+	octal or hexadecimal numbers.
+      <LI> Double-precision numbers.
+      <LI> Booleans. The allowed values are <STRONG>true</STRONG> or
+	<STRONG>false</STRONG>
+      <LI> Strings. These are double-quoted strings with &apos;\&apos; indicating
+	the start of an escape sequence. A &apos;\&apos; followed by a character
+	is replaced with that character with the following exceptions:
+	<UL>
+	  <LI>\b is replaced with a backspace.
+	  <LI>\f is replaced with with a formfeed.
+	  <LI>\n is replaced with with a new-line.
+	  <LI>\r is replaced with with a carriage-return.
+	  <LI>\t is replaced with a tab.
+	  <LI>\u followed by 4 hexadecimal digits is replaced with
+	    the corresponding UNICODE character.
+	</UL>
+      <LI> Method references.
+	A method reference has the same syntax and meaning as in Java
+	and can be used as an argument for Java functions that accept
+	method references. The syntax is shown below.
+      <LI> <STRONG>null</STRONG>. This is just the value null as used
+	by Java, ECMAScript, and various other languages.
+      <LI>A class name, followed by <STRONG>::</STRONG>, followed by
+	<STRONG>null</STRONG> is treated the same as <STRONG>null</STRONG>
+	but with the value tagged with the type given by the class name.
+	This is useful in cases where one would otherwise have to cast a
+	null value to select the desired method or constructor.
+      <LI><STRONG>void</STRONG>. This value is treated like null, but
+	indicates that a value is not appropriate as the argument to a
+	function of method.  It will typically be used as the last
+	statement in a function or method that does not return a
+	useful value. If the value returned by a &apos;parse&apos; method
+	is <STRONG>void</STRONG>, that value is converted
+	to <STRONG>null</STRONG>.
+    </UL>
+  <P>
+    <H3><A NAME="constants">Constants</A></H3>
+  <P>
+    Constants in ESP include numbers and strings as one would expect,
+    but also enumeration constants and the fields of Java objects that
+    are declared to be public, static, and final, and whose type has
+    been either imported or configured using one of
+    {@link ExpressionParser}&apos;s constructors.
+  <P>
+    The full form for an enumeration constant or field is a fully
+    qualified class name, followed by a &apos;.&apos; and the constant
+    itself. The leading components of the class name (that is, anything
+    before and including a period) can be dropped as long as the
+    resulting name is not ambiguous.
+  <P>
+    Variable names may shadow a constant. For example, the following script
+    <BLOCKQUOTE><PRE><CODE>
+import (java.lang.Thread.State);
+
+global.getWriter().println(BLOCKED);
+var BLOCKED = 10;
+global.getWriter().println(BLOCKED);
+global.getWriter().println(State.BLOCKED);
+    </CODE></PRE></BLOCKQUOTE>
+    will generate the following output:
+    <BLOCKQUOTE><PRE><CODE>
+BLOCKED
+10
+BLOCKED
+    </CODE></PRE></BLOCKQUOTE>
+    because the variable <CODE>BLOCKED</CODE> shadows the constant
+    <CODE>BLOCKED</CODE>, but the variable is defined after the
+    first output line was printed. Meanwhile, the use of the constant
+    <CODE>State.BLOCKED</CODE> resolves the ambiguity.
+  <P>
+    <H3><A NAME="operators">Operators</A></H3>
+  <P>
+    Operators are a subset of the operators provided by Java.  Unary
+    operators are &apos;-&apos;, &apos;~&apos; and &apos;!&apos; and &apos;throw&apos; for sign inversion,
+    bitwise complement, logical-not, and throwing an exception
+    respectively.  These have the highest precedence.  The binary
+    operators, grouped by precedence are shown in the following table:
+    <TABLE BORDER=1>
+      <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
+      <TR><TD>* / %</TD><TD> multiplication, division, mod respectively</TD></TR>
+      <TR><TD>+ -</TD><TD>addition, subtraction respectively, with
+      &apos;+&apos; overloaded to handle string concatenation, in which case at
+	  least one argument must be a string.</TD></TR>
+      <TR><TD> &lt;&lt; &gt;&gt; &gt;&gt;&gt;</TD><TD> left-shift,
+	  right-shift, or unsigned right-shift respectively.</TD></TR>
+      <TR><TD>&gt; &lt; &gt;= &lt;= instanceof</TD>
+	<TD>greater-than, less-than, greater-than- or-equal-to, equal-to
+	  or subclass-of respectively</TD></TR>
+      <TR><TD>==, !=</TD><TD>equals and not equal respectively</TD></TR>
+      <TR><TD>&amp;</TD><TD>bitwise AND</TD></TR>
+      <TR><TD>^</TD><TD>bitwise exclusive OR</TD></TR>
+      <TR><TD>|</TD><TD>bitwise OR</TD></TR>
+      <TR><TD>&amp;&amp;</TD><TD>logical AND</TD></TR>
+      <TR><TD>||</TD><TD>logical OR</TD></TR>
+    </TABLE>
+  <P>
+    There is one ternary operator: <STRONG>?</STRONG> with <STRONG>:</STRONG>. This is a conditional
+    construct as in Java and has a precedence below that of the binary
+    operators. For this ternary operator, the expression before the
+    question mark is always evaluated. If that value is &apos;true&apos;, the
+    expression after the question mark, and terminating just before the
+    colon, is the value, with the expression after the colon skipped.
+    If that value is &apos;false&apos;, the expression between the question mark
+    and the colon is skipped and the expression after the colon is the
+    value. This ternary operator can be nested without the use of
+    parentheses: which question mark is paired with which colon can be
+    unambiguously determined by incrementing a &apos;depth&apos; when a question
+    mark is seen and decrementing it when a colon is seen.
+  <P>
+    As with the ternary operator, the operators "&amp;&amp;" and "||"
+    skip expressions that do not have to be evaluated to produce the
+    result.  Because these operators are left associative,
+    <UL>
+      <LI> the expression x &amp;&amp; y will not evaluate y if the value
+	of x is &apos;false&apos;.
+      <LI> the expression x || y will not evaluate y if the value of x
+        is &apos;true&apos;.
+    </UL>
+  <P>
+    <H3><A NAME="statements">Statements</A></H3>
+  <P>
+    Statements are described by the following grammar:
+    <BLOCKQUOTE><PRE>
+statements: statement
+    | statements &apos;;&apos; statement
+    | statements &apos;###&apos; statement
+    | statements &apos;;&apos; &apos;###&apos; statement
+
+statement: <A HREF="expressions">expression</A>
+    | <A HREF="#vardefs">var-definition</A>
+    | <A HREF="functdefs">function-definition</A>
+    | <A HREF="assignment">assignment-statement</A>
+    | <A HREF="import">import-statement</A>
+    </PRE></BLOCKQUOTE>
+  <P>
+    The assignment statement can be used when scripting mode is set,
+    and the import-statement can be used when script-import mode is
+    set.  Each type of statement is described in a subsequent
+    section. If a series of statements ends with a semicolon, that
+    final semicolon is ignored (it is easy to type a final semicolon,
+    when alternating between Java, ECMAScript, and ESP).
+  <P>
+    The token &apos;###&apos; is allowed only in scripting mode and cannot
+    appear within an expression, object, or function definition. It
+    causes the preceding statements to be evaluated before parsing
+    continues. It is provided to handle cases in which variables are
+    defined via side effects: for example, the following script
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationLayer2DFactory,
+			  AnimationPath2DFactory]);
+
+var out = global.getWriter();
+
+var a2d = new Animation2D(scripting);
+
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    apf: "AnimationPath2DFactory"
+});
+out.println("list factories created");
+out.println(alf);
+    </PRE></CODE></BLOCKQUOTE>
+    will generate an error because, while the
+    <CODE>createFactories</CODE> method will define two
+    variables <CODE>alf</CODE> and <CODE>apf</CODE>, but those
+    variables are defined when the method is actually run.
+    {@link ExpressionParser} will notice that there is no previously
+    defined or declared  variable named <CODE>alf</CODE> (because
+    <CODE>createFactories</CODE> has not yet been called) and generate
+    an error.  The script
+    <BLOCKQUOTE><PRE>
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationLayer2DFactory,
+			  AnimationPath2DFactory]);
+
+var out = global.getWriter();
+
+var a2d = new Animation2D(scripting);
+
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    apf: "AnimationPath2DFactory"
+});
+###
+out.println("list factories created");
+out.println(alf);
+    </PRE></BLOCKQUOTE>
+    will function as desired because the &apos;###&apos; line causes the
+    previous statements to be evaluated, which will result in a
+    variable named &apos;alf&apos; being defined.  While not a requirement, as a
+    stylistic hint, the &apos;###&apos; token should be placed on its own line
+    (to improve readability). One of the use cases for ESP involves
+    configuring simulations (see {@link org.bzdev.devqsim.Simulation}
+    and its subclasses).  The run time for simulations can be lengthy,
+    so parsing a script to check for syntax errors is useful as errors
+    can be detected faster than if the previous statements were actually
+    run.  If one does not want to use the &apos;###&apos; syntax, an alternative
+    is to declare some variable in advance. For example,
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationLayer2DFactory,
+			  AnimationPath2DFactory]);
+
+var out = global.getWriter();
+
+var a2d = new Animation2D(scripting);
+
+var alf, apf;
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    apf: "AnimationPath2DFactory"
+});
+out.println("list factories created");
+out.println(alf);
+    </PRE></CODE></BLOCKQUOTE>
+    The disadvantage in using variable declarations in this example
+    is that the declarations and the createFactory call have to be
+    kept in sync. That is trivial when one or two factories are being
+    created, but awkward if there are a sizable number.
+
+    <H3><A NAME="expressions">Expressions</A></H3>
+  <P>
+    Expressions in general the same meaning as in Java or ECMAScript,
+    although both languages have more operators that ESP does.
+    There are a few exceptions:
+    <UL>
+      <LI> the notation "<STRONG>var</STRONG>
+	<STRONG>.</STRONG> <I>IDENTIFIER</I>" has the value true
+	when <I>IDENTIFIER</I> is the name of a variable that exists.
+	The value is false if the variable does not exist.
+      <LI> the keyword <STRONG>this</STRONG> is a reference to the
+	current object and is valid only for methods defined for an
+	object. <STRONG>this</STRONG> <STRONG>.</STRONG> <I>IDENTIFIER</I>
+	refers to an object&apos;s property with the property name given by the
+	identifier.
+      <LI>Method references have the same meaning as in Java, but are
+	represented in ESP by objects. As a result, they can be stored
+	in variables or returned as the value of a functions. They
+	can also be called directly, whether from ESP or Java,
+	by using their "invoke" method.
+	The arguments to the "invoke" method are the same that would
+	be used when the method is converted to lambda expression implementing
+	a functional interface. In searching for a method, the class of the
+	value the method returns and the classes of the arguments must be
+	classes that ESP recognized. These classes are configured by
+	ESP either via an ExpressionParser constructor, the
+	{@link ExpressionParser#addClasses(Class...)} method, or an
+	<A HREF="#import">import statement</A>.
+    </UL>
+  <P>
+    Expressions use the following syntax:
+    <BLOCKQUOTE><PRE>
+expression: term
+    | &apos;!&apos; expression
+    | &apos;throw&apos; expression
+    | expression &apos;+&apos; term
+    | expression &apos;-&apos; term
+    | expression &apos;&lt;&lt;&apos; term
+    | expression &apos;&gt;&gt;&apos; term
+    | expression &apos;&gt;&gt;&gt;&apos; term
+    | expression &apos;&lt;&apos; expression
+    | expression &apos;&gt;&apos; expression
+    | expression &apos;&gt;=&apos; expression
+    | expression &apos;&lt;=&apos; expression
+    | expression &apos;instanceof&apos; qualified-name
+    | expression &apos;==&apos; expression
+    | expression &apos;!=&apos; expression
+    | expression &apos;^&apos; expression
+    | expression &apos;|&apos; expression
+    | expression &apos;&amp;&apos; expression
+    | expression &apos;^&apos; expression
+    | expression &apos;||&apos; expression
+    | expression &apos;&amp;&amp;&apos; expression
+    | expression &apos;?&apos; expression &apos;:&apos; expression
+
+term: value
+    | term &apos;*&apos; value
+    | term &apos;/&apos; value
+    | term &apos;&amp;&apos; value
+    | term &apos;%&apos; value
+    | &apos;-&apos; term
+	
+<A NAME="value">value: number
+    | true
+    | false
+    | null
+    | void
+    | string
+    | variable
+    | var &apos;.&apos; identifier
+    | qualified-name
+    | qualified-name &apos;.&apos; &apos;class&apos;
+    | function-call
+    | lambda-expression
+    | lambda-expression &apos;(&apos; arguments &apos;)&apos;
+    | method-call
+    | constructor
+    | object
+    | array
+    | &apos;(&apos; expression &apos;)&apos;
+    | value &apos;[&apos; value &apos;]&apos;
+    | &apos;this&apos;
+    | &apos;this&apos; &apos;.&apos; identifier
+    | typed-null
+    | method-reference
+
+function-call: function-name &apos;(&apos; arguments &apos;)&apos;
+
+function-name: identifier
+    | qualified-name &apos;.&apos; identifier
+
+
+arguments: expression
+    | arguments &apos;,&apos; expression
+
+lambda-expression: &apos;function&apos; &apos;(&apos; parameters &apos;)&apos; &apos;{&apos; statements &apos;}&apos;
+
+parameters: identifier
+    | parameters &apos;,&apos; identifier
+
+method-call: value &apos;.&apos; method-name &apos;(&apos; arguments &apos;)&apos;
+
+method-name: identifier
+
+constructor: &apos;new&apos; qualified-name &apos;(&apos; arguments &apos;)&apos;
+
+object: [<A HREF="#objects">described below</A>]
+
+array: [<A HREF="#arrays">described below</A>]
+
+qualified-name:  identifier
+    | qualified-name &apos;.&apos; identifier
+
+method-reference:  qualified-name &apos;::&apos; identifier
+
+typed-null: qualified-name &apos;::&apos; &apos;null&apos;
+    </PRE></BLOCKQUOTE>
+
+    <H3><A NAME="vardefs">Variable Definitions</A></H3>
+  <P>
+    Variable definitions always start with the keyword
+    <STRONG>var</STRONG>, and assignments to variables that are not
+    already defined (or being defined) is not allowed.  Such
+    declarations can appear at the top level of a script or within
+    functions or lambda expressions.  The syntax is
+    <BLOCKQUOTE><PRE>
+var-definition : &apos;var&apos; identifier &apos;=&apos; expression
+    | &apos;var&apos; identifier <STRONG>?=</STRONG> expression
+    | &apos;var&apos; identifier <STRONG>??=</STRONG> expression
+    </PRE></BLOCKQUOTE>
+    A variable definition defines a variable whose name is given by
+    the identifier following &apos;var&apos;. The value of the
+    variable for the &apos;=&apos; case is the value of the
+    expression, and an exception will be thrown if the variable has
+    already been defined. For the <STRONG>?=</STRONG> case, the value of
+    the variable is the value of the expression when the variable does
+    not exist, and is the variable&apos;s existing value when the
+    variable already exists. For the <STRONG>??=</STRONG> case, the value
+    of the variable is the value of the expression when the variable
+    either does not exist or has a null value, and is the
+    variable&apos;s existing value otherwise.  The <STRONG>?=</STRONG> and
+    <STRONG>?=</STRONG> cases are provided so that variables can have
+    default values. For the <STRONG>?=</STRONG> case, if the variable
+    already exists, the expression will not be evaluated.  For the
+    <STRONG>?=</STRONG> case, if the variable already exists and has a
+    non-null value, the expression will not be evaluated.  In either
+    case, the value of the statement is the value assigned to the
+    variable, whether a new value or an existing value. While not
+    necessary, the <STRONG>??=</STRONG> operator was introduced to handle
+    a common programming convention: setting a value to null to request
+    a default. It makes some scripts easier to read.
+    <P>
+    When lambda expressions are nested whether within another lambda
+    expression or within a top-level function, the previously defined
+    variables in all enclosing lambda expressions and any top-level
+    function, are visible.  For example
+    <BLOCKQUOTE><CODE><PRE>
+var a = 10;
+function f(x) {
+    var b = x + a;
+    b + function(y) {y+b+a}(x)
+}
+    </PRE></CODE></BLOCKQUOTE>
+    will return the value 2x+20 as both a and b are visible in the
+    inner lambda expression.  On the other hand
+    <BLOCKQUOTE><CODE><PRE>
+var a = 10;
+function f(x) {
+    b + function(y) {y+b}(x)
+    var b = x + a;
+}
+    </PRE></CODE></BLOCKQUOTE>
+    will result in an exception being thrown because b is not visible
+    in the lambda expression <STRONG>function(y){y+b}</STRONG>. By
+    contrast
+    <BLOCKQUOTE><CODE><PRE>
+var a = 10;
+function f(x) {
+    var b = x + a;
+    b + function(y) {y+a}(x)
+}
+    </PRE></CODE></BLOCKQUOTE>
+    will work as expected.
+  <P>
+    When a var statement occurs inside a function, any
+    variable with the same name is shadowed (i.e., not directly
+    accessible). For example
+    <BLOCKQUOTE><CODE><PRE>
+var c = 10;
+function g(x) {
+    var c = 30;
+    x+c
+}
+    </PRE></CODE></BLOCKQUOTE>
+    will return the value x+30 instead of x + 10.
+
+    <H3><A NAME= "functdefs">Function Definitions</A></H3>
+  <P>
+    Function definitions uses a syntax based on ECMAScript: the
+    keyword <STRONG>function</STRONG>, followed a function name,
+    followed by a parameter list delimited by parentheses, and
+    finally a sequence of statements delimited by curly braces.
+    There is not a <STRONG>return</STRONG> statement. Instead, the
+    last file is the value of the final statement.
+  <P>
+    The syntax for a function definition is as follows:
+    <BLOCKQUOTE><PRE>
+function-definition: &apos;function&apos; identifier &apos;(&apos; parameter-list &apos;)&apos;
+                     &apos;{&apos; function-statements &apos;}&apos;
+    | &apos;synchronized&apos; &apos;function&apos; identifier &apos;(&apos; parameter-list &apos;)&apos;
+                     &apos;{&apos; function-statements &apos;}&apos;
+
+function-statements: function-statement
+    | function-statements &apos;;&apos; function-statement
+
+function-statement: expression
+    | var-definition
+    | assignment-statement
+    </PRE></BLOCKQUOTE>
+  <P>
+    When the keyword <STRONG> synchronized</STRONG> is present, the
+    function call will be synchronized on the expression parser
+    itself. In a multi-threaded application, this will allow code such
+    as
+    <BLOCKQUOTE><CODE><PRE>
+var count = 0;
+synchronized function incr() {
+    count = count + 1;
+}
+    </PRE></CODE></BLOCKQUOTE>
+    to work correctly: the variable <CODE>count</CODE> will record
+    the number of times <CODE>incr()</CODE> was called. If
+    <CODE>incr()</CODE> had not been synchronized, two simultaneous
+    calls to <CODE>incr()</CODE> could read the same value of count,
+    and set count to one more than that value.
+
+    <H3><A NAME="assignment">Assignment Statement</A></H3>
+  <P>
+    Assign statements allow the values of previously defined
+    variables (that is, ones  defined used a
+    <A HREF="#vardefs"><STRONG>var</STRONG> statement</A>) to
+    be modified.  These statements are valid only when scripting mode
+    has been set.  In all cases, the assignment operator is "=". The
+    value to the left of the equal sign for a simple assignment is
+    a variable name or the keyword <STRONG>this</STRONG> followed by
+    a period and an identifier that names a field in an object, with
+    the restriction that this type of assignment can be used only
+    within a method defined for some object.
+    If a <A HREF="#value">value</A> is followed by an expression delimited
+    by square brackets, the value must be an ESP array or object. When it
+    is an array, the expression must evaluate to an integer, and when it
+    is an object, the expression must evaluate to a string.
+  <P>
+    The syntax for an assignment statement is as follows:
+    <BLOCKQUOTE><PRE>
+assignment-statement: variable &apos;=&apos; expression
+    | &apos;this&apos; &apos;.&apos; identifier &apos;=&apos; expression
+   | value &apos;[&apos; expression &apos;]&apos; &apos;=&apos; expression
+    </PRE></BLOCKQUOTE>
+
+    <H3><A NAME="import">Import Statement</A></H3>
+  <P>
+    Import statements are recognized when import mode and script import
+    mode have been set. The syntax is similar to that used by the methods
+    {@link org.bzdev.scripting.ExtendedScriptingContext#importClass(String,String)}
+    and
+    {@link org.bzdev.scripting.ExtendedScriptingContext#importClasses(String,Object)},
+    but where, as a convenience, the package names and class names can be
+    qualified names instead of strings. The variants with an array are
+    provided for cases where multiple classes are imported from the same
+    package. If the methods that import classes that are defined in
+    {@link org.bzdev.scripting.ExtendedScriptingContext} are used, a line
+    containing <STRONG>###</STRONG> should be inserted at the top level of the script
+    before the classes defined are used: in a few cases, the ESP parser will
+    check a type during the lexical-analysis phase.  This is not required when
+    the <STRONG>import</STRONG> statements described below are used.
+  <P>
+    The syntax is as follows:
+    <BLOCKQUOTE><PRE>
+import-statement: &apos;import&apos; &apos;(&apos; package-name &apos;,&apos; class-name &apos;)&apos;
+    | &apos;import&apos; &apos;(&apos; package-name &apos;,&apos; &apos;[&apos; class-names &apos;]&apos; &apos;)&apos;
+    | &apos;import&apos; &apos;(&apos; class-name &apos;)&apos;
+    | &apos;import &apos;(&apos; &apos;[&apos; class-names &apos;]&apos; &apos;)&apos;
+
+package-name: qualified-name
+    | &apos;"&apos; &apos;"&apos;
+    | &apos;"&apos; qualified-name &apos;"&apos;
+
+class-names:
+    | class-name
+    | class-names &apos;,&apos; class-names
+
+class-name: qualified-name
+    | &apos;"&apos; qualified-name &apos;"&apos;
+    </PRE></BLOCKQUOTE>
+  <P>
+    When there are multiple import statements in a row (that is,
+    without any intervening statement), all are imported at once - the
+    classes will be added to lists of allowed values and allowed arguments,
+    and those lists determine which methods are visible.  Public,
+    static methods will be treated as functions in the ESP scripting
+    language. Also, method arguments and return values are added to the
+    lists of allowed values and allowed arguments.
+  <P>
+    As a general rule, a class, or a superclass declaring a method
+    must be imported before that method is used. In a few cases, such
+    an import is done implicitly. For example, when the following script
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.anim2d, [Animation2D,
+                          AnimationLayer2DFactory,
+                          AnimationPath2DFactory]);
+var out = global.getWriter();
+var a2d = new Animation2D(scripting);
+var alf, apf;
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    apf: "AnimationPath2DFactory"
+});
+    </PRE></CODE></BLOCKQUOTE>
+    is passed to <CODE>scrunner</CODE>, the call to
+    <STRONG>createFactories</STRONG> will create two new variables
+    name <STRONG>alf</STRONG> and <STRONG>apf</STRONG> by processing
+    the object
+    <BLOCKQUOTE><CODE><PRE>
+{
+  alf: "AnimationLayer2DFactory",
+  apf: "AnimationPath2DFactory"
+}
+    </PRE></CODE></BLOCKQUOTE>
+    with the help of a private script. This private script contains
+    the statement
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
+    </PRE></CODE></BLOCKQUOTE>
+    which allows methods defined by
+    {@link org.bzdev.obnaming.ObjectNamerOps} to be used, including
+    those that return an instance of
+    {@link org.bzdev.obnaming.NamedObjectFactory}. If the class
+    {@link org.bzdev.obnaming.NamedObjectFactory} is not included, a
+    method that is needed will not be accessible. Other classes automatically
+    imported by <CODE>scrunner</CODE> are
+    {@link org.bzdev.io.FileAccessor} and
+    {@link org.bzdev.io.DirectoryAccessor} as objects with these classes can
+    be created via the command line an added to scripts.
+  <P>
+    Another constraint involves threading.  When import statements are
+    processed, multiple threads cannot be processing scripts. This
+    constraint is imposed for performance reasons: internally
+    {@link ExpressionParser} maintains tables used to look up Java methods,
+    and those tables are not thread safe when the tables are being modified.
+    The tables are modified, however, only while import statements and
+    methods such as {@link ExpressionParser#addClasses(Class...)} are
+    being executed.  This is not a significant limitation in practice:
+    typically a top-level script will set everything up, with import
+    statements occurring first.
+
+    <H3><A NAME="objects">Objects</A></H3>
+  <P>
+    ESP objects are basically dictionaries that map properties to values,
+    and that provide methods to access and modify the values associated
+    with a property. ESP objects also provide methods, both predefined and
+    user defined. User-defined methods are essentially ESP functions but
+    with a hidden argument named <STRONG>this</STRONG>. These methods are
+    defined by providing an identifier, a parentheses delimited parameter
+    list, and  a series of statements delimited by curly braces.
+    Properties can be defined by providing either an identifier or a string,
+    followed by a colon that in turn is followed by a value.
+  <P>
+    The syntax is as follows:
+    <BLOCKQUOTE><PRE>
+object: &apos;[&apos; object-elements &apos;]&apos;
+
+object-elements:
+    | object-elements &apos;,&apos; object-element
+
+object-element: identifier &apos;:&apos; value
+    | string &apos;:&apos; value
+    | identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}
+    | &apos;synchronized&apos; identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}
+
+    </PRE></BLOCKQUOTE>
+    As with functions, the use of the keyword <STRONG>synchronized</STRONG>
+    will cause the method call to be synchronized on the expression parser.
+  <P>
+    ESP Objects have several predefined methods:
+    <UL>
+      <LI><STRONG>hasProperty(</STRONG><I>name</I><STRONG>)</STRONG>. This
+	method returns true if this object has the property <I>name</I>.
+      <LI><STRONG>get(</STRONG><I>name</I><STRONG>)</STRONG>. This method
+	returns the value for this object&apos;s property <I>name</I> or
+	<STRONG>null</STRONG> if there is no property with that name.
+      <LI><STRONG>propertyNames()</STRONG>. This method returns a
+	{@link java.util.Set} of property names, where each name is
+	represented by a string.
+      <LI><STRONG>properties()</STRONG>. This method returns a
+	{@link java.util.Map.Entry}, each element of which
+	is a pair whose key is a property name and whose value is the
+	corresponding property value.
+      <LI><STRONG>put(</STRONG><I>name</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+	This method sets the value of a property whose name is <I>name</I>
+	to <I>value</I> and returns the previous value; null if there is
+	none.
+    </UL>
+    In an ESP script, these predefined methods will be used instead of
+    any user-declared methods with the same name and the same number
+    of arguments. Those user-declared methods, however, can be executed
+    by first dereferencing them and then calling the function that was
+    returned. For example,
+    <BLOCKQUOTE><CODE><PRE>
+var obj = {
+    propertyNames() {"property names"}
+};
+obj["propertyNames"]();
+    </PRE></CODE></BLOCKQUOTE>
+    will return the string "property names", whereas
+    <BLOCKQUOTE><CODE><PRE>
+var obj = {
+    propertyNames() {"property names"}
+};
+obj.propertyNames();
+    </PRE></CODE></BLOCKQUOTE>
+    will return a set of property names.
+  <P>
+    On the other hand, if the ESP object (obj) is passed to a Java
+    method as an argument whose type is an interface declared by the
+    Java code
+    <BLOCKQUOTE><CODE><PRE>
+public interface Foo {
+    String propertyNames();
+}
+    </PRE></CODE></BLOCKQUOTE>
+    then the user-defined method will be used to implement the Java
+    interface.
+  <P>
+    Because ESP methods are implemented as ESP functions with a hidden
+    argument, the following code
+    <BLOCKQUOTE><CODE><PRE>
+var obj = {
+    counter: 0,
+    increment() {this.counter = asInt(this.counter + 1)}
+}
+var f = obj["increment"];
+    </PRE></CODE></BLOCKQUOTE>
+    will define an ESP function named <STRONG>f</STRONG> and calling
+    <STRONG>f()</STRONG> repeatedly will generate a series of increasing
+    integer values (the class {@link org.bzdev.lang.MathOps} has to be
+    imported for the function <STRONG>asInt</STRONG> to be accessible.)
+
+    <H3><A NAME="arrays">Arrays</A></H3>
+  <P>
+    ESP arrays are similar to ECMAScript arrays and Java objects whose
+    type is {@link java.util.ArrayList}. The syntax is essentially the
+    same as that used by ECMAScript and some other scripting languages:
+    <BLOCKQUOTE><PRE>
+array: &apos;[&apos; array-elements &apos;]&apos;
+
+array-elements:
+    | value
+    | array-elements &apos;,&apos; value
+    </PRE></BLOCKQUOTE>
+    As objects, arrays have the following methods:
+    <UL>
+      <LI><STRONG>get(</STRONG><I>index</I><STRONG>)</STRONG>. This
+	method returns the array element whose index is <I>index</I>.
+      <LI><STRONG>set(</STRONG><I>index</I><STRONG>,</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method sets the array element at <I>index</I> to <I>object</I>
+	and returns the previous value.
+      <LI><STRONG>add(</STRONG><I>object</I><STRONG>)</STRONG>. Add a
+	new element to the end of the array and return <STRONG>true</STRONG>.
+    <LI><STRONG>size()</STRONG>. return the size of an array.
+    <LI><STRONG>stream()</STRONG>. Get a sequential
+      {@link java.util.stream.Stream stream} with this array as its source.
+    <LI><STRONG>parallelStream()</STRONG>. Get a parallel
+      {@link java.util.stream.Stream stream} with this array as its source.
+    <LI><STRONG>forEach(</STRONG><I>action</I><STRONG>)</STRONG>. Apply
+      an action to reach element of the array. The action can be an ESP
+      function that takes a single argument, or a method reference that
+      implements a function with a single argument.
+    </UL>
+    The same methods, except the <STRONG>add</STRONG> method, can be used
+    with Java arrays as well as ESP arrays.
+  <P>
+    In addition there are several methods that can convert an ESP
+    array to a Java array and vice versa.  For ESP arrays, these
+    methods are the following:
+    <UL>
+      <LI><STRONG>toArray()</STRONG>. Convert an ESP array to a Java array
+	whose component type is {@link java.lang.Object}.
+      <LI><STRONG>toArray(</STRONG><I>class</I><STRONG>)</STRONG>. Convert
+	an ESP array to an array whose component type is <I>class</I>
+	(the ESP syntax for the argument is the class name followed by
+	".class"). Besides non-primitive classes, the primitive classes
+	<STRONG>double</STRONG>, <STRONG>long</STRONG>,
+	<STRONG>int</STRONG>, and <STRONG>boolean</STRONG> are recognized.
+      <LI><STRONG>toMatrix()</STRONG>. Convert a nested ESP array
+	to an n by m Java array whose component type is
+	{@link java.lang.Object}.
+      <LI><STRONG>toMatrix(</STRONG><I>class</I><STRONG>)</STRONG>.
+	Convert a nested ESP array to an n by m Java array whose
+	component type the type specified by <I>class</I> (the ESP
+	syntax for the argument is the class name followed by
+	".class"). Besides non-primitive classes, the primitive classes
+	<STRONG>double</STRONG>, <STRONG>long</STRONG>,
+	<STRONG>int</STRONG>, and <STRONG>boolean</STRONG> are recognized.
+    </UL>
+    and for Java arrays, these methods are the following:
+    <UL>
+      <LI><STRONG>toESPArray</STRONG>. Convert a Java array to an
+	ESP array.
+      <LI><STRONG>toESPMatrix</STRONG>. Convert an n by m Java array
+	to an ESP array. The Java array must be declared as
+	<I>TYPE</I><STRONG>[][]</STRONG>.
+    </UL>
+    Converting a Java array to an ESP array can be useful if the
+    size should be changed.  Converting an ESP array to a Java array
+    allows various classes and methods to be used that would otherwise
+    not be accessible. The <A HREF="#solve">System of Linear Equations</A>
+    example shows one case.
+
+    <H3><A NAME="global">The global object</A></H3>
+  <P>
+    ECMAScript assumes the existence of a global object, but the name
+    of this object was not specified initially, resulting in
+    implementations using "self", "window", or "global" as typical
+    choices.  Finally an the name globalThis was picked, with (as of
+    2021) some variation in implementation status. ESP uses the name
+    "global", but the ESP global object, unlike the corresponding
+    object in ECMAScript, provides methods but not properties.
+    Furthermore, ESP treats "global" as a reserved word: a statement
+    such as "global = 10.0" will fail. This name was chosen because,
+    given the history, it is not likely to collide with the names of
+    variables that a user would typically choose, simplifying the porting
+    of simple scripts written in ECMAScript to ESP.
+  <P>
+    While <STRONG>global</STRONG> cannot be used as an explicitly
+    declared identifier, whether it is present in any particular
+    instance of {@link ExpressionParser} depends on its configuration:
+    the method {@link ExpressionParser#setGlobalMode()} must have been
+    called before a script is run to make the variable
+    <STRONG>global</STRONG> accessible.
+  <P>
+    The methods associated with <STRONG>global</STRONG> are
+    <UL>
+      <LI> <STRONG>ESPObjectType()</STRONG>. This method returns the
+	Java class for expression-parser objects.
+      <LI> <STRONG>ESPArrayType()</STRONG>. This method returns the
+	Java class for expression-parser arrays.
+      <LI> <STRONG>exists(</STRONG><I>objectName</I><STRONG>)</STRONG>.
+	This method returns true if the global namespace contains an
+	object with the name given by this method&apos;s argument; false
+	otherwise.
+      <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>)</STRONG>.
+	This method returns the object with the name specified by this
+	method&apos;s argument and stored in the global namespace;
+	null if there is no such object
+      <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>)</STRONG>.
+	This method returns a property value for the object whose
+	variable name is given by by this method&apos;s first argument and
+	whose property name is given by this method&apos;s second argument.
+      <LI> <STRONG>isArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser array or a Java array; false otherwise.
+      <LI> <STRONG>isESPArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser array; false otherwise.
+      <LI> <STRONG>isJavaArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is a Java array;
+	false otherwise.
+      <LI> <STRONG>isObject(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser object; false otherwise.
+      <LI> <STRONG>typeof(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns the Java class of the object provided by its
+	argument; null if the argument is null
+      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+	This method sets the global value corresponding to this
+	method&apos;s first argument to the value specified by this
+	method&apos;s second argument, and returns either the previous
+	value or null if there is no previous value.
+      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+	This method sets the property specified by this method&apos;s
+	second argument to the value specified by this method&apos;s third
+	argument for the object specified by this method&apos;s first argument
+      <LI> <STRONG>size(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns the size of the object provided as this
+	method&apos;s first argument, provided that the object is an
+	expression-parser object, an expression-parser array, or a
+	Java array. An exception will be thrown otherwise.
+      <LI> <STRONG>getReader()</Strong>. This method returns a reader; null
+	if one is not configured. The reader is configured by calling
+	{@link ExpressionParser#setReader(java.io.Reader)} or
+	{@link ExpressionParser#setReaderTL(java.io.Reader)}.
+      <LI> <STRONG>getWriter()</Strong>. This method returns a writer; null
+	if one is not configured. The writer is configured by calling
+	{@link ExpressionParser#setWriter(java.io.PrintWriter)} or
+	{@link ExpressionParser#setWriterTL(java.io.PrintWriter)}.
+      <LI> <STRONG>getErrorWriter()</Strong>. This method returns a
+	writer for error output; null if one is not configured. The
+	writer is configured by calling
+	{@link ExpressionParser#setErrorWriter(java.io.PrintWriter)} or
+	{@link ExpressionParser#setErrorWriterTL(java.io.PrintWriter)}.
+      <LI> <STRONG>globals()</STRONG>. This method returns an ESP array
+	containing the names (or keys) of objects stored as global bindings.
+	The global bindings are represented by a map that can configured by
+	calling	{@link ExpressionParser#setGlobalBindings(java.util.Map)},
+	which supports the API provided in the package {@link javax.script}.
+      <LI><STRONG>getGlobal(</STRONG><I>key</I><STRONG>)</STRONG>.
+	This method returns an object stored in the global bindings with a
+	name given by <I>key</I>, <STRONG>null</STRONG> if there is no entry
+	in the global table.
+      <LI><STRONG>getGlobal(</STRONG><I>key</I><STRONG>,</STRONG><I>defaultObject</I><STRONG>)</STRONG>.
+	This method returns an object stored in the global bindings with a
+	name given by <I>key</I>, <I>defaultObject</I> if there is no entry
+	in the global table.
+      <LI><STRONG>importClasses(</STRONG><I>pkg</I><STRONG>,</STRONG><I>spec</I><STRONG>)</STRONG>.
+	This method imports classes from package specified by the
+	argument <I>pkg</I>, which must be a string containing a
+	fully-qualified package name. The classes from this package
+	that are imported are the ones specified by the second
+	argument <I>spec</I>, which is either a string containing the
+	qualified class name of a class within the package, or an ESP
+	array whose elements are strings containing the qualified
+	class names of classes within the package. Multiple calls
+	to this method may occur in a row, and must be followed by
+	a call to <STRONG>finishImport()</STRONG>.
+      <LI><STRONG>finishImport()</STRONG>. A sequence of classes
+	to be imported has ended.
+    </UL>
+
+    <H3><A NAME="tracing">Directives for Tracing</A></H3>
+  <P>
+    ESP supports 4 directives that configure tracing. These can appear
+    anywhere that a token can appear, but are ignored if inside comments
+    or strings. The directives are
+    <UL>
+      <LI><STRONG>#+T</STRONG> &mdash; this directive turns token-tracing
+	on. A description of each token will appear on standard error
+	when token tracing is enabled.
+      <LI><STRONG>#-T</STRONG>  &mdash; this directive turns token-tracing
+	off.
+      <LI><STRONG>#+S</STRONG> &mdash; this directive turns stack-tracing
+	on. Tokens and values pushed and popped from the operator stack
+	and value stack respectively are printed to standard error.
+      <LI><STRONG>#-S</STRONG> &mdash; this directive turns stack-tracing
+	off. In the typical case, ESP will push a token onto the operator
+	stack but not evaluate it until the next token going onto the
+	operator stack is available. This delay allows operator precedence
+	to be handled.  As a result, one should be careful about where
+	stack tracing is disabled.  A useful trick is to place a
+	<STRONG>###</STRONG> token before a <STRONG>#-S</STRONG> directive
+	in order to force all previously pushed operators to be processed.
+	Note that <STRONG>###</STRONG> token can appear only at the
+	top level of a script.
+    </UL>
+    Tracing is sometimes useful for debugging as it provides an easy way to
+    determining which operations are being performed and what their
+    arguments are. While global flag could be used instead, the output
+    one gets can be quite long, and often  the user is interested only in
+    the behavior of a few statements.
+
+    <H2><A NAME="iteration">Iteration</A></H2>
+  <P>
+    ESP does not provide any explicit iteration constructs, other than
+    recursion. Java, however, provides the packages {@link java.util.stream}
+    and {@link java.util.function}, and ESP allows lambda expressions or
+    functions to be passed as an argument to Java methods when the type
+    of the argument is expected to be a functional interface.
+  <P>
+    ESP is preconfigured so it can use classes and interfaces from the
+    packages {@link java.util.stream} and {@link java.util.function}.
+    The classes and interfaces from the {@link java.util.stream} package
+    are the following:
+    <UL>
+      <LI> {@link java.util.stream.Collector}.
+      <LI> {@link java.util.stream.Collectors}.
+      <LI> {@link java.util.stream.DoubleStream}.
+      <LI> {@link java.util.stream.IntStream}.
+      <LI> {@link java.util.stream.LongStream}.
+      <LI> {@link java.util.stream.Stream}.
+    </UL>
+    The classes and interfaces from the {@link java.util.function} package
+    are {@link java.util.function.BiConsumer},
+    {@link java.util.function.BinaryOperator},
+    {@link java.util.function.Consumer},
+    {@link java.util.function.DoubleBinaryOperator},
+    {@link java.util.function.DoubleConsumer},
+    {@link java.util.function.DoublePredicate},
+    {@link java.util.function.DoubleSupplier},
+    {@link java.util.function.DoubleUnaryOperator},
+    {@link java.util.function.Function},
+    {@link java.util.function.IntBinaryOperator},
+    {@link java.util.function.IntConsumer},
+    {@link java.util.function.IntPredicate},
+    {@link java.util.function.IntSupplier},
+    {@link java.util.function.IntUnaryOperator},
+    {@link java.util.function.LongBinaryOperator},
+    {@link java.util.function.LongConsumer},
+    {@link java.util.function.LongPredicate},
+    {@link java.util.function.LongSupplier},
+    {@link java.util.function.LongUnaryOperator},
+    {@link java.util.function.Predicate},
+    {@link java.util.function.Supplier},
+    {@link java.util.function.ToDoubleBiFunction},
+    {@link java.util.function.ToDoubleFunction},
+    {@link java.util.function.ToIntBiFunction},
+    {@link java.util.function.ToIntFunction},
+    {@link java.util.function.ToLongBiFunction},
+    {@link java.util.function.ToLongFunction},
+    and {@link java.util.function.UnaryOperator}.
+  <P>
+    As an example, the following script will add the numbers
+    between 1 and 1000000.
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.lang, MathOps);
+LongStream.rangeClosed(1, 1000000)
+          .reduce(0, function(x,y) {asLong(x + y)})
+    </PRE></CODE></BLOCKQUOTE>
+    The function asLong (which is defined in {@link org.bzdev.lang.MathOps},
+    is needed because ESP is typeless returning a long is necessary because
+    of the functional interface that the "reduce" method uses, and ESP
+    arithmetical operations tend to produce double-precision numbers.
+  <P>
+    As a second example,
+    <BLOCKQUOTE><CODE><PRE>
+import (java.lang, Math);
+var list = [10, -20, 30, 40, -50, 60];
+list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
+    </PRE></CODE></BLOCKQUOTE>
+will produce a sum of the absolute values of the number
+in <CODE>list</CODE>.
+
+    <H2><A NAME="threading">Threading</A></H2>
+  <P>
+    The <A HREF="bindings">bindings</A> {@link ExpressionParser} uses
+    by default are thread-safe&mdash;they use synchronized
+    maps&mdash;but this is not sufficient to ensure that a multi
+    threaded applications work correctly.  If exclusive access is
+    needed while changing multiple global variables or while reading
+    one and then replacing it, use synchronized functions or methods
+    as described above.
+  <P>
+    When using {@link org.bzdev.devqsim.Simulation} or any of its
+    subclasses (for example, @link org.bzdev.anim2d.Animation2D or
+    {@link org.bzdev.drama.DramaSimulation}), synchronization is not
+    needed: while multithreaded for convenience, the simulation
+    classes allow a single simulation thread to run at a time. Since
+    these threads can pause, using synchronized functions or methods
+    creates a risk of a deadlock.
+  <P>
+    If a Java class is not thread safe, one should consider accessing
+    it only within a synchronized function or method if the application
+    is multithreaded. Again, this is not an issue for subclasses
+    of {@link org.bzdev.devqsim.Simulation}.
+
+    <H2><A NAME="bindings">Bindings</A></H2>
+  <P>
+    Bindings are provided primarily to support the Java Scripting API.
+    For ExpressionParser, a binding is simply a map whose keys are
+    instances of {@link java.lang.String} and whose values are
+    instances of {@link java.lang.Object}. For multithreaded applications,
+    these maps must be synchronized maps.
+  <P>
+    The method {@link ExpressionParser#parse(String,Map)} allows a
+    script to be evaluated with a temporary set of bindings. Multiple
+    threads may call this method concurrently: thread local variables
+    are used so that bindings used in different threads do not
+    interfere with each other.  By contrast, bindings set with the
+    method {@link ExpressionParser#setBindings(Map)} will apply to
+    all scripts being run.
+  <P>
+    When a function or method is executed, the bindings it uses are
+    the bindings in effect when the function or method was defined.
+    As an example, consider the variable and function
+    <BLOCKQUOTE><CODE><PRE>
+var count = 0;
+synchronized function incr() {
+    count = count + 1;
+}
+    </PRE></CODE></BLOCKQUOTE>
+    defined above, and suppose this code was run when the bindings
+    were <CODE>bindings1</CODE>.  If the function <CODE>incr</CODE> is
+    copied or moved to a new set of bindings, <CODE>bindings2</CODE>,
+    then calling <CODE>incr()</CODE> when the current bindings is set
+    to <CODE>bindings2</CODE> will modify the value of <CODE>count</CODE>
+    in <CODE>bindings1</CODE>.
+
+    <H2><A NAME="api">The ESP API</A></H2>
+
+    The data structures that ESP uses to represent functions, objects,
+    and arrays can be used directly in Java programs.
+
+    <H3>The ESPArray class </H3>
+  <P>
+    The {@link org.bzdev.util.ExpressionParser.ESPArray} class is a
+    subclass of {@link org.bzdev.util.JSArray} and provides no
+    additional public methods. An ESPArray and a JSArray are, however,
+    treated differently internally.
+
+    <H3>The ESPFunction class </H3>
+  <P>
+    The class {@link org.bzdev.util.ExpressionParser.ESPFunction} provides
+    provides a method
+    {@link org.bzdev.util.ExpressionParser.ESPFunction#invoke(Object...)}
+    that will call the corresponding ESP function.  For example, the
+    following script defines a function that computes the square
+    root of the sum of the square of two values:
+    <BLOCKQUOTE><CODE><PRE>
+function foo(x, y) {Math.sqrt(x*x + y*y)}
+    </PRE></CODE></BLOCKQUOTE>
+    If <CODE>foo</CODE> is a java variable  containing
+    <CODE>foo</CODE>&apos;s ESPFunction, then
+    <BLOCKQUOTE><CODE><PRE>
+	  foo.invoke(30.0, 40.0)
+    </PRE></CODE></BLOCKQUOTE>
+    will return the value 5.0.
+  <P>
+    This class also provide method
+    {@link org.bzdev.util.ExpressionParser.ESPFunction#convert(Class)}
+    that will convert this function to an implementation of a functional
+    interface.
+
+    <H3>The ESPMethodReference Interface</H3>
+  <P>
+    ESP method references are represented by implementations of the
+    interface {@link ExpressionParser.ESPMethodReference}.  This
+    interface provides two methods:
+    <UL>
+      <LI> {@link ExpressionParser.ESPMethodReference#invoke(Object...)}.
+	This method executes the method or constructor that a method
+	reference implements.
+      <LI> {@link ExpressionParser.ESPMethodReference#convert(Class)}.
+	This method converts a functional interface into an implementation
+	of a functional interface whose type is the class provided as an
+	argument.
+    </UL>
+    Either of these methods can be called in either Java or ESP code. In
+    all or nearly all cases, the use of the "convert" method is handled
+    automatically by ESP.
+
+    <H3>The ESPObject class</H3>
+  <P>
+    The class {@link org.bzdev.util.ExpressionParser.ESPObject} is a
+    subclass of {@link org.bzdev.util.JSObject}.
+    {@link org.bzdev.util.JSObject} is similar to
+    {@linkjava.util.Map}, with <STRONG>put</STRONG>, <STRONG>get</STRONG>, and
+    <STRONG>remove</STRONG> methods to insert retrieve, or remove entries.
+    The method {@link org.bzdev.util.JSObject#toKeyMap()} is provided so
+    that template processing can be used to print a representation of
+    this object.  There is one method specific to ESP:
+    {@link org.bzdev.util.ExpressionParser.ESPObject#convert(Class)}.
+    This method converts the object into an implementation of an
+    interface defining a series of methods.
+
+    <H2><A NAME="helpers">Helper classes</A></H2>
+  <P>
+    There are a few classes in the BZDev class library that are
+    sometimes needed when writing ESP scripts and that are not
+    obviously related to applications.
+    <UL>
+      <LI> {@link org.bzdev.lang.MathOps} has methods that will
+	 convert numbers to numbers of a particular type.
+	For example,
+	<BLOCKQUOTE><PRE><CODE>
+import (org.bzdev.lang.MathOps);
+var start = 10.0;
+a2d.scheduleFrames(asLong(start), maxFrames);
+	</CODE></PRE></BLOCKQUOTE>
+      <LI> {@link org.bzdev.obnaming.misc.BasicStrokeBuilder} can be
+	used to create an instance of {@link java.awt.BasicStroke}.
+	The constructors for that class use floats as arguments, and
+	ESP does not support floats, only doubles.
+	For example,
+	<BLOCKQUOTE><PRE><CODE>
+import (java.awt.BasicStroke);
+import (org.bzdev.obnaming.misc.BasicStrokeBuilder);
+var stroke = (new BasicStrokeBuilder())
+        .setWidth(2.0)
+	.createStroke();
+	</CODE></PRE></BLOCKQUOTE>
+      <LI> {@link org.bzdev.graphs.Colors#getColorBysRGB(double,double,double)}
+	and
+	{@link org.bzdev.graphs.Colors#getColorBysRGB(double,double,double,double)}
+	can be used to represent sRBG colors, by converting double
+	values to the corresponding float values used by {@link
+	java.awt.Color} constructors.
+    </UL>
+
+    <H2><A NAME="examples">Examples</A></H2>
+  <P>
+    The following examples illustrate how to use ESP.
+
+    <H3>Iteration Example</H3>
+  <P>
+    Iteration in ESP, as mentioned above, is based the Java package
+    {@link java.util.stream}. The following example uses two
+    package from the BZDev class library: {@link org.bzdev.math.rv}
+    for random variables and {@link org.bzdev.math.stats} for a
+    class that computes the mean and standard deviation of a sequence of
+    numbers.  The implementation is straightforward:
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.math.stats, BasicStats.Sample);
+import(org.bzdev.math.rv, GaussianRV);
+
+var out = global.getWriter();
+var rv = new GaussianRV(10.0, 1.0);
+var stats = new BasicStats.Sample();
+rv.stream(1000000).forEach(function (x) {stats.add(x)});
+out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSdev());
+    </PRE></CODE></BLOCKQUOTE>
+    The first step is to import two classes:
+    {@link org.bzdev.math.stats.BasicStats.Sample}, which computes
+    the mean and standard deviation for a representative sample of a data
+    set (in this case, an infinite sequence of random value), and
+    {@link org.bzdev.math.rv.GaussianRV}, which provides an infinite
+    sequence of random numbers with a Gaussian distribution. Then a
+    Gaussian-distributed random variable with a mean value of 10.0 and
+    a standard deviation of 1.0 is created, and an object named
+    <CODE>stats</CODE> that computes means and standard deviations.
+    The script uses a stream with one million entries to compute the
+    statistics, and these values are printed at the end.
+
+    <H3>Typed-Null example</H3>
+  <P>
+    Suppose there is a Java class defined as follows
+    <BLOCKQUOTE><CODE><PRE>
+public class NullTest {
+    int value;
+    public NullTest(Number n) {value = 10;}
+    public NullTest(String s) {value = 20;}
+    public int getValue() {return value;}
+
+    public void set(Number n) {value = 10;}
+    public void set (String s) {value = 20;}
+
+    public static Number getNullNumber() {return null;}
+    public static String getNullString() {return null;}
+}
+    </PRE></CODE></BLOCKQUOTE>
+    The ESP statement
+    <BLOCKQUOTE><CODE><PRE>
+var nt = new NullTest(null);
+    </PRE></CODE></BLOCKQUOTE>
+    is ambiguous as there are two constructors that could be used.  A
+    similar issue exists when the <CODE>set</CODE> method is used.
+    With a null argument, each of the following will create a NullTest
+    object with a value of 10 or set an existing NullTest object's value
+    to 10:
+    <BLOCKQUOTE><CODE><PRE>
+var nt = NullTest(Number::null);
+nt.set(Number::null);
+nt.set(NullTest.getNullNumber());
+    </PRE></CODE></BLOCKQUOTE>
+    Similarly, with a null argument, each of the following will create
+    a NullTest object with a value of 20 or set an existing NullTest
+    object's value to 20:
+    <BLOCKQUOTE><CODE><PRE>
+var nt = NullTest(NString::null);
+nt.set(String::null);
+nt.set(NullTest.getNullString());
+    </PRE></CODE></BLOCKQUOTE>
+    Providing a type for null does not affect equality:
+    <CODE>(Number::null == String::null)</CODE> has the value
+    <CODE>true</CODE>.
+
+    <H3><A NAME="solve">System of Linear Equations</A></H3>
+  <P>
+    A system of linear equations can be written a Ax = y where
+    A is a matrix and x and y are vectors. One can create the
+    vectors and matrices as follows:
+    <BLOCKQUOTE><PRE><CODE>
+import (org.bzdev.math.LUDecomp);
+var y = [5.0, 10.0, 20.0].toArray(double.class);
+var A = [[10.0, 70.0,  3.0],
+         [ 7.0, 20.0,  4.0],
+         [ 3.0,  4.0, 30.0]].toMatrix(double.class);
+
+var lud = new LUDecomp(A);
+var x = lud.solve(y);
+    </CODE></PRE></BLOCKQUOTE>
+  <P>
+    The methods <CODE>toArray</CODE> and <CODE>toMatrix</CODE> are
+    needed because the constructor and method of the class
+    {@link org.bzdev.math.LUDecomp} used in the example take Java arrays
+    as their arguments, both arrays of <CODE>double</CODE>.
+  <P>
+    To print a vector, one can use the following function:
+    <BLOCKQUOTE><PRE><CODE>
+function printArray(array) {
+    var out = global.getWriter();
+    var len = array.size();
+    IntStream.range(0, len).forEachOrdered(function (index) {
+        (index == 0)? out.print("[" + array.get(0)):
+            out.print(", " + array.get(index));
+    });
+    out.print("]");
+    out.flush();
+    void
+}
+    </CODE></PRE></BLOCKQUOTE>
+    The <CODE>printArray</CODE> function can be used when its argument
+    is either an ESP array or a Java array.
+
+    <H3>Drama-Simulation Example</H3>
+  <P>
+    The file TestActor.java, which defines an actor, contains the following:
+    <BLOCKQUOTE><CODE><PRE>
+import org.bzdev.devqsim.*;
+import org.bzdev.drama.*;
+import org.bzdev.lang.*;
+import org.bzdev.lang.annotations.*;
+import org.bzdev.drama.common.ConditionMode;
+
+&commat;DMethodContext(helper="org.bzdev.drama.DoReceive",
+                localHelper = "TestActorDoReceive")
+public class TestActor extends Actor {
+    static {
+	TestActorDoReceive.register();
+    }
+
+    public TestActor(DramaSimulation sim, String name, boolean intern) {
+	super(sim, name, intern);
+    }
+
+    public void sendNewMsg(Actor dest, long delay) {
+	Object msg = new TestMessage("hello");
+	send(msg, dest, delay);
+    }
+
+    &commat;DMethodImpl("org.bzdev.drama.DoReceive")
+    protected void doReceiveImpl(TestMessage msg, Actor source,
+				 boolean wereQueued) {
+	System.out.println("    " + getName() + " received msg \""
+			   + msg.getString()
+			   + "\" from " + source.getName()
+			   + " at time " + getSimulation().currentTicks());
+	}
+    }
+}
+    </PRE></CODE></BLOCKQUOTE>
+  <P>
+    The annotations allow dynamic methods to be used for processing
+    messages that an actor receives. The use of these avoids the need
+    to create a series of <STRONG>if</STRONG> statements that check if a
+    message has a particular type. See {@link org.bzdev.lang} for
+    details, particularly the package description link.
+  <P>
+    An ESP script that can run this script (assume the file name is test.esp)
+    is:
+    <BLOCKQUOTE><CODE><PRE>
+var err ?= global.getErrorWriter();
+var out ?= global.getWriter();
+
+out.println("started script");
+
+import (org.bzdev.drama, [DramaSimulation, DoubleCondition, IntegerCondition
+			  DoubleConditionFactory, IntegerConditionFactory]);
+import ([TestActor, TestActorFactory]);
+
+var sim = new DramaSimulation(scripting);
+
+var taf = sim.createFactory(TestActorFactory.class);
+sim.createFactories("org.bzdev.drama", {
+    dcf: "DoubleConditionFactory",
+    icf: "IntegerConditionFactory"
+}
+###
+
+var dc = dcf.createObject("doubleCondition", {
+    initialValue: 1.0
+});
+
+var ic = icf.createObject("integerCondition", {
+    initialValue: 3
+});
+out.println(dc.getName() + ": value = " + dc.getValue());
+out.println(ic.getName() + ": value = " + ic.getValue());
+
+var a1 = taf.createObject("a1");
+var a2 = taf.createObject("a2");
+
+a1.sendNewMsg(a2, 10);
+
+var adapter = sim.createAdapter({
+    simulationStart: function(s) {out.println("simulation started")},
+    simulationStop: function(s) {out.println("simulation stopped")},
+    messageReceiveStart: function(s,f,t,msg) {
+	out.println("starting msg " + msg)},
+    messageReceiveEnd: function(s,f,t,msg) {
+	out.println("ending msg " + msg)}});
+
+sim.addSimulationListener(adapter);
+a2.addSimulationListener(adapter);
+
+sim.run();
+    </PRE></CODE></BLOCKQUOTE>
+    The variable <CODE>scripting</CODE> is defined automatically by the
+    scrunner command. By passing it to the constructor for the simulation,
+    the simulation can use the scripting environment to perform tasks such
+    as creating factories. The <STRONG>###</STRONG> token after the call to
+    <CODE>createFactories</CODE> forces the previously parsed statements
+    to be evaluated. This is needed because <CODE>createFactories</CODE>
+    programmatically creates the variables <CODE>dcf</CODE> and
+    <CODE>icf</CODE>, and these must either exist or be explicitly declared
+    before they are referenced later in the script. The calls to
+    <CODE>createObject</CODE> creates two conditions named "integerCondition"
+    and "doubleCondition", and two actors named "a1" and "a2". The factories
+    <CODE>icf</CODE> and <CODE>dcf</CODE> have a parameter named
+    <CODE>initialCondition</CODE> and the script objects provide values for
+    that parameter.  The statement <CODE>a1.sendNewMsg(a2, 10)</CODE>
+    makes actor a1 send a message to actor a2, with that message received
+    after 10 simulation ticks.  The statement <CODE>sim.run(),</CODE> starts
+    the simulation. Since there is only a single event, the simulation will
+    halt almost immediately.
+  <P>
+    The object created by <CODE>createAdapter</CODE> allows a script object
+    to implement a simulation listener, which is added to the simulation
+    and one of the actors to instrument the simulation. Such adapters are
+    useful for debugging.
+  <P>
+    The following commands will compile the Java code:
+    <BLOCKQUOTE><CODE><PRE>
+mkdir -p classes tmpsrc
+javac -d classes -classpath /usr/share/bzdev/libbzdev.jar -s tmpsrc *.java
+    </PRE></CODE></BLOCKQUOTE>
+  <p>
+    The following command will run the script using the scrunner
+    command:
+    <BLOCKQUOTE><CODE><PRE>
+scrunner --classpathCodebase classes/ test.esp
+    </PRE></CODE></BLOCKQUOTE>
+
+    <H3>Animation Example</H3>
+  <P>
+    The following example creates a simple animation.
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.anim2d, [Animation2D, AnimationPath2DFactory,
+			  GraphViewFactory, AnimationLayer2DFactory]);
+import(org.bzdev.util.units.MKS);
+import(org.bzdev.io, [FileAccessor, DirectoryAccessor]);
+
+var err ?= global.getErrorWriter();
+var out ?= global.getWriter();
+var tmpdir ?= throw "tmpdir undefined (need scrunner -d tmpdir:TMP option)";
+
+var a2d = new Animation2D(scripting, 1920, 1080, 10000.0, 400);
+
+var pathf = a2d.createFactory("org.bzdev.anim2d.AnimationPath2DFactory");
+var gvf = a2d.createFactory("org.bzdev.anim2d.GraphViewFactory");
+var alf = a2d.createFactory("org.bzdev.anim2d.AnimationLayer2DFactory");
+
+var scaleFactor = 1080.0/MKS.feet(60.0);
+a2d.setRanges(0.0, 0.0, 0.0, 0.5,
+		  scaleFactor, scaleFactor);
+
+var GREEN = {green: 255, red: 0, blue: 0};
+var BLUE = {red: 0, green: 0, blue: 255};
+var DARKGRAY = {red: 96, green: 96, blue: 96};
+var LIGHTGRAY = {red: 160, green: 160, blue: 160};
+var WHITE = {red: 255, green: 255, blue: 255};
+
+var SQUARE6 = {gcsMode: true,
+	       cap: "SQUARE",
+	       width: MKS.inches(6.0)};
+
+var vpath = pathf.createObject("vpath", [
+    {zorder: 10, visible: false},
+    {withPrefix: "color", config: BLUE},
+    {withPrefix: "stroke",
+     config: {width: 2.0, gcsMode: false}},
+    {withPrefix: "cpoint", withIndex: [
+	{type: "MOVE_TO", x: 1.0, y: 0.0},
+	{type: "SEG_END", x: 70.0, y: 0.0}]}]);
+
+var gv = gvf.createObject("view", [
+    {initialX: 1.0, initialY: 0.0},
+    {xFrameFraction: 0.0, yFrameFraction: 0.5},
+    {scaleX: scaleFactor, scaleY: scaleFactor},
+    {withPrefix: "timeline", withIndex: [
+	{time: 0.0, path: vpath, u0: 0.0, velocity: 0,
+	 acceleration: MKS.mphPerSec(5)},
+	{time: 3.0, acceleration: 0.0},
+	{time: 7.7, acceleration: -MKS.mphPerSec(7.5)},
+	{time: 9.7, velocity: 0, acceleration: 0}]}]);
+
+alf.createObject("background", [...]);
+
+tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
+var maxFrames = a2d.estimateFrameCount(10.0);
+out.println("maxFrames = " + maxFrames);
+a2d.initFrames(maxFrames, "col-", "png", tmpdir);
+a2d.scheduleFrames(0, maxFrames);
+
+a2d.run();
+    </PRE></CODE></BLOCKQUOTE>
+    The list (and nested objects for the "background" object are not
+    shown due to length, but is available in the &apos;examples&apos; directory&apos;s
+    &apos;layer&apos; subdirectory. The code functions as follows:
+    <UL>
+      <LI> The <STRONG>import</STRONG> statements make various classes
+	accessible.
+      <LI> The statements containing "?=" either provide default values
+	or throw an exception of a needed variable was not defined by
+	scrunner.
+      <LI> The constructor for the animation is given the scripting
+	environment as its first argument, followed by the number of
+	&apos;points&apos; for each image in the horizontal and
+	vertical directions respectively, followed by the number of
+	simulation ticks per second, followed by the number of
+	simulation ticks per frame. The ratio of these gives the
+	number of frames per second (25).
+      <LI> The statements defining the variables <CODE>pathf</CODE>,
+	<CODE>gvf</CODE>, and <CODE>alf</CODE> create the factories that
+	the animation needs.
+      <LI> The <CODE>scaleFactor</CODE> definition indicates that a user-space
+	dimension of 1080 points corresponds to a physical distance of
+	60 feet.
+      <LI> The call to <CODE>setRanges</CODE> places the origin at the left
+	edge of the frame, half-way up, and the two <CODE>scaleFactor</CODE>
+	arguments configure the X and Y axes to have the same scale.
+      <LI> The definitions for the variables <CODE>GREEN</CODE>,
+	<CODE>BLUE</CODE>, <CODE>DARKGRAY</CODE>, <CODE>LIGHTGRAY</CODE>
+	and <CODE>WHITE</CODE> are provided to avoid having to retype the
+	corresponding value repeatedly.
+      <LI> The <STRONG>createObjects</STRONG> method takes two arguments:
+	a string giving a name to the object and a specification of how
+	that object should be configured. In some cases, the values are
+	the results of function calls.
+      <LI> The statement
+	<BLOCKQUOTE><CODE><PRE>
+tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
+	</PRE></CODE></BLOCKQUOTE>
+	removes all the files from the temporary directory to avoid
+	inadvertently mixing images from different runs.
+      <LI> The sequence of statements
+	<BLOCKQUOTE><CODE><PRE>
+var maxFrames = a2d.estimateFrameCount(10.0);
+out.println("maxFrames = " + maxFrames);
+a2d.initFrames(maxFrames, "col-", "png", tmpdir);
+a2d.scheduleFrames(0, maxFrames);
+a2d.run();
+	</PRE></CODE></BLOCKQUOTE>
+	computes the number of frames created by the animation,
+	provides a pattern for names of the files used to store these
+	frames, provides an object (tmpdir) that provides access to a
+	temporary directory, schedules the frames, and finally runs the
+	animation to create the frames.
+   </UL>
+
+    <H2><A NAME="notes">Implementation Notes</A></H2>
+  <P>
+    ESP was designed to be a rudimentary scripting language, primarily
+    intended for tasks such as setting up simulations, animations, or other
+    software that might be based on the {@link org.bzdev.obnaming} package.
+    Based on experience using ECMAScript (i.e., the Rhino and Nashorn
+    script engines), scripts tended to be mostly declarative. As an
+    example, for an animation, one would create the animation, configure
+    its graph, create animation objects by passing scripting-language
+    objects/arrays to factories, configure the number of frames and some
+    output-related data, and then run the animation. In addition there
+    is typically some simple arithmetic or function calls to determine
+    various time points based on constraints such as covering a
+    specified distance with an initial velocity v1 and a final velocity v2.
+  <P>
+    There were, however, some issues with the ECMAScript
+    implementations.  First, the Rhino and Nashorn implementations had
+    some annoying differences. For example, a &apos;print&apos; function in one
+    added a new line while the other did not.  There was also no
+    standard way of importing Java classes and each of these used a
+    different procedure.  Finally, the BZDev class library&apos;s
+    simulation packages allow one to schedule multiple threads. While
+    just a single thread is active at any time, an object&apos;s methods
+    (typically methods for "adapter" class) may be called from
+    different threads at different times. This worked with both Rhino
+    and Nashorn, but now Nashorn, which replaced Rhino, is being
+    deprecated. The likely replacement, GraalVM, includes an
+    ECMAScript implementation, but that implementation seems to have
+    no way (or at least no portable way) of allowing multiple threads
+    to use the same bindings.  The result is that you cannot create a
+    script object to use as a {@link java.lang.Runnable} and schedule
+    that to run as a thread. ESP does not have any of these issues:
+    there is a specified syntax for handling imports, the bindings are
+    thread safe, and objects can be used in multiple threads. A function
+    defined in one binding can be passed arguments defined in another
+    binding (a capability Rhino and Nashorn has, but that seems to be
+    missing from GraalVM).
+  <P>
+    ESP is a suitable replacement for ECMAScript in cases where
+    <UL>
+      <LI> ESP&apos;s language features are sufficient for easily coding
+	an application.
+      <LI> Scripts will not account for a significant fraction of the
+	application&apos;s execution time.
+      <LI> Stability is important - i.e., one needs to save a script
+	for a long period of time due to it being the input for an
+	application and has to just work without being "maintained"
+	(The intention, at least of ESP's designer, is to resist the
+	natural impulse to add new features and inadvertently modify
+	old ones).
+    </UL>
+  <P>
+    Because of its limited scope, ESP in the BZDev class library has a
+    simple implementation. There is some code, based on the Java
+    reflection API, for mapping java methods to ESP functions and
+    methods, and a parser that is little more than a lexical analyzer.
+    The parser works in two steps. The first turns a script into a
+    series of tokens that are annotated with a "level" used to
+    determine operator precedence. This number replaces a parse tree,
+    which is implicit. For functions or methods, a object (of type
+    ESPFunction) stores a list of tokens representing the body of the
+    function or method, and some additional data such as the names of
+    parameters. When a function is called, its token list is scanned
+    after setting up tables to represent its arguments.  Because the
+    only operators that do any sort of branching are the ternary
+    operator (?:), and the logical operators (|| and &amp;&amp;), the flow of
+    control simply move forwards along a queue, possibly skipping
+    subsequences of tokens.
+  <P>
+    ESP Objects are a subclass of {@link JSObject} and ESP arrays are
+    a subclass of {@link JSArray}. Neither subclass adds any public
+    methods. Non-abstract subclasses of
+    {@link org.bzdev.obnaming.NamedObjectFactory} can handle script
+    objects that are instances of {@link JSArray} or {@link JSObject}
+    directly, a capability that was added in order to use a JSON
+    object or array to configure a factory without needing a script
+    engine.
+
+   <H3>Performance</H3>
+  <P>
+    In some cases, ESP is significantly faster than the Nashorn ECMAScript
+    implementation.  For example, consider the scripts layer.js and
+    layer.esp in the examples/layer directory. These scripts are set up
+    to be run using the scrunner command. The last lines of these
+    scripts are
+    <BLOCKQUOTE>
+var maxFrames = a2d.estimateFrameCount(10.0);
+out.println("maxFrames = " + maxFrames);
+a2d.initFrames(maxFrames, "col-", "png", tmpdir);
+a2d.scheduleFrames(0, maxFrames);
+    </BLOCKQUOTE>
+    If these lines are commented out,  the scripts will stop just
+    after an animation and the animation objects it needs are
+    defined and configured.  For ECMAScript using the Nashorn script
+    engine, the Linux "time" command reports
+    <BLOCKQUOTE><PRE>
+    10.74user 0.26system 0:02.81elapsed 390%CPU (0avgtext+0avgdata 297176maxresident)k
+2624inputs+128outputs (0major+89038minor)pagefaults 0swaps
+    </PRE></BLOCKQUOTE>
+    when the command "scrunner -d:tmpdir:latmp layer.js" is run.
+    For ESP, the Linux "time" command reports
+    <BLOCKQUOTE><PRE>
+2.17user 0.12system 0:00.77elapsed 296%CPU (0avgtext+0avgdata 115192maxresident)k
+144inputs+128outputs (0major+33513minor)pagefaults 0swaps
+    </PRE></BLOCKQUOTE>
+    when the command "scrunner -d:tmpdir:latmp layer.esp" is run.
+    <P>
+      There are several factors that contribute to this rather
+      surprising difference in performance:
+      <UL>
+	<LI>ESP&apos;s codebase is roughly 5 times smaller than Nashorn&apos;s
+	  codebase, which allows ESP to be initialized faster than
+	  Nashorn.
+	<LI>The scripts listed above for the most part merely defines
+	  objects and arrays, and ESP&apos;s implementation of these is
+	  significantly simpler than Nashorn, primarily because ESP
+	  does not include features such as prototypes.
+	<LI> ESP&apos;s objects and arrays are subclasses of {@link JSObject}
+	  and {@link JSArray}, which were written to support JSON and
+	  YAML parsers. {@link org.bzdev.obnaming.NamedObjectFactory}
+	  supports these two classes directly so that JSON and YAML
+	  data sets can be used to configure named-object factories
+	  when a script engine is not used.  As a result, unlike
+	  ECMAScript, a "helper script" is not needed to configure a
+	  factory.
+	<LI>The algorithm Nashorn uses for parsing a script are far
+	  more complex than ESP&apos;s algorithm, which is not much more
+	  complex than lexical analysis. This gives ESP an advantage
+	  for scripts whose execution time is mostly due to parsing.
+	<LI> When reading a script ESP&apos;s default behavior is to parse
+	  the script in its entirety before executing anything.  If
+	  there is a syntax error in a script, the error will be
+	  detected significantly faster than with Nashorn, not only
+	  because ESP initializes faster, but also because Nashorn will
+	  run the script as it is being read.
+      </UL>
+  <P>
+    One would expect Nashorn (or GraalVM) to have significant
+    performance advantages over ESP, given its current implementation,
+    for complex scripts with more substantial running times. A higher
+    performance implementation could be created by modifying
+    {@link ExpressionParser.ESPFunction} so that its token queue is
+    compiled into some data structure that allows more efficient
+    execution.
+</div>
+</BODY>
+
+<!--  LocalWords:  ExpressionParser ESP ObjectParser YAML ECMA boolean
+ -->
+<!--  LocalWords:  setScriptingMode setImportMode addClasses booleans
+ -->
+<!--  LocalWords:  setScriptImportMode setGlobalMode ESP's formfeed js
+ -->
+<!--  LocalWords:  Unary bitwise instanceof incrementing decrementing
+ -->
+<!--  LocalWords:  incr importClass importClasses hasProperty asInt
+ -->
+<!--  LocalWords:  propertyNames dereferencing parallelStream isArray
+ -->
+<!--  LocalWords:  globalThis ESPObjectType ESPArrayType objectName alf
+ -->
+<!--  LocalWords:  namespace isESPArray isJavaArray isObject typeof
+ -->
+<!--  LocalWords:  subclasses multithreaded setBindings preconfigured
+ -->
+<!--  LocalWords:  MathOps LongStream rangeClosed asLong typeless apf
+ -->
+<!--  LocalWords:  lang Nashorn BZDev GraalVM ESPFunction subsequences
+ -->
+<!--  LocalWords:  JSObject JSArray JSON setReader setWriter globals
+ -->
+<!--  LocalWords:  setErrorWriter setReaderTL setWriterTL getReader
+ -->
+<!--  LocalWords:  setErrorWriterTL getWriter getErrorWriter javax
+ -->
+<!--  LocalWords:  setGlobalBindings getGlobal defaultObject println
+ -->
+<!--  LocalWords:  avgtext avgdata maxresident Nashorn's finishImport
+ -->
+<!--  LocalWords:  createFactories AnimationLayer DFactory scrunner
+ -->
+<!--  LocalWords:  AnimationPath createFactory superclasses acyclic
+ -->
+<!--  LocalWords:  pagefaults DOCTYPE ESPArray ESPObject toKeyMap esp
+ -->
+<!--  LocalWords:  TestActor programmatically integerCondition tmpdir
+ -->
+<!--  LocalWords:  doubleCondition subdirectory createObjects png
+ -->
+<!--  LocalWords:  maxFrames initFrames scheduleFrames codebase didn
+ -->
+<!--  LocalWords:  parsers superclass forEach ESPMethodReference
+ -->
+<!--  LocalWords:  setPrefixMode NullTest untyped toArray toLongArray
+ -->
+<!--  LocalWords:   toMatrix toESPArray toESPMatrix
+ -->

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties> 
+  <comment>
+    This defines a private function with no arguments named
+    finishImport. It has an non-trivial implementation for EP
+    as described in the EP documentation for the EP global object.
+  </comment>
+  <entry key="ECMAScript">
+<![CDATA[
+({finishImport: function() {null;}})
+]]>
+  </entry>
+  <entry key="ESP">
+<![CDATA[
+{finishImport: function() {global.finishImport();}}
+]]>
+  </entry>
+  <entry key="python">
+<![CDATA[
+class ___FinishImportScript_For_BZDev_Org:
+	def finishImport():
+	  return null
+	def finishup(self):
+	  del ___FinishImportScript_For_BZDev_Org.finishup
+	  del ___FinishImportScript_For_BZDev_Org
+	  return self
+___ImportScript_For_BZDev_Org().finishup()
+]]>
+  </entry>
+</properties>
