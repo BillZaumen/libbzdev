@@ -160,10 +160,35 @@ abstract public class Path3D implements Cloneable {
 	}
 
 	/**
-	 * Constructor given a 2D path.
+	 * Constructor given a 2D path and a mapper.
 	 * An instance of Point3DMapper is used to map the 2D path's
 	 * control points to the corresponding control points of the
 	 * 3D path.
+	 * <P>
+	 * The mapper is passed a default mapper index of 0, so this
+	 * constructor will typically be used when that index is ignored,
+	 * e.g., when the mapper is used to create a single path.
+	 * @param path the 2D path
+	 * @param mapper the object that converts a 2D point to a 3D point
+	 * @see Point3DMapper
+	 */
+	public Double(Path2D path, Point3DMapper<Point3D> mapper) {
+	    this(INITIAL_SIZE, path, mapper, 0);
+	}
+
+	/**
+	 * Constructor given a 2D path, a mapper, and an index.
+	 * An instance of Point3DMapper is used to map the 2D path's
+	 * control points to the corresponding control points of the
+	 * 3D path.
+	 * <P>
+	 * When a mapper is used to create a single path, the mapper
+	 * index will typically be ignored, and the
+	 * constructor {@link Path3D.Double#Double(Path2D,Point3DMapper)}
+	 * will result in more easily read code. A mapper index is
+	 * used implicitly by the constructor
+	 * {@link BezierGrid#BezierGrid(Path2D,Point3DMapper,int,boolean)},
+	 * which can be used to create surfaces of revolution.
 	 * @param path the 2D path
 	 * @param mapper the object that converts a 2D point to a 3D point
 	 * @param mapperIndex an index used to select a mapping
@@ -209,6 +234,14 @@ abstract public class Path3D implements Cloneable {
 	 * An instance of Point3DMapper is used to map the 2D path's
 	 * control points to the corresponding control points of the
 	 * 3D path.
+	 * <P>
+	 * When a mapper is used to create a single path, the mapper
+	 * index will typically be ignored, and the
+	 * constructor {@link Path3D.Double#Double(Path2D,Point3DMapper)}
+	 * will result in more easily read code. A mapper index is
+	 * used implicitly by the constructor
+	 * {@link BezierGrid#BezierGrid(Path2D,Point3DMapper,int,boolean)},
+	 * which can be used to create surfaces of revolution.
 	 * @param initialCapacity the initial number of path segments
 	 *        allocated in an expandable table
 	 * @param path the 2D path
@@ -576,10 +609,31 @@ abstract public class Path3D implements Cloneable {
 	}
 
 	/**
+	 * Constructor given a 2D path and a mapper.
+	 * An instance of Point3DMapper is used to map the 2D path's
+	 * control points to the corresponding control points of the
+	 * 3D path.
+	 * <P>
+	 * The mapper is passed a default mapper index of 0, so this
+	 * constructor will typically be used when that index is ignored,
+	 * e.g., when the mapper is used to create a single path.
+	 * @param path the 2D path
+	 * @param mapper the object that converts a 2D point to a 3D point
+	 * @see Point3DMapper
+	 */
+	public Float(Path2D path, Point3DMapper<Point3D> mapper) {
+	    this(INITIAL_SIZE, path, mapper, 0);
+	}
+	/**
 	 * Constructor given a 2D path.
 	 * An instance of Point3DMapper is used to map the 2D path's
 	 * control points to the corresponding control points of the
 	 * 3D path.
+	 * <P>
+	 * When a mapper is used to create a single path, the mapper
+	 * index will typically be ignored, and the
+	 * constructor {@link Path3D.Float#Float(Path2D,Point3DMapper)}
+	 * will result in more easily read code.
 	 * @param path the 2D path
 	 * @param mapper the object that converts a 2D point to a 3D point
 	 * @param mapperIndex an index used to select a mapping
@@ -625,6 +679,14 @@ abstract public class Path3D implements Cloneable {
 	 * An instance of Point3DMapper is used to map the 2D path's
 	 * control points to the corresponding control points of the
 	 * 3D path.
+	 * <P>
+	 * When a mapper is used to create a single path, the mapper
+	 * index will typically be ignored, and the
+	 * constructor {@link Path3D.Double#Double(Path2D,Point3DMapper)}
+	 * will result in more easily read code. A mapper index is
+	 * used implicitly by the constructor
+	 * {@link BezierGrid#BezierGrid(Path2D,Point3DMapper,int,boolean)},
+	 * which can be used to create surfaces of revolution.
 	 * @param initialCapacity the initial number of path segments
 	 *        allocated in an expandable table
 	 * @param path the 2D path
@@ -1276,4 +1338,5 @@ abstract public class Path3D implements Cloneable {
 
 //  LocalWords:  exbundle API lastMoveTo initialCapacity MOVETO zier
 //  LocalWords:  missingMOVETO LINETO closePath emptyPathOnClose xc
-//  LocalWords:  eacute tform curveTo subclasses yc zc
+//  LocalWords:  eacute tform curveTo subclasses yc zc DMapper
+//  LocalWords:  BezierGrid boolean mapperIndex
