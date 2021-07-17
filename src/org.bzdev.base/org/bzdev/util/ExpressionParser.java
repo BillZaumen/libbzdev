@@ -1123,7 +1123,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	/**
-	 * Create a set of the current global variables/parameters.
+	 * Create a set of the current global variable/parameter names.
 	 * @return a set of the current global variables
 	 */
 	public Set<String> globals() {
@@ -1283,6 +1283,16 @@ public class ExpressionParser implements ObjectParser<Object>
 		    }
 		}
 	    }
+	}
+
+	/**
+	 * Create a new Java array.
+	 * The maximum number of dimensions is 255 (a limit set by java).
+	 * @param clasz the class of the array's components
+	 * @param dimensions the dimensions of the array
+	 */
+	public Object newJavaArray(Class<?> clasz, int... dimensions) {
+	    return Array.newInstance(clasz, dimensions);
 	}
     }
 
@@ -5065,6 +5075,33 @@ public class ExpressionParser implements ObjectParser<Object>
 				} else if (fname.equals("finishImport")
 					   && args.length == 0) {
 				    results = ep.finishImport();
+				} else if (fname.equals("newJavaArray")
+					   && args.length > 1
+					   && args[0] instanceof Class) {
+				    Class<?> c = (Class<?>)args[0];
+				    int[] arguments = new int[args.length-1];
+				    int i = 0;
+				    int j = 1;
+				    while (j < args.length) {
+					if (!(args[j] instanceof Integer)) {
+					    String msg =
+						errorMsg("notIntElement");
+					    throw new ObjectParser.Exception
+						(msg, opToken.getFileName(),
+						 orig, opToken.getIndex());
+					}
+					arguments[i] = ((Integer) args[j])
+					    .intValue();
+					if (arguments[i] < 0) {
+					    String msg =
+						errorMsg("notPosElement");
+					    throw new ObjectParser.Exception
+						(msg, opToken.getFileName(),
+						 orig, opToken.getIndex());
+					}
+					i++; j++;
+				    }
+				    results = Array.newInstance(c, arguments);
 				} else {
 				    int len = args.length;
 				    String msg =

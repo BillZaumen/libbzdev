@@ -288,6 +288,16 @@ otest:
 	chmod u-x ./run
 	rm -r classes otest.jar
 
+sctest:
+	(cd ../.. ; make )
+	mkdir -p classes
+	javac -d classes OutTest.java
+	jar cf otest.jar -C classes OutTest.class
+	chmod u+x ./run
+	./run --stackTrace sctest.esp
+	chmod u-x ./run
+	rm -r classes otest.jar
+
 clean:
 	rm -fr junk raf tmp.png
 	chmod u-x ./run ./run1

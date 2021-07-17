@@ -16,6 +16,7 @@
     and how it is configured:
     <UL>
       <LI><A HREF="#overview">Overview</A>.
+      <LI><A HREF="#scriptEngine">Script Engines</A>.
       <LI><A HREF="#constructors">Constructors</A>.
       <LI><A HREF="#syntax">ESP Syntax</A>.
       <LI><A HREF="#iteration">Iteration</A>.
@@ -306,6 +307,25 @@ var obj = {
     object to represent a tree (or a directed acyclic graph)
     defining various configurations, were some simple computation may be
     desired.
+
+    <H2><A NAME="scriptEngine">The Script Engine</A></H2>
+    The BZDev class library contains an script engine that implements
+    ESP. This script engine has the following properties:
+    <UL>
+      <LI>the script engine name is "BZDEV ESP Engine".
+      <LI>the recognized file name extension is ".esp".
+      <LI>the scripting-language name is "ESP".
+      <LI>the media type for an ESP file is "text/esp".
+      <LI>besides "ESP", the name "esp" is also recognized as an alias.
+      <LI>the script engine automatically recognizes the following
+	classes as return types for both methods and constructors):
+	java.io.Reader, java.io.PrintWriter, java.io.Writer,
+	java.nio.CharBuffer, java.util.Set, java.lang.Object.
+      <LI>the script engine automatically recognizes the following
+	classes as argument types: java.lang.Object, java.lang.Class,
+	org.bzdev.ScriptingContext, org.bzdev.ExtendedScriptingContext,
+	java.io.Reader, java.io.PrintWriter, java.nio.CharBuffer.
+    </UL>
 
     <H2><A NAME="constructors">Constructors</A></H2>
     {@link ExpressionParser} has two constructors:
@@ -919,7 +939,11 @@ class-name: qualified-name
     and those lists determine which methods are visible.  Public,
     static methods will be treated as functions in the ESP scripting
     language. Also, method arguments and return values are added to the
-    lists of allowed values and allowed arguments.
+    lists of allowed values and allowed arguments.  When a class is
+    imported, the return types and argument types must match those that
+    are in the current sequence of import statements or a previous statements,
+    but once the methods for a class are imported, those methods cannot be
+    augmented by importing the class a second time.
   <P>
     As a general rule, a class, or a superclass declaring a method
     must be imported before that method is used. In a few cases, such
@@ -1188,6 +1212,12 @@ array-elements:
       <LI> <STRONG>isObject(</STRONG><I>object</I><STRONG>)</STRONG>.
 	This method returns true if its argument is an
 	expression-parser object; false otherwise.
+      <LI> <STRONG>newJavaArray(</STRONG><I>clasz</I><STRONG>,</STRONG><I>dimension</I><STRONG>...)</STRONG>.
+	This method creates a new Java array, possibly multidimensional,
+	whose compoment type is provided by the argument <I>clasz</I> and
+	whose dimensions are given by the remaining arguments (there must be
+	at least one dimension provided). A maximum of 255 dimensions may be
+	provided (this limit is set by Java).
       <LI> <STRONG>typeof(</STRONG><I>object</I><STRONG>)</STRONG>.
 	This method returns the Java class of the object provided by its
 	argument; null if the argument is null
@@ -2056,9 +2086,9 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  maxFrames initFrames scheduleFrames codebase didn
  -->
-<!--  LocalWords:  parsers superclass forEach ESPMethodReference
+<!--  LocalWords:  parsers superclass forEach ESPMethodReference sRBG
  -->
 <!--  LocalWords:  setPrefixMode NullTest untyped toArray toLongArray
  -->
-<!--  LocalWords:   toMatrix toESPArray toESPMatrix
+<!--  LocalWords:   toMatrix toESPArray toESPMatrix getColorBysRGB
  -->

@@ -1,0 +1,34 @@
+import (org.bzdev.anim2d.Animation2D);
+import (org.bzdev.lang.MathOps);
+
+var a2d = scripting.create(Animation2D.class, scripting,
+			   1920, 1080, 10000.0, asLong(400));
+
+
+var array = global.newJavaArray(double.class, 10);
+
+var matrix = global.newJavaArray(double.class, 10, 10);
+
+var out = global.getWriter();
+
+out.println("is array a Java array? " + global.isJavaArray(array));
+out.println("is matrix a Java array? " + global.isJavaArray(array));
+
+array[0] = 20.0;
+matrix[0][0] = 30.0;
+
+out.println("array[0] = " + array[0]);
+out.println("array[1] = " + array[1]);
+
+out.println("matrix[0][0] = " + matrix[0][0]);
+out.println("matrix[0][1] = " + matrix[0][1]);
+
+out.println("now try using 'scripting' methods");
+array = scripting.createArray(double.class, 10);
+out.println("is array a Java array? " + global.isJavaArray(array));
+out.println("array[0] = " + array[0]);
+out.println("array[1] = " + array[1]);
+array = scripting.createAndInitArray(double.class, 10.0, 20.0, 30.0);
+out.println("is array a Java array? " + global.isJavaArray(array));
+out.println("array[0] = " + array[0]);
+out.println("array[1] = " + array[1]);

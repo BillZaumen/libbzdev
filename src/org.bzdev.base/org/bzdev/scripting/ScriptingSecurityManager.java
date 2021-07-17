@@ -23,7 +23,7 @@ import java.util.*;
 public class ScriptingSecurityManager extends SecurityManager {
 
     static {
-	// Calling this method causes ScriptinContext to be loaded. We
+	// Calling this method causes ScriptingContext to be loaded. We
 	// need this to paper over a bug in Java-11.0.1 where the
 	// a BootstrapMethodError (bootstrap method initialization exception)
 	// is thrown and caught by the JVM, not the application, causing a

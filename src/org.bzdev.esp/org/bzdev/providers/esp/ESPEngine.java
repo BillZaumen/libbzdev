@@ -50,107 +50,7 @@ public class ESPEngine extends AbstractScriptEngine
     static final char[] linesep = linesepStr.toCharArray();
     static final char finalLineSep = linesep[linesep.length-1];
 
-    /*
-    // for reconstructing an error.
-    static int[] getLineAndColumn(String s, int index) {
-	int line = 1;
-	int last = 0;
-	int count = 0;
-	int j = 0;
-	int len = s.length();
-	if (index > len) {
-	    System.err.println("error at index " + index
-			       + " greater than string length:");
-	    System.err.println(s);
-	    index = len;
-	}
-	for (int i = 0; i < index; i++) {
-	    char ch = s.charAt(i);
-	    if (ch == finalLineSep) {
-		// in case we end with just '\n' instead of '\r'\n'
-		// when running on systems that use '\r'\n' as the
-		// default line terminator.
-		line++;
-		j = 0;
-		last = i;
-	    } else {
-		if (ch == linesep[j]) {
-		    if (j == linesep.length - 1) {
-			line++;
-			j = 0;
-			last = i;
-		    } else {
-			j++;
-		    }
-		} else {
-		    j = 0;
-		}
-	    }
-	}
-	int end = index;
-	j = 0;
-	boolean eol = false;
-	while (end < len) {
-	    char ch = s.charAt(end);
-	    if (ch == linesep[j]) {
-		if (j == linesep.length-1) {
-		    eol = true;
-		    break;
-		} else {
-		    j++;
-		}
-	    } else {
-		j = 0;
-	    }
-	    end++;
-	}
-	if (eol) {
-	    end -= linesep.length;
-	    if (!Character.isWhitespace(s.charAt(end))) end++;
-	}
-	return new int[] {
-	    line, index - last, end
-	};
-    }
-    */
-
     static ScriptException getScriptException(ObjectParser.Exception e) {
-	/*
-	String s = e.getInput();
-	int index = e.getOffset();
-	int[] loc = getLineAndColumn(s, index);
-	String filename = e.getFileName();
-	int lineNumber = loc[0];
-	int columnNumber = loc[1];
-	int end = loc[2];
-	// replace tabs with spaces so we can just count characters to
-	// position the caret.
-	String sourceLine = s.substring(index - columnNumber, end)
-	    .replace('\t', ' ');
-	StringBuilder sb = new StringBuilder();
-	sb.append(e.getMessage());
-	sb.append(linesepStr);
-	sb.append(sourceLine);
-	sb.append(linesepStr);
-	for (int i = 0; i < columnNumber-1; i++) {
-	    sb.append(' ');
-	}
-	sb.append('^');
-	*/
-
-	/*
-	String s = e.getInput();
-	int offset = e.getOffset();
-	int[] loc = ErrorMessage.getLineAndColumn(s, offset);
-	String filename = e.getFileName();
-	int lineNumber = loc[0];
-	int columnNumber = loc[1];
-	// We want the location in a script where an error occurred to
-	// stand out in a stack trace; hence the '### ' prefix.
-	String msg = ErrorMessage.getMultilineString("### ",
-						     filename,  s, offset,
-						     e, false);
-	*/
 	int[] loc = ErrorMessage.getLineAndColumn(e.getInput(), e.getOffset());
 	String filename = e.getFileName();
 	int lineNumber = loc[0];
@@ -175,10 +75,12 @@ public class ESPEngine extends AbstractScriptEngine
 
     private static final Class<?> classArray1[] = {
 	Reader.class, PrintWriter.class, Writer.class, CharBuffer.class,
-	Set.class
+	Set.class, Object.class
+
     };
 
     private static final Class<?> classArray2[] = {
+	Object.class, Class.class,
 	ScriptingContext.class, ExtendedScriptingContext.class,
 	Reader.class, PrintWriter.class, CharBuffer.class
     };
@@ -351,60 +253,11 @@ public class ESPEngine extends AbstractScriptEngine
 	}
     }
 
-    /*
-    @Override
-    public Object get(String key)
-	throws NullPointerException, IllegalArgumentException
-    {
-	return context.getBindings(ENGINE_SCOPE).get(key);
-    }
-
-    @Override
-    public Bindings getBindings(int scope) throws IllegalArgumentException {
-	if (scope == ScriptContext.ENGINE_SCOPE) {
-	    return context.getBindings(ENGINE_SCOPE);
-	} else {
-	    throw new IllegalArgumentException();
-	}
-    }
-
-    @Override
-    public ScriptContext getContext() {
-	return context;
-    }
-    */
     @Override
     public ScriptEngineFactory getFactory() {
 	return new ESPFactory();
     }
 
-    /*
-    @Override
-    public void put(String key, Object value)
-	throws IllegalArgumentException, NullPointerException
-    {
-	context.getBindings(ENGINE_SCOPE).put(key, value);
-    }
-
-    @Override
-    public void setBindings (Bindings bindings, int scope)
-	throws IllegalArgumentException, NullPointerException
-    {
-	if (bindings == null) {
-	    throw new NullPointerException();
-	}
-	if (scope == ScriptContext.ENGINE_SCOPE) {
-	    context.setBindings(bindings, scope);
-	} else {
-	    throw new IllegalArgumentException();
-	}
-    }
-
-    @Override
-    public void setContext(ScriptContext context) throws NullPointerException {
-	this.context = context;
-    }
-    */
     // Invocable
 
     @Override
