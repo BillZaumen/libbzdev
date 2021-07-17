@@ -25,6 +25,7 @@
       <LI><A HREF="#api">The ESP API</A>.
       <LI><A HREF="#helpers">Helper Classes</A>.
       <LI><A HREF="#examples">Examples</A>.
+      <LI><A HREF="#hints">Hints</A>.
       <LI><A HREF="#notes">Implementation Notes</A>.
     </UL>
   <P>
@@ -416,7 +417,9 @@ var obj = {
       <LI> Integers. These use Java syntax but with no support for
 	octal or hexadecimal numbers.
       <LI> Long Integers.These use Java syntax but with no support for
-	octal or hexadecimal numbers.
+	octal or hexadecimal numbers.  If an integer is within the range
+	allowed for an int, it will normally be interpreted as an
+	32-bit integer. Adding an 'L' will result in a 64-bit integer.
       <LI> Double-precision numbers.
       <LI> Booleans. The allowed values are <STRONG>true</STRONG> or
 	<STRONG>false</STRONG>
@@ -1214,7 +1217,7 @@ array-elements:
 	expression-parser object; false otherwise.
       <LI> <STRONG>newJavaArray(</STRONG><I>clasz</I><STRONG>,</STRONG><I>dimension</I><STRONG>...)</STRONG>.
 	This method creates a new Java array, possibly multidimensional,
-	whose compoment type is provided by the argument <I>clasz</I> and
+	whose component type is provided by the argument <I>clasz</I> and
 	whose dimensions are given by the remaining arguments (there must be
 	at least one dimension provided). A maximum of 255 dimensions may be
 	provided (this limit is set by Java).
@@ -1511,8 +1514,8 @@ function foo(x, y) {Math.sqrt(x*x + y*y)}
 	For example,
 	<BLOCKQUOTE><PRE><CODE>
 import (org.bzdev.lang.MathOps);
-var start = 10.0;
-a2d.scheduleFrames(asLong(start), maxFrames);
+var start = asLong(10);
+a2d.scheduleFrames(start, maxFrames);
 	</CODE></PRE></BLOCKQUOTE>
       <LI> {@link org.bzdev.obnaming.misc.BasicStrokeBuilder} can be
 	used to create an instance of {@link java.awt.BasicStroke}.
@@ -1837,7 +1840,7 @@ tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0, maxFrames);
+a2d.scheduleFrames(0L, maxFrames);
 
 a2d.run();
     </PRE></CODE></BLOCKQUOTE>
@@ -1885,15 +1888,59 @@ tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0, maxFrames);
+a2d.scheduleFrames(0L, maxFrames);
 a2d.run();
 	</PRE></CODE></BLOCKQUOTE>
 	computes the number of frames created by the animation,
 	provides a pattern for names of the files used to store these
 	frames, provides an object (tmpdir) that provides access to a
 	temporary directory, schedules the frames, and finally runs the
-	animation to create the frames.
+	animation to create the frames. The first argument to
+	<CODE>scheduleFrames</CODE> is <CODE>0L</CODE> because that method
+	requires a long integer as its first argument.
    </UL>
+
+    <H2><A NAME="hints">Hints</A></H2>
+  <P>
+    ESP is actually rather strict about what types it recognizes. As
+    a result, when importing classes, it is usually necessary to import
+    the classes for the return-value and the arguments of whatever methods
+    (or constructors) are used. This should be an exact match.  Furthermore,
+    once a sequence of import statements in complete all of those classes
+    are processed at concurrently. and only methods that match known types
+    are visible.  Repeating a class in a later import statement will not
+    change the methods for that class that are recognized. For animations
+    and simulations, importing one should import not only the classes of
+    factory methods, but also the classes of the objects those methods
+    create.
+  <P>
+    When <STRONG>scrunner</STRONG> is used a variable named
+    <STRONG>scripting</STRONG> is defined. That variable can also be used to
+    import classes (various ECMAScript engines have different procedures for
+    importing classes, and methods were provided for
+    <STRONG>scripting</STRONG> in order to hide these engine-specific
+    procedures). These methods are
+    <UL>
+      <LI> {@link org.bzdev.scripting.ExtendedScriptingContext#importClass(String)},
+      <LI> {@link org.bzdev.scripting.ExtendedScriptingContext#importClass(String,String)},
+      <LI> {@link org.bzdev.scripting.ExtendedScriptingContext#importClasses(String,Object)},
+      <LI> {@link org.bzdev.scripting.ExtendedScriptingContext#finishImport()}.
+    </UL>
+    The method <CODE>finishImport</CODE> has an empty implementation for
+    some ECMAScript implementations (Nashorn, GraalVM, etc.) but performs
+    a series of operations for ESP. If there are problems with importing
+    Java classes in this way, check that a call to <CODE>finishImport</CODE>
+    is not missing. Also make sure that a sequence of such import
+    statements is followed by a line containing "###".
+  <P>
+    ESP also makes little effort at casting values to an appropriate type.
+    When this is an issue, consider methods from the class
+    {@link org.bzdev.lang.MathOps}. Arithmetical operations in ESP tend
+    to produce double-precision floating-point numbers. For simulations
+    and animations there are methods such as
+    {@link org.bzdev.devqsim.Simulation#run(long)} whose arguments are
+    long integers. When the value is a constant, an 'L' immediately
+    after the number will create an integer with the desired type.
 
     <H2><A NAME="notes">Implementation Notes</A></H2>
   <P>
@@ -1984,7 +2031,7 @@ a2d.run();
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0, maxFrames);
+a2d.scheduleFrames(0L, maxFrames);
     </BLOCKQUOTE>
     If these lines are commented out,  the scripts will stop just
     after an animation and the animation objects it needs are
@@ -2091,4 +2138,6 @@ a2d.scheduleFrames(0, maxFrames);
 <!--  LocalWords:  setPrefixMode NullTest untyped toArray toLongArray
  -->
 <!--  LocalWords:   toMatrix toESPArray toESPMatrix getColorBysRGB
+ -->
+<!--  LocalWords:  newJavaArray clasz
  -->

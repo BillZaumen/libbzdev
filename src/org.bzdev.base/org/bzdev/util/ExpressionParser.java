@@ -6671,7 +6671,6 @@ public class ExpressionParser implements ObjectParser<Object>
     private static final Pattern STRING_PATTERN
 	= Pattern.compile("\"((\\\\.|[^\"\\\\])*)\"");
     
-
     private static final Pattern
 	INTEGER_PATTERN = Pattern.compile("[-+]?[0-9]+");
 
@@ -6889,6 +6888,25 @@ public class ExpressionParser implements ObjectParser<Object>
 	    firstQMark = token;
 	    qmarkIndex = ind;
 	}
+    }
+
+    // Provided because the String substring(int) method
+    // seems to make a full copy from the index to the end of the string
+    // instead of sharing a buffer (which is immutable).
+    private static String getLineTail(String s, int i) {
+	// Get the tail up to an EOL.
+
+	int len = s.length();
+	if (i >= len) return "";
+        char ch = s.charAt(i);
+	if (ch == '\r' || ch == '\n') return "";
+	int end = i + 1;
+	while (end < len) {
+	    ch = s.charAt(end);
+	    if (ch == '\r' || ch == '\n') break;
+	    end++;
+	}
+	return s.substring(i, end);
     }
 
     private LinkedList<Token>
@@ -8135,7 +8153,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		    throw new ObjectParser.Exception (msg, filenameTL.get(),
 						      s, i);
 		}
-		String stail = s.substring(i);
+		// String stail = s.substring(i);
+		String stail = getLineTail(s, i);
 		Matcher smatcher = STRING_PATTERN.matcher(stail);
 		if (smatcher.lookingAt()) {
 		    int start = i + smatcher.start(1);
@@ -8272,7 +8291,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		break;
 	    case '.': case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
-		String tail = s.substring(i);
+		// String tail = s.substring(i);
+		String tail = getLineTail(s, i);
 		Matcher matcher = DOUBLE_PATTERN.matcher(tail);
 		if (matcher.lookingAt()) {
 		    if (ptype != null) {
@@ -8303,7 +8323,13 @@ public class ExpressionParser implements ObjectParser<Object>
 			    if (lval > Integer.MAX_VALUE) {
 				next.setValue(Long.valueOf(lval));
 			    } else {
-				next.setValue(Integer.valueOf((int)lval));
+				if (end < len && s.charAt(end) == 'L') {
+				    // We found an explicit long integer
+				    next.setValue(Long.valueOf(lval));
+				    i++;
+				} else {
+				    next.setValue(Integer.valueOf((int)lval));
+				}
 			    }
 			} else {
 			    next.setValue(Double.valueOf(number));

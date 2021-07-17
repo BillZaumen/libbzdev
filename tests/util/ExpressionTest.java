@@ -114,12 +114,32 @@ public class ExpressionTest {
 	}
     }
 
+    static String getLineTail(String s, int i) {
+	// Get the tail up to an EOL.
+
+	int len = s.length();
+	if (i >= len) return "";
+        char ch = s.charAt(i);
+	if (ch == '\r' || ch == '\n') return "";
+	int end = i + 1;
+	while (end < len) {
+	    ch = s.charAt(end);
+	    if (ch == '\r' || ch == '\n') break;
+	    end++;
+	}
+	return s.substring(i, end);
+    }
 
 
     // test methods from ExpressionParser that were copied to
     // this file for stand-alone testing
     private static void testMethods() throws Exception {
 
+	String ts = "sldkf lsjdf  sldf \n sldkjf";
+	for  (int i = 0; i < ts.length(); i++) {
+	    System.out.println("ts tail at " + i + " = "
+			       + getLineTail(ts, i));
+	}
 	if (classDist(Double.class, Number.class) != 1)
 	    throw new Exception();
 	if (classDist(Double.class, Object.class) != 2)
@@ -579,6 +599,17 @@ public class ExpressionTest {
 	value = parser.parse ("var vt2 ?= 200");
 	System.out.println("value = " + value);
 	if ((Integer)value != 200) {
+	    throw new Exception();
+	}
+
+	s = "= 30L";
+	System.out.println("trying s " + s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	if (!(value instanceof Long)) {
+	    throw new Exception();
+	}
+	if ((Long)value != 30L) {
 	    throw new Exception();
 	}
 
