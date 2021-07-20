@@ -208,4 +208,4 @@ clean:
 	(cd rv ; make clean)
 	(cd units ; make clean)
 	rm -f sequence.txt
-
+	rm -f test.html

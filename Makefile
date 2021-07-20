@@ -208,6 +208,7 @@ BASE_RESOURCES1 = $(wildcard $(BASE_DIR)/$(BZDEV)/io/lpack/*.properties) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/protocols/sresource/lpack/*.properties)\
 	$(wildcard $(BASE_DIR)/$(BZDEV)/scripting/*.xml) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/scripting/lpack/*.properties) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/espdocs.tpl) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/*.properties) \
 
 BASE_RESOURCES = $(subst ./src/,,$(BASE_RESOURCES1))

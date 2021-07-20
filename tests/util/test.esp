@@ -7,6 +7,9 @@
 import(java.lang, [Math, StringBuilder]);
 import(org.bzdev.lang, MathOps);
 
+global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
+			"/usr/share/doc/openjdk-11-doc/api"]);
+
 var testq = function (t) { (t < 180)? 1.1: 2.0}
 
 var temp1 = ({a: 10, b: 30}["a"] + [10, 20, 30, 40][0]) / tan(20);

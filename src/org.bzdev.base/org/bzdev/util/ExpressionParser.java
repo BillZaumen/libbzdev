@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.bzdev.lang.UnexpectedExceptionError;
+import org.bzdev.net.URLPathParser;
 import org.bzdev.util.SuffixArray;
 import org.bzdev.util.TemplateProcessor;
 import java.security.*;
@@ -1293,6 +1294,119 @@ public class ExpressionParser implements ObjectParser<Object>
 	 */
 	public Object newJavaArray(Class<?> clasz, int... dimensions) {
 	    return Array.newInstance(clasz, dimensions);
+	}
+
+	private TemplateProcessor.KeyMapList
+	    getClassList(TemplateProcessor.KeyMapList list)
+	{
+	    TemplateProcessor.KeyMapList clist = new
+		TemplateProcessor.KeyMapList();
+	    String cname = null;
+	    for (TemplateProcessor.KeyMap kmap: list) {
+		if (!kmap.get("class").equals(cname)) {
+		    cname = (String)kmap.get("class");
+		    kmap.put("title", cname);
+		    TemplateProcessor.KeyMap kmap2 =
+			new TemplateProcessor.KeyMap();
+		    kmap2.put("class", cname);
+		    clist.add(kmap2);
+		}
+	    }
+	    return clist;
+	}
+
+	/**
+	 * Generate documentation for imported classes and methods.
+	 * The first argument will typically be created on the command
+	 * line when scrunner is used to run this script.  The second will
+	 * usually be an ESP array, all of whose elements are strings. These
+	 * strings will be URLs.  For example,
+	 * <BLOCkQUOTE><CODE><PRE>
+	 *  global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
+                                    "/usr/share/doc/librdanim-doc/api"]);
+	 * </PRE></CODE></BLOCKQUOTE>
+	 * <P>
+	 * The 'docs' arguments is a list of strings.  Each string
+	 * that can contain multiple URLS or file names, with '|' used
+	 * as a separator for URLs or filenames.  A sequence of n "|"
+	 * characters will be replaced by floor(n/2) "|" characters
+	 * and if n is odd, the final "|" is treated as the separator.
+	 * As a result, except when it is the first component, a file
+	 * name cannot start with "|".  If it is really necessary to
+	 * have a "|" at the start of a file name, use a "file" URL
+	 * (in which case the "|" should be encoded as "%7C".)  If a
+	 * path component's initial characters, up to and including
+	 * the first ":" are syntactically valid as part of a URL, the
+	 * component is interpreted as a URL, not a file name.  <P> In
+	 * addition, a leading "~", followed by either the standard
+	 * file-separator character or "/", is replaced with the
+	 * user's home directory. The sequence "~~" at the start of a
+	 * component will be replaced by a single "~".  All subsequent
+	 * "~" in that component are left as is.
+	 * @param w a writer to record the documentation
+	 * @param docs a  string giving the URLs for each API's
+	 *        documentation, with '|' separating URLs and '~' used to
+	 *        indicate home directories
+	 * @exception IllegalArgumentException an element of the second
+	 *            argument is not a string
+	 * @exception IOException an IO error occurred
+	 * @exception MalformedURLException a URL was malformed
+	 * @see org.bzdev.net.URLPathParser
+	 */
+	public Object generateDocs(PrintWriter w, JSArray docs)
+	    throws IllegalArgumentException, IOException,
+		   MalformedURLException
+	{
+	    LinkedList<URL> apis = new LinkedList<URL>();
+	    for (Object o: docs) {
+		if (o instanceof String) {
+		    URL[] apiURLs = URLPathParser.getURLs(null, (String) o,
+							  null, null);
+		    if (apiURLs == null) {
+			apiURLs = new URL[0];
+		    }
+		    for (URL url: apiURLs) {
+			apis.add(url);
+		    }
+		} else {
+		    throw new IllegalArgumentException();
+		}
+	    }
+	    createAPIMap(apis);
+	    TemplateProcessor.KeyMap kmap = new TemplateProcessor.KeyMap();
+	    kmap.put("retList", keylistForReturnClasses());
+	    kmap.put("argList", keylistForArgumentClasses());
+	    TemplateProcessor.KeyMapList
+		list = keylistForConstructors();
+	    kmap.put("constrClasses", getClassList(list));
+	    kmap.put("constrList", list);
+	    list = keylistForFunctions();
+	    kmap.put("functClasses", getClassList(list));
+	    kmap.put("functList", list);
+	    list = keylistForMethods();
+	    kmap.put("methodClasses", getClassList(list));
+	    kmap.put("methodList", list);
+	    kmap.put("constList", keylistForConstants());
+	    String resource = errorMsg("docResource");
+	    TemplateProcessor tp = new TemplateProcessor(kmap);
+	    try {
+		AccessController.doPrivileged
+		    (new PrivilegedExceptionAction<Void>() {
+			    public Void run() throws IOException {
+				tp.processSystemResource(resource, "UTF-8", w);
+				return (Void)null;
+			    }
+			});
+	    } catch (PrivilegedActionException e) {
+		Throwable t = e.getCause();
+		if (t instanceof IOException) {
+		    throw (IOException) t;
+		} else {
+		    String msg = errorMsg("unexpected");
+		    throw new RuntimeException(msg, t);
+		}
+	    }
+	    return VOID;
 	}
     }
 
@@ -5102,6 +5216,13 @@ public class ExpressionParser implements ObjectParser<Object>
 					i++; j++;
 				    }
 				    results = Array.newInstance(c, arguments);
+				} else if (fname.equals("generateDocs")
+					   && args.length == 2
+					   && args[0] instanceof PrintWriter
+					   && args[1] instanceof JSArray) {
+				    PrintWriter w = (PrintWriter) args[0];
+				    JSArray docs = (JSArray) args[1];
+				    results = ep.generateDocs(w, docs);
 				} else {
 				    int len = args.length;
 				    String msg =
@@ -9751,6 +9872,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		{
 		    processor.pushValue(NULL);
 		}
+		break;
 	    default:
 		// unexpected token - should not occur
 	    }

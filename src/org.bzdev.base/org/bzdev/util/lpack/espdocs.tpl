@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+  <BODY>
+    <H2>Links to API Documentation</H2>
+    This document contains links to API documentation for classes
+    and methods specified by ESP import statements, including ones
+    provided implicitly. These are grouped into several sections:
+    <UL>
+      <LI><A HREF="#retvals">Return Values</A>. This section lists the
+	classes whose constructors can be used and that can be the
+	values of functions or methods.
+      <LI><A HREF="#args">Arguments</A>. This section lists the
+	classes that can be used as arguments for functions or
+	methods.
+      <LI><A HREF="#constrs">Constructors</A>. This section lists
+	constructors.
+      <LI><A HREF="#functs">Functions</A>. This section lists functions
+	(static methods that are used as functions).
+      <LI><A HREF="#methods">Methods</A>. This section lists instance
+	methods.
+      <LI><A HREF="#consts">Constants</A>. This section lists constants,
+	including enumerations.
+    </UL>
+    Each section contains links to the API documentation for the corresponding
+    classes, methods, and fields.
+
+    <H2><A NAME="retvals">Return-Value Classes</A></H2>
+    <P>
+      $(retList:endList)<A HREF="$(href)">$(item)</A>
+$(endList)
+
+    <H2><A NAME="args">Argument Classes</A></H2>
+    <P>
+      $(argList:endList)<A HREF="$(href)">$(item)</A>
+$(endList)
+
+    <H2><A NAME="constrs">Constructors</A></H2>
+    <P>
+      Constructors are available for the following classes:$(constrClasses:endCC)
+      <A HREF="#constr-$(class)">$(class)</A>$(endCC).
+    <P>
+      The constructors are are shown with links to the API documentation:
+    <UL>
+      $(constrList:endList)<LI>$(+title:eT)<A NAME="constr-$(class)">$(eT)<A HREF="$(href)">$(class)</A>$(+title:eT)</A>$(eT)$(arguments)
+$(endList)
+    </UL>
+
+    <H2><A NAME="functs">Functions</A></H2>
+    <P>
+      Functions are provided by the following classes:$(functClasses:endF)
+      <A HREF="#funct-$(class)">$(class)</A>$(endF).
+    <P>
+      The functions are shown with links to the API documentation:
+    <UL>
+      $(functList:endList)<LI>class $(+title:eT)<A NAME="funct-$(class)">$(eT)$(class)$(+title:eT)</A>$(eT) &mdash; <A HREF="$(href)">$(method)</A>$(arguments)
+$(endList)
+    </UL>
+
+    <H2><A NAME="methods">Methods</A></H2>
+    <P>
+      Instance methods are provided by the following classes:$(methodClasses:endM)
+      <A HREF="#method-$(class)">$(class)</A>$(endM)
+    <P>
+      The methods are shown with links to the API documentation:
+    <UL>
+      $(methodList:endList)<LI>class $(+title:eT)<A NAME="method-$(class)">$(eT)$(class)$(+title:eT)</A>$(eT) &mdash; <A HREF="$(href)">$(method)</A>$(arguments)
+$(endList)
+    </UL>
+
+    <H2><A NAME="consts">Constants</A></H2>
+    <P>
+      $(constList:endList)<A HREF="$(href)">$(item)</A>
+$(endList)
+  </BODY>
+</HTML>

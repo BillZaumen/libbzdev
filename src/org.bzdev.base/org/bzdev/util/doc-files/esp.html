@@ -1195,10 +1195,23 @@ array-elements:
 	This method returns true if the global namespace contains an
 	object with the name given by this method&apos;s argument; false
 	otherwise.
+      <LI><STRONG>generateDocs(</STRONG><I>w</I><STRONG>,</STRONG><I>list</I><STRONG>)</STRONG>.
+	This method uses a {@link java.io.PrintWriter PrintWriter}
+	<I>w</I> as the output for an HTML document describing the
+	Java classes, interfaces, enums, methods, and fields, that ESP
+	recognizes given the current set of explicit and implicit
+	import statements. The argument <I>list</I> contains strings
+	giving URLs or file names for the corresponding
+	javadoc-generated API documentation.  Each element of the list
+	is a string as described in the documentation for {@link
+	org.bzdev.net.URLPathParser}. This method is provided
+	primarily for debugging, but may have other uses. The value it
+	returns, ESP's value <STRONG>void</STRONG>), should be
+	ignored.
       <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>)</STRONG>.
 	This method returns the object with the name specified by this
 	method&apos;s argument and stored in the global namespace;
-	null if there is no such object
+	null if there is no such object.
       <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>)</STRONG>.
 	This method returns a property value for the object whose
 	variable name is given by by this method&apos;s first argument and
@@ -1370,7 +1383,19 @@ LongStream.rangeClosed(1, 1000000)
     The function asLong (which is defined in {@link org.bzdev.lang.MathOps},
     is needed because ESP is typeless returning a long is necessary because
     of the functional interface that the "reduce" method uses, and ESP
-    arithmetical operations tend to produce double-precision numbers.
+    arithmetical operations tend to produce double-precision numbers. If
+    a class has methods with the same name that accept either int or long
+    arguments, one can preface an integer constant with the letter 'L',
+    which will force the value to be interpreted as a long.  For example,
+    <BLOCKQUOTE><CODE><PRE>
+import(org.bzdev.lang, MathOps);
+LongStream.rangeClosed(1, 1000000)
+          .reduce(0L, function(x,y) {20L})
+    </PRE></CODE></BLOCKQUOTE>
+    The use of the 'L' notation is mostly for clarity: ESP will convert
+    32-bit integer values to long values when needed for method
+    or function calls. An explicit choice might be needed if methods are
+    overloaded.
   <P>
     As a second example,
     <BLOCKQUOTE><CODE><PRE>
@@ -1840,7 +1865,7 @@ tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0L, maxFrames);
+a2d.scheduleFrames(0, maxFrames);
 
 a2d.run();
     </PRE></CODE></BLOCKQUOTE>
@@ -1888,16 +1913,14 @@ tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0L, maxFrames);
+a2d.scheduleFrames(0, maxFrames);
 a2d.run();
 	</PRE></CODE></BLOCKQUOTE>
 	computes the number of frames created by the animation,
 	provides a pattern for names of the files used to store these
 	frames, provides an object (tmpdir) that provides access to a
 	temporary directory, schedules the frames, and finally runs the
-	animation to create the frames. The first argument to
-	<CODE>scheduleFrames</CODE> is <CODE>0L</CODE> because that method
-	requires a long integer as its first argument.
+	animation to create the frames.
    </UL>
 
     <H2><A NAME="hints">Hints</A></H2>
@@ -1912,7 +1935,10 @@ a2d.run();
     change the methods for that class that are recognized. For animations
     and simulations, importing one should import not only the classes of
     factory methods, but also the classes of the objects those methods
-    create.
+    create. To see exactly which methods are available, after the imports
+    one can call the method <STRONG>generateDocs</STRONG> provided by the
+    global object <STRONG>global</STRONG> at the appropriate point in a
+    script.
   <P>
     When <STRONG>scrunner</STRONG> is used a variable named
     <STRONG>scripting</STRONG> is defined. That variable can also be used to
@@ -1940,7 +1966,17 @@ a2d.run();
     and animations there are methods such as
     {@link org.bzdev.devqsim.Simulation#run(long)} whose arguments are
     long integers. When the value is a constant, an 'L' immediately
-    after the number will create an integer with the desired type.
+    after the number will create an integer with the desired type, but
+    this is typically not necessary as ESP will convert integers to longs
+    when a long integer is expected.
+  <P>
+    Finally, one can use the directives <STRONG>#+T</STRONG>,
+    <STRONG>#-T</STRONG>, <STRONG>#+S</STRONG>, and <STRONG>#-S</STRONG>,
+    which are described in the section on <A HREF="#tracing">tracing</A>,
+    to turn token tracing and stack tracing on and off. This can be useful
+    in determining how ESP is parsing and processing a script. Because these
+    directives can produce significant amounts of output, one would typically
+    use them for small portions of a script.
 
     <H2><A NAME="notes">Implementation Notes</A></H2>
   <P>
@@ -2031,7 +2067,7 @@ a2d.run();
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
-a2d.scheduleFrames(0L, maxFrames);
+a2d.scheduleFrames(0, maxFrames);
     </BLOCKQUOTE>
     If these lines are commented out,  the scripts will stop just
     after an animation and the animation objects it needs are
@@ -2139,5 +2175,7 @@ a2d.scheduleFrames(0L, maxFrames);
  -->
 <!--  LocalWords:   toMatrix toESPArray toESPMatrix getColorBysRGB
  -->
-<!--  LocalWords:  newJavaArray clasz
+<!--  LocalWords:  newJavaArray clasz generateDocs PrintWriter enums
+ -->
+<!--  LocalWords:  javadoc
  -->

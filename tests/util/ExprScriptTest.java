@@ -4,11 +4,14 @@ import org.bzdev.graphs.Graph;
 import org.bzdev.lang.MathOps;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import static java.lang.Math.hypot;
 import static java.lang.Math.cos;
 import static java.lang.Math.acos;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -138,7 +141,12 @@ public class ExprScriptTest {
 	parser.setScriptImportMode();
 	parser.setGlobalMode();
 
+	PrintWriter w = new PrintWriter(new
+					FileWriter("test.html",
+						   Charset.forName("UTF-8")));
 	Map<String,Object> gmap = new HashMap<String,Object>();
+	System.out.println("Java version = "
+			   + System.getProperty("java.version"));
 	gmap.put("org.bzdev.test", true);
 	parser.setGlobalBindings(gmap);
 
@@ -148,6 +156,7 @@ public class ExprScriptTest {
 
 	int[] iarray = {1, 2, 0};
 	parser.set("iarray", iarray);
+	parser.set("w", w);
 
 	ExpressionParser parser2 = new ExpressionParser();
 	parser2.setScriptingMode();

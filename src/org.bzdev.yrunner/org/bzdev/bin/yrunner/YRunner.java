@@ -357,8 +357,8 @@ public class YRunner {
 	    } else if (argv[index].equals("--link")) {
 		index++;
 		try {
-		    URL[] apiURLs  = URLPathParser.getURLs(null, argv[index],
-						       null, null);
+		    URL[] apiURLs = URLPathParser.getURLs(null, argv[index],
+							  null, null);
 		    if (apiURLs == null) apiURLs = noURLs;
 		    for (URL url: apiURLs) {
 			apis.add(url);

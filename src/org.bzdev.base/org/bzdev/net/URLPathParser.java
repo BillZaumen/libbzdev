@@ -25,10 +25,11 @@ import java.io.IOException;
  * valid as part of a URL, the component is interpreted as a URL, not
  * a file name.
  * <P>
- * In addition, a a leading "~", followed by either the standard file-separator
- * character or "/", is replaced with the user's home directory. The
- * sequence "~~" at the start of a component will be replaced by a single
- * "+".  All subsequent "~" are left as is.  The method
+ * In addition, a leading "~", followed by either the standard
+ * file-separator character or "/", is replaced with the user's home
+ * directory. The sequence "~~" at the start of a component will be
+ * replaced by a single "~".  All subsequent "~" characters in that
+ * component are left as is.  The method
  * {@link URLPathParser#getURLs(File,String,String)} and
  * {@link URLPathParser#getURLs(File,String,String, Appendable)} will
  * treat a leading "..." followed by the file separator or "/" as
