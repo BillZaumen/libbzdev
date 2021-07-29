@@ -356,6 +356,40 @@ public class ExpressionTest {
 	parser.setImportMode();
 	parser.setScriptImportMode();
 	parser.setGlobalMode();
+	parser.addClasses(java.awt.Color.class);
+
+	try {
+	    s = "blue.darker();";
+	    value = parser.parse(s);
+	    System.out.println("value = " + value);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
+	try {
+	    s = "Color . blue./*hi*/darker();";
+	    value = parser.parse(s);
+	    System.out.println("value = " + value);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
+	try {
+	    s = "Color . blue./*hi*/darker().darker();";
+	    value = parser.parse(s);
+	    System.out.println("value = " + value);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
+	parser = new ExpressionParser();
+	parser.setScriptingMode();
+	parser.setImportMode();
+	parser.setScriptImportMode();
+	parser.setGlobalMode();
 	parser.addClasses(Math.class);
 
 	try {

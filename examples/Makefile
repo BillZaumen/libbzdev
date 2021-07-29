@@ -206,6 +206,13 @@ run-p3d-sc: lockpart.jar
 	$(AVCONV) -y -f image2 -r 30 -i lptmp/lp-%03d.png -r 30 lockpart-sc.webm
 	rm -f lptmp/*.png
 
+run-p3d-esp: lockpart.jar
+	rm -f lptmp/*.png
+	./scrun -o:stl:lockpart-sc.stl -d:da:lptmp p3d/lockpart.esp
+	$(AVCONV) -y -f image2 -r 30 -i lptmp/lp-%03d.png -r 30 lockpart-sc.webm
+	rm -f lptmp/*.png
+
+
 run-p3d-scerr: lockpart.jar
 	./scrun  p3d/errtest.js || echo '(error expected)'
 

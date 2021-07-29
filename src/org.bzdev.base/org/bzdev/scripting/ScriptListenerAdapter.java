@@ -38,7 +38,7 @@ import org.bzdev.util.ExpressionParser.ESPFunction;
  *                                  implements FooListener
  *    {
  *        public FooScriptAdapter() {
- *            super(null);
+ *            super();
  *        }
  *
  *        public FooScriptAdapter(Object scriptObject)
@@ -86,7 +86,6 @@ public abstract class ScriptListenerAdapter {
     static String errorMsg(String key, Object... args) {
 	return Scripting.errorMsg(key, args);
     }
-
 
     ScriptingContext context;
     Object scriptObject;

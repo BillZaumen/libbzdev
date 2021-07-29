@@ -8752,15 +8752,38 @@ public class ExpressionParser implements ObjectParser<Object>
 				next = new Token(Operator.METHOD, m,
 						 offset+firstdot+1,
 						 level);
-
 				tokens.add(next);
 				i--;
 				break;
 			    } else {
-				String msg = errorMsg("noValue", v);
-				int ind = (firstdot < 0)? i: firstdot;
-				throw new ObjectParser.Exception
-				    (msg, filenameTL.get(), s, ind);
+				String fname = findField(v);
+				if (fname != null) {
+				    // v was actually a constant. Some
+				    // constants have methods, so we
+				    // duplicate what we do with variables
+				    // except for picking a constant instead
+				    // to get the object.
+				    level++;
+				    next = new Token(Operator.CONSTANT, v,
+						     offset+start, level);
+				    next.setValue(cmap.get(fname));
+				    tokens.add(next);
+				    prev = new Token(Operator.DOT, ".",
+						     offset + firstdot, level);
+				    String m = s.substring(firstdot+1, i)
+					.replaceAll(COMMENT_RE,"").trim();
+				    next = new Token(Operator.METHOD, m,
+						     offset+firstdot+1,
+						     level);
+				    tokens.add(next);
+				    i--;
+				    break;
+				} else {
+				    String msg = errorMsg("noValue", v);
+				    int ind = (firstdot < 0)? i: firstdot;
+				    throw new ObjectParser.Exception
+					(msg, filenameTL.get(), s, ind);
+				}
 			    }
 			}
 		    }
@@ -9207,6 +9230,37 @@ public class ExpressionParser implements ObjectParser<Object>
 			boolean maybeCall = maybeCall(s, i, len);
 			String fname = (varExists || maybeCall)? null:
 			    findField(variable);
+			if (!varExists && maybeCall) {
+			    //check for calling a constant's method.
+			    int index = variable.lastIndexOf('.');
+			    if (index != -1) {
+				String constant = variable.substring(0, index);
+				fname = findField(constant);
+				if (fname != null) {
+				    String method = variable.substring(index+1)
+					.replaceAll(COMMENT_RE,"").trim();
+				    if (method.length() == 0) method = null;
+				    if (method != null) {
+					level++;
+					next = new Token(Operator.CONSTANT,
+							 constant,
+							 offset+start, level);
+					next.setValue(cmap.get(fname));
+					tokens.add(next);
+					prev = new Token(Operator.DOT, ".",
+							 offset+start+index,
+							 level);
+					next = new Token(Operator.METHOD,
+							 method,
+							 offset+start+index+1,
+							 level);
+					tokens.add(next);
+					i--;
+					break;
+				    }
+				}
+			    }
+			}
 			if (fname != null) {
 			    level++; // so we have to decr after each operator
 			    next = new Token(Operator.CONSTANT, variable,

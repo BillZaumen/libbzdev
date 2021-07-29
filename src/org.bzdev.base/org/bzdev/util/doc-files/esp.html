@@ -288,7 +288,7 @@ var obj = {
 	in Java (or <STRONG>==</STRONG> for primitive types).
       <LI>A class name followed by <STRONG>.class</STRONG> denotes a
 	class object (i.e., an instance of {@link java.lang.Class}).
-	Arrays are not allowed (for example, <STRONG>double[].class</STRONG>,
+	Arrays are not allowed (for example, <STRONG>double[].class</STRONG>),
 	but the  primitive classes <STRONG>double.class</STRONG>,
 	<STRONG>long.class</STRONG>, <STRONG>int.class</STRONG>
 	and <STRONG>boolean.class</STRONG> are allowed.
@@ -506,7 +506,7 @@ BLOCKED
 	  right-shift, or unsigned right-shift respectively.</TD></TR>
       <TR><TD>&gt; &lt; &gt;= &lt;= instanceof</TD>
 	<TD>greater-than, less-than, greater-than- or-equal-to, equal-to
-	  or subclass-of respectively</TD></TR>
+	  or instance-of respectively</TD></TR>
       <TR><TD>==, !=</TD><TD>equals and not equal respectively</TD></TR>
       <TR><TD>&amp;</TD><TD>bitwise AND</TD></TR>
       <TR><TD>^</TD><TD>bitwise exclusive OR</TD></TR>
@@ -928,8 +928,7 @@ package-name: qualified-name
     | &apos;"&apos; &apos;"&apos;
     | &apos;"&apos; qualified-name &apos;"&apos;
 
-class-names:
-    | class-name
+class-names: class-name
     | class-names &apos;,&apos; class-names
 
 class-name: qualified-name
@@ -1014,15 +1013,15 @@ import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
   <P>
     The syntax is as follows:
     <BLOCKQUOTE><PRE>
-object: &apos;[&apos; object-elements &apos;]&apos;
+object: &apos;{&apos; object-elements &apos;}&apos;
 
 object-elements:
     | object-elements &apos;,&apos; object-element
 
 object-element: identifier &apos;:&apos; value
     | string &apos;:&apos; value
-    | identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}
-    | &apos;synchronized&apos; identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}
+    | identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}&apos;
+    | &apos;synchronized&apos; identifier &apos;(&apos; parameter-list &apos;)&apos; &apos;{&apos; function-statements &apos;}&apos;
 
     </PRE></BLOCKQUOTE>
     As with functions, the use of the keyword <STRONG>synchronized</STRONG>
@@ -1104,7 +1103,12 @@ array-elements:
     | value
     | array-elements &apos;,&apos; value
     </PRE></BLOCKQUOTE>
-    As objects, arrays have the following methods:
+    An array element can be dereferenced by following the array
+    (include ones provided by expressions) with a <STRONG>[</STRONG>,
+    followed by an expression that evaluates to an index, followed by
+    <STRONG>]</STRONG>. An array's indices start at 0. This form can
+    be used as the target for an assignment as well. As objects,
+    arrays have the following methods:
     <UL>
       <LI><STRONG>get(</STRONG><I>index</I><STRONG>)</STRONG>. This
 	method returns the array element whose index is <I>index</I>.
@@ -1195,16 +1199,19 @@ array-elements:
 	This method returns true if the global namespace contains an
 	object with the name given by this method&apos;s argument; false
 	otherwise.
+      <LI><STRONG>finishImport()</STRONG>. A sequence of classes
+	to be imported has ended. This should be called after a series
+	of calls to <STRONG>importClasses</STRONG>.
       <LI><STRONG>generateDocs(</STRONG><I>w</I><STRONG>,</STRONG><I>list</I><STRONG>)</STRONG>.
 	This method uses a {@link java.io.PrintWriter PrintWriter}
 	<I>w</I> as the output for an HTML document describing the
 	Java classes, interfaces, enums, methods, and fields, that ESP
 	recognizes given the current set of explicit and implicit
-	import statements. The argument <I>list</I> contains strings
-	giving URLs or file names for the corresponding
-	javadoc-generated API documentation.  Each element of the list
-	is a string as described in the documentation for {@link
-	org.bzdev.net.URLPathParser}. This method is provided
+	import statements. The argument <I>list</I> is an ESP list of
+	strings, each providing URLs or file names for the corresponding
+	javadoc-generated API documentation, with the URLs or file names
+	using the syntax described in the documentation for
+	{@link org.bzdev.net.URLPathParser}. This method is provided
 	primarily for debugging, but may have other uses. The value it
 	returns, ESP's value <STRONG>void</STRONG>), should be
 	ignored.
@@ -1216,41 +1223,6 @@ array-elements:
 	This method returns a property value for the object whose
 	variable name is given by by this method&apos;s first argument and
 	whose property name is given by this method&apos;s second argument.
-      <LI> <STRONG>isArray(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns true if its argument is an
-	expression-parser array or a Java array; false otherwise.
-      <LI> <STRONG>isESPArray(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns true if its argument is an
-	expression-parser array; false otherwise.
-      <LI> <STRONG>isJavaArray(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns true if its argument is a Java array;
-	false otherwise.
-      <LI> <STRONG>isObject(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns true if its argument is an
-	expression-parser object; false otherwise.
-      <LI> <STRONG>newJavaArray(</STRONG><I>clasz</I><STRONG>,</STRONG><I>dimension</I><STRONG>...)</STRONG>.
-	This method creates a new Java array, possibly multidimensional,
-	whose component type is provided by the argument <I>clasz</I> and
-	whose dimensions are given by the remaining arguments (there must be
-	at least one dimension provided). A maximum of 255 dimensions may be
-	provided (this limit is set by Java).
-      <LI> <STRONG>typeof(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns the Java class of the object provided by its
-	argument; null if the argument is null
-      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
-	This method sets the global value corresponding to this
-	method&apos;s first argument to the value specified by this
-	method&apos;s second argument, and returns either the previous
-	value or null if there is no previous value.
-      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
-	This method sets the property specified by this method&apos;s
-	second argument to the value specified by this method&apos;s third
-	argument for the object specified by this method&apos;s first argument
-      <LI> <STRONG>size(</STRONG><I>object</I><STRONG>)</STRONG>.
-	This method returns the size of the object provided as this
-	method&apos;s first argument, provided that the object is an
-	expression-parser object, an expression-parser array, or a
-	Java array. An exception will be thrown otherwise.
       <LI> <STRONG>getReader()</Strong>. This method returns a reader; null
 	if one is not configured. The reader is configured by calling
 	{@link ExpressionParser#setReader(java.io.Reader)} or
@@ -1288,8 +1260,41 @@ array-elements:
 	class names of classes within the package. Multiple calls
 	to this method may occur in a row, and must be followed by
 	a call to <STRONG>finishImport()</STRONG>.
-      <LI><STRONG>finishImport()</STRONG>. A sequence of classes
-	to be imported has ended.
+      <LI> <STRONG>isArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser array or a Java array; false otherwise.
+      <LI> <STRONG>isESPArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser array; false otherwise.
+      <LI> <STRONG>isJavaArray(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is a Java array;
+	false otherwise.
+      <LI> <STRONG>isObject(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns true if its argument is an
+	expression-parser object; false otherwise.
+      <LI> <STRONG>newJavaArray(</STRONG><I>clasz</I><STRONG>,</STRONG><I>dimension</I><STRONG>...)</STRONG>.
+	This method creates a new Java array, possibly multidimensional,
+	whose component type is provided by the argument <I>clasz</I> and
+	whose dimensions are given by the remaining arguments (there must be
+	at least one dimension provided). A maximum of 255 dimensions may be
+	provided (this limit is set by Java).
+      <LI> <STRONG>typeof(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns the Java class of the object provided by its
+	argument; null if the argument is null
+      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+	This method sets the global value corresponding to this
+	method&apos;s first argument to the value specified by this
+	method&apos;s second argument, and returns either the previous
+	value or null if there is no previous value.
+      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+	This method sets the property specified by this method&apos;s
+	second argument to the value specified by this method&apos;s third
+	argument for the object specified by this method&apos;s first argument
+      <LI> <STRONG>size(</STRONG><I>object</I><STRONG>)</STRONG>.
+	This method returns the size of the object provided as this
+	method&apos;s first argument, provided that the object is an
+	expression-parser object, an expression-parser array, or a
+	Java array. An exception will be thrown otherwise.
     </UL>
 
     <H3><A NAME="tracing">Directives for Tracing</A></H3>
@@ -1403,7 +1408,7 @@ import (java.lang, Math);
 var list = [10, -20, 30, 40, -50, 60];
 list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
     </PRE></CODE></BLOCKQUOTE>
-will produce a sum of the absolute values of the number
+will produce a sum of the absolute values of the numbers
 in <CODE>list</CODE>.
 
     <H2><A NAME="threading">Threading</A></H2>
