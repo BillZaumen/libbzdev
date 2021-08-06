@@ -33,8 +33,10 @@
  * <code>resource.path</code> is a list of jar files and directories
  * separated by the path-separator character. In this list, the
  * component "$classpath" indicates that the class path should be
- * searched, allowing the search order to be controlled precisely
- * (otherwise the classes in "$classpath"
+ * searched, allowing the search order to be controlled precisely.
+ * If this property is not defined, the class path will be searched
+ * for the resource. Otherwise "$classpath" must appear explicitly
+ * if the class path is to be searched.
  * </dd>
  * <dt><B>sresource</B></dt><dd>A URL of the form sresource:PATH[#FRAGMENT]
  * (where PATH starts with a "/") accesses a resource that can be found using

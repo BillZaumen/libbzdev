@@ -11,6 +11,8 @@ import javax.swing.table.*;
 
 import org.bzdev.lang.UnexpectedExceptionError;
 
+//@exbundle org.bzdev.swing.lpack.Swing
+
 /**
  * Table pane for inputing data.
  * This class creates a JPanel containing a JTable plus some controls.
@@ -29,6 +31,10 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * representing the rows.
  */
 public class InputTablePane extends JPanel {
+
+    static String errorMsg(String key, Object... args) {
+	return SwingErrorMsg.errorMsg(key, args);
+    }
 
     private  static DefaultCellEditor default_cell_editor;
 
@@ -203,6 +209,19 @@ public class InputTablePane extends JPanel {
 
     /*private*/ JTable table;
 
+    private static final String appendRowStr = errorMsg("appendRow");
+    private static final String insertRowStr = errorMsg("insertRow");
+    private static final String deleteRowStr = errorMsg("deleteRow");
+    private static final String moveUpStr = errorMsg("moveUp");
+    private static final String moveDownStr = errorMsg("moveDown");
+    private static final String clearSelectionStr = errorMsg("clearSelection");
+
+    // record these so we can determine if the table can be edited.
+    boolean canAdd;
+    boolean canDel;
+    boolean canMove;
+    boolean canEdit;
+
     /**
      * Constructor with explicitly provided rows, possibly followed by
      * blank rows.
@@ -223,13 +242,21 @@ public class InputTablePane extends JPanel {
 			  boolean canAdd, boolean canDel, boolean canMove)
     {
 	super();
-	JButton addRowButton = canAdd? new JButton("Append Row"): null;
+	this.canAdd = canAdd;
+	this.canDel = canDel;
+	this.canMove = canMove;
+	this.canEdit = false;
+	for (ColSpec spec: colspec) {
+	    if (spec.tce != null) this.canEdit = true;
+	}
+
+	JButton addRowButton = canAdd? new JButton(appendRowStr): null;
 	JButton insertRowButton =
-	    (canAdd && canMove)? new JButton("Insert Row"): null;
-	JButton deleteRowButton = canDel? new JButton("Delete Row"): null;
-	JButton moveUpButton = canMove? new JButton("Move Up"): null;
-	JButton moveDownButton = canMove? new JButton("MoveDown"): null;
-	JButton clearSelectionButton = new JButton("Clear Selection");
+	    (canAdd && canMove)? new JButton(insertRowStr): null;
+	JButton deleteRowButton = canDel? new JButton(deleteRowStr): null;
+	JButton moveUpButton = canMove? new JButton(moveUpStr): null;
+	JButton moveDownButton = canMove? new JButton(moveDownStr): null;
+	JButton clearSelectionButton = new JButton(clearSelectionStr);
 
 	table = new JTable() {
 		public Class<?> getColumnClass(int columnIndex) {
@@ -516,7 +543,21 @@ public class InputTablePane extends JPanel {
 			  canAdd, canDel, canMove);
     }
 
-    private static Object[] options = {"OK", "Cancel"};
+    private static final String okStr = errorMsg("OK");
+    private static final String cancelStr = errorMsg("Cancel");
+
+    private static final Object[] options = {okStr, cancelStr};
+
+    /**
+     * Determine if this input table pane can be modified.
+     * A table can be modified if its cells can be changed, if
+     * new rows can be added, if rows can be moved, or if rows
+     * can be deleted.
+     * @return true if it can be modified; false otherwise
+     */
+    boolean isModifiable() {
+	return canAdd || canDel || canMove || canEdit;
+    }
 
     /**
      * Create a new InputTablePane, initializing some rows, placing
@@ -532,7 +573,7 @@ public class InputTablePane extends JPanel {
      *        false otherwise
      * @param canMove true if rows can be moved up or down in the table;
      *        false otherwise
-     * @return an input-table pane if successful; null if canceled or closed
+     * @return an input-table pane if successful or closed; null if canceled
      */
     public static InputTablePane
 	showDialog(Component parent, String title,
@@ -543,16 +584,22 @@ public class InputTablePane extends JPanel {
 	InputTablePane pane = new InputTablePane(colspec, nrows, initialRows,
 						 canAdd, canDel, canMove);
 
-	int status = JOptionPane.showOptionDialog(parent, pane, title,
-						  JOptionPane.YES_NO_OPTION,
-						  JOptionPane.PLAIN_MESSAGE,
-						  null,
-						  options, options[0]);
-	pane.stopCellEditing();
-	if (status == 0 || status == JOptionPane.CLOSED_OPTION) {
-	    return pane;
+	if (pane.isModifiable()) {
+	    int status = JOptionPane.showOptionDialog(parent, pane, title,
+						      JOptionPane.YES_NO_OPTION,
+						      JOptionPane.PLAIN_MESSAGE,
+						      null,
+						      options, options[0]);
+	    pane.stopCellEditing();
+	    if (status == 0 || status == JOptionPane.CLOSED_OPTION) {
+		return pane;
+	    } else {
+		return null;
+	    }
 	} else {
-	    return null;
+	    JOptionPane.showMessageDialog(parent, pane, title,
+					  JOptionPane.PLAIN_MESSAGE, null);
+	    return pane;
 	}
     }
 
@@ -581,13 +628,20 @@ public class InputTablePane extends JPanel {
     public static int showDialog(Component parent, String title,
 				       InputTablePane ipane)
     {
-	int status = JOptionPane.showOptionDialog(parent, ipane, title,
-						  JOptionPane.YES_NO_OPTION,
-						  JOptionPane.PLAIN_MESSAGE,
-						  null,
-						  options, options[0]);
-	ipane.stopCellEditing();
-	return status;
+	if (ipane.isModifiable()) {
+	    int status = JOptionPane.showOptionDialog(parent, ipane, title,
+						      JOptionPane.YES_NO_OPTION,
+						      JOptionPane.PLAIN_MESSAGE,
+						      null,
+						      options, options[0]);
+	    ipane.stopCellEditing();
+	    return (status == JOptionPane.CLOSED_OPTION)? 0: status;
+	} else {
+	    JOptionPane.showMessageDialog(parent, ipane, title,
+					 JOptionPane.PLAIN_MESSAGE,
+					 null);
+	    return OK;
+	}
     }
 }
 

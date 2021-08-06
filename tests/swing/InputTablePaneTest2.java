@@ -97,12 +97,13 @@ public class InputTablePaneTest2 {
 				      true, true, true);
 	if (ipane == null) {
 	    System.out.println("... canceled");
-	}
-	for (int i = 0; i < ipane.getRowCount(); i++) {
-	    String user = (String)ipane.getValueAt(i,0);
-	    String value = (String)ipane.getValueAt(i, 1);
-	    if (user != null && value != null) {
-		System.out.format("%s: %s\n", user, value);
+	} else {
+	    for (int i = 0; i < ipane.getRowCount(); i++) {
+		String user = (String)ipane.getValueAt(i,0);
+		String value = (String)ipane.getValueAt(i, 1);
+		if (user != null && value != null) {
+		    System.out.format("%s: %s\n", user, value);
+		}
 	    }
 	}
     }

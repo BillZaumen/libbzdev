@@ -1,5 +1,6 @@
-import(org.bzdev.anim2d, [Animation2D, AnimationPath2DFactory,
-			    GraphViewFactory, AnimationLayer2DFactory]);
+import(org.bzdev.anim2d, [Animation2D,
+			  AnimationPath2D, AnimationPath2DFactory,
+			  GraphViewFactory, AnimationLayer2DFactory]);
 import(org.bzdev.util.units.MKS);
 
 var err ?= global.getErrorWriter();

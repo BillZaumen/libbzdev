@@ -27,7 +27,8 @@ import java.security.*;
  * The supported schemes are
  * <ul>
  *  <li> resource. This scheme looks up resources based on a class
- *       path whose entries are separated by '|' and that is stored in
+ *       path whose entries are separated by the path-separator character
+ *       ('|' on Unix/Linux systems) and that is stored in
  *       a system property named org.bzdev.protocols.resource.path. If
  *       this system property is not provided, the system class loader
  *       will be used as a default. The path entry $classpath

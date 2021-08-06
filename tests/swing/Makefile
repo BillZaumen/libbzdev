@@ -101,6 +101,18 @@ inputtable2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) InputTablePaneTest2
 
+inputtable3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest3
+
+inputtable4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest4
+
 frametests:
 	make ctest ctest1 ctest1f ctest2 ctest3 ctest3sa ctest3sb
 	make ctest3a ctest3b ctest3aa ctest3ab ctest3ba ctest3bb
