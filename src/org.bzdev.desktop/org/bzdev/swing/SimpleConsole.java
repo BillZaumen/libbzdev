@@ -927,7 +927,7 @@ public class SimpleConsole extends JComponent implements Appendable {
 	JFrame frame = getFrame();
 	if (frame == null) {
 	    if (getParent() != null) {
-		throw new IllegalStateException();
+		throw new IllegalStateException(errorMsg("hasParent"));
 	    }
 	    frame = new Frame(title, width, height, this, false);
 	} else {

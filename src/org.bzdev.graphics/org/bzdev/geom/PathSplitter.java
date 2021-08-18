@@ -2,6 +2,8 @@ package org.bzdev.geom;
 import java.awt.geom.*;
 import java.util.ArrayList;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Utility class with static methods for splitting paths into
  * subpaths.
@@ -11,6 +13,10 @@ import java.util.ArrayList;
  * @see Path3D
  */
 public class PathSplitter {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
 
     // just static
     private PathSplitter() {}
@@ -795,7 +801,7 @@ public class PathSplitter {
 	    splitCubic(startX, startY, coords, offset, scoords, soffset, u);
 	    break;
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
     }
 
@@ -863,7 +869,7 @@ public class PathSplitter {
 		       coords, offset, scoords, soffset, u);
 	    break;
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
     }
 
@@ -976,7 +982,7 @@ public class PathSplitter {
     {
 	// System.out.println("u1 = " + u1 + ", u2 = " + u2);
 	if (u1 > u2) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("u1GTu2"));
 	}
 	int start = (int) Math.round(Math.floor(u1));
 	int end = (int) Math.round(Math.floor(u2));
@@ -1013,10 +1019,13 @@ public class PathSplitter {
     {
 	Path2D p;
 	if (start > end) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("startGTend"));
 	}
-	if (start < 0 || end < 0) {
-	    throw new IllegalArgumentException();
+	if (start < 0) {
+	    throw new IllegalArgumentException(errorMsg("startNegative"));
+	}
+	if (end < 0) {
+	    throw new IllegalArgumentException(errorMsg("endNegative"));
 	}
 	if (path instanceof Path2D.Double) {
 	    p = new Path2D.Double(path.getWindingRule());
@@ -1028,7 +1037,7 @@ public class PathSplitter {
 	}
 	PathIterator pit = path.getPathIterator(null);
 	if (pit.isDone()) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalStateException(errorMsg("iterationError"));
 	}
 	if (end > start && Math.abs(u2) < 1.e-10) {
 	    end--;
@@ -1057,18 +1066,19 @@ public class PathSplitter {
 		return p;
 	    }
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
 	int index = -1;
 	while (index < start) {
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
 		if (index != -1) {
-		    throw new IllegalArgumentException();
+		    throw new IllegalArgumentException(errorMsg("needMoveTo"));
 		}
 		break;
 	    case PathIterator.SEG_CLOSE:
-		throw new IllegalArgumentException();
+		throw new
+		    IllegalArgumentException(errorMsg("misplacedClose"));
 	    case PathIterator.SEG_LINETO:
 		x = coords[0];
 		y = coords[1];
@@ -1084,21 +1094,21 @@ public class PathSplitter {
 	    }
 	    pit.next();
 	    if (pit.isDone()) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("iterationError"));
 	    }
 	    type = pit.currentSegment(coords);
 	    index++;
 	}
 	switch(type) {
 	case PathIterator.SEG_MOVETO:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	case PathIterator.SEG_CLOSE:
 	    /*
 	    System.out.format("end = %d, u2 = %g, index =%d\n", end, u2,
 			      index);
 	    */
 	    if (x == lastX && y == lastY) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("badClose"));
 	    } else if (index == end) {
 		coords[0] = lastX;
 		coords[1] = lastY;
@@ -1109,7 +1119,7 @@ public class PathSplitter {
 		p.lineTo(scoords[4], scoords[5]);
 		return p;
 	    } else {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    }
 	case PathIterator.SEG_LINETO:
 	    splitLine(x, y, coords, 0, scoords, 0, u1);
@@ -1183,15 +1193,15 @@ public class PathSplitter {
 	while(index < endm1) {
 	    pit.next();
 	    if (pit.isDone()) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("iterationError"));
 	    }
 	    type = pit.currentSegment(coords);
 	    index++;
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	    case PathIterator.SEG_CLOSE:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    case PathIterator.SEG_LINETO:
 		p.lineTo(coords[0], coords[1]);
 		// System.out.format("lineTo (%g, %g)\n", coords[0], coords[1]);
@@ -1215,15 +1225,15 @@ public class PathSplitter {
 	if (Math.abs(u2) < 1.e-10) return p;
 	pit.next();
 	if (pit.isDone()) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("iterationError"));
 	}
 	type = pit.currentSegment(coords);
 	switch(type) {
 	case PathIterator.SEG_MOVETO:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	case PathIterator.SEG_CLOSE:
 	    if (x == lastX && y == lastY) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("badClose"));
 	    }
 	    if (u2 <=  1.0) {
 		coords[0] = lastX;
@@ -1233,7 +1243,7 @@ public class PathSplitter {
 				  lastX, lastY);
 		*/
 	    } else {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    }
 	case PathIterator.SEG_LINETO:
 	    splitLine(x, y, coords, 0, scoords, 0, u2);
@@ -1278,7 +1288,7 @@ public class PathSplitter {
     {
 	// System.out.println("u1 = " + u1 + ", u2 = " + u2);
 	if (u1 > u2) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("u1GTu2"));
 	}
 	int start = (int) Math.round(Math.floor(u1));
 	int end = (int) Math.round(Math.floor(u2));
@@ -1315,10 +1325,13 @@ public class PathSplitter {
     {
 	Path3D p;
 	if (start > end) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("startGTend"));
 	}
-	if (start < 0 || end < 0) {
-	    throw new IllegalArgumentException();
+	if (start < 0) {
+	    throw new IllegalArgumentException(errorMsg("startNegative"));
+	}
+	if (end < 0) {
+	    throw new IllegalArgumentException(errorMsg("endNegative"));
 	}
 	if (path instanceof Path3D.Double) {
 	    p = new Path3D.Double();
@@ -1330,7 +1343,7 @@ public class PathSplitter {
 	}
 	PathIterator3D pit = path.getPathIterator(null);
 	if (pit.isDone()) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("iterationError"));
 	}
 	if (end > start && Math.abs(u2) < 1.e-10) {
 	    end--;
@@ -1363,18 +1376,19 @@ public class PathSplitter {
 		return p;
 	    }
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("needMoveTo"));
 	}
 	int index = -1;
 	while (index < start) {
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
 		if (index != -1) {
-		    throw new IllegalArgumentException();
+		    throw new
+			IllegalArgumentException(errorMsg("misplacedMoveTo"));
 		}
 		break;
 	    case PathIterator.SEG_CLOSE:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    case PathIterator.SEG_LINETO:
 		x = coords[0];
 		y = coords[1];
@@ -1393,21 +1407,21 @@ public class PathSplitter {
 	    }
 	    pit.next();
 	    if (pit.isDone()) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("iterationError"));
 	    }
 	    type = pit.currentSegment(coords);
 	    index++;
 	}
 	switch(type) {
 	case PathIterator.SEG_MOVETO:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	case PathIterator.SEG_CLOSE:
 	    /*
 	    System.out.format("end = %d, u2 = %g, index =%d\n", end, u2,
 			      index);
 	    */
 	    if (x == lastX && y == lastY) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("badClose"));
 	    } else if (index == end) {
 		coords[0] = lastX;
 		coords[1] = lastY;
@@ -1420,7 +1434,7 @@ public class PathSplitter {
 		p.lineTo(scoords[6], scoords[7],scoords[8]);
 		return p;
 	    } else {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    }
 	case PathIterator.SEG_LINETO:
 	    splitLine(x, y, z, coords, 0, scoords, 0, u1);
@@ -1501,15 +1515,15 @@ public class PathSplitter {
 	while(index < endm1) {
 	    pit.next();
 	    if (pit.isDone()) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("iterationError"));
 	    }
 	    type = pit.currentSegment(coords);
 	    index++;
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	    case PathIterator.SEG_CLOSE:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    case PathIterator.SEG_LINETO:
 		p.lineTo(coords[0], coords[1], coords[2]);
 		// System.out.format("lineTo (%g, %g)\n", coords[0], coords[1]);
@@ -1538,15 +1552,15 @@ public class PathSplitter {
 	if (Math.abs(u2) < 1.e-10) return p;
 	pit.next();
 	if (pit.isDone()) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("iterationError"));
 	}
 	type = pit.currentSegment(coords);
 	switch(type) {
 	case PathIterator.SEG_MOVETO:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("misplacedMoveTo"));
 	case PathIterator.SEG_CLOSE:
 	    if (x == lastX && y == lastY && z == lastZ) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("badClose"));
 	    }
 	    if (u2 <=  1.0) {
 		coords[0] = lastX;
@@ -1557,7 +1571,7 @@ public class PathSplitter {
 				  lastX, lastY);
 		*/
 	    } else {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("misplacedClose"));
 	    }
 	case PathIterator.SEG_LINETO:
 	    splitLine(x, y, z, coords, 0, scoords, 0, u2);

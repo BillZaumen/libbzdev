@@ -1601,7 +1601,7 @@ public class Path2DInfo {
 		return getLineBezierUV(x1, y1, coords1[0], coords1[1],
 				       x2, y2, coords2, 3);
 	    default:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("piUnknown"));
 	    }
 	case PathIterator.SEG_QUADTO:
 	    switch(type2) {
@@ -1626,7 +1626,7 @@ public class Path2DInfo {
 		return getBezierBezierUV(x1, y1, coords1, 2,
 					 x2, y2, coords2, 3);
 	    default:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("piUnknown"));
 	    }
 	case PathIterator.SEG_CUBICTO:
 	    switch(type2) {
@@ -1651,10 +1651,10 @@ public class Path2DInfo {
 		return getBezierBezierUV(x1, y1, coords1, 3,
 					 x2, y2, coords2, 3);
 	    default:
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("piUnknown"));
 	    }
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
     }
 
@@ -5994,7 +5994,7 @@ public class Path2DInfo {
      */
     public static double[] principalMoments(double[][] moments) {
 	if (moments[0][1] != moments[1][0]) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("badMoments"));
 	}
 	if (moments[0][1] == 0.0) {
 	    double val1 = moments[0][0];
@@ -6044,7 +6044,7 @@ public class Path2DInfo {
     public static double[][] principalAxes(double[][] moments)
     {
 	if (moments[0][1] != moments[1][0]) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("badMoments"));
 	}
 	if (moments[0][1] == 0.0) {
 	    double val1 = moments[0][0];

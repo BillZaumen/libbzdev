@@ -2,6 +2,9 @@ package org.bzdev.obnaming;
 import org.bzdev.util.JSArray;
 import org.bzdev.util.JSObject;
 import java.util.Collection;
+import java.util.MissingResourceException;
+
+//@exbundle org.bzdev.obnaming.lpack.Launcher
 
 /**
  * Simplified JavaScript-like array (or list) class.
@@ -35,6 +38,12 @@ import java.util.Collection;
  * @see NamedObjectFactory
  */
 public class NJSArray extends JSArray {
+
+    static String errorMsg(String key, Object... args)
+	throws NullPointerException, MissingResourceException
+    {
+	return ObjectNamerLauncher.errorMsg(key, args);
+    }
 
     /**
      * Constructor.
@@ -82,7 +91,7 @@ public class NJSArray extends JSArray {
 	    || object instanceof JSObject) {
 	    return super.setObject(index, object);
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("badElement"));
 	}
     }
 
@@ -105,7 +114,7 @@ public class NJSArray extends JSArray {
 	    || object instanceof JSObject) {
 	    return addObject(object);
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("badElement"));
 	}
     }
 }

@@ -6,11 +6,17 @@ import org.bzdev.lang.UnexpectedExceptionError;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Class to create a Transform2D based on real-valued functions of
  * two arguments.
  */
 public class RVFTransform2D implements Transform2D, Cloneable {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
 
     RealValuedFunctionTwo xfunct;
     RealValuedFunctionTwo yfunct;
@@ -33,14 +39,14 @@ public class RVFTransform2D implements Transform2D, Cloneable {
     public RVFTransform2D(RealValuedFunctionTwo xfunct,
 			  RealValuedFunctionTwo yfunct) {
 	if (xfunct == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullFunct2"));
 	} else if (xfunct instanceof RealValuedFunctionTwo) {
 	    this.xfunct = (RealValuedFunctionTwo) xfunct;
 	} else {
 	    this.xfunct = new RealValuedFunctionTwo(xfunct) ;
 	}
 	if (yfunct == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullFunct2"));
 	} else if (yfunct instanceof RealValuedFunctionTwo) {
 	    this.yfunct = (RealValuedFunctionTwo) yfunct;
 	} else {

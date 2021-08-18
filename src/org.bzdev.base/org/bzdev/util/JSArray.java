@@ -146,7 +146,7 @@ public class JSArray implements Iterable<Object>, JSOps {
 	    return list.add(object);
 	} else {
 	    String msg = errorMsg("illegalClass", object.getClass().getName());
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(msg);
 	}
     }
 

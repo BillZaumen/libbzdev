@@ -9,6 +9,8 @@ import org.bzdev.math.StaticRandom;
 import org.bzdev.lang.MathOps;
 import org.bzdev.lang.UnexpectedExceptionError;
 
+//@exbundle org.bzdev.math.rv.lpack.RV
+
 /**
  * Create a correlated set of Gaussian random variables.
  * This class provides a method {@link GaussianRVs#next(double[])}
@@ -33,6 +35,11 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * random numbers are not mutually independent.
  */
 public class GaussianRVs {
+
+    static String errorMsg(String key, Object... args) {
+	return RVErrorMsg.errorMsg(key, args);
+    }
+
     double[][] L;
     double[] rvs;
     double[] means;
@@ -54,8 +61,13 @@ public class GaussianRVs {
      * @param means the mean values for each of the set of random variables
      */
     public GaussianRVs(double[][]cov, double[] means) {
-	if (cov == null || means == null) {
-	    throw new IllegalArgumentException();
+	if (cov == null) {
+	    String msg = errorMsg("firstArgNull");
+	    throw new IllegalArgumentException(msg);
+	}
+	if (means == null) {
+	    String msg = errorMsg("secondArgNull");
+	    throw new IllegalArgumentException(msg);
 	}
 	try {
 	    this.means = means.clone();
@@ -78,9 +90,17 @@ public class GaussianRVs {
      * @param n the number of rows and columns of cov and mean that are used
      */
     public GaussianRVs(double[][]cov, double[] means, int n) {
-	if (n < 0) throw new IllegalArgumentException();
-	if (cov == null || means == null) {
-	    throw new IllegalArgumentException();
+	if (n < 0) {
+	    String msg = errorMsg("thirdArgNeg");
+	    throw new IllegalArgumentException(msg);
+	}
+	if (cov == null) {
+	    String msg = errorMsg("firstArgNull");
+	    throw new IllegalArgumentException(msg);
+	}
+	if (means == null) {
+	    String msg = errorMsg("secondArgNull");
+	    throw new IllegalArgumentException(msg);
 	}
 	try {
 	    this.means = new double[n];

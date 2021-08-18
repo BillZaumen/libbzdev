@@ -24,7 +24,7 @@ array[0] = 10.0; array[1] = 20.0;
 out.println(array.class);
 out.println("array length = " +array.length);
 out.println(array[0].class);
-out.println(array[0].class);
+out.println(array[1].class);
 
 formatter = new SciFormatter();
 out.println(formatter.format("%.2f %.2f", array));

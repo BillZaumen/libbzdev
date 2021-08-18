@@ -581,7 +581,8 @@ public class DirectoryAccessor {
 			     throw nfe;
 			}
 			if (!pf.equals(dir)) {
-			    throw new FileNotFoundException();
+			    String msg = errorMsg("unexpectedParent", pf, dir);
+			    throw new FileNotFoundException(msg);
 			}
 			return readable && file.canRead();
 		    }
@@ -633,7 +634,8 @@ public class DirectoryAccessor {
 			     throw nfe;
 			}
 			if (!pf.equals(dir)) {
-			    throw new FileNotFoundException();
+			    String msg = errorMsg("unexpectedParent", pf, dir);
+			    throw new FileNotFoundException(msg);
 			}
 			return writable && file.canWrite();
 		    }
@@ -682,7 +684,8 @@ public class DirectoryAccessor {
 			     throw nfe;
 			}
 			if (!pf.equals(dir)) {
-			    throw new FileNotFoundException();
+			    String msg = errorMsg("unexpectedParent", pf, dir);
+			    throw new FileNotFoundException(msg);
 			}
 			return file.isDirectory();
 		    }
@@ -730,7 +733,8 @@ public class DirectoryAccessor {
 			     throw nfe;
 			}
 			if (!pf.equals(dir)) {
-			    throw new FileNotFoundException();
+			    String msg = errorMsg("unexpectedParent", pf, dir);
+			    throw new FileNotFoundException(msg);
 			}
 			return file.exists();
 		    }

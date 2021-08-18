@@ -847,6 +847,7 @@ public abstract class SuffixArray {
      * from a search for all instances of a subsequence.
      */
     public class OurRange implements Range {
+
 	int seqlength;
 	int length;
 	int start;
@@ -866,7 +867,8 @@ public abstract class SuffixArray {
 	@Override
 	public int subsequenceIndex(int ind) {
 	    if (ind < 0 || ind >= length) {
-		throw new IllegalArgumentException();
+		java.lang.String msg = errorMsg("indexRange", ind);
+		throw new IllegalArgumentException(msg);
 	    }
 	    return array[start + ind];
 	}
@@ -1019,7 +1021,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -1904,7 +1908,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -2784,7 +2790,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -3664,7 +3672,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -4626,7 +4636,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -5511,7 +5523,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -6547,7 +6561,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -7558,7 +7574,9 @@ public abstract class SuffixArray {
 			    } else if (s == end-1) {
 				return middle;
 			    } else {
-				throw new IllegalStateException();
+				java.lang.String
+				    msg = errorMsg("processingError");
+				throw new IllegalStateException(msg);
 			    }
 			}
 		    }
@@ -7669,7 +7687,9 @@ public abstract class SuffixArray {
 		    java.lang.Integer val1 = map.get(sequence[o1 + i]);
 		    java.lang.Integer val2 = map.get(sarray[i]);
 		    if (val1 == null || val2 == null) {
-			throw new IllegalArgumentException();
+			java.lang.String
+			    msg = errorMsg("compareToNull");
+			throw new IllegalArgumentException(msg);
 		    }
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;

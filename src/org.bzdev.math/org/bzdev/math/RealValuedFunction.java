@@ -374,7 +374,7 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 		}
 	    };
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("derivOrder"));
 	}
     }
 

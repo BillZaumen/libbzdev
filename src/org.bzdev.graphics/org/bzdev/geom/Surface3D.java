@@ -10742,7 +10742,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	case PathIterator3D.SEG_CUBICTO:
 	    break;
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
 	addCubicVertex(x1, y1, z1,
 		       coords[0], coords[1], coords[2],
@@ -10805,7 +10805,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	case PathIterator3D.SEG_CUBICTO:
 	    break;
 	default:
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
 	}
 	addFlippedCubicVertex(x1, y1, z1,
 			      coords[0], coords[1], coords[2],
@@ -11524,11 +11524,11 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	int diff = poffset - offset;
 
 	if (coords.length - 48 < offset) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("argarray"));
 	}
 	if (coords == pcoords && ((diff > 0 && diff < 15)
 				  || (diff < 0 && diff > -48))) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("arrayRegions"));
 	}
 	if (coords != pcoords) {
 	    System.arraycopy(coords, offset, pcoords, poffset, 12);

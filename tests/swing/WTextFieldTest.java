@@ -63,5 +63,7 @@ public class WTextFieldTest {
 		    // utf.repaint();
 		}
 	    });
+	Thread.sleep(30000L);
+	System.exit(0);
     }
 }

@@ -20,41 +20,44 @@ public class ErrorMessageTest {
 
 	System.out.println("... try using a frame");
 
-	SimpleConsole tc = new SimpleConsole();
-        int i;
-        JFrame frame = new JFrame("Error Message Test");
-        Container fpane = frame.getContentPane();
-        frame.addWindowListener(new WindowAdapter () {
-                public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+	SwingUtilities.invokeLater(() -> {
+		SimpleConsole tc = new SimpleConsole();
+		int i;
+		JFrame frame = new JFrame("Error Message Test");
+		Container fpane = frame.getContentPane();
+		frame.addWindowListener(new WindowAdapter () {
+			public void windowClosing(WindowEvent e) {
+			    System.exit(0);
+			}
+		    });
  
-        frame.setSize(700,400);
-        JScrollPane scrollpane = new JScrollPane(tc);
-        fpane.setLayout(new BorderLayout());
+		frame.setSize(700,400);
+		JScrollPane scrollpane = new JScrollPane(tc);
+		fpane.setLayout(new BorderLayout());
 
-        fpane.add("Center", scrollpane);
-        // fpane.setVisible(true);
-        frame.setVisible(true);
+		fpane.add("Center", scrollpane);
+		// fpane.setVisible(true);
+		frame.setVisible(true);
 	
-	ErrorMessage.setAppendable(tc);
-	SwingErrorMessage.setComponent(frame);
-	ErrorMessage.display("hello.txt", 10, "hello");
-	ErrorMessage.display(new Exception("exception"));
-	ErrorMessage.format("%s", "hello there");
-	ErrorMessage.format((Locale)null, "%s", "hello there");
-	ErrorMessage.addSeparatorIfNeeded();
-	ErrorMessage.addSeparatorIfNeeded();
-	ErrorMessage.displayConsoleIfNeeded();
-	ErrorMessage.displayFormat("Error", "%s", "hello there");
-	ErrorMessage.displayFormat("Error", (Locale)null, "%s",
-				       "hello there");
-	ErrorMessage.display("Error", "hello");
-	SwingErrorMessage.displayFormat(frame, "Error", "%s", "hello there");
-	SwingErrorMessage.displayFormat(frame, "Error", (Locale)null, "%s",
-				       "hello there");
-	SwingErrorMessage.display(frame, "Error", "hello");
+		ErrorMessage.setAppendable(tc);
+		SwingErrorMessage.setComponent(frame);
+		ErrorMessage.display("hello.txt", 10, "hello");
+		ErrorMessage.display(new Exception("exception"));
+		ErrorMessage.format("%s", "hello there");
+		ErrorMessage.format((Locale)null, "%s", "hello there");
+		ErrorMessage.addSeparatorIfNeeded();
+		ErrorMessage.addSeparatorIfNeeded();
+		ErrorMessage.displayConsoleIfNeeded();
+		ErrorMessage.displayFormat("Error", "%s", "hello there");
+		ErrorMessage.displayFormat("Error", (Locale)null, "%s",
+					   "hello there");
+		ErrorMessage.display("Error", "hello");
+		SwingErrorMessage.displayFormat(frame, "Error", "%s", "hello there");
+		SwingErrorMessage.displayFormat(frame, "Error", (Locale)null, "%s",
+						"hello there");
+		SwingErrorMessage.display(frame, "Error", "hello");
+	    });
+	Thread.sleep(40000L);
 	System.exit(0);
     }
 }

@@ -133,9 +133,15 @@ clonetest: compile
 	$(JAVA) CloneTest
 
 sctest:
-	(cd ../.. ; make jarfile)
+	(cd ../.. ; make)
 	chmod u+x scrun
 	@./scrun --stackTrace SciFormatterTest.js
+	chmod u-x scrun
+
+sctest-esp:
+	(cd ../.. ; make)
+	chmod u+x scrun
+	@./scrun --stackTrace SciFormatterTest.esp
 	chmod u-x scrun
 
 scftest: compile

@@ -29,11 +29,13 @@ public class DebugTransferTest {
     }
 
 
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws Exception{
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    DebugTransferTest.startGUI();
 		}
 	    });
+	Thread.sleep(60000L);
+	System.exit(0);
     }
 }

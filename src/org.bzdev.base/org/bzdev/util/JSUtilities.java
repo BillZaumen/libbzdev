@@ -1994,7 +1994,9 @@ public class JSUtilities {
 		} else if (flag == '>') {
 		    style = Style.FOLDED;
 		} else {
-		    throw new IllegalArgumentException();
+		    java.lang.String
+			msg = errorMsg("badStringStyle");
+		    throw new IllegalArgumentException(msg);
 		}
 		for (int i = 1; i < slen; i++) {
 		    switch (s.charAt(i)) {
@@ -2375,7 +2377,8 @@ public class JSUtilities {
 				return;
 			    } else {
 				if (hc) {
-				    throw new IOException();
+				    String msg = errorMsg("badPrefix", prefix);
+				    throw new IOException(msg);
 				}
 			    }
 			    hc = hasComment(prefix);
@@ -2451,9 +2454,9 @@ public class JSUtilities {
 		    skipWhitespace();
 		    break;
 		case TERMINATED:
-		    throw new IOException();
+		    throw new IOException(errorMsg("parsingTerminated"));
 		case FAILED:
-		    throw new IOException();
+		    throw new IOException(errorMsg("parsingFailed"));
 		}
 		if (termination == Termination.TERMINATED_DELAYED) {
 		    termination = Termination.TERMINATED;

@@ -1384,11 +1384,11 @@ class Shape3DHelper {
 	int diff = poffset - offset;
 
 	if (coords.length - 48 < offset) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("argarray"));
 	}
 	if (coords == pcoords && ((diff > 0 && diff < 15)
 				  || (diff < 0 && diff > -48))) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("arrayRegions"));
 	}
 	if (coords != pcoords) {
 	    System.arraycopy(coords, offset, pcoords, poffset, 12);

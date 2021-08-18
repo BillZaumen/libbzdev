@@ -673,7 +673,14 @@ public class Functions {
 	 */
 	public static int raiseBy(double[] result, double[] beta, int n, int r)
 	{
-	    if (n < 0 || r < 0) throw new IllegalArgumentException();
+	    if (n < 0) {
+		String msg = errorMsg("thirdArgNeg", n);
+		throw new IllegalArgumentException(msg);
+	    }
+	    if (r < 0) {
+		String msg = errorMsg("fourthArgNeg", r);
+		throw new IllegalArgumentException(msg);
+	    }
 	    if (result == null || beta == null) {
 		throw new NullPointerException();
 	    }
@@ -2840,7 +2847,7 @@ public class Functions {
 		}
 	    } else if ( x < 0) {
 		throw new IllegalArgumentException
-		    (errorMsg("secondArgNeg", + x));
+		    (errorMsg("secondArgNeg", x));
 	    }
 	    return Math.pow(x/2.0, nu) * modSeries(nu, x);
 	}
@@ -4165,8 +4172,10 @@ public class Functions {
      */
     @Deprecated
     public static double root(int n, double x) {
-	if (n < 1) throw new IllegalArgumentException
-		       (errorMsg("firstArgNotPositive", n));
+	if (n < 1) {
+	    String msg = errorMsg("firstArgNotPositive", n);
+	    throw new IllegalArgumentException(msg);
+	}
 	if (n == 1) return x;
 	boolean negative;
 	if (x == 0.0) {
@@ -5706,7 +5715,10 @@ public class Functions {
 	    if (intA) {
 		return M(Math.round(a), Math.round(b), z);
 	    }
-	    if (b <= 0.0) throw new IllegalArgumentException();
+	    if (b <= 0.0) {
+		String msg = errorMsg("secondArgNeg", b);
+		throw new IllegalArgumentException(msg);
+	    }
 	} else if (intA) {
 	    return M(Math.round(a), b, z);
 	}
@@ -5789,7 +5801,8 @@ public class Functions {
     public static double M(long a, long b, double z) {
 	if (b <= 0) {
 	    if (b >= a) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("secondGTfirst", b, a);
+		throw new IllegalArgumentException(msg);
 	    }
 	}
 	double sum = 1.0;
@@ -6248,7 +6261,12 @@ public class Functions {
      * @return the value &Beta;<sub>x</sub>(a,b)
      */
     public static double Beta(double x, double a, double b) {
-	if (a <= 0.0 || b <= 0.0) throw new IllegalArgumentException();
+	if (a <= 0.0) {
+	    throw new IllegalArgumentException(errorMsg("secondArgPos", a));
+	}
+	if (b <= 0.0) {
+	    throw new IllegalArgumentException(errorMsg("thirdArgPos", b));
+	}
 	if (x > 0.7) {
 	    return Beta(a,b) - Beta(1.0-x, b, a);
 	}

@@ -29,6 +29,8 @@ public class ColorChooserTest {
 
     public static void main(String argv[]) throws Exception {
 	SwingUtilities.invokeAndWait(()->{doit();});
+	Thread.sleep(30000L);
+	System.exit(0);
     }
 
     

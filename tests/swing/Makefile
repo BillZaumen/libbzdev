@@ -59,6 +59,10 @@ scpolicy.policy:
 	echo "      permission java.security.AllPermission;" >> scpolicy.policy
 	echo "};" >> scpolicy.policy
 	echo \
+	"grant codebase \"file:`cd ../..;pwd`/BUILD/libbzdev-graphics.jar\" {" \
+	>> scpolicy.policy
+	echo "      permission java.security.AllPermission;" >> scpolicy.policy
+	echo "};" >> scpolicy.policy
 	echo "grant codebase \"file:`pwd`/classes.jar\" {" >> scpolicy.policy
 	echo "      permission org.bzdev.swing.ExitPermission" \
 	>> scpolicy.policy
@@ -324,6 +328,15 @@ atest3s:
 	$(JAVA2) AnimPanelTest3 --accessor --before
 	$(JAVA2) AnimPanelTest3 --accessor --after
 
+atest3s-fb:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar \
+		AnimPanelTest3.java
+	$(JAVA2) AnimPanelTest3 --false --before
+	echo ---------
+	$(JAVA3) AnimPanelTest3 --false --before
+
 
 atest3a: scpolicy.policy
 	(cd ../.. ; make jars)
@@ -345,8 +358,6 @@ atest3b: scpolicy.policy
 	$(JAVA3) AnimPanelTest3 --false --before
 	$(JAVA3) AnimPanelTest3 --true --before
 	$(JAVA3) AnimPanelTest3 --accessor --before
-
-
 
 dtest:
 	(cd ../.. ; make jars)

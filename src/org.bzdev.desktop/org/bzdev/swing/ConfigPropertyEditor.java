@@ -776,11 +776,10 @@ public abstract class ConfigPropertyEditor {
      */
     protected void addReservedKeys(String... keys) {
 	if (ind < 0) {
-	    throw new IllegalStateException();
+	    throw new IllegalStateException(errorMsg("indexWrap"));
 	}
 	Collections.addAll(reserved, keys);
 	sl.add(reserved.size() + (ind++));
-
     }
 
     private int KLEN = 0;

@@ -30,13 +30,15 @@ public class ErrorMessageTest2 {
 	};
 
 
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws Exception {
 	SwingUtilities.invokeLater(setup);
-	for (;;) {
+	for (int i = 0; i < 30; i++) {
 	    try {
 	    Thread.currentThread().sleep(5000);
 	    ErrorMessage.display(new Exception("hello"));
 	    } catch (Exception e) {}
 	}
+	Thread.sleep(30000L);
+	System.exit(0);
     }
 }

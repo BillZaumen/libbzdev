@@ -74,12 +74,13 @@ public class ButtonTest {
 	frame.setVisible(true);
     }
 
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws Exception {
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    init();
 		}
 	    });
-	
+	Thread.sleep(30000L);
+	System.exit(0);
     }
 }

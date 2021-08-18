@@ -4,11 +4,17 @@ import org.bzdev.math.RealValuedFunctThreeOps;
 import org.bzdev.util.Cloner;
 import org.bzdev.lang.UnexpectedExceptionError;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Class to create a Transform3D based on real-valued functions of
  * three arguments.
  */
 public class RVFTransform3D implements Transform3D, Cloneable {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
 
     RealValuedFunctionThree xfunct;
     RealValuedFunctionThree yfunct;
@@ -36,21 +42,21 @@ public class RVFTransform3D implements Transform3D, Cloneable {
 			  RealValuedFunctThreeOps yfunct,
 			  RealValuedFunctThreeOps zfunct) {
 	if (xfunct == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullFunct3"));
 	} else if (xfunct instanceof RealValuedFunctionThree) {
 	    this.xfunct = (RealValuedFunctionThree) xfunct;
 	} else {
 	    this.xfunct = new RealValuedFunctionThree(xfunct) ;
 	}
 	if (yfunct == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullFunct3"));
 	} else if (yfunct instanceof RealValuedFunctionThree) {
 	    this.yfunct = (RealValuedFunctionThree) yfunct;
 	} else {
 	    this.yfunct = new RealValuedFunctionThree(yfunct) ;
 	}
 	if (zfunct == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullFunct3"));
 	} else if (zfunct instanceof RealValuedFunctionThree) {
 	    this.zfunct = (RealValuedFunctionThree) zfunct;
 	} else {

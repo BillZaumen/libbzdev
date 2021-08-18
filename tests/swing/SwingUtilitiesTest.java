@@ -15,5 +15,7 @@ public class SwingUtilitiesTest {
 	SwingUtilities.invokeAndWait(() -> {
 		System.out.println("goodbye");
 	    });
+	Thread.sleep(300000L);
+	System.exit(0);
     }
 }

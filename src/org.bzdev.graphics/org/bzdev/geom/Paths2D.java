@@ -1373,7 +1373,8 @@ public class Paths2D {
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
 		if (sawMove == false && prevEntry != null) {
-		    throw new IllegalArgumentException();
+		    throw new
+			IllegalArgumentException(errorMsg("misplacedMoveTo"));
 		}
 		sawMove = true;
 		hasPrevCurvature = false;
@@ -2447,7 +2448,8 @@ public class Paths2D {
 	    switch(type) {
 	    case PathIterator.SEG_MOVETO:
 		if (sawMove == false && prevEntry != null) {
-		    throw new IllegalArgumentException();
+		    throw new
+			IllegalArgumentException(errorMsg("misplacedMoveTo"));
 		}
 		sawMove = true;
 		hasPrevCurvature = false;

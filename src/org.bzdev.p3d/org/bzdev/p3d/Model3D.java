@@ -3420,7 +3420,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param level the tessellation level
      */
     public void setTessellationLevel(int level) {
-	if (level < 0) throw new IllegalArgumentException();
+	if (level < 0) {
+	    String msg  = errorMsg("negativeTessellation");
+	    throw new IllegalArgumentException(msg);
+	}
 	tlevel = level;
     }
 
@@ -4489,7 +4492,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *            negative
      */
     public Iterator<Triangle> tessellate(int level) {
-	if (level < 0) throw new IllegalArgumentException();
+	if (level < 0) {
+	    String msg = errorMsg("negativeTessellation");
+	    throw new IllegalArgumentException(msg);
+	}
 
 	TreeSet<Double> xvalueSet = (TreeSet<Double>)xCornerCoords.clone();
 	TreeSet<Double> yvalueSet = (TreeSet<Double>)yCornerCoords.clone();
@@ -4547,7 +4553,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 		x = fx; y = fy; z = fz;
 		break;
 	    default:
-		throw new IllegalStateException();
+		String msg = errorMsg("badPathIteratorType");
+		throw new IllegalStateException(msg);
 	    }
 	    pit.next();
 	}

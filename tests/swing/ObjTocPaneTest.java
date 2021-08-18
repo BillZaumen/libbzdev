@@ -8,7 +8,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class ObjTocPaneTest {
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws Exception {
 	try {
 	    final ObjTocPane tocPane = new ObjTocPane();
 
@@ -21,7 +21,7 @@ public class ObjTocPaneTest {
 					   +tocPane.getRowCount());
 		    }
 		});
-	    JFrame frame = new JFrame("TreeTest");
+	    JFrame frame = new JFrame("TreeTest 2");
 	    Container hpane = frame.getContentPane();
 	    tocPane.addEntry("Table of Contents", "http:foo.com/help.html");
 	    tocPane.nextLevel();
@@ -90,5 +90,7 @@ public class ObjTocPaneTest {
 	    e.printStackTrace();
 	    System.exit(1);
 	}
+	Thread.sleep(30000L);
+	System.exit(0);
     }
 }

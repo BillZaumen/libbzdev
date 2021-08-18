@@ -39,5 +39,7 @@ public class SwingUtilitiesTest2 {
 		    e.printStackTrace();
 		}
 	    });
+	Thread.sleep(300000L);
+	System.exit(0);
     }
 }

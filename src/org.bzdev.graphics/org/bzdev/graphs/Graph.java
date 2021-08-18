@@ -4218,8 +4218,10 @@ import org.bzdev.util.SafeFormatter;
 	 public void setAxisScale(double scaleFactor)
 	     throws IllegalArgumentException
 	 {
-	     if (scaleFactor < Double.MIN_NORMAL)
-		 throw new IllegalArgumentException();
+	     if (scaleFactor < Double.MIN_NORMAL) {
+		 String msg = errorMsg("scaleFactor", scaleFactor);
+		 throw new IllegalArgumentException(msg);
+	     }
 	     axisScale = scaleFactor;
 	 }
 

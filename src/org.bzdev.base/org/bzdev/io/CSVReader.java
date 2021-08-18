@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.*;
 
+//@exbundle org.bzdev.io.lpack.IO
+
 /**
  * Reader for CSV (Comma Separated Values) input streams.
  * The CSV format is describe in
@@ -66,6 +68,11 @@ import java.util.regex.*;
  * with several intermediate readers.
  */
 public class CSVReader extends Reader {
+
+    static String errorMsg(String key, Object... args) {
+	return IoErrorMsg.errorMsg(key, args);
+    }
+
     BufferedReader in;
     boolean hasHeader = false;
     String[] header;
@@ -192,7 +199,7 @@ public class CSVReader extends Reader {
 		if (tmp.substring(end).contains("\"")) {
 		    line = in.readLine();
 		    if (line == null) {
-			throw new IOException();
+			throw new IOException(errorMsg("emptyLine"));
 		    }
 		    if (delimiter == null) {
 			tmp = tmp + DEFAULT_DELIMITER;

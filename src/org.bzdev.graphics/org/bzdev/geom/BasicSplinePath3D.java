@@ -2368,8 +2368,8 @@ public class BasicSplinePath3D extends SplinePath3D {
     {
 	if (entries == null) refresh();
 	if (i < 0 || i >= entries.length) {
-	    System.out.println("i = " + i + ", entries.length = " + entries.length);
-	    throw new IllegalArgumentException();
+	    // System.out.println("i = " + i + ", entries.length = " + entries.length);
+	    throw new IllegalArgumentException(errorMsg("segmentIndex", i));
 	}
 	Path3DInfo.Entry entry = entries[i];
 	coords[0] = entry.x;

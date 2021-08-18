@@ -1,7 +1,15 @@
 package org.bzdev.net;
 import java.util.Locale;
 
-class ServerCookieUtils{
+//@exbundle org.bzdev.net.lpack.Net
+
+class ServerCookieUtils {
+
+    static String errorMsg(String key, Object... args) {
+	return NetErrorMsg.errorMsg(key, args);
+    }
+
+
     static final ServerCookie[] EMPTY = new ServerCookie[0];
 
     static class Cookie implements ServerCookie {
@@ -18,20 +26,26 @@ class ServerCookieUtils{
 	void checkToken(String token)
 	    throws IllegalArgumentException, NullPointerException
 	{
-	    if (token == null) throw new NullPointerException();
+	    if (token == null) {
+		throw new NullPointerException(errorMsg("nullToken"));
+	    }
 	    int len = token.length();
-	    if (len == 0) throw new IllegalArgumentException();
+	    if (len == 0) {
+		throw new IllegalArgumentException(errorMsg("emptyToken"));
+	    }
 	    for (int i = 0; i < len; i++) {
 		char ch = token.charAt(i);
 		if (ch >= 127 || ch <= 31) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("illegalTokenChar");
+		    throw new IllegalArgumentException(msg);
 		}
 		switch (ch) {
 		case '(': case ')': case '<': case '>': case '@':
 		case ',': case ';': case ':': case '\\': case '"':
 		case '/': case '[': case ']': case '?': case '=':
 		case '{': case '}': case ' ': case '\t':
-		    throw new IllegalArgumentException();
+		    String msg2 = errorMsg("illegalTokenChar");
+		    throw new IllegalArgumentException(msg2);
 		}
 	    }
 	}
@@ -39,7 +53,9 @@ class ServerCookieUtils{
 	void checkValue(String value)
 	    throws IllegalArgumentException, NullPointerException
 	{
-	    if (value == null) throw new NullPointerException();
+	    if (value == null) {
+		throw new NullPointerException(errorMsg("nullValue"));
+	    }
 	    int len = value.length();
 	    if (len == 0) return;
 	    int start= 0;
@@ -54,7 +70,8 @@ class ServerCookieUtils{
 		} else if ((ch == ' ') || (ch == '\t')) {
 		    continue;
 		} else {
-		    throw new IllegalArgumentException("" + (int)ch);
+		    String msg = errorMsg("illegalValue", "" + (int)ch);
+		    throw new IllegalArgumentException(msg);
 		}
 	    }
 	}
@@ -62,11 +79,14 @@ class ServerCookieUtils{
 	void checkPath(String path) throws IllegalArgumentException {
 	    if (path == null) return;
 	    int len = path.length();
-	    if (len == 0) throw new IllegalArgumentException();
+	    if (len == 0) {
+		throw new IllegalArgumentException(errorMsg("nullPath"));
+	    }
 	    for (int i = 0; i < len; i++) {
 		char ch = path.charAt(i);
 		if (ch >= 127 || ch <= 31 || ch == ';') {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("illegalPath", "" + (int) ch);
+		    throw new IllegalArgumentException(msg);
 		}
 	    }
 	}
@@ -78,7 +98,9 @@ class ServerCookieUtils{
 	void checkDomain(String domain) throws IllegalArgumentException {
 	    if (domain == null) return;
 	    int len = domain.length();
-	    if (len == 0) throw new IllegalArgumentException();
+	    if (len == 0) {
+		throw new IllegalArgumentException(errorMsg("emptyDomain"));
+	    }
 	    if (isIPV6(domain)) return;
 	    // all other cases: ip4v and domain names
 	    char ch = domain.charAt(0);
@@ -86,21 +108,30 @@ class ServerCookieUtils{
 	    if (!((ch >= 'a' && ch <= 'z')
 		  || (ch >= 'A' && ch <= 'Z')
 		  || (ch >= '0' && ch <= '9'))) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("illegalDomain"));
 	    }
 	    if (domain.charAt(len-1) == '.') {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("illegalDomain"));
 	    }
 	    boolean sawdot = false;
 	    boolean sawhyphen = false;
 	    for (int i = 1; i < len; i++) {
 		ch = domain.charAt(i);
 		if (ch == '.') {
-		    if (sawdot) throw new IllegalArgumentException();
-		    if (sawhyphen) throw new IllegalArgumentException();
+		    if (sawdot) {
+			String msg = errorMsg("illegalDomain");
+			throw new IllegalArgumentException(msg);
+		    }
+		    if (sawhyphen) {
+			String msg = errorMsg("illegalDomain");
+			throw new IllegalArgumentException(msg);
+		    }
 		    sawdot = true;
 		} else if (ch == '-') {
-		    if (sawdot) throw new IllegalArgumentException();
+		    if (sawdot) {
+			String msg = errorMsg("illegalDomain");
+			throw new IllegalArgumentException(msg);
+		    }
 		    sawhyphen = true;
 		} else if ((ch >= 'a' && ch <= 'z')
 			   || (ch >= 'A' && ch <= 'Z')
@@ -108,11 +139,13 @@ class ServerCookieUtils{
 		    sawdot = false;
 		    sawhyphen = false;
 		} else {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("illegalDomain");
+		    throw new IllegalArgumentException(msg);
 		}
 	    }
 	    if (sawdot || sawhyphen) {
-		throw new IllegalArgumentException();
+		    String msg = errorMsg("illegalDomain");
+		throw new IllegalArgumentException(msg);
 	    }
 	}
 

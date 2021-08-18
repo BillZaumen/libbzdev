@@ -8,6 +8,8 @@ import java.util.SimpleTimeZone;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+//@exbundle org.bzdev.graphs.lpack.Graphs
+
 /**
  * Base class for axis builders.
  * In addition to some methods shared by all subclasses,
@@ -21,6 +23,10 @@ import java.util.GregorianCalendar;
  * cases.
  */
 public abstract class AxisBuilder<T extends Graph.Axis> {
+
+    static String errorMsg(String key, Object... args) {
+	return Graph.errorMsg(key, args);
+    }
 
     /**
      * The graph on which an axis will be drawn.
@@ -234,8 +240,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
     public void setAxisScale(double scaleFactor)
 	throws IllegalArgumentException
     {
-	if (scaleFactor < Double.MIN_NORMAL)
-	    throw new IllegalArgumentException();
+	if (scaleFactor < Double.MIN_NORMAL) {
+	    String msg = errorMsg("scaleFactor", scaleFactor);
+	    throw new IllegalArgumentException(msg);
+	}
 	axisScale = scaleFactor;
     }
 
@@ -339,7 +347,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * @param width the width in user space; 0.0 for the default
      */
     public void setWidth(double width) {
-	if (width < 0.0) throw new IllegalArgumentException();
+	if (width < 0.0) {
+	    String msg = errorMsg("width", width);
+	    throw new IllegalArgumentException(msg);
+	}
 	if (width == 0.0) width = DEFAULT_WIDTH;
 	this.width = width;
     }
@@ -396,7 +407,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * @param value the tick-scaling factor; 0 for the default
      */
     public void setTickScalingFactor (double value) {
-	if (value < 0.0) throw new IllegalArgumentException();
+	if (value < 0.0) {
+	    String msg = errorMsg("tickScalingFactor", value);
+	    throw new IllegalArgumentException(msg);
+	}
 	if (value == 0.0) {
 	    tickScalingFactor = DEFAULT_TICK_SCALING;
 	} else {
@@ -514,12 +528,13 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
     {
 	if (lengths == null || widths == null || labelSeps == null) {
 	    if (lengths != null || widths != null || labelSeps != null) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("someNullNotAll");
+		throw new IllegalArgumentException(msg);
 	    }
 	} else {
 	    if (lengths.length != widths.length
 		|| widths.length != labelSeps.length) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(errorMsg("arrayLengths"));
 	    }
 	}
 
@@ -841,7 +856,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 * @see #setMaximumExponent(int)
 	 */
 	public void setNumberOfSteps(int n) {
-	    if (n < 1) throw new IllegalArgumentException();
+	    if (n < 1) {
+		String msg = errorMsg("numberOfSteps", n);
+		throw new IllegalArgumentException(msg);
+	    }
 	    nsteps = n;
 	}
 
@@ -858,7 +876,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 		      int level, int exponent,String format, boolean middle)
 	    {
 		stepped = false;
-		if (level < 0) throw new IllegalArgumentException();
+		if (level < 0) {
+		    String msg = errorMsg("level", level);
+		    throw new IllegalArgumentException(msg);
+		}
 		this.exponent = exponent;
 		this.level = level;
 		this.format = format;
@@ -876,14 +897,21 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 
 	    TickData(int nsteps, int level, int divisor, String format) {
 		stepped = true;
-		if (divisor < 1) throw new IllegalArgumentException();
-		if (level < 0) throw new IllegalArgumentException();
+		if (divisor < 1) {
+		    String msg = errorMsg("divisor", divisor);
+		    throw new IllegalArgumentException(msg);
+		}
+		if (level < 0) {
+		    String msg = errorMsg("level", level);
+		    throw new IllegalArgumentException(msg);
+		}
 		this.divisor = divisor;
 		this.level = level;
 		this.format = format;
 		mod = nsteps/divisor;
 		if (mod * divisor != nsteps) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("notDiv", divisor, nsteps);
+		    throw new IllegalArgumentException(msg);
 		}
 		modtest = 0;
 	    }
@@ -999,7 +1027,8 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	public void addTickSpec(int level, int depth, boolean middle,
 				String format, String mformat) {
 	    if (depth < 0) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("depth", depth);
+		throw new IllegalArgumentException(msg);
 	    }
 	    int exponent = maxExponent - depth;
 	    if (middle) exponent--;
@@ -1435,8 +1464,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	public void addOneTick(int level, double position)
 	    throws IllegalArgumentException
 	{
-	    if (position < 1.0 || position >= 10.0)
-		throw new IllegalArgumentException();
+	    if (position < 1.0 || position >= 10.0) {
+		String msg = errorMsg("position", position);
+		throw new IllegalArgumentException(msg);
+	    }
 	    // The ticks start at 1.0, not 0.0, so we need to subtract 1.0
 	    // so we'll get the correct increment.
 	    position = position - 1.0;
@@ -1444,7 +1475,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	    int scaling = 1;
 	    int i = 1;
 	    while (Math.abs(Math.rint(position) - position) > 1.e-10) {
-		if (i > 5) throw new IllegalArgumentException();
+		if (i > 5) {
+		    String msg = errorMsg("scalingLimit");
+		    throw new IllegalArgumentException(msg);
+		}
 		scaling *= 10;
 		position *= 10.0;
 		i++;
@@ -1873,13 +1907,22 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 * @param max the maximum spacing.
 	 */
 	public void setSpacings(Spacing min, Spacing max) {
+	    if (min == null) {
+		String msg = errorMsg("timeSpacing", min);
+		throw new IllegalArgumentException(msg);
+	    }
+	    if (max == null) {
+		String msg = errorMsg("timeSpacing", max);
+		throw new IllegalArgumentException(msg);
+	    }
 	    switch(min) {
 	    case SECONDS:
 	    case MINUTES:
 	    case HOURS:
 		break;
 	    default:
-		throw new IllegalArgumentException();
+		String msg1 = errorMsg("timeSpacing", min);
+		throw new IllegalArgumentException(msg1);
 	    }
 	    minSpacing = min;
 	    switch (max) {
@@ -1889,7 +1932,8 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	    case DAYS:
 		break;
 	    default:
-		throw new IllegalArgumentException();
+		String msg2 = errorMsg("timeSpacing", max);
+		throw new IllegalArgumentException(msg2);
 	    }
 	    maxSpacing = max;
 	}
@@ -1912,7 +1956,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 * @see #setSpacings(AxisBuilder.Spacing,AxisBuilder.Spacing)
 	 */
 	public void setNumberOfSteps(int n) {
-	    if (n < 1) throw new IllegalArgumentException();
+	    if (n < 1) {
+		String msg = errorMsg("numberOfSteps", n);
+		throw new IllegalArgumentException(msg);
+	    }
 	    nsteps = n;
 	}
 
@@ -1928,7 +1975,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 			  int level, Spacing spacing, String format)
 	    {
 		stepped = false;
-		if (level < 0) throw new IllegalArgumentException();
+		if (level < 0) {
+		    String msg = errorMsg("level", level);
+		    throw new IllegalArgumentException(msg);
+		}
 		this.level = level;
 		this.format = format;
 		mod = nsteps;
@@ -1991,15 +2041,24 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 			  int level, int divisor)
 	    {
 		stepped = true;
-		if (divisor < 1) throw new IllegalArgumentException();
-		if (level < 0) throw new IllegalArgumentException();
-		if (minSpacing != Spacing.SECONDS)
-		    throw new IllegalArgumentException();
+		if (divisor < 1) {
+		    String msg = errorMsg("divisor", divisor);
+		    throw new IllegalArgumentException(msg);
+		}
+		if (level < 0) {
+		    String msg = errorMsg("level", level);
+		    throw new IllegalArgumentException(msg);
+		}
+		if (minSpacing != Spacing.SECONDS) {
+		    String msg = errorMsg("timeSpacing", minSpacing);
+		    throw new IllegalArgumentException(msg);
+		}
 		this.level = level;
 		this.divisor = divisor;
 		mod = nsteps/divisor;
 		if (mod * divisor != nsteps) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("notDiv", divisor, nsteps);
+		    throw new IllegalArgumentException(msg);
 		}
 		modtest = 0;
 	    }
@@ -2112,7 +2171,8 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 		tickIncr = 3600.0 * oneSecond;
 		break;
 	    default:
-		throw new IllegalStateException();
+		String msg1 = errorMsg("timeSpacing", minSpacing);
+		throw new IllegalStateException(msg1);
 	    }
 	    long adiv = 1L;
 	    switch(maxSpacing) {
@@ -2129,7 +2189,8 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 		adiv = 86400;
 		break;
 	    default:
-		throw new IllegalStateException();
+		String msg2 = errorMsg("timeSpacing", maxSpacing);
+		throw new IllegalStateException(msg2);
 	    }
 
 	    if (nsteps > 1) {

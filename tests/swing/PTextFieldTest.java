@@ -55,6 +55,8 @@ public class PTextFieldTest {
 		    init();
 		}
 	    });
+	Thread.sleep(300000L);
+	System.exit(0);
     }
 }
 

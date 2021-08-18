@@ -6,6 +6,8 @@ import org.bzdev.lang.StackTraceModePermission;
 import java.awt.Color;
 import java.security.*;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Class representing a rectangular cuboid aligned with respect to 
  * the X, Y, and Z axes.
@@ -34,6 +36,10 @@ import java.security.*;
  */
 public abstract class Rectangle3D implements Shape3D, Cloneable {
 
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
+
     Color color;
     Object tag;
 
@@ -60,7 +66,10 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
     public int numberOfComponents() {return 1;}
 
     public Shape3D getComponent(int i) throws IllegalArgumentException {
-	if (i != 0) throw new IllegalArgumentException();
+	if (i != 0) {
+	    String msg = errorMsg("illegalIndex", i, 1);
+	    throw new IllegalArgumentException(msg);
+	}
 	return this;
     }
 

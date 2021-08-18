@@ -1,11 +1,17 @@
 package org.bzdev.math;
 import java.util.Arrays;
 
+//@exbundle org.bzdev.math.lpack.Math
+
 /**
  * Class providing operations on polynomials.
  * The methods in this class are static methods.
  */
 public class Polynomials {
+
+    static String errorMsg(String key, Object... args) {
+	return MathErrorMsg.errorMsg(key, args);
+    }
 
     /**
      * Convert a monomial polynomial to one using a Bernstein basis
@@ -57,8 +63,13 @@ public class Polynomials {
 	if (a == null) {
 	    throw new NullPointerException();
 	}
+	if (offset < 0) {
+	    String msg = errorMsg("secondArgNegI", offset);
+	    throw new IllegalArgumentException(msg);
+	}
 	if (a.length < n+1 || beta.length - offset < n+1 || offset < 0) {
-	    throw new IllegalArgumentException();
+	    String msg = errorMsg("argArrayTooShort");
+	    throw new IllegalArgumentException(msg);
 	}
 	if (beta == a && offset <= n) {
 	    a = new double[n+1];
@@ -128,7 +139,8 @@ public class Polynomials {
 	    throw new NullPointerException();
 	}
 	if (result.length < n+1 || beta.length + offset < n+1 || offset < 0) {
-	    throw new IllegalArgumentException();
+	    String msg = errorMsg("argArray1TooShortNN");
+	    throw new IllegalArgumentException(msg);
 	}
 	if (result == beta && offset <= n) {
 	    beta = new double[n+1];
@@ -290,11 +302,20 @@ public class Polynomials {
 			       double[] p2, int n2)
 	throws IllegalArgumentException
     {
-	if (n1 < 0) throw new IllegalArgumentException();
-	if (n2 < 0) throw new IllegalArgumentException();
+	if (n1 < 0) {
+	    String msg = errorMsg("argNonNegative3", n1);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (n2 < 0) {
+	    String msg = errorMsg("argNonNegative5", n2);
+	    throw new IllegalArgumentException(msg);
+	}
 	int n1pn2 = n1 + n2;
 	int n1pn2p1 = n1pn2 + 1;
-	if (result.length < n1pn2p1) throw new IllegalArgumentException();
+	if (result.length < n1pn2p1) {
+	    String msg = errorMsg("argArray1TooShortNN");
+	    throw new IllegalArgumentException(msg);
+	}
 
 	if (p1 == p2) {
 	    if (result == p1) {
@@ -851,7 +872,7 @@ public class Polynomials {
 	int n1 = p1.degree;
 	int n2 = p2.degree;
 	if (n1 == -1 || n2 == -1) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("illformedPolynomial"));
 	}
 	if  (n2 > n1) {
 	    if (q != null) {
@@ -965,8 +986,11 @@ public class Polynomials {
 			     double[] p1, int n1, double[] p2, int n2)
 	throws IllegalArgumentException
     {
-	if  (q == r) throw new IllegalArgumentException();
-	if (r.length < n1+1) new IllegalArgumentException();
+	if  (q == r) throw new IllegalArgumentException(errorMsg("sameArray"));
+	if (r == null || r.length < n1+1) {
+	    String msg = errorMsg("argArray2TooShort");
+	    new IllegalArgumentException(msg);
+	}
 	while (p1[n1] == 0.0 && n1 > 0) n1--;
 	while (p2[n2] == 0.0 && n2 > 0) n2--;
 	int nq = n1 - n2;

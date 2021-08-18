@@ -1374,11 +1374,13 @@ public class SurfaceIntegral  {
 		    || this.npt != rsi.npt
 		    || this.fncp != rsi.fncp
 		    || this.fnct != rsi.fnct) {
-		    throw new IllegalArgumentException();
+		    throw new
+			IllegalArgumentException(errorMsg("surfaceIntegral"));
 		}
 		if (!((si.sf == null && rsi.sf == null)
 		      ||(si.sf != null && rsi.sf != null))) {
-		    throw new IllegalArgumentException();
+		    throw new
+			IllegalArgumentException(errorMsg("surfaceIntegral"));
 		}
 		siarray[ind++] = rsi;
 	    }

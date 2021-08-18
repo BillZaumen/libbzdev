@@ -61,6 +61,8 @@ public class URLTextAreaPaneTest {
 	    // frame.setSize(750, 400);
 	    System.out.println("frame constructed");
 	    frame.setVisible(true);
+	    Thread.sleep(300000L);
+	    System.exit(0);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    System.exit(1);

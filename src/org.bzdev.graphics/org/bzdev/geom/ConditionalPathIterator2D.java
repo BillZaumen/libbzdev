@@ -4,6 +4,8 @@ import org.bzdev.math.VectorOps;
 import java.awt.geom.*;
 import java.util.function.Predicate;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Conditional path iterator class for two dimensions.
  * This iterator adds segments to the segments returned by
@@ -25,6 +27,11 @@ import java.util.function.Predicate;
  * and cubic segments into straight lines.
  */
 public class ConditionalPathIterator2D implements PathIterator {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
+
     PathIterator src;
     Transform2D transform;
     AffineTransform atransform;
@@ -259,8 +266,11 @@ public class ConditionalPathIterator2D implements PathIterator {
 				     int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || condition == null) {
-	    throw new IllegalArgumentException();
+	if (limit < 0 ) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (condition == null) {
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	this.condition = condition;
@@ -352,8 +362,11 @@ public class ConditionalPathIterator2D implements PathIterator {
 				     Predicate<double[]> condition, int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || condition == null) {
-	    throw new IllegalArgumentException();
+	if (limit < 0 ) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (condition == null) {
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	atransform = transform;

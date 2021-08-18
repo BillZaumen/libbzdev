@@ -39,9 +39,7 @@ public class AnimPanelTest {
 			   + ((aend - astart)/1000000)
 			   + " ms");
 	apg.close();
-	/*
 	Thread.currentThread().sleep(50000);
 	System.exit(0);
-	*/
     }
 }

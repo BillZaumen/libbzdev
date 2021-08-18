@@ -3,6 +3,8 @@ import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.math.VectorOps;
 import java.util.Arrays;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Flattening path iterator class for three dimensions.
  * This iterator adds segments to the segments returned by
@@ -39,6 +41,11 @@ import java.util.Arrays;
  * is useful when applying a transform that is not an affine transform.
  */
 public class FlatteningPathIterator3D implements PathIterator3D {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
+
     PathIterator3D src;
     Transform3D transform;
     double flatness;
@@ -215,7 +222,7 @@ public class FlatteningPathIterator3D implements PathIterator3D {
 	throws IllegalArgumentException
     {
 	if (flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.flatness = flatness;
@@ -236,7 +243,7 @@ public class FlatteningPathIterator3D implements PathIterator3D {
 	throws IllegalArgumentException
     {
 	if (flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.transform = transform;
@@ -260,8 +267,11 @@ public class FlatteningPathIterator3D implements PathIterator3D {
 				    int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (flatness < 0.0) {
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.flatness = flatness;
@@ -283,8 +293,11 @@ public class FlatteningPathIterator3D implements PathIterator3D {
 				    double flatness, int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (flatness < 0.0) {
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.transform = transform;

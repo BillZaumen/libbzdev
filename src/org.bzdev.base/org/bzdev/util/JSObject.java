@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+//@exbundle org.bzdev.util.lpack.JSUtilities
+
 /**
  * Simplified JavaScript-like object class.
  * Formats such as JSON are syntactically similar to the source code
@@ -33,6 +35,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see JSUtilities
  */
 public class JSObject implements JSOps {
+
+    static String errorMsg(String key, Object... args) {
+	return UtilErrorMsg.errorMsg(key, args);
+    }
 
     private static final AtomicLong identityCounter = new AtomicLong();
 
@@ -137,7 +143,7 @@ public class JSObject implements JSOps {
 	    || object instanceof JSObject) {
 	    return map.put(key, object);
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("unknownType"));
 	}
     }
 

@@ -3257,7 +3257,8 @@ public class SteppedGrid  implements Shape3D {
 	    boolean isUpper = !Double.isNaN(zBase1);
 	    boolean isLower = !Double.isNaN(zBase2);
 	    if (isUpper && isLower) {
-		throw new IllegalStateException();
+		String msg = errorMsg("lowerUpper");
+		throw new IllegalStateException(msg);
 	    }
 
 	    xs = null; ys = null;

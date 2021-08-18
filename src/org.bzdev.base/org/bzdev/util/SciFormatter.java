@@ -1,5 +1,6 @@
 package org.bzdev.util;
 import org.bzdev.lang.MathOps;
+import java.lang.reflect.Array;
 import java.util.regex.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -1704,8 +1705,12 @@ public final class SciFormatter implements Closeable, Flushable {
     public SciFormatter format(Locale l, String format, Object arg1)
 	throws IllegalFormatException, FormatterClosedException
     {
-	Object[] args = {arg1};
-	return format(l, format, args);
+	if (arg1.getClass().isArray()) {
+	    return format(l, format, (Object[]) arg1);
+	} else {
+	    Object[] args = {arg1};
+	    return format(l, format, args);
+	}
     }
 
     /**

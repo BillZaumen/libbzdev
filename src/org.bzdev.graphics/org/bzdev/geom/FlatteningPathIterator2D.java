@@ -3,6 +3,8 @@ import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.math.VectorOps;
 import java.awt.geom.*;
 
+//@exbundle org.bzdev.geom.lpack.Geom
+
 /**
  * Flattening path iterator class for two dimensions.
  * This iterator adds segments to the segments returned by
@@ -50,6 +52,10 @@ public class FlatteningPathIterator2D implements PathIterator {
     AffineTransform atransform;
     double flatness;
     int limit = 10;
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
 
     static class SegmentPathIterator implements PathIterator {
 	double dx0;
@@ -212,7 +218,7 @@ public class FlatteningPathIterator2D implements PathIterator {
 	throws IllegalArgumentException
     {
 	if (flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.flatness = flatness;
@@ -233,7 +239,7 @@ public class FlatteningPathIterator2D implements PathIterator {
 	throws IllegalArgumentException
     {
 	if (flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.transform = transform;
@@ -256,7 +262,7 @@ public class FlatteningPathIterator2D implements PathIterator {
 	throws IllegalArgumentException
     {
 	if (flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	atransform = transform;
@@ -276,8 +282,11 @@ public class FlatteningPathIterator2D implements PathIterator {
 				    int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (flatness < 0.0) {
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	this.flatness = flatness;
@@ -344,8 +353,11 @@ public class FlatteningPathIterator2D implements PathIterator {
 				    double flatness, int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (flatness < 0.0) {
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	if (transform != null) {
@@ -425,8 +437,11 @@ public class FlatteningPathIterator2D implements PathIterator {
 				    double flatness, int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || flatness < 0.0) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (flatness < 0.0) {
+	    throw new IllegalArgumentException(errorMsg("negativeFlatness"));
 	}
 	this.src = src;
 	atransform = transform;

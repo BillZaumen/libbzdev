@@ -4,6 +4,7 @@ import org.bzdev.math.VectorOps;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+//@exbundle org.bzdev.geom.lpack.Geom
 
 /**
  * Conditional path iterator class for three dimensions.
@@ -26,6 +27,11 @@ import java.util.function.Predicate;
  * and cubic segments into straight lines.
  */
 public class ConditionalPathIterator3D implements PathIterator3D {
+
+    static String errorMsg(String key, Object... args) {
+	return GeomErrorMsg.errorMsg(key, args);
+    }
+
     PathIterator3D src;
     Predicate<double[]> condition = null;
     int limit = 10;
@@ -211,7 +217,7 @@ public class ConditionalPathIterator3D implements PathIterator3D {
 	throws IllegalArgumentException
     {
 	if (condition == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	this.condition = condition;
@@ -241,8 +247,11 @@ public class ConditionalPathIterator3D implements PathIterator3D {
 				    int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || condition == null) {
-	    throw new IllegalArgumentException();
+	if (limit < 0 ) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (condition == null) {
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	this.condition = condition;
@@ -273,7 +282,7 @@ public class ConditionalPathIterator3D implements PathIterator3D {
 	throws IllegalArgumentException
     {
 	if (condition == null) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	this.transform = transform;
@@ -304,8 +313,11 @@ public class ConditionalPathIterator3D implements PathIterator3D {
 				     Predicate<double[]> condition, int limit)
 	throws IllegalArgumentException
     {
-	if (limit < 0 || condition == null) {
-	    throw new IllegalArgumentException();
+	if (limit < 0) {
+	    throw new IllegalArgumentException(errorMsg("negativeLimit"));
+	}
+	if (condition == null) {
+	    throw new IllegalArgumentException(errorMsg("nullCondition"));
 	}
 	this.src = src;
 	this.transform = transform;

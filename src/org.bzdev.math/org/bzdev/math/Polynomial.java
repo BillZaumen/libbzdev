@@ -1,6 +1,8 @@
 package org.bzdev.math;
 import java.util.Arrays;
 
+//@exbundle org.bzdev.math.lpack.Math
+
 /**
  * Class representing polynomials.
  * Methods include ones for computing a polynomial's value,
@@ -18,6 +20,11 @@ import java.util.Arrays;
    in this class use the methods in the {@link Polynomials} class).
  */
 public class Polynomial extends RealValuedFunction {
+
+    static String errorMsg(String key, Object... args) {
+	return MathErrorMsg.errorMsg(key, args);
+    }
+
     int degree;
     double[] coefficients;
 
@@ -182,7 +189,7 @@ public class Polynomial extends RealValuedFunction {
     {
 	int dp1 = degree+1;
 	if (dp1 > coefficients.length) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("argArrayTooShort"));
 	}
 	if (this.coefficients == coefficients) {
 	    return;

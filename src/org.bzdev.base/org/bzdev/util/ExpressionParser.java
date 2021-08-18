@@ -1015,18 +1015,17 @@ public class ExpressionParser implements ObjectParser<Object>
 
 	/**
 	 * Get the size of a ESP array, an ESP object, or an array
-	 * @param object the object
+	 * @param object  the object
 	 * @return the size (or array length)
 	 */
-	public int size(String object) {
-	    Object obj = vmap.get().get(object);
-	    if (obj instanceof ESPArray) {
-		return ((ESPArray)obj).size();
-	    } else if (obj instanceof ESPObject) {
-		return ((ESPObject)obj).size();
+	public int size(Object object) {
+	    if (object instanceof ESPArray) {
+		return ((ESPArray)object).size();
+	    } else if (object instanceof ESPObject) {
+		return ((ESPObject)object).size();
 
-	    } else if (obj.getClass().isArray()) {
-		return Array.getLength(obj);
+	    } else if (object.getClass().isArray()) {
+		return Array.getLength(object);
 	    } else {
 		throw new
 		    IllegalArgumentException(errorMsg("notArrayOrObject"));
@@ -1360,8 +1359,25 @@ public class ExpressionParser implements ObjectParser<Object>
 	    LinkedList<URL> apis = new LinkedList<URL>();
 	    for (Object o: docs) {
 		if (o instanceof String) {
-		    URL[] apiURLs = URLPathParser.getURLs(null, (String) o,
-							  null, null);
+		    URL[] apiURLs = null;
+		    try {
+			apiURLs = AccessController.doPrivileged
+			    (new PrivilegedExceptionAction<URL[]>() {
+				    public URL[] run()
+					throws MalformedURLException
+				    {
+					return URLPathParser.getURLs(null,
+								     (String) o,
+								     null,
+								     null);
+				    }
+				});
+		    } catch (PrivilegedActionException ep) {
+			java.lang.Exception e = ep.getException();
+			if (e instanceof MalformedURLException) {
+			    throw (MalformedURLException) e;
+			}
+		    }
 		    if (apiURLs == null) {
 			apiURLs = new URL[0];
 		    }
@@ -1369,10 +1385,24 @@ public class ExpressionParser implements ObjectParser<Object>
 			apis.add(url);
 		    }
 		} else {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("expectedString2A");
+		    throw new IllegalArgumentException(msg);
 		}
 	    }
-	    createAPIMap(apis);
+	    try {
+		AccessController.doPrivileged
+		    (new PrivilegedExceptionAction<Void>() {
+			    public Void run() throws IOException {
+				createAPIMap(apis);
+				return (Void) null;
+			    }
+			});
+	    } catch (PrivilegedActionException ep1) {
+		java.lang.Exception e = ep1.getException();
+		if (e instanceof IOException) {
+		    throw (IOException) e;
+		}
+	    }
 	    TemplateProcessor.KeyMap kmap = new TemplateProcessor.KeyMap();
 	    kmap.put("retList", keylistForReturnClasses());
 	    kmap.put("argList", keylistForArgumentClasses());
@@ -5155,7 +5185,7 @@ public class ExpressionParser implements ObjectParser<Object>
 				    results = ep.get((String)args[0]);
 				} else if (fname.equals("size")
 					   && args.length == 1) {
-				    results = ep.size((String)args[0]);
+				    results = ep.size(args[0]);
 				} else if (fname.equals("exists")
 					   && args.length == 1) {
 				    results = ep.exists((String)args[0]);

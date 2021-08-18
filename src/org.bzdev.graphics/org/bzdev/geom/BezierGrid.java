@@ -914,7 +914,7 @@ public class BezierGrid implements Shape3D {
 	if (hasNormal == false) {
 	    if (inormal == null) {
 		String msg = errorMsg("inormalNeeded");
-		throw new IllegalStateException();
+		throw new IllegalStateException(msg);
 	    }
 	    tmpv = VectorOps.crossProduct(inormal, tangent);
 	    VectorOps.crossProduct(normal, tangent, tmpv);
@@ -1265,14 +1265,22 @@ public class BezierGrid implements Shape3D {
     public BezierGrid subgrid(int i, int j, int n, int m) {
 	createSplines();
 	if (uclosed) {
-	    if (n > nu+1) throw new IllegalArgumentException();
+	    if (n > nu+1) {
+		String msg = errorMsg("index", n, nu+2);
+		throw new IllegalArgumentException(msg);
+	    }
 	} else if (n-i > nu) {
-	    throw new IllegalArgumentException();
+	    String msg = errorMsg("index2");
+	    throw new IllegalArgumentException(msg);
 	}
 	if (vclosed) {
-	    if (m > nv+1) throw new IllegalArgumentException();
+	    if (m > nv+1) {
+		String msg = errorMsg("index", m, nv+2);
+		throw new IllegalArgumentException(msg);
+	    }
 	} else if (m-j > nv) {
-	    throw new IllegalArgumentException();
+		String msg = errorMsg("index2");
+	    throw new IllegalArgumentException(msg);
 	}
 
 	BezierGrid g = new BezierGrid(n, false, m, false);

@@ -2122,7 +2122,7 @@ public class BasicSplinePath2D extends SplinePath2D {
     {
 	if (entries == null) refresh();
 	if (i < 0 || i > entries.length) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("segmentIndex", i));
 	}
 	Path2DInfo.Entry entry = entries[i];
 	coords[0] = entry.x;

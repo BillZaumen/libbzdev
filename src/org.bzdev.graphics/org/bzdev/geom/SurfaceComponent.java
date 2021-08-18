@@ -368,7 +368,9 @@ class SurfaceComponent implements Shape3D, SurfaceOps {
 
     @Override
     public Shape3D getComponent(int i) {
-	if (i != 0) throw new IllegalArgumentException();
+	if (i != 0) {
+	    throw new IllegalArgumentException(errorMsg("segmentIndex", i));
+	}
 	return this;
     }
 

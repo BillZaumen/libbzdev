@@ -947,7 +947,10 @@ public class PanelGraphics implements OSGraphicsOps {
      * @see Creator#getRepetitionCount()
      */
     public Creator newPanelGraphicsCreator(boolean mode, int count) {
-	if (count < 0) throw new IllegalArgumentException();
+	if (count < 0) {
+	    String msg = errorMsg("negativeRepCount");
+	    throw new IllegalArgumentException(msg);
+	}
 	return new Creator(mode, count);
     }
 

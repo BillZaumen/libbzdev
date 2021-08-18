@@ -1,6 +1,9 @@
 package org.bzdev.math;
 import java.util.Arrays;
 
+//@exbundle org.bzdev.math.lpack.Math
+
+
 /**
  * Class representing polynomials using a Bernstein basis.
  * Methods include ones for computing a polynomial's value,
@@ -18,6 +21,11 @@ import java.util.Arrays;
    in this class use the methods in the {@link Polynomials} class).
  */
 public class BezierPolynomial extends RealValuedFunction {
+
+    static String errorMsg(String key, Object... args) {
+	return MathErrorMsg.errorMsg(key, args);
+    }
+
     int degree;
     double[] coefficients;
 
@@ -186,7 +194,8 @@ public class BezierPolynomial extends RealValuedFunction {
     {
 	int dp1 = degree+1;
 	if (dp1 > coefficients.length) {
-	    throw new IllegalArgumentException();
+	    String msg = errorMsg("argArrayTooShort");
+	    throw new IllegalArgumentException(msg);
 	}
 	if (this.coefficients == coefficients) {
 	    return;

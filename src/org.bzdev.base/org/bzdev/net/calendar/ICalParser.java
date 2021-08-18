@@ -198,13 +198,13 @@ public class ICalParser implements ICalComponent {
 	    int len = line.length();
 	    int ind = line.indexOf(':');
 	    if (ind < 0) {
-		throw new IOException();
+		throw new IOException(errorMsg("emptyLine"));
 	    }
 	    String start = line.substring(0, ind).toUpperCase(Locale.US);
 	    if(start.equals("BEGIN")) {
 		String name = line.substring(ind+1).trim().toUpperCase();
 		if (name.length() == 0) {
-		    throw new IOException();
+		    throw new IOException(errorMsg("emptyName"));
 		}
 		Node node = new Node();
 		node.name = name;
@@ -214,10 +214,12 @@ public class ICalParser implements ICalComponent {
 	    } else if (start.equals("END")) {
 		String name = line.substring(ind+1).trim().toUpperCase();
 		if (parent == null) {
-		    throw new IOException();
+		    throw new IOException("noParent");
 		}
 		if (!parent.name.equals(name)) {
-		    throw new IOException();
+		    String msg =
+			errorMsg("parentNameMismatch", parent.name, name);
+		    throw new IOException(msg);
 		}
 		if (parent.parent == null) {
 		    nodelist = parent.children;
@@ -241,27 +243,27 @@ public class ICalParser implements ICalComponent {
 		    ArrayList<ICalParameter> parameters = new ArrayList<>();
 		    while (hasparams) {
 			if (startInd == line.length()) {
-			    throw new IOException();
+			    throw new IOException(errorMsg("emptyLine"));
 			}
 			line = line.substring(startInd);
 			ind = line.indexOf("=");
 			if (ind < 0) {
-			    throw new IOException();
+			    throw new IOException(errorMsg("missingEq"));
 			}
 			ICalParameter p = new ICalParameter();
 			p.name = line.substring(0, ind).trim().toUpperCase();
 			if (line.length() == ind) {
-			    throw new IOException();
+			    throw new IOException(errorMsg("missingTail"));
 			}
 			line = line.substring(ind+1);
 			if (line.length() == 0) {
-			    throw new IOException();
+			    throw new IOException(errorMsg("missingTail"));
 			}
 			p.quoted = (line.charAt(0) == '"');
 			if (p.quoted) {
 			    line = line.substring(1);
 			    if (line.length() == 0) {
-				throw new IOException();
+				throw new IOException(errorMsg("badString"));
 			    }
 			    ind = line.indexOf('"');
 			} else {
@@ -270,25 +272,27 @@ public class ICalParser implements ICalComponent {
 			if (ind < 0) {
 			    ind = line.indexOf(':');
 			    if (ind < 0) {
-				throw new IOException();
+				throw new IOException(errorMsg("noColon"));
 			    }
 			    cind = line.indexOf(';');
 			    ind = (cind < 0)? ind:
 				((cind < ind)? cind: ind);
 			    if (ind < 0) {
-				throw new IOException();
+				String msg = errorMsg("noOrMisplacedSemicolon");
+				throw new IOException(msg);
 			    }
 			    p.value = line.substring(0, ind).toUpperCase();
 			    hasparams = !(cind < 0);
 			    if (ind == line.length()) {
-				throw new IOException();
+				String msg = errorMsg("noOrMisplacedSemicolon");
+				throw new IOException(msg);
 			    }
 			    line = line.substring(ind+1);
 			    startInd = 0;
 			} else {
 			    p.value = line.substring(0, ind);
 			    if (ind == line.length()) {
-				throw new IOException();
+				throw new IOException(errorMsg("badLineParse"));
 			    }
 			    line = line.substring(ind+1);
 			    line = line.stripLeading();
@@ -306,11 +310,12 @@ public class ICalParser implements ICalComponent {
 		    // no parameters
 		    int npind = line.indexOf(":");
 		    if (npind < 0 ) {
-			throw new IOException();
+			throw new IOException(errorMsg("noColon"));
 		    }
 		    npind++;
 		    if (npind == line.length()) {
-			throw new IOException();
+			String msg = errorMsg("noParameters");
+			throw new IOException(msg);
 		    }
 		    line = line.substring(npind);
 		}

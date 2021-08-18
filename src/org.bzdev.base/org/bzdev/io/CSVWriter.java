@@ -2,6 +2,8 @@ package org.bzdev.io;
 import java.io.Writer;
 import java.io.IOException;
 
+//@exbundle org.bzdev.io.lpack.IO
+
 /**
  * Writer for CSV (Comma Separated Values) output streams.
  * The CSV format is describe in
@@ -75,6 +77,11 @@ import java.io.IOException;
  * with several intermediate writers.
  */
 public class CSVWriter extends Writer {
+
+    static String errorMsg(String key, Object... args) {
+	return IoErrorMsg.errorMsg(key, args);
+    }
+
     Writer out;
     int n;
     boolean alwaysQuote = false;
@@ -279,7 +286,7 @@ public class CSVWriter extends Writer {
 	throws IOException, IllegalArgumentException
     {
 	if (fields.length > n) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("tooManyFields"));
 	}
 	synchronized(lock) {
 	    if (field.length() > 0) {

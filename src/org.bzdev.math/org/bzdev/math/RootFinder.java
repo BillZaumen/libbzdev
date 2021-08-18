@@ -78,7 +78,6 @@ public abstract class RootFinder<P> {
 	return MathErrorMsg.errorMsg(key, args);
     }
 
-
     P parameters = null;
     
     /**
@@ -2703,14 +2702,22 @@ public abstract class RootFinder<P> {
 	    System.out.println(" ... eqn[" + i + "] = " + eqn[i]);
 	}
 	*/
-	if (n < 0) throw new IllegalArgumentException();
-	if (eqn.length <= n) throw new IllegalArgumentException();
+	if (n < 0) {
+	    String msg = errorMsg("argNonNegative2", n);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (eqn == null || eqn.length <= n) {
+	    throw new IllegalArgumentException(errorMsg("argArray1TooShort"));
+	}
 	while (n > 0 && eqn[n] == 0.0) n--;
 	switch (n) {
 	case 0:
 	    return -1;
 	case 1:
-	    if (res.length == 0) throw new IllegalArgumentException();
+	    if (res == null || res.length == 0) {
+		String msg = errorMsg("argArray3TooShort");
+		throw new IllegalArgumentException(msg);
+	    }
 	    res[0] = -eqn[0] /eqn[1];
 	    if (cpts != null) {
 		res[1] = 0;
@@ -2718,6 +2725,10 @@ public abstract class RootFinder<P> {
 	    return 1;
 	case 2:
 	    if (cpts != null) {
+		if (res == null || res.length < 2) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		int nr = solveQuadratic(eqn, res);
 		cpts[0] = -eqn[1]/(2*eqn[2]);
 		res[nr] = 1;
@@ -2732,7 +2743,10 @@ public abstract class RootFinder<P> {
 		cpts[2] = 3*eqn[3];
 		int ni = solveQuadratic(cpts,cpts);
 		int nr = solveCubic(eqn, res);
-		if (res.length <= nr) throw new IllegalArgumentException();
+		if (res == null || res.length <= nr) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		res[nr] = ni;
 		return nr;
 	    } else {
@@ -2779,7 +2793,10 @@ public abstract class RootFinder<P> {
 	    }
 	    */
 	    if (nroots == 0) {
-		if (res.length == 0) throw new IllegalArgumentException();
+		if (res == null || res.length == 0) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		res[0] = 0.0;
 		if (cpts != null) {
 		    res[1] = ni;
@@ -2796,8 +2813,10 @@ public abstract class RootFinder<P> {
 		    break;
 		} else if (root > 0.0) {
 		    shifted = true;
-		    if (res.length <= offset+1)
-			throw new IllegalArgumentException();
+		    if (res.length <= offset+1) {
+			String msg = errorMsg("argArray3TooShort");
+			throw new IllegalArgumentException(msg);
+		    }
 		    res[offset+1] = res[offset];
 		    offset--;
 		}
@@ -2806,7 +2825,10 @@ public abstract class RootFinder<P> {
 	    if (shifted) {
 		res[offset] = 0.0;
 	    } else if (noZero){
-		if (res.length <= nroots) throw new IllegalArgumentException();
+		if (res.length <= nroots) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		res[nroots] = 0.0;
 	    }
 	    /*
@@ -2834,7 +2856,10 @@ public abstract class RootFinder<P> {
 	    // System.out.println("ttCase");
 	    double tmp = -eqn[0] / eqn[n];
 	    if (n == 1) {
-		if (res.length < 1) throw new IllegalArgumentException();
+		if (res.length < 1) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		res[0] = tmp;
 		if (cpts != null) {
 		    res[1] = 0;
@@ -2849,7 +2874,10 @@ public abstract class RootFinder<P> {
 		    return 0;
 		}
 		if (tmp == 0.0) {
-		    if (res.length < 1) throw new IllegalArgumentException();
+		    if (res.length < 1) {
+			String msg = errorMsg("argArray3TooShort");
+			throw new IllegalArgumentException(msg);
+		    }
 		    res[0] = 0.0;
 		    if (cpts != null) {
 			cpts[0] = 0.0;
@@ -2857,7 +2885,10 @@ public abstract class RootFinder<P> {
 		    }
 		    return 1;
 		} else {
-		    if (res.length < 2) throw new IllegalArgumentException();
+		    if (res.length < 2) {
+			String msg = errorMsg("argArray3TooShort");
+			throw new IllegalArgumentException(msg);
+		    }
 		    double r = MathOps.root(n, tmp);
 		    res[0] = -r;
 		    res[1] = r;
@@ -2868,7 +2899,10 @@ public abstract class RootFinder<P> {
 		    return 2;
 		}
 	    } else {
-		if (res.length < 1) throw new IllegalArgumentException();
+		if (res.length < 1) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		res[0] = MathOps.root(n, tmp);
 		if (cpts != null) {
 		    tmp /= (n-1);
@@ -2909,7 +2943,10 @@ public abstract class RootFinder<P> {
 	    }
 	    if (nr > 0) {
 		int j = 0;
-		if (res.length < nr) throw new IllegalArgumentException();
+		if (res.length < nr) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		for (int i = 0; i < nr; i++) {
 		    double r2  = array[i];
 		    if (r2 < 0.0) continue;
@@ -3083,7 +3120,10 @@ public abstract class RootFinder<P> {
 	    System.out.println("x1 = "+ x1 + ", val = " + f.applyAsDouble(x1));
 	    System.out.println("x2 = "+ x2 + ", val = " + f.applyAsDouble(x2));
 	    */
-	    if (res.length < 0) throw new IllegalArgumentException();
+	    if (res.length < 0) {
+		String msg = errorMsg("argArray3TooShort");
+		throw new IllegalArgumentException(msg);
+	    }
 	    res[0] = findPolyRoot(EQN, n, x1, x2);
 	    if (res.length > 1) {
 		res[1] = ncpts;
@@ -3144,7 +3184,10 @@ public abstract class RootFinder<P> {
 	double val = f.applyAsDouble(x);
 	double err = ferr.applyAsDouble(x);
 	if (Math.abs(val) < err) {
-	    if (res.length <= resind) throw new IllegalArgumentException();
+	    if (res.length <= resind) {
+		String msg = errorMsg("argArray3TooShort");
+		throw new IllegalArgumentException(msg);
+	    }
 	    res[resind++] = x;
 	    /*
 	    System.out.println("set res[" + (resind-1) + "] to "
@@ -3184,7 +3227,10 @@ public abstract class RootFinder<P> {
 		System.out.println("guess = " + guess
 				   + ", val = " +f.applyAsDouble(guess));
 		*/
-		if (res.length <= resind) throw new IllegalArgumentException();
+		if (res.length <= resind) {
+		    String msg = errorMsg("argArray3TooShort");
+		    throw new IllegalArgumentException(msg);
+		}
 		if (Math.signum(f.applyAsDouble(x))
 		    != Math.signum(f.applyAsDouble(guess))) {
 		    res[resind++] = findPolyRoot(EQN, N, guess, x);
@@ -3208,7 +3254,8 @@ public abstract class RootFinder<P> {
 			// System.out.println("guess = " +guess +", x = " +x);
 			if (guess > x) {
 			    if (res.length <= resind) {
-				throw new IllegalArgumentException();
+				String msg = errorMsg("argArray3TooShort");
+				throw new IllegalArgumentException(msg);
 			    }
 			    if (Math.signum(f.applyAsDouble(x))
 				!= Math.signum(f.applyAsDouble(guess))) {
@@ -3239,7 +3286,8 @@ public abstract class RootFinder<P> {
 					   + "root");
 			*/
 			if (res.length <= resind) {
-			    throw new IllegalArgumentException();
+			    String msg = errorMsg("argArray3TooShort");
+			    throw new IllegalArgumentException(msg);
 			}
 			res[resind++] = refineSolution(f, df, 0.0, x2);
 			if (resind > 1 && res[resind-1] == res[resind-2]) {
@@ -3278,7 +3326,8 @@ public abstract class RootFinder<P> {
 					   + " and " + x2);
 			*/
 			if (res.length <= resind) {
-			    throw new IllegalArgumentException();
+			    String msg = errorMsg("argArray3TooShort");
+			    throw new IllegalArgumentException(msg);
 			}
 			res[resind++] = findPolyRoot(EQN, N, x, x2);
 			if (resind > 1 && res[resind-1] == res[resind-2]) {
@@ -3319,7 +3368,8 @@ public abstract class RootFinder<P> {
 		*/
 		if (guess > x) {
 		    if (res.length <= resind) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray3TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    if (Math.signum(f.applyAsDouble(x)) !=
 			Math.signum(f.applyAsDouble(guess))) {
@@ -3353,7 +3403,8 @@ public abstract class RootFinder<P> {
 				       + ", v = " + v +", ev = " + ev);
 		    */
 		    if (res.length <= resind) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray3TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[resind++] = refineSolution(f, null, 0.0, x2);
 		    if (resind > 1 && res[resind-1] == res[resind-2]) {
@@ -3383,7 +3434,8 @@ public abstract class RootFinder<P> {
 		    if (Math.signum(val) != Math.signum(v)) {
 			// System.out.println("bracketing");
 			if (res.length <= resind) {
-			    throw new IllegalArgumentException();
+			    String msg = errorMsg("argArray3TooShort");
+			    throw new IllegalArgumentException(msg);
 			}
 			res[resind++] = findPolyRoot(EQN, N, x, x2);
 			/*
@@ -3500,7 +3552,8 @@ public abstract class RootFinder<P> {
 	if (e == 0.0) {
 	    // System.out.println("e == 0.0 case");
 	    if (res.length <= 4) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    res[0] = d;
 	    res[1] = c;
@@ -3525,7 +3578,8 @@ public abstract class RootFinder<P> {
 
 	if (b == 0.0 && d == 0.0) {
 	    if (res.length <= 2) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    res[0] = e;
 	    res[1] = c;
@@ -3902,7 +3956,8 @@ public abstract class RootFinder<P> {
 		multiple = 1;
 		nr = 3;
 		if (res.length <= 3) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		res[0] = d;
 		res[1] = 2*c;
@@ -3924,7 +3979,8 @@ public abstract class RootFinder<P> {
 		// System.out.println("case 5: nr = 1");
 		if (hasIntCoefficients && safeInts) {
 		    if (res.length <= 3) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[3] = 4*ia;
 		    res[2] = 3*ib;
@@ -3932,7 +3988,8 @@ public abstract class RootFinder<P> {
 		    res[0] = id;
 		} else {
 		    if (res.length <= 3) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[3] = 4*a;
 		    res[2] = 3*b;
@@ -3951,7 +4008,8 @@ public abstract class RootFinder<P> {
 		}
 		if (ind != 0) {
 		    if (res.length < 1) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[0] = res[ind];
 		}
@@ -3961,7 +4019,8 @@ public abstract class RootFinder<P> {
 		multiple = 1;
 		// System.out.println("case 6: nr = 2");
 		if (res.length <= 2) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		if (hasIntCoefficients && safeInts) {
 		    res[2] = 6*ia;
@@ -4006,7 +4065,8 @@ public abstract class RootFinder<P> {
 		    // two real double roots
 		    multiple = 2;
 		    if (res.length <= 3) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    if (hasIntCoefficients && safeInts) {
 			res[0] = id;
@@ -4034,7 +4094,8 @@ public abstract class RootFinder<P> {
 		    int ind = -1;
 		    double max = -1.0;
 		    if (res.length < n) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    for (int i = 0; i < n; i++) {
 			double aval = Math.abs(f.applyAsDouble(res[i]));
@@ -4060,7 +4121,8 @@ public abstract class RootFinder<P> {
 		    return 0;
 		} else if (Delta0 == 0) {
 		    if (res.length < 1) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    multiple = 1;
 		    // System.out.println("case 9: nr = 1");
@@ -4152,7 +4214,8 @@ public abstract class RootFinder<P> {
 	if (m == 0) {
 	    // System.out.println("q = " + q);
 	    if (Math.abs(q) > Math.scalb(Math.ulp(q), 5)) {
-		throw new RuntimeException();
+		String msg = errorMsg("floatingPointErr");
+		throw new RuntimeException(msg);
 	    }
 	    tmp[0] = r;
 	    tmp[1] = p;
@@ -4211,7 +4274,8 @@ public abstract class RootFinder<P> {
 	// System.out.println("... found " + n + " solutions");
 	for (int i = 0; i < n; i++) {
 	    if (res.length <= resind) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    res[resind++] = refineSolution(f, df, 0.0, tmp[i] + offset);
 	    /*
@@ -4451,13 +4515,15 @@ public abstract class RootFinder<P> {
 
 	    if (Math.abs(delta0) < edelta0) {
 		if (res.length < 1) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		res[0] = 0.0;
 		return 1;
 	    } else  {
 		if (res.length < 2) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		double r1 = (9*e3*e0)/(2*delta0);
 		double r2 = -(9*e3*e3*e0) / (e3 * delta0);
@@ -4485,7 +4551,8 @@ public abstract class RootFinder<P> {
 	// handle these.
 	if (eqn[1] == 0.0) {
 	    if (res.length < 1) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    if (eqn[0] == 0.0) {
 		res[0] = 0.0;
@@ -4498,7 +4565,8 @@ public abstract class RootFinder<P> {
 	} else if (eqn[0] == 0.0) {
 	    // a == 0 case handled by eqn[1] == 0;.0 case above
 	    if (res.length < 2) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    if (a < 0) {
 		res[0] = 0.0;
@@ -4527,13 +4595,15 @@ public abstract class RootFinder<P> {
 
 	    if (Math.abs(delta0) <= edelta0) {
 		if (res.length < 1) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		res[0] = 0.0;
 		return 1;
 	    } else {
 		if (res.length < 2) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		double r1 = (9*e3*e0)/(2*delta0);
 		double r2 = -(9*e3*e3*e0) / (e3 * delta0);
@@ -4550,7 +4620,8 @@ public abstract class RootFinder<P> {
 	    }
 	} else if (discr < 0) {
 	    if (res.length < 1) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    double negb2 = -b/2;
 	    sqrtTerm = Math.sqrt(sqrtTerm);
@@ -4575,7 +4646,8 @@ public abstract class RootFinder<P> {
 	} else {
 	    // Trigonometric solution
 	    if (res.length < 3) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    double negb2 = -b/2;
 	    double sqrt = Math.sqrt(-sqrtTerm2);
@@ -5001,7 +5073,8 @@ public abstract class RootFinder<P> {
 	} else if (Delta == 0) {
 	    if (P < 0 && D < 0 && Delta0 != 0) {
 		if (res.length <= 3) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		// double real root & two real simple roots
 		// System.out.println("case 4: nr = 3");
@@ -5024,7 +5097,8 @@ public abstract class RootFinder<P> {
 	    } else if ((D > 0) || ((P > 0) && (D != 0 || R != 0))) {
 		// double real root and two complex conjugate roots
 		if (res.length <= 3) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		multiple = 1;
 		// System.out.println("case 5: nr = 1");
@@ -5056,7 +5130,8 @@ public abstract class RootFinder<P> {
 	    } else if (Delta0 == 0 && D != 0) {
 		// triple real root and a real simple root
 		if (res.length <= 2) {
-		    throw new IllegalArgumentException();
+		    String msg = errorMsg("argArray2TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		multiple = 1;
 		// System.out.println("case 6: nr = 2");
@@ -5120,7 +5195,8 @@ public abstract class RootFinder<P> {
 	    } else if (D == 0) {
 		if (P < 0) {
 		    if (res.length <= 3) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    // System.out.println("case 7: nr = 2");
 		    // two real double roots
@@ -5174,7 +5250,8 @@ public abstract class RootFinder<P> {
 		    return 0;
 		} else if (Delta0 == 0) {
 		    if (res.length < 1) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    multiple = 1;
 		    // System.out.println("case 9: nr = 1");
@@ -5269,7 +5346,8 @@ public abstract class RootFinder<P> {
 	if (m == 0) {
 	    // System.out.println("q = " + q);
 	    if (Math.abs(q) > Math.scalb(Math.ulp(q), 5)) {
-		throw new RuntimeException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new RuntimeException(msg);
 	    }
 	    tmp[0] = r;
 	    tmp[1] = p;
@@ -5281,12 +5359,14 @@ public abstract class RootFinder<P> {
 		double rr = tmp[i];
 		if (rr == 0.0) {
 		    if (res.length <= resind) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[resind++] = 0.0;
 		} else if (rr > 0) {
 		    if (res.length <= resind+1) {
-			throw new IllegalArgumentException();
+			String msg = errorMsg("argArray2TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    rr = Math.sqrt(rr);
 		    res[resind++] = -rr;
@@ -5315,7 +5395,8 @@ public abstract class RootFinder<P> {
 	// System.out.println("... found " + n + " solutions");
 	for (int i = 0; i < n; i++) {
 	    if (res.length <=resind) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    res[resind++] = refineSolution(f, df, 0.0, tmp[i]);
 	    /*
@@ -5337,7 +5418,8 @@ public abstract class RootFinder<P> {
 	// System.out.println("... found " + n + " solutions");
 	for (int i = 0; i < n; i++) {
 	    if (res.length <=resind) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("argArray2TooShort");
+		throw new IllegalArgumentException(msg);
 	    }
 	    res[resind++] = refineSolution(f, df, 0.0, tmp[i]);
 	    /*
@@ -5521,8 +5603,14 @@ public abstract class RootFinder<P> {
 			       + eqn[offset+i]);
 	}
 	*/
-	if (n < 0) throw new IllegalArgumentException();
-	if (eqn.length <= offset+n) throw new IllegalArgumentException();
+	if (n < 0) {
+	    String msg = errorMsg("thirdArgNegI", n);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (eqn == null || eqn.length <= offset+n) {
+	    String msg = errorMsg("argArray1TooShort");
+	    throw new IllegalArgumentException(msg);
+	}
 
 	// N >= 3 because we already took care of the lower-order polynomials
 	final int N = n;
@@ -5555,7 +5643,10 @@ public abstract class RootFinder<P> {
 	case 0:
 	    return -1;
 	case 1:
-	    if (res.length == 0) throw new IllegalArgumentException();
+	    if (res == null || res.length == 0) {
+		String msg = errorMsg("argArray4TooShort");
+		throw new IllegalArgumentException(msg);
+	    }
 	    double error1 = Math.ulp(eqn[offset]);
 	    double error2 = error1 + Math.ulp(eqn[offset+1]);
 	    double denom = eqn[offset+1] - eqn[offset];
@@ -5813,7 +5904,10 @@ public abstract class RootFinder<P> {
 	double val = f.applyAsDouble(x);
 	double err = ferr.applyAsDouble(x);
 	if (Math.abs(val) < err) {
-	    if (res.length <= resind) throw new IllegalArgumentException();
+	    if (res == null || res.length <= resind) {
+		String msg = errorMsg("argArray4TooShort");
+		throw new IllegalArgumentException(msg);
+	    }
 	    res[resind++] = x;
 	    /*
 	    System.out.println("set res[" + (resind-1) + "] to "
@@ -5870,8 +5964,9 @@ public abstract class RootFinder<P> {
 		  + ", ptind = " + ptind
 		  + ", v = " + v +", ev = " + ev);
 		*/
-		if (res.length <= resind) {
-		    throw new IllegalArgumentException();
+		if (res == null || res.length <= resind) {
+		    String msg = errorMsg("argArray4TooShort");
+		    throw new IllegalArgumentException(msg);
 		}
 		res[resind++] = refineSolution(f, null, 0.0, x2);
 		if (resind > 1 && res[resind-1] == res[resind-2]) {
@@ -5908,8 +6003,9 @@ public abstract class RootFinder<P> {
 		// System.out.println("checking (" +x + ", " + x2 + ")");
 		if (Math.signum(val) != Math.signum(v)) {
 		    // System.out.println("bracketing");
-		    if (res.length <= resind) {
-			throw new IllegalArgumentException();
+		    if (res == null || res.length <= resind) {
+			String msg = errorMsg("argArray4TooShort");
+			throw new IllegalArgumentException(msg);
 		    }
 		    res[resind++] = findBezierRoot(0, EQN, N, x, x2);
 		    /*

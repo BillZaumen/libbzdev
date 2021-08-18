@@ -2,7 +2,9 @@ package org.bzdev.obnaming;
 import org.bzdev.util.JSArray;
 import org.bzdev.util.JSObject;
 import java.util.LinkedHashMap;
+import java.util.MissingResourceException;
 
+//@exbundle org.bzdev.obnaming.lpack.Launcher
 
 /**
  * Simplified JavaScript-like object class.
@@ -32,6 +34,13 @@ import java.util.LinkedHashMap;
  * @see NamedObjectFactory
  */
 public class NJSObject extends JSObject {
+
+    static String errorMsg(String key, Object... args)
+	throws NullPointerException, MissingResourceException
+    {
+	return ObjectNamerLauncher.errorMsg(key, args);
+    }
+
 
     /**
      * Constructor.
@@ -80,7 +89,7 @@ public class NJSObject extends JSObject {
 	    || object instanceof JSObject) {
 	    return super.putObject(key, object);
 	} else {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("badElement"));
 	}
     }
 }

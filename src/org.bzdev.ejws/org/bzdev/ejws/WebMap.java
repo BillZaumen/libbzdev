@@ -376,7 +376,7 @@ abstract public class WebMap {
 	    if (session != null) {
 		return session.changeSessionID();
 	    } else {
-		throw new IllegalStateException();
+		throw new IllegalStateException(errorMsg("noSession"));
 	    }
 	}
 

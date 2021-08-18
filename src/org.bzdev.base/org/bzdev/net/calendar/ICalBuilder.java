@@ -2451,8 +2451,12 @@ public class ICalBuilder {
 		String s1 = (summary != null)? summary: parent.summary;
 		String s2 = (description != null)? description:
 		    parent.description;
-		if (s1 == null || s2 == null)
-		    throw new IllegalStateException();
+		if (s1 == null) {
+		    throw new IllegalStateException(errorMsg("noSummary"));
+		}
+		if (s2 == null) {
+		    throw new IllegalStateException(errorMsg("noDescr"));
+		}
 		String[] p1 = (summary != null)? summaryParams:
 		    parent.summaryParams;
 		String[] p2 = (description != null)? descriptionParams:

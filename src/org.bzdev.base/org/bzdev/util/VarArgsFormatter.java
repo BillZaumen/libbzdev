@@ -1196,6 +1196,9 @@ public final class VarArgsFormatter implements Closeable, Flushable {
     public VarArgsFormatter format(Locale l, String format, Object arg1)
 	throws IllegalFormatException, FormatterClosedException
     {
+	if (arg1.getClass().isArray()) {
+	    return format(l, format, (Object[])arg1);
+	}
 	Object[] args = {arg1};
 	return format(l, format, args);
     }
