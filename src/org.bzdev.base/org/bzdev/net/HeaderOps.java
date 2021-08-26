@@ -376,6 +376,10 @@ public interface HeaderOps extends Map<String,List<String>> {
 	}
     }
 
+    /**
+     * Create a new instance of this interface with a default
+     * implementation.
+     */
     static HeaderOps newInstance() {
 	return new OurHeaderOpsMap();
     }
@@ -385,10 +389,10 @@ public interface HeaderOps extends Map<String,List<String>> {
      * The result is map whose keys are the parameter names and whose
      * values are the parameter values.  As a special case, the value
      * of the header, excluding its parameters, has the header's name
-     * as key, unless it contains "=", in which case the corresponding
-     * name and value becomes the first entry in the map that is
-     * returned. Double quotes and escapes will be removed.  Each key
-     * in the map is a lower-case string.
+     * as the header's key, unless it contains "=", in which case the
+     * corresponding name and value becomes the first entry in the map
+     * that is returned. Double quotes and escapes will be removed.
+     * Each key in the map is a lower-case string.
      * <P>
      * For example, the header
      * <BLOCKQUOTE><PRE><CODE>
@@ -406,7 +410,7 @@ public interface HeaderOps extends Map<String,List<String>> {
      * cookies) use commas as part of a value.
      * @param name the name of the header
      * @param acceptCommas true if commas are valid in a value or a
-     *        parameter; false if headers are delimiters separating
+     *        parameter; false if commas are delimiters separating
      *        multiple values
      * @return a map providing the value and parameters for the header;
      *         null if there is no header with the specified name
@@ -441,7 +445,7 @@ public interface HeaderOps extends Map<String,List<String>> {
      * represented by a map whose keys are the parameter names and
      * whose values are the parameter values.  As a special case, the
      * value of the header, excluding its parameters, has the header's
-     * name as key, unless it contains "=", in which case the
+     * name as the header's key, unless it contains "=", in which case the
      * corresponding name and value becomes the first entry in the map
      * that is returned. Double quotes and escapes will be
      * removed. All keys for these maps are in lower case.
@@ -451,7 +455,7 @@ public interface HeaderOps extends Map<String,List<String>> {
      *   accept: text/plain; charset=utf-8, text/html; charset=utf-8
      * </CODE></PRE></BLOCKQUOTE>
      * would return a list containing two maps, each with two entries:
-     * the key "content-type" with "text/plain" as its value, and the
+     * the key "accept" with "text/plain" as its value, and the
      * key "charset" with "utf-8" as its value. While generally
      * parameters are name-value pairs, in a few cases, parameters may
      * consist of a name without a value, in which case the value will

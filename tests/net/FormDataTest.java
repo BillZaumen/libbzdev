@@ -133,8 +133,27 @@ public class FormDataTest {
 	    if (it.getMediaType() == null
 		|| it.getMediaType().startsWith("text/")) {
 		cis.transferTo(System.out);
+		System.out.println("\n----------------");
+	    } else {
+		cis.close();
 	    }
-	    System.out.println("\n----------------");
+	}
+	System.out.println();
+	System.out.println("...  formadata.txt but just close");
+	System.out.println();
+	is = new FileInputStream("formdata.txt");
+	it = new FormDataIterator(is, boundary);
+	while (it.hasNext()) {
+	    System.out.println("Next entry:");
+	    InputStream cis = it.next();
+	    if (cis == null) System.out.println("[no input stream]");
+	    System.out.println("content-type = " + it.getContentType());
+	    System.out.println("media-type = " + it.getMediaType());
+	    System.out.println("name = " + it.getName());
+	    System.out.println("filename = " + it.getFileName());
+	    System.out.println("charset = " + it.getCharset());
+	    System.out.println("----------------");
+	    cis.close();
 	}
 	System.out.println("Done");
     }

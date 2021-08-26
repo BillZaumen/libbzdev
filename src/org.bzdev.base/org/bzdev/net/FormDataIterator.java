@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-// import com.sun.net.httpserver.Headers;
 
 //@exbundle org.bzdev.net.lpack.Net
 
@@ -33,6 +32,21 @@ import java.util.NoSuchElementException;
  *            ...
  *            cis.close();
  *         }
+ *     }
+ * </CODE></PRE></BLOCKQUOTE>
+ * If the content-type header's value <CODE>CTYPE</CODE>, and the input stream
+ * <CODE>is</CODE> containing the form's content, are available, then
+ * the following design pattern can be used:
+ * <BLOCKQUOTE><PRE><CODE>
+ *     HeaderOps headerOps = HeaderOps.newInstance();
+ *     headerOps.set("content-type", CTYPE);
+ *     String boundary = headerOps.getFirst("content-type", false)
+ *            .get("boundary");
+ *     FormDataIterator it = new FormDataIterator(is, boundary);
+ *     while (it.hasNext()) {
+ *       InputStream cis = it.next();
+ *       ...
+ *       it.close();
  *     }
  * </CODE></PRE></BLOCKQUOTE>
  * <P>
@@ -360,8 +374,8 @@ public class FormDataIterator implements Iterator<InputStream> {
      * Determine if their are more entries to process.
      * <P>
      * Note: if the {@link java.io.InputStream InputStream} returned
-     * by {@link #next()} has not been read fully or if such a stream
-     * has not been closed, an exception will be thrown
+     * by {@link #next()} has not been read fully and if such a stream
+     * has not been explicitly closed, an exception will be thrown
      * @return true if there are more entries; false otherwise
      * @exception IllegalStateException this method cannot be called
      *            when the input stream returned by next() has not
@@ -370,14 +384,18 @@ public class FormDataIterator implements Iterator<InputStream> {
     @Override
     public boolean hasNext() throws IllegalStateException {
 	if (streamOpened) {
-	    throw new IllegalStateException("hasNext");
+	    throw new IllegalStateException(errorMsg("hasNext"));
 	}
 	return more;
     }
 
     /**
      * Get the next entry.
-     * @return an input stream containing the data for the current
+     * Note: if the {@link java.io.InputStream InputStream} returned
+     * by this method has not been read fully and if such a stream
+     * has not been explicitly closed, an exception will be thrown when
+     * {@link #hasNext()} is called.
+     * @return an input stream containing the data for the next
      *         entry
      */
     @Override
@@ -573,6 +591,15 @@ public class FormDataIterator implements Iterator<InputStream> {
 
        @Override
 	public void close() throws IOException {
+	   if (streamOpened) {
+	       // This will read to the end of the current stram
+	       // and set streamOpened to false.  By reading to
+	       // the end at this point, the caller does not have
+	       // to explicitly read the full stream, although reading
+	       // it anyway is harmless.
+	       while (read() != -1);
+	   }
+
 	    if (endBoundary < rposition) {
 		if (needBoundary) {
 		    while (scanForBoundary() == false) {
@@ -585,11 +612,12 @@ public class FormDataIterator implements Iterator<InputStream> {
 	    if (rposition < endStream) {
 		rposition = endStream;
 	    }
-	    streamOpened = false;
+	    // streamOpened = false;
 	}
 
        @Override
 	public int read() throws IOException {
+	   if (streamOpened == false) return -1;
 	    if(needBoundary && scanForBoundary()) {
 		needBoundary = false;
 	    }
