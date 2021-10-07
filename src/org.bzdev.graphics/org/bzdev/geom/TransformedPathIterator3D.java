@@ -5,48 +5,44 @@ import org.bzdev.util.Cloner;
 //@exbundle org.bzdev.geom.lpack.Geom
 
 /**
- * PathIterator based on an affine transformation of another PathIterator.
+ * PathIterator3D based on a transformation of another PathIterator3D.
  * This class obtains the segment type and control points from
- * a path iterator that it encapsulates, and applies an affine transform
+ * a path iterator that it encapsulates, and applies a transform
  * to those control points.  The path iterator passed to the constructor
  * will be modified as methods are called.
  * <P>
- * The rationale for this class is that the {@link java.awt.Shape}
- * interface allows an affine transformation to be applied when creating
- * a path iterator,  but there are no methods in subpackages of the java
- * and javax packages that will apply an affine transformation to an
- * existing path iterator&mdash;instead one must create a new path
- * and obtain an iterator for that path.
+ * The rationale for this class is the same as for
+ *  {@link TransformedPathIterator}.
  * <P>
- * The same effect can be achieved by calling FlattenedPathIterator2D
+ * The same effect can be achieved by calling FlattenedPathIterator3D
  * with a limit of 0, albeit with slightly worse performance.
  */
-public class TransformedPathIterator implements PathIterator {
+public class TransformedPathIterator3D implements PathIterator3D {
 
     static String errorMsg(String key, Object... args) {
 	return GeomErrorMsg.errorMsg(key, args);
     }
 
-    PathIterator pi;
-    AffineTransform at;
-    Transform2D tf;
+    PathIterator3D pi;
+    AffineTransform3D at;
+    Transform3D tf;
 
     /**
-     * Constructor given an AffineTransform.
+     * Constructor given an AffineTransform3D.
      * Because the path iterator passed to this constructor will be
      * modified by this object's methods, it is a good practice to
      * call the constructor as follows
      * <blockquote><code><pre>
-     *      PathIterator pi = ...
-     *      AffineTransform at = ...
-     *      pi = new TransformedPathIterator(pi, at);
+     *      PathIterator3D pi = ...
+     *      AffineTransform3D at = ...
+     *      pi = new TransformedPathIterator3D(pi, at);
      * </pre></code></blockquote>
      * to avoid having multiple references that modify the same object.
      * @param pi the path iterator
      * @param at the affine transform; null if there is none.
      * @exception NullPointerException the path iterator was null
      */
-    public TransformedPathIterator(PathIterator pi, AffineTransform at) {
+    public TransformedPathIterator3D(PathIterator3D pi, AffineTransform3D at) {
 	if (pi == null)
 	    throw new NullPointerException(errorMsg("nullPathIterator"));
 	this.pi = pi;
@@ -54,8 +50,8 @@ public class TransformedPathIterator implements PathIterator {
 	if (at != null) {
 	    try {
 		Object obj = at.clone();
-		if (obj instanceof AffineTransform) {
-		    this.at = (AffineTransform) obj;
+		if (obj instanceof AffineTransform3D) {
+		    this.at = (AffineTransform3D) obj;
 		} else {
 		    this.at = at;
 		}
@@ -66,13 +62,13 @@ public class TransformedPathIterator implements PathIterator {
     }
 
     /**
-     * Constructor given a Transform2D.
+     * Constructor given a Transform3D.
      * Because the path iterator passed to this constructor will be
      * modified by this object's methods, it is a good practice to
      * call the constructor as follows
      * <blockquote><code><pre>
      *      PathIterator pi = ...
-     *      Transform2D at = ...
+     *      Transform3D at = ...
      *      pi = new TransformedPathIterator(pi, at);
      * </pre></code></blockquote>
      * to avoid having multiple references that modify the same object.
@@ -80,7 +76,7 @@ public class TransformedPathIterator implements PathIterator {
      * @param tf the  transform; null if there is none.
      * @exception NullPointerException the path iterator was null
      */
-    public TransformedPathIterator(PathIterator pi, Transform2D tf) {
+    public TransformedPathIterator3D(PathIterator3D pi, Transform3D tf) {
 	if (pi == null)
 	    throw new NullPointerException(errorMsg("nullPathIterator"));
 	this.pi = pi;
@@ -176,11 +172,6 @@ public class TransformedPathIterator implements PathIterator {
     }
 
     @Override
-    public int getWindingRule() {
-	return pi.getWindingRule();
-    }
-    
-    @Override
     public boolean isDone() {
 	return pi.isDone();
     }
@@ -192,6 +183,6 @@ public class TransformedPathIterator implements PathIterator {
 }
 
 //  LocalWords:  exbundle PathIterator affine subpackages javax mdash
-//  LocalWords:  FlattenedPathIterator AffineTransform blockquote pre
+//  LocalWords:  FlattenedPathIterator AffineTransform3D blockquote pre
 //  LocalWords:  TransformedPathIterator NullPointerException tf
 //  LocalWords:  nullPathIterator

@@ -12,9 +12,12 @@ import org.bzdev.math.GLQuadrature;
 
 /**
  * Class to compute a path integral of a vector or scalar field.
- *  An instance of this class is created by providing the vector or
- * scalar fields and can then be used to find the path interval for a
+ * An instance of this class is created by providing the vector or
+ * scalar fields and can then be used to find the path integral for a
  * given path.
+ * <P>
+ * The implementation uses Gauss-Legendre quadrature on each
+ * segment of a path.
  */
 public class PathIntegral {
 
@@ -193,7 +196,10 @@ public class PathIntegral {
      * <P>
      * If p(x,y) is a polynomial approximation to xf or yf, then
      * the corresponding value for n is the degree of the polynomial
-     *  p(at+b,ct+d) where t is the independent variable.
+     * p(at+b,ct+d) where t is the independent variable. The
+     * polynomial approximation applies to each segment of the
+     * path, where a path segment is determined by the path's
+     * path iterator.
      * @param n the degree of a polynomial that is an adequate
      *        approximation to the functions xf(x,y) and yf(x,y)
      * @param xf a function of x and y providing the value of
@@ -336,13 +342,16 @@ public class PathIntegral {
      * parameter for P, and where x and y are values on the path
      * corresponding to each value of the path parameter u.
      * <P>
-     * If p(x,y) is a polynomial approximation to sf, then
+     * If p(x,y,z) is a polynomial approximation to sf, then
      * the corresponding value for n is the degree of the polynomial
-     *  p(at+b,ct+d) where t is the independent variable.
+     *  p(at+b,ct+d,et+f) where t is the independent variable. The
+     * polynomial approximation applies to each segment of the
+     * path, where a path segment is determined by the path's
+     * path iterator.
      * @param n the degree of a polynomial that is an adequate
-     *        approximation to the function sf(x,y) 
+     *        approximation to the function sf(x,y,z)
      * @param sf a function of x and y providing the value of
-     *        the scalar field at coordinates (x, y).
+     *        the scalar field at coordinates (x, y, z).
      */
     public PathIntegral(int n, RealValuedFunctThreeOps sf) {
 	n = glqlenS(n);
@@ -383,7 +392,10 @@ public class PathIntegral {
      * <P>
      * If p(x,y,z) is a polynomial approximation to xf or yf, then
      * the corresponding value for n is the degree of the polynomial
-     *  p(at+b,ct+d,et+f) where t is the independent variable.
+     *  p(at+b,ct+d,et+f) where t is the independent variable. The
+     * polynomial approximation applies to each segment of the
+     * path, where a path segment is determined by the path's
+     * path iterator.
      * @param n the degree of a polynomial that is an adequate
      *        approximation to the functions xf(x,y,z), yf(x,y,z),
      *        and zf(x,y,z)

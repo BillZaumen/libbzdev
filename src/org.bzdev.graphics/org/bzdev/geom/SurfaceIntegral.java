@@ -19,6 +19,8 @@ import org.bzdev.math.*;
  * {@link SurfaceIntegral#integrate(Shape3D,Transform3D)}, or
  * {@link SurfaceIntegral#integrate(Shape3D,Transform3D,int)}
  * will perform the integration for a specified surface.
+ * <P>
+ * The implementation uses Gauss-Legendre quadrature.
  */
 public class SurfaceIntegral  {
     static String errorMsg(String key, Object... args) {

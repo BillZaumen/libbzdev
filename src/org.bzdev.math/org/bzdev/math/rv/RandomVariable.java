@@ -110,7 +110,7 @@ abstract public class  RandomVariable<T>
     }
 
     /**
-     * Set the maximum value for a random variable.
+     * Set the required maximum value for a random variable.
      * Normally this is called by a constructor to prevent a random
      * variable from having values outside a range that makes sense.
      * @param max maximum value.
@@ -305,7 +305,7 @@ abstract public class  RandomVariable<T>
 	return spliteratorAux(maxdepth);
     }
 
-    public Spliterator<T> spliteratorAux(final int maxDepth) {
+    Spliterator<T> spliteratorAux(final int maxDepth) {
 	return new Spliterator<T>() {
 	    int maxdepth = maxDepth;
 	    int characteristics = getCharacteristics()

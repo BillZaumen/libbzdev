@@ -1365,8 +1365,8 @@ install-javadocs: javadocs
 		done
 	install -d $(EXAMPLES)
 	for i in blackhole dplot drama harmonic Legendre lgraph lingraph \
-	   lognormal lsqfit math multi p3d path pendulum smartmeter \
-	   stephan tandem zipviewer ; \
+	   lognormal lsqfit math multi p3d path pendulum plates \
+	   smartmeter stephan tandem zipviewer ; \
 	do  install -d $(EXAMPLES)/$$i ; \
 	    install -m 0644 $(JROOT_EXAMPLES)/$$i/*.java $(EXAMPLES)/$$i ; \
 	done

@@ -5450,9 +5450,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * v=0.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter u is 0.0,
      * and the last control point is the point on the curve
      * where the parameter u is 1.0. There are a total of four control points
@@ -5580,9 +5580,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * and an array.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter u is 0.0,
      * and the last control point is the point on the curve
      * where the parameter u is 1.0. There are a total of four control points
@@ -5680,9 +5680,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * v=1.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter u is 0.0,
      * and the last control point is the point on the curve
      * where the parameter u is 1.0. There are a total of four control points
@@ -5761,9 +5761,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * and an array.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter u is 0.0,
      * and the last control point is the point on the curve
      * where the parameter u is 1.0. There are a total of four control points
@@ -5860,9 +5860,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * u=0.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter v is 0.0,
      * and the last control point is the point on the curve
      * where the parameter v is 1.0. There are a total of four control points
@@ -5942,9 +5942,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * and an array.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter v is 0.0,
      * and the last control point is the point on the curve
      * where the parameter v is 1.0. There are a total of four control points
@@ -6043,9 +6043,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * u=1.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter v is 0.0,
      * and the last control point is the point on the curve
      * where the parameter v is 1.0. There are a total of four control points
@@ -6125,9 +6125,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * and an array.
      * Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
+     * The coordinates of the control points for the cubic curve are listed
      * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
+     * grouped together and in that order.  The first (O<sup>th</sup>)
      * control point is the point on the curve where the parameter v is 0.0,
      * and the last control point is the point on the curve
      * where the parameter v is 1.0. There are a total of four control points
@@ -7000,15 +7000,17 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve. The coordinates of the first of these are provided
-     * as explicit arguments and the coordinates of the rest are provided in
-     * an array.
+
+     * The coordinates of the control points (P0, P1, P2, and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter v is 0.0, and the last control point is the
+     * point on the curve where the parameter v is 1.0. There are a
+     * total of four control points for this curve. The coordinates of
+     * the first of these are provided as explicit arguments and the
+     * coordinates of the rest are provided in an array.
+
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7083,8 +7085,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
-     * specified by the 'reverse' argument, will be placed at
-     * locations 003, 012, 021, and 030.
+     * specified by the 'reverse' argument (P0 to P3 when 'reverse'
+     * is false and P3 to P0 when reverse is true), will be placed at
+     * locations 003, 012, 021, and 030 respectively.
      * @param lastX the initial control point's X coordinate
      * @param lastY the initial control point's Y coordinate
      * @param lastZ the initial control point's Z coordinate
@@ -7118,13 +7121,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve.
+
+     * The coordinates of the control points (P0, P1, P2, and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter v is 0.0, and the last control point is the
+     * point on the curve where the parameter v is 1.0. There are a
+     * total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7195,7 +7199,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 003, 012, 021, and 030.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when reverse
+     * is true), will be placed at locations 003, 012, 021, and 030.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier triangle's
@@ -7238,13 +7243,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve.
+     * The coordinates of the control points (P0, P1, P2, and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter v is 0.0, and the last control point is the
+     * point on the curve where the parameter v is 1.0. There are a
+     * total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7315,7 +7320,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 003, 012, 021, and 030.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
+     * is true), will be placed at locations 003, 012, 021, and 030.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier triangle's
@@ -7360,15 +7366,16 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve. The coordinates of the first of these are provided
-     * as explicit arguments and the coordinates of the rest are provided in
-     * an array.
+
+     * The coordinates of the control points (P0, P1, P2, and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter v is 0.0, and the last control point is the
+     * point on the curve where the parameter v is 1.0. There are a
+     * total of four control points for this curve. The coordinates of
+     * the first of these are provided as explicit arguments and the
+     * coordinates of the rest are provided in an array.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7442,8 +7449,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
-     * specified by the 'reverse' argument, will be placed at
-     * locations 003, 102, 201, and 300.
+     * specified by the 'reverse' argument (P0 to P3 when 'reverse' is false
+     * and P3 to P0 when reverse is true), will be placed at
+     * locations 003, 102, 201, and 300  respectively.
      * @param lastX the first control point's X coordinate
      * @param lastY the first control point's Y coordinate
      * @param lastZ the first control point's Z coordinate
@@ -7477,13 +7485,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve.
+     * The coordinates of the control points (P0, P1, P2, and P3) for
+     * the cubic curve are listed sequentially, with X, Y, and Z
+     * values for each control point grouped together and in that
+     * order.  The first (O<sup>th</sup>) control point is the point on
+     * the curve where the parameter v is 0.0, and the last control
+     * point is the point on the curve where the parameter v is
+     * 1.0. There are a total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7554,7 +7562,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 003, 102, 201, and 300.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
+     * is true), will be placed at locations 003, 102, 201, and 300.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier triangle's
@@ -7597,13 +7606,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter v is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter v is 1.0. There are a total of four control points
-     * for this curve.
+     * The coordinates of the control points (P0, P1, P2, and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter v is 0.0, and the last control point is the
+     * point on the curve where the parameter v is 1.0. There are a
+     * total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7674,7 +7683,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 003, 102, 201, and 300.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
+     * is true), will be placed at locations 003, 102, 201, and 300.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier triangle's
@@ -7719,15 +7729,16 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter t is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter t is 1.0. There are a total of four control points
-     * for this curve.  The coordinates of the first of these are provided
-     * as explicit arguments and the coordinates of the rest are provided in
-     * an array.
+     * The coordinates of the control points (P0, P1, P2, and P3) for
+     * the cubic curve are listed sequentially, with X, Y, and Z
+     * values for each control point grouped together and in that
+     * order.  The first (O<sup>th</sup>) control point is the point on
+     * the curve where the parameter t is 0.0, and the last control
+     * point is the point on the curve where the parameter t is
+     * 1.0. There are a total of four control points for this curve.
+     * The coordinates of the first of these are provided as explicit
+     * arguments and the coordinates of the rest are provided in an
+     * array.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7801,7 +7812,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
-     * specified by the 'reverse' argument, will be placed at
+     * specified by the 'reverse' argument (P0 to P3 when 'reverse' is
+     * false and P3 to P0 when 'reverse' is true), will be placed at
      * locations 300, 210, 210, and 030.
      * @param lastX the initial control point's X coordinate
      * @param lastY the initial control point's Y coordinate
@@ -7837,13 +7849,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter t is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter t is 1.0. There are a total of four control points
-     * for this curve.
+     * The coordinates of the control points (P0, P1, P2, and P3) for
+     * the cubic curve are listed sequentially, with X, Y, and Z
+     * values for each control point grouped together and in that
+     * order.  The first (O<sup>th</sup>) control point is the point on
+     * the curve where the parameter t is 0.0, and the last control
+     * point is the point on the curve where the parameter t is
+     * 1.0. There are a total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -7923,7 +7935,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 300, 210, 120, and 030.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when
+     * 'reverse' is true), will be placed at locations 300, 210, 120,
+     * and 030.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier triangle's
@@ -7966,13 +7980,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * the constraint u+v+w = 1, and where u, v, and w are constrained
      * to lie in the interval [0,1]. Each edge is a cubic B&eacute;zier curve.
      * <P>
-     * The coordinates of control points for the cubic curve are listed
-     * sequentially, with X, Y, and Z values for each control point
-     * grouped together and in that order.  The first (O<sup>th</sup>
-     * control point is the point on the curve where the parameter t is 0.0,
-     * and the last control point is the point on the curve
-     * where the parameter t is 1.0. There are a total of four control points
-     * for this curve.
+     * The coordinates of the control points (P0, P1, P2 and P3) for the
+     * cubic curve are listed sequentially, with X, Y, and Z values
+     * for each control point grouped together and in that order.  The
+     * first (O<sup>th</sup>) control point is the point on the curve
+     * where the parameter t is 0.0, and the last control point is the
+     * point on the curve where the parameter t is 1.0. There are a
+     * total of four control points for this curve.
      * <P>
      * A cubic B&eacute;zier triangle is specified by 10 control points.
      * These are labeled by a set of indices
@@ -8043,7 +8057,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </blockquote>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
-     * argument, will be placed at locations 300, 210, 120, and 030.
+     * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
+     * is true), will be placed at locations 300, 210, 120, and 030.
      * @param pcoords the coordinates for the control points of a cubic
      *        B&eacute;zier curve
      * @param scoords the coordinates for a cubic B&eacute;zier patch's
@@ -9089,7 +9104,6 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * As a result, applying the right hand rule using the ordering of the
      * control points (v<sub>1</sub> to v<sub>3</sub> to v<sup>3</sub> yields
      * an orientation opposite to that of the triangle.
-     * It is not the same as the ordering used for
      * It is not the same as the ordering used for
      * {@link #addPlanarTriangle(double,double,double,double,double,double,double,double,double,Color)}.
      * @param controlPoints the vertices of this triangle

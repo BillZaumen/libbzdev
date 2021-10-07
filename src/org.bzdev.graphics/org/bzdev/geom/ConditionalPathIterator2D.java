@@ -14,7 +14,10 @@ import java.util.function.Predicate;
  * that indicates that splitting should continue. If that condition is not
  * satisfied, splitting may continue in some circumstances: the
  * second control point, for example, should not be closer to the initial
- * control point than the first control point.
+ * control point than the first control point.   The condition is a predicate
+ * whose argument is a control point array including the end points of a
+ * segment. It will have a length of 6 for qudratic segments and a length of
+ * 8 for cubic segments.
  * <P>
  * The iterator has a recursion limit (the default value is 10) to
  * prevent the number of segments from becoming excessively large.

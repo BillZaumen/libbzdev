@@ -21,6 +21,4 @@ public class MathLauncherData implements ONLauncherData {
 	    .getBundle("org.bzdev.providers.math.lpack.MathLauncherData")
 	    .getString("description");
     }
-
-
 }

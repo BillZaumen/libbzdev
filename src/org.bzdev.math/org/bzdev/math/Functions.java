@@ -774,6 +774,21 @@ public class Functions {
 	    return n;
 	}
 
+	// timing tests indicate that array allocation is a signficant
+	// cost: much more so than using a pool of preallocated arrays.
+	private static int ALEN = 256;
+	private static class ArrayPair {
+	    double[] prev = new double[ALEN];
+	    double[] next = new double[ALEN];
+	}
+	private static LinkedList<ArrayPair> arrayPairPool = new LinkedList<>();
+	static {
+	    int np = Runtime.getRuntime().availableProcessors();
+	    for (int i = 0; i < np; i++) {
+		arrayPairPool.add(new ArrayPair());
+	    }
+	}
+
 	/**
 	 * Compute a weighted sum of Bernstein polynomials of the same degree,
 	 * specifying an offset.
@@ -811,18 +826,40 @@ public class Functions {
 		return beta[m]*x1 + beta[m+1]*x;
 	    }
 
-	    double[] prev = new double[n+1];
-	    double[] next = new double[n+1];
-	    System.arraycopy(beta, m, next, 0, n+1);
-	    for (int j = 1; j <= n; j++) {
-		double[] tmp = prev;
-		prev = next;
-		next = tmp;
-		for (int i = 0; i <= n-j; i++) {
-		    next[i] = prev[i]*x1 + prev[i+1]*x;
+	    ArrayPair pair = null;
+	    double[] prev;
+	    double[] next;
+	    if (n < ALEN) {
+		synchronized(arrayPairPool) {
+		    pair = arrayPairPool.poll();
+		    if (pair == null) {
+			pair = new ArrayPair();
+		    }
+		    prev = pair.prev;
+		    next = pair.next;
+		}
+	    } else {
+		prev = new double[n+1];
+		next = new double[n+1];
+	    }
+	    try {
+		System.arraycopy(beta, m, next, 0, n+1);
+		for (int j = 1; j <= n; j++) {
+		    double[] tmp = prev;
+		    prev = next;
+		    next = tmp;
+		    for (int i = 0; i <= n-j; i++) {
+			next[i] = prev[i]*x1 + prev[i+1]*x;
+		    }
+		}
+		return next[0];
+	    } finally {
+		if (pair != null) {
+		    synchronized(arrayPairPool) {
+			arrayPairPool.add(pair);
+		    }
 		}
 	    }
-	    return next[0];
 	}
 
 	/**
@@ -935,33 +972,54 @@ public class Functions {
 		return;
 	    }
 
+	    ArrayPair pair = null;
+
 	    double[] prev = null;
 	    double[] next = null;
 
 	    if (n > 1) {
-		prev = new double[n+1];
-		next = new double[n+1];
+		if (n < ALEN) {
+		    pair = arrayPairPool.poll();
+		    if (pair == null) {
+			pair = new ArrayPair();
+		    }
+		    prev = pair.prev;
+		    next = pair.next;
+		} else {
+		    prev = new double[n+1];
+		    next = new double[n+1];
+		}
 	    }
 
 	    double x1 = 1.0 - x;
-	    for (int i = 0; i < result.length; i++) {
-		if (n == 1) {
+	    if (n == 1) {
+		for (int i = 0; i < result.length; i++) {
 		    result[i] =  beta[i + m*result.length]*x1
 			+ beta[i + (m+1)*result.length]*x;
-		} else {
-		    for (int j = 0; j < n+1; j++) {
-			next[j] = beta[i + (m+j)*result.length];
-			prev[j] = 0.0;
+		}
+	    } else {
+		try {
+		    for (int i = 0; i < result.length; i++) {
+			for (int j = 0; j < n+1; j++) {
+			    next[j] = beta[i + (m+j)*result.length];
+			    prev[j] = 0.0;
+			}
+			for (int j = 1; j <= n; j++) {
+			    double[] tmp = prev;
+			    prev = next;
+			    next = tmp;
+			    for (int k = 0; k <= n-j; k++) {
+				next[k] = prev[k]*x1 + prev[k+1]*x;
+			    }
+			}
+			result[i] =  next[0];
 		    }
-		    for (int j = 1; j <= n; j++) {
-			double[] tmp = prev;
-			prev = next;
-			next = tmp;
-			for (int k = 0; k <= n-j; k++) {
-			    next[k] = prev[k]*x1 + prev[k+1]*x;
+		} finally {
+		    if (pair != null) {
+			synchronized(arrayPairPool) {
+			    arrayPairPool.add(pair);
 			}
 		    }
-		    result[i] =  next[0];
 		}
 	    }
 	}
@@ -1016,33 +1074,54 @@ public class Functions {
 		return;
 	    }
 
+	    ArrayPair pair = null;
+
 	    double[] prev = null;
 	    double[] next = null;
 
 	    if (n > 1) {
-		prev = new double[n+1];
-		next = new double[n+1];
+		if (n < ALEN) {
+		    pair = arrayPairPool.poll();
+		    if (pair == null) {
+			pair = new ArrayPair();
+		    }
+		    prev = pair.prev;
+		    next = pair.next;
+		} else {
+		    prev = new double[n+1];
+		    next = new double[n+1];
+		}
 	    }
 
 	    double x1 = 1.0 - x;
-	    for (int i = 0; i < rlen; i++) {
-		if (n == 1) {
+	    if (n == 1) {
+		for (int i = 0; i < rlen; i++) {
 		    result[i+offset] =  beta[i + m*rlen]*x1
 			+ beta[i + (m+1)*rlen]*x;
-		} else {
-		    for (int j = 0; j < n+1; j++) {
-			next[j] = beta[i + (m+j)*rlen];
-			prev[j] = 0.0;
+		}
+	    } else {
+		try {
+		    for (int i = 0; i < rlen; i++) {
+			for (int j = 0; j < n+1; j++) {
+			    next[j] = beta[i + (m+j)*rlen];
+			    prev[j] = 0.0;
+			}
+			for (int j = 1; j <= n; j++) {
+			    double[] tmp = prev;
+			    prev = next;
+			    next = tmp;
+			    for (int k = 0; k <= n-j; k++) {
+				next[k] = prev[k]*x1 + prev[k+1]*x;
+			    }
+			}
+			result[i+offset] =  next[0];
 		    }
-		    for (int j = 1; j <= n; j++) {
-			double[] tmp = prev;
-			prev = next;
-			next = tmp;
-			for (int k = 0; k <= n-j; k++) {
-			    next[k] = prev[k]*x1 + prev[k+1]*x;
+		} finally {
+		    if (pair != null) {
+			synchronized(arrayPairPool) {
+			    arrayPairPool.add(pair);
 			}
 		    }
-		    result[i+offset] =  next[0];
 		}
 	    }
 	}
@@ -3845,6 +3924,52 @@ public class Functions {
 		r[n/2] = 0.0;
 	    }
 	    return ind;
+	}
+
+	private static double[] coefficients(int n)
+	    throws IllegalArgumentException
+	{
+	    if (n < 0) {
+		String msg = errorMsg("argNonNegative", n);
+		throw new IllegalArgumentException(msg);
+	    }
+	    double[] coefficients = new double[n+1];
+	    int floor = n/2;
+	    int n2 = n*2;
+	    double factor = 1.0/MathOps.pow(2.0, n);
+	    for (int k = 0; k <= floor; k++) {
+		int k2 = 2*k;
+		double sign = (k%2 == 0)? 1: -1;
+		coefficients[n-k2] = factor * sign
+		    * Binomial.coefficient(n, k)
+		    * Binomial.coefficient(n2 - k2, n);
+	    }
+	    return coefficients;
+	}
+
+	/**
+	 * Create a Legendre polynomial of degree n using a monomial basis.
+	 * @param n the degree of the Legendre polynomial
+	 * @return the polynomial
+	 * @exception the argument was negative
+	 */
+	public static Polynomial asPolynomial(int n)
+	    throws IllegalArgumentException
+	{
+	    return new Polynomial(coefficients(n), n);
+	}
+
+	/**
+	 * Create a Legendre polynomial of degree n using a Bernstein basis.
+	 * @param n the degree of the Legendre polynomial
+	 * @return the polynomial
+	 * @exception the argument was negative
+	 */
+	public static BezierPolynomial asBezierPolynomial(int n)
+		    throws IllegalArgumentException
+	{
+	    return new
+		BezierPolynomial(Polynomials.toBezier(coefficients(n), n));
 	}
     }
 

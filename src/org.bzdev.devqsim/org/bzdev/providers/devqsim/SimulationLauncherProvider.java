@@ -26,7 +26,6 @@ public class SimulationLauncherProvider implements ONLauncherProvider {
 	    .getBundle("org.bzdev.providers.devqsim.lpack.SimulationLauncher")
 	    .getString("description");
     }
-
 }
 
 //  LocalWords:  devqsim

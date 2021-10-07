@@ -1726,7 +1726,7 @@ public abstract class RootFinder<P> {
      * </UL>
      * @param eqn the input/output array containing the roots (starting at
      *        index 0) for output and the coefficients ordered so that
-     *        eqn[0] = c, eqn[1] = b, and eqn[2] = a.
+     *        eqn[0] = d, eqn[1] = c, eqn[2] = b, and eqn[3] = a.
      * @return the number of roots; -1 if the coefficients a and b are zero
      */
     public static int solveCubic(double[] eqn) {
@@ -1947,9 +1947,9 @@ public abstract class RootFinder<P> {
      *               signs.
      *       </UL>
      * </UL>
-     * @param eqn the input array containing the roots (starting at
-     *        index 0) with the coefficients ordered so that
-     *        eqn[0] = c, eqn[1] = b, and eqn[2] = a.
+     * @param eqn the input/output array containing the roots (starting at
+     *        index 0) for output and the coefficients ordered so that
+     *        eqn[0] = d, eqn[1] = c, eqn[2] = b, and eqn[3] = a.
      * @param res the output array containing the roots (starting at
      *        index 0) in numerical order
      * @return the number of roots; -1 if the coefficients a and b are zero
@@ -2673,10 +2673,23 @@ public abstract class RootFinder<P> {
 	return rf.solve(0.0, guess, x1, x2);
     }
 
+    /**
+     * Find the zeros of a {@link Polynomial}.
+     * @param p the polynomial
+     * @return the number of roots; -1 if the degree of the
+     *         polynomial is zero.
+     * @exception IllegalArgumentException if the array
+     *            argument is too short
+     */
+    public static int solvePolynomial(Polynomial p, double[] res) {
+	return solvePolynomial(p.getCoefficientsArray(), p.getDegree(), res);
+    }
 
     /**
      * Find the zeros of a polynomial of degree n.
-     * @param eqn the coefficients of the polynomial for input
+     * @param eqn the coefficients of the polynomial for input,
+     *        ordered so that eqn[i] provides the coefficient for
+     *        x<sup>i</sup> where x is the polynomial's indeterminate
      * @param n the degree of the polynomial
      * @param res the roots that were found
      * @return the number of roots; -1 if the degree of the
@@ -4370,7 +4383,7 @@ public abstract class RootFinder<P> {
     // Case in which eqn[2] = 0, eqn[3] != 0, and eqn[0] != 0.
     //
 
-    public static int depressedCubic(double[] eqn, double[] res) {
+    private static int depressedCubic(double[] eqn, double[] res) {
 
 	double norm = eqn[3];
 
@@ -5513,12 +5526,27 @@ public abstract class RootFinder<P> {
     static final int BEZIER_FERR_SCALB = 8;
 
     /**
-     * Find the zeros of a sum of Berstein polynomial of degree n.
+     * Find the zeros of a {@link BezierPolynomial}.
+     * @param p the polynomial
+     * @return the number of roots; -1 if the degree of the
+     *         polynomial is zero.
+     * @exception IllegalArgumentException if the array
+     *            argument is too short
+     */
+    public static int solvePolynomial(BezierPolynomial p, double[] res) {
+	return solveBezier(p.getCoefficientsArray(), 0, p.getDegree(), res);
+    }
+
+
+    /**
+     * Find the zeros of a sum of Bernstein polynomial of degree n.
      * The name of the method, solveBezier, reflects the
      * use of Bernstein polynomials for B&eacute;zier curves.
      * The roots returned are in the range [0.0, 1.0], the range
      * appropriate for B&eacute;zier curves.
-     * @param eqn the coefficients of the polynomial for input
+     * @param eqn the coefficients of the polynomial for input, where
+     *        eqn[i] is the coefficient for the Bernstein polynomial
+     *         B<sub>i,n</sub>(t)
      * @param offset the offset into the array eqn at which the
      *        coefficients start
      * @param n the degree of the polynomial

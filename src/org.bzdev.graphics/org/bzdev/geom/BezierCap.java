@@ -1025,12 +1025,25 @@ public class BezierCap implements Shape3D {
 	double[][] workspaceR = new double[rlevel][];
 
 	private void setup(double[] buffer) {
-	    Surface3D.setupV0ForTriangle(spokes[index], buffer, !flip);
-	    Surface3D.setupU0ForTriangle(edges[index], buffer, flip);
-	    Surface3D.setupW0ForTriangle(spokes[index+1], buffer, flip);
+	    // Surface3D.setupV0ForTriangle(spokes[index], buffer, !flip);
+	    // Surface3D.setupU0ForTriangle(edges[index], buffer, flip);
+	    // Surface3D.setupW0ForTriangle(spokes[index+1], buffer, flip);
+
+	    if (flip) {
+		Surface3D.setupV0ForTriangle(spokes[index+1], buffer, true);
+		Surface3D.setupU0ForTriangle(edges[index], buffer, true);
+		Surface3D.setupW0ForTriangle(spokes[index], buffer, false);
+	    } else {
+		Surface3D.setupV0ForTriangle(spokes[index], buffer, true);
+		Surface3D.setupU0ForTriangle(edges[index], buffer, false);
+		Surface3D.setupW0ForTriangle(spokes[index+1], buffer, false);
+	    }
+
+
 	    if (cp111[index] == null) {
 		for (int i = 0; i < 3; i++) {
-		    buffer[15+i] = (buffer[12+i] + buffer[18+i]) / 2.0;
+		    buffer[15+i] = (double)(float)
+			((buffer[12+i] + buffer[18+i]) / 2.0);
 		}
 		double len1 = VectorOps.norm(buffer, 12, 3);
 		double len2 = VectorOps.norm(buffer, 15, 3);
@@ -1039,8 +1052,8 @@ public class BezierCap implements Shape3D {
 		double ratio = len / len2;
 		if (ratio < 1.0) {
 		    for (int i = 0; i < 3; i++) {
-			buffer[15+i] = center[i] +
-			    ratio * (buffer[15+i] - center[i]);
+			buffer[15+i] = (double)(float)
+			    (center[i] + ratio * (buffer[15+i] - center[i]));
 		    }
 		}
 

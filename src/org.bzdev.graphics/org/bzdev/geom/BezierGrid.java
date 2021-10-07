@@ -126,7 +126,7 @@ import java.io.IOException;
  * at j = 0.  These flags are useful for some common shapes:
  * <UL>
  *   <LI> When one is true, the grid can represent a cylinder or a ring with
- *        an inner and outer boundary.
+ *        two boundaries.
  * </UL>  When both are true, the grid can represent a torus.
  * <P>
  * One can partition the grid into regions by giving each point a
@@ -312,6 +312,12 @@ public class BezierGrid implements Shape3D {
 	return GeomErrorMsg.errorMsg(key, args);
     }
 
+    // To determine if vertices lie in a plane by computing
+    // v1 . (v2 X v3) using normalized vectors.  The limit allows
+    // for roundoffs errors.
+    static final double PLANAR_LIMIT = 1.e-6;
+
+
     private static class Vertex {
 	int i;
 	int j;
@@ -331,6 +337,8 @@ public class BezierGrid implements Shape3D {
 
     int nu;
     int nv;
+
+    private boolean linear = false;
 
     /**
      * Get the array length in the U direction (e.g., the length for
@@ -386,6 +394,30 @@ public class BezierGrid implements Shape3D {
      * @param vclosed true if the V direction is closed; false otherwise
      */
     public BezierGrid(int nu, boolean uclosed, int nv, boolean vclosed) {
+	this(nu, uclosed, nv, vclosed, false);
+    }
+
+    /**
+     * Constructor for an empty, possibly linear grid.
+     * When a direction is closed, then when all points along a line in that
+     * direction are defined, no points along that line have been
+     * removed, and  all points along that lie are in the same region, then
+     * the spline created will be a cyclic one.  When closed, one should
+     * not duplicate an end point: the expected behavior occurs automatically.
+     * <P>
+     * When the argument <CODE>linear</COdE> is true, each grid point is
+     * configured to have its own region. By default, each line connecting
+     * two adjacent grid points will be a straight line.
+     * @parem nu the number of vertices in the U direction
+     * @param uclosed true if the U direction is close; false otherwise
+     * @parem nv the number of vertices in the V direction
+     * @param vclosed true if the V direction is closed; false otherwise
+     * @param linear true if lines connecting grid points are straight lines;
+     *        false otherwise
+     */
+    public BezierGrid(int nu, boolean uclosed, int nv, boolean vclosed,
+		      boolean linear)
+    {
 	this.uclosed = uclosed;
 	this.vclosed = vclosed;
 	this.nu = nu;
@@ -397,6 +429,16 @@ public class BezierGrid implements Shape3D {
 		array[i][j] = v;
 		v.i = i;
 		v.j = j;
+	    }
+	}
+	this.linear = linear;
+	if (linear) {
+	    int regionCode = 0;
+	    for (int i = 0; i < nu; i++) {
+		for (int j = 0; j < nv; j++) {
+		    Vertex v = array[i][j];
+		    v.region = regionCode++;
+		}
 	    }
 	}
     }
@@ -446,7 +488,46 @@ public class BezierGrid implements Shape3D {
     public BezierGrid(Point3D[][] points,
 		      boolean uclosed, boolean vclosed)
     {
-	this(points.length, uclosed, points[0].length, vclosed);
+	this(points, uclosed, vclosed, false);
+    }
+
+    /**
+     * Constructor for open or closed grids with possibily linear
+     * connections between adjacent grid points.
+     * The points on each patch are functions of two variables u and
+     * v. Increasing u moves a point on the surface towards the next
+     * highest first index and increasing v moves a point on the
+     * surface towards the next highest second index.  Both u and v
+     * must be in the range [0.0, 1.0].  If the array is an n by m
+     * array with indices [i][j], the points at i = n-1 should not
+     * repeat the points at i = 0 to create a closed
+     * surface&mdash;that will be done automatically when uclosed is
+     * true. Similarly, when vclosed is true, the points at j = m-1
+     * should not contain the same values as those at i = 0 as the
+     * additional patches will be provided automatically.
+     * <P>
+     * When uclosed or vclosed is true, the splines used to create
+     * the B&eacute;zier patches will be a smooth at all points
+     * including the end points.
+     * <P>
+     * When stored, the points provided will have their coordinates
+     * rounded to the nearest 'float' value by first casting the values
+     * to a float and then to a double.
+     * <P>
+     * When the argument <CODE>linear</COdE> is true, each grid point is
+     * configured to have its own region. By default, each line connecting
+     * two adjacent grid points will be a straight line.
+     * @param points a two-dimensional array of points
+     * @param uclosed the grid is closed in the U direction
+     * @param vclosed the grid is closed in the V direction
+     * @param linear true if lines connecting grid points are straight lines;
+     *        false otherwise
+     */
+    public BezierGrid(Point3D[][] points,
+		      boolean uclosed, boolean vclosed, boolean linear)
+    {
+
+	this(points.length, uclosed, points[0].length, vclosed, linear);
 	for (int i = 0; i < nu; i++) {
 	    for (int j = 0; j < nv; j++) {
 		Point3D p = points[i][j];
@@ -540,7 +621,63 @@ public class BezierGrid implements Shape3D {
 		      RealValuedFunctTwoOps yfunct,
 		      RealValuedFunctTwoOps zfunct)
     {
-	this(sarray.length, uclosed, tarray.length, vclosed);
+	this(sarray, uclosed, tarray, vclosed, false,
+	     xfunct, yfunct, zfunct);
+    }
+    /**
+     * Constructor using real-valued functions and specifying if the U
+     * and V directions are cyclic or not, with possibly a linear
+     * constraint for the line segments connecting adjacent points on
+     * the grid.
+     * <P>
+     * The paths connecting adjectent grid points can be constrained
+     * to be linear.  The grid is a two-dimensional array whose values
+     * are points in a three-dimensional space.  The first index
+     * refers to the 'U' axis and the second index refers to the 'V'
+     * axis. The values u and v are restricted to the range [0, 1) for
+     * a given pair.  of indices [i][j].  The real-valued functions
+     * are functions of two arguments (s,t). Arrays sarray and tarray
+     * are one-dimensional arrays whose indices are i and j
+     * respectively and whose values are the corresponding values for
+     * s and t.
+     * <P>
+     * The argument uclosed, when true, indicates that the surface
+     * corresponding to the grid is closed in the 'U' direction.
+     * Similarly vclosed, when true, indicates that the surface
+     * corresponding to the grid is closed in the 'V' direction.
+     * When the grid is closed in the U direction, sarray's final
+     * element must not repeat its initial element. Similarly
+     * when the grid is closed in the V direction, tarray's final
+     * element must not repeat its initial element.
+     * <P>
+     * When stored, the coordinates provided will have their values
+     * rounded to the nearest 'float' value by first casting the values
+     * to a float and then to a double.
+     * <P>
+     * When the argument <CODE>linear</COdE> is true, each grid point is
+     * configured to have its own region. By default, each line connecting
+     * two adjacent grid points will be a straight line.
+     * @param sarray the 's' values at grid points in increasing order
+     * @param uclosed
+     * @param tarray the 't' values at grid points in increasing order
+     * @param vclosed
+     * @param linear true if lines connecting grid points are straight lines;
+     *        false otherwise
+     * @param xfunct the function f<sub>x</sub>(s,t) providing the X
+     *        coordinate at (s,t)
+     * @param yfunct the function f<sub>y</sub>(s,t) providing the Y
+     *        coordinate at (s,t)
+     * @param zfunct the function f<sub>z</sub>(s,t) providing the Z
+     *        coordinate at (s,t)
+     */
+    public BezierGrid(double[] sarray, boolean uclosed,
+		      double[] tarray, boolean vclosed,
+		      boolean linear,
+		      RealValuedFunctTwoOps xfunct,
+		      RealValuedFunctTwoOps yfunct,
+		      RealValuedFunctTwoOps zfunct)
+    {
+	this(sarray.length, uclosed, tarray.length, vclosed, linear);
 	for (int i = 0; i < nu; i++) {
 	    for (int j = 0; j < nv; j++) {
 		double s = sarray[i];
@@ -1472,6 +1609,13 @@ public class BezierGrid implements Shape3D {
      * When stored, the coordinates provided will have their values
      * rounded to the nearest 'float' value by first casting the values
      * to a float and then to a double.
+     * <P>
+     * This method returns false if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)},
+     * with its 'linear' argument set to true.
      * @param i the U index
      * @param j the V index
      * @param coords the coordinates for the intermediate control points.
@@ -1480,6 +1624,7 @@ public class BezierGrid implements Shape3D {
      *            or i and/or j are out of range
      */
     public boolean setSplineU(int i, int j, double[] coords) {
+	if (linear) return false;
 	if (frozenU) return false;
 	if (coords == null || coords.length < 6) {
 	    throw new IllegalArgumentException(errorMsg("argarraylength"));
@@ -1522,6 +1667,13 @@ public class BezierGrid implements Shape3D {
      * will be attached to a planar triangle in order to ensure that the
      * tessellation will work as expected: otherwise small floating-point
      * errors can result in a surface that is not well formed.
+     * <P>
+     * This method returns false if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)},
+     * with its 'linear' argument set to false.
      * @param i the U index
      * @param j the V index
      * @return true if the spline is allowed for this point; false if it is not
@@ -1529,6 +1681,7 @@ public class BezierGrid implements Shape3D {
      */
 
     public boolean setLinearU(int i, int j) {
+	if (linear) return false;
 	if (frozenU) return false;
 	if (i < 0 || j < 0 || i >= nu || j >= nv) {
 	    String msg = errorMsg("argOutOfRange2ii", i, j);
@@ -1572,12 +1725,20 @@ public class BezierGrid implements Shape3D {
      * will be attached to a planar triangle in order to ensure that the
      * tessellation will work as expected: otherwise small floating-point
      * errors can result in a surface that is not well formed.
+     * <P>
+     * This method returns false if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)},
+     * with its 'linear' argument set to true.
      * @param i the U index
      * @param j the V index
      * @return true if the spline is allowed for this point; false if it is not
      * @exception IllegalArgumentException i and/or j are out of range
      */
     public boolean setLinearV(int i, int j) {
+	if (linear) return false;
 	if (frozenV) return false;
 	if (i < 0 || j < 0 || i >= nu || j >= nv) {
 	    String msg = errorMsg("argOutOfRange2ii", i, j);
@@ -1622,6 +1783,13 @@ public class BezierGrid implements Shape3D {
      * When stored, the coordinates provided will have their values
      * rounded to the nearest 'float' value by first casting the values
      * to a float and then to a double.
+     * <P>
+     * This method returns false if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)}.
+     * with its 'linear' argument set to true.
      * @param i the U index
      * @param j the V index
      * @param coords and array to hold the results
@@ -1630,6 +1798,7 @@ public class BezierGrid implements Shape3D {
      *            or i and/or j are out of range
      */
     public boolean setSplineV(int i, int j, double[] coords) {
+	if (linear) return false;
 	if (frozenV) return false;
 	if (coords == null || coords.length < 6) {
 	    throw new IllegalArgumentException(errorMsg("argarraylength"));
@@ -1671,6 +1840,13 @@ public class BezierGrid implements Shape3D {
      * When stored, the coordinates provided will have their values
      * rounded to the nearest 'float' value by first casting the values
      * to a float and then to a double.
+     * <P>
+     * This method returns false if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)}.
+     * with its 'linear' argument set to true.
      * @param i the U index, which must be in the range [0,N) where N
      *        is the largest allowable U index
      * @param j the V index, which must be in the range[0,M) where M
@@ -1683,6 +1859,7 @@ public class BezierGrid implements Shape3D {
     public boolean setRemainingControlPoints(int i, int j, double[] rest)
 	throws IllegalArgumentException
     {
+	if (linear) return false;
 	if (rest != null && rest.length < 12) {
 	    throw new IllegalArgumentException(errorMsg("argarraylength"));
 	}
@@ -2006,9 +2183,18 @@ public class BezierGrid implements Shape3D {
      * For each corner, if a grid point already exists, its cell's
      * status (empty or filled) is unchanged.  Otherwise its cell
      * status is set to filled.
+     * <P>
+     * This throws an exception if the grid is a linear grid: one created
+     * with the constructors
+     * {@link BezierGrid#BezierGrid(int,boolean,int,boolean,boolean)},
+     * {@link BezierGrid#BezierGrid(Point3D[][],boolean,boolean,boolean)}, or
+     * {@link BezierGrid#BezierGrid(double[],boolean,double[],boolean,boolean,RealValuedFunctTwoOps,RealValuedFunctTwoOps,RealValuedFunctTwoOps)},
+     * with its 'linear' argument set to true.
      * @param i the U index of the grid point
      * @param j the V index of the grid point
      * @param coords the control points.
+     * @exeption IllegalArgumentException if an argument is out of range
+     * @exception IllegalStateException if a patch may not be set
      * @see #getPatch(int,int,double[])
      */
     public void setPatch(int i, int j, double[] coords)
@@ -2017,6 +2203,9 @@ public class BezierGrid implements Shape3D {
 	if (i < 0 || i >= nu || j < 0 || j >= nv) {
 	    String msg = errorMsg("argOutOfRange2ii", i, j);
 	    throw new IllegalArgumentException(msg);
+	}
+	if (linear) {
+	    throw  new IllegalStateException(errorMsg("linearWithPatch"));
 	}
 	bpathSet = false;
 	createSplines();
@@ -2254,6 +2443,10 @@ public class BezierGrid implements Shape3D {
 	    String msg = errorMsg("argOutOfRange2ii", i, j);
 	    throw new IllegalArgumentException(msg);
 	}
+	if (linear) {
+	    throw new
+		IllegalStateException(errorMsg("linearStartSpline"));
+	}
 	if (frozen) {
 	    throw new
 		IllegalStateException(errorMsg("bgfrozen"));
@@ -2341,8 +2534,8 @@ public class BezierGrid implements Shape3D {
      * not both, until the spline is completed
      * @param cyclic true if the spline is cyclic, false otherwise
      * @exception IllegalStateException if the spline is cyclic and cannot be
-     *            completed by moving in the U direction or the V direction,
-     *            but not both
+     *            completed by moving in the U direction or the V direction
+     *            but not both, or if a spline has not been started
      * @see #startSpline(int,int)
      * @see #moveU(int)
      * @see #moveV(int)
@@ -2351,6 +2544,9 @@ public class BezierGrid implements Shape3D {
 	splinesCreated = false;
 	bpathSet = false;
 	int size = list.size();
+	if (size == 0) {
+	    throw new IllegalStateException(errorMsg("emptySpline"));
+	}
 	if (size == 1) {
 	    // Just a single point doesn't do anything useful, so we
 	    // just delete the entry.
@@ -2380,6 +2576,8 @@ public class BezierGrid implements Shape3D {
 	list.toArray(sd.points);
 	splineDescriptors.add(sd);
 	list.clear();
+	ci = -1; cj = -1;
+	oi = -1; oj = -1;
 	splinesCreated = false;
 	bpathSet = false;
     }
@@ -3282,13 +3480,16 @@ public class BezierGrid implements Shape3D {
 		    break;
 		case PathIterator3D.SEG_LINETO:
 		    if (coords[0] != array[ni][nj].p.getX()) {
-			throw new RuntimeException("wrong spline");
+			String msg = errorMsg("wrongSpline", ni, nj);
+			throw new RuntimeException(msg);
 		    }
 		    if (coords[1] != array[ni][nj].p.getY()) {
-			throw new RuntimeException("wrong spline");
+			String msg = errorMsg("wrongSpline", ni, nj);
+			throw new RuntimeException(msg);
 		    }
 		    if (coords[2] != array[ni][nj].p.getZ()) {
-			throw new RuntimeException("wrong spline");
+			String msg = errorMsg("wrongSpline", ni, nj);
+			throw new RuntimeException(msg);
 		    }
 		    if (udir) {
 			if (ni > ci) {
@@ -3558,8 +3759,13 @@ public class BezierGrid implements Shape3D {
      * @param width the number of indices in the U direction
      * @param height the number of indices in the V diction
      * @param id the region id
+     * @exception IllegalArgumentException if an argument was out of range
+     * @exception IllegalStateException if called on a linear BezierGrid
      */
     public void setRegion(int i, int j, int width, int height, int id) {
+	if (linear) {
+	    throw new IllegalStateException(errorMsg("linearSetRegion"));
+	}
 	if (i < 0 || j < 0 || i >= nu || j >= nv) {
 	    String msg = errorMsg("argOutOfRange2ii", i, j);
 	    throw new IllegalArgumentException(msg);
@@ -3673,6 +3879,7 @@ public class BezierGrid implements Shape3D {
 	int nvm1 = nv-1;
 	boolean flip = flipped;
 
+
 	Iterator1() {
 	    next();
 	}
@@ -3682,8 +3889,15 @@ public class BezierGrid implements Shape3D {
 	    return index >= limit;
 	}
 
+	int triangleMode = 0;
+	double[] tcoords = linear? new double[9]: null;
+
 	@Override
 	public int currentSegment(double[] coords) {
+	    if (triangleMode == 2) {
+		System.arraycopy(tcoords, 0, coords, 0, 9);
+		return SurfaceIterator.PLANAR_TRIANGLE;
+	    }
 	    if (index >= limit) {
 		Arrays.fill(coords, 0, 48, Double.NaN);
 		return -1;
@@ -3702,6 +3916,75 @@ public class BezierGrid implements Shape3D {
 		double x3 = v3.p.getX();
 		double y3 = v3.p.getY();
 		double z3 = v3.p.getZ();
+		if (linear) {
+		    Vertex v4;
+		    if (i < num1) {
+			if (j < nvm1) {
+			    // normal case
+			    v4 = array[i+1][j+1];
+			} else {
+			    v4 = array[i+1][0];
+			}
+		    } else if (j < nvm1) {
+			v4 = array[0][j+1];
+		    } else {
+			v4 = array[0][0];
+		    }
+		    double x4 = v4.p.getX();
+		    double y4 = v4.p.getY();
+		    double z4 = v4.p.getZ();
+		    tcoords[0] = x2-x1;
+		    tcoords[1] = y2-y1;
+		    tcoords[2] = z2-z1;
+		    tcoords[3] = x3-x1;
+		    tcoords[4] = y3-y1;
+		    tcoords[5] = z3-z1;
+		    tcoords[6] = x4-x1;
+		    tcoords[7] = y4-y1;
+		    tcoords[8] = z4-z1;
+		    for (int k = 0; k < 9; k += 3) {
+			try {
+			    VectorOps.normalize(tcoords, k, 3);
+			} catch (IllegalArgumentException iae) {
+			    // a vector has a length of 0, which is OK here.
+			}
+		    }
+		    double dotcp = VectorOps.dotCrossProduct(tcoords, 0,
+							     tcoords, 3,
+							     tcoords, 6);
+		    if (Math.abs(dotcp) < PLANAR_LIMIT) {
+			// The corners lie in a plane, so we can generate
+			// planar triangles.
+			coords[0] = x1;
+			coords[1] = y1;
+			coords[2] = z1;
+			coords[3] = x4;
+			coords[4] = y4;
+			coords[5] = z4;
+			coords[6] = x2;
+			coords[7] = y2;
+			coords[8] = z2;
+			tcoords[0] = x1;
+			tcoords[1] = y1;
+			tcoords[2] = z1;
+			tcoords[3] = x3;
+			tcoords[4] = y3;
+			tcoords[5] = z3;
+			tcoords[6] = x4;
+			tcoords[7] = y4;
+			tcoords[8] = z4;
+			if (flip) {
+			    Surface3D.reverseOrientation(SurfaceIterator
+							 .PLANAR_TRIANGLE,
+							 coords);
+			    Surface3D.reverseOrientation(SurfaceIterator
+							 .PLANAR_TRIANGLE,
+							 tcoords);
+			}
+			triangleMode = 1;
+			return SurfaceIterator.PLANAR_TRIANGLE;
+		    }
+		}
 		Surface3D.setupU0ForPatch(x1, y1, z1, v1.vc, coords, false);
 		Surface3D.setupV0ForPatch(x1, y1, z1, v1.uc, coords, false);
 		Surface3D.setupU1ForPatch(x2, y2, z2, v2.vc, coords, false);
@@ -3734,7 +4017,8 @@ public class BezierGrid implements Shape3D {
 	    } else {
 		if (dcoords == null) dcoords = new double[48];
 		int result = currentSegment(dcoords);
-		for (int i = 0; i < 48; i++) {
+		int len = (result == SurfaceIterator.PLANAR_TRIANGLE)? 9: 48;
+		for (int i = 0; i < len; i++) {
 		    coords[i] = (float) dcoords[i];
 		}
 		return result;
@@ -3756,6 +4040,16 @@ public class BezierGrid implements Shape3D {
 
 	@Override
 	public void next() {
+	    switch(triangleMode) {
+	    case 0:
+		break;
+	    case 1:
+		triangleMode = 2;
+		return;
+	    case 2:
+		triangleMode = 0;
+		break;
+	    }
 	    while (index < limit) {
 		index++;
 		if (index == limit) {
@@ -3809,6 +4103,7 @@ public class BezierGrid implements Shape3D {
 
 	Transform3D transform;
 
+
 	Iterator2(Transform3D tform) {
 	    this.transform = tform;
 	    next();
@@ -3821,38 +4116,115 @@ public class BezierGrid implements Shape3D {
 
 	double[] dcoords2 = new double[48];
 
-	private void setupCoords(double[] result) {
-		int i = index % nu;
-		int j = index / nu;
-		Vertex v1 = array[i][j];
-		double x1 = v1.p.getX();
-		double y1 = v1.p.getY();
-		double z1 = v1.p.getZ();
-		Vertex v2 = (i < num1)? array[i+1][j]: array[0][j];
-		double x2 = v2.p.getX();
-		double y2 = v2.p.getY();
-		double z2 = v2.p.getZ();
-		Vertex v3 = (j < nvm1)? array[i][j+1]: array[i][0];
-		double x3 = v3.p.getX();
-		double y3 = v3.p.getY();
-		double z3 = v3.p.getZ();
-		Surface3D.setupU0ForPatch(x1, y1, z1, v1.vc, result, false);
-		Surface3D.setupV0ForPatch(x1, y1, z1, v1.uc, result, false);
-		Surface3D.setupU1ForPatch(x2, y2, z2, v2.vc, result, false);
-		Surface3D.setupV1ForPatch(x3, y3, z3, v3.uc, result, false);
-		if (v1.rest == null) {
-		    Surface3D.setupRestForPatch(result);
+	int triangleMode = 0;
+	double[] tcoords = linear? new double[9]: null;
+
+	private int setupCoords(double[] result) {
+	    if (triangleMode == 2) {
+		System.arraycopy(tcoords, 0, result, 0, 9);
+		return SurfaceIterator.PLANAR_TRIANGLE;
+	    }
+	    int i = index % nu;
+	    int j = index / nu;
+	    Vertex v1 = array[i][j];
+	    double x1 = v1.p.getX();
+	    double y1 = v1.p.getY();
+	    double z1 = v1.p.getZ();
+	    Vertex v2 = (i < num1)? array[i+1][j]: array[0][j];
+	    double x2 = v2.p.getX();
+	    double y2 = v2.p.getY();
+	    double z2 = v2.p.getZ();
+	    Vertex v3 = (j < nvm1)? array[i][j+1]: array[i][0];
+	    double x3 = v3.p.getX();
+	    double y3 = v3.p.getY();
+	    double z3 = v3.p.getZ();
+	    if (linear) {
+		Vertex v4;
+		if (i < num1) {
+		    if (j < nvm1) {
+			// normal case
+			v4 = array[i+1][j+1];
+		    } else {
+			v4 = array[i+1][0];
+		    }
+		} else if (j < nvm1) {
+		    v4 = array[0][j+1];
 		} else {
-		    System.arraycopy(v1.rest, 0, result, 5*3, 6);
-		    System.arraycopy(v1.rest, 6, result, 9*3, 6);
-		    for (int k = 0; k < v1.rest.length; k++) {
-			v1.rest[k] = (double)(float) v1.rest[k];
+		    v4 = array[0][0];
+		}
+		double x4 = v4.p.getX();
+		double y4 = v4.p.getY();
+		double z4 = v4.p.getZ();
+		tcoords[0] = x2-x1;
+		tcoords[1] = y2-y1;
+		tcoords[2] = z2-z1;
+		tcoords[3] = x3-x1;
+		tcoords[4] = y3-y1;
+		tcoords[5] = z3-z1;
+		tcoords[6] = x4-x1;
+		tcoords[7] = y4-y1;
+		tcoords[8] = z4-z1;
+		for (int k = 0; k < 9; k += 3) {
+		    try {
+			VectorOps.normalize(tcoords, k, 3);
+		    } catch (IllegalArgumentException iae) {
+			// a vector has a length of 0, which is OK here.
 		    }
 		}
-		if (flip) {
-		    Surface3D.reverseOrientation(SurfaceIterator.CUBIC_PATCH,
-						 result);
+		double dotcp = VectorOps.dotCrossProduct(tcoords, 0,
+							 tcoords, 3,
+							 tcoords, 6);
+		if (Math.abs(dotcp) < PLANAR_LIMIT) {
+		    // The corners lie in a plane, so we can generate
+		    // planar triangles.
+		    result[0] = x1;
+		    result[1] = y1;
+		    result[2] = z1;
+		    result[3] = x4;
+		    result[4] = y4;
+		    result[5] = z4;
+		    result[6] = x2;
+		    result[7] = y2;
+		    result[8] = z2;
+		    tcoords[0] = x1;
+		    tcoords[1] = y1;
+		    tcoords[2] = z1;
+		    tcoords[3] = x3;
+		    tcoords[4] = y3;
+		    tcoords[5] = z3;
+		    tcoords[6] = x4;
+		    tcoords[7] = y4;
+		    tcoords[8] = z4;
+		    if (flip) {
+			Surface3D.reverseOrientation(SurfaceIterator
+						     .PLANAR_TRIANGLE,
+						     result);
+			Surface3D.reverseOrientation(SurfaceIterator
+						     .PLANAR_TRIANGLE,
+						     tcoords);
+		    }
+		    triangleMode = 1;
+		    return SurfaceIterator.PLANAR_TRIANGLE;
 		}
+	    }
+	    Surface3D.setupU0ForPatch(x1, y1, z1, v1.vc, result, false);
+	    Surface3D.setupV0ForPatch(x1, y1, z1, v1.uc, result, false);
+	    Surface3D.setupU1ForPatch(x2, y2, z2, v2.vc, result, false);
+	    Surface3D.setupV1ForPatch(x3, y3, z3, v3.uc, result, false);
+	    if (v1.rest == null) {
+		Surface3D.setupRestForPatch(result);
+	    } else {
+		System.arraycopy(v1.rest, 0, result, 5*3, 6);
+		System.arraycopy(v1.rest, 6, result, 9*3, 6);
+		for (int k = 0; k < v1.rest.length; k++) {
+		    v1.rest[k] = (double)(float) v1.rest[k];
+		}
+	    }
+	    if (flip) {
+		Surface3D.reverseOrientation(SurfaceIterator.CUBIC_PATCH,
+					     result);
+	    }
+	    return SurfaceIterator.CUBIC_PATCH;
 	}
 
 	@Override
@@ -3861,9 +4233,10 @@ public class BezierGrid implements Shape3D {
 		Arrays.fill(coords, 0, 48, Double.NaN);
 		return -1;
 	    } else {
-		setupCoords(dcoords2);
-		transform.transform(dcoords2, 0, coords, 0, 16);
-		return SurfaceIterator.CUBIC_PATCH;
+		int type = setupCoords(dcoords2);
+		int npts = (type == SurfaceIterator.PLANAR_TRIANGLE)? 3: 16;
+		transform.transform(dcoords2, 0, coords, 0, npts);
+		return type;
 	    }
 	}
 	
@@ -3874,9 +4247,10 @@ public class BezierGrid implements Shape3D {
 		Arrays.fill(coords, 0, 48, Float.NaN);
 		return -1;
 	    } else {
-		setupCoords(dcoords2);
-		transform.transform(dcoords2, 0, coords, 0, 16);
-		return SurfaceIterator.CUBIC_PATCH;
+		int type = setupCoords(dcoords2);
+		int npts = (type == SurfaceIterator.PLANAR_TRIANGLE)? 3: 16;
+		transform.transform(dcoords2, 0, coords, 0, npts);
+		return type;
 	    }
 	}
 
@@ -3895,6 +4269,16 @@ public class BezierGrid implements Shape3D {
 
 	@Override
 	public void next() {
+	    switch(triangleMode) {
+	    case 0:
+		break;
+	    case 1:
+		triangleMode = 2;
+		return;
+	    case 2:
+		triangleMode = 0;
+		break;
+	    }
 	    while (index < limit) {
 		index++;
 		if (index == limit) return;
@@ -3927,6 +4311,7 @@ public class BezierGrid implements Shape3D {
 	}
     }
 
+
     @Override
     public SurfaceIterator getSurfaceIterator(Transform3D tform) {
 	createSplines();
@@ -3951,13 +4336,15 @@ public class BezierGrid implements Shape3D {
 	    if (level == 0) {
 		return new Iterator2(tform);
 	    } else {
-		return new SubdivisionIterator(new Iterator2(tform), level);
+		return new SubdivisionIterator(new Iterator2(tform),
+					       level);
 	    }
 	} else {
 	    if (level == 0) {
 		return new Iterator2(tform);
 	    } else {
-		return new SubdivisionIterator(new Iterator1(), tform, level);
+		return new SubdivisionIterator(new Iterator1(),
+					       tform, level);
 	    }
 	}
     }
@@ -4253,6 +4640,9 @@ public class BezierGrid implements Shape3D {
 				double[] coords2, int len,
 				boolean reverse) {
 	if (coords1 == null || coords2 == null) return false;
+	// For a linear segment, vc and uc are of different lengths;
+	// we don't have a quad case.
+	int offset = (len == 3)? 6: 0;
 	if (reverse) {
 	    if (p == null) return false;
 	    if (coords1[--len] != p.getZ()) return false;
@@ -4260,12 +4650,12 @@ public class BezierGrid implements Shape3D {
 	    if (coords1[--len] != p.getX()) return false;
 	    int k2 = 3;
 	    while(len > 0) {
-		if (coords1[--len] != coords2[--k2]) return false;
+		if (coords1[--len] != coords2[offset + (--k2)]) return false;
 		if (k2%3 == 0) k2 += 6;
 	    }
 	} else {
 	    for (int k = 0; k < len; k++) {
-		if (coords1[k] != coords2[k]) return false;
+		if (coords1[k] != coords2[offset+k]) return false;
 	    }
 	}
 	return true;
@@ -4648,7 +5038,7 @@ public class BezierGrid implements Shape3D {
 	throws IllegalStateException, IllegalArgumentException
     {
 	if (indices.length%2 != 0) {
-	    throw new IllegalArgumentException("counterspies");
+	    throw new IllegalArgumentException(errorMsg("oddIndexCount"));
 	}
 
 	boolean useIndices = (indices.length != 0);
@@ -4699,11 +5089,11 @@ public class BezierGrid implements Shape3D {
 			(new Integer[vrlist.size()]);
 		    if (gridsSeparated(varray, grid)) {
 			if (varray.length/2 != iarray.length) {
-			    throw new RuntimeException("region length "
-						       + iarray.length
-						       + ", expecting "
-						       + (varray.length/2)
-						       + " (SEG_MOVETO");
+			    int l1 = iarray.length;
+			    int l2 = varray.length/2;
+			    String msg =
+				errorMsg("badRegionLen", l1, l2, "SEG_MOVETO");
+			    throw new RuntimeException(msg);
 			}
 			blist.add(varray);
 			rlist.add(iarray);
@@ -4768,11 +5158,12 @@ public class BezierGrid implements Shape3D {
 			    (new Integer[vrlist.size()]);
 			if (gridsSeparated(varray, grid)) {
 			    if (varray.length/2 != iarray.length) {
-				throw new RuntimeException("region length "
-							   + iarray.length
-							   + ", expecting "
-							   + (varray.length/2)
-							   + " (SEG_LINETO)");
+				int l1 = iarray.length;
+				int l2 = varray.length/2;
+				String t = "SEG_LINETO";
+				String msg =
+				    errorMsg("badRegionLen", l1, l2, t);
+				throw new RuntimeException(msg);
 			    }
 			    count++;
 			    blist.add(varray);
@@ -4830,11 +5221,13 @@ public class BezierGrid implements Shape3D {
 			    (new Integer[vrlist.size()]);
 			if (gridsSeparated(varray, grid)) {
 			    if (varray.length/2 != iarray.length) {
-				throw new RuntimeException("region length "
-							   + iarray.length
-							   + ", expecting "
-							   + (varray.length/2)
-							   + " (SEG_QUADTO)");
+				int l1 = iarray.length;
+				int l2 = varray.length/2;
+				String t = "SEG_QUADTO";
+				String msg =
+				    errorMsg("badRegionLen", l1, l2, t);
+
+				throw new RuntimeException(msg);
 			    }
 			    count++;
 			    blist.add(varray);
@@ -4900,11 +5293,12 @@ public class BezierGrid implements Shape3D {
 			    (new Integer[vrlist.size()]);
 			if (gridsSeparated(varray, grid)) {
 			    if (varray.length/2 != iarray.length) {
-				throw new RuntimeException("region length "
-							   + iarray.length
-							   + ", expecting "
-							   + (varray.length/2)
-							   + " (SEG_CUBICTO)");
+				int l1 = iarray.length;
+				int l2 = varray.length/2;
+				String t = "SEG_CUBICTO";
+				String msg =
+				    errorMsg("badRegionLen", l1, l2, t);
+				throw new RuntimeException(msg);
 			    }
 			    count++;
 			    blist.add(varray);
@@ -4997,11 +5391,11 @@ public class BezierGrid implements Shape3D {
 		(new Integer[vrlist.size()]);
 	    if (gridsSeparated(varray, grid)) {
 		if (varray.length/2 != iarray.length) {
-		    throw new RuntimeException("region length "
-					       + iarray.length
-					       + ", expecting "
-					       + (varray.length/2)
-					       + " (After loop on boundary)");
+		    int l1 = iarray.length;
+		    int l2 = varray.length/2;
+		    String t = errorMsg("afterLoop");
+		    String msg = errorMsg("badRegionLen", l1, l2, t);
+		    throw new RuntimeException(msg);
 		}
 		blist.add(varray);
 		rlist.add(iarray);
@@ -5371,11 +5765,11 @@ public class BezierGrid implements Shape3D {
 		    iarray = vrlist.toArray
 			(new Integer[vrlist.size()]);
 		    if (varray.length/2 != iarray.length) {
-			throw new RuntimeException("region length "
-						   + iarray.length
-						   + ", expecting "
-						   + (varray.length/2)
-						   + " (SEG_MOVETO");
+			int l1 = iarray.length;
+			int l2 = varray.length/2;
+			String t = "SEG_MOVETO";
+			String msg = errorMsg("badRegionLen", l1, l2, t);
+			throw new RuntimeException(msg);
 		    }
 		    // blist.add(varray);
 		    // rlist.add(iarray);
@@ -5586,11 +5980,11 @@ public class BezierGrid implements Shape3D {
 	    iarray = vrlist.toArray
 		(new Integer[vrlist.size()]);
 	    if (varray.length/2 != iarray.length) {
-		throw new RuntimeException("region length "
-					   + iarray.length
-					   + ", expecting "
-					   + (varray.length/2)
-					   + " (After loop on boundary)");
+		int l1 = iarray.length;
+		int l2 = varray.length/2;
+		String t = errorMsg("afterLoop");
+		String msg = errorMsg("badRegionLen", l1, l2, t);
+		throw new RuntimeException(msg);
 	    }
 	}
 	// now have lists of segments making up a boundary.

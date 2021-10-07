@@ -370,6 +370,23 @@ public class FunctionsTest {
 		    errcount++;
 		}
 	    }
+	    Polynomial lp = Functions.LegendrePolynomial.asPolynomial(i);
+	    BezierPolynomial blp =
+		Functions.LegendrePolynomial.asBezierPolynomial(i);
+	    for (int k = 0; k <= 10; k++) {
+		double t = k/10.0;
+		if (t < 0.0) t = 0.0;
+		if (t > 1.0) t = 1.0;
+		double val1 = lp.valueAt(t);
+		double val2 = blp.valueAt(t);
+		double val = Functions.P(i, t);
+		if (Math.abs(val - val1) > 1.e-10) {
+		    throw new Exception();
+		}
+		if (Math.abs(val - val2) > 1.e-10) {
+		    throw new Exception();
+		}
+	    }
 	}
 	if (errcount > 0) {
 	    System.out.println ("roots or weights wrong");
@@ -3365,6 +3382,39 @@ public class FunctionsTest {
 	} else {
 	    System.out.println(" ... OK");
 	}
+
+	System.out.println("timing test for Legendre Polynomials:");
+	Polynomial p60 = Functions.LegendrePolynomial.asPolynomial(65);
+	BezierPolynomial bp60 =
+	    Functions.LegendrePolynomial.asBezierPolynomial(65);
+
+	double sum = 0.0;
+	int ilimit = 1000000;
+	Runtime.getRuntime().gc();
+	long t0 = System.nanoTime();
+	for (int i = 0; i < ilimit; i++) {
+	    sum += Functions.P(60, 0.5);
+	}
+	long t1 = System.nanoTime();
+	for (int i = 0; i < ilimit; i++) {
+	    sum += p60.valueAt(0.5);
+	}
+	long t2 = System.nanoTime();
+	for (int i = 0; i < ilimit; i++) {
+	    sum += bp60.valueAt(0.5);
+	}
+	long t3 = System.nanoTime();
+	System.out.format("%d %d %d\n", (t1-t0)/1000L, (t2-t1)/1000L,
+			  (t3-t2)/1000L);
+
+	 t1 = System.nanoTime();
+	for (int i = 0; i < ilimit; i++) {
+	    double[] array1 = new double[61];
+	    double[] array2 = new double[61];
+	}
+	t2 = System.nanoTime();
+	System.out.format("array allocation time: %d\n",
+			  (t2-t1)/1000L);
 
 	System.exit(0);
     }

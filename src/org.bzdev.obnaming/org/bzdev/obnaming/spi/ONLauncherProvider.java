@@ -38,11 +38,12 @@ import org.bzdev.util.JSObject;
  *       containing fields that can be used. The types of the fields
  *       that will be included are boolean, int, long, double,
  *       {@link String}, or an enumeration.
- *   <LI><B>functionClasses</B> - a {@link JSArray} providing a list of
- *       strings the fully qualified class names for classes whose public,
- *       static methods returning an allowable type have a fixed number
- *       of arguments whose types are boolean, int, long, double, or
- *       a type provided by the <B>argumentTypes</B> property.
+ *   <LI><B>functionClasses</B> - a {@link JSArray} providing a list
+ *       of strings giving the fully qualified class names for classes
+ *       whose public, static methods returning an allowable type have
+ *       a fixed number of arguments whose types are boolean, int,
+ *       long, double, or a type provided by the <B>argumentTypes</B>
+ *       property.
  *   <LI><B>methodClasses</B> - a {@link JSArray} providing a list of
  *       strings giving the fully qualified class names classes whose
  *       instance methods returning an allowable type have a fixed number
@@ -54,6 +55,21 @@ import org.bzdev.util.JSObject;
  *       will be provided are those with a fixed number of arguments
  *       whose types are int, long, double, boolean, {@link String}, or
  *       a type provided by the <B>argumentTypes</B> property.
+ * </UL>
+ * <P>
+ * Typically, a provider will implement the following methods:
+ * <UL>
+ *  <LI><STRONG>getName()</STRONG>. This will return the name of the
+ *    provider.  Names are expected to be unique.
+ *  <LI><STRONG>onlClass()</STRONG>. This method returns a class: a
+ *    subclass on {@link org.bzdev.obnaming.ObjectNamerLauncher}.
+ *  <LI><STRONG>getInputStream()</STRONG>. The implementation of this
+ *   method will return an input stream containing the YAML data
+ *   described above. Typically it simply calls the launcher's
+ *   getResourceStream() method.
+ *  <LI><STRONG>description()</STRONG>. This returns a short description
+ *     of the launcher.  It is a good practice to use resource bundles
+ *     so that the description can be easily localized.
  * </UL>
  * @see org.bzdev.obnaming.ObjectNamerLauncher#newInstance(String)
  * @see org.bzdev.obnaming.ObjectNamerLauncher#newInstance(String,String...)

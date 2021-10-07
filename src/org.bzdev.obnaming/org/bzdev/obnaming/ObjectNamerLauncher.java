@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.io.PrintWriter;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -52,182 +53,23 @@ import java.util.Set;
 /**
  * Base class for object-namer launchers.
  * An object-namer launcher allows on the process an instance of
- * {@link JSOps} (e.g., a{@link JSObject} or a {@link JSArray})
- * to configure an application and run it as an alternative to using
- * a scripting language in cases.  The application is assumed to
- * consist of an object namer, named objects, and named object factories.
- * Examples of these include animations provided by the
- * org.bzdev.anim2d package, the org.bzdev.devqsim package, or the
- * org.bzdev.drama package in cases for cases where factories and
- * simple constructors can be used to create objects and where operations
- * are simply sequences of expressions.
+ * {@link JSOps} (e.g., a{@link JSObject} or a {@link JSArray}) to
+ * configure an application and run it as an alternative to using a
+ * scripting language in cases.  The application is assumed to consist
+ * of an object namer, named objects, and named object factories.  The
+ * {@link org.bzdev.util.ExpressionParser} class is used to provide an
+ * <A HREF="{@docRoot}/org.bzdev.base/org/bzdev/util/doc-files/esp.html">
+ * ESP-like scripting environment</A>, but without the ability to
+ * explicitly import Java classes.  Examples of classes that have
+ * object-namer launchers are the org.bzdev.anim2d package, the
+ * org.bzdev.devqsim package, or the org.bzdev.drama package in cases
+ * for cases where factories and simple constructors can be used to
+ * create objects and where operations are simply sequences of
+ * expressions.
  * <P>
- * For a typical subclass, there will be two constructors. The first
- * takes no arguments.  The second takes a single argument, an instance
- * of {@link JSObject} that provides the following properties:
- * <UL>
- *   <LI><B>argumentTypes</B> - a {@link JSArray} providing a list of
- *       strings giving the fully qualified class names for arguments
- *       used by constructors, functions, and methods. The types
- *       String, int, double, Integer, or Double should not be used,
- *       as these are allowed by default.
- *   <LI><B>fieldClasses</B> -  a {@link JSArray} providing a list of
- *       strings giving the fully qualified class names for classes
- *       containing fields that can be used. The types of the fields
- *       that will be included are boolean, int, long, double,
- *       {@link String}, or an enumeration.
- *   <LI><B>functionClasses</B> -  a {@link JSArray} providing a list of
- *       strings the fully qualified class names for classes whose public,
- *       static methods returning an allowable type have a fixed number
- *       of arguments whose types are boolean, int, long, double, or
- *       a type provided by the <B>argumentTypes</B> property.
- *   <LI><B>methodClasses</B> -  a {@link JSArray} providing a list of
- *       strings giving the fully qualified class names classes whose
- *       instance methods returning an allowable type have a fixed number
- *       of arguments with types int, double, long, boolean, {@link String},
- *       or a type provided by the <B>argumentTypes</B> property.
- *   <LI><B>returnTypes</B> -  a {@link JSArray} providing a list of
- *       strings giving the fully qualified class names for objects that
- *       the parser can return or can construct.  The constructors that
- *       will be provided are those with a fixed number of arguments
- *       whose types are int, long, double, boolean, {@link String}, or
- *       a type provided by the <B>argumentTypes</B> property.
- *    <LI><B>define</B> - this property (actually any property other than
- *       the ones listed above) is ignored.  If provided it should
- *       appear first, and should be used merely to provide anchors so that
- *       YAML aliases can be used to minimize the replication of class names.
- * </UL>
- * This argument allows the caller to augment the types, methods, functions,
- * and fields that a launcher would provided by default. The lists of fully
- * qualified class names can be nested lists if desired (this facilitates the
- * use of YAML anchors and aliases when approprriate).
- * <P>
- * There can be at most one active instance of this class (including
- * its subclasses) per thread. An instance is active once it is
- * created and is inactive once the method 
- * {@link ObjectNamerLauncher#close()} is called.  Once closed, the
- * thread may create a new instance of this class.
- * <P>
- * The method {@link ObjectNamerLauncher#process(String,JSOps,boolean,Map)}
- * processes requests.  Its argument, and instance of {@link JSOps},
- * can be created by using {@link org.bzdev.util.JSUtilities.JSON} or
- * {@link org.bzdev.util.JSUtilities.YAML}, which create such
- * instances from an input in JSON or YAML format respectively). The
- * top-level object can be an instance of either {@link JSObject} or
- * {@link JSArray}.  If a {@link JSArray} contains another
- * {@link JSArray}, the effect is the same as flattening the nested
- * list: the list elements are processed in the order they appear in
- * the textual representation.  A {@link JSObject} has specific
- * property keys:
- * <UL>
- *    <LI> <B>execute</B>. The value may be an object or a list of objects
- *         with types supported by JSON or YAML.  When a value is a
- *         string using the syntax specified for {@link ExpressionParser},
- *         the string is interpretted as follows:
- *         <UL>
- *            <LI> a statement starting with "=" will be evaluated.
- *            <LI> a "var" statement will set a variable with a specified
- *              name, and its variant using '?=" will provide a default
- *              values if the variable is not set externally. The variant
- *              using "??=" will provide a default value if the variable is
- *              either not defined or has the value null.
- *            <LI> a "function" or "synchronized function" statement will
- *              define a function, giving it a name.
- *          <UL>
- *          If a string that could be confused with an ExpressionParser
- *          statement is desired, there are two ways of handling it:
- *          <UL>
- *            <LI> For YAML, once can force the value to be an string by
- *               using "!!str" tag.
- *              For example
- *              <BLOCKQUOTE><CODE><PRE>
- *                 execute: !!str var foo = 10
- *              </PRE></CODE></BLOCKQUOTE>
- *              If the string is a quoted string (delimited by double
- *              quotes) or a YAML multi-line string, it is assumed to
- *              be a string. To make such a string an expression, on
- *              may use a tag:
- *              <BLOCKQUOTE><CODE><PRE>
- *                 execute: !bzdev!esp "var foo = 10"
- *              </PRE></CODE></BLOCKQUOTE>
- *            <LI> For JSON, one can use "=" with a quoted string.
- *              For example
- *              <BLOCKQUOTE><CODE><PRE>
- *                 execute: "= \"var foo = 10\""
- *              </PRE></CODE></BLOCKQUOTE>
- *          </UL>
- *          Such a conflict should occur rarely, if at all, in practice.
- *    <LI> <B>factories</B>. The value is either an object or a sequence
- *         of objects. Each of these objects contains a "context"
- *         property and a sequence of properties whose names are
- *         variable names and whose values are the simple class names
- *         of factories.  The value for a context is a list with two
- *         elements.  The first element is a variable name for an
- *         object namer. The second is the package in which the
- *         factories provided by that context's factories are located.
- *    <LI><B>define</B>. This section allows one to provide YAML anchors
- *         to avoid repetition and is otherwise ignored. This is needed
- *         because the variable provided by an expression parser cannot be used
- *         to define a common subtree for part of JSON or YAML object: a
- *         YAML anchor and alias is used instead.
- *    <LI><B>create</B>. The value is either an object or a list of objects.
- *           For each object, there are four properties:
- *           <UL>
- *              <LI><B>var</B>. The value is the variable storing the object
- *                  that will be created.
- *               <LI><B>name</B>. The value is name of the object.
- *              <LI><B>factory</B>. The value is the variable storing the
- *                  factory that will be used to create the object.
- *              <LI><B>configuration</B>. The value is either another object
- *                  or a list of objects. This value is factory dependent.
- *                  The syntax for an object follows that provided in
- *                  the documentation for {@link NamedObjectFactory} (that
- *                  documentation describes the use of ECMAScript, but
- *                  ECMAScript is similar to JSON syntactically and YAML
- *                  is (approximately) a superset of JSON.
- *           </UL>
- * </UL>
- * <P>
- * An SPI (Service Provider Interface) is available for creating new
- * instances: {@link org.bzdev.obnaming.spi.ONLauncherProvider}. To
- * make use of it, use the static methods {#link getLauncherNames()},
- * {@link #newInstance(String)}, or {@link #newInstance(String,String...)}.
- * The naming convention that the BZDev library uses is to make the name
- * of a launcher the last component of the package name. If there are
- * multiple launchers in a package, the alternatives are name
- * PACKAGENAME-VARIANT.  For example, "anim2d" and "anim2d-desktop".
- * <P>
- * The following pattern is commonly used to create a subclass of
- * ObjectNamerLauncher:
- * <BLOCKQUOTE><PRE><CODE>
- * public class LAUNCHER extends LAUNCHER_SUPERCLASS {
- *
- *    public static InputStream getResourceStream() {
- *        return LAUNCHER.class.getResourceAsStream("LAUNCHER.yaml");
- *    }
- *
- *    public LAUNCHER(JSObject initializer)
- *        throws ClassNotFoundException, IOException, IllegalAccessException
- *    {
- *        super(combine(loadFromStream(LAUNCHER.class,
- *                                     LAUNCHER.getResourceAsStream(),
- *                                     8),
- *		        initializer));
- *    }
- *
- *    public LAUNCHER()
- *        throws ClassNotFoundException, IOException, IllegalAccessException
- *    {
- *        this(null);
- *    }
- * }
- * </CODE></PRE></BLOCKQUOTE>
- * where LAUNCHER should be replaced with a class name and
- * LAUNCHER_SUPERCLASS is a subclass of {@link ObjectNamerLauncher} or
- * {@link ObjectNamerLauncher} itself.  The resource LAUNCHER.yaml contains
- * the data necessary to configure the launcher and should appear in the
- * same directory as LAUNCHER (and, of course, copied into the launcher's
- * JAR file).
+ * Please visit <A HREF="doc-files/launcher.html"> the object-namer
+ * launcher documentation</A> and the manual page for the
+ * <CODE>yrunner</CODE> for additional information.
  */
 public abstract class ObjectNamerLauncher
     implements AutoCloseable
@@ -889,7 +731,10 @@ public abstract class ObjectNamerLauncher
 	    object = yparser.getResults();
 	    map = yparser.getLocationMap();
 	}  else {
-	    object = JSUtilities.JSON.parse(r);
+	    // object = JSUtilities.JSON.parse(r);
+	    JSUtilities.JSON.Parser jparser = new JSUtilities.JSON.Parser(r);
+	    object = jparser.getResults();
+	    map = jparser.getLocationMap();
 	}
 	if (object instanceof JSOps) {
 	    process(filename, (JSOps) object, ymode, map);
@@ -1169,8 +1014,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForConstants() {
+    public static TemplateProcessor.KeyMapList keylistForConstants()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1194,8 +1043,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForReturnClasses() {
+    public static TemplateProcessor.KeyMapList keylistForReturnClasses()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1219,8 +1072,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForArgumentClasses() {
+    public static TemplateProcessor.KeyMapList keylistForArgumentClasses()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1246,8 +1103,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForConstructors() {
+    public static TemplateProcessor.KeyMapList keylistForConstructors()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1274,8 +1135,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForFunctions() {
+    public static TemplateProcessor.KeyMapList keylistForFunctions()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1302,8 +1167,12 @@ public abstract class ObjectNamerLauncher
      * to API documentation.  The method {@link #createAPIMap(List)}
      * must be called before this method is used.
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
-    public static TemplateProcessor.KeyMapList keylistForMethods() {
+    public static TemplateProcessor.KeyMapList keylistForMethods()
+	throws IllegalStateException
+    {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
 	    String msg = errorMsg("noLauncher");
@@ -1331,9 +1200,11 @@ public abstract class ObjectNamerLauncher
      * @param hideString true if methods of {@link String} should not be
      *        shown; false otherwise
      * @return the key list
+     * @exception IllegalStateException a launcher was not created for this
+     *            thread.
      */
     public static TemplateProcessor.KeyMapList
-	keylistForMethods(boolean hideString)
+	keylistForMethods(boolean hideString) throws IllegalStateException
     {
 	ObjectNamerLauncher launcher = self.get();
 	if (launcher == null) {
@@ -1606,6 +1477,12 @@ public abstract class ObjectNamerLauncher
 	tag.popLevel();
     }
 
+    /**
+     * Close the currently active launcher.
+     * If a launcher was created, this method must be called before
+     * a new launcher can be created in the current thread.
+     */
+    @Override
     public void close() {
 	ep = null;
 	self.set(null);
@@ -1614,6 +1491,12 @@ public abstract class ObjectNamerLauncher
     private static ServiceLoader<ONLauncherProvider> loader = null;
     private static ServiceLoader<ONLauncherData> dloader = null;
 
+    /**
+     * Reset the SPI loaders.
+     * This method resets the SPI (Service Provider Interface) loaders,
+     * and can be used in the unusual case in which the classes accessible
+     * from the class path or module path are modified.
+     */
     public static synchronized void resetLoaders() {
 	loader = null;
 	dloader = null;
@@ -1801,8 +1684,8 @@ public abstract class ObjectNamerLauncher
      * </UL>
      * Each of these lists in turn contain a key map with two directives:
      * <UL>
-     *    <LI><B>name<B> - the name of a provider.
-     *    <LI><B>description<B> - a description of the provider.
+     *    <LI><B>name</B> - the name of a provider.
+     *    <LI><B>description</B> - a description of the provider.
      * </UL>
      * @return the key map
      */
@@ -1845,8 +1728,8 @@ public abstract class ObjectNamerLauncher
     }
 
     /**
-     * Get a all launcher names available via a service-provider
-     * interface.
+     * Get all names for launcher-data additions available via the
+     * service-provider interface.
      * @return the names
      */
     public static synchronized String[] getLauncherDataNames() {
@@ -1899,12 +1782,16 @@ public abstract class ObjectNamerLauncher
 //  LocalWords:  notVariableName nullContextPkg notContextPkg boolean
 //  LocalWords:  nullClassName factoryFailed badContext superset anim
 //  LocalWords:  getLauncherNames newInstance PACKAGENAME BLOCKQUOTE
-//  LocalWords:  PRE SUPERCLASS initializer ClassNotFoundException
+//  LocalWords:  PRE SUPERCLASS initializer ClassNotFoundException sb
 //  LocalWords:  IOException IllegalAccessException loadFromResource
 //  LocalWords:  yaml IllegalStateException initializers initilizer
 //  LocalWords:  lclass tabspacing vname noLauncher href HREF enum
 //  LocalWords:  createAPIMap hideString IllegalArgumentException JDK
 //  LocalWords:  InstantiationException InvocationTargetException api
 //  LocalWords:  ExceptionInInitializerError ClassNotFouncException
-//  LocalWords:  fname javadoc apis dnames launcherList
-//  LocalWords:  launcherDataList
+//  LocalWords:  fname javadoc apis dnames launcherList yrunner msg
+//  LocalWords:  launcherDataList launcherExists setObject ArrayList
+//  LocalWords:  pushLevel popLevel incrList setKey StringBuilder
+//  LocalWords:  errorMsg locationDescription toString HashSet ymode
+//  LocalWords:  TreeSet bzdev noVar noName noFactory noContext
+//  LocalWords:  noLauncherClassSpec noLauncherData

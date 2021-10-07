@@ -1354,8 +1354,11 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	/**
 	 * Set the color for the side of a triangle that should not
 	 * be visible due to being on the inside of a closed manifold.
-	 * This is useful for debugging a model: if the model does not
-	 * @param c the color
+	 * This is useful for debugging a model: one class of errors
+	 * results in a triangle having the wrong orientation, and setting
+	 * this parameter can help indicate where the problem is in the
+	 * model.
+	 * @param c the color; null if a color is not set
 	 */
 	void setBacksideColor(Color c);
 

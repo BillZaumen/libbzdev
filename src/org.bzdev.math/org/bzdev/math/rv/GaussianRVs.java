@@ -47,6 +47,8 @@ public class GaussianRVs {
 
     /**
      * Constructor.
+     * The random variables will have the the specified covariance
+     * matrix with mean values equal to 0.
      * @param cov the covariance matrix.
      */
     public GaussianRVs(CovarianceMatrix cov) {
@@ -114,20 +116,21 @@ public class GaussianRVs {
     }
 
     /**
-     * Get the number of random-variables that will be set
+     * Get the number of values that will be provided
      * when the method {@link #next(double[])} is called.
-     * @return the number of values that will be set when next(double[]) is
-     *         called
+     * @return the number of values that will be provided when
+     *         {@link #next(double[])} is called
      */
     public int length() {
 	return n;
     }
 
     /**
-     * Get the next set of values.
+     * Get the next array of values, storing them in an array
      * @param values an array to hold the results
+     * @return the argument array
      */
-    public void next(double[] values) {
+    public double[] next(double[] values) {
 	int n = means.length;
 	for (int i = 0; i < n; i++) {
 	    rvs[i] = StaticRandom.nextGaussian();
@@ -138,10 +141,11 @@ public class GaussianRVs {
 		values[i] += L[i][j]*rvs[j];
 	    }
 	}
+	return values;
     }
 
     /**
-     * Get an array containing the next set of values.
+     * Get the next array of values.
      * @return an array holding the next values
      */
     public double[] next() {
@@ -225,7 +229,7 @@ public class GaussianRVs {
 	return spliteratorAux(maxdepth);
     }
 
-    public Spliterator<double[]> spliteratorAux(final int maxDepth) {
+    Spliterator<double[]> spliteratorAux(final int maxDepth) {
 	return new Spliterator<double[]>() {
 	    int  maxdepth = maxDepth;
 	    int characteristics = getCharacteristics()

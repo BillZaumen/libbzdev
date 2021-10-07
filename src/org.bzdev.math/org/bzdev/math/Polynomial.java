@@ -4,7 +4,7 @@ import java.util.Arrays;
 //@exbundle org.bzdev.math.lpack.Math
 
 /**
- * Class representing polynomials.
+ * Class representing polynomials using a monomial basis.
  * Methods include ones for computing a polynomial's value,
  * obtaining or modifying a polynomial's coefficients,
  * computing integrals and derivatives of a polynomial, and

@@ -77,16 +77,22 @@ public class VectorOps {
      * @param off1 the offset into the first vector's array
      * @param v2 the second vector
      * @param off2 the offset into the second vector's array
-     * @exception IllegalArgumentException the vectors differ in length
+     * @param n the length of the vectors
+     * @return the result vector with the results starting at the specified
+     *         offset
      */
-    public static void add(double[] result, int offset,
-			   double[] v1, int off1,
-			   double[] v2, int off2,
-			   int n) 
+    public static double[] add(double[] result, int offset,
+				double[] v1, int off1,
+				double[] v2, int off2,
+				int n)
     {
+	if (result == null) {
+	    result = new double[n + offset];
+	}
 	for (int i = 0; i < n; i++) {
 	    result[offset+i] = v1[off1+i] + v2[off2+i];
 	}
+	return result;
     }
 
 
@@ -151,16 +157,23 @@ public class VectorOps {
      * @param off1 the offset into the first vector's array
      * @param v2 the second vector
      * @param off2 the offset into the second vector's array
+     * @param n the length of each vector
+     * @return the result vector with the results starting at the specified
+     *         offset
      * @exception IllegalArgumentException the vectors differ in length
      */
-    public static void sub(double[] result, int offset,
-			   double[] v1, int off1,
-			   double[] v2, int off2,
-			   int n)
+    public static double[] sub(double[] result, int offset,
+			       double[] v1, int off1,
+			       double[] v2, int off2,
+			       int n)
     {
+	if (result == null) {
+	    result = new double[n+offset];
+	}
 	for (int i = 0; i < n; i++) {
 	    result[offset+i] = v1[off1+i] - v2[off2+i];
 	}
+	return result;
     }
 
 
@@ -210,13 +223,20 @@ public class VectorOps {
      * @param scalar the scalar
      * @param v the array storing the vector to be multiplied
      * @param vOffset the offset into the array v for the start of the vector
+     * @param n the length of the vectors
+     * @return the result vector with the results starting at the specified
+     *         offset
      */
-    public static void multiply(double[] result, int rOffset, double scalar,
+    public static double[] multiply(double[] result, int rOffset, double scalar,
 				double[] v, int vOffset, int n)
     {
+	if (result == null) {
+	    result = new double[n+rOffset];
+	}
 	for (int i = 0; i < n; i++) {
 	    result[rOffset+i] = scalar * v[vOffset+i];
 	}
+	return result;
     }
 
     private static final double EPS = Math.scalb(1.0, -52);
@@ -702,19 +722,25 @@ public class VectorOps {
      * array and an offset.
      * If result and v are the same vector, then either the offsets must either
      * be identical or such that the areas used do not overlap.
-     * @param result an array to hold the results
+     * @param result an array to hold the results; null if a new array should be
+     *        allocated
      * @param rOffset the offset into the 'result' array for storing the vector
      * @param v a vector
      * @param vOffset the offset into the array v for the start of the vector
      * @param n the length of the vector.
+     * @return the result vector with the results starting at the specified
+     *         offset
      * @exception IllegalArgumentException the vectors differ in
      *            length, n is not positive, the vector's norm is
      *            zero, or the vector's length is not compatible with
      *            the specified value of n and offset
      */
-    public static void unitVector(double[] result, int rOffset,
-				  double[] v, int vOffset, int n)
+    public static double[] unitVector(double[] result, int rOffset,
+				      double[] v, int vOffset, int n)
     {
+	if (result == null) {
+	    result = new double[n + rOffset];
+	}
 	if (n <= 0) {
 	    String msg = errorMsg("vectLenNotPositive", n);
 	    throw new IllegalArgumentException(msg);
@@ -731,7 +757,7 @@ public class VectorOps {
 	if (vnorm == 0.0) {
 	    throw new IllegalArgumentException(errorMsg("zeroNorm"));
 	}
-	multiply(result, rOffset, 1.0/vnorm, v, vOffset, n);
+	return multiply(result, rOffset, 1.0/vnorm, v, vOffset, n);
     }
 }
 

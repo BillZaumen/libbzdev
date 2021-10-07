@@ -24,11 +24,11 @@ import org.bzdev.math.RootFinder.ConvergenceException;
  * Class representing a continuous path.
  * The path may be opened or closed, but without any gaps. Methods
  * or constructors for splines may be used to create smooth curves.
-* This class extends SplinePath2D by adding methods to determine
+ * This class extends SplinePath2D by adding methods to determine
  * the x and y coordinates of a point given a parameter that starts
  * at 0 and that is incremented by 1 when moving from one segment
  * to another.  The paths that can be represented, however, are
- * restricted.
+ * restricted to continuous paths.
  * <P>
  * A typical use of this class occurs in the anim2d package for
  * computing the position of an object along a specified path as

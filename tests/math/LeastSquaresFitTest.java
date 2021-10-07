@@ -194,6 +194,13 @@ public class LeastSquaresFitTest {
 	    System.out.println();
 	}
 
+	RealValuedFunction rf = lsf.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+
 	System.out.println();
 	System.out.println("Now try with a sigma array, all set to 3");
 	System.out.println();
@@ -213,6 +220,13 @@ public class LeastSquaresFitTest {
 		System.out.format("%12.6g ", cov[i][j]);
 	    }
 	    System.out.println();
+	}
+
+	rf = lsf.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf.valueAt(z)) {
+		throw new Exception();
+	    }
 	}
 
 	System.out.println();
@@ -248,6 +262,14 @@ public class LeastSquaresFitTest {
 	    System.out.println();
 	}
 
+	rf = lsf.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+
+
 	RealValuedFunctionVA.Linear f =
 	    new RealValuedFunctionVA.Linear(f0, f1, f2);
 
@@ -276,6 +298,16 @@ public class LeastSquaresFitTest {
 	LeastSquaresFit lsf3 =
 	    new LeastSquaresFit.NonLinear(xs, ys, f, null);
 
+	rf = lsf3.getFunction(lsf3.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf3.valueAt(z)) {
+		System.out.format("z = %g, rf value is %g, lsf3 value is %g\n",
+				  z, rf.valueAt(z), lsf3.valueAt(z));
+		throw new Exception();
+	    }
+	}
+
+
 	double[] cs3 = lsf3.getParameters();
 	double[][] cov3 = lsf3.getCovarianceMatrix();
 	for (int i = 0; i < cs3.length; i++) {
@@ -293,6 +325,13 @@ public class LeastSquaresFitTest {
 				      i, j, cov[i][j], i, j, cov3[i][j]);
 		    throw new Exception("cov and cov3 differ");
 		}
+	    }
+	}
+
+	rf = lsf2.getFunction(lsf2.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf2.valueAt(z)) {
+		throw new Exception();
 	    }
 	}
 
@@ -322,6 +361,7 @@ public class LeastSquaresFitTest {
 	    }
 	}
 
+
 	System.out.println("try a function basis with sigma = 3.0");
 
 	lsf = new LeastSquaresFit.FunctionBasis(xs, ys, 3.0, f0, f1, f2);
@@ -336,6 +376,13 @@ public class LeastSquaresFitTest {
 		System.out.format("%12.6g ", cov[i][j]);
 	    }
 	    System.out.println();
+	}
+
+	rf = lsf.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf.valueAt(z)) {
+		throw new Exception();
+	    }
 	}
 
 	System.out.println("Now try with a sigma array, all set to 3");
@@ -353,6 +400,13 @@ public class LeastSquaresFitTest {
 		System.out.format("%12.6g ", cov[i][j]);
 	    }
 	    System.out.println();
+	}
+
+	rf = lsf.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf.valueAt(z)) {
+		throw new Exception();
+	    }
 	}
 
 	lsf2 = new LeastSquaresFit.FunctionBasis(xs, ys, 3.0, f);
@@ -373,6 +427,13 @@ public class LeastSquaresFitTest {
 	    }
 	}
 
+	rf = lsf2.getFunction(lsf2.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf2.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+
 	lsf2 = new LeastSquaresFit.FunctionBasis(xs, ys, sigmas, f);
 	cs2 = lsf2.getParameters();
 	cov2 = lsf2.getCovarianceMatrix();
@@ -389,6 +450,12 @@ public class LeastSquaresFitTest {
 	    }
 	}
 
+	rf = lsf2.getFunction(lsf.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsf2.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
 	ys = new double[100];
 	xs = new double[100];
 	rvy = new GaussianRV(0.0, 0.1);
@@ -425,6 +492,20 @@ public class LeastSquaresFitTest {
 	parametersa = lsfnla.getParameters();
 	System.out.println("fitted alpha (with guess) = " + parametersa[0]);
 	System.out.println("fitted beta (with guess) = " + parametersa[1]);
+
+	rf = lsfnl.getFunction(lsfnl.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsfnl.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+	rf = lsfnla.getFunction(lsfnla.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != lsfnla.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+
 
 	System.out.println("covariance test:");
 
@@ -466,6 +547,37 @@ public class LeastSquaresFitTest {
 		|| Math.abs(y5-y)> 2.e-1) {
 		System.out.format("at x = %g, y = %g: %g %g %g %g %g\n", x, y,
 				  y1,  y2, y3, y4, y5);
+	    }
+	}
+
+	rf = fit1.getFunction(fit1.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != fit1.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+	rf = fit2.getFunction(fit2.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != fit2.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+	rf = fit3.getFunction(fit3.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != fit3.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+	rf = fit4.getFunction(fit4.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != fit4.valueAt(z)) {
+		throw new Exception();
+	    }
+	}
+	rf = fit5.getFunction(fit5.getParameters());
+	for (double z: xs) {
+	    if (rf.valueAt(z) != fit5.valueAt(z)) {
+		throw new Exception();
 	    }
 	}
 

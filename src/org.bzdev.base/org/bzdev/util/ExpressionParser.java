@@ -1326,7 +1326,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * </PRE></CODE></BLOCKQUOTE>
 	 * <P>
 	 * The 'docs' arguments is a list of strings.  Each string
-	 * that can contain multiple URLS or file names, with '|' used
+	 * can contain multiple URLS or file names, with '|' used
 	 * as a separator for URLs or filenames.  A sequence of n "|"
 	 * characters will be replaced by floor(n/2) "|" characters
 	 * and if n is odd, the final "|" is treated as the separator.
@@ -1336,8 +1336,9 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * (in which case the "|" should be encoded as "%7C".)  If a
 	 * path component's initial characters, up to and including
 	 * the first ":" are syntactically valid as part of a URL, the
-	 * component is interpreted as a URL, not a file name.  <P> In
-	 * addition, a leading "~", followed by either the standard
+	 * component is interpreted as a URL, not a file name.
+	 *  <P>
+	 * In addition, a leading "~", followed by either the standard
 	 * file-separator character or "/", is replaced with the
 	 * user's home directory. The sequence "~~" at the start of a
 	 * component will be replaced by a single "~".  All subsequent

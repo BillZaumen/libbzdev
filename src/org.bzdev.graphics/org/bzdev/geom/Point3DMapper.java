@@ -64,6 +64,9 @@ public interface Point3DMapper<R> {
 
    /**
      * Applies this mapping to the given arguments.
+     * The default implementation calls
+     * {@link #apply(int,Point3D,Type,Point3D...)} with its third
+     * argument set to null.
      * @param n the index
      * @param p the point to map to another point
      * @param bounds there are no optional arguments if p is a

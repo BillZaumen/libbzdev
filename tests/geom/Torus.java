@@ -1,8 +1,12 @@
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 import org.bzdev.geom.*;
 import org.bzdev.math.VectorOps;
 import org.bzdev.math.stats.BasicStats;
 import org.bzdev.math.stats.BasicStats.Population;
-
+import org.bzdev.p3d.*;
 
 public class Torus {
     public static void main(String argv[]) throws Exception {
@@ -69,6 +73,24 @@ public class Torus {
 	double tvolume = 2*Math.PI*Math.PI*r1*r2*r2;
 	System.out.format("area = %s, expecting %s\n", area, tarea);
 	System.out.format("volume = %s, expecting %s\n", volume, tvolume);
+
+	Model3D m3d = new Model3D();
+	m3d.setTessellationLevel(2);
+	m3d.append(surface);
+
+	Model3D.Image image = new
+	    Model3D.Image(500, 400, BufferedImage.TYPE_INT_ARGB);
+	Graphics2D g2d = image.createGraphics();
+	g2d.setBackground(Color.BLUE.darker().darker());
+	g2d.clearRect(0, 0, 500, 400);
+	g2d.dispose();
+	image.setCoordRotation(0.0, Math.toRadians(30.0), 0.0);
+	image.setColorFactor(0.5);
+	image.setNormalFactor(0.5);
+	m3d.setImageParameters(image, 50.0);
+	m3d.render(image);
+	image.write("png", "torus.png");
+
 	System.exit(0);
    }
 }

@@ -15,7 +15,7 @@ public class Polynomials {
 
     /**
      * Convert a monomial polynomial to one using a Bernstein basis
-     * with the same degree
+     * with the same degree.
      * When this method exits,
      * &sum;<sup>n</sup><sub>i=0</sub>a<sub>i</sub>x<sup>i</sup> =
      * &sum;<sup>n</sup><sub>i=0</sub>&beta;<sub>i</sub>

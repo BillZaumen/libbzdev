@@ -67,7 +67,7 @@ public interface ONLauncherData {
     String getName();
 
     /**
-     * Get the module name for the module containing this launcher.a
+     * Get the module name for the module containing this launcher.
      * @return the module name
      */
     default String getModuleName() {

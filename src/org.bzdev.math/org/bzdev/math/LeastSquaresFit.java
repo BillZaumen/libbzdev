@@ -431,6 +431,71 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	return state.total;
     }
 
+    /**
+     * Get the real valued function associated with this least
+     * squares fit but with altered parameters.
+     * <P>
+     * This method is useful for testing (varying the parameters should
+     * result in a worse fit), but it can also be used in Monte-Carlo
+     * models: Given the parameters and covariance matrix, one can use
+     * the class {@link org.bzdev.math.rv.GaussianRVs} to generate parameters
+     * with the same mean value and covariance metrix. The real-valued
+     * functions corresponding to these parameters can then be used in
+     * Monte-Carlo simulations or models.
+     * @param parameters the parameters.
+     * @return a real-valued function using the specified parameters
+     * @throws IllegalArgumentException the argument has the wrong length
+     */
+    public RealValuedFunction getFunction(double[] parameters)
+	throws IllegalArgumentException
+    {
+	if (parameters.length != getNumberOfParameters()) {
+	    String msg = errorMsg("unexpectedArrayLen", parameters.length);
+	    throw new IllegalArgumentException(msg);
+	}
+	final LeastSquaresFit fit = getFit();
+	fit.setChiSquare(getChiSquare());
+	fit.setDegreesOfFreedom(getDegreesOfFreedom());
+	fit.setReducedChiSquare(getReducedChiSquare());
+	fit.setParameters(parameters);
+	return new RealValuedFunction() {
+	    @Override
+	    public double valueAt(double z) {
+		return fit.valueAt(z);
+	    }
+
+	    @Override
+	    public double derivAt(double z)
+		throws UnsupportedOperationException
+	    {
+		return fit.derivAt(z);
+	    }
+
+	    @Override
+	    public double secondDerivAt(double z)
+		throws UnsupportedOperationException
+	    {
+		return fit.secondDerivAt(z);
+	    }
+	};
+    }
+
+    /**
+     * Get a copy of this least squares fit but without its
+     * parameters, degrees of freedom, chi square value, reduced
+     * chi square value, or covariance set.
+     * <P>
+     * This method is used by {@link #getFunction(double[])}, which only
+     * provides a real-valued function. The only methods that will be
+     * called on the value returned are
+     * {@link #setChiSquare(double)}, {@link #setDegreesOfFreedom(int)},
+     * {@link #setReducedChiSquare(double)},
+     * {@link #setParameters(double[])},
+     * {@link #valueAt(double)}, {@link #derivAt(double)}, and
+     * {@link #secondDerivAt(double)}.
+     * @return a least squares fit
+     */
+    protected abstract LeastSquaresFit getFit();
 
     /**
      * Class for linear least-squares fit.
@@ -447,7 +512,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
      * value y<sub>i</sub> is a random variable with a standard deviation
      * given by &sigma;<sub>i</sub>
      */
-    public static abstract class Linear extends LeastSquaresFit {
+    public abstract static class Linear extends LeastSquaresFit {
 	private double[][] H = null;
 	private TriangularDecomp decomp = null;
 	private double variance = -1.0;
@@ -555,7 +620,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 
     /**
      * Class to provide a linear least squares fit when the basis
-     * functions are the functions whose values are 1, x, x<sup>2</sub>,
+     * functions are the functions whose values are 1, x, x<sup>2</sup>,
      * x<sup>3</sup>, etc.
      * The parameters are the coefficients of the polynomial, with
      * the 0th parameter being the coefficient for 1, the 1st parameter
@@ -577,6 +642,16 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	 */
 	public int getDegree() {return getParametersArray().length - 1;}
 
+	@Override
+	protected LeastSquaresFit getFit() {
+	    return new Polynomial(this);
+	}
+
+	// not complete implementation  - we just need enough
+	// to get the function.
+	private Polynomial(Polynomial existing) {
+	    setParameters(new double[existing.getNumberOfParameters()]);
+	}
 
 	/**
 	 * Constructor.
@@ -929,6 +1004,18 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
     public static class FunctionBasis extends Linear {
 	
 	RealValuedFunction[] fs = null;
+
+	@Override
+	protected LeastSquaresFit getFit() {
+	    return new FunctionBasis(this);
+	}
+
+	// not complete implementation  - we just need enough
+	// to get the function.
+	private FunctionBasis(FunctionBasis existing) {
+	    this.fs = existing.fs;
+	    setParameters(new double[existing.getNumberOfParameters()]);
+	}
 
 	/**
 	 * Constructor.
@@ -1388,6 +1475,21 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
     public static class NonLinear extends LeastSquaresFit {
 
 	private RealValuedFunctionVA rf;
+
+	@Override
+	protected LeastSquaresFit getFit() {
+	    return new NonLinear(this);
+	}
+
+	// not complete implementation  - we just need enough
+	// to get the function.
+	private NonLinear(NonLinear existing) {
+	    this.rf = existing.rf;
+	    int n = existing.getNumberOfParameters();
+	    extendedParameters = new double[n+1];
+	    setParameters(new double[n]);
+	}
+
 
 	TriangularDecomp decomp = null;
 	private double variance = -1.0;
@@ -1938,6 +2040,13 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	}
 
 	@Override
+	protected synchronized void setParameters(double[] parameters) {
+	    super.setParameters(parameters);
+	    System.arraycopy(parameters, 0,
+			     extendedParameters, 1, parameters.length);
+	}
+
+	@Override
 	public synchronized double valueAt(double arg) {
 	    extendedParameters[0] = arg;
 	    return rf.valueAt(extendedParameters);
@@ -1968,6 +2077,19 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 
 	org.bzdev.math.BSpline bspline;
 	private LeastSquaresFit fit;
+
+
+	@Override
+	protected LeastSquaresFit getFit() {
+	   return new BSpline(this);
+	}
+
+	// not complete implementation  - we just need enough
+	// to get the function.
+	private BSpline(BSpline existing) {
+	    bspline = existing.bspline;
+	    super.setParameters(existing.getParameters());
+	}
 
 	@Override
 	protected void createCovariance() {

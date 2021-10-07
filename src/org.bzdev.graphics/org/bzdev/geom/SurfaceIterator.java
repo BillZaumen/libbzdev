@@ -55,11 +55,13 @@ public interface SurfaceIterator
      *       {@link #CUBIC_TRIANGLE}.
      *   <LI>{@link Surface3D#addPlanarTriangle(double[])} for
      *       {@link #PLANAR_TRIANGLE}.
+     *   <LI>{@link Surface3D#addCubicVertex(double[])} for
+     *       {@link #CUBIC_VERTEX}.
      * </UL>
      * @param coords an array to store the values
      * @return one of the constants {@link #CUBIC_PATCH},
-     *         {@link #CUBIC_TRIANGLE}, or {@link #PLANAR_TRIANGLE}
-     *
+     *         {@link #CUBIC_TRIANGLE}, {@link #PLANAR_TRIANGLE}
+     *         or {@link #CUBIC_VERTEX}
      */
     public  int currentSegment(double[] coords);
 
@@ -74,11 +76,14 @@ public interface SurfaceIterator
      *   <LI>{@link Surface3D#addCubicTriangle(double[])} for
      *       {@link #CUBIC_TRIANGLE}.
      *   <LI>{@link Surface3D#addPlanarTriangle(double[])} for
-     *       {@link #PLANAR_TRIANGLE}.
+     *       {@link #PLANAR_TRIANGLE}
+     *   <LI>{@link Surface3D#addCubicVertex(double[])} for
+     *       {@link #CUBIC_VERTEX}.
      * </UL>
      * @param coords an array to store the values
      * @return one of the constants {@link #CUBIC_PATCH},
-     *         {@link #CUBIC_TRIANGLE}, or {@link #PLANAR_TRIANGLE}
+     *         {@link #CUBIC_TRIANGLE} or {@link #PLANAR_TRIANGLE}
+     *         or {@link #CUBIC_VERTEX}
      */
     public int currentSegment(float[] coords);
 

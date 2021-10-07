@@ -68,6 +68,39 @@ public class VectorOpsTest {
 	    throw new Exception("add failed");
 	}
 
+	v = VectorOps.add(null, 30, array1, 10, array2, 20, 3);
+	System.arraycopy(v, 30, result, 0, 3);
+	v = result;
+	if (v[0] != 11.0 || v[1] != 14.0 || v[2] != 17.0) {
+	    throw new Exception("add failed");
+	}
+
+	v = VectorOps.sub(v1, v2);
+	if (v[0] != -9.0 || v[1] != -8.0 || v[2] != -7.0) {
+	    System.out.format("%g, %g, %g\n", v[0], v[1], v[2]);
+	    throw new Exception("sub failed");
+	}
+
+	v = null;
+	v = VectorOps.sub(result, v1, v2);
+	if (v[0] != -9.0 || v[1] != -8.0 || v[2] != -7.0) {
+	    throw new Exception("sub failed");
+	}
+
+	VectorOps.sub(array, 30, array1, 10, array2, 20, 3);
+	System.arraycopy(array, 30, result, 0, 3);
+	v = result;
+	if (v[0] != -9.0 || v[1] != -8.0 || v[2] != -7.0) {
+	    throw new Exception("sub failed");
+	}
+
+	v = VectorOps.sub(null, 30, array1, 10, array2, 20, 3);
+	System.arraycopy(v, 30, result, 0, 3);
+	v = result;
+	if (v[0] != -9.0 || v[1] != -8.0 || v[2] != -7.0) {
+	    throw new Exception("sub failed");
+	}
+
 	v = VectorOps.multiply(2.0, v1);
 	if (v[0] != 2.0 || v[1] != 6.0 || v[2] != 10.0) {
 	    throw new Exception("multiply failed");
@@ -83,6 +116,14 @@ public class VectorOpsTest {
 	if (v[0] != 2.0 || v[1] != 6.0 || v[2] != 10.0) {
 	    throw new Exception("multiply failed");
 	}
+
+	v = VectorOps.multiply(null, 40, 2.0, array1, 10, 3);
+	System.arraycopy(v, 40, result, 0, 3);
+	v = result;
+	if (v[0] != 2.0 || v[1] != 6.0 || v[2] != 10.0) {
+	    throw new Exception("multiply failed");
+	}
+
 
 	w = VectorOps.dotProduct(v1, v2);
 	if (w != (10.0+33.0+60.0)) {
@@ -182,6 +223,15 @@ public class VectorOpsTest {
 
 	VectorOps.unitVector(array, 60, array1, 10, 3);
 	System.arraycopy(array, 60, result, 0, 3);
+	v = result;
+	if (Math.abs(v[0] - v1[0]/w) > 1.e-10
+	    || Math.abs(v[1] - v1[1]/w) > 1.e-10
+	    || Math.abs(v[2] - v1[2]/w) > 1.e-10) {
+	    throw new Exception("unitVector failed");
+	}
+
+	v = VectorOps.unitVector(null, 60, array1, 10, 3);
+	System.arraycopy(v, 60, result, 0, 3);
 	v = result;
 	if (Math.abs(v[0] - v1[0]/w) > 1.e-10
 	    || Math.abs(v[1] - v1[1]/w) > 1.e-10

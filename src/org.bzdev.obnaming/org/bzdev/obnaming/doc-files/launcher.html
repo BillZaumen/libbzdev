@@ -1,0 +1,480 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<BODY>
+    <div style="margin-left: 2em">
+<H2>Object-namer launchers</H2>
+<P>
+  The abstract class {@link org.bzdev.obnaming.ObjectNamerLauncher} is
+  the base class for object-namer launchers.  An object-namer launcher
+  processes input strings, files, or streams that contain YAML or JSON
+  objects.  These can contain expressions written in the
+  <A HREF="{@docRoot}/org.bzdev.base/org/bzdev/util/doc-files/esp.html">
+    ESP scripting language</A>,
+  which is executed in a mode that disables <CODE>import</CODE>
+  statements.  While the <CODE>import</CODE> statement is disabled,
+  the Java classes that can be used (and how they are used) can be
+  configured when an object-namer is created.  If a simulation or
+  animation service is provided via a web server, for example,
+  limiting the classes that a user may access has security
+  advantages. Object-namer launchers do not have to be used
+  explicitly: the program <CODE>yrunner</CODE> will handle these for
+  the user.
+
+  The following sections describe the following:
+  <UL>
+    <LI><A HREF="#instantiation">Instantiating an object-namer launcher</A>. 
+    <LI><A HREF="#use">Using an object-namer launcher</A>.
+    <LI><A HREF="#subclassing">Subclassing an object-namer launcher</A>.
+    <LI><A HREF="#configSyntax">Configuring object-namer launchers</A>.
+    <LI><A HREF="#SPIs">SPIs for accessing launchers and additional classes</A>.
+    <LI><A HREF="#genDoc">Generating class documentation</A>.
+  </UL>
+
+  <H3><A NAME="instantiation">Instantiating an object namer</A></H3>
+<P>
+  While a constructor can be used directly, normally and object-namer
+  launcher will be created by using a <CODE>newInstance</CODE> method:
+  <UL>
+    <LI> {@link org.bzdev.obnaming.ObjectNamerLauncher#newInstance(String)}. This method
+       creates an object-namer launcher, looked up by name, for which
+       scripting-language expressions will allow the use of a specific
+       set of Java classes.
+    <LI> {@link org.bzdev.obnaming.ObjectNamerLauncher#newInstance(String,String...)}.
+       This method creates an object-namer launcher, looked up by names,
+       for which the scripting-language expressions will allow the use
+       of not only the classes associated with the object-namer launcher,
+       but also additional collections of classes specified by the optional
+       arguments and called launcher-data additions.
+  </UL>
+  This is done by the <CODE>yrunner</CODE> program, but it is easy to
+  use the <CODE>newInstance</CODE> methods directly. A
+  <CODE>yrunner</CODE> option will print a table showing the names for
+  launchers and collections of additional classes.
+<P>
+  Object namers have a constraint: there can be only one active per
+  thread. This property is enforced by constructors.  An object namer
+  is active until its {@link org.bzdev.obnaming.ObjectNamerLauncher#close()}
+  method is called.  Because object namers implement the
+  {@link java.lang.AutoCloseable} interface, they may be used in a Java
+  try-with-resources block, in which case the call to
+  {@link org.bzdev.obnaming.ObjectNamerLauncher#close()} is implicit.
+
+  <H3><A NAME="use"></A>Using an object namer</H3>
+<P>
+  An object namer processes text in either JSON or YAML format.  The
+  methods that process text are
+  <UL>
+    <LI> {@link ObjectNamerLauncher#process(java.io.Reader,boolean)}.
+    <LI> {@link ObjectNamerLauncher#process(String,boolean)}.
+    <LI> {@link ObjectNamerLauncher#process(String,java.io.Reader,boolean)}.
+    <LI> {@link ObjectNamerLauncher#process(String,String,boolean)}.
+    <LI> {@link ObjectNamerLauncher#process(String,org.bzdev.util.JSOps,boolean,java.util.Map)}.
+  </UL>
+  These, of course, are not used explicitly if the <CODE>yrunner</CODE>
+  command is used.  Regardless, the input will a text file using the
+  format specified by YAML or JSON, with a UTF-8 character encoding. For
+  the YAML case, tabs are not allowed.  The text file should contain
+  an object, or an array whose elements are objects (the parser actually
+  allows arrays of arrays, but the values that are not arrays must be
+  objects).  Each object (whether represented with JSON or YAML syntax)
+  may have the following properties:
+  <UL>
+    <LI> <B>execute</B>. The value may be an object or a list of objects
+      with types supported by JSON or YAML.  When a value is a
+      string using the syntax specified for
+      {@link org.bzdev.util.ExpressionParser}, the string is
+      interpreted as follows:
+      <UL>
+        <LI> a statement starting with "=" will be evaluated.
+        <LI> a "var" statement will set a variable with a specified
+          name, and its variant using '?=" will provide a default
+          values if the variable is not set externally. The variant
+          using "??=" will provide a default value if the variable is
+          either not defined or has the value null.
+        <LI> a "function" or "synchronized function" statement will
+          define a function, giving it a name.
+      </UL>
+      If a string that could be confused with an ExpressionParser
+      statement is desired, there are two ways of handling it:
+      <UL>
+        <LI> For YAML, once can force the value to be an string by
+          using "!!str" tag. For example
+          <BLOCKQUOTE><CODE><PRE>
+execute: !!str var foo = 10
+          </PRE></CODE></BLOCKQUOTE>
+          If the string is a quoted string (delimited by double
+          quotes) or a YAML multi-line string, it is assumed to
+          be a string. To make such a string an expression, on
+          may use a tag:
+          <BLOCKQUOTE><CODE><PRE>
+execute: !bzdev!esp "var foo = 10"
+          </PRE></CODE></BLOCKQUOTE>
+        <LI> For JSON, one can use "=" with a quoted string. For example
+          <BLOCKQUOTE><CODE><PRE>
+execute: "= \"var foo = 10\""
+          </PRE></CODE></BLOCKQUOTE>
+      </UL>
+      Such a conflict should occur rarely, if at all, in practice.
+    <LI> <B>factories</B>. The value is either an object or a sequence
+      of objects. Each of these objects contains a "context"
+      property and a sequence of properties whose names are
+      variable names and whose values are the simple class names
+      of factories.  The value for a context is a list with two
+      elements.  The first element is a variable name for an
+      object namer. The second is the package in which the
+      factories provided by that context's factories are located.
+    <LI><B>define</B>. This section allows one to provide YAML anchors
+      to avoid repetition and is otherwise ignored. This is needed
+      because the variable provided by an expression parser cannot be used
+      to define a common subtree for part of JSON or YAML object: a
+      YAML anchor and alias is used instead.
+    <LI><B>create</B>. The value is either an object or a list of objects.
+      For each object, there are four properties:
+      <UL>
+        <LI><B>var</B>. The value is the variable storing the object
+          that will be created.
+        <LI><B>name</B>. The value is name of the object.
+        <LI><B>factory</B>. The value is the variable storing the
+          factory that will be used to create the object.
+        <LI><B>configuration</B>. The value is either another object
+          or a list of objects. This value is factory dependent.
+          The syntax for an object follows that provided in
+          the documentation for {@link NamedObjectFactory} (that
+          documentation describes the use of ECMAScript, but
+          ECMAScript is similar to JSON syntactically and YAML
+          is (approximately) a superset of JSON.
+      </UL>
+  </UL>
+<P>
+  It is sometimes necessary to manipulate ESP variables.  The methods
+  <UL>
+    <LI>{@link ObjectNamerLauncher#clear()}
+    <LI>{@link ObjectNamerLauncher#exists(String)}
+    <LI>{@link ObjectNamerLauncher#get(String)}
+    <LI>{@link ObjectNamerLauncher#remove(String)}
+    <LI>{@link ObjectNamerLauncher#set(String,Object)}
+    <LI>{@link ObjectNamerLauncher#variables()}
+  </UL>
+  can be used for this purpose. The <CODE>yrunner</CODE> command, for
+  example, has options that set scripting-language variables and some
+  of these methods are used by yrunner for that purpose.
+
+  <H3><A NAME="subclassing">Subclassing an object-namer launcher</A></H3>
+<P>
+  A subclass of {@link org.bzdev.obnaming.ObjectNamerLauncher} is
+  expected to have two constructors: one with no arguments and one
+  with a single argument, an instance of
+  {@link org.bzdev.util.JSObject}.  The directory containing the
+  source code for the subclass should also contain a YAML file using
+  the syntax shown <A HREF="#configSyntax">below</A>.
+  If <CODE>LAUNCHER</CODE> is the class name of an object-namer launcher
+  and <CODE>LAUNCHER_SUPERCLASS</CODE> is its immediate superclass, then
+  class definition for <CODE>LAUNCHER</CODE> (with these two identifiers
+  replaced with their actual values) is
+  <BLOCKQUOTE><PRE><CODE>
+ public class LAUNCHER extends LAUNCHER_SUPERCLASS {
+
+    public static InputStream getResourceStream() {
+        return LAUNCHER.class.getResourceAsStream("LAUNCHER.yaml");
+    }
+
+    public LAUNCHER(JSObject initializer)
+        throws ClassNotFoundException, IOException, IllegalAccessException
+    {
+        super(combine(loadFromStream(LAUNCHER.class,
+                                     LAUNCHER.getResourceAsStream(),
+                                     8),
+		        initializer));
+    }
+
+    public LAUNCHER()
+        throws ClassNotFoundException, IOException, IllegalAccessException
+    {
+        this(null);
+    }
+ }
+  </CODE></PRE></BLOCKQUOTE>
+  The methods
+  <UL>
+    <LI>{@link org.bzdev.obnaming.ObjectNamerLauncher#combine(org.bzdev.util.JSObject,org.bzdev.util.JSObject...)}
+    <LI>{@link org.bzdev.obnaming.ObjectNamerLauncher#loadFromStream(Class,java.io.InputStream,int)}
+  </UL>
+  will parse YAML files and combine the results to produce a single object.
+  In all or almost all cases, this design pattern should be used. The constant
+  8 indicates that tabs will be converted to spaces with the assumption that
+  there are 8 spaces per tab. Allowing tabs is convenient when using some
+  text editors (e.g., emacs).
+
+  <H3><A NAME="configSyntax">Configuring object-namer launchers</A></H3>
+
+  The YAML file loaded by a constructor lists classes and how they can
+  be used in an object-namer launcher's scripting environment. A
+  a more detailed description is provided by the API documentation for
+  {@link org.bzdev.util.ExpressionParser}, but that documentation
+  does not describe a YAML representation of the same data.
+<P>
+  The YAML file, generally a resource in a JAR file, specifies an
+  a YAML object with the following properties:
+  <UL>
+    <LI><B>argumentTypes</B> - a {@link org.bzdev.util.JSArray}
+      providing a list of strings giving the fully qualified class
+      names for arguments used by constructors, functions, and
+      methods. The types String, int, double, Integer, or Double
+      should not be used, as these are allowed by default.
+    <LI><B>fieldClasses</B> - a {@link org.bzdev.util.JSArray}
+      providing a list of strings giving the fully qualified class
+      names for classes containing fields that can be used. The types
+      of the fields that will be included are boolean, int, long,
+      double, {@link java.lang.String}, or an enumeration.
+    <LI><B>functionClasses</B> - a {@link org.bzdev.util.JSArray}
+      providing a list of strings the fully qualified class names for
+      classes whose public, static methods returning an allowable type
+      have a fixed number of arguments whose types are boolean, int,
+      long, double, or a type provided by the <B>argumentTypes</B>
+      property.
+    <LI><B>methodClasses</B> - a {@link org.bzdev.util.JSArray}
+      providing a list of strings giving the fully qualified class
+      names classes whose instance methods returning an allowable type
+      have a fixed number of arguments with types int, double, long,
+      boolean, {@link java.lang.String}, or a type provided by
+      the <B>argumentTypes</B> property.
+    <LI><B>returnTypes</B> - a {@link org.bzdev.util.JSArray}
+      providing a list of strings giving the fully qualified class
+      names for objects that the parser can return or can construct.
+      The constructors that will be provided are those with a fixed
+      number of arguments whose types are int, long, double, boolean,
+      {@link java.lang.String}, or a type provided by the <B>argumentTypes</B>
+      property.
+    <LI><B>define</B> - this property (actually any property other than
+      the ones listed above) is ignored.  If provided it should
+      appear first, and should be used merely to provide anchors so that
+      YAML aliases can be used to minimize the replication of class names.
+  </UL>
+  
+  <H3><A NAME="SPIs">The SPIs for object-namer launchers</A></H3>
+
+  Both <CODE>yrunner</CODE> and the
+  <A HREF="#instantiate"><CODE>newInstance</CODE></A> methods will
+  look up object-namer launchers, and collections of classes, by name.
+  A name is provided by an SPI (Service Provider Interface). There are
+  two that are applicable:
+  <UL>
+    <LI>{@link org.bzdev.lang.spi.ONLauncherData}.
+    <LI>{@link org.bzdev.obnaming.spi.ONLauncherProvider}.
+  </UL>
+  Methods common to both and that must be implemented are:
+  <UL>
+    <LI>{@link org.bzdev.lang.spi.ONLauncherData#getName()}.
+    <LI>{@link org.bzdev.lang.spi.ONLauncherData#getInputStream()}.
+      This method returns an  input stream containing UTF-8 text, possibly
+      with tabs, and providing a YAML input file describing classes and
+      how they are used as described
+      <A HREF="#configSyntax">above</A>.
+    <LI>{@link org.bzdev.lang.spi.ONLauncherData#description()}. This is
+      a one-line description of the data.
+    <LI>{@link org.bzdev.lang.spi.ONLauncherData#getTabSpacing()}. The
+      tab spacing accepted when the YAML input stream is read. The default
+      value is 8.
+  </UL>
+<P>
+  The interface {@link org.bzdev.obnaming.spi.ONLauncherProvider} adds one
+  additional method:
+  {{@link org.bzdev.obnaming.spi.ONLauncherProvider#onlClass()}. This class
+  provides the class name of the object-namer launcher that matches the
+  name provided by {@link org.bzdev.obnaming.spi.ONLauncherProvider#getName()}.
+<P>
+  Generally, the SPIs should not be in the same directory as the
+  classes they provide: otherwise the SPI classes might appear in the
+  API documentation generated with the javadoc command.  These SPIs
+  typically have trivial implementations.  For example, the SPI for
+  the <CODE>org.bzdev.math</CODE> package, an implementation of
+  {@link org.bzdev.lang.spi.ONLauncherData}, is only a few lines of
+  code:
+  <BLOCKQUOTE><CODE><PRE>
+package org.bzdev.providers.math;
+import java.io.InputStream;
+import java.util.ResourceBundle;
+import org.bzdev.lang.spi.ONLauncherData;
+
+public class MathLauncherData implements ONLauncherData {
+
+    public MathLauncherData() {}
+
+    public String getName() {
+	return "math";
+    }
+
+    public InputStream getInputStream() {
+	return getClass().getResourceAsStream("MathLauncherData.yaml");
+    }
+
+    {@literal @}Override
+    public String description() {
+	return ResourceBundle
+	    .getBundle("org.bzdev.providers.math.lpack.MathLauncherData")
+	    .getString("description");
+    }
+}
+  </PRE></CODE></BLOCKQUOTE>
+  A file in the same directory named <CODE>MathLauncherData.yaml</CODE>
+  contains a list of classes that this service provider makes
+  accessible. The use of a resource bundle allows the description to be
+  localized so that multiple languages can be supported.
+<P>
+  Similarly for the <CODE>org.bzdev.devqsim</CODE> package the implantation
+  of {@link org.bzdev.obnaming.spi.ONLauncherProvider}. is also only a few
+  lines of code long:
+  <BLOCKQUOTE><CODE><PRE>
+package org.bzdev.providers.devqsim;
+import java.io.InputStream;
+import java.util.ResourceBundle;
+import org.bzdev.obnaming.spi.ONLauncherProvider;
+import org.bzdev.devqsim.SimulationLauncher;
+
+public class SimulationLauncherProvider implements ONLauncherProvider {
+    {@literal @}Override
+    public String getName() {
+	return "devqsim";
+    }
+
+    {@literal @}Override
+    public Class<SimulationLauncher> onlClass() {
+	return SimulationLauncher.class;
+    }
+
+    {@literal @}Override
+    public InputStream getInputStream() {
+	return SimulationLauncher.getResourceStream();
+    }
+
+    {@literal @}Override
+    public String description() {
+	return ResourceBundle
+	    .getBundle("org.bzdev.providers.devqsim.lpack.SimulationLauncher")
+	    .getString("description");
+    }
+}
+  </PRE></CODE></BLOCKQUOTE>
+  In this case, <CODE>SimulationLauncher</CODE> is placed in the
+  <CODE>org.bzdev.devqsim</CODE> package along with the resource
+  <CODE>SimulationLauncher.yaml</CODE>, primarily because Java 11
+  makes it difficult to read resources from a different package
+  when Java modules are used.
+<P>
+  The module-info.jar file for org.bzdev.math contains the statement
+  <BLOCKQUOTE><CODE><PRE>
+    provides org.bzdev.lang.spi.ONLauncherData with
+	org.bzdev.providers.math.MathLauncherData,
+        ...
+  </PRE></CODE></BLOCKQUOTE>
+  and the file META-INF/services/org.bzdev.lang.spi.ONLaucherData
+  will contain the line
+  <BLOCKQUOTE><CODE><PRE>
+org.bzdev.providers.math.MathLauncherData
+  </PRE></CODE></BLOCKQUOTE>
+<P>
+  Similarly the module-info.jar file for org.bzdev.devqsim contains
+  the statement
+  <BLOCKQUOTE><CODE><PRE>
+    provides org.bzdev.obnaming.spi.ONLauncherProvider with
+	org.bzdev.providers.devqsim.SimulationLauncherProvider;
+  </PRE></CODE></BLOCKQUOTE>
+  and the file META-INF/services/org.bzdev.obnaming.spi.ONLauncherProvider
+  contains the line
+  <BLOCKQUOTE><CODE><PRE>
+org.bzdev.providers.devqsim.SimulationLauncherProvider
+  </PRE></CODE></BLOCKQUOTE>
+<P>
+  Providing both a META-INF/services file and an entry in a
+  module-info.jar file should be redundant, but some releases of Java,
+  or at least of openjdk, need both if the service provider is to work
+  as expected whether or not Java modules are used.
+
+  <H3><A NAME="genDoc">Generating class documentation</A></H3>
+<P>
+  The class {@link org.bzdev.obnaming.ObjectNamerLauncher} contains
+  methods for querying its expression parser to recover information
+  about the classes it supports. While one can use the following classes
+  to generate documentation, the program yrunner already provides this
+  capability.  The methods described below can be used to generate
+  documentation in a different format than that provided by
+  <CODE>yrunner</CODE>.
+<P>
+  The following
+  describes the lower-level methods used to generate such documentation
+  or extract other information about the Java classes that can be used.
+<P>
+  Several methods return lists of classes based on their usage:
+  <UL>
+    <LI>{@link ObjectNamerLauncher#getArgumentClasses()}.
+    <LI>{@link ObjectNamerLauncher#getConstants()}.
+    <LI>{@link ObjectNamerLauncher#getConstructors()}.
+    <LI>{@link ObjectNamerLauncher#getFunctions()}.
+    <LI>{@link ObjectNamerLauncher#getMethods()}.
+    <LI>{@link ObjectNamerLauncher#getReturnClasses()}.
+  </UL>
+<P>
+    The method {@link ObjectNamerLauncher#createAPIMap(List)} will set
+    up a map that associated class names with a URL for their API
+    documentation. It's argument is a list of URLs that point to the
+    top-level directories for API documentation generated by
+    javadoc. Several methods return a
+    {@link org.bzdev.util.TemplateProcessor.KeyMapList} that will
+    contain key maps for each class:
+  <UL>
+    <LI>{@link ObjectNamerLauncher#keylistForArgumentClasses()}.
+    <LI>{@link ObjectNamerLauncher#keylistForConstants()}.
+    <LI>{@link ObjectNamerLauncher#keylistForFunctions()}.
+    <LI>{@link ObjectNamerLauncher#keylistForMethods()}.
+    <LI>{@link ObjectNamerLauncher#keylistForMethods(boolean)}.
+    <LI>{@link ObjectNamerLauncher#keylistForReturnClasses()}.
+  </UL>
+  The documentation for each of these methods includes a description of
+  the key maps that these produce. The class
+  {@link org.bzdev.util.TemplateProcessor} can then be used to generate
+  documentation.
+<P>
+  Finally, several methods,
+  <UL>
+    <LI>{@link ObjectNamerLauncher#getProviderKeyMap()}
+    <LI>{@link ObjectNamerLauncher#getLauncherNames()}
+    <LI>{@link ObjectNamerLauncher#getLauncherDataNames()}
+  </UL>
+  provide information about the names the SPIs use to look up
+  launchers and launcher-data additions.  The method
+  {@link ObjectNamerLauncher#getProviderKeyMap()} will provide
+  key maps that include a name and a description of each launcher
+  or launcher-data addition, and can be used to generate
+  formatted documentation.
+    </div>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  namer YAML JSON Subclassing SPIs newInstance UTF
+ -->
+<!--  LocalWords:  namers ObjectNamerLauncher boolean str subtree SPI
+ -->
+<!--  LocalWords:  ExpressionParser NamedObjectFactory superset emacs
+ -->
+<!--  LocalWords:  yrunner superclass loadFromStream argumentTypes
+ -->
+<!--  LocalWords:  JSArray fieldClasses functionClasses methodClasses
+ -->
+<!--  LocalWords:  returnTypes getName getInputStream getTabSpacing
+ -->
+<!--  LocalWords:  onlClass javadoc openjdk PrintWriter
+ -->
+<!--  LocalWords:  getArgumentClasses getConstants getConstructors
+ -->
+<!--  LocalWords:  getFunctions getMethods getReturnClasses
+ -->
+<!--  LocalWords:  createAPIMap keylistForArgumentClasses
+ -->
+<!--  LocalWords:  keylistForConstants keylistForFunctions
+ -->
+<!--  LocalWords:  keylistForMethods keylistForReturnClasses
+ -->
+<!--  LocalWords:  getProviderKeyMap getLauncherNames
+ -->
+<!--  LocalWords:  getLauncherDataNames
+ -->

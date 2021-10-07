@@ -154,6 +154,18 @@ all:
 	$(JAVA) BezierVertexTest
 	@echo ------- ConvexPathCTest -----------
 	@$(JAVA) ConvexPathCTest
+	@echo ------- TPITest -----------
+	@$(JAVA) TPITest
+	@echo ------- TPITest -----------
+	@$(JAVA) CondTest
+	@echo ------- TwoCylinderTest -----------
+	@$(JAVA) TwoCylinderTest
+	@echo ------- CylinderBoxTest -----------
+	@$(JAVA) CylinderBoxTest
+	@echo ------- BezierBox -----------
+	@$(JAVA) BezierBox
+	@$(JAVA) BezierBox2
+
 affine:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -204,6 +216,14 @@ sphere:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@echo ------- Sphere ----------
 	$(JAVA) Sphere
+
+bgsphere1:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BGSphere1 ----------
+	$(JAVA) BGSphere1
+
 
 builder:
 	(cd ../.. ; make jars)
@@ -817,6 +837,37 @@ sint:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@$(JAVA) SurfaceIntTest
 
+tpitest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) TPITest
+
+condtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) CondTest
+
+twocylinders:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) TwoCylinderTest
+
+cylinderbox:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) CylinderBoxTest
+
+bezierbox:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) BezierBox
+	@$(JAVA) BezierBox2
+
 clean:
 	rm -rf classes
-	rm -f *.isq *.png *.stl
+	rm -f *.isq *.png *.stl condtest?.ps condtest?.eps

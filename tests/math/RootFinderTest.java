@@ -693,7 +693,7 @@ public class RootFinderTest {
 	    }
 	    for (int k = 0; k < nr; k++) {
 		double err = 256*Math.abs(eroots[k] - roots2[k]);
-		if (err < 1.e-11) err = 1.e-11;
+		if (err < 1.e-11) err = 1.e-10;
 		if (Math.abs(eroots[k] - roots[k]) > err) {
 		    System.out.println("k = " + k + ", diff = "
 				       + Math.abs(eroots[k] - roots[k])

@@ -3005,6 +3005,8 @@ public class Path3DInfo {
     /**
      * Find the first closed component of a path that goes through a point
      * (x, y, z) and shift that path component so it starts at (x, y, z);
+     * The point (x, y, z) must be the last point in a segment (including
+     * a MOVE_TO segment).
      * @param path the path
      * @param x the X coordinate of a point on the path
      * @param y the Y coordinate of a point on the path
