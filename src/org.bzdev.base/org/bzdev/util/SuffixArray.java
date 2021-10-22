@@ -138,14 +138,14 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * <P>
  * The implementation supports three auxiliary tables:
  * <UL>
- *   <IT> An inverse table. This table is implemented as an array
+ *   <LI> An inverse table. This table is implemented as an array
  *        with the same length as the suffix array.
  *        A copy of this table can be created by
  *        calling {@link #getInverse()}.  To create this table and
  *        cache it, call {@link #useInverse()}. To remove the cached
  *        table, call {@link #clearCachedInverse()}. To check if a
  *        cached table exists, call {@link #hasInverse()}.
- *   <IT> an LCP (Longest Common Prefix) table. This table is implemented
+ *   <LI> an LCP (Longest Common Prefix) table. This table is implemented
  *        as an array with the same length as the suffix array. A copy
  *        of this table can be created by calling {@link #getLCP()}.
  *        To create this table and cache it, call {@link #useLCP()}. To
@@ -155,7 +155,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
  *        index table will be used after the LCP table is created,
  *        call {@link #useInverse()} before calling {@link #useLCP()} or
  *        {@link #getLCP()}.
- *   <IT> an LCP-LR table. This contains a left and right LCP table for
+ *   <LI> an LCP-LR table. This contains a left and right LCP table for
  *        a binary search case and is used to speed up some computations.
  *        The table consists of two protected fields, both arrays and
  *        each as large as the corresponding suffix array. To create

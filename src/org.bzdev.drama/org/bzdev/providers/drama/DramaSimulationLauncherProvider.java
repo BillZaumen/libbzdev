@@ -27,5 +27,4 @@ public class DramaSimulationLauncherProvider implements ONLauncherProvider {
 		       + "DramaSimulationLauncher")
 	    .getString("description");
     }
-
 }

@@ -12,7 +12,6 @@ import org.bzdev.math.FFT;
  * For a modular JAR file, module-info.java should contain the following
  * clauses in its module declaration:
  * <BLOCKQUOTE><CODE><PRE>
- *     uses org.bzdev.math.spi.FFTProvider;
  *     provides org.bzdev.math.spi.FFTProvider with ...;
  * </PRE></CODE></BLOCKQUOTE>
  * where "<CODE>...</CODE>" is a comma-separated list of the fully

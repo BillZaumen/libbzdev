@@ -717,11 +717,15 @@ public class JSArray implements Iterable<Object>, JSOps {
      * There is one constraint: if the {@link JSArray} contains
      * another {@link JSArray}, all the elements that are not instances of
      * {@link JSObject} must be instances of {@link JSArray}.
+     * <P>
+     * This method is used internally for the case where an element in
+     * a {@link JSArray} is another {@link JSArray}.
+     * @param defaultKey the key to  use in single-entry key maps
      * @return a key-map list containing those list elements that are
-     *         instances of JSObject.
+     *         instances of JSObject
      * @exception ConversionException the list contained elements that
      *           are instances of {@link JSArray} and also elements that
-     *           are not instances of {@link JSObject}.
+     *           are not instances of {@link JSObject}
      * @see JSObject#toKeyMap()
      */
     public TemplateProcessor.KeyMapList toKeyMapList(String defaultKey)

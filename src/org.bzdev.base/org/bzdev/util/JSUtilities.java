@@ -1572,7 +1572,30 @@ public class JSUtilities {
 	 * <BLOCKQUOTE>
 	 * %TAG !bzdev! tag:bzdev.org,2021:
 	 * </BLOCKQUOTE>
-	 * and the string will be processed by {@link ExpressionParser}.
+	 * and the string will be processed by {@link ExpressionParser}
+	 * when a value starts with the sequence !bzdev!esp
+	 * For example
+	 * <BLOCKQUOTE>
+	 * - expressionList:
+	 *    - !bzdev!esp &gt;-
+	 *        ...
+	 * </BLOCKQUOTE>
+	 * If the constructor explicitly provides the prefix, the
+	 * %TAG directive is not needed.  For example
+	 * <BLOCKQUOTE>
+	 *   ExpressionParser ep = new ExpressionParser(...);
+	 *   ObjectParser.SourceParser sp =
+	 *       new ObjectParser.SourceParser(ep);
+	 *   TagSpec ts = new TagSpec("!bzdev!",
+	 *                            "tag:bzdev.org,2021:esp",
+	 *                            sp);
+	 * </BLOCKQUOTE>
+	 * will create an {@link ObjectParser.SourceParser} for
+	 * an expression parser that will encapsulate the content
+	 * so it can be evaluated at a later time (this occurs in
+	 * the {@link org.bzdev.obnaming.ObjectNamerLauncher} class
+	 * which for implementation reasons has to control the order
+	 * of evaluation when anchors are used.
 	 */
 	public static class TagSpec {
 	    String prefix;
@@ -1595,13 +1618,15 @@ public class JSUtilities {
 	     * will be defined in a YAML "%TAG" directive.
 	     * <P>
 	     * A prefix is a string that represents the portion of the
-	     * tag before its final colon, and should start and end with
+	     * tag up to its final colon, and should start and end with
 	     * exclamation points: for example if the prefix i
 	     * !bzdev! and the tag is tag:bzdev.org,2021:esp, then
 	     * !bzdev! will represent "tag:bzdev.org,2021:", providing a
 	     * terser notation.  That in turn will indicate which object
-	     * parser to use.
-	     * @param prefix the prefix ; null if not used for this entry
+	     * parser to use.  If the prefix is null, it should be defined
+	     * previously or in a %TAG directive at the start of a YAML
+	     * file.
+	     * @param prefix the prefix; null if not used for this entry
 	     * @param tag the tag
 	     * @param objectParser the object parser for this data type.
 	     */

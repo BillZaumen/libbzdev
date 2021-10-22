@@ -1000,7 +1000,7 @@ public class BezierGrid implements Shape3D {
 	 */
 	boolean isClosed();
 
-	/*
+	/**
 	 * Get the region for a given index.
 	 * The region will depend on the U index only.
 	 * regions start with 0 and are incremented each time a

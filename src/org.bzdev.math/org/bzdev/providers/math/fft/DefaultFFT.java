@@ -309,6 +309,7 @@ public class DefaultFFT extends FFT {
 	p = fft.p;
 	c = fft.c;
 	s = fft.s;
+	nu = fft.nu;
 	this.mode = getMode();
     }
 

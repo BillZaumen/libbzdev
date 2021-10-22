@@ -233,10 +233,13 @@ public class JSObject implements JSOps {
      * pairs, but with values that are instances of JSArray converted
      * to key-map lists. If an element in the list is not an instance
      * of JSObject, that element is replaced with a key map containing
-     * a single entry: one whose key is the key the key corresponding
+     * a single entry: one whose key is the key corresponding
      * to the JSArray, and whose value is the  list element.  If the
      * element in the list is a JSObject, that JSObject is converted to
      * a key list (by calling this method).
+     * <P>
+     * The single-entry maps are inserted in those cases where an
+     * entry in a list would be another list.
      * <P>
      * If creating a JSON representation of this object, the key map
      * should be modified to properly quote strings.

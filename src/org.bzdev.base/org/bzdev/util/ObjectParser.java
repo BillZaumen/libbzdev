@@ -223,6 +223,10 @@ public interface ObjectParser<T> {
 	    return evaluated;
 	}
 
+	/**
+	 * Return the string encapsulated by this object
+	 * @return the string
+	 */
 	@Override
 	public String toString() {
 	    return s;

@@ -21,8 +21,6 @@ public class P3DLauncherData implements ONLauncherData {
 	    .getBundle("org.bzdev.providers.p3d.lpack.P3DLauncherData")
 	    .getString("description");
     }
-
-
 }
 
 //  LocalWords:  DLauncherData yaml

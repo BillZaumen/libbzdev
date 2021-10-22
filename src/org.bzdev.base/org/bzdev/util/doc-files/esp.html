@@ -79,7 +79,8 @@
       <LI> {@link ExpressionParser#setScriptingMode()}. An input
 	string can contain multiple statements, separated by
 	semicolons, and an input string must not contain an initial
-	"=".
+	"=" unless {@link ExpressionParser#setPrefixMode()} is also
+	called.
       <LI> {@link ExpressionParser#setPrefixMode()}. This mode is
 	meaningful when scripting mode is enabled. Prefix mode requires
 	that each top-level statement start with either an '=' or the

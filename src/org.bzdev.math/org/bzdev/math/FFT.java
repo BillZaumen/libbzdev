@@ -211,6 +211,12 @@ public abstract class FFT {
 	return llname;
     }
 
+    /**
+     * Get the largest array length that some FFT provider supports
+     * subject to an optional in-place constraint
+     * @param inplace true if an FFT must be able to use the same
+     *        vectors for input and ouput; false otherwise.
+     */
     public static int getMaxLength(boolean inplace) {
 	int length = 0;
 	for (Map.Entry<String,FFTProvider> entry: map.entrySet()) {
@@ -224,7 +230,12 @@ public abstract class FFT {
 
     /**
      * Factory class for creating FFT instances that satisfy
-     * various criteria.
+     * various criteria. FFT factories can be configured to
+     * cache previous results, with the cache having a finite
+     * size. Constructing an FFT requires a potentially large
+     * number of sin and cosine computations.  For some
+     * applications, it is useful to store previously computed
+     * FFTs.
      */
     public static class Factory {
 	boolean useDefault = true;
@@ -251,10 +262,20 @@ public abstract class FFT {
 	 * matches the existing cache size.
 	 * @param size the new cache size; 0 or negative for no caching
 	 */
-	public void setCacheSize(int size) {
+	public synchronized void setCacheSize(int size) {
 	    cache.clear();
 	    cacheSize = size;
 	}
+
+
+	/**
+	 * Clear the cache.
+	 * This will free up memory without changing the cache size.
+	 */
+	public synchronized void clearCache() {
+	    cache.clear();
+	}
+
 
 	/**
 	 * Specify the length, in-place, and length-mode that may be
@@ -267,7 +288,7 @@ public abstract class FFT {
 	 * decision will be made during a call to {@link #newInstance(int)}.
 	 * <P>
 	 * Calling this method will clear the cache.
-	 * @param length the maximum of the arrays
+	 * @param length the maximum length of the arrays
 	 *       storing the real or imaginary components used for
 	 *       input or output; 0 or negative for modes other than
 	 *        {@link FFT.LMode#MAX_LENGTH} if the length is ignored
@@ -281,7 +302,9 @@ public abstract class FFT {
 	 *        {@link FFT.LMode#EXACT_LENGTH} if the length argument
 	 *        represents a specific length
 	 */
-	public boolean setParameters(int length, boolean inplace, LMode mode)
+	public synchronized boolean setParameters(int length,
+						  boolean inplace,
+						  LMode mode)
 	    throws IllegalArgumentException
 	{
 	    cache.clear();
@@ -318,7 +341,7 @@ public abstract class FFT {
 	 *        provider  is to be used.
 	 * @return true if the name is a valid name; false otherwise
 	 */
-	public boolean setName(String name) {
+	public synchronized boolean setName(String name) {
 	    cache.clear();
 	    if (name == null) {
 		serviceName = null;
@@ -339,6 +362,11 @@ public abstract class FFT {
 	    }
 	}
 
+	/**
+	 *  Get the maximum array length the service that meets
+	 * this factory's constraints will suppport.
+	 * @return the maximum length
+	 */
 	public int getMaxLength() {
 	    if (useDefault) {
 		return FFT.getMaxLength();
@@ -415,12 +443,15 @@ public abstract class FFT {
 		    (errorMsg("closedOutOfRangeI", 0, len, length));
 	    }
 	    FFT newFFT;
-	    if (cacheSize > 0) {
-		FFT existingFFT = cache.get(len);
-		if (existingFFT != null) {
-		    newFFT = FFT.newInstance(existingFFT, m);
-		    cache.remove(existingFFT);
-		    cache.put(len, newFFT);
+	    synchronized(this) {
+		if (cacheSize > 0) {
+		    FFT existingFFT = cache.get(len);
+		    if (existingFFT != null) {
+			newFFT = FFT.newInstance(existingFFT, m);
+			cache.remove(existingFFT);
+			cache.put(len, newFFT);
+			return newFFT;
+		    }
 		}
 	    }
 	    if (m == null) m = Mode.SYMMETRIC;
@@ -441,8 +472,10 @@ public abstract class FFT {
 		    }
 		}
 	    }
-	    if (cacheSize > 0) {
-		cache.put(len, newFFT);
+	    synchronized(this) {
+		if (cacheSize > 0) {
+		    cache.put(len, newFFT);
+		}
 	    }
 	    return newFFT;
 	}
@@ -471,8 +504,9 @@ public abstract class FFT {
 	 * and the inverse transform is defined by
 	 *  x<sub>n</sub> = (1/&radic;<SPAN style="text-decoration: overline">N</SPAN>)&sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>,
 	 * where the indices have values in the range [0, N-1).
-	 * This is useful when one wants the norm of the x and X to be
-	 * identical.
+	 * This is useful when one wants the norm of a vector and its
+	 * transform to be identical, as is typically the case in
+	 * physics applications.
 	 */
 	SYMMETRIC,
 	/**
@@ -482,7 +516,7 @@ public abstract class FFT {
 	 *  x<sub>n</sub> = &sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>,
 	 * where the indices have values in the range [0, N-1).
 	 * This is useful for statistics applications due to the
-	 * definition  of the characteristic function.
+	 * definition of the characteristic function.
 	 */
 	REVERSED,
     };
@@ -610,9 +644,9 @@ public abstract class FFT {
     static final Mode defaultMode = Mode.SYMMETRIC;
 
     /**
-     * Create a new instance of the FFT class using the default
-     * FFT provider with the default mode. The length must be one
-     * that the FFT provider supports.
+     * Create a new instance of the FFT class using the default FFT
+     * provider with the default mode ({@link FFT.Mode#SYMMETRIC}).
+     * The length must be one that the FFT provider supports.
      * @param n the length of the input and output arrays
      * @see FFT.Mode
      * @see #getLength(int)
@@ -752,7 +786,7 @@ public abstract class FFT {
     /**
      * Compute an FFT.
      * The transform is defined by
-     * X<sub>k</sub> = F&sum;<sub>n &isin;[0,N) x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>.
+     * X<sub>k</sub> = F&sum;<sub>n &isin;[0,N)</sub> x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>.
      * where
      * <UL>
      *   <LI> F = 1 when the transform was created with a mode of
@@ -762,6 +796,7 @@ public abstract class FFT {
      *        {@link Mode#SYMMETRIC}.
      *   <LI>  F = 1/N when the transform was created with a mode of
      *        {@link Mode#REVERSED}.
+     *   <LI> N is the length of the argument arrays
      * </UL>
      * <P>
      * The arrays xiReal and xoReal may be the same array, as may
@@ -781,7 +816,7 @@ public abstract class FFT {
     /**
      * Compute an inverse FFT.
      * The inverse transform is defined by
-     * x<sub>n</sub> = F&sum;<sub>k &isin;[0,N) X<sub>k</sub>e<sup>i2&pi;kn/N</sup>.
+     * x<sub>n</sub> = F&sum;<sub>k &isin;[0,N)</sub> X<sub>k</sub>e<sup>i2&pi;kn/N</sup>.
      * where
      * <UL>
      *   <LI> F = 1/N when the transform was created with a mode of
@@ -791,6 +826,7 @@ public abstract class FFT {
      *        {@link Mode#SYMMETRIC}.
      *   <LI>  F = 1 when the transform was created with a mode of
      *        {@link Mode#REVERSED}.
+     *   <LI> N is the length of the argument arrays
      * </UL>
      * <P>
      * The arrays xiReal and xoReal may be the same array, as may
@@ -814,7 +850,8 @@ public abstract class FFT {
      * The discrete analog of this equation is
      *  C<sub>k</sub> = &sum;f<sub>i</sub>g<sub>(k-i)</sub>
      * The values for f<sub>i</sub> and g<sub>k-i</sub> are
-     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M).
+     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M-L)
+     * where L is the value of zeroOffset.
      * For convenience g can be represented by a vector of length
      * N<sub>g</sub>, the signed index covers the range [-z,N<sub>g</sub>-z)
      * while an unsigned index covers the range [0, N<sub>g</sub>).
@@ -845,7 +882,8 @@ public abstract class FFT {
      * The discrete analog of this equation is
      *  C<sub>k</sub> = &sum;f<sub>i</sub>g<sub>(k-i)</sub>
      * The values for f<sub>i</sub> and g<sub>k-i</sub> are
-     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M).
+     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M-L)
+     * where L is the value of zeroOffset.
      * For convenience g can be represented by a vector of length
      * N<sub>g</sub>, the signed index covers the range [-z,N<sub>g</sub>-z)
      * while an unsigned index covers the range [0, N<sub>g</sub>).
@@ -937,7 +975,8 @@ public abstract class FFT {
      * The discrete analog of this equation is
      *  C<sub>k</sub> = &sum;f<sub>i</sub>g<sub>(k-i)</sub>
      * The values for f<sub>i</sub> and g<sub>k-i</sub> are
-     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M).
+     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M-L)
+     * where L is the value of zeroOffset.
      * For convenience g can be represented by a vector of length
      * N<sub>g</sub>, the signed index covers the range [-z,N<sub>g</sub>-z)
      * while an unsigned index covers the range [0, N<sub>g</sub>).
@@ -968,7 +1007,8 @@ public abstract class FFT {
      * The discrete analog of this equation is
      *  C<sub>k</sub> = &sum;f<sub>i</sub>g<sub>(k-i)</sub>
      * The values for f<sub>i</sub> and g<sub>k-i</sub> are
-     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M).
+     * assumed to be zero except when i&isin;[0,N) and (k-i)&isin;[-L,M-L)
+     * where L is the value of zeroOffset.
      * For convenience g can be represented by a vector of length
      * N<sub>g</sub>, the signed index covers the range [-z,N<sub>g</sub>-z)
      * while an unsigned index covers the range [0, N<sub>g</sub>).

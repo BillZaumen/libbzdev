@@ -510,6 +510,22 @@ public class ExpressionTest {
 	    if (((double)(Double)value) != 6.0) {
 		throw new Exception();
 	    }
+	} else {
+	    throw new Exception();
+	}
+
+	parser = new ExpressionParser(Math.class, MathOps.class);
+
+	s = "= IntStream.rangeClosed(1, 10)"
+	    + ".reduce(0, function(x,y) {asInt(x+y)})";
+	value = parser.parse(s);
+	System.out.println(value + " " + s);
+	if (value instanceof Integer) {
+	    if (((int)(Integer)value) != 55) {
+		throw new Exception();
+	    }
+	} else {
+	    throw new Exception();
 	}
 
 	parser = new ExpressionParser(Math.class);

@@ -1,4 +1,3 @@
-
 # GNU Make file.
 #
 DATE = (shell date -R)
@@ -126,7 +125,7 @@ SCRUNNER_DIR  = ./src/org.bzdev.scrunner
 YRUNNER_DIR = ./src/org.bzdev.yrunner
 
 SHORT_MODULE_NAMES = base esp dmethods math obnaming parmproc \
-	graphics desktop devqsim drama anim2d ejws p3d
+	graphics desktop devqsim drama anim2d p3d ejws
 
 
 # The module-info.java files for each module
@@ -532,7 +531,7 @@ RTJARS = BUILD/libbzdev-base.jar BUILD/libbzdev-esp.jar \
 JARS = BUILD/libbzdev-base.jar BUILD/libbzdev-esp.jar \
 	BUILD/libbzdev-dmethods.jar BUILD/libbzdev-math.jar \
 	BUILD/libbzdev-obnaming.jar BUILD/libbzdev-parmproc.jar \
-	BUILD/libbzdev-graphics.jar BUILD/libbzdev-devqsim.jar \
+	BUILD/libbzdev-graphics.jar \
 	BUILD/libbzdev-desktop.jar BUILD/libbzdev-devqsim.jar \
 	BUILD/libbzdev-drama.jar BUILD/libbzdev-anim2d.jar \
 	BUILD/libbzdev-p3d.jar BUILD/libbzdev-ejws.jar
@@ -1267,7 +1266,8 @@ JROOT_EXAMPLES = $(JROOT)/examples
 
 # Rules for stand-alone use:
 
-install: install-lib install-utils install-links install-javadocs install-misc
+install: install-libs install-lib install-utils install-links \
+	install-javadocs install-misc
 
 uninstall: uninstall-misc uninstall-links uninstall-utils uninstall-lib
 
@@ -1278,12 +1278,63 @@ uninstall: uninstall-misc uninstall-links uninstall-utils uninstall-lib
 #
 install-lib: $(JARS)
 	install -d $(LIBJARDIR)
-	for i in $(SHORT_MODULE_NAMES) ; do \
-		install -m 0644 -T BUILD/libbzdev-$$i.jar \
-			$(LIBJARDIR)/libbzdev-$$i-$(VERSION).jar ; \
-	done
+#	for i in $(SHORT_MODULE_NAMES) ; do \
+#		install -m 0644 -T BUILD/libbzdev-$$i.jar \
+#			$(LIBJARDIR)/libbzdev-$$i-$(VERSION).jar ; \
+#	done
 	install -m 0644 -T BUILD/libbzdev.jar \
 		$(LIBJARDIR)/libbzdev-$(VERSION).jar
+
+install-libs: $(JARS)
+	install -d $(LIBJARDIR)
+	for i in $(SHORT_MODULE_NAMES) ; do \
+		$(MAKE) MODULE_NAME=$$i install-$$i ; \
+	done
+
+install-base-jar: $(JARS)
+	$(MAKE) MODULE_NAME=base install-base
+
+install-esp-jar: $(JARS)
+	$(MAKE) MODULE_NAME=esp install-esp
+
+install-dmethods-jar: $(JARS)
+	$(MAKE) MODULE_NAME=dmethods install-dmethods
+
+install-math-jar: $(JARS)
+	$(MAKE) MODULE_NAME=math install-math
+
+install-obnaming-jar: $(JARS)
+	$(MAKE) MODULE_NAME=obnaming install-obnaming
+
+install-parmproc-jar: $(JARS)
+	$(MAKE) MODULE_NAME=parmproc install-parmproc
+
+install-graphics-jar: $(JARS)
+	$(MAKE) MODULE_NAME=graphics install-graphics
+
+install-desktop-jar: $(JARS)
+	$(MAKE) MODULE_NAME=desktop install-desktop
+
+install-devqsim-jar: $(JARS)
+	$(MAKE) MODULE_NAME=devqsim install-devqsim
+
+install-drama-jar: $(JARS)
+	$(MAKE) MODULE_NAME=drama install-drama
+
+install-anim2d-jar: $(JARS)
+	$(MAKE) MODULE_NAME=anim2d install-anim2d
+
+install-p3d-jar: $(JARS)
+	$(MAKE) MODULE_NAME=p3d install-p3d
+
+install-ejws-jar: $(JARS)
+	$(MAKE) MODULE_NAME=ejws install-ejws
+
+
+install-$(MODULE_NAME):  BUILD/libbzdev-$(MODULE_NAME).jar
+	install -d $(LIBJARDIR)
+	install -m 0644 -T BUILD/libbzdev-$(MODULE_NAME).jar \
+		$(LIBJARDIR)/libbzdev-$(MODULE_NAME)-$(VERSION).jar ;
 
 install-utils: BUILD/lsnof.jar BUILD/scrunner.jar BUILD/ejwsCerts.jks \
 		BUILD/yrunner.jar
