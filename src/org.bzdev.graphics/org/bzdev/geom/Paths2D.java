@@ -1206,7 +1206,12 @@ public class Paths2D {
      * When the original path is not a closed path and a closed path is
      * requested, the path created will be a closed path oriented
      * counterclockwise: traversing one around this path will result in
-     * its tangent rotating a total of 360 degrees counterclockwise.l
+     * its tangent rotating a total of 360 degrees counterclockwise.
+     * When the original path is not closed and the value of 'close' is false,
+     * the second segment of the resulting path will be offset in the
+     * direction of the normal vector (the direction of a vector rotated
+     * 90 degrees counterclockwise from the tangent), and the first segment
+     * will be on the opposite side of the original curve.
      * When the original path is closed, two paths will be created.
      * The outer of these two paths will have a counterclockwise orientation
      * and the inner will have a clockwise orientation.
@@ -1227,6 +1232,10 @@ public class Paths2D {
      * original path is not closed, the returned path will have two
      * separate components.  If dist1 or dist2 is zero, the corresponding
      * path will be identical to the original path.
+     * <P>
+     * Note: of the two subpaths, the clockwise one is always the first
+     * so that when 'close' is true, the orientation of the path will be
+     * determined by the right-hand rule.
      * @param path the original path
      * @param dist1 the distance from the path in the counterclockwise direction
      * @param dist2 the distance from the path in the clockwise direction
@@ -1265,7 +1274,12 @@ public class Paths2D {
      * When the original path is not a closed path and a closed path is
      * requested, the path created will be a closed path oriented
      * counterclockwise: traversing one around this path will result in
-     * its tangent rotating a total of 360 degrees counterclockwise.l
+     * its tangent rotating a total of 360 degrees counterclockwise.
+     * When the original path is not closed and the value of 'close' is false,
+     * the second segment of the resulting path will be offset in the
+     * direction of the normal vector (the direction of a vector rotated
+     * 90 degrees counterclockwise from the tangent), and the second segment
+     * will be on the opposite side of the original curve.
      * When the original path is closed, two paths will be created.
      * The outer of these two paths will have a counterclockwise orientation
      * and the inner will have a clockwise orientation.
@@ -1286,6 +1300,10 @@ public class Paths2D {
      * original path is not closed, the returned path will have two
      * separate components.  If dist1 or dist2 is zero, the corresponding
      * path will be identical to the original path.
+     * <P>
+     * Note: of the two subpaths, the clockwise one is always the first
+     * so that when 'close' is true, the orientation of the path will be
+     * determined by the right-hand rule.
      * @param path the original path
      * @param dist1 the distance from the path in the counterclockwise direction
      * @param dist2 the distance from the path in the clockwise direction
@@ -3457,4 +3475,5 @@ public class Paths2D {
 //  LocalWords:  DInfo getLineIntersectionUVXY ny noArcParallel tx ty
 //  LocalWords:  noArcPossible createArc spath counterClockwise SEG
 //  LocalWords:  affine PathIterator MOVETO offsetted lessThanZero
-//  LocalWords:  offsetBy ccw isin
+//  LocalWords:  offsetBy ccw isin maxdelta subpaths PathSplitter
+//  LocalWords:  subpath misplacedMoveTo closePath

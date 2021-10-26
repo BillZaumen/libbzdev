@@ -154,9 +154,9 @@ import org.bzdev.lang.MathOps;
  *       </UL>
  *  <li> inverse hyperbolic functions:
  *        <UL>
- *         <li> asinh(x) - sinh<sub>-1</sub>(x).
- *         <li> acosh(x) - cosh<sub>-1</sub>(x).
- *         <li> atanh(x) - tanh<sub>-1</sub>(x).
+ *         <li> asinh(x) - sinh<sup>-1</sup>(x).
+ *         <li> acosh(x) - cosh<sup>-1</sup>(x).
+ *         <li> atanh(x) - tanh<sup>-1</sup>(x).
  *        </UL>
  *  <li> Laguerre polynomials and associated Laguerre polynomials:
  *       <UL>
@@ -180,8 +180,8 @@ import org.bzdev.lang.MathOps;
  *                respect to x).
  *           <li> P(n,m,x) computes the associated Legendre function
  *                P<sup>m</sup><sub>n</sub>(x) for integer values of n and m.
- *           <li> dPdx(n,m,x) computes dP<sub>n</sub><sup>m</sub>/dx
- *                (the derivative of associated Legendre polynomials of
+ *           <li> dPdx(n,m,x) computes dP<sup>m</sup><sub>n</sub>/dx
+ *                (the derivative of the associated Legendre polynomial of
  *                degree n and order m with respect to x).
  *       </UL>
  *  <li> A function pow(x, n) to raise a real number x to an integer power n
@@ -660,8 +660,8 @@ public class Functions {
 	}
 
 	/**
-	 * Compute the coefficients for a weighted sum of Bernstein polyomials
-	 * of degree n+r for a wieghted sum of Bernstein polyomials of degree
+	 * Compute the coefficients for a weighted sum of Bernstein polynomials
+	 * of degree n+r for a weighted sum of Bernstein polynomials of degree
 	 * n.
 	 * @param result an array holding the coefficients after the degree
 	 *        was raised by r
@@ -738,7 +738,7 @@ public class Functions {
 	 * The arrays result and beta may be the same array.
 	 * @param result the coefficients for a scaled Bernstein basis
 	 * @param beta the coefficients for a Bernstein basis
-	 * @int n the degree of the Bernstein  poynomials
+	 * @int n the degree of the Bernstein  polynomials
 	 */
 	public static int scale(double[] result, double[] beta, int n) {
 	    for (int i = 1; i < n; i++) {
@@ -761,7 +761,7 @@ public class Functions {
 	 * The arrays result and beta may be the same array.
 	 * @param result the coefficients for a scaled Bernstein basis
 	 * @param beta the coefficients for a Bernstein basis
-	 * @int n the degree of the Bernstein  poynomials
+	 * @int n the degree of the Bernstein  polynomials
 	 */
 	public static int unscale(double[] result, double[] beta, int n) {
 	    for (int i = 1; i < n; i++) {
@@ -774,7 +774,7 @@ public class Functions {
 	    return n;
 	}
 
-	// timing tests indicate that array allocation is a signficant
+	// timing tests indicate that array allocation is a significant
 	// cost: much more so than using a pool of preallocated arrays.
 	private static int ALEN = 256;
 	private static class ArrayPair {
@@ -1169,7 +1169,7 @@ public class Functions {
 	}
 
 	/**
-	 * Compute the Ith derivative of a weighted sum of Bernstein
+	 * Compute the I<sup>th</sup> derivative of a weighted sum of Bernstein
 	 * polynomials of the same degree using a coefficient array with
 	 * an offset.
 	 * The implementation uses De Casteljau's algorithm, which is fast
@@ -1990,7 +1990,7 @@ public class Functions {
 	/**
 	 * Compute a weighted sum of Bernstein polynomials of the same degree
 	 * using barycentric coordinates for each of sequence of values from
-	 * an array, also specifing an offset into that array.
+	 * an array, also specifying an offset into that array.
 	 * The sum is given by
 	 * &sum;<sub>&lambda;</sub>&beta;<sub>&lambda;</sub>B<sup>n</sup><sub>&lambda;</sub>(&tau;)
 	 * where &tau; is a vector
@@ -2139,7 +2139,7 @@ public class Functions {
 	/**
 	 * Compute a first partial derivative of a weighted sum of
 	 * Bernstein polynomials of the same degree using barycentric
-	 * coordinates for each of a sequence of values, specifing an offset
+	 * coordinates for each of a sequence of values, specifying an offset
 	 * into the array providing the weights.
 	 * The sum is given by
 	 * &sum;<sub>&lambda;</sub>&beta;<sub>&lambda;</sub>B<sup>n</sup><sub>&lambda;</sub>(&tau;)
@@ -2344,7 +2344,7 @@ public class Functions {
 	 * @param result the partial derivative of a weighted sum of
 	 *         Bernstein polynomials for specified barycentric coordinates
 	 * @param beta the weights
-	 * @param offset the offest into the array beta at which the weights
+	 * @param offset the offset into the array beta at which the weights
 	 *        start
 	 * @param n the degree of the Bernstein polynomials
 	 * @param x the barycentric coordinates
@@ -4622,6 +4622,10 @@ public class Functions {
 
     static final double LOG_GAMMA_LIMIT = 1.0e-14;
 
+    /**
+     * Class providing static methods for computing Gamma functions,
+     * their logarithms, and asymptotic values.
+     */
     public static class GammaFunction {
 
 	private GammaFunction() {}
@@ -4676,6 +4680,11 @@ public class Functions {
 	    }
 	}
 
+	/**
+	 * Compute the logarithm of the Gamma function
+	 * @param z a non-negative number
+	 * @return the value of log (&Gamma;(x))
+	 */
 	public static double logGamma(double z) {
 	    if (z == 0) return Double.POSITIVE_INFINITY;
 	    if (z >=40.0) return logAsymptoticValue(z);
@@ -4712,6 +4721,7 @@ public class Functions {
 
 
 	// log Gamma (z + 1) for z < 1.
+
 	static double logGamma1(double z) {
 
 	    double sum = - Constants.EULERS_CONSTANT * z;
@@ -4738,7 +4748,7 @@ public class Functions {
 	    return sum;
 	}
 
-	/*
+	/**
 	 * Compute the asymptotic value of the Gamma function.
 	 * The computation uses Nemes' approximation with up to a t<sup>6</sup>
 	 * term.  Errors are less than 1 part in 10<sup>12</sup> for t \gt; 20.
@@ -4760,7 +4770,7 @@ public class Functions {
 		* Math.exp(x * (Math.log(x) - 1.0));
 	}
 
-	/*
+	/**
 	 * Compute the asymptotic value of the logarithm of the Gamma function.
 	 * The computation uses Nemes' approximation with up to a t<sup>6</sup>
 	 * term.  Errors are less than 1 part in 10<sup>12</sup> for t \gt; 20.
@@ -6908,6 +6918,8 @@ public class Functions {
 //  LocalWords:  zTooLargeForIntCAB argRatioNotInts secondArgZero dat
 //  LocalWords:  argRatioNumbNotInts fourthArgZero ErfTable BZdev lm
 //  LocalWords:  argv fterm sumg ftermg oneThird twoThirds sqrt im De
-//  LocalWords:  etable barycentric dMdx Mdx lPow zeroArgument pdf
-//  LocalWords:  relativelyPrime precomputed firstArgNotPositive
-//  LocalWords:  infin Pochhammer
+//  LocalWords:  etable barycentric dMdx Mdx lPow zeroArgument pdf ir
+//  LocalWords:  relativelyPrime precomputed firstArgNotPositive npir
+//  LocalWords:  infin Pochhammer thirdArgNeg fourthArgNeg npirp rlen
+//  LocalWords:  preallocated th monomial secondGTfirst secondArgPos
+//  LocalWords:  thirdArgPos

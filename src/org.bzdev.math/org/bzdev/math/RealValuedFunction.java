@@ -95,7 +95,7 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 	return getDomainMin();
     }
 
-    /*
+    /**
      * Get the minimum value in the domain of the function.
      * @return the minimum value
      * @exception IllegalStateException the function was not fully
@@ -176,7 +176,7 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 	return isInDomain(args[0]);
     }
 
-    /**
+    /*
      * Determine if an argument is within the domain of
      * a real-valued function.
      * <P>
@@ -342,7 +342,7 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 	return derivAt(args[0]);
     }
 
-    /*
+    /**
      * Get a function that computes this function's nth derivative.
      * The value of n must be 0 (for the function itself), 1 for
      * the first derivative, or 2 for the second derivative.
@@ -557,4 +557,4 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 //  LocalWords:  domainMinClosed scriptingContext fname fpname
 //  LocalWords:  fppname IllegalArgumentException numberNotReturned
 //  LocalWords:  functionNotSupported callFailsArg opNotSupported
-//  LocalWords:  SplinePath
+//  LocalWords:  SplinePath IllegalStateException derivOrder

@@ -4014,7 +4014,99 @@ public class Path2DInfoTest {
 			  + "t2-t1=%d\n",
 			  t1-t0, t2-t1);
 
+	System.out.println("First and last tangent tests ...");
+
+	Path2D tpath = Paths2D.createArc(0.0, 0.0, 1.0, -1.0,
+					 Math.PI/2, Math.PI/8);
+
+	double[] tangent = Path2DInfo.firstTangent(tpath);
+	double[] normal =  Path2DInfo.firstNormal(tpath);
+	double[] vec1 = new double[3];
+	double[] vec2 = new double[3];
+	System.arraycopy(tangent, 0, vec1, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	normal =  Path2DInfo.firstNormal(tpath);
+	System.arraycopy(normal, 0, vec2, 0, 2);
+	if (Math.abs(VectorOps.crossProduct(vec1, vec2)[2] - 1.0) > 1.e-14) {
+	    throw new Exception();
+	}
+	tangent = Path2DInfo.lastTangent(tpath);
+	System.arraycopy(tangent, 0, vec2, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	if (Math.abs(VectorOps.crossProduct(vec1, vec2)[2] - 1.0) > 1.e-14) {
+	    throw new Exception();
+	}
+	normal = Path2DInfo.lastNormal(tpath);
+	System.arraycopy(normal, 0, vec1, 0, 2);
+	if (Math.abs(VectorOps.crossProduct(vec2, vec1)[2] - 1.0) > 1.e-14) {
+	    throw new Exception();
+	}
+
+	tpath.append(Paths2D.createArc(0.0, 0.0, 2.0, -2.0,
+				       Math.PI/2, Math.PI/8),
+		     false);
+	tangent = Path2DInfo.firstTangent(tpath);
+	System.arraycopy(tangent, 0, vec1, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	tangent = Path2DInfo.lastTangent(tpath);
+	System.arraycopy(tangent, 0, vec2, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	if (Math.abs(VectorOps.crossProduct(vec1, vec2)[2] - 1.0) > 1.e-14) {
+	    System.out.println("cross product was "
+			       + VectorOps.crossProduct(vec1, vec2)[2]);
+	    throw new Exception();
+	}
+
+	tpath.closePath();
+	tangent = Path2DInfo.firstTangent(tpath);
+	if (Math.abs(VectorOps.norm(tangent)-1.0) > 1.e-14) {
+	    throw new Exception();
+	}
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	tangent = Path2DInfo.lastTangent(tpath);
+	if (tangent != null) {
+	    throw new Exception();
+	}
+	System.out.println(tangent);
+
+	tpath = new Path2D.Double();
+	tpath.moveTo(1.0, 1.0);
+	tpath.lineTo(2.0, 2.0);
+	tangent = Path2DInfo.firstTangent(tpath);
+	System.arraycopy(tangent, 0, vec1, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	tangent = Path2DInfo.lastTangent(tpath);
+	System.arraycopy(tangent, 0, vec2, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	if (Math.abs(VectorOps.crossProduct(vec1, vec2)[2]) > 1.e-14) {
+	    throw new Exception();
+	}
+
+	tpath = new Path2D.Double();
+	tpath.moveTo(1.0, 1.0);
+	tpath.quadTo(2.0, 1.0, 2.0, 2.0);
+	tangent = Path2DInfo.firstTangent(tpath);
+	System.arraycopy(tangent, 0, vec1, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	tangent = Path2DInfo.lastTangent(tpath);
+	System.arraycopy(tangent, 0, vec2, 0, 2);
+	System.out.format("(%g, %g)\n", tangent[0], tangent[1]);
+	if (Math.abs(VectorOps.crossProduct(vec1, vec2)[2] - 1.0) > 1.e-14) {
+	    throw new Exception();
+	}
+	tpath.closePath();
+	tangent = Path2DInfo.firstTangent(tpath);
+	if (tangent != null) {
+	    throw new Exception();
+	}
+	System.out.println(tangent);
+	tangent = Path2DInfo.lastTangent(tpath);
+	System.out.println(tangent);
+	if (tangent != null) {
+	    throw new Exception();
+	}
 	System.out.println("... OK");
+
 	System.exit(0);
     }
 }

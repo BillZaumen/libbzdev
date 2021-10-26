@@ -2,6 +2,9 @@ package org.bzdev.math;
 
 //@exbundle org.bzdev.math.lpack.Math
 
+/**
+ * Vector-valued functions with a variable number of arguments.
+ */
 public abstract class VectorValuedFunctionVA implements VADomainOps {
 
     static String errorMsg(String key, Object... args) {

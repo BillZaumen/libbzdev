@@ -235,7 +235,7 @@ public class Path2DInfo {
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
      *        included
-     * @return an array containing the countrol points, each as
+     * @return an array containing the control points, each as
      *         a pair of values
      */
     public static double[] getControlPoints(Path2D path, boolean all)
@@ -250,7 +250,7 @@ public class Path2DInfo {
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
      *        included
-     * @return an array containing the countrol points, each as
+     * @return an array containing the control points, each as
      *         a pair of values
      */
     public static double[] getControlPoints(PathIterator pit,
@@ -323,7 +323,7 @@ public class Path2DInfo {
      * @param path the path to process
      * @param all true if all control points should be included;
      *        false for just the 'knots' (the end-points of each
-     *        segement)
+     *        segment)
      * @param af an affine transform to apply the path before
      *        processing; null for an identity transform
      * @return a path consisting of straight-line  segments
@@ -6646,7 +6646,7 @@ public class Path2DInfo {
      * the terminating PathIterator.SEG_CLOSE segment is not included in
      * the count.
      * @param path the path
-     * @return true if the path is closed; false otherwise
+     * @return the number of drawable segments
      * @throws IllegalStateException if the path does not start with a
      *         segment whose type is PathIterator.SEG_MOVE.
      */
@@ -6718,8 +6718,199 @@ public class Path2DInfo {
 	}
 	return false;
     }
-}
 
+    /**
+     * Get the tangent vector for the start of a path.
+     * @param path the path
+     * @return the tangent vector; null if the path's first component
+     *         is a closed path
+     * @exception IllegalArgumentException if the path did not start
+     *     with a {@link PathIterator#SEG_MOVETO} segment or if the
+     *     path had only {@link PathIterator#SEG_MOVETO} segments
+     *     before a {@link PathIterator#SEG_CLOSE} segment
+     */
+    public static double[] firstTangent(Path2D path)
+	throws IllegalArgumentException
+    {
+	PathIterator pi = path.getPathIterator(null);
+	double[] tangent = null;
+	double[] coords = new double[6];
+	if (!pi.isDone()) {
+	    if (pi.currentSegment(coords) != PathIterator.SEG_MOVETO) {
+		throw new
+		    IllegalArgumentException(errorMsg("missingSEGMOVETO"));
+	    }
+	    tangent = new double[2];
+	    tangent[0] = -coords[0];
+	    tangent[1] = -coords[1];
+	    pi.next();
+	}
+	boolean done = false;
+	while (!pi.isDone()) {
+	    switch (pi.currentSegment(coords)) {
+	   case  PathIterator.SEG_MOVETO:
+		tangent[0] = -coords[0];
+		tangent[1] = -coords[1];
+		break;
+	    case PathIterator.SEG_CLOSE:
+		throw new
+		    IllegalArgumentException(errorMsg("noSegsBeforeClose"));
+	    default:
+		tangent[0] += coords[0];
+		tangent[1] += coords[1];
+		done = true;
+		break;
+	    }
+	    pi.next();
+	    if (done) break;
+	}
+	while (!pi.isDone()) {
+	    int mode = pi.currentSegment(tmp);
+	    if (mode == PathIterator.SEG_MOVETO) {
+		try {
+		    VectorOps.normalize(tangent);
+		} catch (IllegalArgumentException e) {}
+		return tangent;
+	    }
+	    if (mode == PathIterator.SEG_CLOSE) return null;
+	    pi.next();
+	}
+	try {
+	    VectorOps.normalize(tangent);
+	} catch (IllegalArgumentException e) {}
+	return tangent;
+    }
+
+    /**
+     * Get the tangent vector for the end of a path.
+     * The tangent vector, if it exists and has a non-zero length,
+     * will have unit length.
+     * @param path the path
+     * @return the tangent vector; null if the last component of the
+     *         path is a closed path
+     * @exception IllegalArgumentException if the path did not start
+     *     with a {@link PathIterator#SEG_MOVETO} segment, if the
+     *     path ends with a {@link PathIterator#SEG_MOVETO} segment,
+     *     or if the segment type is not recognized
+     */
+    public static double[] lastTangent(Path2D path) {
+	PathIterator pi = path.getPathIterator(null);
+	double[] tangent = new double[2];
+	double[] coords = new double[6];
+	double[] pt = new double[2];
+	double lastX = 0, lastY = 0;
+	if (!pi.isDone()) {
+	    if (pi.currentSegment(coords) != PathIterator.SEG_MOVETO) {
+		throw new
+		    IllegalArgumentException(errorMsg("missingSEGMOVETO"));
+	    }
+	    lastX = coords[0];
+	    lastY = coords[1];
+	    pt[0] = lastX;
+	    pt[1] = lastY;
+	    pi.next();
+	}
+	int mode = PathIterator.SEG_MOVETO;
+	while (!pi.isDone()) {
+	    mode = pi.currentSegment(coords);
+	    switch (mode) {
+	    case PathIterator.SEG_MOVETO:
+		lastX = coords[0];
+		lastY = coords[1];
+		pt[0] = lastX;
+		pt[1] = lastY;
+		break;
+	    case PathIterator.SEG_LINETO:
+		tangent[0] = coords[0] - pt[0];
+		tangent[1] = coords[1] - pt[1];
+		pt[0] = coords[0];
+		pt[1] = coords[1];
+		break;
+	    case PathIterator.SEG_QUADTO:
+		tangent[0] = coords[2] - coords[0];
+		tangent[1] = coords[3] - coords[1];
+		pt[0] = coords[2];
+		pt[1] = coords[3];
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		tangent[0] = coords[4] - coords[2];
+		tangent[1] = coords[5] - coords[3];
+		pt[0] = coords[4];
+		pt[1] = coords[5];
+		break;
+	    case PathIterator.SEG_CLOSE:
+		pt[0] = lastX;
+		pt[1] = lastY;
+		break;
+	    default:
+		String msg = errorMsg("unknownSegmentType", mode);
+		throw new IllegalArgumentException(msg);
+	    }
+	    pi.next();
+	}
+	if (mode == PathIterator.SEG_MOVETO) {
+	    throw new IllegalArgumentException("endingMOVETO");
+	}
+	try {
+	    return (mode == PathIterator.SEG_CLOSE)? null:
+		VectorOps.normalize(tangent);
+	} catch (IllegalArgumentException e) {
+	    return tangent;
+	}
+    }
+
+    /**
+     * Get the normal vector for the start of a path.
+     * The normal vector, if it exists and has a non-zero length,
+     * will have unit length.
+     * This vector is perpendicular to the tangent vector and
+     * is equal to a vector that results from a 90 degree
+     * counterclockwise rotation of the tangent vector.
+     * @param path the path
+     * @return the normal vector; null if the path's first component
+     *         is a closed path
+     * @exception IllegalArgumentException if the path did not start
+     *     with a {@link PathIterator#SEG_MOVETO} segment or if the
+     *     path had only {@link PathIterator#SEG_MOVETO} segments
+     *     before a {@link PathIterator#SEG_CLOSE} segment
+     */
+    public static double[] firstNormal(Path2D path)
+	throws IllegalArgumentException
+    {
+	double[] result = firstTangent(path);
+	if (result != null) {
+	    double tmp = result[0];
+	    result[0] = - result[1];
+	    result[1] = tmp;
+	}
+	return result;
+    }
+
+    /**
+     * Get the normal vector for the end of a path.
+     * The normal vector, if it exists and has a non-zero length,
+     * will have unit length.
+     * This vector is perpendicular to the tangent vector and
+     * is equal to a vector that results from a 90 degree
+     * counterclockwise rotation of the tangent vector.
+     * @param path the path
+     * @return the normal vector; null if the last component of the
+     *         path is a closed path
+     * @exception IllegalArgumentException if the path did not start
+     *     with a {@link PathIterator#SEG_MOVETO} segment, if the
+     *     path ends with a {@link PathIterator#SEG_MOVETO} segment,
+     *     or if the segment type is not recognized
+     */
+    public static double[] lastNormal(Path2D path) {
+	double[] result = lastTangent(path);
+	if (result != null) {
+	    double tmp = result[0];
+	    result[0] = - result[1];
+	    result[1] = tmp;
+	}
+	return result;
+    }
+}
 
 //  LocalWords:  exbundle af eacute zier href coords rOffset cOffset
 //  LocalWords:  SegmentData IllegalArgumentException argOutOfRange
@@ -6746,5 +6937,6 @@ public class Path2DInfo {
 //  LocalWords:  clastX clastY yx dA xydA yy momentsOf pmatrix zz
 //  LocalWords:  principalMoments signedArea xyMoment SurfaceOps
 //  LocalWords:  principalAxes numberOfSegments getPathIterator
-//  LocalWords:  isDone Drawable IllegalStateException
-//  LocalWords:  expectingMoveTo
+//  LocalWords:  isDone Drawable IllegalStateException badMoments
+//  LocalWords:  expectingMoveTo drawable missingSEGMOVETO
+//  LocalWords:  noSegsBeforeClose unknownSegmentType endingMOVETO
