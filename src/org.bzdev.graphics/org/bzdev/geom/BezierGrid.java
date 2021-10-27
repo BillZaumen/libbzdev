@@ -817,7 +817,7 @@ public class BezierGrid implements Shape3D {
     public BezierGrid(Path2D path, Point3DMapper<Point3D> mapper,
 		      int n, boolean uclosed)
     {
-	this(n, uclosed, Path2DInfo.numberOfDrawableSegments(path),
+	this(n, uclosed, Path2DInfo.numberOfDrawableKnots(path),
 	     Path2DInfo.isClosed(path));
 
 	PathIterator pi = path.getPathIterator(null);

@@ -1101,5 +1101,71 @@ public class Paths2DTest {
 	graph2.write("png", new File("Paths2DOffset2.png"));
 	graph3.write("png", new File("Paths2DOffset3.png"));
 
+
+	path = new Path2D.Double();
+	path.moveTo(10.0, 10.0);
+	path.lineTo(10.000000000001, 10.0);
+	path.curveTo(12.0, 12.0, 17.0, 17.0, 19.999999999999998, 20.0);
+	path.lineTo( 20.0, 20.0);
+	path.curveTo(25.0, 25.0, 27.0, 27.0,
+		     29.99999999999998, 29.9999999999997);
+	path.lineTo(30.0, 30.0);
+	path.quadTo(35.000000, 35.00000, 40.0, 39.99999999999998);
+	path.lineTo( 40.0, 39.99999999999999);
+	path.lineTo(40.0, 40.0);
+	path.lineTo(49.99999999998, 49.9999999999997);
+	path.lineTo(50.0, 50.0);
+
+	Path2D epath = new Path2D.Double();
+	epath.moveTo(10.0, 10.0);
+	epath.curveTo(12.0, 12.0, 17.0, 17.0, 20.0, 20.0);
+	epath.curveTo(25.0, 25.0, 27.0, 27.0, 30.0, 30.0);
+	epath.quadTo(35.000000, 35.00000, 40.0, 40.0);
+	epath.lineTo(50.0, 50.0);
+
+	System.out.println("original path");
+	Path2DInfo.printSegments(path);
+
+	path = Paths2D.pruneShortLineSegments(path);
+
+	double[] pcoords1 = new double[6];
+	double[] pcoords2 = new double[6];
+	PathIterator pit1 = path.getPathIterator(null);
+	PathIterator pit2 = epath.getPathIterator(null);
+	while (!pit1.isDone() && !pit2.isDone()) {
+	    int type1 = pit1.currentSegment(pcoords1);
+	    int type2 = pit2.currentSegment(pcoords2);
+	    if (type1 != type2) throw new Exception("type1 != type2");
+	    int max = 0;
+	    switch(type1) {
+	    case PathIterator.SEG_MOVETO:
+		max = 2;
+		break;
+	    case PathIterator.SEG_LINETO:
+		max = 2;
+		break;
+	    case PathIterator.SEG_QUADTO:
+		max = 4;
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		max = 6;
+		break;
+	    case PathIterator.SEG_CLOSE:
+		max = 0;
+		break;
+	    }
+	    for (int i = 0; i < max; i++) {
+		if (pcoords1[i] != pcoords2[i]) {
+		    throw new Exception("pcoords do not match");
+		}
+	    }
+	    pit1.next();
+	    pit2.next();
+	}
+	if (!pit1.isDone() || !pit2.isDone()) {
+	    throw new Exception("path has wrong number of segments");
+	}
+	System.out.println("pruned path");
+	Path2DInfo.printSegments(path);
     }
 }

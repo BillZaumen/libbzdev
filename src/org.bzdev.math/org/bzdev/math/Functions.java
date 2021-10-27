@@ -829,20 +829,20 @@ public class Functions {
 	    ArrayPair pair = null;
 	    double[] prev;
 	    double[] next;
-	    if (n < ALEN) {
-		synchronized(arrayPairPool) {
-		    pair = arrayPairPool.poll();
-		    if (pair == null) {
-			pair = new ArrayPair();
+	    try {
+		if (n < ALEN) {
+		    synchronized(arrayPairPool) {
+			pair = arrayPairPool.poll();
+			if (pair == null) {
+			    pair = new ArrayPair();
+			}
 		    }
 		    prev = pair.prev;
 		    next = pair.next;
+		} else {
+		    prev = new double[n+1];
+		    next = new double[n+1];
 		}
-	    } else {
-		prev = new double[n+1];
-		next = new double[n+1];
-	    }
-	    try {
 		System.arraycopy(beta, m, next, 0, n+1);
 		for (int j = 1; j <= n; j++) {
 		    double[] tmp = prev;
@@ -977,28 +977,31 @@ public class Functions {
 	    double[] prev = null;
 	    double[] next = null;
 
-	    if (n > 1) {
-		if (n < ALEN) {
-		    pair = arrayPairPool.poll();
-		    if (pair == null) {
-			pair = new ArrayPair();
+	    try {
+		if (n > 1) {
+		    if (n < ALEN) {
+			synchronized(arrayPairPool) {
+			    pair = arrayPairPool.poll();
+			    if (pair == null) {
+				pair = new ArrayPair();
+			    }
+			}
+			prev = pair.prev;
+			next = pair.next;
+		    } else {
+			prev = new double[n+1];
+			next = new double[n+1];
 		    }
-		    prev = pair.prev;
-		    next = pair.next;
-		} else {
-		    prev = new double[n+1];
-		    next = new double[n+1];
 		}
-	    }
 
-	    double x1 = 1.0 - x;
-	    if (n == 1) {
-		for (int i = 0; i < result.length; i++) {
-		    result[i] =  beta[i + m*result.length]*x1
-			+ beta[i + (m+1)*result.length]*x;
-		}
-	    } else {
-		try {
+		double x1 = 1.0 - x;
+		if (n == 1) {
+		    for (int i = 0; i < result.length; i++) {
+			result[i] =  beta[i + m*result.length]*x1
+			    + beta[i + (m+1)*result.length]*x;
+		    }
+		} else {
+
 		    for (int i = 0; i < result.length; i++) {
 			for (int j = 0; j < n+1; j++) {
 			    next[j] = beta[i + (m+j)*result.length];
@@ -1014,11 +1017,11 @@ public class Functions {
 			}
 			result[i] =  next[0];
 		    }
-		} finally {
-		    if (pair != null) {
-			synchronized(arrayPairPool) {
-			    arrayPairPool.add(pair);
-			}
+		}
+	    } finally {
+		if (pair != null) {
+		    synchronized(arrayPairPool) {
+			arrayPairPool.add(pair);
 		    }
 		}
 	    }
@@ -1079,28 +1082,30 @@ public class Functions {
 	    double[] prev = null;
 	    double[] next = null;
 
-	    if (n > 1) {
-		if (n < ALEN) {
-		    pair = arrayPairPool.poll();
-		    if (pair == null) {
-			pair = new ArrayPair();
+	    try {
+		if (n > 1) {
+		    if (n < ALEN) {
+			synchronized(arrayPairPool) {
+			    pair = arrayPairPool.poll();
+			    if (pair == null) {
+				pair = new ArrayPair();
+			    }
+			}
+			prev = pair.prev;
+			next = pair.next;
+		    } else {
+			prev = new double[n+1];
+			next = new double[n+1];
 		    }
-		    prev = pair.prev;
-		    next = pair.next;
-		} else {
-		    prev = new double[n+1];
-		    next = new double[n+1];
 		}
-	    }
 
-	    double x1 = 1.0 - x;
-	    if (n == 1) {
-		for (int i = 0; i < rlen; i++) {
-		    result[i+offset] =  beta[i + m*rlen]*x1
-			+ beta[i + (m+1)*rlen]*x;
-		}
-	    } else {
-		try {
+		double x1 = 1.0 - x;
+		if (n == 1) {
+		    for (int i = 0; i < rlen; i++) {
+			result[i+offset] =  beta[i + m*rlen]*x1
+			    + beta[i + (m+1)*rlen]*x;
+		    }
+		} else {
 		    for (int i = 0; i < rlen; i++) {
 			for (int j = 0; j < n+1; j++) {
 			    next[j] = beta[i + (m+j)*rlen];
@@ -1116,11 +1121,11 @@ public class Functions {
 			}
 			result[i+offset] =  next[0];
 		    }
-		} finally {
-		    if (pair != null) {
-			synchronized(arrayPairPool) {
-			    arrayPairPool.add(pair);
-			}
+		}
+	    } finally {
+		if (pair != null) {
+		    synchronized(arrayPairPool) {
+			arrayPairPool.add(pair);
 		    }
 		}
 	    }

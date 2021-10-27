@@ -5,6 +5,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.function.Predicate;
+import org.bzdev.lang.Callable;
 import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.math.VectorOps;
 
@@ -1017,7 +1018,13 @@ public class Paths2D {
 		    double yp = y1 + dt*ty1;
 		    Path2D result = new Path2D.Double();
 		    result.moveTo(x1, y1);
-		    result.lineTo(xp, yp);
+		    if (dt < Math.ulp((float)x1)
+			&& (dt < Math.ulp((float)y1))) {
+			xp = x1;
+			yp = y1;
+		    } else {
+			result.lineTo(xp, yp);
+		    }
 		    Path2D ptmp = createArc(xp, yp, tangent, 0, x2, y2,
 					    maxDelta);
 		    result.append(ptmp, true);
@@ -1025,9 +1032,16 @@ public class Paths2D {
 		} else {
 		    double xp = x2 - dt*tx1;
 		    double yp = y2 - dt*ty1;
-		    Path2D result = createArc(x1, y1, tangent, 0, xp, yp,
-					      maxDelta);
-		    result.lineTo(x2, y2);
+		    Path2D result;
+		    if (dt < Math.ulp((float)x2)
+			&& (dt < Math.ulp((float)y2))) {
+			result = createArc(x1, y1, tangent, 0, x2, y2,
+					   maxDelta);
+		    } else {
+			result = createArc(x1, y1, tangent, 0, xp, yp,
+					   maxDelta);
+			result.lineTo(x2, y2);
+		    }
 		    return result;
 		}
 	    }
@@ -1058,15 +1072,29 @@ public class Paths2D {
 	    } else if (d1 < d2) {
 		xp = xv + tx2*d1;
 		yp = yv + ty2*d1;
-		Path2D path = createArc(x1, y1, array, 0, xp, yp, maxDelta);
-		path.lineTo(x2, y2);
-		return path;
+		double dx = Math.abs(xp - x2);
+		double dy = Math.abs(yp - y2);
+		if (dx < Math.ulp((float)x2) && dy < Math.ulp((float)y2)) {
+		    Path2D path = createArc(x1, y1, array, 0, x2, y2, maxDelta);
+		    return path;
+		} else {
+		    Path2D path = createArc(x1, y1, array, 0, xp, yp, maxDelta);
+		    path.lineTo(x2, y2);
+		    return path;
+		}
 	    } else {
 		xp = xv - tx1*d2;
 		yp = yv - ty1*d2;
 		Path2D path = new Path2D.Double();
+		double dx = Math.abs(xp - x1);
+		double dy = Math.abs(yp - y1);
 		path.moveTo(x1, y1);
-		path.lineTo(xp, yp);
+		if (dx < Math.ulp((float)x1) && dy < Math.ulp((float)y1)) {
+		    xp = x1;
+		    yp = y1;
+		} else {
+		    path.lineTo(xp, yp);
+		}
 		Path2D path2 = createArc(xp, yp, array, 0, x2, y2, maxDelta);
 		path.append(path2, true);
 		return path;
@@ -1079,16 +1107,30 @@ public class Paths2D {
 		yp = yv + ty1*d2;
 		Path2D path = new Path2D.Double();
 		path.moveTo(x1, y1);
-		path.lineTo(xp, yp);
+		double dx = Math.abs(xp - x1);
+		double dy = Math.abs(yp - y1);
+		if (dx < Math.ulp((float)x1) && dy < Math.ulp((float)y1)) {
+		    xp = x1;
+		    yp = y1;
+		} else {
+		    path.lineTo(xp, yp);
+		}
 		Path2D path2 = createArc(xp, yp, array, 0, x2, y2, maxDelta);
 		path.append(path2, true);
 		return path;
 	    } else {
 		xp = xv - tx2*d1;
 		yp = yv - ty2*d1;
-		Path2D path = createArc(x1, y1, array, 0, xp, yp, maxDelta);
-		path.lineTo(x2, y2);
-		return path;
+		double dx = Math.abs(xp - x2);
+		double dy = Math.abs(yp - y2);
+		if (dx < Math.ulp((float)x2) && dy < Math.ulp((float)y2)) {
+		    Path2D path = createArc(x1, y1, array, 0, x2, y2, maxDelta);
+		    return path;
+		} else {
+		    Path2D path = createArc(x1, y1, array, 0, xp, yp, maxDelta);
+		    path.lineTo(x2, y2);
+		    return path;
+		}
 	    }
 	} else /* (u > 0 && v > 0) || (u < 0 && v < 0) */ {
 	    throw new IllegalArgumentException(errorMsg("noArcPossible"));
@@ -3465,6 +3507,147 @@ public class Paths2D {
 	if (closed) result3.closePath();
 	return result3;
     }
+
+    /**
+     * Remove straight line segments whose length is 0 to single-precision
+     * accuracy.
+     * <P>
+     * This method is provided to eliminate extremely short line
+     * segments that might be added inadvertently such as when one
+     * path is appended to the other and where the end of the first
+     * path and the start of the next path differ by a very small
+     * amount due to round-off errors.  The {@link BezierGrid} class
+     * in particular will fail to produce a boundary if adjacent grid
+     * points are identical to within single-precision accuracy, and a
+     * {@link Path2D} is an argument for the constructor
+     * {@link BezierGrid#BezierGrid(Path2D,Point3DMapper,int,boolean)}.
+     * While such short segments can be eliminated as a path is generated,
+     * it may be easier to fix it up afterwards.
+     * @param path the initial path
+     * @return the modified path if changed; otherwise the initial path
+     */
+    public static Path2D pruneShortLineSegments(Path2D path) {
+	PathIterator pi = path.getPathIterator(null);
+	double[] coords = new double[6];
+	final double[] lastCoords = new double[6];
+	Callable call = null;
+	int offset = 0;
+	double lastX = 0.0, lastY = 0.0;
+	double prevX = 0.0, prevY = 0.0;
+	double x, y, dx, dy;
+	boolean prune = false;
+	while (!pi.isDone()) {
+	    switch (pi.currentSegment(coords)) {
+	    case PathIterator.SEG_MOVETO:
+		lastX = coords[0];
+		lastY = coords[1];
+		prevX = lastX;
+		prevY = lastY;
+		break;
+	    case PathIterator.SEG_LINETO:
+		x = coords[0];
+		y = coords[1];
+		dx = Math.abs(x - lastX);
+		dy = Math.abs(y - lastY);
+		double mx = Math.max(Math.abs(x), Math.abs(lastX));
+		double my = Math.max(Math.abs(y), Math.abs(lastY));
+		if (dx <= Math.ulp((float)mx) && dy <= Math.ulp(my)) {
+		    prune = true;
+		}
+		lastX = coords[0];
+		lastY = coords[1];
+		break;
+	    case PathIterator.SEG_QUADTO:
+		lastX = coords[2];
+		lastY = coords[3];
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		lastX = coords[4];
+		lastY = coords[5];
+		break;
+	    case PathIterator.SEG_CLOSE:
+		lastX = prevX;
+		lastY = prevY;
+	    }
+	    pi.next();
+	}
+	if (prune) {
+	    pi = path.getPathIterator(null);
+	    Path2D npath = new Path2D.Double();
+	    while (!pi.isDone()) {
+		switch (pi.currentSegment(coords)) {
+		case PathIterator.SEG_MOVETO:
+		    lastX = coords[0];
+		    lastY = coords[1];
+		    prevX = lastX;
+		    prevY = lastY;
+		    if (call != null) call.call();
+		    call = null;
+		    npath.moveTo(lastX, lastY);
+		    break;
+		case PathIterator.SEG_LINETO:
+		    x = coords[0];
+		    y = coords[1];
+		    dx = Math.abs(x - lastX);
+		    dy = Math.abs(y - lastY);
+		    double mx = Math.max(Math.abs(x), Math.abs(lastX));
+		    double my = Math.max(Math.abs(y), Math.abs(lastY));
+		    if (dx <= Math.ulp((float)mx)
+			&& dy <= Math.ulp((float)my)) {
+			if (call != null) {
+			    lastCoords[offset] = coords[0];
+			    lastCoords[offset+1] = coords[1];
+			}
+			break;
+		    }
+		    if (call != null) call.call();
+		    lastX = coords[0];
+		    lastY = coords[1];
+		    System.arraycopy(coords, 0, lastCoords, 0, 2);
+		    offset = 0;
+		    call = () -> {
+			npath.lineTo(lastCoords[0], lastCoords[1]);
+		    };
+		    break;
+		case PathIterator.SEG_QUADTO:
+		    if (call != null) call.call();
+		    lastX = coords[2];
+		    lastY = coords[3];
+		    System.arraycopy(coords, 0, lastCoords, 0, 4);
+		    offset = 2;
+		    call = () -> {
+			npath.quadTo(lastCoords[0], lastCoords[1],
+				     lastCoords[2], lastCoords[3]);
+		    };
+		    break;
+		case PathIterator.SEG_CUBICTO:
+		    if (call != null) call.call();
+		    lastX = coords[4];
+		    lastY = coords[5];
+		    System.arraycopy(coords, 0, lastCoords, 0, 6);
+		    offset = 4;
+		    call = () -> {
+			npath.curveTo(lastCoords[0], lastCoords[1],
+				      lastCoords[2], lastCoords[3],
+				      lastCoords[4], lastCoords[5]);
+		    };
+		    break;
+		case PathIterator.SEG_CLOSE:
+		    if (call != null) call.call();
+		    lastX = prevX;
+		    lastY = prevY;
+		    offset = 0;
+		    call = () -> {
+			npath.closePath();
+		    };
+		}
+		pi.next();
+	    }
+	    if (call != null) call.call();
+	    path = npath;
+	}
+	return path;
+    }
 }
 
 //  LocalWords:  exbundle xc yc Bezier Aleksas Riskus Giedrfia Liekus
@@ -3476,4 +3659,4 @@ public class Paths2D {
 //  LocalWords:  noArcPossible createArc spath counterClockwise SEG
 //  LocalWords:  affine PathIterator MOVETO offsetted lessThanZero
 //  LocalWords:  offsetBy ccw isin maxdelta subpaths PathSplitter
-//  LocalWords:  subpath misplacedMoveTo closePath
+//  LocalWords:  subpath misplacedMoveTo closePath BezierGrid DMapper

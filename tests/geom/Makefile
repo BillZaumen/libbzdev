@@ -165,6 +165,12 @@ all:
 	@echo ------- BezierBox -----------
 	@$(JAVA) BezierBox
 	@$(JAVA) BezierBox2
+	@echo ---- Cylinder ------
+	@$(JAVA) CylinderTest
+	@echo ---- Cylinder2 ------
+	@$(JAVA) CylinderTest2
+	@echo ---- Carafe ----
+	@$(JAVA) Carafe
 
 affine:
 	(cd ../.. ; make jars)
@@ -719,7 +725,7 @@ surface2:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	$(JAVA) Surface3DTest2
+	$(JAVA) -Xmx1G -Xmn500M Surface3DTest2
 
 surface3:
 	(cd ../.. ; make jars)
@@ -848,6 +854,24 @@ condtest:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@$(JAVA) CondTest
+
+carafe:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) Carafe
+
+cylinder:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) CylinderTest
+
+cylinder2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) CylinderTest2
 
 twocylinders:
 	(cd ../.. ; make jars)

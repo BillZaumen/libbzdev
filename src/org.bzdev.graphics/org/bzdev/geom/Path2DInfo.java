@@ -6698,6 +6698,73 @@ public class Path2DInfo {
 	return count;
     }
 
+    /**
+     * Count the number of knots in the  first continuous portion of a
+     * path that are Drawable.
+     * Knots are defined as those control points that are not
+     * intermediate control points.  For a closed path, if the end of
+     * the preceding segment is the point corresponding to the last
+     * PathIterator.SEG_MOVETO, that point is ignored.
+     * The test ignores any segments after a second PathIterator.SEG_MOVE
+     * or a first PathIterator.SEG_CLOSE.  If the last point is the segment
+     * preceding a PathIterator.SEG_CLOSE segment is equal to t he
+     * initial segment (whose type is first PathIterator.SEG_MOVETO),
+     * the terminating PathIterator.SEG_CLOSE segment is not included in
+     * the count.
+     * @param path the path
+     * @return the number of drawable segments
+     * @throws IllegalStateException if the path does not start with a
+     *         segment whose type is PathIterator.SEG_MOVE.
+     */
+    public static int numberOfDrawableKnots(Path2D path) {
+	double[] tmp = new double[6];
+	PathIterator pi = path.getPathIterator(null);
+	int count = 1;
+	double startx = 0.0, starty = 0.0;
+	double lastx = 0.0, lasty = 0.0;
+	if (!pi.isDone()) {
+	    // count++;
+	    if (pi.currentSegment(tmp) == PathIterator.SEG_MOVETO) {
+		lastx = tmp[0]; lasty = tmp[1];
+		startx = lastx; starty = lasty;
+	    } else {
+		throw new IllegalStateException(errorMsg("expectingMoveTo"));
+	    }
+	    pi.next();
+	}
+	while (!pi.isDone()) {
+	    switch(pi.currentSegment(tmp)) {
+	    case PathIterator.SEG_MOVETO:
+		lastx = tmp[0];
+		lasty = tmp[1];
+		return count;
+	    case PathIterator.SEG_LINETO:
+		lastx = tmp[0];
+		lasty = tmp[1];
+		break;
+	    case PathIterator.SEG_QUADTO:
+		lastx = tmp[2];
+		lasty = tmp[3];
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		lastx = tmp[4];
+		lasty = tmp[5];
+		break;
+	    case PathIterator.SEG_CLOSE:
+		startx = (double)(float)startx;
+		starty = (double)(float)starty;
+		lastx = (double)(float)lastx;
+		lasty = (double)(float)lasty;
+		if (lastx == startx && lasty == starty) count--;
+		return count;
+	    }
+	    count++;
+	    pi.next();
+	}
+	return count;
+    }
+
+
     static double[] tmp = new double[6];
     /**
      * Determine if the first continuous portion of a path is closed.
