@@ -67,7 +67,8 @@ public class GaussianDistr extends ProbDistribution {
      * @return the probability density
      */
     public static double pd(double x, double mu, double sigma) {
-	return Math.exp(-x*x/(2.0*sigma*sigma))/(ROOT_2PI*sigma);
+	double xx = (x - mu)/sigma;
+	return Math.exp(-xx*xx/2.0)/(ROOT_2PI*sigma);
     }
 
 

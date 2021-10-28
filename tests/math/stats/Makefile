@@ -23,6 +23,12 @@ all:
 	@echo ---------- FTest -----------
 	@$(JAVA) FTest
 
+gauss:
+	(cd ../../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../../BUILD/libbzdev.jar *.java
+	@$(JAVA) GaussianTest
+
 cov:
 	(cd ../../.. ; make jars)
 	mkdir -p classes

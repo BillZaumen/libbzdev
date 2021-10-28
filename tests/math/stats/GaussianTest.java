@@ -52,6 +52,11 @@ public class GaussianTest {
 	    }
 	}
 
+	if (Math.abs(GaussianDistr.pd(1.0, 1.0, 2.0) - 0.19947114020071633897)
+	    > 1.e-12) throw new Exception();
+	if (Math.abs(GaussianDistr.pd(0.0, 1.0, 2.0) - 0.1760326633821497388873)
+	    > 1.e-12) throw new Exception();
+
 	GaussianDistr gd = new GaussianDistr(1.0, 2.0);
 	for (int i = 0; i < 20; i++) {
 	    double x = i/10.0;
