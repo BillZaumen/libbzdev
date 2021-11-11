@@ -821,6 +821,8 @@ DIAGRAMS = $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/anim2d.png \
 	$(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/gevents.png \
 	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/geom.png \
 	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/pathbuilder.png \
+	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/barycentric.png \
+	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/planar.png \
 	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/basicbuilder.png \
 	$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/bgsphere.png \
 	$(GRAPHICS_DIR)/org/bzdev/gio/doc-files/gio.png \
@@ -938,6 +940,22 @@ $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/pathbuilder.png: \
 		diagrams/geom/pathbuilder.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
 	dia -s 700x -e $@ $<
+
+BARYCENTRIC=$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/barycentric.png
+PLANAR=$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/planar.png
+
+$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/barycentric.png: \
+		diagrams/geom/barycentric.svg
+	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
+	inkscape -w 329 --export-filename=$(BARYCENTRIC) \
+		diagrams/geom/barycentric.svg
+
+$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/planar.png: \
+		diagrams/geom/planar.svg
+	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
+	inkscape -w 127 --export-filename=$(PLANAR) \
+		diagrams/geom/planar.svg
+
 
 $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/basicbuilder.png: \
 		diagrams/geom/basicbuilder.dia

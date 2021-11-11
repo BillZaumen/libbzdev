@@ -4,6 +4,16 @@ package org.bzdev.net;
  * Operations for managing an  HTTP session.
  * The type parameter T is the type of the session implementation
  * and can be used to reference an application-specific data structure.
+ * Each session is represented by a string that provides a session ID.
+ * <P>
+ * For the class {@link org.bzdev.ejws.EmbeddedWebServer}, the method
+ * {@link org.bzdev.ejws.EmbeddedWebServer#addSessionFilter(String,HttpSessionOps)}
+ * must be called to install an instance of this class and that method
+ * will pass its {@link HttpSessionOps} to
+ * {@link org.bzdev.ejws.EjwsSession}'s constructor. Application-specific
+ * code will typically have reference to this class but will just use the
+ * {@link HttpSessionOps#contains(String)} or
+ * {@link HttpSessionOps#get(String)} methods.
  * @see org.bzdev.ejws.EjwsSession
  */
 public interface HttpSessionOps<T> {

@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="600" height="600">
+    <imageURI>-</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="triangle" type="PATH_START"   />
+       <row type="MOVE_TO" x="300.0" y="500.0" xp="300.0" yp="100.0"/>
+       <row type="SEG_END" x="150.00000000000006" y="240.1923788646684" xp="150.00000000000006" yp="359.8076211353316"/>
+       <row type="SEG_END" x="450.00000000000006" y="240.1923788646684" xp="450.00000000000006" yp="359.8076211353316"/>
+       <row type="SEG_END" x="300.0000000000001" y="500.0" xp="300.0000000000001" yp="100.0"/>
+       <row type="CLOSE"/>
+       <row type="PATH_END"/>
+       <row varname="line1" type="PATH_START"   />
+       <row type="MOVE_TO" x="250.0" y="413.39746" xp="250.0" yp="186.60253999999998"/>
+       <row type="SEG_END" x="350.0" y="413.39746" xp="350.0" yp="186.60253999999998"/>
+       <row type="SEG_END" x="300.0" y="326.7949196215561" xp="300.0" yp="273.2050803784439"/>
+       <row type="SEG_END" x="400.0" y="326.7949196215561" xp="400.0" yp="273.2050803784439"/>
+       <row type="SEG_END" x="350.0" y="240.19237924311224" xp="350.0" yp="359.8076207568878"/>
+       <row type="SEG_END" x="300.0" y="326.7949196215561" xp="300.0" yp="273.2050803784439"/>
+       <row type="SEG_END" x="250.00000000000003" y="240.19237924311224" xp="250.00000000000003" yp="359.8076207568878"/>
+       <row type="SEG_END" x="200.00000000000006" y="326.7949196215561" xp="200.00000000000006" yp="273.2050803784439"/>
+       <row type="SEG_END" x="300.00000000000006" y="326.7949196215561" xp="300.00000000000006" yp="273.2050803784439"/>
+       <row type="SEG_END" x="250.00000000000009" y="413.39746" xp="250.00000000000009" yp="186.60253999999998"/>
+       <row type="CLOSE"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

@@ -127,10 +127,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *   <LI> 48 when the return value is {@link SurfaceIterator#CUBIC_PATCH}.
      *   <LI> 30 when the return value is
      *        {@link SurfaceIterator#CUBIC_TRIANGLE}.
-     *   <LI> {15 when the return value is {@link SurfaceIterator#CUBIC_VERTEX}.
+     *   <LI> 15 when the return value is {@link SurfaceIterator#CUBIC_VERTEX}.
      *   <LI> 12 when the return value is
      *        {@link SurfaceIterator#PLANAR_TRIANGLE}.
-     * <UL>
+     * </UL>
      * In general, the array's length should be at least 48.
      * The format for the array is described in the documentation for
      * <P>
@@ -959,7 +959,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	 *          <LI> edge 0 is the edge from vertex 1 to vertex 2
 	 *          <LI> edge 1 is the edge from vertex 2 to vertex 3
 	 *          <LI> edge 2 is the edge from vertex 3 to vertex 1
-	 *       <UL>
+	 *       </UL>
 	 *   <LI> For a cubic triangle, described in (u,v) coordinates
 	 *        where the barycentric coordinates are (u, v, w) with
 	 *        w = 1 - u - v,
@@ -967,14 +967,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	 *          <LI> edge 0 is the edge from (0, 0) to (1, 0)
 	 *          <LI> edge 1 is the edge from (1, 0) to (0, 1)
 	 *          <LI> edge 2 is the edge from (0, 1) to (0,0)
-	 *       <UL>
+	 *       </UL>
 	 *   <LI> For a cubic patch, described in (u,v) coordinates
 	 *       <UL>
 	 *          <LI> edge 0 is the edge from (0, 0) to (1, 0)
 	 *          <LI> edge 1 is the edge from (1, 0) to (1, 1)
 	 *          <LI> edge 2 is the edge from (1, 1) to (0, 1)
 	 *          <LI> edge 3 is the edge from (0, 1) to (0, 0)
-	 *       <UL>
+	 *       </UL>
 	 * </UL>
 	 * @return the edge numbers for the surface segments adjacent to the
 	 *         path segments along the boundary; null if the 3D shape
@@ -6550,7 +6550,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6602,7 +6602,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6660,7 +6660,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6713,7 +6713,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6771,7 +6771,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6824,7 +6824,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6884,7 +6884,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * The orientation of the patch is determined by the right-hand
      * rule when traversing the edges of the patch so that the (u,v)
@@ -6937,7 +6937,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
      * <blockquote><pre><big>
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre><blockquote>
+     * </big></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * The orientation of the patch is determined by the right-hand
      * rule when traversing the edges of the patch so that the (u,v)
@@ -7029,8 +7029,8 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * (1, 0, 0) to (0, 1, 0). The corresponding edges satisfy the
      * constraints v = 0 and w = 0.  To continue from (0,1,0) back to
      * (0, 0, 1), the u=0 edge is traversed in the opposite direction.
-     * The  the normal vector at the vertices is the normalized cross
-     * product of tangent vectors at these vertices.
+     * The normal vector at the vertices is the normalized cross
+     * product of tangent vectors at these vertices:
      * <UL>
      *   <LI> For the (0,0,1) vertex, one computes the cross product
      *        of the tangent for the v=0 edge with the tangent for
@@ -7042,6 +7042,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7056,33 +7057,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * operation, is used as the start of the next.
      * <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
      * specified by the 'reverse' argument (P0 to P3 when 'reverse'
@@ -7160,6 +7137,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7170,33 +7148,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * true, the first control point will match (0,1).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when reverse
@@ -7281,6 +7235,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7291,33 +7246,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * true, the first control point will match (0,1).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
@@ -7407,6 +7338,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7420,33 +7352,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * end of the last segment, or coordinates specified by a SEG_MOVETO
      * operation, is used as the start of the next.
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
      * specified by the 'reverse' argument (P0 to P3 when 'reverse' is false
@@ -7523,6 +7431,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7533,33 +7442,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * true, the first control point will match (1,0).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
@@ -7644,6 +7529,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7654,33 +7540,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * true, the first control point will match (1,0).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
@@ -7770,6 +7632,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7783,33 +7646,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * end of the last segment, or coordinates specified by a SEG_MOVETO
      * operation, is used as the start of the next.
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
      * specified by the 'reverse' argument (P0 to P3 when 'reverse' is
@@ -7896,6 +7735,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -7906,33 +7746,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * is true, the first control point will match (0,1).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when
@@ -8018,6 +7834,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *        of the tangent for the u=0 edge with the tangent for
      *        the w=0 edge.
      * </UL>
+     * <P>
      * After the cross products are computed, the resulting vector
      * is normalized. In each case the tangent vector is the
      * difference between an adjacent control point and the control
@@ -8028,33 +7845,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * is true, the first control point will match (0,1).
      <P>
      * Given the following diagram:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
      * argument (P0 to P3 when 'reverse' is false and P3 to P0 when 'reverse'
@@ -8269,33 +8062,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * The control points, labeled by their three indices, are located
      * as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \ 
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     * 
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
      * ending with the edge (0,0)--&gt;(0,1), where the ordered pairs
@@ -8353,33 +8122,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8439,33 +8184,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * The control points, labeled by their three indices, are located
      * as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
      * ending with the edge (0,0)--&gt;(0,1), where the ordered pairs
@@ -8525,33 +8246,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8612,32 +8309,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * The control points, labeled by their three indices, are located
      * as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
      * ending with the edge (0,0)--&gt;(0,1), where the ordered pairs
@@ -8696,33 +8370,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     *
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8784,32 +8434,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * The control points, labeled by their three indices, are located
      * as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, when traversing the vertices whose (u,v)
      * values are (0,0), (1,0), and (0,1) in that order. More
@@ -8866,32 +8493,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Before the orientation is reversed, the control points,
      * labeled by their three indices, are located as follows:
-     * <blockquote>
-     * <pre>
-     *                  (0,1)
-     *                   030
-     *                    *
-     *                   / \
-     *                  /   \
-     *                 /     \
-     *                /       \
-     *           021 *---------* 120
-     *              / \       / \
-     *    [u = 0]  /   \     /   \  [w = 0]
-     *   (v axis) /     \   /     \
-     *           /    111\ /       \
-     *      012 *---------*---------* 210
-     *         / \       / \       / \
-     *        /   \     /   \     /   \
-     *       /     \   /     \   /     \
-     *      /       \ /       \ /       \
-     *     *---------*---------*---------*
-     *    003       102       201       300
-     *  (0,0)                          (1,0)
-     *                 [v = 0]
-     *                 (u axis)
-     * </pre>
-     * </blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/barycentric.png">
+     * <P>
      * The orientation of the triangle, again before the orientation
      * is reversed, is determined by applying the right-hand rule,
      * when traversing the vertices whose (u,v) values are (0,0),
@@ -8953,19 +8557,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -8986,9 +8580,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * As a result, applying the right hand rule using the ordering of the
-     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sup>3</sub> yields
+     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sub>3</sub> yields
      * an orientation opposite to that of the triangle.
      * It is not the same as the ordering used for
      * It is not the same as the ordering used for
@@ -9009,19 +8604,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9042,6 +8627,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * For a flipped triangle, the order of the control points determines
      * the orientation using the right hand rule for traversing
@@ -9067,19 +8653,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9100,9 +8676,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * As a result, applying the right hand rule using the ordering of the
-     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sup>3</sub> yields
+     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sub>3</sub> yields
      * an orientation opposite to that of the triangle.
      * It is not the same as the ordering used for
      * {@link #addPlanarTriangle(double,double,double,double,double,double,double,double,double,Color)}.
@@ -9123,19 +8700,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9156,12 +8723,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * It is not the same as the ordering used for
      * {@link #addPlanarTriangle(double,double,double,double,double,double,double,double,double,Color)}.
      * For a flipped triangle, the order of the control points determines
      * the orientation using the right hand rule for traversing
-     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2.
+     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>.
      * <P>
      * For a flipped and non-flipped triangle created using the same
      * arguments, a point on the surface at coordinates (v,u,w) for the
@@ -9182,19 +8750,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9215,9 +8773,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * As a result, applying the right hand rule using the ordering of the
-     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sup>3</sub> yields
+     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sub>3</sub> yields
      * an orientation opposite to that of the triangle.
      * It is not the same as the ordering used for
      * It is not the same as the ordering used for
@@ -9239,19 +8798,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9272,10 +8821,11 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * For a flipped triangle, the order of the control points determines
      * the orientation using the right hand rule for traversing
-     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2.
+     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>.
      * <P>
      * For a flipped and non-flipped triangle created using the same
      * arguments, a point on the surface at coordinates (v,u,w) for the
@@ -9297,19 +8847,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9330,9 +8870,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *      the X, Y and Z coordinates respectively for the second
      *      vertex.
      * </UL>
+     * <P>
      * This order matches the ordering used for a cubic Bezier triangle.
      * As a result, applying the right hand rule using the ordering of the
-     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sup>3</sub> yields
+     * control points (v<sub>1</sub> to v<sub>3</sub> to v<sub>3</sub> yields
      * an orientation opposite to that of the triangle.
      * It is not the same as the ordering used for
      * {@link #addPlanarTriangle(double,double,double,double,double,double,double,double,double,Color,Object)}.
@@ -9354,19 +8895,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v).  All three coordinates are
@@ -9389,7 +8920,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * For a flipped triangle, the order of the control points determines
      * the orientation using the right hand rule for traversing
-     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2.
+     * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>.
      * <P>
      * For a flipped and non-flipped triangle created using the same
      * arguments, a point on the surface at coordinates (v,u,w) for the
@@ -9412,24 +8943,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * <P>
      * The orientation of the triangle is that given by the right hand rule
      * when traversing the triangle from v<sub>1</sub> to v<sub>2</sub> to
@@ -9462,24 +8983,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * orientation is reversed, in order to be consistent with the
      * representation used in the org.bzdev.p3d package (which is based
      * on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * For a flipped triangle the orientation is given by using the
      * right hand rule when traversing the vertices from
      * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>, the opposite of a
@@ -9517,24 +9028,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * <P>
      * The orientation of the triangle is that given by the right hand rule
      * when traversing the triangle from v<sub>1</sub> to v<sub>2</sub> to
@@ -9571,24 +9072,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * outward direction in order to be consistent with the
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * For a flipped triangle the orientation is given by using the
      * right hand rule when traversing the vertices from
      * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>, the opposite of a
@@ -9628,24 +9119,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * <P>
      * The orientation of the triangle is that given by the right hand rule
      * when traversing the triangle from v<sub>1</sub> to v<sub>2</sub> to
@@ -9683,24 +9164,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * outward direction in order to be consistent with the
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * For a flipped triangle the orientation is given by using the
      * right hand rule when traversing the vertices from
      * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>, the opposite of a
@@ -9740,24 +9211,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * hand rule indicates an outward direction in order to be consistent
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * The orientation of the triangle is that given by the right hand rule
      * when traversing the triangle from v<sub>1</sub> to v<sub>2</sub> to
      * v<sub>3</sub>, which is the same order as the arguments. This differs
@@ -9806,24 +9267,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * outward direction in order to be consistent with the
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
-     * <blockquote><pre>
-     *
-     *              * v<sub>3</sub>
-     *             / \
-     *            /   \
-     *  v axis   /     \  [w = 0]
-     *  [u = 0] /       \
-     *         /         \
-     *     v<sub>1</sub> *-----------* v<sub>2</sub>
-     *          u axis
-     *          [v = 0]
-
-     * </pre></blockquote>
+     * <P style="text-align:center">
+     * <IMG SRC="doc-files/planar.png">
+     * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
      * we will use u and v and set w = 1 - (u + v). All three coordinates are
      * restricted to the range [0,1]. In barycentric coordinates, a point
-     * p will be located at p = wv<sub>1<sub> +uv<sub>3</sub> + vv<sub>2</sub>.
+     * p will be located at p = wv<sub>1</sub> +uv<sub>3</sub> + vv<sub>2</sub>.
      * For a flipped triangle the orientation is given by using the
      * right hand rule when traversing the vertices from
      * v<sub>1</sub> to v<sub>3</sub> to v<sub>2</sub>, the opposite of a
@@ -12328,9 +11779,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.
@@ -12381,9 +11832,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.
@@ -12431,9 +11882,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.
@@ -12484,9 +11935,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.
@@ -12537,9 +11988,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.
@@ -12598,9 +12049,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
-     *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
-     *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
+     *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
+     * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
+     *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
      * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
      * are over the volume of the shape and v is the volume of the shape.

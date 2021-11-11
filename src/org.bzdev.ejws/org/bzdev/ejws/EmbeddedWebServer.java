@@ -275,12 +275,12 @@ public class EmbeddedWebServer {
 
     /**
      * Configure an HTTPS server.
-     * This interface is provided because the constructors for
-     * {@link EmbeddedWebServer} the underlying
-     * {@link HttpServer} is not returned by an {@link EmbeddedWebServer}
-     * method. The constructors will create an {@link HttpsConfigurator}
-     * and this interface can be used to implement its
-     * {@link HttpsConfigurator#configure(HttpsParameters)} method.
+     * This interface is provided because {@link EmbeddedWebServer},
+     * when configured for HTTPS, does not provide direct access to
+     * its {@link HttpsServer}, but will create an
+     * {@link HttpsConfigurator} and this interface can be used to
+     * implement its {@link HttpsConfigurator#configure(HttpsParameters)}
+     * method.
      */
     @FunctionalInterface
     public static interface Configurator {
@@ -449,6 +449,8 @@ public class EmbeddedWebServer {
 			public void configure(HttpsParameters params) {
 			    if (conf != null) {
 				conf.configure(sslContext, params);
+			    } else {
+				super.configure(params);
 			    }
 			}
 		};

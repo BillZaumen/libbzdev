@@ -95,7 +95,13 @@ public class EjwsSession {
 
     /**
      * Set the maximum time interval over which a session can be
-     * inactive
+     * inactive.
+     * <P>
+     * This method is called by
+     * {@link org.bzdev.net.HttpServerRequest#setMaxInactiveInterval(int)}
+     * and {@link WebMap.RequestInfo#setMaxInactiveInterval(int)}:
+     * instances of {@link EjwsSession} are normally not visible
+     * outside of this package.
      * @param value the time interval in seconds
      */
     public void setMaxInactiveInterval(int value) {

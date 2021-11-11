@@ -226,6 +226,15 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     /**
      * Image for a 3D model.
+     * While the p3d package can create images of 3D models, these
+     * images are intended primarily for debugging.  For example, it
+     * can show the interior of a surface in a different color than the
+     * exterior, which is useful in finding errors in a model.  For
+     * high quality images, one should consider creating an STL or
+     * X3D file and importing it into programs designed to display
+     * 3D models&mdash;these can take advantage of graphics processors.
+     * and will produce more realistic images.
+     * <P>
      * The constructors are the same as those for the BufferedImage class,
      * with there additional constructors that can use a
      * {@link org.bzdev.graphs.GraphCreator},
@@ -262,7 +271,6 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * {@link Image#write(String, FileAccessor)},
      * {@link Image#write(String, OutputStream)}, or
      * {@link Image#write()}.
-
      * @see java.awt.image.BufferedImage
      * @see org.bzdev.graphs.Graph
      * @see org.bzdev.gio.OSGraphicsOps
@@ -3419,7 +3427,15 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * {@link #setULPFactor(double)} to coalesce nearby floating-point
      * values.
      * <P>
-     * The initial tessellation level is 0.
+     * The initial tessellation level is 0. Checking if a model is
+     * printable, well-formed, etc., can take significantly longer
+     * if the level is set to values larger than 0.  In cases where
+     * the time is excessive, one may want to check the model before
+     * calling this method.  Similar considerations apply to generating
+     * images of a model using methods provided by this class. An
+     * alternative for high resolution images is to create an STL or X3D
+     * file and then use applications that make use of a computer's
+     * GPU to improve the performance.
      * @param level the tessellation level
      */
     public void setTessellationLevel(int level) {

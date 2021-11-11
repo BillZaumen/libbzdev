@@ -235,7 +235,8 @@ public class CloseWaitService {
      * 0, but the IP address may be a wildcard address. Multiple wildcard
      * addresses can be provided, each for a different port (duplicates
      * will be ignored).
-     * @param timeout the timeout in seconds
+     * @param timeout the timeout in seconds for how long a socket can be
+              in a CLOSE-WAIT state
      * @param interval the interval at which the network state is
      *        polled, expressed in units of seconds
      * @param saddr the socket address to monitor

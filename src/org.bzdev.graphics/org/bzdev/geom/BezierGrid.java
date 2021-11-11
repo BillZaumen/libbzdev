@@ -65,14 +65,17 @@ import java.io.IOException;
  * {@link BezierGrid#createConnectionsTo(BezierGrid,boolean,int...)},
  * {@link BezierGrid#createConnectionsTo(BezierGrid,int,boolean,int...)}, and
  * {@link BezierGrid#createConnectionsTo(BezierGrid,int,boolean,boolean,int...)}
- * have a precondition: except when a loop is being closed, multiple
+ * have a precondition: except when a loop is being closed (that is, the
+ * intermediate control points differ from the grid points), multiple
  * points on a grid must not have the same values. For cases where it
  * is convenient to create grids in which multiple points have the
  * same values, one may be able to use the method
  * {@link BezierGrid#subgrid(int,int,int,int)} to create a suitable
- * grid.
+ * grid.  This is useful in some unusual cases such as creating a M&ouml;bius
+ * strip where to get a closed curve, the surface has to be traversed twice,
+ * and a subgrid will produce a shape that is closed.
  * <P>
- * The grid has two dimensions, with indices (i,j). For an element
+ * A grid has two dimensions, with indices (i,j). For an element
  * at  indices (i, j), the end points for each edge of the patch
  * are shown in the following table.
  * <BLOCKQUOTE>
@@ -809,6 +812,15 @@ public class BezierGrid implements Shape3D {
      * repeated with the index indicating the position along the U direction.
      * The resulting grid will generate splines along the U direction but will
      * not alter the splines in the V direction.
+     * <P>
+     * If mapper makes the 2D path's Y coordinate the Z coordinate and
+     * treats the 2D path's X coordinate (or a non-negative function
+     * of that coordinate) as a radius, if the 2D path's shape is such
+     * that traversing this path (when closed) is counterclockwise,
+     * and if increasing the mapper's index results in a
+     * counterclockwise rotation about the Z axis, then the surface's
+     * orientation will be correct. Othewise the surface willhave to
+     * be flipped.
      * @param path the path
      * @param mapper the object that maps 2D points to 3D points
      * @param n the number of points along the U axis.

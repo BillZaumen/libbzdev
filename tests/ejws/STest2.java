@@ -1,8 +1,10 @@
 import org.bzdev.ejws.*;
 import org.bzdev.ejws.maps.*;
+import org.bzdev.net.CloseWaitService;
 import org.bzdev.util.ErrorMessage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.*;
 
 // See https://gist.github.com/wsargent/11062032
 // for how to generate a certificate authority using keytool.
@@ -22,13 +24,18 @@ import java.io.FileInputStream;
 public class STest2 {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
+	InetSocketAddress saddr = new InetSocketAddress("localhost", 8080);
 	EmbeddedWebServer ews = new
-	    EmbeddedWebServer(8080, 48, 10, (new EmbeddedWebServer.SSLSetup())
+	    EmbeddedWebServer(saddr.getAddress(),
+			      8080, 48, 10, (new EmbeddedWebServer.SSLSetup())
 			      .keystore(new FileInputStream("thelio-ks.jks"))
 			      .truststore(new FileInputStream
 					  ("thelio-ts.jks")));
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,
 		true, true, true);
+
+	CloseWaitService cws = new CloseWaitService(120, 30, saddr);
+	cws.start();
 	ews.start();
     }
 }

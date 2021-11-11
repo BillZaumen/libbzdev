@@ -1390,7 +1390,8 @@ public class ScriptingContext {
      * Subclasses providing a scripting environment must override this
      * method.  It will typically be called once, but could be called
      * multiple times, so the method must be idempotent in case it is
-     * called multiple times.
+     * called multiple times. It will not be called by this class if
+     * the constructor provided a parent.
      * @return the script engine for this scripting context; null if
      *         there is none
      */
@@ -1447,7 +1448,8 @@ public class ScriptingContext {
      * Get the default script bindings.
      * Subclasses providing a scripting environment must override this
      * method.  It will typically be called once, but could be called
-     * multiple times, so the method must be idempotent.
+     * multiple times, so the method must be idempotent. It will not
+     * be called by this class if the constructor provided a parent.
      * @return the default bindings for this scripting context; null if
      *         there are none
      */
@@ -1473,7 +1475,8 @@ public class ScriptingContext {
      * Get the scripting language.
      * Subclasses providing a scripting environment must override this
      * method.  It will typically be called once, but could be called
-     * multiple times, so the method must be idempotent.
+     * multiple times, so the method must be idempotent. It will not
+     * be called by this class if the constructor provided a parent.
      * @return the script engine for this scripting context; null if
      *         there is none
      */

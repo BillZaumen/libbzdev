@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="400" height="400">
+    <imageURI>-</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="triangle" type="PATH_START"   />
+       <row type="MOVE_TO" x="200.0" y="300.0" xp="200.0" yp="100.0"/>
+       <row type="SEG_END" x="150.00000000000003" y="213.39745962155612" xp="150.00000000000003" yp="186.60254037844388"/>
+       <row type="SEG_END" x="250.00000000000003" y="213.39745962155612" xp="250.00000000000003" yp="186.60254037844388"/>
+       <row type="CLOSE"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

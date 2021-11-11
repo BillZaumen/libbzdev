@@ -84,7 +84,7 @@ public class ServletWebMap extends WebMap {
 
     /**
      * Constructor.
-     * @param root an instance of {@link org.bzdev.net.ServletAdapter}
+     * @param root an instance of {@link ServletWebMap.Config}
      */
     public ServletWebMap(Object root) throws IllegalArgumentException {
 	if (root instanceof Config) {
@@ -100,11 +100,27 @@ public class ServletWebMap extends WebMap {
 	}
     }
 
+    /**
+     * {@inheritDoc}
+     * <P>
+     * This method will call the map's servlet adapter's init method. It
+     * should be overridden if more initialization is required. The
+     * init method's argument is a \texttt{Map} whose keys and values are
+     * strings. Such a map can be specified when the constructor is called.
+     */
     @Override
     protected void configure() throws Exception {
 	// super.configure(); not needed - we are a direct subclass of WebMap
 	sa.init(parameters);
     }
+
+    /**
+     * {@inheritDoc}
+     * <P>
+     * This method will call the map's servlet adapter's destroy method.  It
+     * should be overridden if more operations are needed to deconfigure this
+     * web map.
+     */
     @Override
     protected void deconfigure() {
 	sa.destroy();

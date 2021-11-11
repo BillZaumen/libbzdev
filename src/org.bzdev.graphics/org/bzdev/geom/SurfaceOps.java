@@ -28,7 +28,7 @@ public interface SurfaceOps extends Shape3D {
      *        {@link SurfaceIterator#PLANAR_TRIANGLE}.
      *   <LI> 15 when the return value is
      *        {@link SurfaceIterator#CUBIC_VERTEX}.
-     * <UL>
+     * </UL>
      * In general, the array's length should be at least 48.
      * The format for the array is described in the documentation for
      * <P>
@@ -89,7 +89,7 @@ public interface SurfaceOps extends Shape3D {
      *          <LI> edge 0 is the edge from vertex 1 to vertex 2
      *          <LI> edge 1 is the edge from vertex 2 to vertex 3
      *          <LI> edge 2 is the edge from vertex 3 to vertex 1
-     *       <UL>
+     *       </UL>
      *   <LI> For a cubic triangle, described in (u,v) coordinates
      *        where the barycentric coordinates are (u, v, w) with
      *        w = 1 - u - v,
@@ -97,14 +97,14 @@ public interface SurfaceOps extends Shape3D {
      *          <LI> edge 0 is the edge from (0, 0) to (1, 0)
      *          <LI> edge 1 is the edge from (1, 0) to (0, 1)
      *          <LI> edge 2 is the edge from (0, 1) to (0,0)
-     *       <UL>
+     *       </UL>
      *   <LI> For a cubic patch, described in (u,v) coordinates
      *       <UL>
      *          <LI> edge 0 is the edge from (0, 0) to (1, 0)
      *          <LI> edge 1 is the edge from (1, 0) to (1, 1)
      *          <LI> edge 2 is the edge from (1, 1) to (0, 1)
      *          <LI> edge 3 is the edge from (0, 1) to (0, 0)
-     *       <UL>
+     *       </UL>
      * </UL>
      * <P>
      * @return the edge numbers for the surface segments adjacent to the
