@@ -39,6 +39,11 @@ include VersionVars.mk
 # manipulate version numbers - must be after default rule.
 include MajorMinor.mk
 
+#
+# Set DARKMODE to --darkmode to turn on dark mode.
+#
+DARKMODE =
+
 MIMETYPES_DIR = mimetypes
 # System directories
 #
@@ -1336,8 +1341,10 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 	mkdir -p $(MATH_DIR)/$(BZDEV)/math/doc-files
 	cp $(MATH_DIR)/$(BZDEV)/providers/math/fft/DefaultFFT.txt \
 		$(MATH_DIR)/$(BZDEV)/math/doc-files/DefaultFFT.txt
+	styleoption=`[ -z "$(DARKMODE)" ] && echo \
+		|| echo --main-stylesheet stylesheet.css`; \
 	javadoc -d $(JROOT_JAVADOCS) --module-path BUILD \
-		--main-stylesheet stylesheet.css \
+		$$styleoption \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api \
@@ -1349,7 +1356,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 	cp src/description.html $(JROOT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
-	$(RUNLSNOF) --darkmode --link \
+	$(RUNLSNOF) $(DARKMODE) --link \
 		file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api/ \
 		--overview src/FactoryOverview.html \
 		-d $(JROOT_JAVADOCS)/  '**'
@@ -1357,7 +1364,10 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	rm -rf $(JROOT_ALT_JAVADOCS)
 	mkdir -p $(JROOT_ALT_JAVADOCS)
+	styleoption=`[ -z "$(DARKMODE)" ] && echo \
+		|| echo --main-stylesheet stylesheet.css`; \
 	javadoc -d $(JROOT_ALT_JAVADOCS) --module-path BUILD \
+		$$styleoption \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link \
@@ -1369,7 +1379,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
-	$(RUNLSNOF) --link-offline \
+	$(RUNLSNOF) $(DARKMODE) --link-offline \
 	    https://docs.oracle.com/en/java/javase/$(JAVA_VERSION)/docs/api/ \
 		file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api/ \
 		--overview src/FactoryOverview.html \
