@@ -35,7 +35,7 @@ import java.util.TreeMap;
  * key, the following transition diagram shows the sequence of allowed values
  * for this type:
  * <DIV style="text-align:center">
- *     <IMG SRC="doc-files/basicpath.png">
+ *     <IMG SRC="doc-files/basicpath.png" class="imgBackground">
  *</DIV>
  * The factory parameters this factory provides are the same as the parameters
  * provided by its subclass {@link AnimationPath2DFactory}

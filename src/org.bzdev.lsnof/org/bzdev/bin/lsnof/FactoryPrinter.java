@@ -216,28 +216,64 @@ public class FactoryPrinter {
 	}
     }
 
+    static private void setupColors(TemplateProcessor.KeyMap keymap,
+				    boolean darkmode)
+    {
+	if (darkmode) {
+	    keymap.put("frameBackground", "#000000");
+	    keymap.put("frameColor", "#2E1319");
+	    keymap.put("menuBackground", "#101010");
+	    keymap.put("menuColor", "#FFFFFF");
+	    keymap.put("menuLinkColor", "#9EADC0");
+	    keymap.put("contentBackground", "#101010");
+	    keymap.put("contentColor", "#FFFFFF");
+	    keymap.put("contentLinkColor", "#9EADC0");
+	    keymap.put("contentVisitedColor", "#7E8DA0");
+	    keymap.put("otherBackground", "#101010");
+	    keymap.put("otherColor", "#FFFFFF");
+	    keymap.put("otherLinkColor", "#9EADC0");
+	    keymap.put("otherVisitedColor", "#7E8DA0");
+	} else {
+	    keymap.put("frameBackground", "#4D7A97");
+	    keymap.put("frameColor", "#000077");
+	    keymap.put("menuBackground", "#f8f8f8");
+	    keymap.put("menuColor", "#000000");
+	    keymap.put("menuLinkColor", "#4A6782");
+	    keymap.put("contentBackground", "#ffffff");
+	    keymap.put("contentColor", "#000000");
+	    keymap.put("contentLinkColor", "#4A6782");
+	    keymap.put("contentVistedColor", "#1F389C");
+	    keymap.put("otherBackground", "#ffffff");
+	    keymap.put("otherColor", "#000000");
+	    keymap.put("otherLinkColor", "#4A6782");
+	    keymap.put("otherVistedColor", "#1F389C");
+	}
+    }
+
     /**
      * Print a listing of factory information.
      * @param templateReader a Reader configured to read a template
+     * @param darkmode true if dark mode is in effect; false otherwise
      * @param ap an Appendable used for output.
      * @param argv the class names of the factories that will be listed
      */
-    static void printFactories(Reader templateReader,
+    static void printFactories(Reader templateReader, boolean darkmode,
 				      Appendable ap, String[] argv) 
 	throws Exception
     {
-	printFactories(templateReader, ap, argv, 0);
+	printFactories(templateReader, darkmode, ap, argv, 0);
     }
 
     /**
      * Print a listing of factory information given an offset.
      * @param templateReader a Reader configured to read a template
+     * @param darkmode true if dark mode is in effect; false otherwise
      * @param ap an Appendable used for output.
      * @param argv the class names of the factories that will be listed
      * @param index the starting index to use for the array passed as the
      *        second argument
      */
-    static void printFactories(Reader templateReader,
+    static void printFactories(Reader templateReader, boolean darkmode,
 				      Appendable ap, String[] argv, int index) 
 	throws Exception
     {
@@ -302,6 +338,7 @@ public class FactoryPrinter {
 		keymaplist.add(factory.getTemplateKeyMap());
 	}
 	keymap.put("factories", keymaplist);
+	setupColors(keymap, darkmode);
 	printFactories(templateReader, ap, keymap);
     }
 
@@ -406,6 +443,7 @@ public class FactoryPrinter {
 	    boolean notTrusted = true;
 	    String languageName = null;
 	    boolean listCodeBase = false;
+	    boolean darkmode = false;
 	    URL[] urls = noURLs;
 	    String target = null;
 	    String menuFile = null;
@@ -465,6 +503,8 @@ public class FactoryPrinter {
 			System.exit(1);
 		    }
 		    charset = argv[index];
+		} else if (argv[index].equals("--darkmode")) {
+		    darkmode = true;
 		} else if (argv[index].equals("--html")) {
 		    templateName = "htmlTemplate";
 		} else if (argv[index].equals("--menu")) {
@@ -672,8 +712,8 @@ public class FactoryPrinter {
 	    if (listCodeBase) System.exit(0);
 	    // null implies ignore language-specific parts of the
 	    // configuration file.
-	    readConfigFiles(languageName);
-	    URLClassLoaderOps.close();
+	    // readConfigFiles(languageName);
+	    // URLClassLoaderOps.close();
 	    
 	    String overviewResource = null;
 	    CharArrayReader menuTemplateReader = null;
@@ -789,6 +829,7 @@ public class FactoryPrinter {
 
 		OutputStream os = da.getOutputStream("menu.html");
 		Writer writer = new OutputStreamWriter(os, "UTF-8");
+		setupColors(keymap, darkmode);
 		printFactories(menuTemplateReader, writer, keymap);
 		writer.flush();
 		writer.close();
@@ -810,6 +851,7 @@ public class FactoryPrinter {
 		    writer = new OutputStreamWriter(os, "UTF-8");
 		    keymap = NamedObjectFactory.getTemplateKeyMapForFactories
 			(p + cname);
+		    setupColors(keymap, darkmode);
 		    printFactories(docTemplateReader, writer, keymap);
 		    docTemplateReader.reset();
 		    writer.flush();
@@ -821,12 +863,14 @@ public class FactoryPrinter {
 		    overviewStream = FactoryPrinter.class.getResourceAsStream
 			(overviewResource.startsWith("/")? overviewResource:
 			 "/" + overviewResource);
-		    CopyUtilities.copyStream(overviewStream, writer,
-					       Charset.forName("UTF-8"));
-		} else {
-		    CopyUtilities.copyStream(overviewStream, writer,
-					  Charset.forName("UTF-8"));
 		}
+		TemplateProcessor.KeyMap keymap2 =
+			new TemplateProcessor.KeyMap();
+		setupColors(keymap2, darkmode);
+		TemplateProcessor tp2 = new TemplateProcessor(keymap2);
+		tp2.processTemplate(new InputStreamReader(overviewStream,
+							  "UTF-8"),
+				    writer);
 		writer.flush();
 		writer.close();
 		os = da.getOutputStream("index.html");
@@ -834,17 +878,26 @@ public class FactoryPrinter {
 		InputStream fsis = FactoryPrinter.class.getResourceAsStream
 		    (framesetResource.startsWith("/")? framesetResource:
 		     "/" + framesetResource);
+		TemplateProcessor.KeyMap keymap1 =
+		    new TemplateProcessor.KeyMap();
+		setupColors(keymap1, darkmode);
+		TemplateProcessor tp = new TemplateProcessor(keymap1);
+		/*
 		CopyUtilities.copyStream(fsis, writer,
 					 Charset.forName("UTF-8"));
+		*/
+		tp.processTemplate(new InputStreamReader(fsis, "UTF-8"),
+				   writer);
 		fsis.close();
 		writer.flush();
 		writer.close();
 	    } else if (index == argv.length) {
 		TemplateProcessor.KeyMap keymap =
 		    NamedObjectFactory.getTemplateKeyMapForFactories();
+		setupColors(keymap, darkmode);
 		printFactories(reader, System.out, keymap);
 	    } else {
-		printFactories(reader, System.out, argv, index);
+		printFactories(reader, darkmode, System.out, argv, index);
 	    }
 	} catch (Exception e) {
 	    System.err.println(e.getMessage());

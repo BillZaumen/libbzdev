@@ -1,10 +1,54 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
-	  "http://www.w3.org/TR/html4/frameset.dtd">
+<!DOCTYPE html>
 <HTML>
-<head>
-</head>
-<frameset cols="20%, 80%">
-<frame src="menu.html">
-<frame src="overview.html" name="factories">
-</frameset>
+<HEAD>
+    <STYLE TYPE="text/css">
+      .frame {
+	  float:left; margin-right:8px; margin-left:8px;
+	  padding-top:0px; padding-bottom:0px;
+	  padding-left:0px; padding-right:0px;
+	  marging-top:8px;
+	  margin-bottom:8px;
+	  vertical-align:top;
+	  white-space:nowrap;
+      }
+      body {
+	  margin: 8px;
+	  padding: 0px;
+	  background-color:$(frameBackground);
+	  color:$(frameColor);
+      }
+      iframe {
+	  border: 4pt solid $(frameColor);
+      }
+    </STYLE>
+    <SCRIPT>
+      function doResize() {
+	  var width = window.innerWidth - 32 ;
+	  var height = window.innerHeight - 32;
+	  if (width < 300) width = 300;
+	  if (height < 300) height = 300;
+	  var tocWidth = Math.floor(width/5)-8;
+	  if (tocWidth < 256) tocWidth = 256;
+	  var contentWidth = width - tocWidth - 24;
+	  var toc = document.getElementById("tocID");
+	  var contents = document.getElementById("contentsID");
+	  toc.width = tocWidth;
+	  toc.height = height;
+	  contents.width = contentWidth;
+	  contents.height = height;
+      }
+      window.addEventListener("resize", doResize);
+    </SCRIPT>
+
+</HEAD>
+  <BODY onload="doResize()">
+    <div class="frame">
+      <IFRAME SRC="menu.html" NAME="toc" WIDTH="128"
+	      ID="tocID" HEIGHT="600" SCROLLING="auto">
+      </IFRAME>
+      <IFRAME SRC="overview.html" NAME="factories" width="800"
+	      ID="contentsID" HEIGHT="600" SCROLLING="auto">
+      </IFRAME>
+      </div>
+  </BODY>
 </HTML>

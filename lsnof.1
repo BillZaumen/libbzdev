@@ -66,7 +66,25 @@ The syntax used by the template processor can be found in the javadoc
 documentation for org.bzdev.util.TemplateProcessor.  The key map used
 by the template processor is defined in the javadoc documentation for
 the method getTemplateKeyMap in the class
-org.bzdev.obnaming.NamedObjectFactory.
+org.bzdev.obnaming.NamedObjectFactory with the following additional keys:
+.BR frameBackground ,
+.BR frameColor ,
+.BR menuBackground ,
+.BR menuColor ,
+.BR menuLinkColor ,
+.BR contentBackground ,
+.BR contentColor ,
+.BR contnetLinkColor ,
+.BR contentVisitedColor ,
+.BR otherBackground ,
+.BR otherColor ,
+.BR otherLinkColor .
+and
+.BR otherVisitedColor .
+The values for each is a
+.B #
+followed by 6 hexadecimal digits to represent a color for use in a
+CSS style.
 .SH COMMON OPTIONS
 .PP
 These options are shared by all uses of this command. Most of
@@ -202,6 +220,11 @@ the non-option arguments). For additional API directories, use the
 or
 .B \-\-link-offline
 options.
+\TP
+.B \-\-darkmode
+Indicates that HTML that is generated will have light text on a dark
+backgound for improved readibility.  This option does not affect an
+externally provided overview as that is merely copied as is.
 .TP
 .BI \-\-link\  URLs
 Specifies a Javadoc API directory to which links may be created. Multiple
@@ -211,7 +234,7 @@ is a '|' separated list of URLs. Pairs of '|' characters are replaced
 with single '|' characters to allow a '|' to appear in a URL. If a URL
 does not have a protocol, it is assumed to be a file name.
 .TP
-.BI \-\-link\-offline\  URL1 URL2
+.BI \-\-link\-offline\  URL1\ URL2
 Specifies a Javadoc API directory to which links may be created. Multiple
 .B \-\- link options may be used.  Links are made to
 .IR URL1 ,
@@ -230,7 +253,12 @@ index.html file is opened by a browser.  The
 option is used only with the
 .B \-d
 option. If the URL does not start with a protocol followed by a colon, it
-is assumed to be a file name.
+is assumed to be a file name. In either case, the value that is referenced
+will be copied into the directory referenced by the
+.B \-d
+option and will not be modified by the
+\B \-\-darkmode
+option.
 .TP
 .BI \-\-target\  name
 provides a target name for use in <A> elements. This is used in key maps

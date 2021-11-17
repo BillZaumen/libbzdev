@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.drama.generic Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.drama.generic package</H2>    
@@ -67,7 +72,7 @@ The org.bzdev.devqsim package defines a Simulation class and a
 SimObject class at the top of the class hierarchy, as illustrated
 in the following UML class diagram:
 <p style="ext-align: center">
-<img src="genericdrama.png">
+<img src="genericdrama.png" class="imgBackground">
 <p>
 With a few exceptions
 (e.g., {@link GenericSimulation}),
@@ -168,7 +173,7 @@ or a set if actors. The following state-transition diagram shows
 the process for the case in which messages are sent directly,
 specifying a delay to account for propagation time:
 <P style="text-align:center">
-<img src="message1.png">
+<img src="message1.png" class="imgBackground">
 <P>
 If a delay is not provided,  a domain is used to obtain the
 delay. The domain can be provided explicitly.  In addition
@@ -178,7 +183,7 @@ drop them, and is provided to represent noisy communication
 channels. This process
 is illustrated by the following state-transition diagram:
 <P style="text-align:center">
-<img src="message2.png">
+<img src="message2.png" class="imgBackground">
 <P>
 The corresponding methods defined
 by {@link GenericActor} are named "send"
@@ -189,7 +194,7 @@ MessageSimulationEvent (used internally in this package)
 and post that on the event queue.  The class structure is illustrated
 in the following diagram:
 <P style="text-align:center">
-<IMG SRC="gevents.png">
+<IMG SRC="gevents.png" class="imgBackground">
 <P>
 The classes shown in gray and light blue are classes from the
 org.bzdev.devqsim package.  The classes in the org.bzdev.drama.generic
@@ -200,7 +205,7 @@ that are in the org.bzdev.drama.common package.
 Finally, a number of abstract classes provide support for factories,
 as shown in the following diagram:
 <P style="text-align:center">
-<IMG SRC="gdfactories.png">
+<IMG SRC="gdfactories.png" class="imgBackground">
 <P>
 These can be subclassed to create various factories. See
 {@link org.bzdev.devqsim.SimObjectFactory} and

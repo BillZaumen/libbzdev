@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.obnaming Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.obnaming package</H2>
@@ -12,7 +17,7 @@ The following topics are described below:
   <LI><A HREF="#factoryExamples">examples for named-object factories</A>.
 </UL>
 
-<H3><A NAME="namers">Object namers and named objects</A></H3>
+<H3><A NAME="namers"></A>Object namers and named objects</H3>
 
 It is sometimes useful to be able to look up objects by name, and it
 is also useful to be able to find the names of those objects, perhaps
@@ -46,13 +51,13 @@ There are two cases:
 Both object-namer cases are shown in the following figure (the helper
 classes created by an annotation processor are shown in blue).
 <P style="text-align: center">
-  <img src="obnaming.png">
+  <img src="obnaming.png" class="imgBackground">
 <P>
 The figure above indicates that named objects are registered with
 object namers (via operations that occur when constructors are called),
 and that the helpers, when used, are specified by annotations.
 
-<H3><A NAME="factories">Factories for named objects</A></H3>
+<H3><A NAME="factories"></A>Factories for named objects</H3>
 
 In addition, this package provides a framework for creating
 factories to configure named objects.  This framework provides common
@@ -61,7 +66,7 @@ about the factory.
 The following figure shows the relationship between various classes
 related to factories:
 <P style="text-align: center">
- <img src="factory.png">
+ <img src="factory.png" class="imgBackground">
 <P>
 The class {@link NamedObjectFactory}
 is a generic class.  A subclass will use its own class name as the
@@ -82,7 +87,7 @@ double, and boolean), strings, and random variables.  If the desired
 type is that of a named object, the object is referenced by name and
 the object namer is used to find the object itself.
 
-<H3><A NAME="namerExamples">Examples for object namers</A></H3>
+<H3><A NAME="namerExamples"></A>Examples for object namers</H3>
 
 As an example, if an object namer does not have a superclass, one
 can simply extend the classes
@@ -234,7 +239,7 @@ The namerClass method is not actually needed, but is required for
 documentation reasons. It makes it easier to find the corresponding
 object namer.
 
-<H3><A NAME="factoryExamples">Examples for named-object factories</A></H3>
+<H3><A NAME="factoryExamples"></A>Examples for named-object factories</H3>
 
 Factory classes will typically be arranged in a specific class
 hierarchy, a convention that is useful but not mandatory. For
@@ -246,7 +251,7 @@ of these classes: a set of abstract factories that are paired with
 these classes and additional factories to create specific objects.
 This is illustrated by the following UML diagram:
 <P style="text-align: center">
-<img src="example.png">
+<img src="example.png" class="imgBackground">
 <P>
 In this example, the non-abstract factory classes will create the actual
 objects, while the abstract factories will perform initializations

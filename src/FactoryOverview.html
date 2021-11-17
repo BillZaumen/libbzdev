@@ -2,6 +2,33 @@
   <HEAD>
     <META HTTP-EQUIV="content-type" content="text/html; charset=UTF-8">
     <TITLE>Factory Parameter Documentation</TITLE>
+    <STYLE>
+      body {
+	  background-color:$(contentBackground);
+	  color:$(contentColor);
+      }
+      a:link {
+	  text-decoration:none;
+	  color:$(contentLinkColor);
+      }
+      a:visited {
+	  text-decoration:none;
+	  color:$(contentVisitedColor);
+      }
+
+      li {
+	  padding-top: 8pt;
+      }
+
+      li:first-child {
+	  padding-top: 0pt;
+      }
+
+      li:last-child {
+	  padding-top: 8pt;
+	  padding-below: 8pt;
+      }
+    </STYLE>
   </HEAD>
   <BODY>
     <H1>Factory Parameter Documentation</H1>
@@ -19,6 +46,9 @@
 	  package support various types of queues, a  class used for
 	  tracing a simulation's execution, and a class
 	  (ProcessClockFactory) that can be used to represent CPU time.
+	<LI> <CODE><A HREF="../org.bzdev.devqsim/org/bzdev/devqsim/rv/package-summary.html#package_description">
+	      org.bzdev.devqsim.rv</A></CODE>. The factories in this
+	  package support named random variables for use in simulations.
 	<LI> <CODE><A HREF="../org.bzdev.drama/org/bzdev/drama/package-summary.html#package_description">
 	      org.bzdev.drama</A></CODE>. The factories in this class
 	  support actor-based (or agent-based) simulations by allowing
@@ -34,8 +64,8 @@
       </UL>
       The factories are grouped according to their packages.
     <P>
-      Please click on a factory name to find the parameter documentation
-      for the corresponding factory.
+      Please click on a factory name in the adjacent menu to find the
+      parameter documentation for the corresponding factory.
   </BODY>
 </HTML>
 

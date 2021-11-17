@@ -14,7 +14,7 @@ package org.bzdev.anim2d;
  * key, the following transition diagram shows the sequence of allowed values
  * for this type:
  * <DIV style="text-align:center">
- *     <IMG SRC="doc-files/basicpath.png">
+ *     <IMG SRC="doc-files/basicpath.png" class="imgBackground">
  *</DIV>
  * The parameters this factory supports are shown in the following table
  * (the documentation for

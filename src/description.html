@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The BZDev Class Library</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css"
+</HEAD>
 <BODY>
 <H2>The BZDev Class Library</H2>
 <P>
@@ -7,7 +12,8 @@ The BZDev class library is partitioned into 8 modules as shown
 in the following diagram (also shown on the
 <A HREF="../index.html">OVERVIEW</A> page):
 <center>
-<img src="modules2.png" width="600px" height="auto" usemap="#modules2">
+  <img src="modules2.png" width="600px" height="auto" usemap="#modules2"
+       class="imgBackground">
 </center>
 <MAP NAME="modules2">
 <AREA SHAPE="rect" coords="447,0,547,15" href="#rest" alt="3D Printing Module">
@@ -29,12 +35,13 @@ enough so that the diagram will show at least an indirect dependency.
 Two  modules, org.bzdev.dmethods and org.bzdev.parmproc, are not shown
 as these are used only for annotation processing.
 
-<H2><A NAME="base">The module org.bzdev.base</A></H2>
+<H2><A NAME="base"></A>The module org.bzdev.base</H2>
 The module <CODE>org.bzdev.base</CODE> provides basic operations. The
 following diagram shows the packages this module contains:
 <P>
 <center>
-  <img src="base.png" width="700px" height="auto", usemap="#baseMap">
+  <img src="base.png" width="700px" height="auto", usemap="#baseMap"
+       class="imgBackground">
 </center>
 <MAP NAME="baseMap">
 <AREA SHAPE="rect" coords="3,2,81,20" href="../org.bzdev.base/module-summary.html" alt="Base Module">
@@ -79,14 +86,15 @@ The packages in this module provide the following:
   <li> org.bzdev.util.units provides classes for converting from one
        set of units to another.
 </UL>
-<H2><A NAME="math">The module org.bzdev.math</A></H2>
+<H2><A NAME="math"></A>The module org.bzdev.math</H2>
 The module <CODE>org.bzdev.math</CODE> provides special functions,
 various numerical algorithms, random variables, and statistics.
  The
 following diagram shows the packages this module contains:
 <P>
 <center>
-  <img src="math.png" width="700px" height="auto" usemap="#mathMap">
+  <img src="math.png" width="700px" height="auto" usemap="#mathMap"
+       class="imgBackground">
 </center>
 <MAP NAME="mathMap">
 <AREA SHAPE="rect" coords="1,2,89,16" href="../org.bzdev.math/module-summary.html" alt="Math Module">
@@ -114,7 +122,7 @@ The packages in this module provide the following:
        an FFT (Fast Fourier Transform).
 </UL>
 
-<H2><A NAME="graphics">The module org.bzdev.graphics</A></H2>
+<H2><A NAME="graphics"></A>The module org.bzdev.graphics</H2>
 
 The module <CODE>org.bzdev.graphics</CODE> provides graphs and IO operatios
 involving geometry, graphics-based IO operations, graphs, and packages that
@@ -122,7 +130,8 @@ support factory classes for simulations, animations, etc.
 The following diagram shows the packages this module contains:
 <P>
 <center>
-  <img src="graphics.png" width="700px" height="auto" usemap="#graphicsMap">
+  <img src="graphics.png" width="700px" height="auto" usemap="#graphicsMap"
+       class="imgBackground">
 </center>
 <MAP NAME="graphicsMap">
 <AREA SHAPE="rect" coords="0,1,103,16" href="../org.bzdev.graphics/module-summary.html" alt="Graphics Module">
@@ -156,13 +165,14 @@ The packages in this module provide the following:
        fonts.
 </UL>
 
-<H2><a NAME="desktop">The module org.bzdev.desktop</A></H2>
+<H2><a NAME="desktop"></A>The module org.bzdev.desktop</H2>
 
 The module <CODE>org.bzdev.base</CODE> provides graphics and desktop
 operations. The following diagram shows the packages this module contains:
 <P>
 <center>
-  <img src="desktop.png" width="700px" height="auto" usemap="#desktopMap">
+  <img src="desktop.png" width="700px" height="auto" usemap="#desktopMap"
+       class="imgBackground">
 </center>
 <MAP NAME="desktopMap">
 <AREA SHAPE="rect" coords="2,1,116,20" href="../org.bzdev.desktop/module-summary.html" alt="Desktop Module">
@@ -188,13 +198,14 @@ The packages in this module provide the following:
        be entered into a text component.
 </ul>
 
-<H2><A NAME="devqsim">The module org.bzdev.devqsim</A></H2>
+<H2><A NAME="devqsim"></A>The module org.bzdev.devqsim</H2>
 
 The module <CODE>org.bzdev.devqsim</CODE> provides discrete event
 and queuing simulation.  The folloowing diagram shows the packages
 this module contains:
 <center>
-  <img src="devqsim.png" width="500px" height="auto" usemap="#devqsimMap">
+  <img src="devqsim.png" width="500px" height="auto" usemap="#devqsimMap"
+       class="imgBackground">
 </center>
 <MAP NAME="devqsimMap">
 <AREA SHAPE="rect" coords="2,1,139,21" href="../org.bzdev.devqsim/module-summary.html" alt="Discrete Event Simulation Module">
@@ -219,13 +230,14 @@ The package
     methods for creating them.
 </UL>
 
-<H2><A NAME="drama">The module org.bzdev.drama</A></H2>
+<H2><A NAME="drama"></A>The module org.bzdev.drama</H2>
 
 The module <CODE>org.bzdev.drama</CODE> provides discrete event
 simulations using a message-passing paradigm. The following diagram
 shows the packages this module contains:
 <center>
-  <img src="drama.png" width="500px" height="auto" usemap="#dramaMap">
+  <img src="drama.png" width="500px" height="auto" usemap="#dramaMap"
+       class="imgBackground">
 </center>
 <MAP NAME="dramaMap">
 <AREA SHAPE="rect" coords="-1,1,111,23" href="../org.bzdev.drama/module-summary.html" alt="Actor-Based Simulation Module">
@@ -254,7 +266,7 @@ The package
     flavors of drama-like simulations.
 </UL>
 
-<H2><A NAME="ejws">The module org.bzdev.ejws</A></H2>
+<H2><A NAME="ejws"></A>The module org.bzdev.ejws</H2>
 
 The module <CODE>org.bzdev.base</CODE> provides an embedded web server
 based on the Java package com.sun.net.httpserver that is part of the
@@ -262,7 +274,8 @@ standard Java release. The following diagram shows the packages this
 module contains:
 <P>
 <center>
-  <img src="ejws.png" width="300px" height="auto" usemap="#ejwsMap">
+  <img src="ejws.png" width="300px" height="auto" usemap="#ejwsMap"
+       class="imgBackground">
 </center>
 <MAP NAME="ejwsMap">
 <AREA SHAPE="rect" coords="6,0,97,17" href="../org.bzdev.ejws/module-summary.html" alt="Embedded Web Server Module">
@@ -283,14 +296,15 @@ These packages are described below:
 </UL>
 
 
-<H2><A NAME="rest">The remaining modules</A></H2>
+<H2><A NAME="rest"></A>The remaining modules</H2>
 
 The remaining modules are ones with one package (sometimes a substantial
 package) per module. The following diagram shows these modules and their
 packages:
 <P>
 <center>
-  <img src="rest.png" width="500px" height="auto" usemap="#restMap">
+  <img src="rest.png" width="500px" height="auto" usemap="#restMap"
+       class="imgBackground">
 </center>
 <MAP NAME="restMap">
 <AREA SHAPE="rect" coords="-1,2,121,20" href="../org.bzdev.anim2d/module-summary.html" alt="2D Animation Module">
@@ -319,7 +333,7 @@ packages:
     package for generating complex shapes, and it can use the org.bzdev.graph
     class to create images.
 </UL>
-<H2><A name="compile">Compilation</A></H2>
+<H2><A name="compile"></A>Compilation</H2>
 <P>
 The following instructions are appropriate for Debian Linux and
 other distributions that put libraries in the same locations.
@@ -431,7 +445,7 @@ whose source attribute is
 The javadoc program will replace <CODE>{@docRoot}</CODE> with the API
 directory (APIDIR in this example).
 
-<H2><A name="libraries">Libraries</A></H2>
+<H2><A name="libraries"></A>Libraries</H2>
 
 The JAR files for the libbzdev modules should be available in a single
 directory.  On Debian Linux systems, unless modified by a package

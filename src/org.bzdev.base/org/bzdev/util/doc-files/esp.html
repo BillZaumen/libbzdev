@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>ExpressionParser and ESP</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
   <BODY>
     <div style="margin-left: 2em">
   <H2>ExpressionParser and the ESP scripting language</H2>
@@ -150,7 +155,7 @@
     including ones used to help generate documentation for the classes
     that a given instance has available.
 
-    <H2><A NAME="overview">Overview</A></H2>
+    <H2><A NAME="overview"></A>Overview</H2>
   <P>
     Programmers familiar with Java and ECMAScript can learn how to use
     ESP with very little effort, and those familiar with ECMAScript
@@ -310,7 +315,7 @@ var obj = {
     defining various configurations, were some simple computation may be
     desired.
 
-    <H2><A NAME="scriptEngine">The Script Engine</A></H2>
+    <H2><A NAME="scriptEngine"></A>The Script Engine</H2>
     The BZDev class library contains an script engine that implements
     ESP. This script engine has the following properties:
     <UL>
@@ -329,7 +334,7 @@ var obj = {
 	java.io.Reader, java.io.PrintWriter, java.nio.CharBuffer.
     </UL>
 
-    <H2><A NAME="constructors">Constructors</A></H2>
+    <H2><A NAME="constructors"></A>Constructors</H2>
     {@link ExpressionParser} has two constructors:
     <UL>
       <LI> {@link ExpressionParser#ExpressionParser(Class...)} creates an
@@ -373,7 +378,7 @@ var obj = {
     {@link ExpressionParser#setImportMode()} has been called before any
     script has been executed.
 
-    <H2><A NAME="syntax">ESP Syntax</A></H2>
+    <H2><A NAME="syntax"></A>ESP Syntax</H2>
   <P>
     ESP&apos;s syntax is described in the following subsections:
     <UL>
@@ -393,7 +398,7 @@ var obj = {
       <LI> <A HREF="#tracing">Tracing Options</A>
     </UL>
 
-    <H3><A NAME="comments">Comments</A></H3>
+    <H3><A NAME="comments"></A>Comments</H3>
   <P>
     Two types of comments are recognized in scripting mode. One
     starts with the token &apos;//&apos; (unless within a string), and continues
@@ -411,7 +416,7 @@ var obj = {
     so that the method {ExpressionParser#matches(String)} will return
     quickly when there is not a match.
 
-    <H3><A NAME="primitiveValues">Primitive Values</A></H3>
+    <H3><A NAME="primitiveValues"></A>Primitive Values</H3>
   <P>
     ESP recognizes several types of primitive values:
     <UL>
@@ -456,7 +461,7 @@ var obj = {
 	to <STRONG>null</STRONG>.
     </UL>
   <P>
-    <H3><A NAME="constants">Constants</A></H3>
+    <H3><A NAME="constants"></A>Constants</H3>
   <P>
     Constants in ESP include numbers and strings as one would expect,
     but also enumeration constants and the fields of Java objects that
@@ -490,7 +495,7 @@ BLOCKED
     first output line was printed. Meanwhile, the use of the constant
     <CODE>State.BLOCKED</CODE> resolves the ambiguity.
   <P>
-    <H3><A NAME="operators">Operators</A></H3>
+    <H3><A NAME="operators"></A>Operators</H3>
   <P>
     Operators are a subset of the operators provided by Java.  Unary
     operators are &apos;-&apos;, &apos;~&apos; and &apos;!&apos; and &apos;throw&apos; for sign inversion,
@@ -539,7 +544,7 @@ BLOCKED
         is &apos;true&apos;.
     </UL>
   <P>
-    <H3><A NAME="statements">Statements</A></H3>
+    <H3><A NAME="statements"></A>Statements</H3>
   <P>
     Statements are described by the following grammar:
     <BLOCKQUOTE><PRE>
@@ -641,7 +646,7 @@ out.println(alf);
     kept in sync. That is trivial when one or two factories are being
     created, but awkward if there are a sizable number.
 
-    <H3><A NAME="expressions">Expressions</A></H3>
+    <H3><A NAME="expressions"></A>Expressions</H3>
   <P>
     Expressions in general the same meaning as in Java or ECMAScript,
     although both languages have more operators that ESP does.
@@ -703,7 +708,7 @@ term: value
     | term &apos;%&apos; value
     | &apos;-&apos; term
 	
-<A NAME="value">value: number
+<A NAME="value"></A>value: number
     | true
     | false
     | null
@@ -759,7 +764,7 @@ method-reference:  qualified-name &apos;::&apos; identifier
 typed-null: qualified-name &apos;::&apos; &apos;null&apos;
     </PRE></BLOCKQUOTE>
 
-    <H3><A NAME="vardefs">Variable Definitions</A></H3>
+    <H3><A NAME="vardefs"></A>Variable Definitions</H3>
   <P>
     Variable definitions always start with the keyword
     <STRONG>var</STRONG>, and assignments to variables that are not
@@ -837,7 +842,7 @@ function g(x) {
     </PRE></CODE></BLOCKQUOTE>
     will return the value x+30 instead of x + 10.
 
-    <H3><A NAME= "functdefs">Function Definitions</A></H3>
+    <H3><A NAME= "functdefs"></A>Function Definitions</H3>
   <P>
     Function definitions uses a syntax based on ECMAScript: the
     keyword <STRONG>function</STRONG>, followed a function name,
@@ -877,7 +882,7 @@ synchronized function incr() {
     calls to <CODE>incr()</CODE> could read the same value of count,
     and set count to one more than that value.
 
-    <H3><A NAME="assignment">Assignment Statement</A></H3>
+    <H3><A NAME="assignment"></A>Assignment Statement</H3>
   <P>
     Assign statements allow the values of previously defined
     variables (that is, ones  defined used a
@@ -901,7 +906,7 @@ assignment-statement: variable &apos;=&apos; expression
    | value &apos;[&apos; expression &apos;]&apos; &apos;=&apos; expression
     </PRE></BLOCKQUOTE>
 
-    <H3><A NAME="import">Import Statement</A></H3>
+    <H3><A NAME="import"></A>Import Statement</H3>
   <P>
     Import statements are recognized when import mode and script import
     mode have been set. The syntax is similar to that used by the methods
@@ -1000,7 +1005,7 @@ import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
     typically a top-level script will set everything up, with import
     statements occurring first.
 
-    <H3><A NAME="objects">Objects</A></H3>
+    <H3><A NAME="objects"></A>Objects</H3>
   <P>
     ESP objects are basically dictionaries that map properties to values,
     and that provide methods to access and modify the values associated
@@ -1092,7 +1097,7 @@ var f = obj["increment"];
     integer values (the class {@link org.bzdev.lang.MathOps} has to be
     imported for the function <STRONG>asInt</STRONG> to be accessible.)
 
-    <H3><A NAME="arrays">Arrays</A></H3>
+    <H3><A NAME="arrays"></A>Arrays</H3>
   <P>
     ESP arrays are similar to ECMAScript arrays and Java objects whose
     type is {@link java.util.ArrayList}. The syntax is essentially the
@@ -1168,7 +1173,7 @@ array-elements:
     not be accessible. The <A HREF="#solve">System of Linear Equations</A>
     example shows one case.
 
-    <H3><A NAME="global">The global object</A></H3>
+    <H3><A NAME="global"></A>The global object</H3>
   <P>
     ECMAScript assumes the existence of a global object, but the name
     of this object was not specified initially, resulting in
@@ -1298,7 +1303,7 @@ array-elements:
 	Java array. An exception will be thrown otherwise.
     </UL>
 
-    <H3><A NAME="tracing">Directives for Tracing</A></H3>
+    <H3><A NAME="tracing"></A>Directives for Tracing</H3>
   <P>
     ESP supports 4 directives that configure tracing. These can appear
     anywhere that a token can appear, but are ignored if inside comments
@@ -1329,7 +1334,7 @@ array-elements:
     one gets can be quite long, and often  the user is interested only in
     the behavior of a few statements.
 
-    <H2><A NAME="iteration">Iteration</A></H2>
+    <H2><A NAME="iteration"></A>Iteration</H2>
   <P>
     ESP does not provide any explicit iteration constructs, other than
     recursion. Java, however, provides the packages {@link java.util.stream}
@@ -1412,7 +1417,7 @@ list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
 will produce a sum of the absolute values of the numbers
 in <CODE>list</CODE>.
 
-    <H2><A NAME="threading">Threading</A></H2>
+    <H2><A NAME="threading"></A>Threading</H2>
   <P>
     The <A HREF="bindings">bindings</A> {@link ExpressionParser} uses
     by default are thread-safe&mdash;they use synchronized
@@ -1435,7 +1440,7 @@ in <CODE>list</CODE>.
     is multithreaded. Again, this is not an issue for subclasses
     of {@link org.bzdev.devqsim.Simulation}.
 
-    <H2><A NAME="bindings">Bindings</A></H2>
+    <H2><A NAME="bindings"></A>Bindings</H2>
   <P>
     Bindings are provided primarily to support the Java Scripting API.
     For ExpressionParser, a binding is simply a map whose keys are
@@ -1467,7 +1472,7 @@ synchronized function incr() {
     to <CODE>bindings2</CODE> will modify the value of <CODE>count</CODE>
     in <CODE>bindings1</CODE>.
 
-    <H2><A NAME="api">The ESP API</A></H2>
+    <H2><A NAME="api"></A>The ESP API</H2>
 
     The data structures that ESP uses to represent functions, objects,
     and arrays can be used directly in Java programs.
@@ -1534,7 +1539,7 @@ function foo(x, y) {Math.sqrt(x*x + y*y)}
     This method converts the object into an implementation of an
     interface defining a series of methods.
 
-    <H2><A NAME="helpers">Helper classes</A></H2>
+    <H2><A NAME="helpers"></A>Helper classes</H2>
   <P>
     There are a few classes in the BZDev class library that are
     sometimes needed when writing ESP scripts and that are not
@@ -1568,7 +1573,7 @@ var stroke = (new BasicStrokeBuilder())
 	java.awt.Color} constructors.
     </UL>
 
-    <H2><A NAME="examples">Examples</A></H2>
+    <H2><A NAME="examples"></A>Examples</H2>
   <P>
     The following examples illustrate how to use ESP.
 
@@ -1645,7 +1650,7 @@ nt.set(NullTest.getNullString());
     <CODE>(Number::null == String::null)</CODE> has the value
     <CODE>true</CODE>.
 
-    <H3><A NAME="solve">System of Linear Equations</A></H3>
+    <H3><A NAME="solve"></A>System of Linear Equations</H3>
   <P>
     A system of linear equations can be written a Ax = y where
     A is a matrix and x and y are vectors. One can create the
@@ -1929,7 +1934,7 @@ a2d.run();
 	animation to create the frames.
    </UL>
 
-    <H2><A NAME="hints">Hints</A></H2>
+    <H2><A NAME="hints"></A>Hints</H2>
   <P>
     ESP is actually rather strict about what types it recognizes. As
     a result, when importing classes, it is usually necessary to import
@@ -1984,7 +1989,7 @@ a2d.run();
     directives can produce significant amounts of output, one would typically
     use them for small portions of a script.
 
-    <H2><A NAME="notes">Implementation Notes</A></H2>
+    <H2><A NAME="notes"></A>Implementation Notes</H2>
   <P>
     ESP was designed to be a rudimentary scripting language, primarily
     intended for tasks such as setting up simulations, animations, or other

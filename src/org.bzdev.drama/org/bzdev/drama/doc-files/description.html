@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.drama Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.drama package</H2>
@@ -10,7 +15,7 @@ Please see
   <LI><A HREF="#examples">the examples</A> for coding examples.
 </UL>
 
-<H3><A NAME="intro">Introduction</A></H3>
+<H3><A NAME="intro"></A>Introduction</H3>
 
 This package provides a simulation flavor that essentially
 instantiates the {@link org.bzdev.drama.generic} package but with no extra
@@ -19,7 +24,7 @@ hierarchy used in the generic simulation package, as the following UML
 diagram shows (the classes in org.bzdev.drama.generic are shown in
 blue):
 <P style="text-align:center">
-<img src="drama.png">
+<img src="drama.png" class="imgBackground">
 <P>
 The classes {@link DramaSimObject}
 and {@link AbstractTaskObject} are
@@ -34,7 +39,7 @@ Similarly {@link org.bzdev.obnaming.NamedObjectFactory named-object factories}
 are subclasses of the corresponding factories defined in
 org.bzdev.drama.generic.  These are shown in the following diagram:
 <P style="text-align:center">
-<img src="dfactories.png">
+<img src="dfactories.png" class="imgBackground">
 <P>
 All the named-object factories that are direct subclasses of the
 factory classes in {@link org.bzdev.drama.generic} are abstract
@@ -75,7 +80,7 @@ class is supported by several other classes:
     actors will have the same domains, In some cases, its use improves
     performance.
 </UL>
-<H3><A NAME="examples">Examples</A></H3>
+<H3><A NAME="examples"></A>Examples</H3>
 As a coding example, a trivial simulation using this package might
 create a subclass of {@link org.bzdev.drama.Actor} as follows:
 <BLOCKQUOTE><CODE><PRE>

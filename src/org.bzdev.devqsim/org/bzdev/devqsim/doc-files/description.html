@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.devqsim Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The discrete-event simulation package</H2>
@@ -10,7 +15,7 @@ Please see
   <LI><A HREF="#examples">the examples</A> for some coding examples.
 </UL>
 
-<H3><A NAME="intro">Introduction</A></H3>
+<H3><A NAME="intro"></A>Introduction</H3>
 
 This package provides the basic mechanisms needed for scheduling
 calls and tasks, managing simulation time, and for queuing
@@ -35,7 +40,7 @@ The following diagram shows a high-level view of the structure of
 this package, except for "factory" classes, emphasizing the classes
 used to write simulations:
 <P style="text-align: center">
-<img src="devqsim.png">
+<img src="devqsim.png" class="imgBackground">
 <P>
 A Callable can be scheduled directly.  For a task thread, one normally
 schedules a Runnable and the simulation will then create the task thread.
@@ -57,7 +62,7 @@ debugging, but it can also be used if a GUI needs to track a simulation
 for purposes of updating the contents of a window.  These classes and
 how they interact is shown in the following figure:
 <P style="text-align: center">
-<img src="monitoring.png">
+<img src="monitoring.png" class="imgBackground">
 <P>
 The class DefaultSimAdapter implements SimulationListener but
 provide defaults to make it easy to write a listener that responds
@@ -77,7 +82,7 @@ defined by packages that implement extensions of the current
 package for specific kinds of simulations.  The class hierarchy for
 simulation events is shown in the following figure:
 <P style="text-align: center">
-<img src="events.png">
+<img src="events.png" class="imgBackground">
 <ul>
   <li> The class {@link SimulationEvent}
     can be subclassed to add more types of events.  This is done in
@@ -124,14 +129,14 @@ separate from the animation code.
 Factory classes can be used to configure simulation objects. The
 class hierarchy is shown in the following diagram:
 <P style="text-align: center">
-<img src="dqfactories.png">
+<img src="dqfactories.png" class="imgBackground">
 <P>
 The class hierarchy follows the guidelines suggested for the
 org.bzdev.obnaming package. where abstract factory classes with
 type parameters follow the class hierarchy for the objects the
 factories create, and non-abstract subclasses of these allow
 objects to be created.
-<H3><A NAME="examples">Examples</A></H3>
+<H3><A NAME="examples"></A>Examples</H3>
 As an example, the following program
 <BLOCKQUOTE><CODE><PRE>
 import org.bzdev.devqsim.Simulation;

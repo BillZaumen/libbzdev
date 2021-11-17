@@ -851,95 +851,140 @@ DIAGRAMS = $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/anim2d.png \
 	$(MATH_DIR)/org/bzdev/math/rv/doc-files/rvtoplevel.png \
 	$(MATH_DIR)/org/bzdev/math/rv/doc-files/partial.png \
 	$(MATH_DIR)/org/bzdev/math/rv/doc-files/rvrv.png \
-	src/doc-files/modules.png src/doc-files/modules2.png \
-	src/doc-files/base.png  src/doc-files/math.png \
-	src/doc-files/graphics.png src/doc-files/desktop.png \
-	src/doc-files/drama.png src/doc-files/ejws.png \
-	src/doc-files/devqsim.png src/doc-files/rest.png
+	src/doc-files/modules.png \
+	src/doc-files/modules2.png \
+	src/doc-files/base.png  \
+	src/doc-files/math.png \
+	src/doc-files/graphics.png \
+	src/doc-files/desktop.png \
+	src/doc-files/drama.png \
+	src/doc-files/ejws.png \
+	src/doc-files/devqsim.png \
+	src/doc-files/rest.png
 
 diagrams: $(DIAGRAMS)
 
+#
+# When dia exports SVG, the background is transparent, but not when
+# dia exports PNG.  So, the following first creates an SVG file
+# and then uses inkscape to export a PNG file beecause inscape does
+# not fill transparent areas.
+
 $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/anim2d.png: diagrams/anim2d/anim2d.dia
 	mkdir -p $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/basicpath.png: \
 		diagrams/anim2d/basicpath.dia
 	mkdir -p $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/layerpath.png: \
 		diagrams/anim2d/layerpath.dia
 	mkdir -p $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files/devqsim.png: \
 		diagrams/devqsim/devqsim.dia
 	mkdir -p $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files/dqfactories.png: \
 		diagrams/devqsim/dqfactories.dia
 	mkdir -p $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files/events.png: \
 		diagrams/devqsim/events.dia
 	mkdir -p $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files/monitoring.png: \
 		diagrams/devqsim/monitoring.dia
 	mkdir -p $(DEVQSIM_DIR)/org/bzdev/devqsim/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/doc-files/drama.png: diagrams/drama/drama.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/doc-files/dfactories.png: \
 		diagrams/drama/dfactories.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/common/doc-files/commondrama.png: \
 		diagrams/drama/common/commondrama.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/common/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/genericdrama.png: \
 		diagrams/drama/generic/genericdrama.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/gevents.png: \
 		diagrams/drama/generic/gevents.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/message1.png: \
 		diagrams/drama/generic/message1.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/message2.png: \
 		diagrams/drama/generic/message2.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files/gdfactories.png: \
 		diagrams/drama/generic/gdfactories.dia
 	mkdir -p $(DRAMA_DIR)/org/bzdev/drama/generic/doc-files
-	dia -s 650x -e $@ $<
+	dia -s 650x -e tmp.svg $<
+	inkscape -w 650 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/geom.png: diagrams/geom/geom.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/pathbuilder.png: \
 		diagrams/geom/pathbuilder.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 BARYCENTRIC=$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/barycentric.png
 PLANAR=$(GRAPHICS_DIR)/org/bzdev/geom/doc-files/planar.png
@@ -960,7 +1005,9 @@ $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/planar.png: \
 $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/basicbuilder.png: \
 		diagrams/geom/basicbuilder.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/bgsphere.png: diagrams/geom/bgsphere.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/geom/doc-files
@@ -968,91 +1015,117 @@ $(GRAPHICS_DIR)/org/bzdev/geom/doc-files/bgsphere.png: diagrams/geom/bgsphere.pn
 
 $(GRAPHICS_DIR)/org/bzdev/gio/doc-files/gio.png: diagrams/gio/gio.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/gio/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/graphs.png: diagrams/graphs/graphs.dia
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis1.png: diagrams/graphs/axis1.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis2.png: diagrams/graphs/axis2.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis3.png: diagrams/graphs/axis3.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis4.png: diagrams/graphs/axis4.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis5.png: diagrams/graphs/axis5.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/axis6.png: diagrams/graphs/axis6.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files/clocktime.png: \
 		diagrams/graphs/clocktime.png
 	mkdir -p $(GRAPHICS_DIR)/org/bzdev/graphs/doc-files
-	cp $< $@
+	convert -transparent white $< $@
 
 $(MATH_DIR)/org/bzdev/math/doc-files/math1.png: diagrams/math/math1.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(MATH_DIR)/org/bzdev/math/doc-files/math2.png: diagrams/math/math2.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(MATH_DIR)/org/bzdev/math/stats/doc-files/stats.png: \
 		diagrams/math/stats/stats.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/stats/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(BASE_DIR)/org/bzdev/net/calendar/doc-files/ICalBuilder.png: \
 		diagrams/net/ICalBuilder.dia
 	mkdir -p $(BASE_DIR)/org/bzdev/net/calendar/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(BASE_DIR)/org/bzdev/net/calendar/doc-files/ICalParser.png: \
 		diagrams/net/ICalParser.dia
 	mkdir -p $(BASE_DIR)/org/bzdev/net/calendar/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(BASE_DIR)/org/bzdev/scripting/doc-files/scripting.png: \
 		diagrams/scripting/scripting.dia
 	mkdir -p $(BASE_DIR)/org/bzdev/scripting/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DESKTOP_DIR)/org/bzdev/swing/doc-files/swing1.png: diagrams/swing/swing1.dia
 	mkdir -p $(DESKTOP_DIR)/org/bzdev/swing/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(DESKTOP_DIR)/org/bzdev/swing/doc-files/swing2.png: diagrams/swing/swing2.dia
 	mkdir -p $(DESKTOP_DIR)/org/bzdev/swing/doc-files
-	dia -s 450x -e $@ $<
+	dia -s 450x -e tmp.svg $<
+	inkscape -w 450 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/obnaming.png: \
 		diagrams/obnaming/obnaming.dia
 	mkdir -p $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/example.png: \
 		diagrams/obnaming/example.dia
 	mkdir -p $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/factory.png: \
 		diagrams/obnaming/factory.dia
 	mkdir -p $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(P3D_DIR)/org/bzdev/p3d/doc-files/sgexample.png: diagrams/p3d/sgexample.png
 	mkdir -p  $(P3D_DIR)/org/bzdev/p3d/doc-files
@@ -1069,20 +1142,28 @@ $(P3D_DIR)/org/bzdev/p3d/doc-files/sgbuilder2.png: diagrams/p3d/sgbuilder2.png
 $(MATH_DIR)/org/bzdev/math/rv/doc-files/rvtoplevel.png: \
 		diagrams/math/rv/rvtoplevel.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/rv/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(MATH_DIR)/org/bzdev/math/rv/doc-files/partial.png: \
 		diagrams/math/rv/partial.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/rv/doc-files
-	dia -s 600x -e $@ $<
+	dia -s 600x -e tmp.svg $<
+	inkscape -w 600 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 $(MATH_DIR)/org/bzdev/math/rv/doc-files/rvrv.png: diagrams/math/rv/rvrv.dia
 	mkdir -p $(MATH_DIR)/org/bzdev/math/rv/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/bzdev.png: diagrams/bzdev.dia
 	mkdir -p src/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/modules.png: diagrams/modules.svg
 	mkdir -p src/doc-files
@@ -1096,35 +1177,51 @@ src/doc-files/modules2.png: diagrams/modules.svg
 
 src/doc-files/base.png: diagrams/modules/base.dia
 	mkdir -p src/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/math.png: diagrams/modules/math.dia
 	mkdir -p src/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/graphics.png: diagrams/modules/graphics.dia
 	mkdir -p src/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/desktop.png: diagrams/modules/desktop.dia
 	mkdir -p src/doc-files
-	dia -s 700x -e $@ $<
+	dia -s 700x -e tmp.svg $<
+	inkscape -w 700 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/drama.png: diagrams/modules/drama.dia
 	mkdir -p src/doc-files
-	dia -s 500x -e $@ $<
+	dia -s 500x -e tmp.svg $<
+	inkscape -w 500 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/ejws.png: diagrams/modules/ejws.dia
 	mkdir -p src/doc-files
-	dia -s 300x -e $@ $<
+	dia -s 300x -e tmp.svg $<
+	inkscape -w 300 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/devqsim.png: diagrams/modules/devqsim.dia
 	mkdir -p src/doc-files
-	dia -s 500x -e $@ $<
+	dia -s 500x -e tmp.svg $<
+	inkscape -w 500 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 src/doc-files/rest.png: diagrams/modules/rest.dia
 	mkdir -p src/doc-files
-	dia -s 500x -e $@ $<
+	dia -s 500x -e tmp.svg $<
+	inkscape -w 500 --export-filename=$@ tmp.svg
+	rm tmp.svg
 
 #
 # HTML PAGES
@@ -1140,6 +1237,9 @@ JROOT_ALT_JAVADOCS = $(JROOT)/BUILD/alt-api
 jdclean:
 	rm -rf BUILD/api
 	rm -rf BUILD/alt-api
+
+diaclean:
+	rm $(DIAGRAMS)
 
 javadocs: $(JROOT_JAVADOCS)/index.html
 
@@ -1229,13 +1329,15 @@ saved:
 	       cp src/$$i/description.html $(JROOT_JAVADOCS)/$$i ; done
 
 $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
-		src/overview.html src/description.html
+		src/overview.html src/description.html stylesheet.css \
+		src/FactoryOverview.html
 	rm -rf $(JROOT_JAVADOCS)
 	mkdir -p $(JROOT_JAVADOCS)
 	mkdir -p $(MATH_DIR)/$(BZDEV)/math/doc-files
 	cp $(MATH_DIR)/$(BZDEV)/providers/math/fft/DefaultFFT.txt \
 		$(MATH_DIR)/$(BZDEV)/math/doc-files/DefaultFFT.txt
 	javadoc -d $(JROOT_JAVADOCS) --module-path BUILD \
+		--main-stylesheet stylesheet.css \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api \
@@ -1247,7 +1349,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 	cp src/description.html $(JROOT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
-	$(RUNLSNOF) --link \
+	$(RUNLSNOF) --darkmode --link \
 		file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api/ \
 		--overview src/FactoryOverview.html \
 		-d $(JROOT_JAVADOCS)/  '**'

@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.math.rv Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.math.rv package</H2>
@@ -38,7 +43,7 @@ modify the factory's methods.
 The top-level classes for the class hierarchy are shown in the
 following figure:
 <P style="text-align:center">
-<img src="rvtoplevel.png">
+<img src="rvtoplevel.png" class="imgBackground">
 <P>
 The base class is named {@link RandomVariable} and it has a type
 parameter giving the type of the values it creates.  This is an
@@ -91,7 +96,7 @@ There are a number of classes to provide random variables with
 specific distributions.  A partial class hierarchy is shown in
 the following figure:
 <P style="text-align: center">
-<img src="partial.png">
+<img src="partial.png" class="imgBackground">
 <P>
 These include are classes to produce random variables with a fixed
 distribution which provides a single value, a uniform distribution,
@@ -111,7 +116,7 @@ PoissonIATimeRV, and UniformIATimeRV.
 Similarly, the following figure shows a partial class
 hierarchy for random variables that generate other random variables:
 <P style="text-align: center">
-<img src="rvrv.png">
+<img src="rvrv.png" class="imgBackground">
 <P>
 These classes are used primarily with factories that initialize
 multiple objects, each with a random variable with a different

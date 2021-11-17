@@ -4,6 +4,12 @@
   <HEAD>
     <META HTTP-EQUIV="content-type" content="text/html; charset=UTF-8">
     <TITLE>Factory Parameter Defining Classes</TITLE>
+    <STYLE>
+      body {
+	  background-color:$(otherBackground);
+	  color:$(otherColor);
+      }
+    </STYLE>
   </HEAD>
   <BODY>$(factories:endFactories)
     <TABLE border="1">

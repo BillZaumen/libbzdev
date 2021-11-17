@@ -72,7 +72,7 @@ import java.io.IOException;
  * The allowed sequences of object.type values for these paths are shown
  * in the following diagram:
  * <DIV style="text-align: center">
- * <img src="doc-files/layerpath.png">
+ * <img src="doc-files/layerpath.png" class="imgBackground">
  * </DIV>
  * <P>
  * The factory parameters this factory provides are the same as the parameters

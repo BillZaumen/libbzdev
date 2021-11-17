@@ -101,8 +101,7 @@ import org.bzdev.util.SafeFormatter;
  * graph-coordinate space. The other objects are instances of Drawable
  * and Graphic described below The drawing methods are
  * <ul>
- *  <li> <A name="drawImg">drawImage.</A>  There are several variants,
-
+ *  <li> <A name="drawImg"></A>drawImage.  There are several variants,
  *       some of which allow the image to be rotated, scaled, or
  *       flipped.  Arguments common to all are a graphics context, an
  *       image, and the x and y coordinate in graph-coordinate

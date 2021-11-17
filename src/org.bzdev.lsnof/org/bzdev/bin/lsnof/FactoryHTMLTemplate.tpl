@@ -4,6 +4,29 @@
   <HEAD>
     <META HTTP-EQUIV="content-type" content="text/html; charset=UTF-8">
     <TITLE>Factory Parameter Documentation</TITLE>
+    <STYLE>
+      body {
+	  background-color:$(contentBackground);
+	  color:$(contentColor);
+      }
+      a:link, a:visited {
+	  text-decoration:none;
+	  color:$(contentLinkColor)
+      }
+
+      li {
+	  padding-top: 8pt;
+      }
+
+      li:first-child {
+	  padding-top: 0pt;
+      }
+
+      li:last-child {
+	  padding-top: 8pt;
+	  padding-below: 8pt;
+      }
+    </STYLE>
   </HEAD>
   <BODY>$(factories:endFactories)
     <TABLE border="1">
@@ -21,7 +44,7 @@
 	  <TD rowspan="$(hasDoc:endDoc)3$(endDoc)$(noDoc:endDoc)2$(endDoc)"
 	      valign="top">
 	    <TABLE border="0">
-      <TR><TD><CODE><B><A name="$(name)-$(factory)">$(name)</A></B></CODE>
+      <TR><TD><CODE><B><A name="$(name)-$(factory)"></A>$(name)</B></CODE>
 	      </TD></TR>
 	      <TR><TD><I>$(label)</I></TD></TR>
 	    </TABLE>

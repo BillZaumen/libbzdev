@@ -14,7 +14,7 @@ import java.security.*;
  * The API is modeled after the API for {@link java.awt.geom.Rectangle2D}
  * in order to reduce the learning curve.
  * <P>
- * A point is considered to lie <a name="inside">inside</a>
+ * A point is considered to lie <a name="inside"></a>inside
  * the rectangular cuboid, and thus to be contained by it, if all of
  * the following are true:
  * <UL>

@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>Object-Namer Launchers</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>Object-namer launchers</H2>
@@ -30,7 +35,7 @@
     <LI><A HREF="#genDoc">Generating class documentation</A>.
   </UL>
 
-  <H3><A NAME="instantiation">Instantiating an object namer</A></H3>
+  <H3><A NAME="instantiation"></A>Instantiating an object namer</H3>
 <P>
   While a constructor can be used directly, normally and object-namer
   launcher will be created by using a <CODE>newInstance</CODE> method:
@@ -159,7 +164,7 @@ execute: "= \"var foo = 10\""
   example, has options that set scripting-language variables and some
   of these methods are used by yrunner for that purpose.
 
-  <H3><A NAME="subclassing">Subclassing an object-namer launcher</A></H3>
+  <H3><A NAME="subclassing"></A>Subclassing an object-namer launcher</H3>
 <P>
   A subclass of {@link org.bzdev.obnaming.ObjectNamerLauncher} is
   expected to have two constructors: one with no arguments and one
@@ -205,7 +210,7 @@ execute: "= \"var foo = 10\""
   there are 8 spaces per tab. Allowing tabs is convenient when using some
   text editors (e.g., emacs).
 
-  <H3><A NAME="configSyntax">Configuring object-namer launchers</A></H3>
+  <H3><A NAME="configSyntax"></A>Configuring object-namer launchers</H3>
 
   The YAML file loaded by a constructor lists classes and how they can
   be used in an object-namer launcher's scripting environment. A
@@ -251,7 +256,7 @@ execute: "= \"var foo = 10\""
       YAML aliases can be used to minimize the replication of class names.
   </UL>
   
-  <H3><A NAME="SPIs">The SPIs for object-namer launchers</A></H3>
+  <H3><A NAME="SPIs"></A>The SPIs for object-namer launchers</H3>
 
   Both <CODE>yrunner</CODE> and the
   <A HREF="#instantiate"><CODE>newInstance</CODE></A> methods will
@@ -390,7 +395,7 @@ org.bzdev.providers.devqsim.SimulationLauncherProvider
   or at least of openjdk, need both if the service provider is to work
   as expected whether or not Java modules are used.
 
-  <H3><A NAME="genDoc">Generating class documentation</A></H3>
+  <H3><A NAME="genDoc"></A>Generating class documentation</H3>
 <P>
   The class {@link org.bzdev.obnaming.ObjectNamerLauncher} contains
   methods for querying its expression parser to recover information

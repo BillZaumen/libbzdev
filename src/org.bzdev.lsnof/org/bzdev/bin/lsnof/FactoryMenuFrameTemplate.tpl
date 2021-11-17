@@ -19,6 +19,14 @@
     ul li {
        list-style:none;
     }
+    body {
+	  background-color:$(menuBackground);
+	  color:$(menuColor);
+      }
+      a:link, a:visited {
+	  text-decoration:none;
+	  color:$(menuLinkColor)
+      }
     </STYLE>
     <TITLE>Factories</TITLE>
   </HEAD>

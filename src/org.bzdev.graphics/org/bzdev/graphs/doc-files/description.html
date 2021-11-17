@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.graphs Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.graphs package</H2>
@@ -56,7 +61,7 @@ parameters to be specified, and tick-marks on axes to be specified.
 Several interfaces allow objects to define how they should be drawn, as
 illustrated in the following UML diagram:
 <P style="text-align: center">
-<img src="graphs.png">
+<img src="graphs.png" class="imgBackground">
  *<P>
 The interfaces whose names being with Graph.User specify objects
 in user-space coordinates, and are intended for drawing icons that
@@ -77,7 +82,7 @@ CSS specification, HSL (Hue, Saturation, Lightness) values, wavelength
 for a monochromatic color, or a spectrum.  A method is also provided
 to return the spectrum for blackbody radiation.
 
-<H3><A NAME="linear">Creating linear graphs</A></H3>
+<H3><A NAME="linear"></A>Creating linear graphs</H3>
 
 The following example shows how to use the {@link org.bzdev.graphs} package
 to create graphs with linear axes. One will first import the
@@ -165,7 +170,7 @@ for SVG, Postscript, or any case in which an instance of
 {@link org.bzdev.gio.OutputStreamGraphics} was used in the
 graph's constructor.
 
-<H3><A NAME="log">Creating a logarithmic axis</A></H3>
+<H3><A NAME="log"></A>Creating a logarithmic axis</H3>
 
 If an axis is a logarithmic axis, the values plotted on that
 axis should be the logarithm to base 10 of the value to be
@@ -187,7 +192,7 @@ and the X axis is created by
       graph.draw(ab.createAxis());
 </PRE></CODE></BLOCKQUOTE>
 
-<H3><A NAME="clock">Creating as clock-time graphs</A></H3>
+<H3><A NAME="clock"></A>Creating as clock-time graphs</H3>
 When a distance of 1.0 in user space corresponds to one second in
 time, on can use the class {@link AxisBuilder.ClockTime} to create
 an axis:
@@ -216,7 +221,7 @@ Finally the axis is added to the graph.
       graph.draw(abct.createAxis());
 </PRE></CODE></BLOCKQUOTE>
 
-<H3><A NAME="symbols">Adding symbols</A></H3>
+<H3><A NAME="symbols"></A>Adding symbols</H3>
 
 The {@link org.bzdev.graphs} package predefines a set of
 symbols (more can be added by using a
@@ -260,7 +265,7 @@ For example,
       graph.drawEY(symbol2, 200.0, 200.0, 10.0, 15.0);
 </PRE></CODE></BLOCKQUOTE>
 
-<H3><A NAME="overlays">Overlays</A></H3>
+<H3><A NAME="overlays"></A>Overlays</H3>
 
 The use of graph coordinate space as described, particularly when axes
 are added to a graph, does not work very well when curves with different
@@ -279,7 +284,7 @@ When the graph is finally drawn, using either graph for output, the
 resulting graph will reflect what was drawn for both of the two
 graphs.
 
-<H3><A NAME="drawing">Using graphs as canvases</A></H3>
+<H3><A NAME="drawing"></A>Using graphs as canvases</H3>
 
 When used for drawing, the method
 {@link Graph#setRanges(double,double,double,double,double,double)}

@@ -183,7 +183,7 @@ import java.security.*;
  * must be used with the same names and in the same order as in the
  * factory definition, and will generally differ from the type parameters
  * shown for the documentation for this class. As an example,
- * <A NAME="pmexample">
+ * <A NAME="pmexample"></A>
  * <BLOCKQUOTE><CODE><PRE>
  *     {@literal @}FactoryParmManager(value="AbstractFooFactoryPM")
  *     public abstract class AbstractFooFactory&lt;OBJ extends Foo&gt; {
@@ -194,7 +194,7 @@ import java.security.*;
  *           initParms(pm, AbstractFooFactory.class);
  *        }
  *     }
- * </PRE></CODE></BLOCKQUOTE></A>
+ * </PRE></CODE></BLOCKQUOTE>
  * would be appropriate for a factory for a subclass of some object
  * defined in the <code>anim2d</code> package --- the class created by the
  * annotation processor is defined as follows:

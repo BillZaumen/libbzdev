@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * new point to the SplinePath2D builder:
  * <P>
  * <P style="text-align:center">
- * <IMG SRC="doc-files/pathbuilder.png">
+ * <IMG SRC="doc-files/pathbuilder.png" class="imgBackground">
  * <P>
  * The line colors are not significant - they are just used to
  * make it obvious that lines cross rather than join. Bidirectional

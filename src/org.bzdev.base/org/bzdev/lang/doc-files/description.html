@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <HTML lang="en">
+<HEAD>
+  <title>The org.bzdev.lang Package</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+</HEAD>
 <BODY>
     <div style="margin-left: 2em">
 <H2>The org.bzdev.lang package</H2>
@@ -12,7 +17,7 @@ For specific topics, please see
   <LI><A HREF="#misc">miscellaneous classes</A>.
 </UL>
 
-<H3><A NAME="callable">The Callable interface</A></H3>
+<H3><A NAME="callable"></A>The Callable interface</H3>
 
 Starting with the initial version of Java (1.0), Java has provided an
 interface named <CODE>Runnable</CODE> with a single method named
@@ -72,13 +77,13 @@ related interfaces:
     that does not take any arguments. It may throw an exception (any
     subclass of java.lang.Exception).
 </UL>
-<H3><A NAME="lib">Library loading</A></H3>
+<H3><A NAME="lib"></A>Library loading</H3>
 <p>
 The class ResourceLibLoader supports looking up and loading a resource
 containing a shared library. A naming convention is used to allow the
 correct resource to be obtained for a given version of the operating
 system and a given machine architecture.
-<H3><A NAME="dmethods">Dynamic Methods</A></H3>
+<H3><A NAME="dmethods"></A>Dynamic Methods</H3>
 <p>
 Normally Java looks up an object&apos;s method at run time but bases the
 lookup on the method&apos;s signature (specifically the types of the
@@ -605,7 +610,7 @@ for
   <LI> {@link org.bzdev.lang.annotations.DMethodImpl}.
   <LI> {@link org.bzdev.lang.annotations.DMethodContext}.
 </UL>
-<H3><A NAME="misc">Miscellaneous classes</A></H3>
+<H3><A NAME="misc"></A>Miscellaneous classes</H3>
 Finally, there are several miscellaneous classes:
 <UL>
   <LI><CODE>DesignatedThreadsSM</CODE>. This security turns off most
