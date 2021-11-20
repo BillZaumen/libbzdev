@@ -447,6 +447,8 @@ public class FactoryPrinter {
 	    URL[] urls = noURLs;
 	    String target = null;
 	    String menuFile = null;
+	    int menuWidth = errorMsg("factories").length();
+
 	    while (index < argv.length && argv[index].startsWith("-")) {
 		if (argv[index].equals("--")) {
 		    index++;
@@ -823,10 +825,23 @@ public class FactoryPrinter {
 		    fset.addAll(NamedObjectFactory
 				.getListedFactories(argv[index++]));
 		}
+		for (NamedObjectFactory f: fset) {
+		    Class<?> c = f.getClass();
+		    String pname = c.getPackage().getName();
+		    String cname = c.getSimpleName();
+		    int clen = cname.length();
+		    if (cname.endsWith("Factory")) {
+			clen -= 8;
+		    }
+		    int len = Math.max(pname.length(), clen);
+		    if (menuWidth < len) {
+			menuWidth = len;
+		    }
+		}
 		NamedObjectFactory.setTarget("factories");
 		TemplateProcessor.KeyMap keymap =
 		    NamedObjectFactory.getTemplateKeyMapForFactories(fset);
-
+		keymap.put("menuWidth", "" + menuWidth);
 		OutputStream os = da.getOutputStream("menu.html");
 		Writer writer = new OutputStreamWriter(os, "UTF-8");
 		setupColors(keymap, darkmode);
@@ -866,6 +881,7 @@ public class FactoryPrinter {
 		}
 		TemplateProcessor.KeyMap keymap2 =
 			new TemplateProcessor.KeyMap();
+		keymap.put("menuWidth", "" + menuWidth);
 		setupColors(keymap2, darkmode);
 		TemplateProcessor tp2 = new TemplateProcessor(keymap2);
 		tp2.processTemplate(new InputStreamReader(overviewStream,
@@ -880,6 +896,7 @@ public class FactoryPrinter {
 		     "/" + framesetResource);
 		TemplateProcessor.KeyMap keymap1 =
 		    new TemplateProcessor.KeyMap();
+		keymap1.put("menuWidth", "" + menuWidth);
 		setupColors(keymap1, darkmode);
 		TemplateProcessor tp = new TemplateProcessor(keymap1);
 		/*
@@ -894,6 +911,7 @@ public class FactoryPrinter {
 	    } else if (index == argv.length) {
 		TemplateProcessor.KeyMap keymap =
 		    NamedObjectFactory.getTemplateKeyMapForFactories();
+		keymap.put("menuWidth", "" + menuWidth);
 		setupColors(keymap, darkmode);
 		printFactories(reader, System.out, keymap);
 	    } else {

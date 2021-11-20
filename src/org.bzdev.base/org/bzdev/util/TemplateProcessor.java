@@ -167,7 +167,10 @@ public class TemplateProcessor {
 	 * A key containing white space will not be recognized by a
 	 * template processor.
 	 * @param key the key
-	 * @param value the value corresponding to the key
+	 * @param value the value corresponding to the key (either a
+	 *        {@link java.lang.String} or an instance of a class
+	 *        implementing {@link TemplateProcessor.KeyMapIterable},
+	 *        with a null value trated as an empty string)
 	 * @return the previous object; null if there was none
 	 */
 	@Override
@@ -184,10 +187,14 @@ public class TemplateProcessor {
 	/**
 	 * Set a key-map entry for both a key and its '+' or '-'
 	 * conditional directives.
+	 * <P>
+	 * A value, if not null, must be either a {@link java.lang.String}
+	 * or an instance of a class implementing
+	 * {@link TemplateProcessor.KeyMapIterable}.
 	 * @param key the key
 	 * @param value the value for the key (if null, the key will
 	 *        not be entered, but KeyMap entries for the hasList
-	 *        and hasntList will be entered if non null
+	 *        and hasntList will be entered if non null)
 	 * @param hasList an instance of {@link TemplateProcessor.KeyMap},
 	 *        {@link TemplateProcessor.KeyMapList},
 	 *        {@link TemplateProcessor.KeyMapIterable},

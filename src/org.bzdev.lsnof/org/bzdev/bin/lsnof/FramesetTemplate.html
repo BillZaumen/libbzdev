@@ -27,8 +27,9 @@
 	  var height = window.innerHeight - 32;
 	  if (width < 300) width = 300;
 	  if (height < 300) height = 300;
-	  var tocWidth = Math.floor(width/5)-8;
-	  if (tocWidth < 256) tocWidth = 256;
+	  // var tocWidth = Math.floor(width/5)-8;
+	  var tocWidth = $(menuWidth)*10 + 20;
+	  // if (tocWidth < 256) tocWidth = 256;
 	  var contentWidth = width - tocWidth - 24;
 	  var toc = document.getElementById("tocID");
 	  var contents = document.getElementById("contentsID");

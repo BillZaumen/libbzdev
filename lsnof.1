@@ -66,7 +66,8 @@ The syntax used by the template processor can be found in the javadoc
 documentation for org.bzdev.util.TemplateProcessor.  The key map used
 by the template processor is defined in the javadoc documentation for
 the method getTemplateKeyMap in the class
-org.bzdev.obnaming.NamedObjectFactory with the following additional keys:
+org.bzdev.obnaming.NamedObjectFactory with the following additional keys
+representing colors:
 .BR frameBackground ,
 .BR frameColor ,
 .BR menuBackground ,
@@ -84,7 +85,12 @@ and
 The values for each is a
 .B #
 followed by 6 hexadecimal digits to represent a color for use in a
-CSS style.
+CSS style. One additional key,
+.BR menuWidth ,
+provides the number of characters in each key in the menu providing
+the factory class names, excluding any trailing characters matching
+the string "Factory".
+
 .SH COMMON OPTIONS
 .PP
 These options are shared by all uses of this command. Most of

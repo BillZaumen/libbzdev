@@ -10,7 +10,7 @@
     h2 {
        font-weight:bold;
        font-style: italic;
-       font-size:1.25em;
+       font-size:16px;
        padding:10px 0 0 0;
     }
     ul {
