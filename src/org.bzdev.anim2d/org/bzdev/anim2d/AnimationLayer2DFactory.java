@@ -48,7 +48,7 @@ package org.bzdev.anim2d;
  * allowed sequences of <CODE>object.type</CODE> values for these
  * paths are shown in the following diagram:
  * <DIV style="text-align: center">
- * <img src="doc-files/layerpath.png">
+ * <img src="doc-files/layerpath.png" class="imgBackground">
  * </DIV>
  * <P>
  * The parameters this factory supports are shown in the following table

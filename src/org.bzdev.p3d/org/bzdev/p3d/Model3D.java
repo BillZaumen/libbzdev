@@ -9159,7 +9159,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * produced the following image (truncated and rotated for display
      * purposes:
      * <P style="text-align: center">
-     * <img src="doc-files/fakelock.png">
+     * <img src="doc-files/fakelock.png"  class="imgBackground">
      * <P>
      * thus providing a visual representation of the error.
      * @param graph the graph

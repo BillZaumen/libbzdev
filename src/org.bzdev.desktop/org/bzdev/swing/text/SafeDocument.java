@@ -383,7 +383,8 @@ public class SafeDocument implements Document {
      * down to the start of the range, and any marks in the removal
      * range are collapsed down to the start of the range.
      * <p style="text-align:center"><img src="doc-files/Document-remove.gif"
-     *  alt="Diagram shows removal of 'quick' from 'The quick brown fox.'">
+     *  alt="Diagram shows removal of 'quick' from 'The quick brown fox.'"
+     *  class="imgBackground">
      * <p>
      * If the Document structure changed as result of the removal,
      * the details of what Elements were inserted and removed in
@@ -429,7 +430,8 @@ public class SafeDocument implements Document {
      * The offset and length of the generated DocumentEvent
      * will indicate what change was actually made to the Document.
      * <p style="text-align:center"><img src="doc-files/Document-insert.gif"
-     *  alt="Diagram shows insertion of 'quick' in 'The quick brown fox'">
+     *  alt="Diagram shows insertion of 'quick' in 'The quick brown fox'"
+     *  class="imgBackground">
      * <p>
      * If the Document structure changed as result of the insertion,
      * the details of what Elements were inserted and removed in

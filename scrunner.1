@@ -175,7 +175,7 @@ name separator ("/" for Unix) is expanded to the user\'s home
 directory, a file name consisting of only "~" is replaced with the
 user\'s home directory, a leading "~~" is replaced with "~", and a
 leading "..." followed by the name separator ("/" for Unix) is
-replaced by the directory in which the bzdev class library's JAR file
+replaced by the directory in which the BZDev class library's JAR file
 is located.  For the
 .B \-\-classpathCodebase
 case, a component can be any could appear in a Java
@@ -191,7 +191,18 @@ Define the name of a Java property and give it a value.  See the java
 command for details.  The syntax for this argument is the same as that
 defined for the similarly named option for the
 .B java
-command.  The properties "java.system.class.loader", "java.security.manager",
+command.  One use of this option that should be mentioned occurs when
+the
+.B org.bzdev.anim2d
+package is used: to include images in untrusted scripts, one should add
+a property whose name is
+.B org.bzdev.protocols.resource.path
+and whose value is one or more directories containing images, separated
+by the standard path-separator character (":" on Unix/Linux systems).
+Then the images can be accessed by using the
+.B resource
+URL The.
+scheme properties "java.system.class.loader", "java.security.manager",
 "scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
 option (or the corresponding
 .B \-J
@@ -451,3 +462,17 @@ file override those in the system configuration file.
 .BR scrunner.conf (5)
 .br
 .BR lsnof (1)
+
+\"  LocalWords:  SCRUNNER libbzdev util scrunner fB fIOPTION fIFILE
+\"  LocalWords:  fR br listScriptingLanguages fILANGUAGE IFILE BZDev
+\"  LocalWords:  supportsLanguage trustLevel subclasses createFactory
+\"  LocalWords:  Javascript DramaSimulation importClass boolean TP TQ
+\"  LocalWords:  importClasses getReader getWriter getErrorWriter rw
+\"  LocalWords:  javascript println Nashorn listCodeBase codebase rws
+\"  LocalWords:  classpathCodebase URLPATH classpath fIVALUE sysconf
+\"  LocalWords:  untrusted usrconf DIRNAME fIDIRNAME accessor dryrun
+\"  LocalWords:  subdirectory DirectoryAccessor fIFILENAME JOPTION vS
+\"  LocalWords:  makefiles OUTPUTFILE VARNAME IFILENAME rwd fIN vB vI
+\"  LocalWords:  stackTrace hecto giga vL tera peta exa vD yocto atto
+\"  LocalWords:  zepto femto nano milli centi zetta yotta fRor fI
+\"  LocalWords:  Solaris config conf lsnof

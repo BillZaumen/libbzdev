@@ -25,7 +25,7 @@ import org.bzdev.util.TemplateProcessor.KeyMapList;
  * Users of this class should be familiar with this RFC. This class
  * uses several additional classes as shown in the following diagram:
  * <P style="text-align: center">
- * <img src="doc-files/ICalBuilder.png">
+ * <img src="doc-files/ICalBuilder.png" class="imgBackground">
  * <P>
  * Users of this class will first create an instance of it and also
  * instances of inner classes representing iCalendar components. Then

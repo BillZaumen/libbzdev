@@ -675,14 +675,14 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * The following figure shows the effects of successive calls
      * to addTickSpec when the first call's second argument is false.
      * <P style="text-align: center">
-     * <img src="doc-files/axis3.png">
+     * <img src="doc-files/axis3.png" class="imgBackground">
      *<P>
      * The following figure shows the effects of successive calls
      * to addTickSpec when the first call's second argument is true.
      * In this case, the first call consumes two levels, so the
      * second call to addTickSpec sets its level to 2.
      * <P style="text-align: center">
-     * <img src="doc-files/axis4.png">
+     * <img src="doc-files/axis4.png" class="imgBackground">
      *<P>
      * For the use of a divisor, consider an axis builder created as
      * follows:
@@ -695,7 +695,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * Successive calls to addTickSpec then behave as shown in the
      * next figure:
      * <P style="text-align: center">
-     * <img src="doc-files/axis5.png">
+     * <img src="doc-files/axis5.png" class="imgBackground">
      *<P>
      * Finally, the following provides examples of the full sequence of
      * operations needed to create a graph and its axes.
@@ -1162,7 +1162,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * The following figure shows the effect of calling these
      * methods:
      * <P style="text-align: center">
-     * <img src="doc-files/axis6.png">
+     * <img src="doc-files/axis6.png" class="imgBackground">
      *<P>
      */
     public static class Log extends AxisBuilder<Graph.LogAxis> {
@@ -1800,7 +1800,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * </pre></code></blockquote>
      * will produce the following axis:
      * <P style="text-align: center">
-     * <img style="width: 100%; height: auto" src="doc-files/clocktime.png">
+     * <img style="width: 100%; height: auto" src="doc-files/clocktime.png"  class="imgBackground">
      */
     public static class ClockTime extends AxisBuilder<Graph.Axis> {
 

@@ -12,7 +12,7 @@ import java.util.List;
  * components, properties, and parameters is shown in the following
  * UML diagram:
  * <P style="text-align: center">
- * <img src="doc-files/ICalParser.png">
+ * <img src="doc-files/ICalParser.png" class="imgBackground">
  * <P>
  * Starting from the top-level component (an instance of{@link
  * ICalParser}), calling {@link ICalComponent#getComponents()} will

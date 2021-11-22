@@ -7058,7 +7058,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7149,7 +7149,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7247,7 +7247,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7353,7 +7353,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * operation, is used as the start of the next.
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7443,7 +7443,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7541,7 +7541,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7647,7 +7647,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * operation, is used as the start of the next.
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7747,7 +7747,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7846,7 +7846,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -8063,7 +8063,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8123,7 +8123,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8185,7 +8185,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8247,7 +8247,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8310,7 +8310,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8371,7 +8371,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8435,7 +8435,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, when traversing the vertices whose (u,v)
@@ -8494,7 +8494,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points,
      * labeled by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
      * <P>
      * The orientation of the triangle, again before the orientation
      * is reversed, is determined by applying the right-hand rule,
@@ -8558,7 +8558,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8605,7 +8605,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8654,7 +8654,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8701,7 +8701,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8751,7 +8751,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8799,7 +8799,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8848,7 +8848,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8896,7 +8896,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8944,7 +8944,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8984,7 +8984,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is based
      * on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9029,7 +9029,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9073,7 +9073,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9120,7 +9120,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9165,7 +9165,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9212,7 +9212,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9268,7 +9268,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="navBarCell1Rev">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
