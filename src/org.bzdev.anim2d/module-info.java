@@ -32,6 +32,7 @@ module org.bzdev.anim2d {
 	org.bzdev.anim2d.AnimationPath2DFactory,
 	org.bzdev.anim2d.AnimationShape2DFactory,
 	org.bzdev.anim2d.CartesianGrid2DFactory,
+	org.bzdev.anim2d.ConnectingLine2DFactory,
 	org.bzdev.anim2d.GraphViewFactory,
 	org.bzdev.anim2d.PolarGridFactory;
 

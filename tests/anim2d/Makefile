@@ -229,6 +229,11 @@ eptest-err:
 	@echo ----- Starting Script Factory Test with EP script ----
 	$(SCRUN) scriptTestErr.esp
 
+cltest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar CLTest.java
+	$(JAVA) CLTest
 
 clean:
 	rm -rf classes
