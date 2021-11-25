@@ -559,7 +559,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * @exception IllegalArgumentException an argument was not appropriate
 	 */
 	public Object invoke(Object... fargs) throws IllegalArgumentException {
-	    int nargs = fargs.length;
+	    int nargs = (fargs == null)? 0: fargs.length;
 	    if (nargs != (args.length)) {
 		// for methods ignore the first "this" argument that is
 		// automatically added. [no longer needed]
@@ -2003,6 +2003,30 @@ public class ExpressionParser implements ObjectParser<Object>
 	    private Class<?> clasz;
 	    private String method;
 	    private Object object = null;
+	    int nargs = -2;
+
+	    public int numberOfArguments() {
+		if (nargs < -1) {
+		    synchronized(ExpressionParser.this) {
+			AccessController.doPrivileged
+			    (new PrivilegedAction<Void>() {
+				    public Void run() {
+					Method[] methods =
+					    clasz.getMethods();
+					for (Method meth: methods) {
+					    if (meth.getName().equals(method)) {
+						nargs =
+						    meth.getParameterCount();
+						break;
+					    }
+					}
+					return (Void) null;
+				    }
+				});
+		    }
+		}
+		return nargs;
+	    }
 
 	    ESPMethodRef(Class<?> clasz, String method) {
 		this.clasz = clasz;
@@ -2184,7 +2208,8 @@ public class ExpressionParser implements ObjectParser<Object>
 				}
 			    }
 			}
-			if (m == null && carray.length > 0) {
+			if (m == null
+			    && (object != null ||carray.length > 0)) {
 			    minfo = (object == null)?
 				methodMap.get(fim.isVarArgs()? method:
 					      method + ":"
@@ -3892,6 +3917,21 @@ public class ExpressionParser implements ObjectParser<Object>
 	    throws IllegalStateException, NoSuchMethodException,
 		   IllegalArgumentException
 	{
+	    /*
+	    System.out.format("findMethod: fname=%s, targetClass=%s\n",
+			      fname, targetClass.getName());
+	    if (argcount == null) {
+		System.out.println("... argcount = " + argcount);
+	    } else {
+		System.out.print("... argcount = [");
+		for (int i = 0; i < argcount.length; i++) {
+		    if (i != 0) System.out.print(", ");
+		    System.out.print(argcount[i]);
+		}
+		System.out.println("]");
+	    }
+	    */
+
 	    for (int i = 0;  i < argclasses.length; i++) {
 		if (argclasses[i] == null) {
 		    continue;
@@ -4138,6 +4178,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    boolean needObjMaps = false;
 	    for (Object obj: args) {
 		if (obj instanceof ESPFunction) sawf = true;
+		else if (obj instanceof ESPMethodRef) sawf = true;
 		else if (obj instanceof ESPObject) {
 		    sawf = true;
 		    needObjMaps = true;
@@ -4161,6 +4202,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		    if (argclasses[i].equals(ESPFunction.class)) {
 			ESPFunction f = (ESPFunction)args[i];
 			argcount[i] = f.numberOfArguments();
+		    } else if (argclasses[i].equals(ESPMethodRef.class)) {
+			ESPMethodRef mr = (ESPMethodRef)args[i];
+			argcount[i] = mr.numberOfArguments();
 		    } else if (argclasses[i].equals(ESPObject.class)) {
 			argcount[i] = ClassArraySorter.INTERFACE_TEST;
 		        ClassArraySorter.ArgCountMap omap =

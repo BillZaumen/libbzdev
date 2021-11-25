@@ -70,6 +70,8 @@ all: compile
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
+	@echo ---- Supplier Test ----
+	@$(JAVA) SupplierTest
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest
 
@@ -208,6 +210,10 @@ unitree: compile
 emsgtest: compile
 	@echo ---- Exception  Message Test ----
 	@$(JAVA) EOLTest
+
+supplier: compile
+	@echo ---- Supplier Test ----
+	@$(JAVA) SupplierTest
 
 clean:
 	rm -rf classes

@@ -150,10 +150,10 @@ public class ConnectingLine2D extends AnimationObject2D  {
 
     @Override
     public void addTo(Graph graph, Graphics2D g2d, Graphics2D g2dgcs) {
-	double x1 = fx1.getAsDouble();;
-	double y1 = fy1.getAsDouble();;
-	double x2 = fx2.getAsDouble();;
-	double y2 = fy2.getAsDouble();;
+	double x1 = fx1.getAsDouble();
+	double y1 = fy1.getAsDouble();
+	double x2 = fx2.getAsDouble();
+	double y2 = fy2.getAsDouble();
 	double omu1 = 1.0 - u1;
 	double omu2 = 1.0 - u2;
 
