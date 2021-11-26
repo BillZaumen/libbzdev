@@ -7077,6 +7077,20 @@ public class ExpressionParser implements ObjectParser<Object>
 	return false;
     }
 
+    // for debugging
+    private static void printVsets(Stack<Set<String>> stack) {
+	int i = 0;
+	System.out.println("... vsetStack:");
+	for (Set<String> set: stack) {
+	    System.out.println("        stack " + i + ":");
+	    for (String name: set) {
+		System.out.println("            " + name);
+	    }
+	    i++;
+	}
+    }
+
+
     private static class QMarkPair {
 	Token firstQMark;
 	int qmarkIndex;
@@ -7364,9 +7378,13 @@ public class ExpressionParser implements ObjectParser<Object>
 				    firstQMark = null;
 				}
 				qmarkIndex = 0;
-				vset = vsetThreadLocal.get();
+				// vset = vsetThreadLocal.get();
+				Set<String> savedVset = new
+				    HashSet<String>(vsetThreadLocal.get());
+				/*
 				vsetStack = new Stack<Set<String>>();
 				vsetStack.push(vset);
+				*/
 				if (tarray != null) {
 				    tarray.add(tokens);
 				    tokens = null;
@@ -7386,6 +7404,10 @@ public class ExpressionParser implements ObjectParser<Object>
 				    processor.clear();
 				}
 				// reinitialize and continue
+				vsetStack = new Stack<Set<String>>();
+				vset = savedVset;
+				vsetThreadLocal.set(savedVset);
+				vsetStack.push(savedVset);
 				tokens = new LinkedList<Token>();
 				i--;
 				continue;

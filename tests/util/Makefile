@@ -66,6 +66,12 @@ all: compile
 	@$(JAVA) ExprScriptTest2
 	@echo ----- ExpressionParser Test '(lexical scoping)' -------
 	@$(JAVA) ExprScriptTest3
+	@echo ----- ExpressionParser Test '(issues from EPTS)' -------
+	@$(JAVA) ExprScriptTest4
+	@echo ----- ExpressionParser Test '(va list)' -------
+	@$(JAVA) ExprScriptTest5
+	@echo ----- ExpressionParser Test '(var.identifier)' -------
+	@$(JAVA) ExprScriptTest6
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
@@ -202,6 +208,12 @@ estest5: compile
 	@echo ----- ExpressionParser Test '(va list)' -------
 	@$(JAVA) ExprScriptTest5
 
+estest6: compile
+	@echo ----- ExpressionParser Test '(var.identifier)' -------
+	@$(JAVA) ExprScriptTest6
+estest7: compile
+	@echo ----- ExpressionParser Test '(second var.identifier)' -------
+	@$(JAVA) ExprScriptTest7
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------

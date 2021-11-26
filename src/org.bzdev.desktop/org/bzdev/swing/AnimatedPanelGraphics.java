@@ -523,6 +523,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 
     ActionListener playListener = new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
+		if (frameCount == 0) return;
 		swapIfNeeded();
 		if (currentRepCount > 0) {
 		    currentRepCount--;
@@ -1146,6 +1147,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
     void addAdjustButtonListener() {
 	adjustLeftButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+		    if (frameCount == 0) return;
 		    synchronized(queue) {
 			if (timer.isRunning()) {
 			    return;
@@ -1209,6 +1211,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 
 	adjustRightButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+		    if (frameCount == 0) return;
 		    synchronized(queue) {
 			if (timer.isRunning()) {
 			    return;
