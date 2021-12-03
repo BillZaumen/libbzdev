@@ -5,8 +5,10 @@ import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.GraphicsConfiguration;
 import java.awt.Container;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+// import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -86,9 +88,15 @@ public class HtmlPane extends JComponent {
     private class StackElement {
 	URL url;
 	HTMLFrameHyperlinkEvent event;
+	Point position = null;
 	StackElement(URL url, HTMLFrameHyperlinkEvent env) {
 	    this.url = url;
 	    event = env;
+	}
+	StackElement(URL url, Point p) {
+	    this.url = url;
+	    event = null;
+	    position = p;
 	}
     }
     private HtmlPane me = null;
@@ -257,9 +265,18 @@ public class HtmlPane extends JComponent {
 			    endButton.setEnabled(false);
 			    event = evt;
 			} else {
+			    /*
+			    System.out.println(editorScrollPane
+					       .getViewport()
+					       .getViewPosition());
+			    */
+			    Point p = editorScrollPane.getViewport()
+				.getViewPosition();
 			    pane.setPage(e.getURL());
 			    page = e.getURL();
-			    urlstack.push(new StackElement(current, event));
+			    position = editorScrollPane.getViewport()
+				.getViewPosition();
+			    urlstack.push(new StackElement(current, p));
 			    revUrlstack.clear();
 			    startButton.setEnabled(true);
 			    backButton.setEnabled(true);
@@ -301,6 +318,7 @@ public class HtmlPane extends JComponent {
     // field when setPage is called, so we keep track of it just in
     // case.
     private URL page = null;
+    private Point position = null;
     /**
      * Set the page to display and display it.
      * @param page the URL of the page to display.
@@ -309,6 +327,7 @@ public class HtmlPane extends JComponent {
     public void setPage(URL page) throws IOException {
 	editorPane.setPage(page);
 	this.page = page;
+	this.position = editorScrollPane.getViewport().getViewPosition();
 	setPageAux();
     }
 
@@ -450,6 +469,11 @@ public class HtmlPane extends JComponent {
 		    try {
 			editorPane.setPage(element.url);
 			page = element.url;
+			position = element.position;
+			if (position != null) {
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
 			if (element.event != null) {
 			    doc.processHTMLFrameHyperlinkEvent(element.
 							       event);
@@ -471,6 +495,8 @@ public class HtmlPane extends JComponent {
 			try {
 			    editorPane.setPage(current);
 			    page = current;
+			    position = editorScrollPane.getViewport()
+				.getViewPosition();
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
@@ -501,6 +527,8 @@ public class HtmlPane extends JComponent {
 		    try {
 			editorPane.setPage(current);
 			page = current;
+			position = editorScrollPane.getViewport()
+			    .getViewPosition();
 			if (event != null) {
 			    HTMLDocument doc =
 				(HTMLDocument)editorPane.getDocument();
@@ -526,6 +554,11 @@ public class HtmlPane extends JComponent {
 		    try {
 			editorPane.setPage(element.url);
 			page = element.url;
+			position = element.position;
+			if (position != null) {
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
 			if (element.event != null) {
 			    doc.processHTMLFrameHyperlinkEvent(element.
 							       event);
@@ -543,6 +576,8 @@ public class HtmlPane extends JComponent {
 			try {
 			    editorPane.setPage(current);
 			    page = current;
+			    position = editorScrollPane.getViewport()
+				.getViewPosition();
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
@@ -575,6 +610,11 @@ public class HtmlPane extends JComponent {
 		    try {
 			editorPane.setPage(element.url);
 			page = element.url;
+			position = element.position;
+			if (position != null) {
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
 			if (element.event != null) {
 			    doc.processHTMLFrameHyperlinkEvent(element.
 							       event);
@@ -593,6 +633,8 @@ public class HtmlPane extends JComponent {
 			try {
 			    editorPane.setPage(current);
 			    page = current;
+			    position = editorScrollPane.getViewport()
+				.getViewPosition();
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
@@ -626,6 +668,11 @@ public class HtmlPane extends JComponent {
 		    try {
 			editorPane.setPage(element.url);
 			page = element.url;
+			position = element.position;
+			if (position != null) {
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
 			if (element.event != null) {
 			    doc.processHTMLFrameHyperlinkEvent(element.
 							       event);
@@ -648,6 +695,8 @@ public class HtmlPane extends JComponent {
 			try {
 			    editorPane.setPage(current);
 			    page = current;
+			    position = editorScrollPane.getViewport()
+				.getViewPosition();
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
@@ -671,6 +720,7 @@ public class HtmlPane extends JComponent {
 		    }
 		}
 	    });
+	editorPane.setContentType("text/html");
 	editorPane.setEditable(false);
 	editorPane.addHyperlinkListener(hl);
 	setLayout(new BorderLayout());

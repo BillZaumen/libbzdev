@@ -93,6 +93,19 @@ config2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ConfigTest config.foo
 
+htest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) HtmlPaneTest testfile.html
+
+otoc:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ObjTocPaneTest $(BG)
+
+
 inputtable:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -327,6 +340,13 @@ atest3s:
 	$(JAVA2) AnimPanelTest3 --true --before
 	$(JAVA2) AnimPanelTest3 --accessor --before
 	$(JAVA2) AnimPanelTest3 --accessor --after
+
+hwt:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	sed -e 's/CWD/$(CWD)/' < toc.xml.tpl > toc.xml
+	$(JAVA) HtmlWithTocTest toc.xml
 
 atest3s-fb:
 	(cd ../.. ; make jars)

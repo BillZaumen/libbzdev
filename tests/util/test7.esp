@@ -1,0 +1,39 @@
+import(org.bzdev.util.units.MKS);
+import (org.bzdev.anim2d, [
+    Animation2D, KinematicOps2D,
+    ConnectingLine2D, ConnectingLine2DFactory,
+    AnimationLayer2D, AnimationLayer2DFactory,
+    AnimationPath2D, AnimationPath2DFactory]);
+import (org.bzdev.swing.AnimatedPanelGraphics);
+var frameWidth = 1046;
+var frameHeight = 722;
+
+var da;
+
+var a2d = new Animation2D(scripting, frameWidth, frameHeight, 1000.0, 40);
+
+
+var apg = var.da? null:
+    AnimatedPanelGraphics.newFramedInstance(a2d, "Near Miss",
+					    true, true, null);
+
+a2d.createFactories("org.bzdev.anim2d", {
+    alf: "AnimationLayer2DFactory",
+    pathf: "AnimationPath2DFactory",
+    clf: "ConnectingLine2DFactory"});
+
+###
+
+var maxframes = a2d.estimateFrameCount(4.0);
+
+var.da? function() {
+    da.list().forEach(function(name) {
+	da.isDirectory(name) || da.delete(name); void;
+    });
+    a2d.initFrames(maxframes, "img", "png", da) ; null
+  }(): function() {
+       global.getWriter().println("got here");
+       global.getWriter().flush();
+      a2d.initFrames(maxframes, apg); a2d.run(); apg.close(); null
+  }();
+

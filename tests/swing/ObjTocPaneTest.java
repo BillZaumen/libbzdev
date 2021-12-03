@@ -21,6 +21,24 @@ public class ObjTocPaneTest {
 					   +tocPane.getRowCount());
 		    }
 		});
+	    if (argv.length > 0) {
+		if (argv[0].equals("light")) {
+		    tocPane.setBackground(new Color(224,224,255));
+		} else if (argv[0].equals("dark")) {
+		    tocPane.setBackground(new Color(0, 0, 64));
+		    tocPane.setForeground(Color.WHITE);
+		} else if (argv[0].equals("mix")) {
+		    tocPane.setBackground(new Color(89, 128, 164));
+		    tocPane.setForeground(Color.WHITE);
+		} else if (argv[0].equals("fixed")) {
+		    tocPane.setBackground(new Color(0, 0, 64));
+		    tocPane.setForeground(Color.WHITE);
+		    tocPane.setTCRBackgroundSelectionColor
+			(new Color(32, 32, 164));
+		    tocPane.setTCRTextSelectionColor(Color.YELLOW);
+		}
+	    }
+
 	    JFrame frame = new JFrame("TreeTest 2");
 	    Container hpane = frame.getContentPane();
 	    tocPane.addEntry("Table of Contents", "http:foo.com/help.html");

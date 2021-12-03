@@ -16,6 +16,11 @@ public class HtmlWithTocTest {
 			HtmlWithTocPane tocPane =
 			    new HtmlWithTocPane(is, true, true);
 
+			tocPane.setTocBackground(Color.BLUE.
+						 darker().darker().darker());
+			tocPane.setTocForeground(Color.WHITE);
+
+
 			JFrame frame = new JFrame("TreeTest 1");
 			Container hpane = frame.getContentPane();
 			hpane.setLayout(new BorderLayout());

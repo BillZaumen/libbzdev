@@ -1,11 +1,13 @@
 package org.bzdev.swing;
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.InputStream;
 import java.io.IOException;
+
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -494,52 +496,66 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	tocPane.addEntry(title, url);
     }
 
+    @Override
     public void nextLevel() {tocPane.nextLevel();}
 
+    @Override
     public void prevLevel() {tocPane.prevLevel();}
 
+    @Override
     public void entriesCompleted() {tocPane.entriesCompleted();}
 
+    @Override
     public void entriesCompleted(boolean expand) {
 	tocPane.entriesCompleted(expand);
     }
 
+    @Override
     public void setSelectionWithAction(int row) {
 	tocPane.setSelectionWithAction(row);
     }
 
+    @Override
     public void clearSelection() {
 	tocPane.clearSelection();
     }
 
+    @Override
     public void addActionListener(ActionListener l) {
 	tocPane.addActionListener(l);
     }
 
+    @Override
     public void removeActionListener(ActionListener l) {
 	tocPane.removeActionListener(l);
     }
 
+    @Override
     public void collapseRow(int row) {
 	tocPane.collapseRow(row);
     }
 
+    @Override
     public void expandRow(int row) {
 	tocPane.expandRow(row);
     }
 
+    @Override
     public boolean isCollapsed(int row) {
 	return tocPane.isCollapsed(row);
     }
 
+    @Override
     public boolean isExpanded(int row) {
 	return tocPane.isExpanded(row);
     }
 
+    @Override
     public void clearToc() {
 	tocPane.clearToc();
     }
 
+    @Override
     public void setToc(URL url, boolean expand, boolean validating)
 	throws FactoryConfigurationError, SAXException, IOException,
 	       ParserConfigurationException, MalformedURLException
@@ -548,6 +564,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	setDividerLocation(tocPane.getPreferredSize().width);
     }
 
+    @Override
     public void setToc(String url, boolean expand, boolean validating)
 	throws FactoryConfigurationError, SAXException, IOException,
 	       ParserConfigurationException
@@ -556,6 +573,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	setDividerLocation(tocPane.getPreferredSize().width);
     }
 
+    @Override
     public void setToc(InputStream is, boolean expand, boolean validating)
 	throws FactoryConfigurationError, SAXException, IOException,
 	       ParserConfigurationException
@@ -581,6 +599,98 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      */
     public final String getHtmlErrorTitle() {
 	return htmlPane.getErrorTitle();
+    }
+
+    /**
+     * Get the tre cell renderer for the table of contents.
+     * @return the cell renderer
+     */
+    public DefaultTreeCellRenderer getTocCellRenderer() {
+	return (DefaultTreeCellRenderer) tocPane.getCellRenderer();
+    }
+
+    /**
+     * Get the background color for the table of contents.
+     * @return the background color for the table of contents (if none
+     *         has been explicitly set, the background color of the
+     *         TOC component's parent is returned)
+     *
+     */
+    public final Color getTocBackgound() {
+	return tocPane.getBackground();
+    }
+
+    /**
+     * Set the background color for the table of contents.
+     * @param c the background color; null if the parent component's color
+     *        should be used.
+     */
+    public final void setTocBackground(Color c) {
+	tocPane.setBackground(c);
+    }
+
+    /**
+     * Get the foreground color for the table of contents.
+     * @return the foreground color for the table of contents (if none
+     *         has been explicitly set, the foreground color of the
+     *         TOC component's parent is returned)
+     *
+     */
+    public final Color getTocForeground() {
+	return tocPane.getForeground();
+    }
+
+    /**
+     * Set the foreground color for the table of contents.
+     * @param c the foreground color; null if the parent component's color
+     *        should be used.
+     */
+    public final void setTocForeground(Color c) {
+	tocPane.setForeground(c);
+    }
+
+    /**
+     * Set the background color for items that are selected in the
+     * table of contents.
+     * @param c the color
+     */
+    public void setTocBackgroundSelectionColor(Color c) {
+	tocPane.setTCRBackgroundSelectionColor(c);
+    }
+
+    /**
+     * Set the background color for items that are not selected in the
+     * table of contents.
+     * @param c the color
+     */
+    public void setTocBackgroundNonSelectionColor(Color c) {
+	tocPane.setTCRBackgroundNonSelectionColor(c);
+    }
+
+    /**
+     * Set the color of text describing items that are selected in
+     * the table of contents.
+     * @param c the color
+     */
+    public void setTocTextSelectionColor(Color c) {
+	tocPane.setTCRTextSelectionColor(c);
+    }
+
+    /**
+     * Set the color of text describing items that are not selected in
+     * the table of contents.
+     * @param c the color
+     */
+    public void setTocTextNonSelectionColor(Color c) {
+	tocPane.setTCRTextNonSelectionColor(c);
+    }
+
+    /**
+     * Set the font for the entries in table of contents.
+     * @param font the font
+     */
+    public final void setTocTCRFont(Font font) {
+	tocPane.setTCRFont(font);
     }
 }
 

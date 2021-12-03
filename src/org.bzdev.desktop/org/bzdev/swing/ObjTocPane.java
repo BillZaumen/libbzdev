@@ -57,6 +57,8 @@ import java.util.Stack;
 
 public class ObjTocPane extends JTree implements TocTree {
 
+    DefaultTreeCellRenderer tcr = new DefaultTreeCellRenderer();
+
     static String errorMsg(String key, Object... args) {
 	return SwingErrorMsg.errorMsg(key, args);
     }
@@ -388,6 +390,218 @@ public class ObjTocPane extends JTree implements TocTree {
      */
     public ObjTocPane() {
 	super();
+	setCellRenderer(tcr);
+    }
+
+    private boolean setBackSelectionColorCalled = false;
+    private boolean setBackNonSelectionColorCalled = false;
+    private boolean setTextSelectionColorCalled = false;
+    private boolean setTextNonSelectionColorCalled = false;
+
+    /**
+     * Sets the TreeCellRenderer that will be used to draw each cell.
+     * @param x the tree-cell renderer that is to render each cell
+     * @see javax.swing.JTree#setCellRenderer(TreeCellRenderer)
+     */
+    @Override
+    public void setCellRenderer(TreeCellRenderer x) {
+	super.setCellRenderer(x);
+	tcr = (x instanceof DefaultTreeCellRenderer)?
+	    (DefaultTreeCellRenderer) x: null;
+    }
+
+
+    /** Set the backgound color of this component.
+     * A background color is used only if a component is opaque;
+     * however, unless the colors for the selected or non-selected
+     * tree endtries are already set explicitly, this method will also
+     * set the background color for those entries to reasonable
+     * values.
+     * <P>
+     * Modifications to a table-cell renderer are not automtically
+     * reapplied if the table-cell renderer is changed.
+     * @param color the color
+     * @see javax.swing.JComponent#setBackground(Color)
+     */
+    @Override
+    public void setBackground(Color color) {
+	super.setBackground(color);
+	if (tcr != null && setBackSelectionColorCalled == false) {
+	    tcr.setBackgroundSelectionColor(color);
+	}
+	if (tcr != null && setBackNonSelectionColorCalled == false) {
+	    Color c = color;
+	    if (c != null) {
+		int red = c.getRed();
+		int green = c.getGreen();
+		int blue = c.getBlue();
+		if (red < 96 && green < 96 && blue < 96) {
+		    c = c.brighter().brighter();
+		} else if (red > 160 && green > 160 && blue > 160) {
+		    c = c.darker();
+		} else {
+		    if (red < 96) red += 24;
+		    else if (red > 160) red -= 24;
+		    if (green < 96) green += 24;
+		    else if (green > 160) green -= 24;
+		    if (blue < 96) blue += 24;
+		    else if (blue > 160) blue -= 16;
+		    c = new Color(red, green, blue);
+		}
+	    }
+	    tcr.setBackgroundSelectionColor(c);
+	    tcr.setBackgroundNonSelectionColor(color);
+	}
+    }
+
+    /** Set the foreground color of this component.
+     * A foreground color is used only if a component is opaque;
+     * however, unless the colors for the selected or non-selected
+     * tree entries are already set explicitly, this method will also
+     * set the text color for those entries.
+     * <P>
+     * Modifications to a table-cell renderer are not automtically
+     * reapplied if the table-cell renderer is changed.
+     * @param color the color
+     * @see javax.swing.JComponent#setForeground(Color)
+     */
+    @Override
+    public void setForeground(Color color) {
+	super.setForeground(color);
+	if (tcr != null && setTextSelectionColorCalled == false) {
+	    tcr.setTextSelectionColor(color);
+	}
+	if (tcr != null && setTextNonSelectionColorCalled == false) {
+	    tcr.setTextNonSelectionColor(color);
+	}
+    }
+
+    /**
+     * Set the current table-cell-renderer's background color for
+     * selected items.
+     * <P>
+     * This method is provided for convenience.
+     * To get the value, use {@link javax.swing.JTree#getCellRenderer()}
+     * to get the current cell renderer. If the cell renderer is an
+     * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
+     * the method
+     * {@link javax.swing.tree.DefaultTreeCellRenderer#getBackgroundSelectionColor()}.
+     * @param c the color
+     * @exception UnsupportedOperationException if the tree cell
+     *            renderer is not an instance of
+     *            {@link javax.swing.tree.DefaultTreeCellRenderer}
+     */
+    public void setTCRBackgroundSelectionColor(Color c)
+	throws UnsupportedOperationException
+    {
+	if (tcr == null) {
+	    String msg = errorMsg("notDefaultTCR");
+	    throw new UnsupportedOperationException();
+	}
+	setBackSelectionColorCalled = true;
+	tcr.setBackgroundSelectionColor(c);
+    }
+
+    /**
+     * Set the current table-cell-renderer's background color for
+     * non-selected items.
+     * <P>
+     * This method is provided for convenience.
+     * To get the value, use {@link javax.swing.JTree#getCellRenderer()}
+     * to get the current cell renderer. If the cell renderer is an
+     * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
+     * the method
+     * {@link javax.swing.tree.DefaultTreeCellRenderer#getBackgroundNonSelectionColor()}.
+     * @param c the color
+     * @exception UnsupportedOperationException if the tree cell
+     *            renderer is not an instance of
+     *            {@link javax.swing.tree.DefaultTreeCellRenderer}
+     */
+    public void setTCRBackgroundNonSelectionColor(Color c)
+	throws UnsupportedOperationException
+    {
+	if (tcr == null) {
+	    String msg = errorMsg("notDefaultTCR");
+	    throw new UnsupportedOperationException();
+	}
+	setBackNonSelectionColorCalled = true;
+	tcr.setBackgroundNonSelectionColor(c);
+
+    }
+
+    /**
+     * Set the current table-cell-renderer's text color for
+     * selected items.
+     * <P>
+     * This method is provided for convenience.
+     * To get the value, use {@link javax.swing.JTree#getCellRenderer()}
+     * to get the current cell renderer. If the cell renderer is an
+     * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
+     * the method
+     * {@link javax.swing.tree.DefaultTreeCellRenderer#getTextSelectionColor()}.
+     * @param c the color
+     * @exception UnsupportedOperationException if the tree cell
+     *            renderer is not an instance of
+     *            {@link javax.swing.tree.DefaultTreeCellRenderer}
+     */
+    public void setTCRTextSelectionColor(Color c)
+	throws UnsupportedOperationException
+    {
+	if (tcr == null) {
+	    String msg = errorMsg("notDefaultTCR");
+	    throw new UnsupportedOperationException();
+	}
+	setTextSelectionColorCalled = true;
+	tcr.setTextSelectionColor(c);
+    }
+
+    /**
+     * Set the current table-cell-renderer's text color for
+     * non-selected items.
+     * This method is provided for convenience.
+     * To get the value, use {@link javax.swing.JTree#getCellRenderer()}
+     * to get the current cell renderer. If the cell renderer is an
+     * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
+     * the method
+     * {@link javax.swing.tree.DefaultTreeCellRenderer#getTextNonSelectionColor()}.
+     * @param c the color
+     * @exception UnsupportedOperationException if the tree cell
+     *            renderer is not an instance of
+     *            {@link javax.swing.tree.DefaultTreeCellRenderer}
+     */
+    public void setTCRTextNonSelectionColor(Color c)
+	throws UnsupportedOperationException
+    {
+	if (tcr == null) {
+	    String msg = errorMsg("notDefaultTCR");
+	    throw new UnsupportedOperationException();
+	}
+	setTextNonSelectionColorCalled = true;
+	tcr.setTextNonSelectionColor(c);
+    }
+
+    /**
+     * Set the current table-cell-renderer's font.
+     * <P>
+     * This method is provided for convenience.
+     * To get the value, use {@link javax.swing.JTree#getCellRenderer()}
+     * to get the current cell renderer. If the cell renderer is an
+     * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
+     * the method
+     * {@link javax.swing.tree.DefaultTreeCellRenderer#getFont()}.
+     * @param font the font
+     * @exception UnsupportedOperationException if the tree cell
+     *            renderer is not an instance of
+     *            {@link javax.swing.tree.DefaultTreeCellRenderer}
+     */
+    public void setTCRFont(Font font)
+	throws UnsupportedOperationException
+    {
+	if (tcr == null) {
+	    String msg = errorMsg("notDefaultTCR");
+	    throw new UnsupportedOperationException();
+	}
+	tcr.setFont(font);
     }
 }
 
