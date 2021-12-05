@@ -6,15 +6,22 @@ import java.net.*;
 import javax.swing.*;
 import org.bzdev.protocols.*;
 
-public class HtmlPaneTest {
+public class HtmlPaneTest2 {
     public static void main(String argv[]) throws Exception {
+	Handlers.enable();
 	try {
-	    URL url = new File(argv[0]).toURI().toURL();
+	    URL url = new URL(argv[0]);
 	    System.out.println("url = " + url);
 
 	    SwingUtilities.invokeLater(() -> {
 		    try {
-			HtmlPane htmlPane = new HtmlPane(url);
+			HtmlPane htmlPane = new HtmlPane();
+			htmlPane.setPage(url);
+			htmlPane.setBackground(Color.BLUE
+					       .darker().darker().darker());
+			htmlPane.setButtonBackground(Color.BLUE
+						     .darker().darker(),
+						     true);
 			htmlPane.setSize(800, 600);
 			JFrame frame = new JFrame("HtmlPane Test");
 			Container hpane = frame.getContentPane();

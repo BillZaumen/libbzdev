@@ -99,6 +99,35 @@ htest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) HtmlPaneTest testfile.html
 
+htest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) HtmlPaneTest2 file:`pwd`/html/manual.html
+
+htest2a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) HtmlPaneTest2 jar:file:`pwd`/manual.jar!/html/manual.html
+
+htest2b:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) HtmlPaneTest2  jar:file:`pwd`/manual.jar!/html/manual2.html
+
+htest2c:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) -Dorg.bzdev.protocols.resource.path=`pwd`/manual.jar \
+		HtmlPaneTest2  resource:html/manual2.html
+
 otoc:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -346,7 +375,7 @@ hwt:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	sed -e 's/CWD/$(CWD)/' < toc.xml.tpl > toc.xml
-	$(JAVA) HtmlWithTocTest toc.xml
+	$(JAVA) HtmlWithTocTest toc.xml --no-timeout
 
 atest3s-fb:
 	(cd ../.. ; make jars)
@@ -512,4 +541,4 @@ ops:
 	$(JAVA) SwingOpsTest
 
 clean:
-	rm -rf classes toc.xml scpolicy.policy
+	rm -rf classes toc.xml scpolicy.policy manual.jar

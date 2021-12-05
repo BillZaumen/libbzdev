@@ -1,5 +1,6 @@
 package org.bzdev.swing;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
@@ -77,6 +78,18 @@ import java.util.Stack;
  * <P>
  * This component allows HTML pages to be displayed but does not allow
  * them to be edited.
+ * <P>
+ * A few methods allow one to set colors to implement a "dark mode" for
+ * viewing HTML pages in reverse video.  This does change an HTML page's
+ * appearance: to change it (e.g., to make the text white and the background
+ * dark), a style sheet can be used.
+ * <P>
+ * The behavior specified for JEditorPane in Java 11 is such that the
+ * constuctor {@link HtmlPane#HtmlPane()} configure a JEditorPane so
+ * that {@link JEditorPane#getPage()} will return null even if
+ * {@link HtmlPane#setPage(URL)} or {@link HtmlPane#setPage(String)} was
+ * called. This may affect address resolution.  The method
+ * {@link HtmlPane#getPage()} always returns the page that was last set.
  * @author Bill Zaumen
  */
 public class HtmlPane extends JComponent {
@@ -100,8 +113,8 @@ public class HtmlPane extends JComponent {
 	}
     }
     private HtmlPane me = null;
-    private JEditorPane editorPane = new JEditorPane();
-    private JScrollPane editorScrollPane = new JScrollPane(editorPane);
+    private JEditorPane editorPane = null /*new JEditorPane() */;
+    private JScrollPane editorScrollPane = null /*new JScrollPane(editorPane)*/;
     JPanel top = new JPanel();
 
     public void setLocale(Locale locale) {
@@ -186,6 +199,21 @@ public class HtmlPane extends JComponent {
     ImageIcon rlReloadIcon = null;
     ImageIcon leftIcon = null;
     ImageIcon fleftIcon = null;
+
+    ImageIcon frightRVIcon = null;
+    ImageIcon rightRVIcon = null;
+    ImageIcon reloadRVIcon = null;
+    ImageIcon rlReloadRVIcon = null;
+    ImageIcon leftRVIcon = null;
+    ImageIcon fleftRVIcon = null;
+
+    ImageIcon frightRVDIcon = null;
+    ImageIcon rightRVDIcon = null;
+    ImageIcon reloadRVDIcon = null;
+    ImageIcon rlReloadRVDIcon = null;
+    ImageIcon leftRVDIcon = null;
+    ImageIcon fleftRVDIcon = null;
+
     private boolean iconsInitialized = false;
 
     private void initIcons() {
@@ -205,6 +233,34 @@ public class HtmlPane extends JComponent {
 			    .getResource("/org/bzdev/swing/icons/left.gif");
 			URL fleftUrl = HtmlPane.class
 			    .getResource("/org/bzdev/swing/icons/fleft.gif");
+
+			URL frightRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/frightRV.gif");
+			URL rightRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/rightRV.gif");
+			URL reloadRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/redoRV.gif");
+			URL rlReloadRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/rlredoRV.gif");
+			URL leftRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/leftRV.gif");
+			URL fleftRVUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/fleftRV.gif");
+
+
+			URL frightRVDUrl = HtmlPane.class.getResource
+			    ("/org/bzdev/swing/icons/frightRVD.gif");
+			URL rightRVDUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/rightRVD.gif");
+			URL reloadRVDUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/redoRVD.gif");
+			URL rlReloadRVDUrl = HtmlPane.class.getResource
+			    ("/org/bzdev/swing/icons/rlredoRVD.gif");
+			URL leftRVDUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/leftRVD.gif");
+			URL fleftRVDUrl = HtmlPane.class
+			    .getResource("/org/bzdev/swing/icons/fleftRVD.gif");
+
 			/*
 			URL frightUrl = ClassLoader.getSystemClassLoader()
 			    .getResource("org/bzdev/swing/icons/fright.gif");
@@ -225,12 +281,39 @@ public class HtmlPane extends JComponent {
 			    new ImageIcon(rightUrl);
 			reloadIcon = (reloadUrl == null)? null:
 			    new ImageIcon(reloadUrl);
-			rlReloadIcon = (reloadUrl == null)? null:
+			rlReloadIcon = (rlReloadUrl == null)? null:
 			    new ImageIcon(rlReloadUrl);
 			leftIcon = (frightUrl == null)? null:
 			    new ImageIcon(leftUrl);
 			fleftIcon = (fleftUrl == null)? null:
 			    new ImageIcon(fleftUrl);
+
+			frightRVIcon = (frightRVUrl == null)? null:
+			    new ImageIcon(frightRVUrl);
+			rightRVIcon = (frightRVUrl == null)? null:
+			    new ImageIcon(rightRVUrl);
+			reloadRVIcon = (reloadRVUrl == null)? null:
+			    new ImageIcon(reloadRVUrl);
+			rlReloadRVIcon = (rlReloadRVUrl == null)? null:
+			    new ImageIcon(rlReloadRVUrl);
+			leftRVIcon = (frightRVUrl == null)? null:
+			    new ImageIcon(leftRVUrl);
+			fleftRVIcon = (fleftRVUrl == null)? null:
+			    new ImageIcon(fleftRVUrl);
+
+			frightRVDIcon = (frightRVDUrl == null)? null:
+			    new ImageIcon(frightRVDUrl);
+			rightRVDIcon = (frightRVDUrl == null)? null:
+			    new ImageIcon(rightRVDUrl);
+			reloadRVDIcon = (reloadRVDUrl == null)? null:
+			    new ImageIcon(reloadRVDUrl);
+			rlReloadRVDIcon = (rlReloadRVDUrl == null)? null:
+			    new ImageIcon(rlReloadRVDUrl);
+			leftRVDIcon = (frightRVDUrl == null)? null:
+			    new ImageIcon(leftRVDUrl);
+			fleftRVDIcon = (fleftRVDUrl == null)? null:
+			    new ImageIcon(fleftRVDUrl);
+
 			return (Void)null;
 		    }
 		});
@@ -319,6 +402,14 @@ public class HtmlPane extends JComponent {
     // case.
     private URL page = null;
     private Point position = null;
+
+    private void finishSetPage(URL page) {
+	this.page = page;
+	this.position = editorScrollPane.getViewport().getViewPosition();
+	setPageAux();
+    }
+
+
     /**
      * Set the page to display and display it.
      * @param page the URL of the page to display.
@@ -326,16 +417,56 @@ public class HtmlPane extends JComponent {
      */
     public void setPage(URL page) throws IOException {
 	editorPane.setPage(page);
-	this.page = page;
-	this.position = editorScrollPane.getViewport().getViewPosition();
-	setPageAux();
+	finishSetPage(page);
+    }
+
+    private boolean backgroundSet = false;
+    private boolean scrollbarColorSet = false;
+
+    /**
+     * Set the background color.
+     * This method will also set the background color of scroll bars
+     * unless the last call to {@link #setScrollBarBackground(Color)},
+     * if one was made, had a non-null argument.
+     * @param color the color
+     */
+    @Override
+    public void setBackground(Color color) {
+	super.setBackground(color);
+	top.setBackground(color);
+	editorPane.setBackground(color);
+	editorScrollPane.setBackground(color);
+	if (!scrollbarColorSet) {
+	    editorScrollPane.getVerticalScrollBar().setBackground(color);
+	    editorScrollPane.getHorizontalScrollBar().setBackground(color);
+	}
+	backgroundSet = (color != null);
+    }
+
+    /**
+     * Set the background color for scroll bars.
+     * If color is null and the last call to {@link #setBackground(Color)},
+     * if one was made, had a non-null argument, that background color will
+     * be used.
+     * @param color the color; null for the default color
+     */
+    public void setScrollBarBackground(Color color) {
+	if (backgroundSet && color == null) {
+	    Color c = getBackground();
+	    editorScrollPane.getVerticalScrollBar().setBackground(c);
+	    editorScrollPane.getHorizontalScrollBar().setBackground(c);
+	} else {
+	    editorScrollPane.getVerticalScrollBar().setBackground(color);
+	    editorScrollPane.getHorizontalScrollBar().setBackground(color);
+	}
+	scrollbarColorSet = (color != null);
     }
 
     /**
      * get the URL for the page being displayed.
      * @return the URL for the page being displayed;  null if there is none.
      */
-    public URL getPage() {return page /* editorPane.getPage()*/;}
+    public URL getPage() {return page /*editorPane.getPage()*/;}
 
     /**
      * The string that will be displayed as a frame title when a dialog
@@ -399,17 +530,57 @@ public class HtmlPane extends JComponent {
 	    frwdButton.setDisabledIcon(null);
 	    endButton.setDisabledIcon(null);
 	    if (lrmode) {
-		startButton.setIcon(fleftIcon);
-		backButton.setIcon(leftIcon);
-		reloadButton.setIcon(reloadIcon);
-		frwdButton.setIcon(rightIcon);
-		endButton.setIcon(frightIcon);
+		if (rvmode) {
+		    startButton.setIcon(fleftRVIcon);
+		    backButton.setIcon(leftRVIcon);
+		    reloadButton.setIcon(reloadRVIcon);
+		    frwdButton.setIcon(rightRVIcon);
+		    endButton.setIcon(frightRVIcon);
+
+		    startButton.setDisabledIcon(fleftRVDIcon);
+		    backButton.setDisabledIcon(leftRVDIcon);
+		    reloadButton.setDisabledIcon(reloadRVDIcon);
+		    frwdButton.setDisabledIcon(rightRVDIcon);
+		    endButton.setDisabledIcon(frightRVDIcon);
+		} else {
+		    startButton.setIcon(fleftIcon);
+		    backButton.setIcon(leftIcon);
+		    reloadButton.setIcon(reloadIcon);
+		    frwdButton.setIcon(rightIcon);
+		    endButton.setIcon(frightIcon);
+
+		    startButton.setDisabledIcon(null);
+		    backButton.setDisabledIcon(null);
+		    reloadButton.setDisabledIcon(null);
+		    frwdButton.setDisabledIcon(null);
+		    endButton.setDisabledIcon(null);
+		}
 	    } else {
-		startButton.setIcon(frightIcon);
-		backButton.setIcon(rightIcon);
-		reloadButton.setIcon(rlReloadIcon);
-		frwdButton.setIcon(leftIcon);
-		endButton.setIcon(fleftIcon);
+		if (rvmode) {
+		    startButton.setIcon(frightRVIcon);
+		    backButton.setIcon(rightRVIcon);
+		    reloadButton.setIcon(rlReloadRVIcon);
+		    frwdButton.setIcon(leftRVIcon);
+		    endButton.setIcon(fleftRVIcon);
+
+		    startButton.setDisabledIcon(frightRVDIcon);
+		    backButton.setDisabledIcon(rightRVDIcon);
+		    reloadButton.setDisabledIcon(rlReloadRVDIcon);
+		    frwdButton.setDisabledIcon(leftRVDIcon);
+		    endButton.setDisabledIcon(fleftRVDIcon);
+		} else {
+		    startButton.setIcon(frightIcon);
+		    backButton.setIcon(rightIcon);
+		    reloadButton.setIcon(rlReloadIcon);
+		    frwdButton.setIcon(leftIcon);
+		    endButton.setIcon(fleftIcon);
+
+		    startButton.setDisabledIcon(null);
+		    backButton.setDisabledIcon(null);
+		    reloadButton.setDisabledIcon(null);
+		    frwdButton.setDisabledIcon(null);
+		    endButton.setDisabledIcon(null);
+		}
 	    }
 	    startButton.setToolTipText(bundle.getString(startTip));
 	    backButton.setToolTipText(bundle.getString(backTip));
@@ -425,11 +596,80 @@ public class HtmlPane extends JComponent {
 	}
     }
 
+    boolean rvmode = false;
+
     /**
-     * Class constructor.
+     * Set the background color for the 'start', 'back', 'reload',
+     * 'forward', and 'end' controls.
+     * When rvmode is true, the icons will be white when enabled
+     * and grey when disabled, the reverse from the normal behavior.
+     * @param color the color
+     * @param rvmode true for reverse video; false otherwise
      */
-    public HtmlPane()  {
+    public void setButtonBackground(Color color, boolean rvmode) {
+	if (this.rvmode != rvmode) {
+	    if (rvmode) {
+		if (lrmode) {
+		    startButton.setIcon(fleftRVIcon);
+		    backButton.setIcon(leftRVIcon);
+		    reloadButton.setIcon(reloadRVIcon);
+		    frwdButton.setIcon(rightRVIcon);
+		    endButton.setIcon(frightRVIcon);
+
+		    startButton.setDisabledIcon(fleftRVDIcon);
+		    backButton.setDisabledIcon(leftRVDIcon);
+		    reloadButton.setDisabledIcon(reloadRVDIcon);
+		    frwdButton.setDisabledIcon(rightRVDIcon);
+		    endButton.setDisabledIcon(frightRVDIcon);
+		} else {
+		    startButton.setIcon(frightRVIcon);
+		    backButton.setIcon(rightRVIcon);
+		    reloadButton.setIcon(rlReloadRVIcon);
+		    frwdButton.setIcon(leftRVIcon);
+		    endButton.setIcon(fleftRVIcon);
+
+		    startButton.setDisabledIcon(frightRVDIcon);
+		    backButton.setDisabledIcon(rightRVDIcon);
+		    reloadButton.setDisabledIcon(rlReloadRVDIcon);
+		    frwdButton.setDisabledIcon(leftRVDIcon);
+		    endButton.setDisabledIcon(fleftRVDIcon);
+		}
+	    } else {
+		if (lrmode) {
+		    startButton.setIcon(fleftIcon);
+		    backButton.setIcon(leftIcon);
+		    reloadButton.setIcon(reloadIcon);
+		    frwdButton.setIcon(rightIcon);
+		    endButton.setIcon(frightIcon);
+		} else {
+		    startButton.setIcon(frightIcon);
+		    backButton.setIcon(rightIcon);
+		    reloadButton.setIcon(rlReloadIcon);
+		    frwdButton.setIcon(leftIcon);
+		    endButton.setIcon(fleftIcon);
+		}
+
+		startButton.setDisabledIcon(null);
+		backButton.setDisabledIcon(null);
+		reloadButton.setDisabledIcon(null);
+		frwdButton.setDisabledIcon(null);
+		endButton.setDisabledIcon(null);
+	    }
+	}
+	startButton.setBackground(color);
+	backButton.setBackground(color);
+	reloadButton.setBackground(color);
+	frwdButton.setBackground(color);
+	endButton.setBackground(color);
+    }
+
+    /**
+     * Constructor.
+     */
+    private HtmlPane(JEditorPane ep)  {
 	super();
+	editorPane = ep;
+	editorScrollPane = new JScrollPane(editorPane);
 	me = this;
 	initIcons();
 	Locale locale = getLocale();
@@ -743,23 +983,30 @@ public class HtmlPane extends JComponent {
     }
 
     /**
-     * Class constructor based on a url.
+     * Constructor.
+     */
+    public HtmlPane() {
+	this(new JEditorPane());
+    }
+
+    /**
+     * Constructor based on a url represented by a string.
      * @param url the URL that the pane should initially display
      * @throws IOException an error setting the page occured.
      */
     public HtmlPane(String url) throws IOException {
-	this();
-	setPage(url);
+	this(new JEditorPane(url));
+	finishSetPage(editorPane.getPage());
     }
 
     /**
-     * Class constructor based on a url.
+     * Constructor based on a url.
      * @param url the URL that the pane should initially display
      * @throws IOException an error setting the page occurred.
      */
     public HtmlPane(URL url) throws IOException {
-	this();
-	setPage(url);
+	this(new JEditorPane(url));
+	finishSetPage(url);
     }
 }
 

@@ -1,6 +1,10 @@
 package org.bzdev.swing;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.plaf.SplitPaneUI;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.awt.event.ActionListener;
@@ -59,9 +63,9 @@ import java.awt.Component;
  * <p>
  * To initialize the class manually, use the same procedure as for
  * an instance of the class {@link org.bzdev.swing.UrlTocPane}.
- * A number of methods are borrowed from the JSplitPane class
- * (including some of the Javadoc comments) and simply call the
- * corresponding methods (but with 'left' and 'right' replaced by
+ * A number of method signatures are borrowed from the JSplitPane class
+ * (with some of the Javadoc comments) and simply call the
+ * corresponding JSplitPane methods (but with 'left' and 'right' replaced by
  * the edges closest to the TOC pane and HTML pane respectively.
  *
  * @author Bill Zaumen
@@ -328,7 +332,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     }
 
     /**
-     * Get the left or right inset adjacent to HTML pane.
+     * Get the left or right inset adjacent to the HTML pane.
      * Whether the HTML pane appears on the left or right depends
      * on localization.
      * @return the inset for the split pane this component contains
@@ -369,6 +373,100 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	htmlPane.setPreferredSize(preferredSize);
     }
 
+    @Override
+    public void setBackground(Color color) {
+	super.setBackground(color);
+	htmlPane.setBackground(color);
+	tocPane.setBackground(color);
+	tocScrollPane.setBackground(color);
+	splitPane.setBackground(color);
+    }
+
+    /**
+     * Set the background color for the 'start', 'back', 'reload',
+     * 'forward', and 'end' controls.
+     * When rvmode is true, the icons will be white when enabled
+     * and grey when disabled, the reverse from the normal behavior.
+     * @param color the color
+     * @param rvmode true for reverse video; false otherwise
+     */
+    public void setHtmlButtonBackground(Color color, boolean rvmode) {
+	htmlPane.setButtonBackground(color, rvmode);
+    }
+
+
+    BasicSplitPaneUI origspui = null;
+    BasicSplitPaneUI newspui = null;
+    Color spcolor = null;
+
+    /**
+     *
+     */
+    public void setSplitterBackground(Color color) {
+	if (spcolor == null && color == null) return;
+	SplitPaneUI spui = splitPane.getUI();
+	if (spui instanceof BasicSplitPaneUI) {
+	    if (origspui == null) {
+		BasicSplitPaneUI bspui = (BasicSplitPaneUI) spui;
+		origspui = bspui;
+		newspui = new BasicSplitPaneUI() {
+			public BasicSplitPaneDivider createDefaultDivider() {
+			    return new BasicSplitPaneDivider(this) {
+				@Override
+				public void paint(Graphics g) {
+				    Color c = g.getColor();
+				    try {
+					g.setColor(spcolor);
+					Dimension size = getSize();
+					g.fillRect(0, 0,
+						   size.width, size.height);
+					super.paint(g);
+				    } finally {
+					g.setColor(c);
+				    }
+				}
+			    };
+			}
+		    };
+	    }
+	}
+	boolean nosetUI = false;
+	if (color == null && spui == newspui) {
+	    BasicSplitPaneDivider divider =  newspui.getDivider();
+	    BasicSplitPaneDivider divider2 =  origspui.getDivider();
+	    Border b = divider.getBorder();
+	    if (divider2 != null) {
+		divider2.setBorder(b);
+	    }
+	    splitPane.setUI(origspui);
+	} else if (color != null && spui == origspui) {
+	    BasicSplitPaneDivider divider =  origspui.getDivider();
+	    BasicSplitPaneDivider divider2 =  newspui.getDivider();
+	    Border b = divider.getBorder();
+	    if (divider2 != null) {
+		divider2.setBorder(b);
+	    }
+	    splitPane.setUI(newspui);
+	} else {
+	    nosetUI = true;
+	}
+	spcolor = color;
+	if (nosetUI && splitPane.isVisible()) splitPane.repaint();
+    }
+
+
+    /**
+     * Set the background color for the HTML pane.
+     * <P>
+     * Note: sometimes the background color for the HTML pane
+     * will be visible such as when the HTML code is being loaded
+     * and this method can produce a suitable color for this case.
+     * @param color the color
+     */
+    public void setHtmlPaneBackground(Color color) {
+	htmlPane.setBackground(color);
+    }
+
     /**
      * Rest the split pane to the preferred sizes.
      * This must be called after individual preferred sizes are set
@@ -397,7 +495,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     }
 
     /**
-     *  Returns the last value passed to setDividerLocation.  The
+     * Returns the last value passed to setDividerLocation.  The
      * value returned from this method may differ from the actual
      * divider location (if setDividerLocation was passed a value
      * bigger than the current size).
@@ -414,7 +512,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * divider should be reset to a value that attempts to honor the
      * preferred size of the TOC component.
      * @param location  an integer specifying the location of the divider
-     * measured from right or left hand edge adjacent to the TOC pane.
+     * measured from the right or left hand edge adjacent to the TOC pane.
      */
     public void setDividerLocation(int location) {
 	splitPane.setDividerLocation(location);
