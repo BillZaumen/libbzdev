@@ -266,6 +266,52 @@ public class Handler extends URLStreamHandler {
 	}
 	return url.openConnection();
     }
+
+    @Override
+    protected void parseURL(URL u, String spec, int start, int limit) {
+	String ref = (limit == spec.length())? null: spec.substring(limit+1);
+	if (start == 9) {
+	    // The spec starts with "resource:" so absolute
+	    super.setURL(u, "resource", "", -1, null, null,
+			 spec.substring(start, limit), null, ref);
+	} else {
+	    // relative path
+	    String upath = u.getPath();
+	    String spath  = spec.substring(start, limit);
+	    if (upath == null) {
+		upath = "";
+	    } else if (spath.length() > 0){
+		int ind = upath.lastIndexOf("/");
+		if (ind == -1) {
+		    upath="";
+		} else {
+		    upath = upath.substring(0, ind+1);
+		}
+	    }
+	    if (spath.startsWith("/")) spath = spath.substring(1);
+	    String path = upath + spath;
+	    super.setURL(u, "resource", "", -1, null, null,
+			 path, null, ref);
+	}
+    }
+
+    @Override
+    public boolean sameFile(URL u1, URL u2) {
+	String p1 = u1.getProtocol();
+	String p2 = u2.getProtocol();
+	if (p1.equals("resource") && p2.equals("resource")) {
+	    String path1 = u1.getPath();
+	    String path2 = u2. getPath();
+	    if (path1 != null && path2 != null) {
+		return path1.equals(path2);
+	    } else if (path1 == null || path2 == null) {
+		return false;
+	    }
+	} else if (p1.equals("resource") || p2.equals("resource")) {
+	    return false;
+	}
+	return super.sameFile(u1, u2);
+    }
 }
 
 //  LocalWords:  exbundle URLStreamHandler doPrivileged zA Za badPath

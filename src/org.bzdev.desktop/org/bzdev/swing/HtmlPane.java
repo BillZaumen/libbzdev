@@ -8,6 +8,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 // import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
@@ -146,6 +147,11 @@ public class HtmlPane extends JComponent {
 		return new Rectangle(ix, iy, iw, ih);
 	    }
 
+	    private Point2D toPoint2D(Point p) {
+		return new Point2D.Double(p.getX(), p.getY());
+	    }
+
+
 	    public void keyPressed(KeyEvent e) {
 		int keycode = e.getKeyCode();
 		int mod = e.getModifiersEx();
@@ -154,18 +160,122 @@ public class HtmlPane extends JComponent {
 		case KeyEvent.VK_HOME:
 		    editorPane.setCaretPosition(0);
 		    try {
-			editorPane.scrollRectToVisible
-			    (toRect(editorPane.modelToView2D(0)));
+			Rectangle r = new Rectangle(0, 0, 0, 0);
+			editorPane.scrollRectToVisible(r);
 		    } catch (Exception badloc) {}
 		    break;
 		case KeyEvent.VK_END:
 		    int len = editorPane.getDocument().getLength();
 		    editorPane.setCaretPosition(len);
 		    try {
-			editorPane.scrollRectToVisible
-			    (toRect(editorPane.modelToView2D(len)));
+			Rectangle r = toRect(editorPane.modelToView2D(len));
+			editorPane.scrollRectToVisible(r);
 		    } catch (Exception badloc) {}
-		    
+		    break;
+		case KeyEvent.VK_DOWN:
+		    try {
+			Rectangle r = editorScrollPane.getViewport()
+			    .getViewRect();
+			Point2D p = new Point2D
+			    .Double(r.getX(),r.getY() + r.getHeight());
+			int pos = editorPane.viewToModel2D(p);
+			Rectangle nr = toRect(editorPane.modelToView2D(pos));
+			int dist = nr.height;
+			if (dist == 0) {
+			    dist = 10;
+			} else if (dist > 20) {
+			    dist = 20;
+			}
+			r.translate(0, dist);
+			editorPane.scrollRectToVisible(r);
+		    } catch (Exception badloc) {}
+		    break;
+		case KeyEvent.VK_UP:
+		    try {
+			Rectangle r = editorScrollPane.getViewport()
+			    .getViewRect();
+			Point2D p = toPoint2D(editorScrollPane.getViewport()
+					      .getViewPosition());
+			int pos = editorPane.viewToModel2D(p);
+			Rectangle nr = toRect(editorPane.modelToView2D(pos));
+			int dist = nr.height;
+			if (dist == 0) {
+			    dist = 10;
+			} else if (dist > 20) {
+			    dist = 20;
+			}
+			int y1 = r.y;
+			int y2 = y1 - dist;
+			if (y2 < 0) y2 = 0;
+			r.translate(0, y2 - y1);
+			editorPane.scrollRectToVisible(r);
+		    } catch (Exception badloc) {}
+		    break;
+		case KeyEvent.VK_PAGE_DOWN:
+		    try {
+			Rectangle r = editorScrollPane.getViewport()
+			    .getViewRect();
+			Rectangle r1 = new Rectangle(r.x, r.y, r.width, 0);
+			r1.translate(0, r.height);
+			editorPane.scrollRectToVisible(r1);
+			r1 = editorScrollPane.getViewport()
+			    .getViewRect();
+			if (r1.y == r.y) {
+			    // did not move: have to fix it up
+			    int max = editorPane.getDocument().getLength();
+			    Rectangle lr =
+				toRect(editorPane.modelToView2D(max));
+			    int ymax = lr.y + lr.height;
+			    Point2D p = new Point2D
+				.Double(r.getX(),r.getY() + r.getHeight());
+			    int pos = editorPane.viewToModel2D(p) ;
+			    Rectangle r2 = r1;
+			    do {
+				r2.translate(0, 10);
+				editorPane.scrollRectToVisible(r2);
+				/*
+				pos++;
+				r1 = toRect(editorPane.modelToView2D(pos));
+				editorPane.scrollRectToVisible(r1);
+				*/
+				r1 = editorScrollPane.getViewport()
+				    .getViewRect();
+			    } while (r1.y == r.y && r2.y < ymax);
+			}
+		    } catch (Exception badloc) {}
+		    break;
+		case KeyEvent.VK_PAGE_UP:
+		    try {
+			Rectangle r = editorScrollPane.getViewport()
+			    .getViewRect();
+			if (r.y == 0) return;
+			Rectangle r1  = new Rectangle(r.x, r.y, r.width, 0);
+			r1.translate(0, -r.height);
+			editorPane.scrollRectToVisible(r1);
+			r1 = editorScrollPane.getViewport()
+			    .getViewRect();
+			if (r1.y == r.y) {
+			    // did not move: have to fix it up
+			    Point2D p = new Point2D
+				.Double(r.getX(),r.getY() - r.getHeight());
+			    // int pos = editorPane.viewToModel2D(p) - 1;
+			    // r1 = toRect(editorPane.modelToView2D(pos));
+			    // editorPane.scrollRectToVisible(r1);
+			    // int pos = editorPane.viewToModel2D(p);
+			    Rectangle r2 = r1;
+			    do {
+				r2.translate(0, -10);
+				editorPane.scrollRectToVisible(r1);
+				/*
+				pos--;
+				r1 = toRect(editorPane.modelToView2D(pos));
+				editorPane.scrollRectToVisible(r1);
+				*/
+				r1 = editorScrollPane.getViewport()
+				    .getViewRect();
+			    } while (r1.y == r.y && r2.y > 0);
+			}
+		    } catch (Exception badloc) {}
 		    break;
 		}
 	    }
@@ -174,6 +284,7 @@ public class HtmlPane extends JComponent {
     // private Stack revUrlstack = new Stack();
     private Stack<StackElement> urlstack = new Stack<StackElement>();
     private Stack<StackElement> revUrlstack = new Stack<StackElement>();
+    private StackElement currentElement = null;
 
     // use for internationalization - appears in tooltips.
     private static String startTip = "startTip";
@@ -348,18 +459,29 @@ public class HtmlPane extends JComponent {
 			    endButton.setEnabled(false);
 			    event = evt;
 			} else {
-			    /*
-			    System.out.println(editorScrollPane
-					       .getViewport()
-					       .getViewPosition());
-			    */
+			    URL newpage = e.getURL();
+			    if (newpage.equals(page)) {
+				pane.setPage(newpage);
+				event = null;
+				return;
+			    }
 			    Point p = editorScrollPane.getViewport()
 				.getViewPosition();
+			    // so we have the current position when we
+			    // clicked the link
+			    currentElement = new StackElement(page, p);
+			    urlstack.push(currentElement);
 			    pane.setPage(e.getURL());
 			    page = e.getURL();
 			    position = editorScrollPane.getViewport()
 				.getViewPosition();
-			    urlstack.push(new StackElement(current, p));
+			    // urlstack.push(new StackElement(current, p));
+			    // The position field in the stack element is
+			    // null because the actual value is not
+			    // available immediately.  Instead, it is
+			    // determined using a property chagne listener.
+			    currentElement = new StackElement(page,
+							      (Point) null);
 			    revUrlstack.clear();
 			    startButton.setEnabled(true);
 			    backButton.setEnabled(true);
@@ -406,6 +528,7 @@ public class HtmlPane extends JComponent {
     private void finishSetPage(URL page) {
 	this.page = page;
 	this.position = editorScrollPane.getViewport().getViewPosition();
+	currentElement = new StackElement(this.page, this.position);
 	setPageAux();
     }
 
@@ -669,6 +792,15 @@ public class HtmlPane extends JComponent {
     private HtmlPane(JEditorPane ep)  {
 	super();
 	editorPane = ep;
+	editorPane.addPropertyChangeListener((evt) -> {
+		if(evt.getPropertyName().equals("page")
+		   && currentElement != null
+		   && currentElement.event == null
+		   && currentElement.position == null) {
+		    currentElement.position =
+			editorScrollPane.getViewport().getViewPosition();
+		}
+	    });
 	editorScrollPane = new JScrollPane(editorPane);
 	me = this;
 	initIcons();
@@ -701,35 +833,55 @@ public class HtmlPane extends JComponent {
 
 	startButton.addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
+		    if (urlstack.empty()) {
+			if (currentElement != null) {
+			    position = currentElement.position;
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
+			backButton.setEnabled(false);
+			startButton.setEnabled(false);
+			return;
+		    }
+		    if (currentElement != null) {
+			revUrlstack.push(currentElement);
+		    }
+		    currentElement = urlstack.pop();
+		    while (!urlstack.empty()) {
+			revUrlstack.push(currentElement);
+			currentElement = urlstack.pop();
+		    }
 		    
 		    URL current = /*editorPane.*/getPage();
-		    StackElement element = (StackElement)urlstack.elementAt(0);
+		    // StackElement element=(StackElement)urlstack.elementAt(0);
 		    HTMLDocument doc =
 			(HTMLDocument)editorPane.getDocument();
 		    try {
-			editorPane.setPage(element.url);
-			page = element.url;
-			position = element.position;
+			if (page == null ||
+			    !page.sameFile(currentElement.url)) {
+			    editorPane.setPage(currentElement.url);
+			}
+			// editorPane.setPage(element.url);
+			page = currentElement.url;
+			position = currentElement.position;
 			if (position != null) {
 			    editorScrollPane.getViewport()
 				.setViewPosition(position);
 			}
-			if (element.event != null) {
-			    doc.processHTMLFrameHyperlinkEvent(element.
+			if (currentElement.event != null) {
+			    doc.processHTMLFrameHyperlinkEvent(currentElement.
 							       event);
 			}
 			StackElement el = new StackElement(current, event);
-			do {
-			    revUrlstack.push(el);
-			    el = (StackElement)urlstack.pop();
-			} while (el != element);
-			event = element.event;
+			event = currentElement.event;
 			frwdButton.setEnabled(true);
 			endButton.setEnabled(true);
+			/*
 			if (urlstack.empty()) {
 			    backButton.setEnabled(false);
 			    startButton.setEnabled(false);
 			}
+			*/
 		    } catch (Exception ee) {
 			boolean fixed = true;
 			try {
@@ -740,13 +892,13 @@ public class HtmlPane extends JComponent {
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
-			    urlstack.push(element);
+			    urlstack.push(currentElement);
 			} catch (Exception eee){fixed = false;}
 			if (fixed) {
 			    JOptionPane.
 				showMessageDialog(me,
 						  "Cannot go back to " 
-						  +element.url,
+						  +currentElement.url,
 						  errorTitle,
 						  JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -787,24 +939,33 @@ public class HtmlPane extends JComponent {
 	backButton.addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    
+		    if (urlstack.empty()) {
+			return;
+		    }
+		    if (currentElement != null) {
+			revUrlstack.push(currentElement);
+		    }
 		    URL current = /*editorPane.*/getPage();
-		    StackElement element = (StackElement)urlstack.pop();
+		    currentElement = urlstack.pop();
 		    HTMLDocument doc =
 			(HTMLDocument)editorPane.getDocument();
 		    try {
-			editorPane.setPage(element.url);
-			page = element.url;
-			position = element.position;
-			if (position != null) {
-			    editorScrollPane.getViewport()
-				.setViewPosition(position);
+			if (page == null ||
+			    !page.sameFile(currentElement.url)) {
+			    editorPane.setPage(currentElement.url);
 			}
-			if (element.event != null) {
-			    doc.processHTMLFrameHyperlinkEvent(element.
+			page = currentElement.url;
+			position = currentElement.position;
+			if (position != null) {
+			    JViewport vp = editorScrollPane.getViewport();
+			    vp.setViewPosition(position);
+			}
+			if (currentElement.event != null) {
+			    doc.processHTMLFrameHyperlinkEvent(currentElement.
 							       event);
 			}
-			revUrlstack.push(new StackElement(current, event));
-			event = element.event;
+			// revUrlstack.push(new StackElement(current, event));
+			event = currentElement.event;
 			frwdButton.setEnabled(true);
 			endButton.setEnabled(true);
 			if (urlstack.empty()) {
@@ -821,13 +982,13 @@ public class HtmlPane extends JComponent {
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
-			    urlstack.push(element);
+			    urlstack.push(currentElement);
 			} catch (Exception eee){fixed = false;}
 			if (fixed) {
 			    JOptionPane.
 				showMessageDialog(me,
 						  "Cannot go back to " 
-						  +element.url,
+						  +currentElement.url,
 						  errorTitle,
 						  JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -843,25 +1004,33 @@ public class HtmlPane extends JComponent {
 	    });
 	frwdButton.addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
+		    if (revUrlstack.empty()) {
+			return;
+		    }
+		    if (currentElement != null) {
+			urlstack.push(currentElement);
+		    }
 		    URL current = /*editorPane.*/getPage();
-		    StackElement element = (StackElement)revUrlstack.pop();
+		    currentElement = revUrlstack.pop();
 		    HTMLDocument doc =
 			(HTMLDocument)editorPane.getDocument();
 		    try {
-			editorPane.setPage(element.url);
-			page = element.url;
-			position = element.position;
+			editorPane.setPage(currentElement.url);
+			page = currentElement.url;
+			position = currentElement.position;
 			if (position != null) {
 			    editorScrollPane.getViewport()
 				.setViewPosition(position);
 			}
-			if (element.event != null) {
-			    doc.processHTMLFrameHyperlinkEvent(element.
+			if (currentElement.event != null) {
+			    doc.processHTMLFrameHyperlinkEvent(currentElement.
 							       event);
 			}
+			/*
 			urlstack.push(new 
 				      StackElement(current, event));
-			event = element.event;
+			*/
+			event = currentElement.event;
 			backButton.setEnabled(true);
 			startButton.setEnabled(true);
 			if (revUrlstack.empty()) {
@@ -878,13 +1047,13 @@ public class HtmlPane extends JComponent {
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
-			    revUrlstack.push(element);
+			    revUrlstack.push(currentElement);
 			} catch (Exception eeee) {fixed = false;}
 			if (fixed) {
 			    JOptionPane.
 				showMessageDialog(me,
 						  "Cannot go to " 
-						  +element.url,
+						  +currentElement.url,
 						  errorTitle,
 						  JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -900,36 +1069,56 @@ public class HtmlPane extends JComponent {
 	    });
 	endButton.addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
+		    if (revUrlstack.empty()) {
+			if (currentElement != null) {
+			    position = currentElement.position;
+			    editorScrollPane.getViewport()
+				.setViewPosition(position);
+			}
+			frwdButton.setEnabled(false);
+			endButton.setEnabled(false);
+			return;
+		    }
+		    if (currentElement != null) {
+			urlstack.push(currentElement);
+		    }
+		    currentElement = revUrlstack.pop();
+		    while (!revUrlstack.empty()) {
+			urlstack.push(currentElement);
+			currentElement = revUrlstack.pop();
+		    }
 		    URL current = /*editorPane.*/getPage();
+		    /*
 		    StackElement element = 
 			(StackElement)revUrlstack.elementAt(0);
+		    */
 		    HTMLDocument doc =
 			(HTMLDocument)editorPane.getDocument();
 		    try {
-			editorPane.setPage(element.url);
-			page = element.url;
-			position = element.position;
+			if (page == null
+			    || !page.sameFile(currentElement.url)) {
+			    editorPane.setPage(currentElement.url);
+			}
+			page = currentElement.url;
+			position = currentElement.position;
 			if (position != null) {
 			    editorScrollPane.getViewport()
 				.setViewPosition(position);
 			}
-			if (element.event != null) {
-			    doc.processHTMLFrameHyperlinkEvent(element.
+			if (currentElement.event != null) {
+			    doc.processHTMLFrameHyperlinkEvent(currentElement.
 							       event);
 			}
 			StackElement el = new StackElement(current, event);
-			do  {
-			    urlstack.push(el);
-			    el = (StackElement)revUrlstack.pop();
-			}
-			while(el != element);
-			event = element.event;
+			event = currentElement.event;
 			backButton.setEnabled(true);
 			startButton.setEnabled(true);
+			/*
 			if (revUrlstack.empty()) {
 			    frwdButton.setEnabled(false);
 			    endButton.setEnabled(false);
 			}
+			*/
 		    } catch (Exception eee) {
 			boolean fixed = true;
 			try {
@@ -940,13 +1129,13 @@ public class HtmlPane extends JComponent {
 			    if (event != null) {
 				doc.processHTMLFrameHyperlinkEvent(event);
 			    }
-			    revUrlstack.push(element);
+			    revUrlstack.push(currentElement);
 			} catch (Exception eeee) {fixed = false;}
 			if (fixed) {
 			    JOptionPane.
 				showMessageDialog(me,
 						  "Cannot go to " 
-						  +element.url,
+						  +currentElement.url,
 						  errorTitle,
 						  JOptionPane.ERROR_MESSAGE);
 			} else {
