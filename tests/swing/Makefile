@@ -128,14 +128,12 @@ htest2c:
 	$(JAVA) -Dorg.bzdev.protocols.resource.path=`pwd`/manual.jar \
 		HtmlPaneTest2  resource:html/manual2.html
 
-
 htest2d:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	jar cf manual.jar html
 	$(JAVA) HtmlPaneTest2 file:`pwd`/../../../epts/manual/manual.html
-
 
 EPTS = ../../../epts/jar/epts.jar
 htest2e:
@@ -153,6 +151,12 @@ htest2h:
 	jar cf manual.jar html
 	$(JAVA) HtmlPaneTest2 http://localhost:8080/manual.html
 
+htest3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) HtmlPaneTest3 file:`pwd`/html/manual.html
 
 otoc:
 	(cd ../.. ; make jars)

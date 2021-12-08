@@ -1,3 +1,4 @@
+
 package org.bzdev.swing;
 
 import java.awt.Color;
@@ -5,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.GraphicsConfiguration;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -12,8 +14,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 // import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -52,12 +56,38 @@ import java.util.Stack;
  *        "forw" button.
  *   <li> The "reload" button reloads the link currently visited.
  * </ul> 
- * Note: the use of these buttons does not restore any scrolling that
- * the user may have performed.  The buttons contain icons instead of
- * text, but have text-based tooltips. The icons are in resources named
+ * There is keyboard support for scrolling within a window, with
+ * additional shortcuts using some emacs conventions:
+ * <UL>
+ *   <LI> the DOWN-ARROW key, plus C-N , moves the view down by
+ *        roughly one line.
+ *   <LI> the UP-ARROW key, plus C-P, moves the view up by
+ *        roughly one line.
+ *   <LI> the PAGE-DOWN key moves the view down by one page, where
+ *        a page is the size of the window.
+ *   <LI> the PAGE-UP key moves the view up by one page, where a page
+ *        is the size of the window.
+ *   <LI> the HOME key, plus M-&lt;, moves the view to the start of the
+ *        document.
+ *   <LI> the END key, plus M-&lt;, moves the view to the end of the
+ *        document.
+ *</UL>
+ * <P>
+ * Note: The buttons contain icons instead of text, but have
+ * text-based tooltips. The icons are in resources named
  * org/bzdev/swing/icons/fleft.gif, org/bzdev/swing/icons/left.gif,
  * org/bzdev/swing/icons/redo.gif, org/bzdev/swing/icons/right.gif,
- * org/bzdev/swing/icons/fright.gif, and org/bzdev/swing/icons/rlredo.gif.
+ * org/bzdev/swing/icons/fright.gif, and
+ * org/bzdev/swing/icons/rlredo.gif.  These are supplemented for
+ * 'reverse video' by icons in the filesorg/bzdev/swing/icons/fleftRV.gif,
+ * org/bzdev/swing/icons/leftRV.gif, org/bzdev/swing/icons/redoRV.gif,
+ * org/bzdev/swing/icons/rightRV.gif,org/bzdev/swing/icons/frightRV.gif,
+ * and org/bzdev/swing/icons/rlredoRV.gif for enabled icons. The disabled
+ * icons for reverse video are in resources named
+ * org/bzdev/swing/icons/fleftRVD.gif org/bzdev/swing/icons/leftRVD.gif,
+ * org/bzdev/swing/icons/redoRVD.gif, org/bzdev/swing/icons/rightRVD.gif,
+ * org/bzdev/swing/icons/frightRVD.gif, and
+ * org/bzdev/swing/icons/rlredoRVD.gif.
  * <p>
  * The MIME types supported are those that a {@link JEditorPane}
  * supports.
@@ -151,11 +181,66 @@ public class HtmlPane extends JComponent {
 		return new Point2D.Double(p.getX(), p.getY());
 	    }
 
+	    final int META_MASK = InputEvent.ALT_DOWN_MASK
+		| InputEvent.META_DOWN_MASK;
 
 	    public void keyPressed(KeyEvent e) {
+		boolean editable = editorPane.isEditable();
 		int keycode = e.getKeyCode();
 		int mod = e.getModifiersEx();
-		if (mod != 0) return;
+		// if (mod != 0) return;
+		if (mod != 0) {
+		    if ((InputEvent.ALT_DOWN_MASK != InputEvent.META_DOWN_MASK)
+			&& ((mod & ~(InputEvent.META_MASK
+				 | InputEvent.CTRL_DOWN_MASK)) ==
+			    META_MASK)) {
+			return;
+		    }
+		    boolean shifted = ((mod & InputEvent.SHIFT_DOWN_MASK) != 0);
+		    int metaMasked = mod & META_MASK;
+		    int controlMasked = mod & InputEvent.CTRL_DOWN_MASK;
+		    boolean hasMeta = (metaMasked != 0);
+		    boolean hasCtrl =
+			(controlMasked == InputEvent.CTRL_DOWN_MASK);
+		    if (hasMeta && hasCtrl) return;
+		    if (hasCtrl) {
+			switch(keycode) {
+			case KeyEvent.VK_N:
+			    keycode = KeyEvent.VK_DOWN;
+			    break;
+			case KeyEvent.VK_P:
+			    keycode = KeyEvent.VK_UP;
+			    break;
+			case KeyEvent.VK_V:
+			    if (editable) return;
+			    keycode = KeyEvent.VK_PAGE_DOWN;
+			    break;
+			default:
+			    return;
+			}
+		    } else if (hasMeta) {
+			switch(keycode) {
+			case KeyEvent.VK_COMMA:
+			    if (!shifted) return;
+			case KeyEvent.VK_LESS:
+			    keycode = KeyEvent.VK_HOME;
+			    break;
+			case KeyEvent.VK_PERIOD:
+			    if (!shifted) return;
+			case KeyEvent.VK_GREATER:
+			    keycode = KeyEvent.VK_END;
+			    break;
+			case KeyEvent.VK_V:
+			    if (editable) return;
+			    keycode = KeyEvent.VK_PAGE_UP;
+			    break;
+			default:
+			    return;
+			}
+		    } else {
+			return;
+		    }
+		}
 		switch (keycode) {
 		case KeyEvent.VK_HOME:
 		    editorPane.setCaretPosition(0);
@@ -212,69 +297,27 @@ public class HtmlPane extends JComponent {
 		    } catch (Exception badloc) {}
 		    break;
 		case KeyEvent.VK_PAGE_DOWN:
+		    // Page down almost works without this, but it
+		    // sometimes gets stuck if there is a large image.
 		    try {
 			Rectangle r = editorScrollPane.getViewport()
 			    .getViewRect();
-			Rectangle r1 = new Rectangle(r.x, r.y, r.width, 0);
-			r1.translate(0, r.height);
-			editorPane.scrollRectToVisible(r1);
-			r1 = editorScrollPane.getViewport()
-			    .getViewRect();
-			if (r1.y == r.y) {
-			    // did not move: have to fix it up
-			    int max = editorPane.getDocument().getLength();
-			    Rectangle lr =
-				toRect(editorPane.modelToView2D(max));
-			    int ymax = lr.y + lr.height;
-			    Point2D p = new Point2D
-				.Double(r.getX(),r.getY() + r.getHeight());
-			    int pos = editorPane.viewToModel2D(p) ;
-			    Rectangle r2 = r1;
-			    do {
-				r2.translate(0, 10);
-				editorPane.scrollRectToVisible(r2);
-				/*
-				pos++;
-				r1 = toRect(editorPane.modelToView2D(pos));
-				editorPane.scrollRectToVisible(r1);
-				*/
-				r1 = editorScrollPane.getViewport()
-				    .getViewRect();
-			    } while (r1.y == r.y && r2.y < ymax);
-			}
+			int height = (r.height * 9) / 10;
+			if (height == 0) height = 1;
+			Point pt = new Point(r.x, r.y+height);
+			editorScrollPane.getViewport().setViewPosition(pt);
 		    } catch (Exception badloc) {}
 		    break;
 		case KeyEvent.VK_PAGE_UP:
+		    // Page up almost works without this, but it
+		    // sometimes gets stuck if there is a large image.
 		    try {
 			Rectangle r = editorScrollPane.getViewport()
 			    .getViewRect();
-			if (r.y == 0) return;
-			Rectangle r1  = new Rectangle(r.x, r.y, r.width, 0);
-			r1.translate(0, -r.height);
-			editorPane.scrollRectToVisible(r1);
-			r1 = editorScrollPane.getViewport()
-			    .getViewRect();
-			if (r1.y == r.y) {
-			    // did not move: have to fix it up
-			    Point2D p = new Point2D
-				.Double(r.getX(),r.getY() - r.getHeight());
-			    // int pos = editorPane.viewToModel2D(p) - 1;
-			    // r1 = toRect(editorPane.modelToView2D(pos));
-			    // editorPane.scrollRectToVisible(r1);
-			    // int pos = editorPane.viewToModel2D(p);
-			    Rectangle r2 = r1;
-			    do {
-				r2.translate(0, -10);
-				editorPane.scrollRectToVisible(r1);
-				/*
-				pos--;
-				r1 = toRect(editorPane.modelToView2D(pos));
-				editorPane.scrollRectToVisible(r1);
-				*/
-				r1 = editorScrollPane.getViewport()
-				    .getViewRect();
-			    } while (r1.y == r.y && r2.y > 0);
-			}
+			int height = (r.height * 9) / 10;
+			if (height == 0) height = 1;
+			Point pt = new Point(r.x, r.y-height);
+			editorScrollPane.getViewport().setViewPosition(pt);
 		    } catch (Exception badloc) {}
 		    break;
 		}
@@ -778,12 +821,43 @@ public class HtmlPane extends JComponent {
 		frwdButton.setDisabledIcon(null);
 		endButton.setDisabledIcon(null);
 	    }
+
 	}
 	startButton.setBackground(color);
 	backButton.setBackground(color);
 	reloadButton.setBackground(color);
 	frwdButton.setBackground(color);
 	endButton.setBackground(color);
+    }
+
+    Object actionForKeyCV;
+    static final KeyStroke controlVKeyStroke =
+	KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
+
+    /**
+     * Determine if this HtmlPane is editable.
+     * @return true if it is editable; false otherwise
+     */
+    public boolean isEditable() {
+	return editorPane.isEditable();
+    }
+
+    /**
+     * Set whether or not this HtmlPane is editable.
+     * This method sets a property of the underlying JEditorPane.
+     * <P>
+     * When editable, one can add text, but to format it a subclass
+     * will be needed.  When editing, links will not function and the
+     * text will not be modifiable.
+     * @param value true if this pane is to be editable; false otherwise
+     */
+    public void setEditable(boolean value) {
+	if (value) {
+	    editorPane.getInputMap().put(controlVKeyStroke, actionForKeyCV);
+	} else {
+	    editorPane.getInputMap().put(controlVKeyStroke, "doNothing");
+	}
+	editorPane.setEditable(value);
     }
 
     /**
@@ -1168,6 +1242,43 @@ public class HtmlPane extends JComponent {
 	endButton.setEnabled(false);
 	add(top, "North");
 	add(editorScrollPane, "Center");
+
+
+	InputMap inputMap = editorPane.getInputMap();
+	ActionMap actionMap = editorPane.getActionMap();
+	Action doNothing = new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		}
+	    };
+
+	actionMap.put("doNothing", doNothing);
+	KeyStroke ks;
+
+	ks = controlVKeyStroke;
+	actionForKeyCV = inputMap.get(ks);
+	inputMap.put(ks, "doNothing");
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK);
+	inputMap.put(ks, "doNothing");
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.META_DOWN_MASK);
+	inputMap.put(ks, "doNothing");
+
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0);
+	inputMap.put(ks, "doNothing");
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0);
+	inputMap.put(ks, "doNothing");
+
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0);
+	inputMap.put(ks, "doNothing");
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_END, 0);
+	inputMap.put(ks, "doNothing");
+
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+	inputMap.put(ks, "doNothing");
+	ks = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+	inputMap.put(ks, "doNothing");
+
+
+
 	editorPane.addKeyListener(editorKeyAdapter);
     }
 
@@ -1197,6 +1308,18 @@ public class HtmlPane extends JComponent {
 	this(new JEditorPane(url));
 	finishSetPage(url);
     }
+
+    /**
+     * Set the color of the caret.
+     * The caret (by default a blinking vertical line) will normally
+     * be black.  It should be set to white if the background will be
+     * dark.
+     * @param c the color for the caret
+     */
+    public void setCaretColor(Color c) {
+	editorPane.setCaretColor(c);
+    }
+
 }
 
 //  LocalWords:  exbundle JEditorPane JScrollPane ul li setPage forw

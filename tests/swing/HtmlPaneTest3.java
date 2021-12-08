@@ -6,7 +6,7 @@ import java.net.*;
 import javax.swing.*;
 import org.bzdev.protocols.*;
 
-public class HtmlPaneTest2 {
+public class HtmlPaneTest3 {
     public static void main(String argv[]) throws Exception {
 	Handlers.enable();
 	try {
@@ -17,7 +17,7 @@ public class HtmlPaneTest2 {
 		    try {
 			HtmlPane htmlPane = new HtmlPane();
 			htmlPane.setEditable(true);
-			htmlPane.setEditable(false);
+			htmlPane.setCaretColor(Color.WHITE);
 			htmlPane.setPage(url);
 			htmlPane.setBackground(Color.BLUE
 					       .darker().darker().darker());
