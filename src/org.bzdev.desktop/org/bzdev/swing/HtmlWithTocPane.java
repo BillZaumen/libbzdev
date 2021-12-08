@@ -373,6 +373,19 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	htmlPane.setPreferredSize(preferredSize);
     }
 
+    private boolean backgroundSet = false;
+    private boolean tocScrollbarColorSet = false;
+
+
+    /**
+     * Set the background color.
+     * This method will also set the background color of scroll bars
+     * unless the last call to {@link #setTocScrollbarBackground(Color)}
+     * or {@link #setHtmlPaneScrollbarBackground(Color)}
+     * if any were made, had a non-null argument, which explicitly
+     * sets the background color for the corresponding scrollbars.
+     * @param color the color
+     */
     @Override
     public void setBackground(Color color) {
 	super.setBackground(color);
@@ -380,6 +393,44 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	tocPane.setBackground(color);
 	tocScrollPane.setBackground(color);
 	splitPane.setBackground(color);
+	if (!tocScrollbarColorSet) {
+	    tocScrollPane.getVerticalScrollBar().setBackground(color);
+	    tocScrollPane.getHorizontalScrollBar().setBackground(color);
+	}
+	backgroundSet = (color != null);
+    }
+
+    /**
+     * Set the background color for the table of contents scroll bars.
+     * If color is null and the last call to {@link #setBackground(Color)},
+     * if one was made, had a non-null argument, that background color will
+     * be used.  If the last call to {@link #setBackground(Color)} had a
+     * null argument, the color passed as an argument will be used.
+     * @param color the color; null for the default color
+     */
+    public void setTocScrollbarBackground(Color color) {
+	if (backgroundSet && color == null) {
+	    Color c = getBackground();
+	    tocScrollPane.getVerticalScrollBar().setBackground(c);
+	    tocScrollPane.getHorizontalScrollBar().setBackground(c);
+	} else {
+	    tocScrollPane.getVerticalScrollBar().setBackground(color);
+	    tocScrollPane.getHorizontalScrollBar().setBackground(color);
+	}
+	tocScrollbarColorSet = (color != null);
+    }
+
+    /**
+     * Set the background color for the HTML pane scroll bars.
+     * If color is null and the last call to {@link #setBackground(Color)},
+     * if one was made, had a non-null argument, that background color will
+     * be used.  If the last call to {@link #setBackground(Color)} had a
+     * null argument, the color passed as an argument will be used.
+     * @param color the color; null for the default color as modified by
+     *        the last call (if any) to {@link #setBackground(Color)}
+     */
+    public void setHtmlPaneScrollbarBackground(Color color) {
+	htmlPane.setScrollbarBackground(color);
     }
 
     /**

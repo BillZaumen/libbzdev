@@ -26,6 +26,9 @@ public class HtmlWithTocTest {
 			tocPane.setTocBackground(Color.BLUE.
 						 darker().darker().darker());
 
+			tocPane.setTocScrollbarBackground(Color.BLUE);
+			tocPane.setTocScrollbarBackground(null);
+
 			tocPane.setTocForeground(Color.WHITE);
 
 			tocPane.setHtmlButtonBackground(Color.BLUE.darker()

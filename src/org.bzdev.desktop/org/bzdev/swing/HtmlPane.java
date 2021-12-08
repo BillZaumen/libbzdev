@@ -1,4 +1,3 @@
-
 package org.bzdev.swing;
 
 import java.awt.Color;
@@ -592,7 +591,7 @@ public class HtmlPane extends JComponent {
     /**
      * Set the background color.
      * This method will also set the background color of scroll bars
-     * unless the last call to {@link #setScrollBarBackground(Color)},
+     * unless the last call to {@link #setScrollbarBackground(Color)},
      * if one was made, had a non-null argument.
      * @param color the color
      */
@@ -613,10 +612,12 @@ public class HtmlPane extends JComponent {
      * Set the background color for scroll bars.
      * If color is null and the last call to {@link #setBackground(Color)},
      * if one was made, had a non-null argument, that background color will
-     * be used.
-     * @param color the color; null for the default color
+     * be used.  If the last call to {@link #setBackground(Color)} had a
+     * null argument, the color passed as an argument will be used.
+     * @param color the color; null for the default color as modified by
+     *        the last call (if any) to {@link #setBackground(Color)}
      */
-    public void setScrollBarBackground(Color color) {
+    public void setScrollbarBackground(Color color) {
 	if (backgroundSet && color == null) {
 	    Color c = getBackground();
 	    editorScrollPane.getVerticalScrollBar().setBackground(c);
