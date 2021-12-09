@@ -384,6 +384,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * or {@link #setHtmlPaneScrollbarBackground(Color)}
      * if any were made, had a non-null argument, which explicitly
      * sets the background color for the corresponding scrollbars.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      */
     @Override
@@ -406,6 +410,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * if one was made, had a non-null argument, that background color will
      * be used.  If the last call to {@link #setBackground(Color)} had a
      * null argument, the color passed as an argument will be used.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color; null for the default color
      */
     public void setTocScrollbarBackground(Color color) {
@@ -426,6 +434,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * if one was made, had a non-null argument, that background color will
      * be used.  If the last call to {@link #setBackground(Color)} had a
      * null argument, the color passed as an argument will be used.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color; null for the default color as modified by
      *        the last call (if any) to {@link #setBackground(Color)}
      */
@@ -438,6 +450,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * 'forward', and 'end' controls.
      * When rvmode is true, the icons will be white when enabled
      * and grey when disabled, the reverse from the normal behavior.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      * @param rvmode true for reverse video; false otherwise
      */
@@ -452,6 +468,11 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 
     /**
      *
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
+     * @param color the color
      */
     public void setSplitterBackground(Color color) {
 	if (spcolor == null && color == null) return;
@@ -512,6 +533,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * Note: sometimes the background color for the HTML pane
      * will be visible such as when the HTML code is being loaded
      * and this method can produce a suitable color for this case.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      */
     public void setHtmlPaneBackground(Color color) {
@@ -771,6 +796,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 
     /**
      * Set the background color for the table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the background color; null if the parent component's color
      *        should be used.
      */
@@ -791,6 +820,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 
     /**
      * Set the foreground color for the table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the foreground color; null if the parent component's color
      *        should be used.
      */
@@ -801,6 +834,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     /**
      * Set the background color for items that are selected in the
      * table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      */
     public void setTocBackgroundSelectionColor(Color c) {
@@ -810,6 +847,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     /**
      * Set the background color for items that are not selected in the
      * table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      */
     public void setTocBackgroundNonSelectionColor(Color c) {
@@ -819,6 +860,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     /**
      * Set the color of text describing items that are selected in
      * the table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      */
     public void setTocTextSelectionColor(Color c) {
@@ -828,6 +873,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     /**
      * Set the color of text describing items that are not selected in
      * the table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      */
     public void setTocTextNonSelectionColor(Color c) {
@@ -836,6 +885,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 
     /**
      * Set the font for the entries in table of contents.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param font the font
      */
     public final void setTocTCRFont(Font font) {

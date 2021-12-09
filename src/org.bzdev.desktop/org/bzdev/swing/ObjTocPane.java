@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.plaf.TreeUI;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.*;
 
 import java.util.Stack;
@@ -420,12 +422,19 @@ public class ObjTocPane extends JTree implements TocTree {
      * <P>
      * Modifications to a table-cell renderer are not automtically
      * reapplied if the table-cell renderer is changed.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      * @see javax.swing.JComponent#setBackground(Color)
      */
     @Override
     public void setBackground(Color color) {
 	super.setBackground(color);
+	if (tcr != null) {
+	    tcr.setBackground(color);
+	}
 	if (tcr != null && setBackSelectionColorCalled == false) {
 	    tcr.setBackgroundSelectionColor(color);
 	}
@@ -462,6 +471,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * <P>
      * Modifications to a table-cell renderer are not automtically
      * reapplied if the table-cell renderer is changed.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      * @see javax.swing.JComponent#setForeground(Color)
      */
@@ -486,6 +499,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
      * the method
      * {@link javax.swing.tree.DefaultTreeCellRenderer#getBackgroundSelectionColor()}.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      * @exception UnsupportedOperationException if the tree cell
      *            renderer is not an instance of
@@ -512,6 +529,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
      * the method
      * {@link javax.swing.tree.DefaultTreeCellRenderer#getBackgroundNonSelectionColor()}.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      * @exception UnsupportedOperationException if the tree cell
      *            renderer is not an instance of
@@ -539,6 +560,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
      * the method
      * {@link javax.swing.tree.DefaultTreeCellRenderer#getTextSelectionColor()}.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      * @exception UnsupportedOperationException if the tree cell
      *            renderer is not an instance of
@@ -564,6 +589,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
      * the method
      * {@link javax.swing.tree.DefaultTreeCellRenderer#getTextNonSelectionColor()}.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param c the color
      * @exception UnsupportedOperationException if the tree cell
      *            renderer is not an instance of
@@ -589,6 +618,10 @@ public class ObjTocPane extends JTree implements TocTree {
      * instance of {@link javax.swing.tree.DefaultTreeCellRenderer}, use
      * the method
      * {@link javax.swing.tree.DefaultTreeCellRenderer#getFont()}.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param font the font
      * @exception UnsupportedOperationException if the tree cell
      *            renderer is not an instance of

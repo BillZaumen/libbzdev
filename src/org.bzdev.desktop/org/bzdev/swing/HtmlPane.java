@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
+import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Component;
 import java.awt.Container;
@@ -28,6 +29,8 @@ import java.security.*;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.ButtonUI;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
@@ -146,6 +149,18 @@ public class HtmlPane extends JComponent {
     private JEditorPane editorPane = null /*new JEditorPane() */;
     private JScrollPane editorScrollPane = null /*new JScrollPane(editorPane)*/;
     JPanel top = new JPanel();
+
+    private boolean rvmodeChanged() {
+	Color c = top.getBackground();
+	boolean rvm =
+	    ((c.getRed() < 128 && c.getGreen() < 128 && c.getBlue() < 128));
+	try {
+	    return (rvm != rvmode);
+	} finally {
+	    rvmode = rvm;
+	}
+    }
+
 
     public void setLocale(Locale locale) {
 	super.setLocale(locale);
@@ -514,16 +529,28 @@ public class HtmlPane extends JComponent {
 			    currentElement = new StackElement(page, p);
 			    urlstack.push(currentElement);
 			    pane.setPage(e.getURL());
+			    if (page.sameFile(e.getURL())) {
+				String ref = e.getURL().getRef();
+				if (ref == null) position = new Point(0,0);
+				else {
+				    editorPane.scrollToReference(ref);
+				    position = editorScrollPane.getViewport()
+					.getViewPosition();
+				}
+			    } else {
+				position = null;
+			    }
 			    page = e.getURL();
+			    /*
 			    position = editorScrollPane.getViewport()
 				.getViewPosition();
+			    */
 			    // urlstack.push(new StackElement(current, p));
 			    // The position field in the stack element is
 			    // null because the actual value is not
 			    // available immediately.  Instead, it is
 			    // determined using a property chagne listener.
-			    currentElement = new StackElement(page,
-							      (Point) null);
+			    currentElement = new StackElement(page, position);
 			    revUrlstack.clear();
 			    startButton.setEnabled(true);
 			    backButton.setEnabled(true);
@@ -593,6 +620,10 @@ public class HtmlPane extends JComponent {
      * This method will also set the background color of scroll bars
      * unless the last call to {@link #setScrollbarBackground(Color)},
      * if one was made, had a non-null argument.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      */
     @Override
@@ -614,6 +645,10 @@ public class HtmlPane extends JComponent {
      * if one was made, had a non-null argument, that background color will
      * be used.  If the last call to {@link #setBackground(Color)} had a
      * null argument, the color passed as an argument will be used.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color; null for the default color as modified by
      *        the last call (if any) to {@link #setBackground(Color)}
      */
@@ -765,15 +800,25 @@ public class HtmlPane extends JComponent {
 
     boolean rvmode = false;
 
+    // Need this because when we use the system UI, it shuts off the
+    // ability to change the button's background color.
+    ButtonUI origButtonUI = null;
+    boolean buttonBackgroundSet = false;
+    BasicButtonUI buttonUI = new javax.swing.plaf.basic.BasicButtonUI();
     /**
      * Set the background color for the 'start', 'back', 'reload',
      * 'forward', and 'end' controls.
      * When rvmode is true, the icons will be white when enabled
      * and grey when disabled, the reverse from the normal behavior.
+     * <P>
+     * Note:  with some pluggable look and feels, this method may
+     * be fully or partially ignored.  It works as expected with the
+     * default look and feel.
      * @param color the color
      * @param rvmode true for reverse video; false otherwise
      */
     public void setButtonBackground(Color color, boolean rvmode) {
+	buttonBackgroundSet = (color != null);
 	if (this.rvmode != rvmode) {
 	    if (rvmode) {
 		if (lrmode) {
@@ -822,13 +867,20 @@ public class HtmlPane extends JComponent {
 		frwdButton.setDisabledIcon(null);
 		endButton.setDisabledIcon(null);
 	    }
-
+	    this.rvmode = rvmode;
 	}
+	startButton.setOpaque(true);
+	backButton.setOpaque(true);
+	reloadButton.setOpaque(true);
+	frwdButton.setOpaque(true);
+	endButton.setOpaque(true);
+
 	startButton.setBackground(color);
 	backButton.setBackground(color);
 	reloadButton.setBackground(color);
 	frwdButton.setBackground(color);
 	endButton.setBackground(color);
+
     }
 
     Object actionForKeyCV;
@@ -861,6 +913,79 @@ public class HtmlPane extends JComponent {
 	editorPane.setEditable(value);
     }
 
+    private void doPaintComponent(Graphics g, JButton button) {
+	Graphics scratchGraphics = (g == null) ? null : g.create();
+	try {
+	    buttonUI.update(scratchGraphics, button);
+	}
+	finally {
+	    scratchGraphics.dispose();
+	}
+    }
+
+    private JButton createButton(ImageIcon icon) {
+	return new JButton(icon) {
+		protected void paintComponent(Graphics g) {
+		    if (buttonBackgroundSet) {
+			doPaintComponent(g, this);
+		    } else {
+			super.paintComponent(g);
+		    }
+		}
+	    };
+    }
+
+    private void resetIcons() {
+	if (rvmode) {
+	    if (lrmode) {
+		startButton.setIcon(fleftRVIcon);
+		backButton.setIcon(leftRVIcon);
+		reloadButton.setIcon(reloadRVIcon);
+		frwdButton.setIcon(rightRVIcon);
+		endButton.setIcon(frightRVIcon);
+
+		startButton.setDisabledIcon(fleftRVDIcon);
+		backButton.setDisabledIcon(leftRVDIcon);
+		reloadButton.setDisabledIcon(reloadRVDIcon);
+		frwdButton.setDisabledIcon(rightRVDIcon);
+		endButton.setDisabledIcon(frightRVDIcon);
+	    } else {
+		startButton.setIcon(frightRVIcon);
+		backButton.setIcon(rightRVIcon);
+		reloadButton.setIcon(rlReloadRVIcon);
+		frwdButton.setIcon(leftRVIcon);
+		endButton.setIcon(fleftRVIcon);
+
+		startButton.setDisabledIcon(frightRVDIcon);
+		backButton.setDisabledIcon(rightRVDIcon);
+		reloadButton.setDisabledIcon(rlReloadRVDIcon);
+		frwdButton.setDisabledIcon(leftRVDIcon);
+		endButton.setDisabledIcon(fleftRVDIcon);
+	    }
+	} else {
+	    if (lrmode) {
+		startButton.setIcon(fleftIcon);
+		backButton.setIcon(leftIcon);
+		reloadButton.setIcon(reloadIcon);
+		frwdButton.setIcon(rightIcon);
+		endButton.setIcon(frightIcon);
+	    } else {
+		startButton.setIcon(frightIcon);
+		backButton.setIcon(rightIcon);
+		reloadButton.setIcon(rlReloadIcon);
+		frwdButton.setIcon(leftIcon);
+		endButton.setIcon(fleftIcon);
+	    }
+
+	    startButton.setDisabledIcon(null);
+	    backButton.setDisabledIcon(null);
+	    reloadButton.setDisabledIcon(null);
+	    frwdButton.setDisabledIcon(null);
+	    endButton.setDisabledIcon(null);
+	}
+    }
+
+
     /**
      * Constructor.
      */
@@ -885,13 +1010,38 @@ public class HtmlPane extends JComponent {
 
 	errorTitle = bundle.getString("errorTitle");
 
-	if (frightIcon != null && rightIcon != null && reloadIcon != null &&
+	Color c = top.getBackground();
+	if (c.getRed() < 128 && c.getGreen() < 128 && c.getBlue() < 128) {
+	    // set the default RV mode based on the background color
+	    // that was set by the look and feel.
+	    rvmode = true;
+	}
+
+	if (rvmode == false &&
+	    frightIcon != null && rightIcon != null && reloadIcon != null &&
 	    leftIcon != null && fleftIcon != null) {
-	    startButton = new JButton(fleftIcon);
-	    backButton = new JButton(leftIcon);
-	    reloadButton = new JButton(reloadIcon);
-	    frwdButton = new JButton(rightIcon);
-	    endButton = new JButton(frightIcon);
+	    startButton = createButton(fleftIcon);
+	    backButton = createButton(leftIcon);
+	    reloadButton = createButton(reloadIcon);
+	    frwdButton = createButton(rightIcon);
+	    endButton = createButton(frightIcon);
+	} else if (rvmode == true &&
+		   frightRVIcon != null && rightRVIcon != null
+		   && reloadRVIcon != null &&
+		   leftRVIcon != null && fleftRVIcon != null
+		   && frightRVDIcon != null && rightRVDIcon != null
+		   && reloadRVDIcon != null &&
+		   leftRVDIcon != null && fleftRVDIcon != null) {
+	    startButton = createButton(fleftRVIcon);
+	    backButton = createButton(leftRVIcon);
+	    reloadButton = createButton(reloadRVIcon);
+	    frwdButton = createButton(rightRVIcon);
+	    endButton = createButton(frightRVIcon);
+	    startButton.setDisabledIcon(fleftRVDIcon);
+	    backButton.setDisabledIcon(leftRVDIcon);
+	    reloadButton.setDisabledIcon(reloadRVDIcon);
+	    frwdButton.setDisabledIcon(rightRVDIcon);
+	    endButton.setDisabledIcon(frightRVDIcon);
 	} else {
 	    // Some icons not included - use text instead.
 	    startButton = new JButton(bundle.getString(startText));
@@ -951,12 +1101,8 @@ public class HtmlPane extends JComponent {
 			event = currentElement.event;
 			frwdButton.setEnabled(true);
 			endButton.setEnabled(true);
-			/*
-			if (urlstack.empty()) {
-			    backButton.setEnabled(false);
-			    startButton.setEnabled(false);
-			}
-			*/
+			backButton.setEnabled(false);
+			startButton.setEnabled(false);
 		    } catch (Exception ee) {
 			boolean fixed = true;
 			try {
@@ -1013,7 +1159,6 @@ public class HtmlPane extends JComponent {
 	    });
 	backButton.addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    
 		    if (urlstack.empty()) {
 			return;
 		    }
@@ -1147,8 +1292,10 @@ public class HtmlPane extends JComponent {
 		    if (revUrlstack.empty()) {
 			if (currentElement != null) {
 			    position = currentElement.position;
-			    editorScrollPane.getViewport()
-				.setViewPosition(position);
+			    if (position != null) {
+				editorScrollPane.getViewport()
+				    .setViewPosition(position);
+			    }
 			}
 			frwdButton.setEnabled(false);
 			endButton.setEnabled(false);
@@ -1184,16 +1331,12 @@ public class HtmlPane extends JComponent {
 			    doc.processHTMLFrameHyperlinkEvent(currentElement.
 							       event);
 			}
-			StackElement el = new StackElement(current, event);
+			// StackElement el = new StackElement(current, event);
 			event = currentElement.event;
 			backButton.setEnabled(true);
 			startButton.setEnabled(true);
-			/*
-			if (revUrlstack.empty()) {
-			    frwdButton.setEnabled(false);
-			    endButton.setEnabled(false);
-			}
-			*/
+			frwdButton.setEnabled(false);
+			endButton.setEnabled(false);
 		    } catch (Exception eee) {
 			boolean fixed = true;
 			try {
@@ -1235,6 +1378,12 @@ public class HtmlPane extends JComponent {
 	top.add(reloadButton);
 	top.add(frwdButton);
 	top.add(endButton);
+
+	top.addPropertyChangeListener(evt -> {
+		if (rvmodeChanged()) {
+		    resetIcons();
+		}
+	    });
 
 	startButton.setEnabled(false);
 	backButton.setEnabled(false);

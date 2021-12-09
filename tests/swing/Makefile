@@ -407,6 +407,14 @@ hwt:
 	sed -e 's/CWD/$(CWD)/' < toc.xml.tpl > toc.xml
 	$(JAVA) HtmlWithTocTest toc.xml --no-timeout
 
+hwt2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	sed -e 's/CWD/$(CWD)/' < toc.xml.tpl > toc.xml
+	$(JAVA) HtmlWithTocTest toc.xml --no-timeout --systemUI
+
+
 atest3s-fb:
 	(cd ../.. ; make jars)
 	mkdir -p classes
