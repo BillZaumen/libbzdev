@@ -16,6 +16,13 @@ public class HtmlWithTocTest {
 	    java.io.FileInputStream is = 
 		new java.io.FileInputStream(argv[0]);
 
+	    System.out.println("darkmode initially " +
+			       DarkModeMonitor.getDarkmode());
+	    DarkModeMonitor.addPropertyChangeListener(evnt -> {
+		     System.out.println(evnt.getPropertyName()
+				       + "= " + evnt.getNewValue());
+		});
+
 	    SwingUtilities.invokeLater(() -> {
 		    try {
 			/*

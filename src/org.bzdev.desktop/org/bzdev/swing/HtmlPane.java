@@ -205,9 +205,7 @@ public class HtmlPane extends JComponent {
 		// if (mod != 0) return;
 		if (mod != 0) {
 		    if ((InputEvent.ALT_DOWN_MASK != InputEvent.META_DOWN_MASK)
-			&& ((mod & ~(InputEvent.META_MASK
-				 | InputEvent.CTRL_DOWN_MASK)) ==
-			    META_MASK)) {
+			&& ((mod & META_MASK) == META_MASK)) {
 			return;
 		    }
 		    boolean shifted = ((mod & InputEvent.SHIFT_DOWN_MASK) != 0);

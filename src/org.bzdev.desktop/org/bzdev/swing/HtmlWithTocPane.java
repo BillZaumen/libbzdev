@@ -5,6 +5,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.plaf.SplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.awt.event.ActionListener;
@@ -67,6 +68,9 @@ import java.awt.Component;
  * (with some of the Javadoc comments) and simply call the
  * corresponding JSplitPane methods (but with 'left' and 'right' replaced by
  * the edges closest to the TOC pane and HTML pane respectively.
+ * <P>
+ * When an instance of this class is no longer needed, one should call
+ * {@link HtmlWithTocPane#clearToc()} to release some resources.
  *
  * @author Bill Zaumen
  */
@@ -544,7 +548,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     }
 
     /**
-     * Rest the split pane to the preferred sizes.
+     * Reset the split pane to the preferred sizes.
      * This must be called after individual preferred sizes are set
      * for those to have any effect. The divider may move as a result
      * of using this method.
@@ -676,12 +680,28 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     @Override
     public void prevLevel() {tocPane.prevLevel();}
 
+    boolean needDLM = true;
+    private PropertyChangeListener dml = evnt -> {
+	splitPane.setDividerLocation(tocPane.getPreferredSize().width);
+    };
+
+
     @Override
-    public void entriesCompleted() {tocPane.entriesCompleted();}
+    public void entriesCompleted() {
+	tocPane.entriesCompleted();
+	if (needDLM) {
+	    DarkmodeMonitor.addPropertyChangeListener(dml);
+	    needDLM = false;
+	}
+    }
 
     @Override
     public void entriesCompleted(boolean expand) {
 	tocPane.entriesCompleted(expand);
+	if (needDLM) {
+	    DarkmodeMonitor.addPropertyChangeListener(dml);
+	    needDLM = false;
+	}
     }
 
     @Override
@@ -727,6 +747,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     @Override
     public void clearToc() {
 	tocPane.clearToc();
+	if (needDLM == false) {
+	    DarkmodeMonitor.removePropertyChangeListener(dml);
+	    needDLM = true;
+	}
     }
 
     @Override
@@ -736,6 +760,11 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     {
 	tocPane.setToc(url, expand, validating);
 	setDividerLocation(tocPane.getPreferredSize().width);
+	if (needDLM) {
+	    DarkmodeMonitor.addPropertyChangeListener(dml);
+	    needDLM = false;
+	}
+
     }
 
     @Override
@@ -762,9 +791,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      * This title will be used as a title for various dialog boxes.
      * @param title the title to display.
      */
-    public final void setHtmlErrorTitle (String title) {
-	htmlPane.setErrorTitle(title);
-    }
+
 
     /**
      * Get the title used in error message dialog boxes  associated

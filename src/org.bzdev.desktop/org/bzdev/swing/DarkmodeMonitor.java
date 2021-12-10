@@ -1,0 +1,87 @@
+package org.bzdev.swing;
+import java.awt.Color;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import org.bzdev.util.EvntListenerList;
+
+/**
+ * Class to track background color changes due to a pluggable look and
+ * feel that toggles between normal mode and dark mode.
+ * If the red, green, and blue components of a color have values less
+ * than 128 (with the maximum being 255), then dark mode is set to true
+ * otherwise it is false.
+ <P>
+ * If the mode changes, the {@link java.beans.PropertyChangeEvent}
+ * will have a source equal to {@link DarkmodeMonitor}.class, a
+ * property name equal to "darkmode", and Boolean values for the
+ * old value and new value fields.
+ * <P>
+ * To get the mode initially, call {@link DarkmodeMonitor#getDarkmode()}.
+ */
+public class DarkmodeMonitor {
+    private static JFrame frame = new JFrame();
+    private static boolean darkmode = false;
+    private static EvntListenerList list = new EvntListenerList();
+
+    /**
+     * Get the current dark-mode state.
+     * @return true if dark mode is being used; false otherwise
+     */
+    static public boolean getDarkmode() {
+	return darkmode;
+    }
+
+    static {
+	frame.getContentPane().addPropertyChangeListener(evnt -> {
+		if (modeChanged()) {
+		    Boolean oldmode = Boolean.valueOf(!darkmode);
+		    Boolean newmode = Boolean.valueOf(darkmode);
+		    PropertyChangeEvent evt= new PropertyChangeEvent
+			(DarkmodeMonitor.class, "darkmode", oldmode, newmode);
+		    for (Object o: list.getListeners
+			     (PropertyChangeListener.class)) {
+			if (o instanceof PropertyChangeListener) {
+			    PropertyChangeListener l =
+				(PropertyChangeListener) o;
+			    l.propertyChange(evt);
+			}
+		    }
+		}
+	    });
+	modeChanged();
+    }
+
+    private static boolean modeChanged() {
+	Color c = frame.getContentPane().getBackground();
+	boolean dm = 
+	    ((c.getRed() < 128 && c.getGreen() < 128 && c.getBlue() < 128));
+	try {
+	    return (dm != darkmode);
+	} finally {
+	    darkmode = dm;
+	}
+    }
+    
+    /**
+     * Add a property change listener.
+     * @param listener the listener
+     */
+    public static synchronized void
+	addPropertyChangeListener( PropertyChangeListener listener)
+    {
+	list.add(PropertyChangeListener.class, listener);
+    }
+
+    /**
+     * Remove a property change listener.
+     * @param listener the listener
+     */
+    public static synchronized void
+	removePropertyChangeListener(PropertyChangeListener listener)
+    {
+	list.remove(PropertyChangeListener.class, listener);
+    }
+}
