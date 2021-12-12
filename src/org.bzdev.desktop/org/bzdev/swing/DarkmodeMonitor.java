@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import org.bzdev.util.EvntListenerList;
 
 /**
@@ -84,4 +85,39 @@ public class DarkmodeMonitor {
     {
 	list.remove(PropertyChangeListener.class, listener);
     }
+
+    /**
+     * Set the look and feel to a modified system look and feel.
+     * Some system look and feels have a dark caret on a dark background
+     * making the caret (cursor) hard to see. For JTextField, JTextArea,
+     * and JEditorPane, the look and feel is modified so that the
+     * caret color always matches the foreground color (that is,
+     * the text color) when using the settings provided by the look and
+     * feel.
+     */
+    public static void setSystemPLAF() {
+	try {
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    /*
+	     * Some look and feels do not set this to something that
+	     * is easy to see.
+	     */
+	    UIManager.put("TextField.caretForeground",
+			  UIManager.get("TextField.foreground"));
+	    UIManager.put("TextArea.caretForeground",
+			  UIManager.get("TextArea.foreground"));
+	    UIManager.put("EditorPane.caretForeground",
+			  UIManager.get("EditorPane.foreground"));
+	    DarkmodeMonitor.addPropertyChangeListener(evnt -> {
+		    UIManager.put("TextField.caretForeground",
+				  UIManager.get("TextField.foreground"));
+		    UIManager.put("TextArea.caretForeground",
+				  UIManager.get("TextArea.foreground"));
+		    UIManager.put("EditorPane.caretForeground",
+				  UIManager.get("EditorPane.foreground"));
+		});
+	} catch (Exception e) {
+	}
+    }
+
 }

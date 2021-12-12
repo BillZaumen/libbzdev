@@ -9,7 +9,10 @@ public class HtmlWithTocTest {
 	boolean notimeout = argv.length > 1 && argv[1].equals("--no-timeout");
 	boolean systemUI = argv.length > 2 && argv[2].equals("--systemUI");
 	if (systemUI) {
+	    /*
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    */
+	    DarkmodeMonitor.setSystemPLAF();
 	}
 	try {
 	    Handlers.enable();
@@ -18,7 +21,7 @@ public class HtmlWithTocTest {
 
 	    System.out.println("darkmode initially " +
 			       DarkModeMonitor.getDarkmode());
-	    DarkModeMonitor.addPropertyChangeListener(evnt -> {
+	    DarkmodeMonitor.addPropertyChangeListener(evnt -> {
 		     System.out.println(evnt.getPropertyName()
 				       + "= " + evnt.getNewValue());
 		});

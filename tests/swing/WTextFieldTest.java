@@ -11,6 +11,9 @@ public class WTextFieldTest {
     static WholeNumbTextField utf;
 
     public static void init() {
+
+	DarkmodeMonitor.setSystemPLAF();
+
 	JFrame frame = new JFrame ("WTextFieldTest");
         Container fpane = frame.getContentPane();
         frame.addWindowListener(new WindowAdapter () {
