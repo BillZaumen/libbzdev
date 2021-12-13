@@ -13,6 +13,7 @@ public class HtmlWithTocTest {
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    */
 	    DarkmodeMonitor.setSystemPLAF();
+	    DarkmodeMonitor.init();
 	}
 	try {
 	    Handlers.enable();

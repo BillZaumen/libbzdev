@@ -1,10 +1,11 @@
 package org.bzdev.swing;
-import java.awt.Color;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bzdev.util.EvntListenerList;
 
@@ -23,36 +24,65 @@ import org.bzdev.util.EvntListenerList;
  * To get the mode initially, call {@link DarkmodeMonitor#getDarkmode()}.
  */
 public class DarkmodeMonitor {
-    private static JFrame frame = new JFrame();
+    private static JFrame frame;
     private static boolean darkmode = false;
     private static EvntListenerList list = new EvntListenerList();
 
     /**
      * Get the current dark-mode state.
+     * This should be called after the look and feel is installed.
      * @return true if dark mode is being used; false otherwise
      */
     static public boolean getDarkmode() {
+	if (!initialized) init();
 	return darkmode;
     }
 
-    static {
-	frame.getContentPane().addPropertyChangeListener(evnt -> {
-		if (modeChanged()) {
-		    Boolean oldmode = Boolean.valueOf(!darkmode);
-		    Boolean newmode = Boolean.valueOf(darkmode);
-		    PropertyChangeEvent evt= new PropertyChangeEvent
-			(DarkmodeMonitor.class, "darkmode", oldmode, newmode);
-		    for (Object o: list.getListeners
-			     (PropertyChangeListener.class)) {
-			if (o instanceof PropertyChangeListener) {
-			    PropertyChangeListener l =
-				(PropertyChangeListener) o;
-			    l.propertyChange(evt);
-			}
-		    }
-		}
-	    });
-	modeChanged();
+    private static boolean initialized = false;
+
+    /**
+     * Initialization.
+     * This should be called after the look and feel is installed.
+     * Until it is called, events will not be sent to listeners.
+     * {@link #getDarkmode()} will call this method automatically.
+     */
+    public static synchronized void init() {
+	if (initialized) return;
+	try {
+	    SwingUtilities.invokeLater(() -> {
+		    try {
+			frame = new JFrame();
+			Toolkit.getDefaultToolkit().sync();
+		    } catch (Exception e) {}
+		});
+	    SwingUtilities.invokeLater(() -> {
+		    try {
+			Toolkit.getDefaultToolkit().sync();
+		    } catch (Exception e) {}
+		    frame.getContentPane().addPropertyChangeListener(evnt -> {
+			    if (modeChanged()) {
+				Boolean oldmode = Boolean.valueOf(!darkmode);
+				Boolean newmode = Boolean.valueOf(darkmode);
+				PropertyChangeEvent evt = new
+				    PropertyChangeEvent(DarkmodeMonitor.class,
+							"darkmode",
+							oldmode, newmode);
+				for (Object o: list.getListeners
+					 (PropertyChangeListener.class)) {
+				    if (o instanceof PropertyChangeListener) {
+					PropertyChangeListener l =
+					    (PropertyChangeListener) o;
+					l.propertyChange(evt);
+				    }
+				}
+			    }
+			});
+		    modeChanged();
+		});
+	} catch (Exception e) {
+	    // e.printStackTrace();
+	}
+	initialized = true;
     }
 
     private static boolean modeChanged() {
