@@ -189,7 +189,7 @@ public class Handler extends URLStreamHandler {
 			// System.out.println("got here [4a]");
 			continue;
 		    }
-		} else if (locs[i].matches("^(http|https|ftp|file):.*")) {
+		} else if (locs[i].matches("^(http|https|ftp):.*")) {
 		    // System.out.println("got here [1]");
 		    if (locs[i].endsWith(".zip") || locs[i].endsWith(".jar")) {
 			urlstr = "jar:" + locs[i] + "!/" + resource;
@@ -218,6 +218,45 @@ public class Handler extends URLStreamHandler {
 		    } catch (Exception e) {
 			// System.out.println("got here [4]");
 			continue;
+		    }
+		} else if (locs[i].matches("^file:.*")) {
+		    String fname = locs[i].substring(5);
+		    if (fname.startsWith("///")) fname = fname.substring(2);
+		    else if (fname.startsWith("//"))
+			fname = fname.substring(1);
+		    File f = new File(fname).getAbsoluteFile();
+		    if (f.isDirectory()) {
+			URL furl = f.toURI().toURL();
+			try {
+			furl = new URL(furl, resource);
+			    f = new File(furl.toURI());
+			} catch (URISyntaxException e) {
+			    continue;
+			}
+			if (f.exists() && f.canRead()) {
+			    urlstr = furl.toString();
+			    break;
+			}
+		    } else {
+			f = new File(fname).getAbsoluteFile();
+			if (f.isFile()) {
+			    /*
+			     * Assume it is a jar file, regardless of
+			     * the extension. We should get an exception
+			     * if this doesn't work.
+			     */
+			    JarFile jf = new JarFile(f);
+			    if (jf.getEntry(resource) != null) {
+				urlstr = "jar:" +
+				    (f.toURI().toURL()).toString()
+				    +"!/" + resource;
+				/*
+				urlstr = "jar:file:"+f.getAbsolutePath()
+				    +"!/" +resource;
+				*/
+				break;
+			    }
+			}
 		    }
 		} else {
 		    File f = new File(locs[i]).getAbsoluteFile();

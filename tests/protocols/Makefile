@@ -19,6 +19,25 @@ all:
 	$(JAVA) Test
 	@echo ------- Repeat Test using Modules -------
 	$(JAVA2) Test
+	@echo ------- Test2 testdir------------
+	$(JAVA2) Test2 testdir
+	@echo ------- Test2 file:.../testdir ------------
+	$(JAVA2) Test2 file:`pwd`/testdir
+	@echo ------- Test2 file:.../testdir/ ------------
+	$(JAVA2) Test2 file:`pwd`/testdir/
+	@echo ------- Test2 file:///.../testdir/ ------------
+	$(JAVA2) Test2 file://`pwd`/testdir/
+
+test2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	mkdir -p testdir
+	echo hello > classes/hello.txt
+	echo goodbye > testdir/goodbye.txt
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	jar cf test.jar -C classes .
+	$(JAVA2) Test2 file:`pwd`/testdir
+
 
 
 clean:
