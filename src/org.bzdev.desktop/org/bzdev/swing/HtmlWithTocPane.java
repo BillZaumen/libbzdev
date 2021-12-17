@@ -310,40 +310,69 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     }
 
     /**
-     * Get the top inset.
-     * @return the top inset for the split pane this component contains
+     * Get the border for this component's split pane.
+     * @return the border
      */
-    public int getTopInset() {
-	return splitPane.getInsets().top;
+    public Border getSplitPaneBorder() {
+	return splitPane.getBorder();
     }
 
     /**
-     * Get the bottom inset.
-     * @return the bottom inset for the split pane this component contains
+     * Set the border for this component's split pane.
+     * @param border the border
      */
-    public int getBottomInset() {
-	return splitPane.getInsets().bottom;
+    public void setSplitPaneBorder(Border border) {
+	 splitPane.setBorder(border);
     }
 
     /**
-     * Get the left or right inset adjacent to the table of contents pane.
-     * Whether the table of contents appears on the left or right depends
-     * on localization.
-     * @return the inset for the split pane this component contains
+     * Get the border for this component's table of contents.
+     * @return the border
      */
-    public int getTocInset() {
-	return splitPane.getInsets().left;
+    public Border getTocPaneBorder() {
+	return tocPane.getBorder();
     }
 
     /**
-     * Get the left or right inset adjacent to the HTML pane.
-     * Whether the HTML pane appears on the left or right depends
-     * on localization.
-     * @return the inset for the split pane this component contains
+     * Set the border for this component's table of contents.
+     * @param border the border
      */
-    public int getHtmlInset() {
-	return splitPane.getInsets().right;
+    public void setTocPaneBorder(Border border) {
+	tocPane.setBorder(border);
     }
+
+    /**
+     * Get the border for this component's HTML pane.
+     * @return the border
+     */
+    public Border getHtmlPaneBorder() {
+	return htmlPane.getBorder();
+    }
+
+    /**
+     * Set the border for this component's HTML pane.
+     * @param border the border
+     */
+    public void setHtmlPaneBorder(Border border) {
+	htmlPane.setBorder(border);
+    }
+
+    /**
+     * Get the border for this component's contents.
+     * @return the border
+     */
+    public Border getContentPaneBorder() {
+	return htmlPane.getContentPaneBorder();
+    }
+
+    /**
+     * Set the border for this component's contents.
+     * @param border the border
+     */
+    public void setContentPaneBorder(Border border) {
+	htmlPane.setContentPaneBorder(border);
+    }
+
 
     /**
      * Get the preferred size for the TOC pane.
@@ -471,9 +500,9 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     Color spcolor = null;
 
     /**
-     *
+     * Set the background color of the splitter (or divider).
      * <P>
-     * Note:  with some pluggable look and feels, this method may
+     * Note: with some pluggable look and feels, this method may
      * be fully or partially ignored.  It works as expected with the
      * default look and feel.
      * @param color the color

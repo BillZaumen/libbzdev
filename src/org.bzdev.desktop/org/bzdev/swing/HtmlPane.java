@@ -27,6 +27,7 @@ import java.net.URL;
 import java.security.*;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.ButtonUI;
@@ -176,6 +177,22 @@ public class HtmlPane extends JComponent {
      */
     public void setContentLocale(Locale locale) {
 	editorPane.setLocale(locale);
+    }
+
+    /**
+     * Get the border for this component's contents.
+     * @return the border
+     */
+    public Border getContentPaneBorder() {
+	return editorPane.getBorder();
+    }
+
+    /**
+     * Set the border for this component's contents.
+     * @param border the border
+     */
+    public void setContentPaneBorder(Border border) {
+	editorPane.setBorder(border);
     }
 
     private KeyAdapter editorKeyAdapter = new KeyAdapter() {

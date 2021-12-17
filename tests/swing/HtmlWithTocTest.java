@@ -59,6 +59,14 @@ public class HtmlWithTocTest {
 			    tocPane.setHtmlPaneBackground(Color.BLUE.darker()
 							  .darker()
 							  .darker());
+			} else {
+			    tocPane.setHtmlPaneBorder
+				(BorderFactory.createMatteBorder
+				 (0, 10, 0, 10, Color.BLUE));
+			    tocPane.setContentPaneBorder
+				(BorderFactory.createMatteBorder
+				 (0, 10, 0, 10, Color.BLUE.darker()
+				  .darker().darker()));
 			}
 			// tocPane.setSelectionWithAction(0);
 

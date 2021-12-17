@@ -1244,7 +1244,7 @@ src/doc-files/rest.png: diagrams/modules/rest.dia
 	rm tmp.svg
 
 $(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png: \
-	$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.svg
 	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png \
 		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.svg
 
