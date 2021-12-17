@@ -4,6 +4,7 @@
 module org.bzdev.scrunner {
     exports org.bzdev.bin.scrunner;
     requires java.base;
+    requires java.desktop;
     requires java.scripting;
     requires org.bzdev.base;
     requires org.bzdev.math;

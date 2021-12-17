@@ -226,6 +226,18 @@ public class PanelGraphics implements OSGraphicsOps {
 	boolean allow() {return allow;}
     }
 
+    boolean createdByNewFramedInstance = false;
+
+    /**
+     * Dispose this PanelGraphic's window if that was created
+     * by a call to newFramedInstance.
+     */
+    public void disposeFrame() {
+	if (createdByNewFramedInstance) {
+	    getPanelWindow().dispose();
+	}
+    }
+
     /**
      * Create an instance of PanelGraphics with the associated panel in
      * a frame.
@@ -692,6 +704,7 @@ public class PanelGraphics implements OSGraphicsOps {
 	    } catch (InvocationTargetException e) {
 	    }
 	}
+	pg.createdByNewFramedInstance = true;
 	return pg;
     }
 
@@ -733,7 +746,7 @@ public class PanelGraphics implements OSGraphicsOps {
 		    });
 	    } catch (Exception e) {}
 	    return wc.window;
-	}	
+	}
     }
 
     /**

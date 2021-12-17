@@ -12,6 +12,14 @@ public class PanelGraphicsTest3 {
 
     public static void main(String argv[]) throws Exception {
 
+	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
+	if (systemUI) {
+	    /*
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    */
+	    DarkmodeMonitor.setSystemPLAF();
+	    DarkmodeMonitor.init();
+	}
 	SwingUtilities.invokeAndWait(new Runnable() {
 		public void run() {
 		    pg = PanelGraphics.newFramedInstance(500, 400,

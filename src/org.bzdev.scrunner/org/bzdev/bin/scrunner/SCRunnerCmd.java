@@ -68,6 +68,8 @@ public class SCRunnerCmd {
     private static StringBuilder sbmod = new StringBuilder();
     private static List<String> sbjops = new LinkedList<String>();
     private static List<String> sbcmd = new LinkedList<String>();
+    private static StringBuilder sbrp = new StringBuilder();
+
 
     private static String blockName(int mode) {
 	switch(mode) {
@@ -119,6 +121,7 @@ public class SCRunnerCmd {
 
     private static Set<String> modSet = new HashSet<>();
     private static Map<String,Boolean> urlMap = new HashMap<>();
+    private static Set<String>resourcepathSet = new HashSet<>();
 
     private static void readConfigFiles(String languageName, String fileName) {
 	File file = new File (fileName);
@@ -500,6 +503,36 @@ public class SCRunnerCmd {
 	}
     }
 
+    static void extendResourcePath(String entry, Appendable err)
+	throws IOException
+    {
+	String url;
+	try {
+	    if (entry.startsWith("file:")
+		|| entry.startsWith("jar:")
+		|| entry.startsWith("http:")
+		|| entry.startsWith("https:")
+		|| entry.startsWith("ftp:")) {
+		url = entry;
+	    } else {
+		url = new File(entry).getCanonicalFile().toURI().toURL()
+		    .toString();
+	    }
+
+	    if (sbrp.length() > 0) {
+		sbrp.append("|");
+	    }
+	    sbrp.append(url);
+	} catch (IOException e) {
+	    err.append
+		(errorMsg("resourcePathError", e.getMessage()) + "\n");
+	    // System.exit(1);
+	    throw e;
+	}
+    }
+
+
+
     static void extendCodebase(String codebase) {
 	extendCodebase(codebase, true);
     }
@@ -575,7 +608,6 @@ public class SCRunnerCmd {
 
 
     public static void main(String argv[]) {
-
 	// forbid recursive calls (e.g. when SCRunner loads classes from a
 	// third party)
 	CheckOncePerJVM.check();
@@ -763,6 +795,8 @@ public class SCRunnerCmd {
 		index++; break;
 	    } else if (argv[index].equals("-o")) {
 		index++;
+	    } else if (argv[index].equals("--plaf")) {
+		index++;
 	    } else if (argv[index].startsWith("-o:")
 		       || argv[index].startsWith("-i:")
 		       || argv[index].startsWith("-d:")) {
@@ -787,6 +821,11 @@ public class SCRunnerCmd {
 		}
 	    } else if (argv[index].equals("-L")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		languageName = argv[index];
 		if (!Scripting.supportsLanguage(languageName)) {
 		    String ln = Scripting.getLanguageNameByAlias(languageName);
@@ -802,12 +841,22 @@ public class SCRunnerCmd {
 	    } else if (argv[index].equals("-p")
 		       || argv[index].equals("--module-path")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		String[] mcomps = argv[index].trim().split(pathSeparator);
 		for (String mcomp: mcomps) {
 		    extendCodebase(mcomp, true);
 		}
 	    } else if (argv[index].equals("--add-modules")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		String[] modules = argv[index].trim().split(",");
 		for (String mod: modules) {
 		    if (modSet.contains(argv[index]) == false) {
@@ -820,12 +869,34 @@ public class SCRunnerCmd {
 		}
 	    } else if (argv[index].equals("--codebase")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		extendCodebase(argv[index], true);
 	    } else if (argv[index].equals("--classpathCodebase")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		extendCodebase(argv[index], false);
+	    } else if (argv[index].equals("--resourcePath")) {
+		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 	    } else  if (argv[index].equals("--supportsLanguage")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 	    }
 	    index++;
 	}
@@ -889,8 +960,22 @@ public class SCRunnerCmd {
 		break;
 	    } else if (argv[index].equals("-o")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		sbcmd.add("-o");
 		sbcmd.add((argv[index]));
+	    } else if (argv[index].equals("--plaf")) {
+		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
+		sbcmd.add("--plaf");
+		sbcmd.add(argv[index]);
 	    } else if (argv[index].startsWith("-o:")
 		       || argv[index].startsWith("-i:")
 		       || argv[index].startsWith("-d:")) {
@@ -898,6 +983,11 @@ public class SCRunnerCmd {
 		int ind = varName.indexOf(':');
 		if (ind < 0) {
 		    index++;
+		    if (index == argv.length) {
+			System.err.println
+			    (errorMsg("missingArg", argv[--index]));
+			System.exit(1);
+		    }
 		    sbcmd.add((argv[index-1]));
 		    sbcmd.add((argv[index]));
 		} else {
@@ -909,6 +999,11 @@ public class SCRunnerCmd {
 		    int ind = varName.indexOf(':');
 		    if (ind < 0) {
 			index++;
+			if (index == argv.length) {
+			    System.err.println
+				(errorMsg("missingArg", argv[--index]));
+			    System.exit(1);
+			}
 			sbcmd.add((argv[index-1]));
 			sbcmd.add((argv[index]));
 		    } else {
@@ -919,6 +1014,11 @@ public class SCRunnerCmd {
 		    int ind = varName.indexOf(':');
 		    if (ind < 0) {
 			index++;
+			if (index == argv.length) {
+			    System.err.println
+				(errorMsg("missingArg", argv[--index]));
+			    System.exit(1);
+			}
 			sbcmd.add((argv[index-1]));
 			sbcmd.add((argv[index]));
 		    } else {
@@ -929,6 +1029,11 @@ public class SCRunnerCmd {
 		    int ind = varName.indexOf(':');
 		    if (ind < 0) {
 			index++;
+			if (index == argv.length) {
+			    System.err.println
+				(errorMsg("missingArg", argv[--index]));
+			    System.exit(1);
+			}
 			sbcmd.add((argv[index-1]));
 			sbcmd.add((argv[index]));
 		    } else {
@@ -939,6 +1044,11 @@ public class SCRunnerCmd {
 		    int ind = varName.indexOf(':');
 		    if (ind < 0) {
 			index++;
+			if (index == argv.length) {
+			    System.err.println
+				(errorMsg("missingArg", argv[--index]));
+			    System.exit(1);
+			}
 			sbcmd.add((argv[index-1]));
 			sbcmd.add((argv[index]));
 		    } else {
@@ -949,6 +1059,11 @@ public class SCRunnerCmd {
 		    int ind = varName.indexOf(':');
 		    if (ind < 0) {
 			index++;
+			if (index == argv.length) {
+			    System.err.println
+				(errorMsg("missingArg", argv[--index]));
+			    System.exit(1);
+			}
 			sbcmd.add((argv[index-1]));
 			sbcmd.add((argv[index]));
 		    } else {
@@ -978,6 +1093,11 @@ public class SCRunnerCmd {
 		ind = string.indexOf(':');
 		if (ind < 0) {
 		    index++;
+		    if (index == argv.length) {
+			System.err.println
+			    (errorMsg("missingArg", argv[--index]));
+			System.exit(1);
+		    }
 		    sbcmd.add((argv[index-1]));
 		    sbcmd.add((argv[index]));
 		} else {
@@ -985,6 +1105,11 @@ public class SCRunnerCmd {
 		}
 	    } else if (argv[index].equals("-L")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		languageName = argv[index];
 		sbcmd.add("-L");
 		sbcmd.add(languageName);
@@ -1017,13 +1142,42 @@ public class SCRunnerCmd {
 		defs.setProperty(name, value);
 	    } else if (argv[index].equals("--codebase")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		// extendCodebase(argv[index]);
 		sbcmd.add("--codebase");
 		sbcmd.add((argv[index]));
 	    } else if (argv[index].equals("--classpathCodebase")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		sbcmd.add("--classpathCodebase");
 		sbcmd.add(argv[index]);
+	    } else if (argv[index].equals("--resourcePath")) {
+		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
+		try {
+		    for (URL rp: URLPathParser.getURLs(argv[index]) ){
+			String rpname = rp.toString();
+			if (!resourcepathSet.contains(rpname)) {
+			    extendResourcePath(rpname, System.err);
+			    resourcepathSet.add(rpname);
+			}
+		    }
+		} catch (IOException urle) {
+		    System.err.println(errorMsg("badPath", argv[index]));
+		    System.exit(1);
+		}
 	    } else if (argv[index].startsWith("-J")) {
 		String substring = argv[index].substring(2);
 		sbjops.add(substring);
@@ -1042,6 +1196,11 @@ public class SCRunnerCmd {
 		index++;
 	    } else if (argv[index].equals("--supportsLanguage")) {
 		index++;
+		if (index == argv.length) {
+		    System.err.println
+			(errorMsg("missingArg", argv[--index]));
+		    System.exit(1);
+		}
 		sbcmd.add("--supportsLanguage");
 		sbcmd.add(argv[index]);
 	    } else {
@@ -1053,6 +1212,13 @@ public class SCRunnerCmd {
 	}
 	argList.addAll(sbjops);
 		    
+	if (sbrp.length() > 0) {
+	    String resources = defs
+		.getProperty("org.bzdev.protocols.resource.path");
+	    resources = (resources == null)? sbrp.toString():
+		resources + "|" + sbrp.toString();
+	    defs.setProperty("org.bzdev.protocols.resource.path", resources);
+	}
 	for (String name: defs.stringPropertyNames()) {
 	    argList.add("-D" + (name) + "="
 			   + (defs.getProperty(name)));

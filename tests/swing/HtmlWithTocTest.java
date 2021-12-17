@@ -13,19 +13,21 @@ public class HtmlWithTocTest {
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    */
 	    DarkmodeMonitor.setSystemPLAF();
-	    DarkmodeMonitor.init();
+	    // DarkmodeMonitor.init();
 	}
 	try {
 	    Handlers.enable();
 	    java.io.FileInputStream is = 
 		new java.io.FileInputStream(argv[0]);
 
-	    System.out.println("darkmode initially " +
-			       DarkModeMonitor.getDarkmode());
-	    DarkmodeMonitor.addPropertyChangeListener(evnt -> {
-		     System.out.println(evnt.getPropertyName()
-				       + "= " + evnt.getNewValue());
-		});
+	    if (systemUI) {
+		System.out.println("darkmode initially " +
+				   DarkmodeMonitor.getDarkmode());
+		DarkmodeMonitor.addPropertyChangeListener(evnt -> {
+			System.out.println(evnt.getPropertyName()
+					   + " = " + evnt.getNewValue());
+		    });
+	    }
 
 	    SwingUtilities.invokeLater(() -> {
 		    try {

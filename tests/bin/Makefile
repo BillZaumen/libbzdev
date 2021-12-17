@@ -165,6 +165,8 @@ all:
 	./run test14.esp
 	@echo try ESP on a file that will cause an error
 	./run err.esp || echo "Exception Expected"
+	@echo try --dryrun to check --resourcePath
+	./run --dryrun --resourcePath ../swing'|'../math test10.esp
 	chmod u-x ./run ./run1
 	@echo try a userconf file whose entries include  non-existent files
 	if $(HAS_JS_TEST) ; then \
@@ -177,6 +179,12 @@ all:
 	@echo ----- yrunner tests -----
 	make ytest
 
+rpath:
+	( cd ../.. ; make )
+	chmod u+x ./run ./run1
+	./run --dryrun --resourcePath ../swing'|'../math test10.esp
+	chmod u-x ./run ./run1
+
 test10-dry:
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
 		-J-server -J-Xmn10M --trustLevel=2  \
@@ -187,6 +195,12 @@ test10:
 		-J-server -J-Xmn10M --trustLevel=2  \
 		--add-modules org.bzdev.lsnof \
 		--codebase .../lsnof.jar "test10.js"
+
+test10-esp:
+	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
+		-J-server -J-Xmn10M --trustLevel=2  \
+		--add-modules org.bzdev.lsnof \
+		--codebase .../lsnof.jar "test10.esp"
 
 
 test13:

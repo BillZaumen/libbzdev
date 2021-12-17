@@ -350,6 +350,15 @@ atest:
 		AnimPanelTest.java Ball.java HParms.java
 	$(JAVA) -Djava.security.policy=../../BUILD/libbzdev.policy AnimPanelTest
 
+
+atest-dm:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar \
+		AnimPanelTest.java Ball.java HParms.java
+	$(JAVA) -Djava.security.policy=../../BUILD/libbzdev.policy \
+		AnimPanelTest --systemUI
+
 atestm:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -500,6 +509,14 @@ pgtest3:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		PanelGraphicsTest3.java
 	java -classpath ../../BUILD/libbzdev.jar:classes PanelGraphicsTest3
+
+pgtest3-dm:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar \
+		PanelGraphicsTest3.java
+	java -classpath ../../BUILD/libbzdev.jar:classes PanelGraphicsTest3 \
+		--systemUI
 
 pgtest4:
 	(cd ../.. ; make jars)

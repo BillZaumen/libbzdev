@@ -59,6 +59,13 @@ public class URLPathParser {
     /**
      * Parse a list of URLs or file names, separated by "|".
      * Relative files are resolved using the current working directory.
+     * In addition, for each URL, a leading<code>~~</code> will
+     * be replaced with <code>~</code>, and <code>~</code> followed by
+     * the filename separator will be replaced with the user's home
+     * directory followed by the filename separator (in this case, a
+     * security exception will be thrown if the caller does not have
+     * permission to acesss the system property
+     * <code>user.home</code>).
      * @param urlPath the string representation of multiple URLs or files,
      *        separated by "|"
      */
@@ -70,7 +77,13 @@ public class URLPathParser {
      * Parse a list of URLs or file names, separated by "|", given a directory.
      * Relative files are resolved using the current working directory.
      * If the argument urlPath is an empty string, the array returned will
-     * have a length of 0.
+     * have a length of 0. In addition, for each URL, a
+     * leading<code>~~</code> will be replaced with <code>~</code>,
+     * and <code>~</code> followed by the filename separator will be
+     * replaced with the user's home directory followed by the
+     * filename separator (in this case, a security exception will be
+     * thrown if the caller does not have permission to acesss the
+     * system property <code>user.home</code>).
      * @param dir the directory against which to resolve relative files;
      *        null indicates the current working directory
      * @param urlPath the string representation of multiple URLs or files,
@@ -128,12 +141,14 @@ public class URLPathParser {
      * The string "...", if it starts a file name as opposed to a URL and
      * is followed by the name separator ("/" on Unix), will be replaced with
      * the directory given by the third argument when that argument is not
-     * null.  In addition, <code>~~</code> will be replaced with <code>~</code>,
-     * and <code>~</code> followed by the filename separator
-     * will be replaced with the user's home directory followed by the
-     * filename separator (in this case, a security exception will be thrown
-     * if the caller does not have permission to acesss the system property
+     * null.  In addition, for each URL, a leading<code>~~</code> will
+     * be replaced with <code>~</code>, and <code>~</code> followed by
+     * the filename separator will be replaced with the user's home
+     * directory followed by the filename separator (in this case, a
+     * security exception will be thrown if the caller does not have
+     * permission to acesss the system property
      * <code>user.home</code>).
+
      * If the argument is an empty string, the array returned will
      * have a length of 0.
      * Relative files are resolved using the current working directory.
@@ -286,6 +301,8 @@ public class URLPathParser {
      * passed to on the getURLs method, which will then return an array
      * whose length is 1. If the argument is an empty string, the
      * array returned will have a length of 0.
+     * <P>
+     * This method does not treat "~" as a special character.
      * @param urlPath a string containing the URLs or file names.
      * @return an array of strings providing the paths or URLs.
      */

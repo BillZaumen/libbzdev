@@ -8,6 +8,8 @@
 \#*
 /BUILD/
 /org/bzdev/ejws/defaultCerts
+/org/bzdev/swing/icons/*.png
+src/org.bzdev.desktop/org/bzdev/swing/icons/*.png
 classes/
 /mods/
 /aclasses/

@@ -191,18 +191,20 @@ Define the name of a Java property and give it a value.  See the java
 command for details.  The syntax for this argument is the same as that
 defined for the similarly named option for the
 .B java
-command.  One use of this option that should be mentioned occurs when
-the
+command.  While the
+.B \-\-resourcePath
+option is more convenient, one use of this option that should be
+mentioned occurs when the
 .B org.bzdev.anim2d
-package is used: to include images in untrusted scripts, one should add
-a property whose name is
+package is used: to include images in untrusted scripts, one can add a
+property whose name is
 .B org.bzdev.protocols.resource.path
-and whose value is one or more directories containing images, separated
-by the standard path-separator character (":" on Unix/Linux systems).
-Then the images can be accessed by using the
+and whose value is one or more directories or URLs containing images, separated
+by "|". Then the images can be accessed by using the
 .B resource
-URL The.
-scheme properties "java.system.class.loader", "java.security.manager",
+URL.
+The
+properties "java.system.class.loader", "java.security.manager",
 "scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
 option (or the corresponding
 .B \-J
@@ -310,11 +312,49 @@ bound to the output stream for that file.  If
 .I FILENAME
 is "\fB\-\fR", standard output is used.  Standard output can be specified
 only once for the "\fB\-o\fR" and "\fB\-o:\fR" options.
-
+.TP
+.BI \-\-plaf\  PLAF
+Configures a a pluggable look and feel.  The argument
+.I PLAF
+can be the fully qualified class name for the look and feel or
+the strings
+.B system
+(for the system look and field) )or
+.B java
+(for the default java look and feel). The documentation for the java class
+javax.swing.UIManager contains examples of valid class names.
 .TP
 .B \-r
 Maximize the quality of the random number generator provided by
 org.bzdev.util.StaticRandom.
+.TP
+.BI \-\-resourcePath\  URLPATH
+Specifies a search path for directories and jar files for URLs whose scheme is
+"resource". Such URLs will be resolved against each directory or jar
+file in the path, in the specified order, until a match is found.
+.I URLPATH
+may be a URL giving the location of the classes or a path name in the
+local file system.  The character "|" is used as a separator so that
+multiple URLs can appear in the same argument.  The sequence "||" is
+interpreted as a literal "|", so that for an odd number of "|"
+characters in a row, only the final one is treated as a path
+separator.  If file name must start with "|", use a "file" URL and
+encode the "|" as %7C.  If the starting sequence of a path component
+contains a ":" (the first one if there are more than one), and that
+sequence of characters is syntactically valid at the start of a URL,
+the path component is treated as a URL. Otherwise it is a file name.
+This rule implies that Windows file names such as C:mycode.jar will be
+confused with a URL, so a URL should be used instead.  If a file name
+is not absolute, it is interpreted relative to the current working
+directory. Multiple
+.B \-\-resourcePath
+options may be provided (to improve readability).  For file names, a
+leading "~" followed by the name separator ("/" for Unix) is expanded
+to the user\'s home directory, a file name consisting of only "~" is
+replaced with the user\'s home directory, and a leading "~~" is
+replaced with "~". Finally, the substitutions for \'|\' and \'~\'
+(followed by the file-name separator) do not apply to file-name
+arguments that appear after the last option.
 .TP
 .BI \-r: VARNAME\ IFILENAME
 .TQ

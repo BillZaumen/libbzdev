@@ -18,6 +18,12 @@ a2d.createFactories("org.bzdev.anim2d", {
 var layer = alf.createObject("layer", [
     {zorder: 0, visible: true},
     {withPrefix: "object", withIndex: [
+        {type: "IMAGE",
+	 imageURL: "resource:background.png",
+	 refPoint: "LOWER_LEFT",
+	 x: 0.0, y: 0.0,
+	 imageInGCS: false
+	},	 
 	[{type: "TEXT", text: "Sample Text 1"},
 	 {x: 10, y: 20},
 	 {withPrefix: "fontParms", config: [

@@ -365,13 +365,28 @@ DESKTOP_JFILES2 = $(wildcard $(DESKTOP_DIR)/$(BZDEV)/providers/swing/*.java) \
 	$(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/DefaultClass.java \
 	$(DESKTOP_DIR)/$(BZDEV)/swing/table/lpack/DefaultClass.java
 
+DESKTOP_ICONS_PNG = $(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRVD.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRV.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRVD.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRV.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/aright.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRVD.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRV.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/camera.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/pauseRV.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/pause.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/playRV.png \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/play.png
+
+
 DESKTOP_RESOURCES1 = $(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/*.dtd) \
 	$(DESKTOP_DIR)/META-INF/services/$(ONLD_SERVICE) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/providers/swing/*.yaml) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/providers/swing/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/icons/*.gif) \
-	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/icons/*.png) \
+	$(DESKTOP_ICONS_PNG) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/io/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/keys/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/*.properties) \
@@ -1227,6 +1242,71 @@ src/doc-files/rest.png: diagrams/modules/rest.dia
 	dia -s 500x -e tmp.svg $<
 	inkscape -w 500 --export-filename=$@ tmp.svg
 	rm tmp.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png: \
+	$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleft.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRVD.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRVD.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRVD.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRVD.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRV.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRV.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRV.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aleftRV.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/aright.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aright.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/aright.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/aright.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRVD.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRVD.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/arightRVD.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRVD.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRV.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRV.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/arightRV.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/arightRV.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/camera.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/camera.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/camera.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/camera.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRVD.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRVD.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRVD.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRVD.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRV.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRV.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRV.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/cameraRV.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/pause.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/pause.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/pause.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/pause.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/pauseRV.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/pauseRV.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/pauseRV.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/pauseRV.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/play.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/play.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/play.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/play.svg
+
+$(DESKTOP_DIR)/org/bzdev/swing/icons/playRV.png: \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/playRV.svg
+	inkscape -o $(DESKTOP_DIR)/org/bzdev/swing/icons/playRV.png \
+		$(DESKTOP_DIR)/org/bzdev/swing/icons/playRV.svg
 
 #
 # HTML PAGES

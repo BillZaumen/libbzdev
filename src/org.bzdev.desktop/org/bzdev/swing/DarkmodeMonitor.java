@@ -30,7 +30,7 @@ public class DarkmodeMonitor {
 
     /**
      * Get the current dark-mode state.
-     * This should be called after the look and feel is installed.
+     * This may be called after the look and feel is installed.
      * @return true if dark mode is being used; false otherwise
      */
     static public boolean getDarkmode() {
@@ -42,7 +42,7 @@ public class DarkmodeMonitor {
 
     /**
      * Initialization.
-     * This should be called after the look and feel is installed.
+     * This may be called after the look and feel is installed.
      * Until it is called, events will not be sent to listeners.
      * {@link #getDarkmode()} will call this method automatically.
      */
@@ -67,14 +67,17 @@ public class DarkmodeMonitor {
 				    PropertyChangeEvent(DarkmodeMonitor.class,
 							"darkmode",
 							oldmode, newmode);
-				for (Object o: list.getListeners
-					 (PropertyChangeListener.class)) {
-				    if (o instanceof PropertyChangeListener) {
-					PropertyChangeListener l =
-					    (PropertyChangeListener) o;
-					l.propertyChange(evt);
+				SwingUtilities.invokeLater(() -> {
+				    for (Object o: list.getListeners
+					     (PropertyChangeListener.class)) {
+					if (o instanceof
+					    PropertyChangeListener) {
+					    PropertyChangeListener l =
+						(PropertyChangeListener) o;
+					    l.propertyChange(evt);
+					}
 				    }
-				}
+				});
 			    }
 			});
 		    modeChanged();
@@ -86,7 +89,8 @@ public class DarkmodeMonitor {
     }
 
     private static boolean modeChanged() {
-	Color c = frame.getContentPane().getBackground();
+	// Color c = frame.getContentPane().getBackground();
+	Color c = (Color) UIManager.get("Panel.background");
 	boolean dm = 
 	    ((c.getRed() < 128 && c.getGreen() < 128 && c.getBlue() < 128));
 	try {

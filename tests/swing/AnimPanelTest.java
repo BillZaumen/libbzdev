@@ -5,6 +5,15 @@ import java.awt.Color;
 
 public class AnimPanelTest {
     public static void main(String argv[]) throws Exception {
+	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
+	if (systemUI) {
+	    /*
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    */
+	    DarkmodeMonitor.setSystemPLAF();
+	    DarkmodeMonitor.init();
+	}
+
 	System.setSecurityManager(new SecurityManager());
 
 	Animation2D animation = new Animation2D(400, 250, 1000.0, 40);
@@ -39,7 +48,9 @@ public class AnimPanelTest {
 			   + ((aend - astart)/1000000)
 			   + " ms");
 	apg.close();
-	Thread.currentThread().sleep(50000);
-	System.exit(0);
+	if (systemUI == false) {
+	    Thread.currentThread().sleep(50000);
+	    System.exit(0);
+	}
     }
 }

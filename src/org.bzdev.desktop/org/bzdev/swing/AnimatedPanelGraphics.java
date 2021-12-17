@@ -22,6 +22,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.*;
@@ -113,6 +114,42 @@ public class AnimatedPanelGraphics implements ISWriterOps {
     static ImageIcon adjustLeftIcon;
     static ImageIcon adjustRightIcon;
     static ImageIcon snapshotIcon;
+    static ImageIcon playIconRV;
+    static ImageIcon pauseIconRV;
+    static ImageIcon adjustLeftIconRV;
+    static ImageIcon adjustRightIconRV;
+    static ImageIcon snapshotIconRV;
+    static ImageIcon adjustLeftIconRVD;
+    static ImageIcon adjustRightIconRVD;
+    static ImageIcon snapshotIconRVD;
+    private boolean rvmode = false;
+
+    boolean rvmodeChanged() {
+	Color c = (Color) UIManager.get("Panel.background");
+	boolean rvm =
+	    ((c.getRed() < 128 && c.getGreen() < 128 && c.getBlue() < 128));
+	try {
+	    return (rvm != rvmode);
+	} finally {
+	    rvmode = rvm;
+	}
+    }
+
+    // must call vmodeChanged tu update this rvmode.
+    boolean getRVMode() {
+	return rvmode;
+    }
+
+    PropertyChangeListener getPCL(final JPanel controlPanel) {
+	return evt -> {
+	    if (rvmodeChanged()) {
+		boolean darkmode = rvmode;
+		resetIcons(darkmode);
+		controlPanel.setBackground(darkmode? controlPanelDMColor:
+					   controlPanelColor);
+	    }
+	};
+    }
 
     static {
 	AccessController.doPrivileged
@@ -128,6 +165,30 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			    .getResource("/org/bzdev/swing/icons/aright.png");
 			URL cameraURL = AnimatedPanelGraphics.class
 			    .getResource("/org/bzdev/swing/icons/camera.png");
+
+			URL playRVURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/playRV.png");
+			URL pauseRVURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/pauseRV.png");
+			URL adjustLeftRVURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/aleftRV.png");
+			URL adjustRightRVURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/arightRV.png");
+			URL cameraRVURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/cameraRV.png");
+
+
+			URL adjustLeftRVDURL = AnimatedPanelGraphics.class
+			    .getResource("/org/bzdev/swing/icons/aleftRVD.png");
+			URL adjustRightRVDURL = AnimatedPanelGraphics.class
+			    .getResource
+			    ("/org/bzdev/swing/icons/arightRVD.png");
+			URL cameraRVDURL = AnimatedPanelGraphics.class
+			    .getResource
+			    ("/org/bzdev/swing/icons/cameraRVD.png");
+
+
+
 			/*
 			URL playURL = ClassLoader.getSystemClassLoader()
 			    .getResource("org/bzdev/swing/icons/play.png");
@@ -151,10 +212,32 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			snapshotIcon = (cameraURL == null)? null:
 			    new ImageIcon(cameraURL);
 
+			playIconRV = (playRVURL == null)? null:
+			    new ImageIcon(playRVURL);
+			pauseIconRV = (pauseRVURL == null)? null:
+			    new ImageIcon(pauseRVURL);
+			adjustLeftIconRV = (adjustLeftRVURL == null)? null:
+			    new ImageIcon(adjustLeftRVURL);
+			adjustRightIconRV = (adjustRightRVURL == null)? null:
+			    new ImageIcon(adjustRightRVURL);
+			snapshotIconRV = (cameraRVURL == null)? null:
+			    new ImageIcon(cameraRVURL);
+
+			adjustLeftIconRVD = (adjustLeftRVDURL == null)? null:
+			    new ImageIcon(adjustLeftRVDURL);
+			adjustRightIconRVD = (adjustRightRVDURL == null)? null:
+			    new ImageIcon(adjustRightRVDURL);
+			snapshotIconRVD = (cameraRVDURL == null)? null:
+			    new ImageIcon(cameraRVDURL);
+
 			return (Void)null;
 		    }
 		});
     }
+
+    ImageIcon currentPlayIcon = playIcon;
+    ImageIcon currentPauseIcon = pauseIcon;
+
 
     static final private String bundleName = "org.bzdev.swing.lpack.APGBundle";
     ResourceBundle bundle = null;
@@ -169,6 +252,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
     String exitMsg = "Application will exit";
     String snapshotFormat = "Snapshot %1$d of \"%2$s\"";
     String untitled = "[untitled]";
+
     /**
      * Set the locale.
      * @param locale the locale
@@ -536,14 +620,14 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			switch(mode) {
 			case AUTO_RUN:
 			case START_PAUSED:
-			    button.setIcon(playIcon);
+			    button.setIcon(currentPlayIcon);
 			    button.setToolTipText(playTip);
 			    button.setEnabled(false);
 			    break;
 			case AUTO_RUN_REPLAYABLE:
 			case START_PAUSED_REPLAYABLE:
 			case START_PAUSED_SELECTABLE:
-			    button.setIcon(playIcon);
+			    button.setIcon(currentPlayIcon);
 			    button.setToolTipText(playTip);
 			    needSwap = true;
 			    /*
@@ -994,7 +1078,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	    if (SwingUtilities.isEventDispatchThread()) {
 		if (button != null) {
 		    button.setEnabled(true);
-		    button.setIcon(playIcon);
+		    button.setIcon(currentPlayIcon);
 		    button.setToolTipText(playTip);
 		}
 		if (mode == Mode.START_PAUSED_SELECTABLE) {
@@ -1017,7 +1101,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			    public void run() {
 				if (button != null) {
 				    button.setEnabled(true);
-				    button.setIcon(playIcon);
+				    button.setIcon(currentPlayIcon);
 				    button.setToolTipText(playTip);
 				}
 				if (mode == Mode.START_PAUSED_SELECTABLE) {
@@ -1044,7 +1128,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	    if (SwingUtilities.isEventDispatchThread()) {
 		if (button != null) {
 		    button.setEnabled(true);
-		    button.setIcon(pauseIcon);
+		    button.setIcon(currentPauseIcon);
 		    button.setToolTipText(pauseTip);
 		}
 	    } else {
@@ -1053,7 +1137,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			    public void run() {
 				if (button != null) {
 				    button.setEnabled(true);
-				    button.setIcon(pauseIcon);
+				    button.setIcon(currentPauseIcon);
 				    button.setToolTipText(pauseTip);
 				}
 			    }
@@ -1073,7 +1157,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 		    synchronized(queue) {
 			if (timer.isRunning()) {
 			    timer.stop();
-			    button.setIcon(playIcon);
+			    button.setIcon(currentPlayIcon);
 			    button.setToolTipText(playTip);
 			    if (snapshotButton != null) {
 				snapshotButton.setEnabled(true);
@@ -1091,7 +1175,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			    swapIfNeeded();
 			    if (!finished) {
 				timer.start();
-				button.setIcon(pauseIcon);
+				button.setIcon(currentPauseIcon);
 				button.setToolTipText(pauseTip);
 				if (snapshotButton != null) {
 				    snapshotButton.setEnabled(false);
@@ -1237,6 +1321,10 @@ public class AnimatedPanelGraphics implements ISWriterOps {
     static final Color controlPanelColor =
 	(new Color(255-20,255-20,255-10)).darker();
 
+    static final Color controlPanelDMColor =
+	(new Color((128-20)/2,(128-20)/2,(128-10)/2)).darker();
+
+
     /**
      * Class to determine how an application can exit when a
      * security manager is installed and a window created with
@@ -1287,7 +1375,60 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	boolean allow() {return allow;}
     }
 
+    void resetIcons(boolean darkmode) {
+	if (darkmode) {
+	    currentPlayIcon = playIconRV;
+	    currentPauseIcon = pauseIconRV;
+	    if (snapshotButton != null) {
+		snapshotButton.setIcon(snapshotIconRV);
+		snapshotButton.setDisabledIcon(snapshotIconRVD);
+	    }
+	    if (adjustLeftButton != null) {
+		adjustLeftButton.setIcon(adjustLeftIconRV);
+		adjustLeftButton.setDisabledIcon(adjustLeftIconRVD);
+	    }
+	    if (adjustRightButton != null) {
+		adjustRightButton.setIcon(adjustRightIconRV);
+		adjustRightButton.setDisabledIcon(adjustRightIconRVD);
+	    }
+	} else {
+	    currentPlayIcon = playIcon;
+	    currentPauseIcon = pauseIcon;
+	    if (snapshotButton != null) {
+		snapshotButton.setDisabledIcon(null);
+		snapshotButton.setIcon(snapshotIcon);
+	    }
+	    if (adjustLeftButton != null) {
+		adjustLeftButton.setDisabledIcon(null);
+		adjustLeftButton.setIcon(adjustLeftIcon);
+	    }
+	    if (adjustRightButton != null) {
+		adjustRightButton.setDisabledIcon(null);
+		adjustRightButton.setIcon(adjustRightIcon);
+	    }
+	}
+	if (button != null) {
+	    Icon icon = button.getIcon();
+	    if (icon == null || icon == playIcon || icon == playIconRV) {
+		button.setIcon(currentPlayIcon);
+	    }
+	    if (icon == pauseIcon || icon == pauseIconRV) {
+		button.setIcon(currentPauseIcon);
+	    }
+	}
+    }
 
+    boolean createdByNewFramedInstance = false;
+
+    /**
+     * Dispose this AnimatedPanelGraphic's window if that was created
+     * by a call to newFramedInstance.
+     */
+    public void disposeFrame() {
+	if (createdByNewFramedInstance) {
+	    getPanelWindow().dispose();
+	}
+    }
 
     /**
      * Create an instance of AnimatedPanelGraphics whose JPanel
@@ -1572,31 +1713,66 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 				    apg.setLocale(locale);
 				}
 			    };
-			controlPanel.setBackground(controlPanelColor);
+			apg.rvmodeChanged();
+			boolean darkmode = apg.getRVMode();
+			if (darkmode) {
+			    System.out.println("dark mode");
+			    controlPanel.setBackground(controlPanelDMColor);
+			    apg.currentPlayIcon = playIconRV;
+			    apg.currentPauseIcon = pauseIconRV;
+			} else {
+			    controlPanel.setBackground(controlPanelColor);
+			    apg.currentPlayIcon = playIcon;
+			    apg.currentPauseIcon = pauseIcon;
+			}
 			apg.setLocale(Locale.getDefault());
 			apg.button = new JButton();
-			apg.button.setIcon(playIcon);
+			// apg.button.setIcon(apg.currentPlayIcon);
 			apg.button.setToolTipText(apg.playTip);
 			apg.button.setEnabled(false);
 			apg.addButtonListener();
 			controlPanel.add(apg.button);
 			if (ourMode == Mode.START_PAUSED_SELECTABLE) {
 			    apg.snapshotButton = new JButton();
-			    apg.snapshotButton.setIcon(apg.snapshotIcon);
+			    /*
+			    apg.snapshotButton.setIcon
+				(darkmode? apg.snapshotIconRV:
+				 apg.snapshotIcon);
+			    if (darkmode) {
+				apg.snapshotButton
+				    .setDisabledIcon(apg.snapshotIconRVD);
+			    }
+			    */
 			    apg.snapshotButton.setToolTipText
 				(apg.snapshotTip);
 			    apg.addSnapshotListener();
 			    Insets adjustInsets = new Insets(0,0,0,0);
 			    apg.adjustLeftButton = new JButton();
 			    apg.adjustLeftButton.setMargin(adjustInsets);
-			    apg.adjustLeftButton.setIcon(adjustLeftIcon);
+			    /*
+			    apg.adjustLeftButton.setIcon
+				(darkmode? adjustLeftIconRV:
+				 adjustLeftIcon);
+			    if (darkmode) {
+				apg.adjustLeftButton.setDisabledIcon
+				    (adjustLeftIconRVD);
+			    }
+			    */
 			    apg.adjustLeftButton.setToolTipText
 				(apg.adjustDownTip);
 			    apg.slider = new JSlider(0, LIMIT, 0);
 			    apg.slider.setExtent(0);
 			    apg.adjustRightButton = new JButton();
 			    apg.adjustRightButton.setMargin(adjustInsets);
-			    apg.adjustRightButton.setIcon(adjustRightIcon);
+			    /*
+			    apg.adjustRightButton.setIcon
+				(darkmode? adjustRightIconRV:
+				 adjustRightIcon);
+			    if (darkmode) {
+				apg.adjustRightButton.setDisabledIcon
+				    (adjustRightIconRVD);
+			    }
+			    */
 			    apg.adjustRightButton.setToolTipText
 				(apg.adjustUpTip);
 			    apg.addAdjustButtonListener();
@@ -1606,7 +1782,10 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			    controlPanel.add(apg.slider);
 			    controlPanel.add(apg.adjustRightButton);
 			}
+			apg.resetIcons(darkmode);
 			frame.add(BorderLayout.SOUTH, controlPanel);
+			controlPanel.addPropertyChangeListener
+			    (apg.getPCL(controlPanel));
 		    }
 		    frame.add(BorderLayout.CENTER, panel);
 		    apg.setBackground(Color.BLACK);
@@ -1624,6 +1803,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	    } catch (InvocationTargetException e) {
 	    }
 	}
+	apg.createdByNewFramedInstance = true;
 	return apg;
     }
 }

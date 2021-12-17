@@ -764,7 +764,6 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
 	    DarkmodeMonitor.addPropertyChangeListener(dml);
 	    needDLM = false;
 	}
-
     }
 
     @Override
@@ -774,6 +773,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     {
 	tocPane.setToc(url, expand, validating);
 	setDividerLocation(tocPane.getPreferredSize().width);
+	if (needDLM) {
+	    DarkmodeMonitor.addPropertyChangeListener(dml);
+	    needDLM = false;
+	}
     }
 
     @Override
@@ -783,6 +786,10 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
     {
 	tocPane.setToc(is, expand, validating);
 	setDividerLocation(tocPane.getPreferredSize().width);
+	if (needDLM) {
+	    DarkmodeMonitor.addPropertyChangeListener(dml);
+	    needDLM = false;
+	}
     }
 
     /**

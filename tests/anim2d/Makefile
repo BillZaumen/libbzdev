@@ -48,8 +48,10 @@ all:
 	@$(JAVA) PolarTest
 	@echo ----- Starting Script Factory Test ----
 	$(SCRUN) scriptTest.js
-	@echo ----- Starting Script Factory Test with EP script ----
+	@echo ----- Starting Script Factory Test with an ESP script ----
 	$(SCRUN) scriptTest.esp
+	@echo ----- Starting 2nd Script Factory Test with an ESP script ----
+	$(SCRUN) scriptTest2.esp
 
 atest:
 	(cd ../.. ; make jars)
@@ -229,6 +231,11 @@ eptest-err:
 	@echo ----- Starting Script Factory Test with EP script ----
 	$(SCRUN) scriptTestErr.esp
 
+eptest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	@echo ----- Starting Script Factory Test with EP script ----
+	$(SCRUN) --resourcePath images scriptTest2.esp
 cltest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

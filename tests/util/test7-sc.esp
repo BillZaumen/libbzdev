@@ -31,12 +31,10 @@ var.da? function() {
 	da.isDirectory(name) || da.delete(name); void;
     });
     a2d.initFrames(maxframes, "img", "png", da) ; null
-    a2d.scheduleFrames(0L, maxframes);
-    a2d.run();
-}(): function() {
-    global.getWriter().println("starting animation");
-    global.getWriter().flush();
-    a2d.initFrames(maxframes, apg);
-    a2d.scheduleFrames(0L, maxframes);
-    a2d.run(); apg.close(); null
-}();
+  }(): function() {
+       global.getWriter().println("got here");
+       global.getWriter().flush();
+      a2d.initFrames(maxframes, apg);
+      a2d.scheduleFrames(0L, maxframes);
+      a2d.run(); apg.close(); null
+  }();

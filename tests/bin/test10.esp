@@ -6,5 +6,13 @@ import (java.net.URL);
 var err ?= scripting.getErrorWriter();
 var out ?= scripting.getWriter();
 
-var sc = global.typeof(new Simulation(scripting));                                                                                                                                                                                                                                                                                                                                                  
+var sc = global.typeof(new Simulation(scripting));
+out.println(sc);
+
+/*
+// Doesn't work because java.lang.Class was set up by ESP before
+// the import statements above, and a second import will not override
+// or extend the first one.
 out.println(sc.getProtectionDomain().getCodeSource().getLocation().toString());
+*/
+out.println(sc.getName());

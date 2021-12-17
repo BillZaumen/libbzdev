@@ -81,6 +81,12 @@ all: compile
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest
 
+
+test7-sc:
+	chmod u+x scrun
+	@./scrun test7-sc.esp
+	chmod u-x scrun
+
 compile:
 	(cd ../.. ; make jars)
 	mkdir -p classes

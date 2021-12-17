@@ -21,6 +21,10 @@ import java.util.regex.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+// used only to set the look and feel.
+import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
+
 //@exbundle org.bzdev.bin.scrunner.lpack.SCRunner
 
 public class SCRunner {
@@ -300,6 +304,7 @@ public class SCRunner {
 	// Queue<String> nontrusedFileNames = new LinkedList<String>();
 
 	int stdoutCount = 1;
+	String plaf = UIManager.getSystemLookAndFeelClassName();
 
 	while (index < argv.length && argv[index].startsWith("-")
 	       && !argv[index].equals("-t")) {
@@ -326,6 +331,14 @@ public class SCRunner {
 		    System.err.println(errorMsg("exception", e.getMessage()));
 		    System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
+		}
+	    } else if (argv[index].equals("--plaf")) {
+		index++;
+		String ui = argv[index];
+		if (ui.equals("java")) {
+		    plaf = null;
+		} else if (!ui.equals("system")) {
+		    plaf = argv[index];
 		}
 	    } else if (argv[index].startsWith("-o:")) {
 		String varName = argv[index].substring(3);
@@ -852,6 +865,18 @@ public class SCRunner {
 		}
 	    }
 	    ind++;
+	}
+
+	if (plaf != null) {
+	    final String currentPLAF = plaf;
+	    SwingUtilities.invokeLater(() -> {
+		    try {
+			UIManager.setLookAndFeel(currentPLAF);
+		    } catch (Exception uie) {
+			System.err.println(errorMsg("plaf", currentPLAF));
+			System.exit(1);
+		    }
+		});
 	}
 
 	if (languageName == null) {
