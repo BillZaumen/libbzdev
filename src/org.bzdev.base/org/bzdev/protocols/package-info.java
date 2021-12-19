@@ -48,6 +48,12 @@
  * The <code>resource</code> and <code>sresource</code> protocols are useful
  * when a URL references an object that is part of an application's code base
  * or in related files or directories.
+ * <P>
+ * There is one caveat: the the method {@link java.net.URL#openConnection()}
+ * or {@link java.net.URL#openConnection(java.net.Proxy)}
+ * is called, for the {@link java.net.URLConnection} returned, the method
+ * {@link java.net.URLConnection#getURL()} may return a differnt URL than
+ * the URL used to open the connection.
  */
 package org.bzdev.protocols;
 

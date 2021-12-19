@@ -1,5 +1,6 @@
 package org.bzdev.swing;
 
+import org.bzdev.protocols.Handlers;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
@@ -144,6 +145,12 @@ public class HtmlPane extends JComponent {
 	    this.url = url;
 	    event = null;
 	    position = p;
+	}
+	@Override
+	public String toString() {
+	    return "[StackElement: url = " + url
+		+ ", position = " + position
+		+ ", event = " + event + "]";
 	}
     }
     private HtmlPane me = null;
@@ -544,7 +551,7 @@ public class HtmlPane extends JComponent {
 			    currentElement = new StackElement(page, p);
 			    urlstack.push(currentElement);
 			    pane.setPage(e.getURL());
-			    if (page.sameFile(e.getURL())) {
+			    if (Handlers.sameFile(page, e.getURL())) {
 				String ref = e.getURL().getRef();
 				if (ref == null) position = new Point(0,0);
 				else {
@@ -564,7 +571,7 @@ public class HtmlPane extends JComponent {
 			    // The position field in the stack element is
 			    // null because the actual value is not
 			    // available immediately.  Instead, it is
-			    // determined using a property chagne listener.
+			    // determined using a property change listener.
 			    currentElement = new StackElement(page, position);
 			    revUrlstack.clear();
 			    startButton.setEnabled(true);
@@ -1000,6 +1007,9 @@ public class HtmlPane extends JComponent {
 	}
     }
 
+    // For change listener when pages change when the 'back' or 'start'
+    // button is pushed.
+    Point positionToUse = null;
 
     /**
      * Constructor.
@@ -1008,12 +1018,18 @@ public class HtmlPane extends JComponent {
 	super();
 	editorPane = ep;
 	editorPane.addPropertyChangeListener((evt) -> {
-		if(evt.getPropertyName().equals("page")
-		   && currentElement != null
-		   && currentElement.event == null
-		   && currentElement.position == null) {
-		    currentElement.position =
-			editorScrollPane.getViewport().getViewPosition();
+		if(evt.getPropertyName().equals("page")) {
+		    if (currentElement != null
+			&& currentElement.event == null
+			&& currentElement.position == null) {
+			currentElement.position =
+			    editorScrollPane.getViewport().getViewPosition();
+		    }
+		    if (positionToUse != null) {
+			editorScrollPane.getViewport()
+			    .setViewPosition(positionToUse);
+			positionToUse = null;
+		    }
 		}
 	    });
 	editorScrollPane = new JScrollPane(editorPane);
@@ -1098,8 +1114,11 @@ public class HtmlPane extends JComponent {
 			(HTMLDocument)editorPane.getDocument();
 		    try {
 			if (page == null ||
-			    !page.sameFile(currentElement.url)) {
+			    !Handlers.sameFile(page, currentElement.url)) {
 			    editorPane.setPage(currentElement.url);
+			    if (currentElement.position != null) {
+				positionToUse = currentElement.position;
+			    }
 			}
 			// editorPane.setPage(element.url);
 			page = currentElement.url;
@@ -1186,8 +1205,11 @@ public class HtmlPane extends JComponent {
 			(HTMLDocument)editorPane.getDocument();
 		    try {
 			if (page == null ||
-			    !page.sameFile(currentElement.url)) {
+			    !Handlers.sameFile(page, currentElement.url)) {
 			    editorPane.setPage(currentElement.url);
+			    if (currentElement.position != null) {
+				positionToUse = currentElement.position;
+			    }
 			}
 			page = currentElement.url;
 			position = currentElement.position;
@@ -1208,6 +1230,7 @@ public class HtmlPane extends JComponent {
 			    startButton.setEnabled(false);
 			}
 		    } catch (Exception ee) {
+			ee.printStackTrace();
 			boolean fixed = true;
 			try {
 			    editorPane.setPage(current);
@@ -1333,7 +1356,7 @@ public class HtmlPane extends JComponent {
 			(HTMLDocument)editorPane.getDocument();
 		    try {
 			if (page == null
-			    || !page.sameFile(currentElement.url)) {
+			    || !Handlers.sameFile(page, currentElement.url)) {
 			    editorPane.setPage(currentElement.url);
 			}
 			page = currentElement.url;

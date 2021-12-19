@@ -1,5 +1,8 @@
 package org.bzdev.protocols;
+import java.io.IOException;
+import java.net.URL;
 import java.net.NetPermission;
+import java.net.URLConnection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -233,6 +236,29 @@ public class Handlers {
 	    } else {
 		setProperty(key, "|" + value);
 	    }
+	}
+    }
+
+    /**
+     * Determine if two URLs reference the same file.
+     * @param u1 the first URL
+     * @param u2 the second URL
+     * @return true if the URLs reference the same file; false otherwise.
+     */
+    public static boolean sameFile(URL u1, URL u2) {
+	try {
+	    if (u1 == null || u2 == null) return false;
+	    String p1 = u1.getProtocol();
+	    String p2 = u2.getProtocol();
+	    if (p1.equals("resource") || p1.equals("sresource")) {
+		u1 = u1.openConnection().getURL();
+	    }
+	    if (p2.equals("resource") || p2.equals("sresource")) {
+		u2 = u2.openConnection().getURL();
+	    }
+	    return u1.sameFile(u2);
+	} catch (IOException eio) {
+	    return false;
 	}
     }
 }

@@ -144,6 +144,15 @@ htest2e:
 	$(JAVA) -Dorg.bzdev.protocols.resource.path=$(EPTS) \
 		HtmlPaneTest2 resource:org/bzdev/epts/manual/manual.html
 
+htest2e-dm:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	jar cf manual.jar html
+	$(JAVA) -Dorg.bzdev.protocols.resource.path=$(EPTS) \
+		HtmlPaneTest2 resource:org/bzdev/epts/manual/manual.dm.html
+
+
 htest2h:
 	(cd ../.. ; make jars)
 	mkdir -p classes

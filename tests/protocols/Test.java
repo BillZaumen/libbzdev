@@ -125,6 +125,10 @@ public class Test {
 	}
 	is.close();
 	url = new URL("resource:goodbye.txt");
+	URL url2 = url.openConnection().getURL();
+	System.out.println("url = " + url);
+	System.out.println("url2 = " + url2);
+	System.out.println(Handlers.sameFile(url, url2));
 	is = url.openStream();
 	while((val = is.read()) != -1) {
 	    System.out.print((char)val);
