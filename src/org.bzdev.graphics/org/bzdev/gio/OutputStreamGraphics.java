@@ -51,7 +51,9 @@ import java.security.*;
  *         appear. The modification catches a null pointer exception
  *         and quietly continues.  The result is that the image
  *         will not be drawn but the application will continue
- *         running.
+ *         running.  SVG providers should return instances of
+ *         OutputStreamGraphics that implement the {@link SvgOps}
+ *         interface.
  * </UL>
  *<P>
  * The method named <code>newInstance</code> are used to create a new
