@@ -432,6 +432,10 @@ hwt2:
 	sed -e 's/CWD/$(CWD)/' < toc.xml.tpl > toc.xml
 	$(JAVA) HtmlWithTocTest toc.xml --no-timeout --systemUI
 
+geth:
+	(cd ../.. ; make jars)
+	java -classpath ../../BUILD/libbzdev.jar:../../../geth/geth.jar	\
+		HttpHeaders
 
 atest3s-fb:
 	(cd ../.. ; make jars)
