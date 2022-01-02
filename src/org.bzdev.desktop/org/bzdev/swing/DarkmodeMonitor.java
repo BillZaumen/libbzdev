@@ -3,12 +3,12 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.bzdev.util.EvntListenerList;
-
 /**
  * Class to track background color changes due to a pluggable look and
  * feel that toggles between normal mode and dark mode.
@@ -22,6 +22,8 @@ import org.bzdev.util.EvntListenerList;
  * old value and new value fields.
  * <P>
  * To get the mode initially, call {@link DarkmodeMonitor#getDarkmode()}.
+ * The methods that {@link DarkmodeMonitor} provides do not have to be
+ * called from the event dispatch thread.
  */
 public class DarkmodeMonitor {
     private static JFrame frame;
@@ -33,12 +35,16 @@ public class DarkmodeMonitor {
      * This may be called after the look and feel is installed.
      * @return true if dark mode is being used; false otherwise
      */
-    static public boolean getDarkmode() {
-	if (!initialized) init();
+    public static boolean getDarkmode() {
+	if(initialized.get() == false) {
+	    init();
+	}
 	return darkmode;
     }
 
-    private static boolean initialized = false;
+    // An atomic variable is used to avoid having to make some methods
+    // synchronized, which can result in a deadlock.
+    private static AtomicBoolean initialized = new AtomicBoolean();
 
     /**
      * Initialization.
@@ -46,19 +52,50 @@ public class DarkmodeMonitor {
      * Until it is called, events will not be sent to listeners.
      * {@link #getDarkmode()} will call this method automatically.
      */
-    public static synchronized void init() {
-	if (initialized) return;
+    public static void init() {
+	if (initialized.getAndSet(true)) return;
 	try {
+	    if (SwingUtilities.isEventDispatchThread()) {
+		frame = new JFrame();
+		Toolkit.getDefaultToolkit().sync();
+		frame.getContentPane().addPropertyChangeListener(evnt -> {
+			if (modeChanged()) {
+			    Boolean oldmode = Boolean.valueOf(!darkmode);
+			    Boolean newmode = Boolean.valueOf(darkmode);
+			    PropertyChangeEvent evt = new
+				PropertyChangeEvent(DarkmodeMonitor.class,
+						    "darkmode",
+						    oldmode, newmode);
+			    SwingUtilities.invokeLater(() -> {
+				    for (Object o: list.getListeners
+					     (PropertyChangeListener.class)) {
+					if (o instanceof
+					    PropertyChangeListener) {
+					    PropertyChangeListener l =
+						(PropertyChangeListener) o;
+					    l.propertyChange(evt);
+					}
+				    }
+				});
+			}
+		    });
+		modeChanged();
+		return;
+	    }
 	    SwingUtilities.invokeLater(() -> {
 		    try {
 			frame = new JFrame();
 			Toolkit.getDefaultToolkit().sync();
 		    } catch (Exception e) {}
 		});
+	    /*
 	    SwingUtilities.invokeLater(() -> {
 		    try {
 			Toolkit.getDefaultToolkit().sync();
 		    } catch (Exception e) {}
+		});
+	    */
+	    SwingUtilities.invokeAndWait(() -> {
 		    frame.getContentPane().addPropertyChangeListener(evnt -> {
 			    if (modeChanged()) {
 				Boolean oldmode = Boolean.valueOf(!darkmode);
@@ -83,9 +120,8 @@ public class DarkmodeMonitor {
 		    modeChanged();
 		});
 	} catch (Exception e) {
-	    // e.printStackTrace();
+	   e.printStackTrace();
 	}
-	initialized = true;
     }
 
     private static boolean modeChanged() {
@@ -104,9 +140,10 @@ public class DarkmodeMonitor {
      * Add a property change listener.
      * @param listener the listener
      */
-    public static synchronized void
+    public static void
 	addPropertyChangeListener( PropertyChangeListener listener)
     {
+	// the list's add method is synchronized
 	list.add(PropertyChangeListener.class, listener);
     }
 
@@ -114,9 +151,10 @@ public class DarkmodeMonitor {
      * Remove a property change listener.
      * @param listener the listener
      */
-    public static synchronized void
+    public static void
 	removePropertyChangeListener(PropertyChangeListener listener)
     {
+	// the list's remove method is synchronized
 	list.remove(PropertyChangeListener.class, listener);
     }
 
@@ -157,5 +195,9 @@ public class DarkmodeMonitor {
 	} catch (Exception e) {
 	}
     }
-
 }
+
+//  LocalWords:  pluggable DarkmodeMonitor darkmode getDarkmode
+//  LocalWords:  SwingUtilities invokeLater JTextField JTextArea
+//  LocalWords:  JEditorPane TextField caretForeground TextArea
+//  LocalWords:  EditorPane TextPane

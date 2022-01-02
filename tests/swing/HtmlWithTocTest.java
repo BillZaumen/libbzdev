@@ -8,14 +8,16 @@ public class HtmlWithTocTest {
     public static void main(String argv[]) throws Exception {
 	boolean notimeout = argv.length > 1 && argv[1].equals("--no-timeout");
 	boolean systemUI = argv.length > 2 && argv[2].equals("--systemUI");
-	if (systemUI) {
-	    /*
-	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	    */
-	    DarkmodeMonitor.setSystemPLAF();
-	    // DarkmodeMonitor.init();
-	}
 	try {
+	    if (systemUI) {
+		Runnable r = () -> {
+		    System.out.println("trying setSystemPLAF()");
+		    DarkmodeMonitor.setSystemPLAF();
+		    DarkmodeMonitor.init();
+		};
+		// SwingUtilities.invokeLater(r);
+		r.run();
+	    }
 	    Handlers.enable();
 	    java.io.FileInputStream is = 
 		new java.io.FileInputStream(argv[0]);
