@@ -369,7 +369,15 @@ public class FileHandler implements HttpHandler {
 	map.setDisplayDir(displayDir);
 	map.setWebInfHidden(hideWebInf);
 	// InputStream is = WebMap.getWebxml(root);
-	WebMap.Info info  = nowebxml? null: map.getWebxml();
+	// WebMap.Info info  = nowebxml? null: map.getWebxml();
+	WebMap.Info info = null;
+	if (nowebxml == false) {
+	    try {
+		info = map.getWebxml();
+	    } catch (Exception e) {
+		info = null;
+	    }
+	}
 	InputStream is = (info == null)? null: info.getInputStream();
 	String location = (info == null)? "": info.getLocation();
 	if (info != null) {
@@ -430,7 +438,15 @@ public class FileHandler implements HttpHandler {
 	map.setDisplayDir(displayDir);
 	map.setWebInfHidden(hideWebInf);
 	// InputStream is = WebMap.getWebxml(root);
-	WebMap.Info info  = nowebxml? null: map.getWebxml();
+	// WebMap.Info info  = nowebxml? null: map.getWebxml();
+	WebMap.Info info = null;
+	if (nowebxml == false) {
+	    try {
+		info = map.getWebxml();
+	    } catch (Exception e) {
+		info = null;
+	    }
+	}
 	InputStream is = (info == null)? null: info.getInputStream();
 	String location = (info == null)? "": info.getLocation();
 	if (info != null) {
@@ -472,7 +488,15 @@ public class FileHandler implements HttpHandler {
 	map.setDisplayDir(displayDir);
 	map.setWebInfHidden(hideWebInf);
 	// InputStream is = WebMap.getWebxml(root);
-	WebMap.Info info  = nowebxml? null: map.getWebxml();
+	// WebMap.Info info  = nowebxml? null: map.getWebxml();
+	WebMap.Info info = null;
+	if (nowebxml == false) {
+	    try {
+		info = map.getWebxml();
+	    } catch (Exception e) {
+		info = null;
+	    }
+	}
 	InputStream is = (info == null)? null: info.getInputStream();
 	String location = (info == null)? "": info.getLocation();
 	WebxmlParser parser = new WebxmlParser();

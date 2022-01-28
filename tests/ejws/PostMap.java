@@ -46,7 +46,7 @@ public class PostMap extends WebMap {
 	}
 	byte[] array = sb.toString().getBytes(UTF8);
 	WebMap.Info info = new WebMap.Info(requestInfo);
-	info.setHeader("content-type", "text.plain;charset=UTF-8");
+	info.setHeader("content-type", "text/plain;charset=UTF-8");
 	info.sendResponseHeaders(200, array.length);
 	OutputStream os = info.getOutputStream();
 	os.write(array);

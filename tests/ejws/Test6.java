@@ -5,11 +5,13 @@ import java.io.File;
 
 public class Test6 {
     public static void main(String argv[]) throws Exception {
-	ErrorMessage.setStackTrace(true);
+	boolean nowebxml = (argv.length == 0);
+
+	// ErrorMessage.setStackTrace(true);
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
 
 	ews.add("/", DirWebMap.class, new File("example"), null,
-		true, true, true);
+		nowebxml, true, true);
 	ews.start();
     }
 }

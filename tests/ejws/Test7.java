@@ -5,11 +5,12 @@ import com.sun.net.httpserver.*;
 
 public class Test7 {
     public static void main(String argv[]) throws Exception {
+	boolean nowebxml = (argv.length == 0);
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
 
 	ews.add("/", ZipWebMap.class, new File("example.zip"),
 		null,
-		true, true, true);
+		nowebxml, true, true);
 	for (String prefix: ews.getPrefixes()) {
 	    System.out.println("saw prefix \"" + prefix + "\"");
 	}

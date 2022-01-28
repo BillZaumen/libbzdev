@@ -521,10 +521,87 @@ h1.hidden {
 }
 
 /*
-  Fixup for figures with black over a transparent backdrop: the
-  images we have use lines that are eiether black, blue, or green
-  and this background works with all of those.
-*/
+ * Styles for javadoc search.
+ */
+.ui-autocomplete-category {
+    font-weight:bold;
+    font-size:15px;
+    padding:7px 0 7px 3px;
+    background-color:#4D7A97;
+    color:#FFFFFF;
+}
+.resultItem {
+    background-color: rgb(32,32,32);
+    color:#FFFFFF;
+    font-size:13px;
+}
+
+.ui-autocomplete {
+    max-height:85%;
+    max-width:65%;
+    overflow-y:scroll;
+    overflow-x:scroll;
+    background-color: rgb(32,32,32);
+    color:#FFFFFF;
+    white-space:nowrap;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+ul.ui-autocomplete {
+    position:fixed;
+    z-index:999999;
+}
+ul.ui-autocomplete  li {
+    float:left;
+    clear:both;
+    width:100%;
+}
+.resultHighlight {
+    font-weight:bold;
+}
+#search {
+    background-image:url('resources/glass.png');
+    background-size:13px;
+    background-repeat:no-repeat;
+    background-position:2px 3px;
+    padding-left:20px;
+    position:relative;
+    right:-18px;
+}
+#reset {
+    background-color: rgb(255,255,255);
+    background-image:url('resources/x.png');
+
+    background-position:center;
+    background-repeat:no-repeat;
+    background-size:12px;
+    border:0 none;
+    width:16px;
+    height:17px;
+    position:relative;
+    left:-4px;
+    top:-4px;
+    font-size:0px;
+}
+.watermark {
+    color:#545454;
+}
+.searchTagDescResult {
+    font-style:italic;
+    font-size:11px;
+}
+.searchTagHolderResult {
+    font-style:italic;
+    font-size:12px;
+}
+.searchTagResult:before, .searchTagResult:target {
+    color:red;
+}
+
+/*
+ * Fixup for figures with black over a transparent backdrop: the
+ * images we have use lines that are eiether black, blue, or green
+ * and this background works with all of those.
+ */
 
 .imgBackground {
     background-color:#9e5d45;

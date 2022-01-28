@@ -85,6 +85,12 @@ test6:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) Test6
 
+test6a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test6 false
+
 test7:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -93,6 +99,16 @@ test7:
 	(cd example; zip -r ../example.zip *)
 	$(JAVA) Test7
 	rm example.zip
+
+test7a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	rm -f example.zip
+	(cd example; zip -r ../example.zip *)
+	$(JAVA) Test7 false
+	rm example.zip
+
 
 test8:
 	(cd ../.. ; make jars)
