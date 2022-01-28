@@ -61,7 +61,7 @@ public class EjwsPrincipal extends HttpPrincipal {
      */
     public EjwsPrincipal(String username, String realm, Set<String>roles) {
 	super(username, realm);
-	roles = (roles == null)? Collections.emptySet():
+	this.roles = (roles == null)? Collections.emptySet():
 	    Collections.unmodifiableSet(new HashSet<String>(roles));
     }
 

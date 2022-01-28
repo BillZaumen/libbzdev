@@ -500,6 +500,7 @@ abstract public class WebMap {
 	@Override
 	public boolean isUserInRole(String role) {
 	    HttpPrincipal p = exchange.getPrincipal();
+	    if (p == null) return false;
 	    if (p instanceof EjwsPrincipal) {
 		EjwsPrincipal ep = (EjwsPrincipal) p;
 		return ep.getRoles().contains(role);
