@@ -126,14 +126,21 @@ public interface HttpServerResponse {
      *            error occurred (for {@link org.bzdev.ejws.WebMap.Info}
      *            the constructor was not given an instance of
      *            {@link org.bzdev.ejws.WebMap.RequestInfo})
+     * @exception IOException an IO error occurred
      */
-    void sendError(int rc) throws IllegalStateException;
+    void sendError(int rc) throws IllegalStateException, IOException;
 
     /**
      * Sends an HTTP redirect response with a given location.
      * @param location a URL providing the location
+     * @exception IllegalStateException an implementation-dependent
+     *            error occurred (for {@link org.bzdev.ejws.WebMap.Info}
+     *            the constructor was not given an instance of
+     *            {@link org.bzdev.ejws.WebMap.RequestInfo})
+     * @exception IOException an IO error occurred
      */
-    void sendRedirect(String location) throws IllegalStateException;
+    void sendRedirect(String location)
+	throws IllegalStateException, IOException;
 
     /**
      * Add a date header.
