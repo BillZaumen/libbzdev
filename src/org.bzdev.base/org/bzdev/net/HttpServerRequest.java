@@ -1,5 +1,6 @@
 package org.bzdev.net;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.Locale;
 import java.text.DateFormat;
 import java.security.Principal;
@@ -341,7 +342,7 @@ public interface HttpServerRequest {
      * @return the input stream; null if not available
      * @exception IOException an IO error occurred
      */
-    InputStream getEncodedInputStream();
+    InputStream getEncodedInputStream() throws IOException;
 
     /**
      * Get an input stream that will read data in a request
@@ -375,8 +376,9 @@ public interface HttpServerRequest {
      *     return is;
      * </CODE></PRE></BLOCKQUOTE>
      * @return the input stream; null if not available
+     * @exception IOException an IO error occurred
      */
-    InputStream getDecodedInputStream();
+    InputStream getDecodedInputStream() throws IOException;
 }
 
 //  LocalWords:  exbundle Servlet ServletContext servlet Jarkarta URI
