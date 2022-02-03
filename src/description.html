@@ -26,6 +26,7 @@ in the following diagram (also shown on the
 <AREA SHAPE="rect" coords="144,314,272,340" href="#math" alt="Math Module">
 <AREA SHAPE="rect" coords="486,300,609,327" href="#ejws" alt="Embedded Web Server Module">
 <AREA SHAPE="rect" coords="272,364,394,388" href="#base" alt="Base Module">
+<AREA SHAPE="rect" coords="358,323,505,347" href="#servlets" alt="Servlets Module">
 </MAP>
 <P>
 <P>
@@ -68,8 +69,8 @@ The packages in this module provide the following:
        interfaces all the 'call' method to return a value, declare
        exceptions, and declare arguments. The class MathOps is a
        "utility class" that provides simple operations involving Java's
-       primitive types and is effectively a trivial extension of the
-       Java package java.lang.Math.
+       <!--' -->primitive types and is effectively a trivial extension
+       of the Java package java.lang.Math.
   <li> org.bzdev.scripting allows scripts to be run in a sandbox while
        normal Java code is not.
   <li> org.bzdev.io provides some IO-related classes. These include a
@@ -295,12 +296,35 @@ These packages are described below:
   <LI>
 </UL>
 
+<H2><A NAME="servlets"></A>The module org.bzdev.servlets</H2>
+<P>
+The module
+<A HREF="../org.bzdev.servlets/module-summary.html">org.bzdev.servlets</A>
+contains a single package that contains a single class, each of whose
+subclasses will use an instance of {@link org.bzdev.net.ServletAdapter}
+to implement a servlet. Unlike the other modules, compiling this module
+requires an external library (in this case the servlet API)
+on the class path.  The following diagram contains this module and its
+package:
+<P>
+<center>
+  <img src="servlets.png" width="500px" height="auto" usemap="#servletsMap"
+       class="imgBackground">
+</center>
+<MAP NAME="servletsMap">
+<AREA SHAPE="rect" coords="2,4,224,34" href="../org.bzdev.servlets/module-summary.html" alt="Servlets Module">
+<AREA SHAPE="rect" coords="98,140,384,185" href="../org.bzdev.servlets/org/bzdev/net/servlets/package-summary.html" alt="Servlets Package">
+</MAP>
+<P>
+The current name for the servlet-API module is servlet.api although that
+may change.
+
 
 <H2><A NAME="rest"></A>The remaining modules</H2>
 
-The remaining modules are ones with one package (sometimes a substantial
-package) per module. The following diagram shows these modules and their
-packages:
+The remaining modules, like the org.bzdev.servlets module, are ones
+with one package (sometimes a substantial package) per module. The
+following diagram shows these modules and their packages:
 <P>
 <center>
   <img src="rest.png" width="500px" height="auto" usemap="#restMap"

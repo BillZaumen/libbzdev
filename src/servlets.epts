@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE epts PUBLIC "-//BZDev//EPTS-1.0//EN"
+	  "resource:org/bzdev/epts/epts-1.0.dtd">
+<epts xmlns="http://bzdev.org/DTD/epts-1.0">
+  <image width="500" height="313">
+    <imageURI>doc-files/servlets.png</imageURI>
+  </image>
+  <targetList>
+  </targetList>
+  <gcsconfig unitIndex="0" refPointIndex="6"
+	  userSpaceDistance="1.00"
+	  gcsDistance="1.00"
+	  xrefpointGCS="0.00" yrefpointGCS="0.00"/>
+  <table>
+       <row varname="servlets" type="PATH_START" key="module"  description="Servlets Module"/>
+       <row type="MOVE_TO" x="2.0" y="309.0" xp="2.0" yp="4.0"/>
+       <row type="SEG_END" x="224.0" y="279.0" xp="224.0" yp="34.0"/>
+       <row type="PATH_END"/>
+       <row varname="servlets2" type="PATH_START" key="package" link="net/servlets" description="Servlets Package"/>
+       <row type="MOVE_TO" x="98.0" y="173.0" xp="98.0" yp="140.0"/>
+       <row type="SEG_END" x="384.0" y="128.0" xp="384.0" yp="185.0"/>
+       <row type="PATH_END"/>
+  </table>
+</epts>

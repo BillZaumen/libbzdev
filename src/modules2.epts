@@ -52,5 +52,9 @@
        <row type="MOVE_TO" x="272.0" y="23.0" xp="272.0" yp="364.0"/>
        <row type="SEG_END" x="394.0" y="-1.0" xp="394.0" yp="388.0"/>
        <row type="PATH_END"/>
+       <row varname="servlets" type="PATH_START" key="rect" link="#servlets" description="Servlets Module"/>
+       <row type="MOVE_TO" x="358.0" y="64.0" xp="358.0" yp="323.0"/>
+       <row type="SEG_END" x="505.0" y="40.0" xp="505.0" yp="347.0"/>
+       <row type="PATH_END"/>
   </table>
 </epts>

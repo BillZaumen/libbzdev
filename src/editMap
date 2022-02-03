@@ -8,12 +8,13 @@
 (cd .. ; make src/doc-files/ejws.png) > /dev/null
 (cd .. ; make src/doc-files/graphics.png) > /dev/null
 (cd .. ; make src/doc-files/math.png) > /dev/null
+(cd .. ; make src/doc-files/servlets.png) > /dev/null
 (cd .. ; make src/doc-files/rest.png) > /dev/null
 
 
 if [ $# = 0 ]
 then
-    epts modules.epts
+    epts servlets.epts
 else
     if [ -f "$1.epts" ]
     then

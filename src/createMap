@@ -11,6 +11,9 @@ else
 	rest)
 	    epts -o - --template:HTMLImageMap --mapName restMap rest.epts
 	    ;;
+	servlets)
+	    epts -o - --template pkgmap.tpl --mapName servlets $1.epts
+	    ;;
 	*)
 	    epts -o - --template pkgmap.tpl --mapName $1 $1.epts
 	    ;;

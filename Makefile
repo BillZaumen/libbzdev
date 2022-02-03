@@ -113,6 +113,7 @@ BZDEV = org/bzdev
 # Source directories for each module
 #
 BASE_DIR = ./src/org.bzdev.base
+SERVLETS_DIR = ./src/org.bzdev.servlets
 ESP_DIR = ./src/org.bzdev.esp
 DMETHODS_DIR = ./src/org.bzdev.dmethods
 MATH_DIR = ./src/org.bzdev.math
@@ -129,7 +130,7 @@ LSNOF_DIR = ./src/org.bzdev.lsnof
 SCRUNNER_DIR  = ./src/org.bzdev.scrunner
 YRUNNER_DIR = ./src/org.bzdev.yrunner
 
-SHORT_MODULE_NAMES = base esp dmethods math obnaming parmproc \
+SHORT_MODULE_NAMES = base servlets esp dmethods math obnaming parmproc \
 	graphics desktop devqsim drama anim2d p3d ejws
 
 
@@ -221,6 +222,14 @@ BASE_RESOURCES = $(subst ./src/,,$(BASE_RESOURCES1))
 BASE_RESOURCES2 = $(wildcard $(BASE_DIR)/$(BZDEV)/net/calendar/icalEvents.tpl)
 
 BASE_RESOURCES_CRLF = $(subst ./src/,,$(BASE_RESOURCES2))
+
+SERVLETS_JFILES = $(SERVLETS_DIR)/module-info.java \
+	$(SERVLETS_DIR)/$(BZDEV)/net/servlets/package-info.java \
+	$(SERVLETS_DIR)/$(BZDEV)/net/servlets/EncapsulatingServlet.java
+
+SERVLETS_BUILD_PATH1 = /usr/share/java/servlet-api.jar
+SERVLETS_BUILD_PATH = BUILD/libbzdev-base.jar:$(SERVLETS_BUILD_PATH1)
+
 
 # Variables used to build the org.bzdev.esp module's jar file
 ESP_JFILES = $(wildcard $(ESP_DIR)/$(BZDEV)/providers/esp/*.java)
@@ -542,16 +551,19 @@ $(BLDPOLICY): libbzdev.policy
 	mkdir -p $(JROOT)/BUILD
 	sed -e s/LOCATION/$(BUILD_SED)/ libbzdev.policy > $(BLDPOLICY)
 
+SERVLETS_API = /usr/share/java/servlet-api.jar
+
 RTJARS = BUILD/libbzdev-base.jar BUILD/libbzdev-esp.jar \
 	BUILD/libbzdev-math.jar BUILD/libbzdev-obnaming.jar \
-	BUILD/libbzdev-desktop.jar BUILD/libbzdev-drama.jar \
+	BUILD/libbzdev-graphics.jar BUILD/libbzdev-desktop.jar \
+	BUILD/libbzdev-devqsim.jar BUILD/libbzdev-drama.jar \
 	BUILD/libbzdev-anim2d.jar BUILD/libbzdev-p3d.jar \
 	BUILD/libbzdev-ejws.jar
 
-JARS = BUILD/libbzdev-base.jar BUILD/libbzdev-esp.jar \
-	BUILD/libbzdev-dmethods.jar BUILD/libbzdev-math.jar \
-	BUILD/libbzdev-obnaming.jar BUILD/libbzdev-parmproc.jar \
-	BUILD/libbzdev-graphics.jar \
+JARS = BUILD/libbzdev-base.jar BUILD/libbzdev-servlets.jar \
+	BUILD/libbzdev-esp.jar BUILD/libbzdev-dmethods.jar \
+	BUILD/libbzdev-math.jar BUILD/libbzdev-obnaming.jar \
+	BUILD/libbzdev-parmproc.jar BUILD/libbzdev-graphics.jar \
 	BUILD/libbzdev-desktop.jar BUILD/libbzdev-devqsim.jar \
 	BUILD/libbzdev-drama.jar BUILD/libbzdev-anim2d.jar \
 	BUILD/libbzdev-p3d.jar BUILD/libbzdev-ejws.jar
@@ -580,6 +592,16 @@ BUILD/libbzdev-base.jar: $(BASE_JFILES) $(BASE_RESOURCES1) $(BASE_RESOURCES2) \
 	for i in $(BASE_RESOURCES_CRLF) ; do mkdir -p mods/`dirname $$i` ; \
 		sed -e 's/$$//' src/$$i > mods/$$i ; done
 	jar --create --file BUILD/libbzdev-base.jar -C mods/org.bzdev.base .
+
+BUILD/libbzdev-servlets.jar: $(SERVLETS_JFILES)
+	mkdir -p mods/org.bzdev.servlets
+	mkdir -p BUILD
+	javac -d mods/org.bzdev.servlets -p $(SERVLETS_BUILD_PATH) \
+		$(SERVLETS_JFILES)
+	jar --create --file BUILD/libbzdev-servlets.jar \
+		--manifest=$(SERVLETS_DIR)/manifest.mf \
+		-C mods/org.bzdev.servlets .
+
 
 BUILD/libbzdev-esp.jar: $(ESP_JFILES) $(ESP_RESOURCES1) $(ESP_MODINFO) \
 		$(ESP_JFILES2)
@@ -880,6 +902,7 @@ DIAGRAMS = $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/anim2d.png \
 	src/doc-files/drama.png \
 	src/doc-files/ejws.png \
 	src/doc-files/devqsim.png \
+	src/doc-files/servlets.png \
 	src/doc-files/rest.png
 
 diagrams: $(DIAGRAMS)
@@ -1237,6 +1260,12 @@ src/doc-files/devqsim.png: diagrams/modules/devqsim.dia
 	inkscape -w 500 --export-filename=$@ tmp.svg
 	rm tmp.svg
 
+src/doc-files/servlets.png: diagrams/modules/servlets.dia
+	mkdir -p src/doc-files
+	dia -s 500x -e tmp.svg $<
+	inkscape -w 500 --export-filename=$@ tmp.svg
+	rm tmp.svg
+
 src/doc-files/rest.png: diagrams/modules/rest.dia
 	mkdir -p src/doc-files
 	dia -s 500x -e tmp.svg $<
@@ -1333,7 +1362,9 @@ altjavadocs: $(JROOT_ALT_JAVADOCS)/index.html
 JDOC_MODULES1 = org.bzdev.base,org.bzdev.math,org.bzdev.graphics
 JDOC_MODULES2 =	org.bzdev.obnaming,org.bzdev.desktop,org.bzdev.ejws
 JDOC_MODULES3 =	org.bzdev.devqsim,org.bzdev.drama,org.bzdev.anim2d,org.bzdev.p3d
-JDOC_MODULES = $(JDOC_MODULES1),$(JDOC_MODULES2),$(JDOC_MODULES3)
+JDOC_MODULES4 = org.bzdev.servlets
+JDOC_MODULES = \
+	$(JDOC_MODULES1),$(JDOC_MODULES2),$(JDOC_MODULES3),$(JDOC_MODULES4)
 
 JDOC_CLASSPATH = `echo $(JARS) | sed -e s/\ /:/g `
 
@@ -1404,7 +1435,7 @@ DESCR_DIRS = org.bzdev.devqsim/org/bzdev/devqsim/doc-files \
 DESCR_HTML = $(shell find src -name '*.html' | grep /doc-files/ )
 
 MOD_IMAGES = modules.png modules2.png base.png math.png graphics.png \
-	desktop.png devqsim.png drama.png ejws.png rest.png
+	desktop.png devqsim.png drama.png ejws.png servlets.png rest.png
 
 saved:
 	mkdir -p $(JROOT_JAVADOCS)/doc-files
@@ -1423,15 +1454,17 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		$(MATH_DIR)/$(BZDEV)/math/doc-files/DefaultFFT.txt
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
 		|| echo --main-stylesheet stylesheet.css`; \
-	javadoc -d $(JROOT_JAVADOCS) --module-path BUILD \
+	javadoc -d $(JROOT_JAVADOCS) \
+		--module-path BUILD:$(SERVLETS_BUILD_PATH1) \
 		$$styleoption \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api \
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
-		-exclude $(JDOC_EXCLUDE) | grep -E -v -e '^Generating' \
-		| grep -E -v -e '^Copying file'
+		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -E -v -e '^Generating' \
+		| grep -E -v -e '^Copying file'| grep -v javax\\.servlet\\.http
+	@echo '(18 warnings expected due to javax.servlet.http [not shown])'
 	mkdir -p $(JROOT_JAVADOCS)/doc-files
 	cp src/description.html $(JROOT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
@@ -1454,11 +1487,12 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	   https://docs.oracle.com/en/java/javase/$(JAVA_VERSION)/docs/api/ \
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
-		-exclude $(JDOC_EXCLUDE)
+		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -v javax\\.servlet\\.http
+	@echo '(18 warnings expected due to javax.servlet.http [not shown])'
 	mkdir -p $(JROOT_ALT_JAVADOCS)/doc-files
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
-	do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
+	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link-offline \
 	    https://docs.oracle.com/en/java/javase/$(JAVA_VERSION)/docs/api/ \
 		file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api/ \
@@ -1503,6 +1537,9 @@ install-libs: $(JARS)
 
 install-base-jar: $(JARS)
 	$(MAKE) MODULE_NAME=base install-base
+
+install-servlet-jar: $(JARS)
+	$(MAKE) MODULE_NAME=servlets install-servlets
 
 install-esp-jar: $(JARS)
 	$(MAKE) MODULE_NAME=esp install-esp
