@@ -699,13 +699,14 @@ abstract public class WebMap {
 		    contentLengthLong = -1;
 		}
 	    }
-
 	    if (method == HttpMethod.GET || method == HttpMethod.POST) {
 		if (method == HttpMethod.GET) {
 		    String qstr = getQueryString();
-		    parameterMap = WebDecoder.formDecodeMV(qstr, false,
-							   Charset
-							   .forName("UTF-8"));
+		    if (qstr != null) {
+			parameterMap = WebDecoder
+			    .formDecodeMV(qstr, false,
+					  Charset.forName("UTF-8"));
+		    }
 		} else if (method == HttpMethod.POST) {
 		    if (getMediaType()
 			.equals("application/x-www-form-urlencoded")) {
@@ -717,8 +718,12 @@ abstract public class WebMap {
 							  len);
 			    try {
 				is.transferTo(baos);
+				String charEncoding = getCharacterEncoding();
+				if (charEncoding == null) {
+				    charEncoding = "UTF-8";
+				}
 				String qstr =
-				    baos.toString(getCharacterEncoding());
+				    baos.toString(charEncoding);
 				is = new
 				    ByteArrayInputStream(baos.toByteArray());
 				parameterMap =
@@ -726,6 +731,7 @@ abstract public class WebMap {
 							    Charset
 							    .forName("UTF-8"));
 			    } catch(IOException eio) {
+			    } catch (Exception ex) {
 			    }
 			}
 		    }
