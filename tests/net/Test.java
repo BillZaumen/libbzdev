@@ -50,14 +50,23 @@ public class Test {
 	System.out.println("query1 = " + query1);
 	System.out.println("query2 = " + query2);
 	Map<String,String> map2 = WebDecoder.formDecode(query1);
+	Map<String,String[]> map2mv = WebDecoder.formDecodeMV(query1);
 	if (map2.size() != map.size()) throw new Exception("size");
 	for (Map.Entry<String,String> entry: map2.entrySet()) {
 	    String key = entry.getKey();
 	    String value = entry.getValue();
+	    if (!map.containsKey(key)) throw new Exception("key");
+	    if (!value.equals(map.get(key))) throw new Exception("value");
+	}
+	if (map2mv.size() != map.size()) throw new Exception("size");
+	for (Map.Entry<String,String[]> entry: map2mv.entrySet()) {
+	    String key = entry.getKey();
+	    String value = entry.getValue()[0];
 	    if (!map.containsKey(key)) throw new Exception("key");
 	    if (!value.equals(map.get(key))) throw new Exception("value");
 	}
 	map2 = WebDecoder.formDecode(query2, true);
+	map2mv = WebDecoder.formDecodeMV(query2, true);
 	if (map2.size() != map.size()) throw new Exception("size");
 	for (Map.Entry<String,String> entry: map2.entrySet()) {
 	    String key = entry.getKey();
@@ -65,6 +74,19 @@ public class Test {
 	    if (!map.containsKey(key)) throw new Exception("key");
 	    if (!value.equals(map.get(key))) throw new Exception("value");
 	}
+	if (map2mv.size() != map.size()) throw new Exception("size");
+	for (Map.Entry<String,String[]> entry: map2mv.entrySet()) {
+	    String key = entry.getKey();
+	    String value = entry.getValue()[0];
+	    if (!map.containsKey(key)) throw new Exception("key");
+	    if (!value.equals(map.get(key))) throw new Exception("value");
+	}
+	map2mv = WebDecoder.formDecodeMV("foo=a&foo=b&bar=aa&bar=bb");
+	if (map2mv.get("foo").length != 2) throw new Exception("multiple");
+	if (!map2mv.get("foo")[0].equals("a")) throw new Exception("multiple");
+	if (!map2mv.get("foo")[1].equals("b")) throw new Exception("multiple");
+	if (!map2mv.get("bar")[0].equals("aa")) throw new Exception("multiple");
+	if (!map2mv.get("bar")[1].equals("bb")) throw new Exception("multiple");
 	string = "http://a.com/b.jar|foo|for-||||bar|||xyz||";
 	
 	System.out.println("trying " + string);

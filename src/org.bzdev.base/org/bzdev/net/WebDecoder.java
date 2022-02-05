@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -165,7 +167,8 @@ public class WebDecoder {
     /**
      * Convert a string containing application/x-www-form-encoded
      * data, given a default charset (UTF-8) and an ampersand as the separator
-     * between keyword-value pairs, and create a keyword-value map.
+     * between keyword-value pairs, and create a keyword-value map, supporting
+     * a single value per key.
      * The map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param string a String containing the URL-encoded data
@@ -179,7 +182,25 @@ public class WebDecoder {
 
     /**
      * Convert a string containing application/x-www-form-encoded
-     * data, given a default charset (UTF-8), and create a keyword-value map.
+     * data, given a default charset (UTF-8) and an ampersand as the separator
+     * between keyword-value pairs, and create a keyword-value map, supporting
+     * a multiple values per key.
+     * The map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument.
+     * @param string a String containing the URL-encoded data
+     * @return a the map of keyword-value pairs (both elements are strings)
+     */
+    public static Map<String,String[]> formDecodeMV(String string)
+	throws IllegalArgumentException
+    {
+	return formDecodeMV(string, false, UTF8);
+    }
+
+
+    /**
+     * Convert a string containing application/x-www-form-encoded
+     * data, given a default charset (UTF-8), and create a keyword-value map,
+     * supporting a single value per key.
      * The map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param string a String containing the URL-encoded data
@@ -196,7 +217,26 @@ public class WebDecoder {
 
     /**
      * Convert a string containing application/x-www-form-encoded
-     * data, given a charset, and create a keyword-value map.
+     * data, given a default charset (UTF-8), and create a keyword-value map,
+     * supporting a multiple values per key.
+     * The map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument.
+     * @param string a String containing the URL-encoded data
+     * @param semicolonDelimiter true if the delimiter should be a semicolon
+     *        (";") rather than an ampersand ("&amp;").
+     * @return a the map of keyword-value pairs (both elements are strings)
+     */
+    public static Map<String,String[]> formDecodeMV(String string,
+						    boolean semicolonDelimiter)
+	throws IllegalArgumentException
+    {
+	return formDecodeMV(string, semicolonDelimiter, UTF8);
+    }
+
+    /**
+     * Convert a string containing application/x-www-form-encoded
+     * data, given a charset, and create a keyword-value map, supporting
+     * a single value per key.
      * The map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param string a String containing the URL-encoded data
@@ -228,9 +268,60 @@ public class WebDecoder {
     }
 
     /**
+     * Convert a string containing application/x-www-form-encoded
+     * data, given a charset, and create a keyword-value map, supporting
+     * multiple values per key.
+     * The map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument, based on the first occurrence
+     * of a key.
+     * @param string a String containing the URL-encoded data
+     * @param semicolonDelimiter true if the delimiter should be a semicolon
+     *        (";") rather than an ampersand ("&amp;").
+     * @param charset the Charset used when the keyword-value pairs was encoded
+     * @return a the map of keyword-value pairs (both elements are strings)
+     */
+    public static Map<String,String[]> formDecodeMV(String string,
+						    boolean semicolonDelimiter,
+						    Charset charset)
+	throws IllegalArgumentException
+    {
+	Map<String,String[]> map = new LinkedHashMap<String,String[]>();
+	Map<String,ArrayList<String>> map2 = new
+	    LinkedHashMap<String,ArrayList<String>>();
+
+
+	String delimiter = semicolonDelimiter? ";": "&";
+	StringTokenizer tk = new StringTokenizer(string, delimiter, false);
+	StringBuilder sb = new StringBuilder(128);
+	String separator = "";
+	while (tk.hasMoreTokens()) {
+	    String entry  = tk.nextToken();
+	    String[] pair = entry.split("=");
+	    String key = URLDecoder.decode(pair[0], charset);
+	    String value = (pair.length == 2)?
+		URLDecoder.decode(pair[1], charset): null;
+	    if (map2.containsKey(key)) {
+		ArrayList<String> list = map2.get(key);
+		list.add(value);
+	    } else {
+		ArrayList<String> list = new ArrayList<>();
+		list.add(value);
+		map2.put(key, list);
+	    }
+	}
+	for (Map.Entry<String,ArrayList<String>> entry: map2.entrySet()) {
+	    ArrayList<String> list = entry.getValue();
+	    String[] slist = new String[list.size()];
+	    map.put(entry.getKey(), list.toArray(slist));
+	}
+	return map;
+    }
+
+    /**
      * Read an input stream containing application/x-www-form-encoded
      * data, given a default charset (UTF-8) and an ampersand as the separator
-     * between keyword-value pairs, and create a keyword-value map.
+     * between keyword-value pairs, and create a keyword-value map, supporting
+     * a single value per key.
      * The map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param is the input stream
@@ -246,8 +337,27 @@ public class WebDecoder {
 
     /**
      * Read an input stream containing application/x-www-form-encoded
-     * data, given a default charset (UTF-8), and create a keyword-value map.
+     * data, given a default charset (UTF-8) and an ampersand as the separator
+     * between keyword-value pairs, and create a keyword-value map, supporting
+     * multiple values per key.
      * The map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument.
+     * @param is the input stream
+     * @return a the map of keyword-value pairs (both elements are strings)
+     * @exception IOException an IO error occurred, including syntax errors
+     *            in the input stream
+     */
+    public static Map<String,String[]> formDecodeMV(InputStream is)
+	throws IllegalArgumentException, IOException
+    {
+	return formDecodeMV(is, false, UTF8);
+    }
+
+    /**
+     * Read an input stream containing application/x-www-form-encoded
+     * data, given a default charset (UTF-8), and create a
+     * keyword-value map, supporting a single value per key.  The
+     * map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param is the input stream
      * @param semicolonDelimiter true if the delimiter should be a semicolon
@@ -263,10 +373,31 @@ public class WebDecoder {
 	return formDecode(is, semicolonDelimiter, UTF8);
     }
 
+    /**
+     * Read an input stream containing application/x-www-form-encoded
+     * data, given a default charset (UTF-8), and create a
+     * keyword-value map, supporting multiple values per key.  The
+     * map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument.
+     * @param is the input stream
+     * @param semicolonDelimiter true if the delimiter should be a semicolon
+     *        (";") rather than an ampersand ("&amp;").
+     * @return a the map of keyword-value pairs (both elements are strings)
+     * @exception IOException an IO error occurred, including syntax errors
+     *            in the input stream
+     */
+    public static Map<String,String[]> formDecodeMV(InputStream is,
+						boolean semicolonDelimiter)
+	throws IllegalArgumentException, IOException
+    {
+	return formDecodeMV(is, semicolonDelimiter, UTF8);
+    }
+
 
     /**
      * Read an input stream containing application/x-www-form-encoded
-     * data, given a charset, and create a keyword-value map.
+     * data, given a charset, and create a keyword-value map,
+     * supporting a single value per key.
      * The map's iterator will provide entries in the same order as the
      * keyword-value pairs in the argument.
      * @param is the input stream
@@ -285,13 +416,41 @@ public class WebDecoder {
 	BufferedReader r = new BufferedReader(new InputStreamReader(is,
 								    charset));
 	try {
-	return formDecode(r.readLine(), semicolonDelimiter, charset);
+	    return formDecode(r.readLine(), semicolonDelimiter, charset);
 	} catch (IllegalArgumentException e) {
 	    String msg = errorMsg("badFormEncoding");
 	    throw new IOException(msg, e);
 	}
     }
 
+    /**
+     * Read an input stream containing application/x-www-form-encoded
+     * data, given a charset, and create a keyword-value map, supporting
+     * multiple values per key.
+     * The map's iterator will provide entries in the same order as the
+     * keyword-value pairs in the argument.
+     * @param is the input stream
+     * @param semicolonDelimiter true if the delimiter should be a semicolon
+     *        (";") rather than an ampersand ("&amp;").
+     * @param charset the Charset used when the keyword-value pairs was encoded
+     * @return a the map of keyword-value pairs (both elements are strings)
+     * @exception IOException an IO error occurred, including syntax errors
+     *            in the input stream
+     */
+    public static Map<String,String[]> formDecodeMV(InputStream is,
+						    boolean semicolonDelimiter,
+						    Charset charset)
+	throws IllegalArgumentException, IOException
+    {
+	BufferedReader r = new BufferedReader(new InputStreamReader(is,
+								    charset));
+	try {
+	    return formDecodeMV(r.readLine(), semicolonDelimiter, charset);
+	} catch (IllegalArgumentException e) {
+	    String msg = errorMsg("badFormEncoding");
+	    throw new IOException(msg, e);
+	}
+    }
 }
 
 //  LocalWords:  Javascript lt IllegalArgumentException endingAmp UTF

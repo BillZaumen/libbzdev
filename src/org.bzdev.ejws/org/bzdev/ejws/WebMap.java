@@ -4,6 +4,7 @@ import org.bzdev.net.HttpMethod;
 import org.bzdev.net.HttpServerRequest;
 import org.bzdev.net.HttpServerResponse;
 import org.bzdev.net.ServerCookie;
+import org.bzdev.net.WebDecoder;
 import org.bzdev.util.CollectionScanner;
 import org.bzdev.util.EncapsulatingIterator;
 import org.bzdev.util.TemplateProcessor;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.regex.*;
 import java.util.zip.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.security.*;
 import com.sun.net.httpserver.*;
 import javax.imageio.ImageIO;
@@ -588,6 +590,14 @@ abstract public class WebMap {
 	    return (exchange instanceof HttpsExchange);
 	}
 
+	Map<String,String[]> parameterMap = null;
+
+	@Override
+	public Map<String,String[]> getParameterMap() {
+	    return (parameterMap == null)? Collections.emptyMap():
+		Collections.unmodifiableMap(parameterMap);
+	}
+
 	RequestInfo(HttpExchange exch)
 	{
 	    exchange = exch;
@@ -689,6 +699,39 @@ abstract public class WebMap {
 		    contentLengthLong = -1;
 		}
 	    }
+
+	    if (method == HttpMethod.GET || method == HttpMethod.POST) {
+		if (method == HttpMethod.GET) {
+		    String qstr = getQueryString();
+		    parameterMap = WebDecoder.formDecodeMV(qstr, false,
+							   Charset
+							   .forName("UTF-8"));
+		} else if (method == HttpMethod.POST) {
+		    if (getMediaType()
+			.equals("application/x-www-form-urlencoded")) {
+			int len = (contentLengthLong > Integer.MAX_VALUE)? -1:
+			    contentLength;
+			if (len != 0) {
+			    ByteArrayOutputStream baos =
+				new ByteArrayOutputStream((len == -1)? 4096:
+							  len);
+			    try {
+				is.transferTo(baos);
+				String qstr =
+				    baos.toString(getCharacterEncoding());
+				is = new
+				    ByteArrayInputStream(baos.toByteArray());
+				parameterMap =
+				    WebDecoder.formDecodeMV(qstr, false,
+							    Charset
+							    .forName("UTF-8"));
+			    } catch(IOException eio) {
+			    }
+			}
+		    }
+		}
+	    }
+
 	    values = headers.get("Accept-Language");
 	    if (values != null && values.size() == 1) {
 		List<Map<String,String>> list =

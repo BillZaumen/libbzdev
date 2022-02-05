@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.util.Locale;
 import java.text.DateFormat;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import org.bzdev.util.IteratorEnumeration;
 
 //@exbundle org.bzdev.net.lpack.Net
 
@@ -170,6 +174,95 @@ public interface HttpServerRequest {
      * Return the query string
      */
     String getQueryString();
+
+    /**
+     * Returns a java.util.Map of the parameters of this request.
+     * Request parameters are extra information sent with the request.
+     * For HTTP, parameters are contained in a URL's query string
+     * or posted form data.
+     * <P>
+     * @return an immutable java.util.Map containing parameter names
+     *         as keys and parameter values as map values.
+     */
+    Map<String,String[]> getParameterMap();
+
+    /**
+     * Returns the value of a request parameter as a String, or null
+     * if the parameter does not exist.
+     * Request parameters are extra information sent with the
+     * request. For HTTP requests, parameters are contained in the
+     * query string or posted form data.
+     * <P>
+     * Users should only use this method when sure that the parameter
+     * has only one value. If the parameter might have more than one
+     * value, use getParameterValues(java.lang.String).  When used
+     * with a multivalued parameter, the value returned is equal to
+     * the first value in the array returned by getParameterValues.
+     * <P>
+     * When used with a servlet, if the parameter data was sent in the
+     * request body, such as occurs with an HTTP POST request, then
+     * reading the body directly via getEncodedInputStream or
+     * getDecodedInputStream() can interfere with the execution of
+     * this method.
+     * @param name the name of the parameter
+     * @return the value of the parameter; null if there is none
+     */
+    default String getParameter(String name) {
+	String[] values = getParameterMap().get(name);
+	   return (values == null)? null: values[0];
+    }
+
+    /**
+     * Returns an array of String objects containing all of the values
+     * the given request parameter has, or null if the parameter does
+     * not exist.
+     * <P>
+     * When used with a servlet, if the parameter data was sent in the
+     * request body, such as occurs with an HTTP POST request, then
+     * reading the body directly via getEncodedInputStream or
+     * getDecodedInputStream() can interfere with the execution of
+     * this method.
+     * @param name the name of the parameter
+     * @return the values of the parameter
+     */
+    default String[] getParameterValues(String name) {
+	return getParameterMap().get(name);
+    }
+
+    /**
+     * Returns an Enumeration of String objects containing the names
+     * of the parameters contained in this request.
+     * If the request has no parameters, the method returns an
+     * empty Enumeration.
+     * <P>
+     * When used with a servlet, if the parameter data was sent in the
+     * request body, such as occurs with an HTTP POST request, then
+     * reading the body directly via getEncodedInputStream or
+     * getDecodedInputStream() can interfere with the execution of
+     * this method.
+     * @return an enumeration of parameter names
+     */
+    default Enumeration<String> getParameterNames() {
+	return new IteratorEnumeration(getParameterMap().keySet().iterator());
+    }
+
+    /**
+     * Returns a set of String objects containing the names
+     * of the parameters contained in this request.
+     * If the request has no parameters, the method returns an
+     * empty set. This method is provided as a convenience:
+     * unlike enumerations, sets can be used in 'for' loops.
+     * <P>
+     * When used with a servlet, if the parameter data was sent in the
+     * request body, such as occurs with an HTTP POST request, then
+     * reading the body directly via getEncodedInputStream or
+     * getDecodedInputStream() can interfere with the execution of
+     * this method.
+     * @return a set of parameter names
+     */
+    default Set<String> getParameterNameSet() {
+	return Collections.unmodifiableSet(getParameterMap().keySet());
+    }
 
     /**
      * Get the Principal for the user authenticating this request.

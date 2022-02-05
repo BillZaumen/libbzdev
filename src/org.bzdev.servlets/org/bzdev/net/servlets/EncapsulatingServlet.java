@@ -285,6 +285,12 @@ public abstract class EncapsulatingServlet extends HttpServlet {
 		return req.getContentLengthLong();
 	    }
 
+	    @Override
+	    public Map<String,String[]> getParameterMap() {
+		return req.getParameterMap();
+	    }
+
+
 	    boolean usedInputStream  = false;
 
 	    @Override

@@ -30,20 +30,18 @@ public class Adapter implements ServletAdapter {
 	    OutputStreamGraphics.newInstance(os, 600, 800, "svg");
 	Graph graph = new Graph (osg);
 	graph.setOffsets(50, 75, 75, 30);
-	String query = req.getQueryString();
+	// String query = req.getQueryString();
 	// System.out.println("query = " + query);
 	try {
-	    if (query == null) throw new Exception("no query");
-	    Map<String,String> qmap = WebDecoder.formDecode(query);
-	    int xmax = Integer.parseInt(qmap.get("XMax"));
-	    double ymax = Double.parseDouble(qmap.get("YMax"));
-	    double N = Double.parseDouble(qmap.get("N"));
-	    double n0 = Double.parseDouble(qmap.get("N0"));
-	    double ne0 = Double.parseDouble(qmap.get("NE0"));
-	    double ni0 = Double.parseDouble(qmap.get("NI0"));
-	    double R0 = Double.parseDouble(qmap.get("R0"));
-	    double tauE = Double.parseDouble(qmap.get("TAU_E"));
-	    double tauI = Double.parseDouble(qmap.get("TAU_I"));
+	    int xmax = Integer.parseInt(req.getParameter("XMax"));
+	    double ymax = Double.parseDouble(req.getParameter("YMax"));
+	    double N = Double.parseDouble(req.getParameter("N"));
+	    double n0 = Double.parseDouble(req.getParameter("N0"));
+	    double ne0 = Double.parseDouble(req.getParameter("NE0"));
+	    double ni0 = Double.parseDouble(req.getParameter("NI0"));
+	    double R0 = Double.parseDouble(req.getParameter("R0"));
+	    double tauE = Double.parseDouble(req.getParameter("TAU_E"));
+	    double tauI = Double.parseDouble(req.getParameter("TAU_I"));
 	    double nt = ne0 + ni0;
 	    if (n0 < nt) n0 = nt;
 	    
