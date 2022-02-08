@@ -87,7 +87,7 @@ public class EjwsSession {
     /**
      * Get the maximum time interval over which a session can be
      * inactive
-     * @return the time interval in seconds
+     * @return the time interval in seconds; 0 if no limit
      */
     public int getMaxInactiveInterval() {
 	return maxInactiveInterval;
@@ -116,15 +116,14 @@ public class EjwsSession {
 	return isNewID;
     }
 
-
     // used by WebMap.RequestInfo.changeSessionID()
     String changeSessionID() {
 	synchronized(manager) {
 	    try {
+		String oldID = id;
 		String nextid = newID();
 		id = nextid;
-		manager.map.remove(id);
-		manager.map.put(nextid, this);
+		manager.changeSessionID(this, oldID, nextid);
 		return nextid;
 	    } catch (NoSuchAlgorithmException e) {
 		throw new UnexpectedExceptionError(e);

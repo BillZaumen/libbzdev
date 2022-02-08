@@ -34,6 +34,14 @@ import org.bzdev.net.HttpMethod;
  * whose manifest does not contain an AUTOMATIC-MODULE-NAME declaration,
  * the file name must be servlet-api.jar.  This of course is subject to
  * change.
+ * <P>
+ * ServletAdapter states are handled internally by setting and getting
+ * a session attribute named "state", so the attribute name "state" should
+ * be treated a reserved name.  Servlet adapters use a subset of the
+ * servlet API.  If more of the API is needed (e.g., for logins),
+ * methods such as
+ * {@link EncapsulatingServlet#doPost(HttpServletRequest,HttpServletResponse)}
+ * should be overridden to add additional functionality.
  */
 public abstract class EncapsulatingServlet extends HttpServlet {
 
@@ -221,11 +229,27 @@ public abstract class EncapsulatingServlet extends HttpServlet {
 
 	    @Override
 	    public String getRequestedSessionID() {
-		return req.getRequestedSessionId();
+		// return req.getRequestedSessionId();
+		// Servelet Adapters are assumed to always have
+		// a session unless the server cannot create one
+		// (which is not the case for a servlet)
+		return req.getSession(true).getId();
+	    }
+
+	    @Override
+	    public void setSessionState(Object state)
+		throws IllegalStateException
+	    {
+		req.getSession(true).setAttribute("state", state);
+	    }
+
+	    public Object getSessionState() {
+		return req.getSession(true).getAttribute("state");
 	    }
 
 	    @Override
 	    public String changeSessionID() throws IllegalStateException {
+		req.getSession(true);
 		return req.changeSessionId();
 	    }
 
@@ -444,7 +468,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      *        be handled.
      */
     @Override
-    protected final void
+    protected void
 	doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException
     {
@@ -472,7 +496,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      *        be handled.
      */
     @Override
-    protected final void
+    protected void
 	doPost(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException
     {
@@ -499,7 +523,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      *        be handled.
      */
     @Override
-    protected final void
+    protected void
 	doPut(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException
     {
@@ -527,7 +551,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      *        be handled.
      */
     @Override
-    protected final void
+    protected void
 	doDelete(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException
     {
@@ -552,7 +576,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      * @exception ServletException if the initialization fails.
      */
     @Override
-    public final void init() throws ServletException {
+    public void init() throws ServletException {
 	ServletConfig config = getServletConfig();
 	if (config == null) return;
 	Map<String,String> map = new LinkedHashMap<String,String>();

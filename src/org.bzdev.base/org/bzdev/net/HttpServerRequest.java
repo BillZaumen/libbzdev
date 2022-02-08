@@ -20,7 +20,39 @@ class HttpServerRequestConstants {
 }
 
 /**
- *  Servlet-compatibility interface for HTTP requests    .
+ * Servlet-compatibility interface for HTTP requests.
+ * This interface is used by {@link ServletAdapter} for arguments
+ * of the methods
+ * {@link ServletAdapter#doGet(HttpServerRequest,HttpServerResponse)},
+ * {@link ServletAdapter#doPost(HttpServerRequest,HttpServerResponse)},
+ * {@link ServletAdapter#doPut(HttpServerRequest,HttpServerResponse)}, and
+ * {@link ServletAdapter#doDelete(HttpServerRequest,HttpServerResponse)}.
+ * {@link HttpServerRequest} is modeled after
+ * {@link javax.servlet.http.HttpServletRequest}, but with several
+ * differences.  In particular,
+ * <UL>
+ *  <LI> There is no "authenticate" or "getAuthType" method.
+ *  <LI> There are no "login" or "logout" methods.
+ *  <LI> There is no "getHttpServletMapping" method.
+ *  <LI> The "getPart" and "getParts" methods are not implemented:
+ *       one can use {@link FormDataIterator} instead.
+ *  <LI> The "getRemoteUser" method is missing (a logged-in user
+ *       can be found using {@link HttpServerRequest#getUserPrincipal()}).
+ *  <LI> The "getSession" method is not implemented, athough
+ *       {@link HttpServerRequest#getRequestedSessionID()},
+ *       {@link HttpServerRequest#isRequestedSessionIDValid()}, and
+ *       {@link HttpServerRequest#changeSessionID()} are implemented.
+ *       When {@link org.bzdev.ejws.EmbeddedWebServer} is used, sessions are
+ *       created by calling the method
+ *       {@link org.bzdev.ejws.EmbeddedWebServer#addSessionFilter(String,HttpSessionOps)},
+ *       and as a result, HttpServerRequest#isRequestedSessionIDValid()}
+ *       will always return true. It may return false, however, when
+ *       this method is used with other servers.
+ * </UL>
+ *
+ * @see HttpServerResponse
+ * @see javax.servlet.http.HttpServletRequest
+ * @see javax.servlet.http.HttpServletResponse
  */
 
 public interface HttpServerRequest {
@@ -285,6 +317,20 @@ public interface HttpServerRequest {
      * @exception IllegalStateException a session does not exist
      */
     String changeSessionID() throws IllegalStateException;
+
+    /**
+     * Set the current session's state.
+     * @param state the session state
+     * @exception IllegalStateException the session does not exist
+     */
+    void setSessionState(Object state) throws IllegalStateException;
+
+    /**
+     * Get the current session state.
+     * @return the session state; null if one does not exist.
+     */
+    Object getSessionState();
+
 
     /**
      * Get the maximum inactive interval for this request's session.

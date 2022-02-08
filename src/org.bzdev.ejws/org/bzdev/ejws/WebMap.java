@@ -1,6 +1,7 @@
 package org.bzdev.ejws;
 import org.bzdev.net.HeaderOps;
 import org.bzdev.net.HttpMethod;
+import org.bzdev.net.HttpSessionOps;
 import org.bzdev.net.HttpServerRequest;
 import org.bzdev.net.HttpServerResponse;
 import org.bzdev.net.ServerCookie;
@@ -361,11 +362,15 @@ abstract public class WebMap {
 
 	@Override
 	public String getRequestedSessionID()  {
+	    if (sessionIDSet) {
+		return sessionID;
+	    }
 	    EjwsSession session = (EjwsSession)
 		exchange.getAttribute("org.bzdev.ejws.session");
 	    if (session != null) {
 		sessionIDSet = true;
-		return session.getID();
+		sessionID = session.getID();
+		return sessionID;
 	    }
 	    return null;
 	}
@@ -376,9 +381,46 @@ abstract public class WebMap {
 	    EjwsSession session = (EjwsSession)
 		exchange.getAttribute("org.bzdev.ejws.session");
 	    if (session != null) {
-		return session.changeSessionID();
+		sessionID = session.changeSessionID();
+		sessionIDSet = true;
+		return sessionID;
 	    } else {
 		throw new IllegalStateException(errorMsg("noSession"));
+	    }
+	}
+
+	@Override
+	public void setSessionState(Object state)
+	    throws IllegalStateException
+	{
+	    EjwsSession session = (EjwsSession)
+		exchange.getAttribute("org.bzdev.ejws.session");
+	    if (session != null) {
+		sessionID = session.getID();
+		HttpSessionOps ops = session.manager.sessionOps;
+		if (ops == null) {
+		    throw new IllegalStateException(errorMsg("noSession"));
+		} else {
+		    ops.put(sessionID, state);
+		}
+	    } else {
+		throw new IllegalStateException(errorMsg("noSession"));
+	    }
+	}
+
+	@Override
+	public Object getSessionState() {
+	    EjwsSession session = (EjwsSession)
+		exchange.getAttribute("org.bzdev.ejws.session");
+	    if (session == null) {
+		return null;
+	    } else {
+		HttpSessionOps ops = session.manager.sessionOps;
+		if (ops == null) {
+		    return null;
+		} else {
+		    return ops.get(session.getID());
+		}
 	    }
 	}
 

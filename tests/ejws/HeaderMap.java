@@ -30,8 +30,11 @@ public class HeaderMap extends WebMap {
 	throws IOException, EjwsException
     {
 	String sid = requestInfo.getRequestedSessionID();
-	if (!sessionOps.contains(sid)) {
-	    sessionOps.add(sid);
+	if (sid != null && requestInfo.getSessionState() == null) {
+	    requestInfo.setSessionState(sid);
+	    requestInfo.setMaxInactiveInterval(60);
+	} else {
+	    System.out.println("state = " + requestInfo.getSessionState());
 	}
 	Enumeration<String> hn = requestInfo.getHeaderNames();
 	while (hn.hasMoreElements()) {

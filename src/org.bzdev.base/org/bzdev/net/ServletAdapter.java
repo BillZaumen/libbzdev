@@ -11,7 +11,15 @@ import java.io.IOException;
  * written for an embedded web server (EJWS) and then moved easily to
  * a different web server that supports servlets.
  * <P>
- * The class {@link org.bzdev.ejws.EmbeddedWebServer} automatically
+ * The methods that {@link ServletAdapter} provides are modeled after
+ * the methods provided by {@link javax.servlet.http.HttpServlet},
+ * with {@link HttpServerRequest} replacing
+ * {@link javax.servlet.http.HttpServletRequest} and
+ * {@link HttpServerResponse} replacing
+ * {@link javax.servlet.http.HttpServletResponse}.  {@link ServletAdapter}
+ * implements a subset of the methods that
+ * {@link javax.servlet.http.HttpServlet} provides:
+ * the class {@link org.bzdev.ejws.EmbeddedWebServer} automatically
  * handles the HTTP TRACE method, and the
  * {@link org.bzdev.ejws.FileHandler} class handles the HTTP OPTIONS
  * method. The {@link org.bzdev.ejws.WebMap.Info} class, which implements
@@ -22,11 +30,14 @@ import java.io.IOException;
  * {@link ServletAdapter#doGet(HttpServerRequest,HttpServerResponse)} is
  * both idempotent and safe.
  * <P>
- * For servlets, A servlet will typically be initialized by providing
- * it with an instance of {@link ServletAdapter}. The
- * {@linkHttpServerRequest} and {@link HttpServerResponse} arguments
- * can be easily constructed from a servlet's HttpServletRequest and
- * HttpServletResonse arguments respectively.
+ * For servlets, one can either port an implementation
+ * of {@link ServletAdapter}, or one can use the class
+ * {@link org.bzdev.net.servlets.EncapsulatingServlet} to create a servlet's
+ * whose behavior is that provided by a {@link ServletAdapter}.
+ * @see org.bzdev.net.HttpServerRequest
+ * @see org.bzdev.net.HttpServerResponse
+ * @see org.bzdev.net.servlets.EncapsulatingServlet
+ * @see javax.servlet.http.HttpServlet
  */
 public interface ServletAdapter {
 

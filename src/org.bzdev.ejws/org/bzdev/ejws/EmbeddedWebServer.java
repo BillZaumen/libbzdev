@@ -597,9 +597,12 @@ public class EmbeddedWebServer {
 
     /**
      * Add a session manager for a path.
+     * A session implementation is an application-specific object
+     * associated with a session, typically used to maintain the state
+     * of a session.
      * @param path a path that has been added to this server
      * @param sessionOps the object that maps a session ID to
-     *        session implementations
+     *        session implementations; null if no mapping is desired
      */
     public boolean addSessionFilter(String path, HttpSessionOps sessionOps)  {
 	PrefixData data = prefixMap.get(path);

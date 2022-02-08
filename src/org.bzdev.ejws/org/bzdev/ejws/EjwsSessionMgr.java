@@ -15,7 +15,7 @@ import org.bzdev.net.HttpSessionOps;
 
 class EjwsSessionMgr extends Filter {
  
-   HttpSessionOps<?> sessionOps = null;
+   HttpSessionOps sessionOps = null;
 
     static final String JSESSIONID = "Jsessionid";
 
@@ -46,8 +46,9 @@ class EjwsSessionMgr extends Filter {
 	    Iterator<EjwsSession> it = set.iterator();
 	    while (it.hasNext()) {
 		EjwsSession session = it.next();
-		if ((session.lastAccessedTime
-		     + session.maxInactiveInterval*1000L)
+		if (session.maxInactiveInterval > 0 &&
+		     (session.lastAccessedTime
+		      + session.maxInactiveInterval*1000L)
 		    < currentTime) {
 		    String sid = session.getID();
 		    it.remove();
@@ -72,12 +73,31 @@ class EjwsSessionMgr extends Filter {
 		synchronized(this) {
 		    session = map.get(sid);
 		    if (session != null) {
+			// set is sorted by lastAccessedTime
+			// so we have to remove it and then reset
+			// it.
 			set.remove(session);
 			session.lastAccessedTime = currentTime;
 			session.isNewID = false;
 			set.add(session);
 		    } else {
 			session = new EjwsSession(this);
+			/*
+			if (sessionOps != null) {
+			    sessionOps.add(sid);
+			}
+			*/
+			sid = session.getID();
+			if (!map.containsKey(sid)) {
+			    map.put(sid, session);
+			    set.add(session);
+			} else {
+			    while (map.containsKey(sid)) {
+				session = new EjwsSession(this);
+			    }
+			    map.put(sid, session);
+			    set.add(session);
+			}
 		    }
 		}
 		exchange.setAttribute("org.bzdev.ejws.session", session);
@@ -88,10 +108,20 @@ class EjwsSessionMgr extends Filter {
 	EjwsSession s;
 	synchronized(this) {
 	    s = new EjwsSession(this);
+	    set.add(s);
 	}
         exchange.setAttribute("org.bzdev.ejws.session", s);
 	chain.doFilter(exchange);
 	return;
+    }
+
+    synchronized void changeSessionID(EjwsSession session, String oldID,
+				      String newID) {
+	map.remove(oldID);
+	map.put(newID, session);
+	if (sessionOps != null) {
+	    sessionOps.rename(oldID, newID);
+	}
     }
 }
 

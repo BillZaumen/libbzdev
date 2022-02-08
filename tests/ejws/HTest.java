@@ -5,36 +5,24 @@ import org.bzdev.net.HttpSessionOps;
 import org.bzdev.util.ErrorMessage;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 
 public class HTest {
     public static void main(String argv[]) throws Exception {
 	ErrorMessage.setStackTrace(true);
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
 
-	HttpSessionOps<String> sessionOps = new HttpSessionOps() {
-		Set<String> set = new HashSet();
+	HttpSessionOps sessionOps = new EjwsStateTable() {
 		@Override
 		public void remove(String sid) {
+		    super.remove(sid);
 		    System.out.println("removing " + sid);
-		    set.remove(sid);
-		}
-
-		@Override
-		public boolean contains(String sid) {
-		    return set.contains(sid);
-		}
-		
-		@Override
-		public void add(String sid) {
-		    System.out.println("adding " + sid);
-		    set.add(sid);
 		}
 		@Override
-		public String get(String sid) {
-		    return (set.contains(sid)? sid: null);
+		public void put(String sid, Object obj) {
+		    super.put(sid, obj);
+		    System.out.println("adding " + sid + ", value = " + obj);
 		}
 	    };
 

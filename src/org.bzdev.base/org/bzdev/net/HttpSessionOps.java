@@ -11,12 +11,13 @@ package org.bzdev.net;
  * must be called to install an instance of this class and that method
  * will pass its {@link HttpSessionOps} to
  * {@link org.bzdev.ejws.EjwsSession}'s constructor. Application-specific
- * code will typically have reference to this class but will just use the
+ * code will typically have a reference to this class but will just use the
  * {@link HttpSessionOps#contains(String)} or
- * {@link HttpSessionOps#get(String)} methods.
+ * {@link HttpSessionOps#get(String)} methods, the latter providing an
+ * object represents the state of a session.
  * @see org.bzdev.ejws.EjwsSession
  */
-public interface HttpSessionOps<T> {
+public interface HttpSessionOps {
 
     /**
      * Remove a session ID from this object.
@@ -26,9 +27,23 @@ public interface HttpSessionOps<T> {
 
     /**
      * Add a session ID to this object.
+     * This method is responsible for creating a new session
+     * implementation, but must not change an existing one.
+     * If the session ID already exists, nothing is added or removed.
      * @param sid the session ID
+     * @param state an object representing the state of a session
      */
-    void add(String sid);
+    void put(String sid,Object state);
+
+    /**
+     * Rename a session implementation by changing the session ID
+     * referencing it.
+     * @param oldID the existing sessionID
+     * @param newID the new sessionID
+     * @exception IllegalStateException oldID was not already added or
+     *            newID was already added
+     */
+    void rename(String oldID, String newID) throws IllegalStateException;
 
     /**
      * Determine if this object recognizes a session ID.
@@ -39,11 +54,9 @@ public interface HttpSessionOps<T> {
 
     /**
      * Get the session implementation associated with a session ID.
-     * This method should create a new session implementation if
-     * necessary.
      * @param sid the session ID
      */
-    T get(String sid);
+   Object get(String sid);
 }
 
 //  LocalWords:  sid

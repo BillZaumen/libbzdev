@@ -580,8 +580,6 @@ public class FileHandler implements HttpHandler {
 	}
 	if (session != null) {
 	    // the caller has not explicitly set the jsessionid cookie
-	    System.out.println("session.getID() = \"" + session.getID()
-			       + "\"");
 	    ServerCookie cookie =
 		ServerCookie.newInstance("jsessionid",
 					 session.getID());
@@ -597,7 +595,6 @@ public class FileHandler implements HttpHandler {
 	    if (indv6e > 0 && host.charAt(0) == '[') {
 		host = host.substring(1, indv6e);
 	    }
-	    System.out.println(host);
 	    cookie.setDomain(host);
 	    cookie.addToHeaders(headerops);
 	}
