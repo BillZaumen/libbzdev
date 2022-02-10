@@ -1460,6 +1460,8 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link file:///usr/share/doc/openjdk-$(JAVA_VERSION)-doc/api \
+		-link \
+		https://jakarta.ee/specifications/servlet/4.0/apidocs/ \
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
 		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -E -v -e '^Generating' \
@@ -1479,12 +1481,15 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	mkdir -p $(JROOT_ALT_JAVADOCS)
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
 		|| echo --main-stylesheet stylesheet.css`; \
-	javadoc -d $(JROOT_ALT_JAVADOCS) --module-path BUILD \
+	javadoc -d $(JROOT_ALT_JAVADOCS) \
+		--module-path BUILD$(SERVLETS_BUILD_PATH) \
 		$$styleoption \
 		--module-source-path src:tmpsrc \
 		--add-modules $(JDOC_MODULES) \
 		-link \
 	   https://docs.oracle.com/en/java/javase/$(JAVA_VERSION)/docs/api/ \
+		-link \
+		https://jakarta.ee/specifications/servlet/4.0/apidocs/ \
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
 		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -v javax\\.servlet\\.http
