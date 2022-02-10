@@ -319,9 +319,9 @@ abstract public class WebMap {
      * Note: the constructor is visible only in this package.
      * It is used by FileHandler. This class implements the interface
      * HttpServerRequest because that interface was designed to be
-     * easily implemented given the a serlet request. This design
-     * decision was made to faclitate migrating code written for an
-     * EJWS server to a web server that supports servlets.
+     * easily implemented by a servlet. This design
+     * decision was made to facilitate migrating code written for an
+     * EJWS server to a web server that supports servlet.
      */
     public static class RequestInfo implements HttpServerRequest {
 	HttpExchange exchange;
@@ -517,7 +517,7 @@ abstract public class WebMap {
 	 * by preference, highest preference first.
 	 * <P>
 	 * Note: an enumeration is returned instead of an iterator for
-	 * compatibilty with the Servlet specification.
+	 * compatibility with the servlet specification.
 	 * @return an enumeration for these locales
 	 */
 	@Override
@@ -2246,7 +2246,7 @@ abstract public class WebMap {
      * WEB-INF/web.xml file exists, a WebxmlParser will be created and
      * called by a FileHandler's constructor.
      * @param pattern a URL pattern for the path component of a URL as
-     *         described in the Servlet specification
+     *         described in the servlet specification
      * @param encoding the character encoding to use
      * @param isxml true if the JSP page produces an XML document; false
      *        for an HTML document
@@ -2278,7 +2278,7 @@ abstract public class WebMap {
     /**
      * Add page encoding data for JSP pages given a list of patterns.
      * @param patterns a list of URL patterns for the path component of a URL as
-     *         described in the Servlet specification
+     *         described in the servlet specification
      * @param encoding the character encoding to use
      * @param isxml true if the JSP page produces an XML document; false
      *        for an HTML document
@@ -2440,7 +2440,7 @@ abstract public class WebMap {
 //  LocalWords:  webInfHidden request's setWebInfHidden uri toString
 //  LocalWords:  subdirectories getScheme getAuthority WebxmlParser
 //  LocalWords:  FileHandler's mtype getName addErrorException emap
-//  LocalWords:  Servlet isxml urlString Subclasses RequestInfo xsl
+//  LocalWords:  servlet isxml urlString Subclasses RequestInfo xsl
 //  LocalWords:  setMethods HttpMethod setAllowsQuery xslt gzip rinfo
 //  LocalWords:  getDecodedInputStream ByteArrayBuffer IOException os
 //  LocalWords:  getEncodedInputStream InputStream setEncoding ejws
@@ -2448,4 +2448,13 @@ abstract public class WebMap {
 //  LocalWords:  subclasses IllegalStateException notExchange http
 //  LocalWords:  requestInfo https ClassLoader iterable octetstream
 //  LocalWords:  getSystemResourceAsStream sendResponseHeaders len
-//  LocalWords:  copyStream OutputStream baos
+//  LocalWords:  copyStream OutputStream baos HttpServerRequest UTF
+//  LocalWords:  noSession headerops HeaderOps getFirst containsKey
+//  LocalWords:  containsValue entrySet hashCode isEmpty keySet www
+//  LocalWords:  putAll urlencoded addHeader HttpServerResponse getID
+//  LocalWords:  getEncoded getEncoding EjwsSession getAttribute
+//  LocalWords:  parseAll equalsIgnoreCase jsessionid ServerCookie
+//  LocalWords:  newInstance setVersion setHttpOnly getServer URL's
+//  LocalWords:  getAddress getHostString addToHeaders OurHeaderOps
+//  LocalWords:  handledResponse deconfigure EmbeddedWebServer
+//  LocalWords:  isConfigured

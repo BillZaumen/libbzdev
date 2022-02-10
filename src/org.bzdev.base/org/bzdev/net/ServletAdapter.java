@@ -34,6 +34,46 @@ import java.io.IOException;
  * of {@link ServletAdapter}, or one can use the class
  * {@link org.bzdev.net.servlets.EncapsulatingServlet} to create a servlet's
  * whose behavior is that provided by a {@link ServletAdapter}.
+ * <P>
+ * Porting a servlet adapter to create a servlet requires the following
+ * changes (this is not an exhaustive list):
+ * <UL>
+ *  <LI> {@link ServletAdapter} should be replaced by
+ *       {@link javax.servlet.http.HttpServlet}.
+ *  <LI> {@link HttpServerRequest} should be replaced by
+ *       {@link javax.servlet.http.HttpServletRequest}.
+ *  <LI> {@link HttpServerResponse} should be replaced by
+ *       {@link javax.servlet.http.HttpServletResponse}.
+ *  <LI> {@link HttpServerResponse#sendResponseHeaders(int,long)} should
+ *       be replaced with
+ *       {@link javax.servlet.http.HttpServletResponse#setStatus(int)} and
+ *       either
+ *       {@link javax.servlet.http.HttpServletResponse#setContentLength(int)}
+ *       or
+ *       {@link javax.servlet.http.HttpServletResponse#setContentLengthLong(long)}.
+ *  <LI> {@link HttpServerRequest#getMediaType()} should be replaced with
+ *       a method call.  A suitable method is:
+ *       <BLOCKQUOTE><CODE><PRE>
+ *         private String getMediaType(HttpServletRequest req) {
+ *	      String mediaType = req.getHeader("content-type").trim();
+ *	      if (mediaType == null) return "application/octet-stream";
+ *	      int firstsc = mediaType.indexOf(';');
+ *	      if (firstsc == -1) {
+ *	         return mediaType;
+ *	      } else {
+ *	         return mediaType.substring(0, firstsc).trim();
+ *	     }
+ *         }
+ *       </PRE></CODE></BLOCKQUOTE>
+ * </UL>
+ * Porting a servlet adapter, rather then using
+ * {@link org.bzdev.net.servlets.EncapsulatingServlet} to create a
+ * servlet from a servlet adapter, takes more effort and results in
+ * two classes to maintain instead of one.  On the other hand, porting
+ * a servlet can result in a smaller code base when an application is
+ * deployed, particularly if the servlet does not require any classes
+ * that the BZDev class library provides.
+ *
  * @see org.bzdev.net.HttpServerRequest
  * @see org.bzdev.net.HttpServerResponse
  * @see org.bzdev.net.servlets.EncapsulatingServlet
@@ -196,4 +236,6 @@ public interface ServletAdapter {
 //  LocalWords:  HttpServletRequest HttpServletResonse BLOCKQUOTE msg
 //  LocalWords:  ServletException ServeletAdapter getMessage getCause
 //  LocalWords:  init sendResponseHeaders sendRedirect sendError req
-//  LocalWords:  IOException
+//  LocalWords:  IOException setStatus setContentLength getMediaType
+//  LocalWords:  setContentLengthLong mediaType getHeader firstsc
+//  LocalWords:  indexOf substring BZDev

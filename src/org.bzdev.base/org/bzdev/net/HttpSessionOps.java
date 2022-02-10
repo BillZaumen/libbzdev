@@ -8,14 +8,13 @@ package org.bzdev.net;
  * <P>
  * For the class {@link org.bzdev.ejws.EmbeddedWebServer}, the method
  * {@link org.bzdev.ejws.EmbeddedWebServer#addSessionFilter(String,HttpSessionOps)}
- * must be called to install an instance of this class and that method
- * will pass its {@link HttpSessionOps} to
- * {@link org.bzdev.ejws.EjwsSession}'s constructor. Application-specific
- * code will typically have a reference to this class but will just use the
- * {@link HttpSessionOps#contains(String)} or
- * {@link HttpSessionOps#get(String)} methods, the latter providing an
- * object represents the state of a session.
- * @see org.bzdev.ejws.EjwsSession
+ * should be called to install a specific instance of this class.  For
+ * {@link org.bzdev.ejws.EmbeddedWebServer}, the class
+ * {@link org.bzdev.ejws.EjwsStateTable} will provide a suitable
+ * implementation of this class. The method
+ * {@link org.bzdev.ejws.EmbeddedWebServer#addSessionFilter(String,boolean)}
+ * can install {@link org.bzdev.ejws.EjwsStateTable} as a default.
+ * @see org.bzdev.ejws.EjwsStateTable
  */
 public interface HttpSessionOps {
 
@@ -59,4 +58,5 @@ public interface HttpSessionOps {
    Object get(String sid);
 }
 
-//  LocalWords:  sid
+//  LocalWords:  sid addSessionFilter HttpSessionOps boolean oldID
+//  LocalWords:  sessionID newID IllegalStateException

@@ -149,13 +149,17 @@ import org.xml.sax.SAXException;
  * bring up a browser to display the manual, using all the
  * features of a web browser, including javascript.
  * <P>
- * Warning: For HTTPS one needs a large pool size because of what appears to
- * be a bug in the openjdk-11 SSL implementation that leads to an ever
- * increasing number of connections in the TCP CLOSE-WAIT state. This happens
- * sporadically, and when it does, the number of available threads drops.
- * Until this bug is fixed, EmbeddedWebServer using HTTPS should be used only
- * for testing.  The bug does not seem to occur with HTTP, which seems to
- * rule out a bug in the ejws package.
+ * Warning: For HTTPS one needs a large pool size because of what
+ * appears to be a bug in the openjdk-11 SSL implementation that leads
+ * to an ever increasing number of connections in the TCP CLOSE-WAIT
+ * state. This happens sporadically, and when it does, the number of
+ * available threads drops.  Until this bug is fixed, the class
+ * {org.bzdev.net.CloseWaitService} can be used to remove dormant
+ * connections in the CLOSE-WAIT state. This command, however, uses
+ * the program <CODE>ss</CODE>, which appears to be available only on
+ * Linux systems. For non-Linux systems, EmbeddedWebServer using HTTPS
+ * should be used only for testing.  The bug does not seem to occur
+ * with HTTP, which seems to rule out a bug in the ejws package.
  */
 
 public class EmbeddedWebServer {
@@ -593,6 +597,7 @@ public class EmbeddedWebServer {
 	    authenticator = a;
 	}
     }
+
     HashMap<String,PrefixData> prefixMap = new HashMap<String,PrefixData>();
 
     /**
@@ -600,9 +605,66 @@ public class EmbeddedWebServer {
      * A session implementation is an application-specific object
      * associated with a session, typically used to maintain the state
      * of a session.
+     * <P>
+     * The method {@link WebMap.RequestInfo#setSessionState(Object)}, which
+     * implements
+     * {@link org.bzdev.net.HttpServerRequest#setSessionState(Object)}, can
+     * be used to set the session state. Similarly, the method
+     * {@link WebMap.RequestInfo#getSessionState()}, which implements
+     * {@link org.bzdev.net.HttpServerRequest#getSessionState()}, can be
+     * used to fetch the sessions state.
+     * <P>
+     * {@link EmbeddedWebServer} does not provide any way of
+     * deallocating resources once a state is no longer in use. The
+     * class {@link java.lang.ref.Cleaner} (the API documentation for
+     * this class includes an example) can be used to deallocate
+     * resources or to perform some other action when a session is
+     * removed.
+     * @param path a path that has been added to this server
+     * @param withState true if a session has a state; false otherwise
+     * @return true on success; false otherwise (for example, the path
+     *         had not been added to this server or the path does not
+     *         have an {@link com.sun.net.httpserver.HttpContext HttpContext})
+     */
+    public boolean addSessionFilter(String path, boolean withState)  {
+	return addSessionFilter(path, withState? new EjwsStateTable(): null);
+    }
+
+
+    /**
+     * Add a session-manager filter for a path, specifying an implementation
+     * that maps sessions to states.
+     * A session implementation is an application-specific object
+     * associated with a session, typically used to maintain the state
+     * of a session.
+     * <P>
+     * The method {@link WebMap.RequestInfo#setSessionState(Object)}, which
+     * implements
+     * {@link org.bzdev.net.HttpServerRequest#setSessionState(Object)}, can
+     * be used to set the session state. Similarly, the method
+     * {@link WebMap.RequestInfo#getSessionState()}, which implements
+     * {@link org.bzdev.net.HttpServerRequest#getSessionState()}, can be
+     * used to fetch the sessions state.
+     * <P>
+     * {@link EjwsStateTable} provides the default implementation. This
+     * implementation is suitable for most purposes. Subclassing it might
+     * be useful for debugging (e.g., to insert print statements).
+     * <P>
+     * {@link EmbeddedWebServer} does not provide any way of
+     * deallocating resources once a state is no longer in use. The
+     * class {@link java.lang.ref.Cleaner} (the API documentation for
+     * this class includes an example) can be used to deallocate
+     * resources or to perform some other action when a session is
+     * removed.
      * @param path a path that has been added to this server
      * @param sessionOps the object that maps a session ID to
      *        session implementations; null if no mapping is desired
+     * @return true on success; false otherwise (for example, the path
+     *         had not been added to this server or the path does not
+     *         have an {@link com.sun.net.httpserver.HttpContext HttpContext})
+     * @see org.bzdev.net.HttpSessionOps
+     * @see EjwsStateTable
+     * @see EmbeddedWebServer#addSessionFilter(String,boolean)
      */
     public boolean addSessionFilter(String path, HttpSessionOps sessionOps)  {
 	PrefixData data = prefixMap.get(path);
@@ -1308,15 +1370,23 @@ public class EmbeddedWebServer {
 //  LocalWords:  HttpServer HttpsServer wildcard TCP mdash WebMap JKS
 //  LocalWords:  EmbeddedWebServer's FileHandler boolean WebMap's TLS
 //  LocalWords:  BZDev subdirectory URL's serverName errout ejws SunX
-//  LocalWords:  Appendable passphrase useHTTPS SSL TSL maxThreads
+//  LocalWords:  Appendable passphrase useHTTPS SSL TSL maxThreads ss
 //  LocalWords:  maxQueueLength corePoolSize maxPoolSize maxQueueSize
 //  LocalWords:  addr idleTimeout ThreadPoolExecutor HashSet arg xml
 //  LocalWords:  prefixSet className nowebxml displayDir hideWebInf
 //  LocalWords:  IllegalArgumentException IllegalStateException https
-//  LocalWords:  IOException SAXException http clazz prepended URI
+//  LocalWords:  IOException SAXException http clazz prepended URI pw
 //  LocalWords:  serverShutdown pathAlreadyAdded containedBy nthreads
 //  LocalWords:  serverStopping setExecutor serverNotRunning Runnable
-//  LocalWords:  serverAlreadyStopping HttpHandler illegalArgCN
+//  LocalWords:  serverAlreadyStopping HttpHandler illegalArgCN jks
 //  LocalWords:  illegalArgument authenticator subclasses javascript
 //  LocalWords:  InetAddress setupServer LinkedBlockingQueue TimeUnit
-//  LocalWords:  shutdownNow serverRunning
+//  LocalWords:  shutdownNow serverRunning SSLSetup openjdk params
+//  LocalWords:  HttpsConfigurator HttpsParameters SSLContext ksis
+//  LocalWords:  keystore truststore ejwsCerts truststore's changeit
+//  LocalWords:  configurator Configurators InputStream ksp kepw tsis
+//  LocalWords:  tspw crlis toCharArray restartFailed sslSetup
+//  LocalWords:  RequestInfo setSessionState getSessionState
+//  LocalWords:  deallocating deallocate withState HttpContext
+//  LocalWords:  EjwsStateTable Subclassing sessionOps stacktrace
+//  LocalWords:  addSessionFilter ExecutorService
