@@ -25,13 +25,13 @@ import org.bzdev.swing.text.CharDocFilter;
 
 /**
  * Text field constrained to allow time intervals.
- * The intervals can be SECONDS (including decimal values),
- * MINUTES:SECONDS and HOURS:MINUTES:SECONDS.  In addition,
- * the text field can be configures to accept a single-character
- * input containing '?' to indicate that the application will
- * interactively determine the time interval, and '*' to indicate
- * that the time interval is indefinite (i.e., not specified by the
- * user).
+ * The intervals can be SECONDS (including decimal values to
+ * millisecond precision), MINUTES:SECONDS and HOURS:MINUTES:SECONDS.
+ * In addition, the text field can be configures to accept a
+ * single-character input containing '?' to indicate that the
+ * application will interactively determine the time interval, and '*'
+ * to indicate that the time interval is indefinite (i.e., not
+ * specified by the user).
  *
  * @author Bill Zaumen
  */
@@ -318,6 +318,10 @@ public class TimeTextField extends VTextField {
 
     /**
      * Get the text field's value.
+     * The value will be in units of milliseconds, with -1 indicting
+     * that the value is indefinite and -2 indicating that the user is
+     * asking for a value.  Values representing times are always
+     * positive.
      * @return the value of the text field, or the default value
      *         when the text field is empty
      */
@@ -336,10 +340,11 @@ public class TimeTextField extends VTextField {
     }
 
     /**
-     * Set the default value when the text-string is empty.
-     * The value may be any integer, although legal values will
-     * always be positive. This allows getValue to return a negative
-     * value as an indication that the field is empty.
+     * Set the default value when the text-string is empty.  The value
+     * may be any integer larger than -3, although values representing
+     * a time will always be non-negative. This allows getValue to
+     * return a negative value as an indication that the field is
+     * indefinite (-1), or that the user is asking for a value (-2).
      * @param value the default value to use
      */
     public void setDefaultValue(long value) {defaultValue = value;}
