@@ -93,6 +93,25 @@ config2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ConfigTest config.foo
 
+btest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ButtonTest
+
+mtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TextFieldMenuTest
+
+ptest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) PortTextFieldTest
+
+
 htest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

@@ -147,6 +147,8 @@ public class WholeNumbTextField extends VTextField {
      */
     public WholeNumbTextField() {
 	super();
+	AbstractDocument adoc = (AbstractDocument)getDocument();
+	adoc.setDocumentFilter(cdf);
 
     }
 

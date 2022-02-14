@@ -9,25 +9,25 @@ import javax.swing.event.AncestorEvent;
 
 
 /**
- * Button to display a URLTextAreaPane.
+ * Menu item to display a URLTextAreaPane.
  * There are several protected methods that can be used to interact with
  * an application:
  * <UL>
- *    <LI>{@link URLTextAreaButton#inputURLInUse()}.
- *    <LI>{@link URLTextAreaButton#inputText()}.
- *    <LI>{@link URLTextAreaButton#inputURL()}.
- *    <LI>{@link URLTextAreaButton#outputURLInUse(boolean)}.
- *    <LI>{@link URLTextAreaButton#outputText(String)}.
- *    <LI>{@link URLTextAreaButton#outputURL(String)}.
+ *    <LI>{@link URLTextAreaMenuItem#inputURLInUse()}.
+ *    <LI>{@link URLTextAreaMenuItem#inputText()}.
+ *    <LI>{@link URLTextAreaMenuItem#inputURL()}.
+ *    <LI>{@link URLTextAreaMenuItem#outputURLInUse(boolean)}.
+ *    <LI>{@link URLTextAreaMenuItem#outputText(String)}.
+ *    <LI>{@link URLTextAreaMenuItem#outputURL(String)}.
  * </UL>
  * The methods whose names start with <code>input</code> are called when
- * the button is pushed and before a dialog box appears.  The methods whose
+ * the menu item is pushed and before a dialog box appears.  The methods whose
  * names start with <code>output</code> are called after the dialog box
  * is closed.  Whether  input or output methods are called at all depends
  * on a mode provided in a constructor.  The default when a constructor
  * does not provide a mode is to use both the input and output methods.
  */
-public class URLTextAreaButton extends JButton
+public class URLTextAreaMenuItem extends JMenuItem
 {
     /**
      * Called to indicate whether a URL was used to create the text.
@@ -72,46 +72,19 @@ public class URLTextAreaButton extends JButton
     protected String inputURL() {return "";}
     /**
      * Indicate if a URL will specify the location of the text.
-     * This is called when the button is pushed before inputText or inputURL.
+     * This is called when the menu item is pushed before inputText or inputURL.
      * @return true if a URL will specify the location of the text; false
      *         otherwise
      * @see org.bzdev.swing.URLTextAreaButton.Mode
      */
     protected boolean inputURLInUse() {return false;}
 
-
-    /**
-     * The mode of the component.
-     */
-    public static enum Mode {
-	/**
-	 * When the text area's dialog box appears, its state is
-	 * created by calling inputURLInUse and either inputText or
-	 * inputURL. When the dialog box is closed, its state is
-	 * stored by calling outputURLInUse and either outputURL or
-	 * outputText.
-	 */
-	USE_OUTPUT_NO_STATE, 
-	/**
-	 * Text is stored in the component. When the dialog box is
-	 * closed, its state is stored by calling outputURLInUse and
-	 * either outputURL or outputText.
-	 */
-	USE_OUTPUT_WITH_STATE,
-	/**
-	 * Text is stored in the component and neither inputURLInUse,
-	 * inputText, inputURL, outputURLInUse, outputText, nor
-	 * outputURL will be called.
-	 */
-	NO_OUTPUT_WITH_STATE
-    }
-
     boolean inputMode = true;
     boolean outputMode = true;
 
     /**
      * Constructor with mode.
-     * @param label the button label
+     * @param label the menu-item label
      * @param rows  the number of rows for text
      * @param cols the number of columns for text
      * @param frame the frame on which to center a dialog box; null if none
@@ -124,9 +97,10 @@ public class URLTextAreaButton extends JButton
      *        and outputs are not used at all.
      * @see URLTextAreaButton.Mode
      */
-    public URLTextAreaButton (String label, final int rows, final int cols,  
-			      final Component frame,
-			      final String title, String errorTitle, Mode mode)
+    public URLTextAreaMenuItem (String label, final int rows, final int cols,  
+			   final Component frame,
+			      final String title, String errorTitle,
+				URLTextAreaButton.Mode mode)
     {
 	this(label, rows, cols, frame, title, errorTitle);
 	switch (mode) {
@@ -177,14 +151,14 @@ public class URLTextAreaButton extends JButton
 
     /**
      * Constructor with default mode.
-     * @param label the button label
+     * @param label the menu-item label
      * @param rows  the number of rows for text
      * @param cols the number of columns for text
      * @param frame the frame on which to center a dialog box; null if none
      * @param title the title of the dialog box
      * @param titleError the title of dialog boxes used when handling errors
      */
-    public URLTextAreaButton (String label, final int rows, final int cols,  
+    public URLTextAreaMenuItem (String label, final int rows, final int cols,  
 			      final Component frame,
 			      final String title, String titleError)
     {
@@ -295,7 +269,7 @@ public class URLTextAreaButton extends JButton
     }
 }
 
-//  LocalWords:  URLTextAreaPane URLTextAreaButton inputURLInUse url
+//  LocalWords:  URLTextAreaPane URLTextAreaMenuItem inputURLInUse url
 //  LocalWords:  inputText inputURL outputURLInUse boolean outputText
 //  LocalWords:  outputURL inUse errorTitle titleError setText
 //  LocalWords:  requestFocusInWindow showMessageDialog inputValue

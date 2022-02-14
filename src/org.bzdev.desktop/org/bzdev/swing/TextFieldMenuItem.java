@@ -11,23 +11,23 @@ import javax.swing.event.AncestorEvent;
 //@exbundle org.bzdev.swing.lpack.Swing
 
 /**
- * Button to pop up a dialog box containing a text field.
+ * Menu item to pop up a dialog box containing a text field.
  * This class arranges that the text field has the keyboard focus
- * when it first appears. By default, the state of the text field is
+ * when it appears. By default, the state of the text field is
  * read and written via one of two protected methods that the
  * user should implement:
- * {@link TextFieldButton#outputValue(String)} and
- * {@link TextFieldButton#inputValue()}.
+ * {@link TextFieldMenuItem#outputValue(String)} and
+ * {@link TextFieldMenuItem#inputValue()}.
  * <P>
  * For example,
- * <blockquote><code>
+ * <blockquote><code><pre>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "initial value";
  *    void init() {
- *       appFrame = new JFrame("Application");
- *       TextFieldButton tfb =
- *         new TextFieldButton("Set Value", 32, appFrame, "Value") {
+ *      appFrame = new JFrame("Application");
+ *      TextFieldMenuItem tfb =
+ *         new TextFieldMenuItem("Set Value", 32, appFrame, "Value") {
  *              protected String inputValue() {
  *                return value;
  *              }
@@ -36,22 +36,21 @@ import javax.swing.event.AncestorEvent;
  *              }
  *         };
  *      ...
- *   }
+ *    }
  * }
- * </code></blockquote>
+ * </pre></code></blockquote>
  * If access to the text field is needed, one can use a constructor
  *  that explicitly provides the text field.  For example:
  * <blockquote><code><pre>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "";
- *
  *    void init() {
  *      JTextField tf = new JTextField(5);
  *      tf.setBackground(Color.GRAY);
  *      appFrame = new JFrame("Application");
- *      TextFieldButton tfb =
- *         new TextFieldButton("String", tf, -1, appFrame, "String Value")
+ *      TextFieldMenuItem tfmi =
+ *         new TextFieldMenuItem("String", tf, -1, appFrame, "String Value")
  *         {
  *              protected String inputValue() {
  *                return value;
@@ -66,11 +65,12 @@ import javax.swing.event.AncestorEvent;
  * </pre></code></blockquote>
  * <P>
  * IF the text field is a subclass of {@link VTextField}, the class
- * {@link VTextFieldButton} should be used instead as methods such as
- * {@link TextFieldButton#outputValue(String)} are not needed.
+ * {@link VTextFieldMenuItem} should be used instead as methods such as
+ * {@link TextFieldMenuItem#outputValue(String)} are not needed.
+
  * @see javax.swing.JTextField
  */
-public class TextFieldButton extends JButton
+public class TextFieldMenuItem extends JMenuItem
 {
     static String errorMsg(String key, Object... args) {
 	return SwingErrorMsg.errorMsg(key, args);
@@ -79,7 +79,7 @@ public class TextFieldButton extends JButton
     /**
      * Set the output value.
      * The user of this class should override this method to store
-     * text. Whether this method is called depends on the TextFieldButton's
+     * text. Whether this method is called depends on the TextFieldMenuItem's
      * mode.
      * @param value the text of the component
      * @see org.bzdev.swing.TextFieldButton.Mode
@@ -91,62 +91,18 @@ public class TextFieldButton extends JButton
      * Read the component's text from an external source.  This method
      * is expected to return the same value until the dialog box for
      * this component is closed.  Whether this method is called
-     * depends on the TextFieldButton's mode.
+     * depends on the TextFieldMenuItem's mode.
      * @return a string containing the contents for a text area at
      * when the text area becomes visible.
      */
     protected String inputValue() {return "";}
-
-    /**
-     * The mode of the component.
-     */
-    public static enum Mode {
-	/**
-	 * When the text area's dialog box appears, its state is
-	 * created by calling {@link TextAreaButton#inputValue()}.
-	 * When the dialog box is
-	 * closed, its state is written by calling
-	 * {@link TextAreaButton#outputValue(String)}.
-	 */
-	USE_OUTPUT_NO_STATE, 
-	/**
-	 * Text is stored in the component. When the dialog box is closed,
-	 * its state is written by calling
-	 * {@link TextAreaButton#outputValue(String)}.
-	 */
-	USE_OUTPUT_WITH_STATE,
-	/**
-	 * Text is stored in the component and neither
-	 * {@link TextAreaButton#inputValue()} nor
-	 * {@link TextAreaButton#outputValue(String)} is called to store
-	 *  the state of the text area.
-	 */
-	NO_OUTPUT_WITH_STATE
-    }
 
     boolean inputMode = true;
     boolean outputMode = true;
 
     /**
      * Constructor with a mode.
-     * @param label the button label
-     * @param nchars the number of characters displayed by this text field
-     * @param frame the frame on which to center a dialog box; null if none
-     * @param title the title of the dialog box
-     * @param mode the mode for the component
-     * @see TextFieldButton.Mode
-     */
-    public TextFieldButton (String label, final int nchars,  
-			   final Component frame,
-			   final String title, Mode mode)
-    {
-	this(label, null, nchars, frame, title, mode);
-    }
-    /**
-     * Constructor with a mode and document.
-     * @param label the button label
-     * @param textField this button's text-field; null if a text field
-     *        should be provided.
+     * @param label the menu-item label
      * @param nchars the number of characters displayed by this text field;
      *        negative implies that an existing textField's value
      *        should not be modified
@@ -155,10 +111,26 @@ public class TextFieldButton extends JButton
      * @param mode the mode for the component
      * @see TextFieldButton.Mode
      */
-    public TextFieldButton (String label, JTextField textField,
-			    final int nchars,
-			    final Component frame,
-			    final String title, Mode mode)
+    public TextFieldMenuItem (String label, int nchars,  
+			      Component frame,
+			      String title, TextFieldButton.Mode mode)
+    {
+	this(label, null, nchars, frame, title, mode);
+    }
+    /**
+     * Constructor with a mode and text field.
+     * @param label the menu-item label
+     * @param textField this menu item's text-field; null if a text field
+     *        should be provided
+     * @param nchars the number of characters displayed by this text field
+     * @param frame the frame on which to center a dialog box; null if none
+     * @param title the title of the dialog box
+     * @param mode the mode for the component
+     * @see TextFieldButton.Mode
+     */
+    public TextFieldMenuItem (String label, JTextField textField, int nchars,  
+			      Component frame,
+			      String title, TextFieldButton.Mode mode)
     {
 	this(label, textField, nchars, frame, title);
 	switch (mode) {
@@ -176,13 +148,12 @@ public class TextFieldButton extends JButton
 	    break;
 	}
     }
-
     JTextField tf;
 
     /**
      * Get the text of the text-field component.
      * When the mode is USE_OUTPUT_NO_STATE (the default), the value
-     * returned is the value at the time the button was pressed.
+     * returned is the value at the time the menu item was pressed.
      * Otherwise it is the component's current value.
      * @return the component's text
      */
@@ -196,24 +167,24 @@ public class TextFieldButton extends JButton
 
     /**
      * Constructor with a default mode of USE_OUTPUT_NO_STATE.
-     * @param label the button label
+     * @param label the menu item's label
      * @param nchars the number of characters displayed by this text field
      * @param frame the frame on which to center a dialog box; null if none
      * @param title the title of the dialog box
      * @see TextFieldButton.Mode
      */
-    public TextFieldButton (String label, int nchars,
-			   Component frame,
-			   String title)
+    public TextFieldMenuItem(String label, int nchars,
+			    Component frame, String title)
     {
 	this(label, null, nchars, frame, title);
     }
 
+
     /**
-     * Constructor with a default mode of USE_OUTPUT_NO_STATE and
-     * providing a text field.
-     * @param label the button label
-     * @param textField this button's text-field; null if a text field
+     * Constructor with a default mode of
+     * {@link TextFieldButton.Mode#USE_OUTPUT_NO_STATE}.
+     * @param label the menu-item label
+     * @param textField this menu item's text-field; null if a text field
      *        should be provided
      * @param nchars the number of characters displayed by this text field;
      *        negative implies that an existing textField's value
@@ -224,10 +195,9 @@ public class TextFieldButton extends JButton
      * @exception IllegalArgumentException an argument was out of range
      *            (e.g., nchars was negative when textField was null)
      */
-    public TextFieldButton(String label, JTextField textField,
-			   final int nchars,
-			   final Component frame,
-			   final String title)
+    public TextFieldMenuItem(String label, JTextField textField,
+			     final int nchars,
+			     final Component frame, final String title)
     {
 	super(label);
 	if (textField == null) {
@@ -241,6 +211,7 @@ public class TextFieldButton extends JButton
 		tf.setColumns(nchars);
 	    }
 	}
+	tf = new JTextField(nchars);
 	addActionListener(new ActionListener() {
 		private void tryAgainAux() {
 		    // the idea is to delay the call to
@@ -253,7 +224,7 @@ public class TextFieldButton extends JButton
 			    }
 			    public void run() {
 				try {
-				    for (int i = 0; i < 16; i++) {
+				    for (int i = 0;  i < 16; i++) {
 					SwingUtilities.invokeAndWait
 					    (new Runnable() {
 						    public void run() {
@@ -265,6 +236,7 @@ public class TextFieldButton extends JButton
 					    Thread.sleep(100);
 					} catch (Exception e) {}
 				    }
+				    if (!done) System.out.println("not done");
 				} catch (Exception e){}
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
@@ -315,14 +287,6 @@ public class TextFieldButton extends JButton
 		    } else {
 			old = tf.getText();
 		    }
-		    /*
-		    JOptionPane.showMessageDialog
-			(frame,
-			 tf,
-			 title,
-			 JOptionPane.PLAIN_MESSAGE);
-		    outputValue(tf.getText());
-		    */
 		    int choice = JOptionPane.showOptionDialog
 			(frame, tf, title, JOptionPane.OK_CANCEL_OPTION,
 			 JOptionPane.PLAIN_MESSAGE, null, null, null);
@@ -331,7 +295,6 @@ public class TextFieldButton extends JButton
 			 if (inputMode) tf.setText("");
 		    } else {
 			if (inputMode) {
-			    // ta.setText(inputValue());
 			    tf.setText("");
 			} else {
 			    tf.setText(old);
@@ -342,11 +305,11 @@ public class TextFieldButton extends JButton
     }
 }
 
-//  LocalWords:  exbundle TextFieldButton outputValue inputValue tfb
+//  LocalWords:  exbundle TextFieldMenuItem outputValue inputValue tfb
 //  LocalWords:  blockquote JFrame appFrame TCP PortTextField portTF
 //  LocalWords:  setValue getText getValue setDocumentFilter nchars
 //  LocalWords:  DocumentFilter JComponent setInputVerifier textField
-//  LocalWords:  InputVerifier TextFieldButton's TextAreaButton tf
+//  LocalWords:  InputVerifier TextFieldMenuItem's TextAreaButton tf
 //  LocalWords:  textField's IllegalArgumentException ncharsNegative
 //  LocalWords:  requestFocusInWindow showMessageDialog JOptionPane
 //  LocalWords:  setText

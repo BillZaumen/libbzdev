@@ -12,6 +12,8 @@ public class ButtonTest {
     static String utaURL = "";
     static boolean utaInUse = false;
 
+    static int port = 0;
+
     static void init() {
 	JFrame frame = new JFrame("Button Test");
         frame.setLayout(new FlowLayout());
@@ -65,9 +67,24 @@ public class ButtonTest {
 		}
 	    };
 
+	PortTextField ptf = new PortTextField(5) {
+		public void onAccepted() throws Exception {
+		    super.onAccepted();
+		    port = getValue();
+		    System.out.println("port = " + port);
+		}
+	    };
+	ptf.setAllowEmptyTextField(true);
+	ptf.setDefaultValue(0);
+
+	JButton portButton = new
+	    VTextFieldButton(ptf, "HTTP Port", frame, "HTTP TCP Port",
+			       "Please enter the TCP port to use:",
+			       true);
 	frame.add(taButton);
 	frame.add(tfButton);
 	frame.add(urlButton);
+	frame.add(portButton);
 
 	frame.pack();
 

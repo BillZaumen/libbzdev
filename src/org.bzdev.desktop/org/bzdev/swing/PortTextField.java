@@ -131,6 +131,7 @@ public class PortTextField extends WholeNumbTextField {
      */
     public PortTextField() {
 	super();
+	init();
     }
 
     /**
