@@ -46,7 +46,7 @@ import java.awt.event.*;
  * pf.setDefaultValue(0);
  *
  * JMenuItem portMenuItem = new
- *    VTextFieldMenuItem(ptf, "HTTP Port", frame, "HTTP TCP Port
+ *    VTextFieldMenuItem(ptf, "HTTP Port", frame, "HTTP TCP Port"
  *                       "Please enter the TCP port to use:",
  *                       true);
  *
@@ -121,16 +121,16 @@ public class VTextFieldMenuItem extends JMenuItem {
  
     /*
      * Constructor given a {@link Dialog} owner.
-     * @param owner the window on which a dialog box should be centered
      * @param tf the text field
      * @param label the menu label
+     * @param owner the window on which a dialog box should be centered
      * @param title the dialog-box title
      * @param msg the message that will appear in the dialog box
      *        above the text field
      * @param modal true for a modal dialog; false otherwise
      */
-    public VTextFieldMenuItem(Dialog owner, VTextField tf,
-			      String label, String title, String msg,
+    public VTextFieldMenuItem(VTextField tf, String label, Dialog owner,
+			      String title, String msg,
 			      boolean modal)
     {
 	super(label);

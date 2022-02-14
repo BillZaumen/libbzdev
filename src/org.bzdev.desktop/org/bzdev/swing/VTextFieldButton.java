@@ -129,9 +129,9 @@ public class VTextFieldButton extends JButton {
      *        above the text field
      * @param modal true for a modal dialog; false otherwise
      */
-    public VTextFieldButton(Dialog owner, VTextField tf,
-			      String label, String title, String msg,
-			      boolean modal)
+    public VTextFieldButton(VTextField tf, String label,
+			    Dialog owner, String title, String msg,
+			    boolean modal)
     {
 	super(label);
 	dialog = new JDialog(owner, title, modal);
