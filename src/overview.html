@@ -49,33 +49,120 @@ links:</B>
 </UL>
 <B>and the following books:</B>
 <UL>
-  <LI>An introduction to the BZDev Java class library. [in preparation]
+  <LI>An introduction to the BZDev Java class library [in preparation].
     This book provides an overview of the classes provided by this library
     with coding examples.
   <LI>The ESP scripting language and its use with factory classes.
     [in preparation]
     This book describes the ESP scripting language, both its syntax and
     semantics, and shows how it is used with the factory classes provided
-    by the BZDev class library.
-  <LI>Programming BZDev named objects and their factories. [in preparation]
+    by the BZDev class library. The book is an extended version of the
+    <A HREF="org.bzdev.base/org/bzdev/util/doc-files/esp.html">
+      ESP API documentation</A>. ESP is essentially a subset of ECMAScript
+    with a few constructs borrowed from Java and with a few additional
+    operators.  It was written because the Nashorn ECMAScript implementation
+    has been removed from Java-15, and GraalVM does not support multithreading
+    adequately for use with the BZDev library's simulation classes. One of
+    the goals for ESP is stability: it can be used to configure simulations
+    that may be re-run years after they were written.
+  <LI>Programming BZDev named objects and their factories [in preparation].
     This book describes how to create named objects as defined in the
     BZDev class library, and how to create the factory classes that create
     named objects.
-  <LI>A scripting guide for the org.bzdev.roadanim package. [in preparation]
+  <LI>A scripting guide for the org.bzdev.roadanim package [in preparation].
     The package org.bzdev.roadanim provides several classes that extend
-    classes in the org.bzdev.anim2d package.  This guide provides an overview
+    classes in the org.bzdev.anim2d package to support animations showing
+    cars, bicycles, and pedestrians.  This guide provides an overview
     of these classes and specifically how to use them with the ESP
-    scripting language.
-  <LI>A programmable bicycle-sharing simulation. [in preparation]
+    scripting language.  The source code is available on
+    <A HREF="https://github.com/BillZaumen/librdanim">GitHub<A>.
+  <LI>A programmable bicycle-sharing simulation [in preparation].
     This book describes a simulation that provides a realistic test case
     for simulation classes provided by the BZDev class library. At the
     time it was written, a number of cities and towns in the U.S. were
     experimenting with bicycle-sharing programs.  The simulation shows
     that how these services were priced was at best dubious, so it is
-    not surprising that many of these services had problems.
+    not surprising that many of these services had problems. The source
+    code is available on
+    <A HREF="https://github.com/BillZaumen/libbikeshr">GitHub</A>.
 </UL>
+<P>
+In addition, several applications were written using the BZDev
+class library. As they were written, classes that seemed to be
+useful for other applications and that were a good match for those
+already in the library were added to the library so they could be
+shared with other applications.  These programs are
+<UL>
+  <LI><STRONG>epts</STRONG>. This program is a graphics editor that
+    creates and edits two types of objects: points and paths. It can
+    also write a description of these objects to a file, using
+    templates to specify the form of the output.  Built-in templates
+    can create
+    <UL>
+      <LI>SVG files.
+      <LI>ECMAScript/JavaScript files or ESP files
+	in a format usable by the simulations the BZDev class library
+	provides.
+      <LI>HTML image maps (the image above uses an image map
+	created with <STRONG>epts</STRONG>).
+      <LI>lists of path lengths or the  areas of closed paths.
+    </UL>
+    User-supplied templates can be used as well.  Coordinates of
+    points can be in Java user-space units or in some other units,
+    defined by setting a scale factor.  For distances, the values are
+    scaled to meters.  When running the points and paths can be
+    overlayed on a pre-existing image. In this case, the appropriate
+    scaling can be determined by measuring a distance in Java
+    user-space units and providing the corresponding distance in the
+    application's units. The source code is available
+    on <A HREF="https://github.com/BillZaumen/epts">GitHub</A>.
+  <LI><STRONG>geth</STRONG>. This program is a simple utility that
+    issues HTTP requests and prints the headers in a response. It can
+    also print the content if the content is text.  The headers include
+    all those in an exchange, including HTTP redirects. Headers can be
+    set in requests as well, which is useful for analyzing web sites that
+    base their responses on the browser or operating system in use. The
+    source code is available on
+    <A HREF="https://github.com/BillZaumen/geth">GitHub</A>.
+
+  <LI><STRONG>webnail</STRONG>. This program can scale images (one or
+    more) to fit into a specified bounding box. For just scaling
+    images, the output can be in a variety of formats: single images,
+    a directory, or a zip file. In addition, <STRONG>webnail</STRONG>
+    can create a web site in  one of four format:
+    <UL>
+      <LI> A web-site directory. The directory will contain an HTML file
+	and several subdirectories containing images and two ECMAScript
+	files, both used for navigation and to run slideshows.
+      <LI> A web-site ZIP file. The ZIP file created contains the same
+	files and directory structure used in the first option
+	(a web-site directory).
+      <LI> A directory for a web archive. This option creates a web-archive
+	directory containing images, ECMAScript files for controlling a
+	slideshow, and a servlet for cases in which multiple systems should
+	show the same images at the same time.
+      <LI> A web-archive (WAR) file. This option creates a web-archive
+	file (WAR file) containing images, ECMAScript files for
+	controlling a slideshow, and a servlet for cases in which
+	multiple systems should show the same images at the same time.
+    </UL>
+    <STRONG>Webnail</STRONG> allows the user to set various options for
+    this case (for example, titles) and to reorder images and add a
+    title to each that can be displayed when a mouse hovers over an image.
+    Images can be added in various ways including simply dragging them from
+    a folder. The source code is available on
+    <A HREF="https://github.com/BillZaumen/webnail">GitHub</A>.
+</UL>
+The source code for these programs and libraries can be used as
+extended coding examples. For use on Debian systems, the packages
+containing these programs should be in the same repository as the
+package <CODE>libbzdev-java</CODE>.
 </BODY>
 </HTML>
 
-<!--  LocalWords:  BZDev subclasses
+<!--  LocalWords:  BZDev subclasses Nashorn GraalVM multithreading
+ -->
+<!--  LocalWords:  epts SVG overlayed geth webnail subdirectories
+ -->
+<!--  LocalWords:  servlet
  -->
