@@ -391,7 +391,9 @@ public class InputTablePane extends JPanel {
 	int maxwidth = (screensize.width*8)/10;
 	int maxheight = (screensize.height*8)/10;
 	if (twidth > maxwidth) twidth = maxwidth;
-	int theight = 14*(nrows+2);
+	// int theight = 14*(nrows+2);
+	int rowHeight = table.getRowHeight();
+	int theight = rowHeight * (nrows + 1) + rowHeight/3 + 1;
 	if (theight > maxheight) theight = maxheight;
 	sp.setPreferredSize(new Dimension(twidth, theight));
 	setLayout(new BorderLayout());

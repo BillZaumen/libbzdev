@@ -28,6 +28,18 @@ public class InputTablePaneTest3 {
 	row = new Vector<Object>(2);
 	row.add("user 2"); row.add("2021-05-30");
 	data.add(row);
+	row = new Vector<Object>(2);
+	row.add("user 3"); row.add("2021-05-30");
+	data.add(row);
+	row = new Vector<Object>(2);
+	row.add("user 5"); row.add("2021-05-30");
+	data.add(row);
+	row = new Vector<Object>(2);
+	row.add(""); row.add("");
+	data.add(row);
+	row = new Vector<Object>(2);
+	row.add("user 6"); row.add("2021-05-30");
+	data.add(row);
 
 	InputTablePane ipane =
 	    InputTablePane.showDialog(null, "Test", spec, data,
@@ -40,6 +52,10 @@ public class InputTablePaneTest3 {
     }
 
     public static void main(String argv[]) throws Exception {
+
+	DarkmodeMonitor.setSystemPLAF();
+	DarkmodeMonitor.init();
+
 	SwingUtilities.invokeLater(() -> {
 		setup();
 	    });
