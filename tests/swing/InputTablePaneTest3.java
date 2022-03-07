@@ -53,8 +53,11 @@ public class InputTablePaneTest3 {
 
     public static void main(String argv[]) throws Exception {
 
-	DarkmodeMonitor.setSystemPLAF();
-	DarkmodeMonitor.init();
+	if (argv.length == 0) {
+	    // just check this if we are running without arguments
+	    DarkmodeMonitor.setSystemPLAF();
+	    DarkmodeMonitor.init();
+	}
 
 	SwingUtilities.invokeLater(() -> {
 		setup();
