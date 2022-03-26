@@ -149,12 +149,12 @@ public interface ServletAdapter {
     /**
      * Process an HTTP GET request.
      * <P>
-     * An {@link ServletAdapter.ServletException} should not be thrown
+     * A {@link ServletAdapter.ServletException} should not be thrown
      * after the method
      * {@link HttpServerResponse#sendResponseHeaders(int,long)},
      * {@link HttpServerResponse#sendRedirect(String)}, or
      * {@link HttpServerResponse#sendError(int)} has been called.
-     * Instead, use a {@link java.io.IOException}.
+     * Instead, use an {@link java.io.IOException}.
      * @param req the request object
      * @parm res the response object
      * @exception ServletException the request could not be handled

@@ -178,5 +178,11 @@ wmtest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) WebMapTest
 
+atest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest
+
 clean:
 	rm -rf classes

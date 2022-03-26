@@ -68,7 +68,9 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      */
     @Override
     public boolean checkCredentials(String username, String password) {
-	return password.equals(map.get(username).pw);
+	Entry entry = map.get(username);
+	if (entry == null) return false;
+	return password.equals(entry.pw);
     }
 }
 
