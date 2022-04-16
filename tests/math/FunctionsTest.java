@@ -166,6 +166,248 @@ public class FunctionsTest {
 	return sum;
     }
 
+    static void  ellipticIntegralTest() throws Exception {
+	double angles[] = {
+	    Math.PI/8,
+	    Math.PI/4,
+	    3*Math.PI/8,
+	    Math.PI/2,
+	    5*Math.PI/8,
+	    3*Math.PI/4,
+	    7*Math.PI/8,
+	    Math.PI,
+	    Math.PI + Math.PI/8,
+	    Math.PI + Math.PI/4,
+	    Math.PI + 3*Math.PI/8,
+	    Math.PI + Math.PI/2,
+	    Math.PI + 5*Math.PI/8,
+	    Math.PI + 3*Math.PI/4,
+	    Math.PI + 7*Math.PI/8,
+	    2*Math.PI
+	};
+	double firstKind03[] = {
+	    0.3935851732,
+	    0.7919586905,
+	    1.197396134,
+	    1.60804862,
+	    2*1.60804862 - 1.197396134,
+	    2*1.60804862 - 0.7919586905,
+	    2*1.60804862 - 0.3935851732,
+	    2*1.60804862,
+	    2*1.60804862 + 0.3935851732,
+	    2*1.60804862 + 0.7919586905,
+	    2*1.60804862 + 1.197396134,
+	    2*1.60804862 + 1.60804862,
+	    4*1.60804862 - 1.197396134,
+	    4*1.60804862 - 0.7919586905,
+	    4*1.60804862 - 0.3935851732,
+	    4*1.60804862,
+	};
+	double secondKind03[] = {
+	    0.3918165381,
+	    0.7789308656,
+	    1.159301124,
+	    1.534833465,
+	    2*1.534833465 - 1.159301124 ,
+	    2*1.534833465 - 0.7789308656,
+	    2*1.534833465 - 0.3918165381,
+	    2*1.534833465,
+	    2*1.534833465 + 0.3918165381,
+	    2*1.534833465 + 0.7789308656,
+	    2*1.534833465 + 1.159301124,
+	    2*1.534833465 + 1.534833465,
+	    4*1.534833465 - 1.159301124,
+	    4*1.534833465 - 0.7789308656,
+	    4*1.534833465 - 0.3918165381,
+	    4*1.534833465,
+	};
+
+	double thirdKind0307[] = {
+	    0.408264060218680,
+	    0.923378136566370,
+	    1.719788570167700,
+	    2.956212354991400,
+	    2*2.956212354991400 - 1.719788570167700,
+	    2*2.956212354991400 - 0.923378136566370,
+	    2*2.956212354991400 - 0.408264060218680,
+	    2*2.956212354991400,
+	    2*2.956212354991400 + 0.408264060218680,
+	    2*2.956212354991400 + 0.923378136566370,
+	    2*2.956212354991400 + 1.719788570167700,
+	    2*2.956212354991400 + 2.956212354991400,
+	    4*2.956212354991400 - 1.719788570167700,
+	    4*2.956212354991400 - 0.923378136566370,
+	    4*2.956212354991400 - 0.408264060218680,
+	    4*2.956212354991400,
+	};
+
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.eF(angles[i], 0.3);
+	    if (Math.abs(value - firstKind03[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + firstKind03[i]);
+	    }
+	}
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.eF(-angles[i], 0.3);
+	    if (Math.abs(value + firstKind03[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + -firstKind03[i]);
+	    }
+	}
+	// test of RF, RD, RC, RJ using homogeneity properties
+	// & duplication theorems.  This is a consistency test,
+	// but can cover a lot of combinations
+	double vals[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+
+	for (double kappa: vals) {
+	    for(double x: vals) {
+		for (double y: vals) {
+		    for (double z: vals) {
+			double value1 = Functions.RF(kappa*x,
+						     kappa*y,
+						     kappa*z);
+			double value2 = Functions.RF(x, y, z)
+			    / Math.sqrt(kappa);
+			if (Math.abs(value1 - value2) > 1.e-10) {
+			    throw new Exception(value1 + " != " + value2);
+			}
+		    }
+		}
+	    }
+	}
+	for(double x: vals) {
+	    for (double y: vals) {
+		for (double z: vals) {
+		    double lambda = Math.sqrt(x)*Math.sqrt(y)
+			+ Math.sqrt(y)*Math.sqrt(z)
+			+ Math.sqrt(z)*Math.sqrt(x);
+		    double value1 = Functions.RF(x, y, z);
+		    double value2 = Functions.RF((x+lambda)/4,
+						 (y+lambda)/4,
+						 (z+lambda)/4);
+		    if (Math.abs(value1 - value2) > 1.e-10) {
+			throw new Exception(value1 + " != " + value2);
+		    }
+		}
+	    }
+	}
+
+	for(double x: vals) {
+	    for (double y: vals) {
+		    double value1 = Functions.RC(x, y);
+		    double value2 = Functions.RF(x, y, y);
+		    if (Math.abs(value1 - value2) > 1.e-10) {
+			throw new Exception(value1 + " != " + value2);
+		    }
+	    }
+	}
+
+	for(double x: vals) {
+	    for (double y: vals) {
+		for (double z: vals) {
+		    double value1 = Functions.RD(x, y, z);
+		    double value2 = Functions.RJ(x, y, z, z);
+		    if (Math.abs(value1 - value2) > 1.e-10) {
+			throw new Exception(value1 + " != " + value2);
+		    }
+		}
+	    }
+	}
+
+	for (double p: vals) {
+	    for (double kappa: vals) {
+		for(double x: vals) {
+		    for (double y: vals) {
+			for (double z: vals) {
+			    double value1 = Functions.RJ(kappa*x,
+							 kappa*y,
+							 kappa*z,
+							 kappa*p);
+			    double value2 = Functions.RJ(x, y, z, p)
+				/(kappa*Math.sqrt(kappa));
+			    if (Math.abs(value1 - value2) > 1.e-10) {
+				throw new Exception(value1 + " != " + value2);
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	for (double p: vals) {
+	    for(double x: vals) {
+		for (double y: vals) {
+		    for (double z: vals) {
+			double lambda = Math.sqrt(x)*Math.sqrt(y)
+			    + Math.sqrt(y)*Math.sqrt(z)
+			    + Math.sqrt(z)*Math.sqrt(x);
+			double d = (Math.sqrt(p) + Math.sqrt(x))
+			    * (Math.sqrt(p) + Math.sqrt(y))
+			    * (Math.sqrt(p) + Math.sqrt(z));
+
+			double value1 = Functions.RJ(x, y, z, p);
+			double value2 = Functions.RJ((x+lambda)/4,
+					      (y+lambda)/4,
+					      (z+lambda)/4,
+					      (p+lambda)/4) / 4
+			    + 6*Functions.RC(d*d, d*d + (p-x)*(p-y)*(p-z));
+			if (Math.abs(value1 - value2) > 1.e-10) {
+			    throw new Exception(value1 + " != " + value2);
+			}
+		    }
+		}
+	    }
+	}
+
+	// test incomplete elliptic integral of the second kind.
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.eE(angles[i], 0.3);
+	    if (Math.abs(value - secondKind03[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + secondKind03[i]);
+	    }
+	}
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.eE(-angles[i], 0.3);
+	    if (Math.abs(value + secondKind03[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + -secondKind03[i]);
+	    }
+	}
+
+	// test incomplete elliptic integral of the third kind.eE
+	if (Math.abs(Functions.ePI(0.7, Math.PI/2, 0.3)
+		     - Functions.ePI(0.7, 0.3)) > 1.e-11) {
+	    System.out.println(Functions.ePI(0.7, Math.PI/2, 0.3)
+			       + " != "
+			       + Functions.ePI(0.7, 0.3));
+	    throw new Exception ("ePI Error - complete versus incomplete");
+	}
+
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.ePI(0.7, angles[i], 0.3);
+	    if (Math.abs(value - thirdKind0307[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + thirdKind0307[i]);
+	    }
+	}
+	for (int i = 0; i < angles.length; i++) {
+	    double value = Functions.ePI(0.7, -angles[i], 0.3);
+	    if (Math.abs(value + thirdKind0307[i]) > 1.e-8) {
+		throw new Exception("angle index = " + i
+				    + ", saw " + value
+				    + ", expected " + -thirdKind0307[i]);
+	    }
+	}
+
+    }
+
+
     public static void main(String argv[]) throws Exception {
 	double delta = 0.00001;
 	double limit = 0.0001;
@@ -179,6 +421,8 @@ public class FunctionsTest {
 	}
 	int errcount = 0;
 
+	System.out.println("Elliptic Integral Test");
+	ellipticIntegralTest();
 	System.out.println("root test:");
 	for (int i = 1; i < 30; i++) {
 	    double x  = 97.0;
@@ -210,7 +454,6 @@ public class FunctionsTest {
 		throw new Exception("root failed");
 	    }
 	}
-
 
 	System.out.println("power test:");
 	double prod = 1.0;

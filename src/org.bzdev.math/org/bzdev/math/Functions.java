@@ -110,6 +110,18 @@ import org.bzdev.lang.MathOps;
  *                              third argument.
  *       </UL>
  *       An alternate notation is <sub>1</sub>F<sub>1</sub>(a;b;z) = M(a,b,z).
+ *  <li> elliptical integrals in both Legendre and Carlson forms:
+ *         <LI> eK(k) and eF(&phi;, k) - Legendre form for complete and
+ *              incomplete elliptical integrals of the first kind.
+ *         <LI> eE(k) and eE(&phi;, k) - Legendre form for complete and
+ *              incomplete elliptical integrals of the second kind.
+ *         <LI> ePI(n, k) and ePI(n, &phi;, k) - Legendre form for
+ *              complete and incomplete elliptical integrals of the
+ *              third kind.
+ *         <LI> RF(x, y, z) - Carlson's elliptic integral of the first kind.
+ *         <LI> RD(x, y, z) - Carlson's elliptic integral of the second kind.
+ *         <LI> RJ(x, y, z, p) - Carlson's elliptic integral of the third kind.
+ *         <LI> RC(x, y) -  Carlson's degenerate elliptic integral
  *  <li> the error function
  *       erf(x) = (2/&pi;<sup>1/2</sup>)&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt
  *       and the complementary error function
@@ -5055,6 +5067,557 @@ public class Functions {
 	}
     }
 
+    // Elliptic Integrals and some Applications
+    // Jay Villanueva, Florida Memorial University
+    //
+    // Pendulums and Elliptic Integrals
+    // James A. Crawford
+    // (which has a typo: below Equation 19, pi/2 should be phi_p at
+    // convergence).
+
+    private static final double HALF_PI = Math.PI/2.0;
+
+    // see https://www.codeproject.com/Articles/566614/Elliptic-integrals
+    // (which has typos) and
+    // https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals
+    // (which has the correct equations).
+
+    /**
+     * Carson symmetric form R<sub>F</sub> for elliptic integrals.
+     * R<sub>F</sub>(x,y,z) is defined as
+     * (1/2)&int;<sub>t=0</sub><sup>&infin;</sup>
+     * (1/&radic;((t+x)(t+y)(t+z))) dt.
+     * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
+     * Wikipedia article</A> and a
+     * <A HREF="https://arxiv.org/pdf/math/9409227.pdf">publication</A>
+     * describing Carlson elliptic integrals.
+     * <P>
+     * At most one of the arguments may be zero.
+     * @param x the first argument, which must be non-negative
+     * @param y the second argument, which must be non-negative
+     * @param z the third argument, which must be non-negative
+     * @return the value R<sub>F</sub>(x,y,z)
+     * @exception IllegalArgumentException an argument was out of
+     *            range or the arguments are not consistent with each
+     *            other
+     */
+    public static double RF(double x, double y, double z)
+	throws IllegalArgumentException
+    {
+	if (x < 0.0) {
+	    String msg = errorMsg("firstArgNeg", x);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y < 0.0) {
+	    String msg = errorMsg("secondArgNeg", y);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (z < 0.0) {
+	    String msg = errorMsg("thirdArgNeg", z);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (x == 0 && y == 0) {
+	    String msg = errorMsg("bothZero", 1, 2);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (x == 0 && z == 0) {
+	    String msg = errorMsg("bothZero", 1, 3);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y == 0 && z == 0) {
+	    String msg = errorMsg("bothZero", 2, 3);
+	    throw new IllegalArgumentException(msg);
+	}
+
+	double result, A, lambda, dx, dy, dz;
+	do {
+	    lambda = Math.sqrt(x*y) + Math.sqrt(y*z) + Math.sqrt(z*x);
+	    x += lambda;
+	    y += lambda;
+	    z += lambda;
+	    x /= 4.0;
+	    y /= 4.0;
+	    z /= 4.0;
+	    A = (x + y + z)/ 3.0;
+	    dx = 1 - x/A;
+	    dy = 1 - y/A;
+	    dz = 1 - z/A;
+	} while (Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
+			  Math.abs(dz)) > 1.e-7);
+	double e2 = dx*dy + dy*dz + dz*dx;
+	double e22 = e2*e2;
+	double e3 = dx*dy*dz;
+	return (1.0 - e2/10 + e3/14 + e22/24 - 3.0*e2*e3/44
+		/*- 5*e22*e2/208 + 3*e3*e3/104 + e22*e3/16*/)
+	    / Math.sqrt(A);
+    }
+
+    /**
+     * Carson symmetric form R<sub>C</sub> for elliptic integrals.
+     * R<sub>C</sub>(x, y) = R<sub>F</sub>(x, y, y).
+     * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
+     * Wikipedia article</A>  and a
+     * <A HREF="https://arxiv.org/pdf/math/9409227.pdf">publication</A>
+     * describing Carlson elliptic integrals.
+     * @param x the first argument, which must be nonnegative
+     * @param y the second argument, which must be positive
+     * @return the value R<sub>C</sub>(x,y)
+     */
+    public static double RC(double x, double y)
+	throws IllegalArgumentException
+    {
+	if (x < 0.0) {
+	    String msg = errorMsg("argNonNegativeD1", x);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y <= 0.0) {
+	    String msg = errorMsg("secondArgPos", y);
+	    throw new IllegalArgumentException(msg);
+	}
+	return RF(x, y, y);
+    }
+
+
+    /**
+     * Carson symmetric form R<sub>D</sub> for elliptic integrals.
+     * R<sub>D</sub>(x, y, z) = R<sub>J</sub>(x, y, z, z).
+     * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
+     * Wikipedia article</A> and a
+     * <A HREF="https://arxiv.org/pdf/math/9409227.pdf">publication</A>
+     * describing Carlson elliptic integrals.
+     * <P>
+     * At most one of the first two arguments may be zero.
+     * @param x the first argument, which must be nonnegative
+     * @param y the second argument, which must be nonnegative
+     * @param z the third argument, which must be positive
+     * @return the value R<sub>D</sub>(x,y,z)
+     */
+    public static double RD(double x, double y, double z)
+	throws IllegalArgumentException
+    {
+	if (x < 0.0) {
+	    String msg = errorMsg("firstArgNeg", x);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y < 0.0) {
+	    String msg = errorMsg("secondArgNeg", y);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (x == 0 && y == 0) {
+	    String msg = errorMsg("bothZero", 1, 2);
+	    throw new IllegalArgumentException(msg);
+	}
+	if ( z <= 0.0) {
+	    String msg = errorMsg("thirdArgPos", z);
+	    throw new IllegalArgumentException(msg);
+	}
+	double sum = 0.0 , fac = 1.0, lambda, dx, dy, dz, A;
+	do {
+	    lambda = Math.sqrt(x*y) + Math.sqrt(y*z) + Math.sqrt(z*x);
+	    sum += fac/(Math.sqrt(z)*(z+lambda));
+	    fac /= 4;
+	    x += lambda;
+	    y += lambda;
+	    z += lambda;
+	    x /= 4.0;
+	    y /= 4.0;
+	    z /= 4.0;
+	    A = (x + y + 3.0*z)/ 5.0;
+	    dx = 1 - x/A;
+	    dy = 1 - y/A;
+	    dz = 1 - z/A;
+	} while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
+			 Math.abs(dz)) > 1.e-7);
+	double dz2 = dz*dz;
+	double dz3 = dz2*dz;
+	double e2 = dx*dy + dy*dz + 3*dz*dz + 3*dz*dx + 2*dy*dz;
+	double e3 = dz3 + + dx*dz2 + 3*dx*dy*dz + 3*dy*dz2
+	    + 2*dx*dz2;
+	double e4 = dy*dz3 + dx*dz3 + 3*dx*dy*dz2;
+	double e5 = dx*dy*dz3;
+
+	double e22 = e2*e2;
+	return 3.0 * sum
+	    + fac * (1
+		     - 3*e2/14
+		     + e3/6
+		     + 9*e2/88
+		     - 3*e4/22
+		     - 9*e2*e3/52
+		     + 3*e5/26
+		     - e22*e2/16
+		     + 3*e3*e3/40
+		     + 3*e2*e4/20
+		     + 45*e22*e3/272
+		     - 9*(e3*e4 + e2*e5)/68)
+	    / (A*Math.sqrt(A));
+    }
+
+    /**
+     * Carlson symmetric form R<sub>J</sub> for elliptic integrals.
+     * R<sub>J</sub>(x,y,z,p) is defined as
+     * (3/2)&int;<sub>t=0</sub><sup>&infin;</sup>
+     * (1/((t+p)&radic;((t+x)(t+y)(t+z)))) dt.
+     * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
+     * Wikipedia article</A> and a
+     * <A HREF="https://arxiv.org/pdf/math/9409227.pdf">publication</A>
+     * describing Carlson elliptic integrals.
+     * <P>
+     * At most one of the first three arguments may be zero.
+     * @param x the first argument, which must be nonnegative
+     * @param y the second argument, which must be nonnegative
+     * @param z the third argument, which must be nonnegative
+     * @param p the fourth argument, which must be nonzero
+     * @return the value R<sub>P</sub>(x,y,z,p)
+     */
+    public static double RJ(double x, double y, double z, double p)
+	throws IllegalArgumentException
+    {
+	if (x < 0.0) {
+	    String msg = errorMsg("firstArgNeg", x);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y < 0.0) {
+	    String msg = errorMsg("secondArgNeg", y);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (z < 0.0) {
+	    String msg = errorMsg("thirdArgNeg", z);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (x == 0 && y == 0) {
+	    String msg = errorMsg("bothZero", 1, 2);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (x == 0 && z == 0) {
+	    String msg = errorMsg("bothZero", 1, 3);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (y == 0 && z == 0) {
+	    String msg = errorMsg("bothZero", 2, 3);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (p == 0.0) {
+	    throw new IllegalArgumentException(errorMsg("fourthArgZero"));
+	}
+	double sum = 0.0 , fac = 1.0, lambda, dx, dy, dz, dp, A;
+	do {
+	    lambda = Math.sqrt(x*y) + Math.sqrt(y*z) + Math.sqrt(z*x);
+	    double rootp = Math.sqrt(p);
+	    double d = (rootp + Math.sqrt(x))
+		* (rootp + Math.sqrt(y))
+		* (rootp + Math.sqrt(z));
+	    double d2 = d*d;
+	    sum += fac * RC(d2, d2 + (p-x)*(p-y)*(p-z));
+	    fac /= 4;
+	    x += lambda;
+	    y += lambda;
+	    z += lambda;
+	    p += lambda;
+	    x /= 4.0;
+	    y /= 4.0;
+	    z /= 4.0;
+	    p /= 4.0;
+	    A = (x + y + z + 2*p)/ 5.0;
+	    dx = 1 - x/A;
+	    dy = 1 - y/A;
+	    dz = 1 - z/A;
+	    dp = 1 - p/A;
+	} while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
+			 Math.max(Math.abs(dz), Math.abs(dp))) > 1.e-7);
+	double dz2 = dz*dz;
+	double dz3 = dz2*dz;
+	double dp2 = dp*dp;
+	double e2 = dx*dy + dy*dz + 2*dz*dp + dp2 + 2*dp*dx + dx*dz + 2*dy*dp;
+	double e3 = dz*dp2 + dx*dp2 + 2*dx*dy*dp + dx*dy*dz + 2*dy*dz*dp
+	    + dy*dp2 + 2 *dx*dz*dp;
+	double e4 = dy*dz*dp2 + dx*dz*dp2 + dx*dy*dp2 +2*dx*dy*dz*dp;
+	double e5 = dx*dy*dz*dp2;
+
+	double e22 = e2*e2;
+	return 6.0 * sum
+	    + fac * (1
+		     - 3*e2/14
+		     + e3/6
+		     + 9*e2/88
+		     - 3*e4/22
+		     - 9*e2*e3/52
+		     + 3*e5/26
+		     - e22*e2/16
+		     + 3*e3*e3/40
+		     + 3*e2*e4/20
+		     + 45*e22*e3/272
+		     - 9*(e3*e4 + e2*e5)/68)
+	    / (A*Math.sqrt(A));
+    }
+
+    /**
+     * Compute the complete elliptic integral of the first kind.
+     * The complete elliptic integral of the first kind is defined as
+     * F(k) = &int;<sup>&pi;/2</sup></sub>&theta;0</sub>
+     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
+     * <P>
+     * The notation used is the same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param k the modulus argument, restricted to  (-1, 1)
+     * @return the complete elliptic integral of the first kind for the given
+     *         parameter
+     * @exception IllegalArgumentException k is out of range
+     */
+    public static double eK(double k) throws IllegalArgumentException {
+	return eF(HALF_PI, k);
+    }
+
+    /**
+     * Compute the incomplete elliptic integral of the first kind.
+     * The incomplete elliptic integral of the first kind is defined as
+     * F(k, &phi;) = &int;<sup>&phi;</sup></sub>&theta;=0</sub>
+     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
+     * <P>
+     * The notation used is the same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param phi the first argument
+     * @param k the modulus, restricted to  (-1, 1)
+     * @return the incomplete elliptic integral of the first kind for the given
+     *         parameters
+     * @exception IllegalArgumentException k is out of range
+     */
+    public static double eF(double phi, double k)
+	throws IllegalArgumentException
+    {
+	if (k <= -1.0 || k >= 1.0) {
+	    String msg = errorMsg("notBetweenN1P1", 2, k);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (k < 0.0) {
+	    k = -k;
+	}
+	if (phi < 0.0) {
+	    return -eF(Math.abs(phi), k);
+	} else if (phi > Math.PI) {
+	    long n = Math.round(Math.floor(phi/Math.PI));
+	    double base = n * Math.PI;
+	    phi -= base;
+	    if (phi > HALF_PI) {
+		n += 1;
+		phi -= Math.PI;
+	    }
+	    return 2.0*n*eK(k) + eF(phi, k);
+	} else if (phi > HALF_PI) {
+	    phi = Math.PI - phi;
+	    if (phi < 0.0) phi = 0.0;
+	    else if (phi > HALF_PI) phi = HALF_PI;
+	    return 2*eK(k) - eF(phi,k);
+	} else if (k == 0.0 || phi < 1.e-10) {
+	    return phi;
+	} else if (phi == Math.PI/2) {
+	    // shortcut.
+	    double a = 1.0+k;
+	    double b = 1.0-k;
+	    double ap = a;
+	    double bp = b;
+	    do {
+		a = ap;
+		b = bp;
+		ap = (a + b) /2;
+		bp = Math.sqrt(a*b);
+	    } while (Math.abs(a - ap) > 1.e-15 ||
+		     Math.abs(b - bp) > 1.e-15);
+	    return Math.PI/(2.0*ap);
+	} else {
+	    double cosphi = Math.cos(phi);
+	    double sinphi = Math.sin(phi);
+	    return sinphi*RF(cosphi*cosphi, 1 - k*k*sinphi*sinphi, 1.0);
+	}
+    }
+
+    /**
+     * Compute a complete elliptic integral of the second kind.
+     * The integral is defined by eE(k) =
+     * &int;<sup>&pi;/2</sup><sub>&theta;=0</sub>
+     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
+     * <P>
+     * The notation used is the same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param k the modulus, restricted to  (-1, 1)
+     * @return the incomplete elliptic integral of the second kind for the
+     *         given parameters
+     */
+    public static double eE(double k) {
+	double k2 = k*k;
+	double onemk2 = 1.0 - k2;
+	return RF(0.0, onemk2, 1.0) - k2*RD(0.0, onemk2, 1.0)/3.0;
+    }
+
+    /**
+     * Compute an incomplete elliptic integral of the second kind.
+     * The integral is defined by eE(&phi;, k) =
+     * &int;<sup>&phi;</sup><sub>&theta;=0</sub>
+     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
+     * <P>
+     * The notation used is the same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param phi the amplitude
+     * @param k the modulus, restricted to  (-1, 1)
+     * @return the incomplete elliptic integral of the second kind for the
+     *         given parameters
+     */
+    public static double eE(double phi, double k)
+	throws IllegalArgumentException
+    {
+	if (k <= -1.0 || k >= 1.0) {
+	    String msg = errorMsg("notBetweenN1P1", 2, k);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (k < 0.0) {
+	    k = -k;
+	}
+	if (phi < 0.0) {
+	    return -eE(Math.abs(phi), k);
+	} else if (phi > Math.PI) {
+	    long n = Math.round(Math.floor(phi/Math.PI));
+	    double base = n * Math.PI;
+	    phi -= base;
+	    if (phi > HALF_PI) {
+		n += 1;
+		phi -= Math.PI;
+	    }
+	    return 2.0*n*eE(k) + eE(phi, k);
+	} else if (phi > HALF_PI) {
+	    phi = Math.PI - phi;
+	    if (phi < 0.0) phi = 0.0;
+	    else if (phi > HALF_PI) phi = HALF_PI;
+	    return 2*eE(k) - eE(phi,k);
+	} else if (k == 0.0 || phi < 1.e-10) {
+	    return phi;
+	} else {
+	    double sinphi = Math.sin(phi);
+	    double sinphi2 = sinphi*sinphi;
+	    double cosphi = Math.cos(phi);
+	    double cosphi2 = cosphi*cosphi;
+	    double k2 = k*k;
+	    double term = 1.0 - k2*sinphi2;
+	    return sinphi*RF(cosphi2,term, 1.0)
+		- k2*sinphi2*sinphi*RD(cosphi2, term, 1.0)/3.0;
+	}
+    }
+
+    /**
+     * Compute the complete elliptic integral of the third kind.
+     * The integral is defined by ePI(k, n) =
+     * &int;<sup>&pi;/2;</sup><sub>&theta;=0</sub>
+     * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
+     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
+     *<P>
+     * <P>
+     * The notation used is the same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param n the characteristic (n sin<sup>2</sup>&theta; must not
+     *        equal 1 for &theta; &isin; [0, &phi;]).
+     * @param k the modulus, restricted to  (-1, 1)
+     * @return the complete elliptic integral of the third kind for the
+     *         given parameters
+     */
+    public static double ePI(double n, double k) {
+	if (k <= -1.0 || k >= 1.0) {
+	    String msg = errorMsg("notBetweenN1P1", 1, k);
+	    throw new IllegalArgumentException(msg);
+	}
+	double term = 1 - k*k;
+	return RF(0.0, term, 1.0) + n*RJ(0.0, term, 1.0, 1.0-n)/3;
+    }
+
+    /**
+     * Compute an incomplete elliptic integral of the third kind.
+     * The integral is defined by ePI(&phi;, k, n) =
+     * &int;<sup>&phi;</sup><sub>&theta;=0</sub>
+     * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
+     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
+     * <P>
+     * The notation used is the  same as that used for the
+     * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
+     * For elliptic integrals in this form, the angle &phi; is called
+     * the amplitude, the parameter k is called the modulus, and the
+     * parameter n is called the characteristic. A subset of these may
+     * be used for a particular integral. One should keep in mind that
+     * a number of notations are in common use.  The methods
+     * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
+     * Carlson's form.
+     * @param n the characteristic (n sin<sup>2</sup>&theta; must not
+     *        equal 1 for &theta; &isin; [0, &phi;]).
+     * @param phi the amplitude
+     * @param k the modulus, restricted to  (-1, 1)
+     * @return the incomplete elliptic integral of the third kind for the
+     *         given parameters
+     */
+    public static double ePI(double n, double phi, double k) {
+	if (k <= -1.0 || k >= 1.0) {
+	    String msg = errorMsg("notBetweenN1P1", 2, k);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (phi < 0) {
+	    return -ePI(n, -phi, k);
+	} else if (phi >= Math.PI) {
+	    long nn = Math.round(Math.floor(phi/Math.PI));
+	    double base = nn * Math.PI;
+	    phi -= base;
+	    if (phi > HALF_PI) {
+		nn += 1;
+		phi -= Math.PI;
+	    }
+	    return 2.0*nn*ePI(n, k) + ePI(n, phi, k);
+	} else if (phi > HALF_PI) {
+	    phi = Math.PI - phi;
+	    if (phi < 0.0) phi = 0.0;
+	    else if (phi > HALF_PI) phi = HALF_PI;
+	    return 2*ePI(n,k) - ePI(n, phi, k);
+	} else {
+	    double sinphi = Math.sin(phi);
+	    double cosphi = Math.cos(phi);
+	    double sinphi2 = sinphi*sinphi;
+	    double cosphi2 = cosphi*cosphi;
+	    double k2 = k*k;
+	    double term = 1-k2*sinphi2;
+	    return sinphi*RF(cosphi2, term, 1.0)
+		+ n*sinphi2*sinphi*RJ(cosphi2,term, 1.0, 1-n*sinphi2)/3;
+	}
+    }
+
     // Abramowitz & Stegun, 15.3.10
     private static double hgFCase10(double a, double b, double z) {
 	double omz = 1.0 - z;
@@ -6927,4 +7490,5 @@ public class Functions {
 //  LocalWords:  relativelyPrime precomputed firstArgNotPositive npir
 //  LocalWords:  infin Pochhammer thirdArgNeg fourthArgNeg npirp rlen
 //  LocalWords:  preallocated th monomial secondGTfirst secondArgPos
-//  LocalWords:  thirdArgPos
+//  LocalWords:  thirdArgPos eK eF eE ePI RJ Ith Villanueva radic
+//  LocalWords:  firstArgNeg bothZero nonnegative notBetweenN
