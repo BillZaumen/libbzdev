@@ -111,6 +111,7 @@ import org.bzdev.lang.MathOps;
  *       </UL>
  *       An alternate notation is <sub>1</sub>F<sub>1</sub>(a;b;z) = M(a,b,z).
  *  <li> elliptical integrals in both Legendre and Carlson forms:
+ *       <UL>
  *         <LI> eK(k) and eF(&phi;, k) - Legendre form for complete and
  *              incomplete elliptical integrals of the first kind.
  *         <LI> eE(k) and eE(&phi;, k) - Legendre form for complete and
@@ -121,7 +122,8 @@ import org.bzdev.lang.MathOps;
  *         <LI> RF(x, y, z) - Carlson's elliptic integral of the first kind.
  *         <LI> RD(x, y, z) - Carlson's elliptic integral of the second kind.
  *         <LI> RJ(x, y, z, p) - Carlson's elliptic integral of the third kind.
- *         <LI> RC(x, y) -  Carlson's degenerate elliptic integral
+ *         <LI> RC(x, y) -  Carlson's degenerate elliptic integral.
+ *       </UL>
  *  <li> the error function
  *       erf(x) = (2/&pi;<sup>1/2</sup>)&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt
  *       and the complementary error function
@@ -5085,7 +5087,7 @@ public class Functions {
     /**
      * Carson symmetric form R<sub>F</sub> for elliptic integrals.
      * R<sub>F</sub>(x,y,z) is defined as
-     * (1/2)&int;<sub>t=0</sub><sup>&infin;</sup>
+     * (1/2)<span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&infin;</span></sup></span><sub>t=0</sub>
      * (1/&radic;((t+x)(t+y)(t+z))) dt.
      * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
      * Wikipedia article</A> and a
@@ -5256,7 +5258,7 @@ public class Functions {
     /**
      * Carlson symmetric form R<sub>J</sub> for elliptic integrals.
      * R<sub>J</sub>(x,y,z,p) is defined as
-     * (3/2)&int;<sub>t=0</sub><sup>&infin;</sup>
+     * (3/2)<span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&infin;</span></sup></span><sub>t=0</sub>
      * (1/((t+p)&radic;((t+x)(t+y)(t+z)))) dt.
      * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
      * Wikipedia article</A> and a
@@ -5354,7 +5356,7 @@ public class Functions {
     /**
      * Compute the complete elliptic integral of the first kind.
      * The complete elliptic integral of the first kind is defined as
-     * F(k) = &int;<sup>&pi;/2</sup></sub>&theta;0</sub>
+     * F(k) = <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2</span></sup></span><sub>&theta;=0</sub>
      * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
      * <P>
      * The notation used is the same as that used for the
@@ -5378,7 +5380,7 @@ public class Functions {
     /**
      * Compute the incomplete elliptic integral of the first kind.
      * The incomplete elliptic integral of the first kind is defined as
-     * F(k, &phi;) = &int;<sup>&phi;</sup></sub>&theta;=0</sub>
+     * F(k, &phi;) = <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
      * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
      * <P>
      * The notation used is the same as that used for the
@@ -5448,7 +5450,7 @@ public class Functions {
     /**
      * Compute a complete elliptic integral of the second kind.
      * The integral is defined by eE(k) =
-     * &int;<sup>&pi;/2</sup><sub>&theta;=0</sub>
+     * <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2</span></sup></span><sub>&theta;=0</sub>
      * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
      * <P>
      * The notation used is the same as that used for the
@@ -5473,7 +5475,7 @@ public class Functions {
     /**
      * Compute an incomplete elliptic integral of the second kind.
      * The integral is defined by eE(&phi;, k) =
-     * &int;<sup>&phi;</sup><sub>&theta;=0</sub>
+     * <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
      * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
      * <P>
      * The notation used is the same as that used for the
@@ -5533,7 +5535,7 @@ public class Functions {
     /**
      * Compute the complete elliptic integral of the third kind.
      * The integral is defined by ePI(k, n) =
-     * &int;<sup>&pi;/2;</sup><sub>&theta;=0</sub>
+     * <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2;</span></sup></span><sub>&theta;=0</sub>
      * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
      * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
      *<P>
@@ -5565,7 +5567,7 @@ public class Functions {
     /**
      * Compute an incomplete elliptic integral of the third kind.
      * The integral is defined by ePI(&phi;, k, n) =
-     * &int;<sup>&phi;</sup><sub>&theta;=0</sub>
+     * <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
      * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
      * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
      * <P>
@@ -6630,9 +6632,9 @@ public class Functions {
 	return term;
     }
 
-
     private static final double ERFC_LIMIT = 3.1;
     private static final double ROOT_PI = Math.sqrt(Math.PI);
+
     /**
      * Compute the error function.
      * The error function is defined as
