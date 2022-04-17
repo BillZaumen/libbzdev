@@ -124,6 +124,10 @@ import org.bzdev.lang.MathOps;
  *         <LI> RJ(x, y, z, p) - Carlson's elliptic integral of the third kind.
  *         <LI> RC(x, y) -  Carlson's degenerate elliptic integral.
  *       </UL>
+ *       For the Legendre forms, &phi; is the "amplitude", representing an
+ *       angle in units of radians, k is the modulus, and n is the
+ *       characteristic. The notation used in publications is not
+ *       consistent.
  *  <li> the error function
  *       erf(x) = (2/&pi;<sup>1/2</sup>)&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt
  *       and the complementary error function
@@ -5392,7 +5396,7 @@ public class Functions {
      * a number of notations are in common use.  The methods
      * {@link #RF}, {@link #RD}, {@link #RC}, and {@link #RJ} use
      * Carlson's form.
-     * @param phi the first argument
+     * @param phi the amplitude
      * @param k the modulus, restricted to  (-1, 1)
      * @return the incomplete elliptic integral of the first kind for the given
      *         parameters
