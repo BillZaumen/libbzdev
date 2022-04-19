@@ -317,7 +317,14 @@ public class SCRunner {
 
 	while (index < argv.length && argv[index].startsWith("-")
 	       && !argv[index].equals("-t")) {
-	    if (argv[index].equals("--")) {
+	    if (argv[index].equals("-")) {
+		// This is a special case.  The argument "-" indicates
+		// standard input and should be treated as a file-name
+		// argument.  In this case, a preceding "--" argument
+		// is not needed for the option to be unambiguous. The
+		// index is not incremented.
+		break;
+	    } else if (argv[index].equals("--")) {
 		index++;
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {

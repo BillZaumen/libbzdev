@@ -1744,6 +1744,12 @@ install-pop:
 	install -d $(MIME_POPICON_DIR)
 	install -m 0644 -T MediaTypes/ImageSeq.svg \
 		$(MIME_POPICON_DIR)/$(IMAGE_SEQUENCE_ICON).svg
+
+# We are removing this from install-pop due to a package problem
+# that suddenly arose. /usr/share/icons/Pop/NxN, etc. now seem to
+# contain only SVG files and we get some problems installing the
+# package when these lines are included.
+old-install-pop-tail:
 	for i in $(POPICON_WIDTHS) ; do \
 	  install -d $(POPICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
 	  inkscape -w $$i -y 0.0 --export-filename=tmp.png \

@@ -785,7 +785,9 @@ public class SCRunnerCmd {
 
 	String languageName = null;
 	index = 0;
-	String script = (argv[index].startsWith("-"))? null: argv[index++];
+	String script = (argv[index].startsWith("-")
+			 && !argv[index].equals("-"))?
+	    null: argv[index++];
 	// scan ahead to find the language
 	while (index < argv.length && argv[index].startsWith("-")
 	       && !argv[index].equals("-t")) {

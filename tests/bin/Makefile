@@ -325,6 +325,16 @@ sctest:
 	chmod u-x ./run
 	rm -r classes otest.jar
 
+ecirc:
+	(cd ../.. ; make )
+	mkdir -p classes
+	javac -d classes OutTest.java
+	chmod u+x ./run
+	chmod u+x ecirc.sh
+	./ecirc.sh 10 20
+	chmod u-x ecirc.sh
+	chmod u-x ./run
+
 clean:
 	rm -fr junk raf tmp.png
 	chmod u-x ./run ./run1
