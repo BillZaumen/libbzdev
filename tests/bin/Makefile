@@ -232,6 +232,19 @@ test:
 	./run test0.esp
 	chmod u-x ./run
 
+stest:
+	( cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x test.esp
+	@echo try running test.esp as an executable script.
+	./test.esp
+	./test.esp -vD:z:20
+	./test.esp -vD:z:20 test.esp
+	./run test.esp -vD:z:20 test.esp
+	chmod u-x test.esp
+	chmod u-x ./run
+
+
 eptest:
 	( cd ../.. ; make )
 	chmod u+x ./run

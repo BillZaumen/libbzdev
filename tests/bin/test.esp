@@ -1,7 +1,10 @@
-var out = scripting.getWriter();
+#!./run
+var out ?= scripting.getWriter();
 out.println("hello");
-var x = 10.0;
-var y = 20.0;
+var x ?= 10.0;
+var y ?= 20.0;
+var z ?= 30.0;
 out.format("x = %g, y = %g\n", x, y);
-var array = [x, y];
+var array ?= [x, y];
 out.format("x = %g, y = %g\n", array.toArray());
+out.format("z = %g\n", z);

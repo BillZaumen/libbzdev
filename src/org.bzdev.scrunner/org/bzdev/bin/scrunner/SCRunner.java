@@ -222,7 +222,9 @@ public class SCRunner {
 
 	public void checkFiles() {
 	    boolean stdinSeen = false;
+	    int scriptIndex = 0;
 	    for (Info info: queue) {
+		scriptIndex++;
 		try {
 		    if (info.useStdin) {
 			if (stdinSeen) {
@@ -236,7 +238,14 @@ public class SCRunner {
 			stdinSeen = true;
 			continue;
 		    }
-		    if (!extensions.contains(getExtension(info.filename))) {
+		    String ext = getExtension(info.filename);
+		    if (ext == null && scriptIndex == 1) {
+			// If the file for the first script does not have
+			// an extension, assume the extension is "esp",
+			// because ESP is the default scripting language
+			ext = "esp";
+		    }
+		    if (!extensions.contains(ext)) {
 			System.err.println
 			    (errorMsg("illegalExt", info.filename));
 			/*
@@ -881,7 +890,7 @@ public class SCRunner {
 
 	if (languageName == null) {
 	    if (extension == null) {
-		languageName = "ECMAScript";
+		languageName = "ESP";
 	    } else {
 		languageName = Scripting.getLanguageNameByExtension(extension);
 	    }

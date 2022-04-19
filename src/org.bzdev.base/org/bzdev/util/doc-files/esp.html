@@ -85,7 +85,13 @@
 	string can contain multiple statements, separated by
 	semicolons, and an input string must not contain an initial
 	"=" unless {@link ExpressionParser#setPrefixMode()} is also
-	called.
+	called.  In this mode, if the input contains an initial line
+	(whether terminated with a new-line sequence or not) that
+	starts with the sequence "#!", that line is treated as a comment
+	and is ignored so that an ESP script can be used as an executable
+	script by following "#!" with the path name of an ESP interpreter
+	(a Unix/Linux convention,  but possibly used in other systems as
+	well).
       <LI> {@link ExpressionParser#setPrefixMode()}. This mode is
 	meaningful when scripting mode is enabled. Prefix mode requires
 	that each top-level statement start with either an '=' or the
@@ -144,7 +150,7 @@
       <LI> {@link ExpressionParser#exists(String)} &mdash; determine
 	if a variable exists.
       <LI> {@link ExpressionParser#get(String)} &mdash; get the value
-	of a variable. If the variable's value is a "typed null", the
+	of a variable. If the variable&apos;s value is a "typed null", the
 	constant <STRONG>null</STRONG> is returned.
       <LI> {@link ExpressionParser#set(String,Object)} &mdash; set the
 	value of a variable
@@ -416,7 +422,12 @@ var obj = {
     </UL>
     so that the method {ExpressionParser#matches(String)} will return
     quickly when there is not a match.
-
+    If scripting mode is in effect and the first two characters of
+    a script are "#!", those characters  start a comment that is
+    terminated by an end-of-line separator or (if none) the end of
+    the script.  This is a special case that allows one to create
+    executable scripts.  Typically such a comment will be
+    "#!/usr/bin/scrunner".
     <H3><A NAME="primitiveValues"></A>Primitive Values</H3>
   <P>
     ESP recognizes several types of primitive values:
@@ -848,7 +859,7 @@ function g(x) {
     <H3><A NAME="vardecls"></A>Variable Declarations</H3>
   <P>
     Variable declarations indicate that an identifier represents
-    a variable but does not provide a value for it. THe syntax is
+    a variable but does not provide a value for it. The syntax is
     <BLOCKQUOTE><PRE>
 var-declaration: &apos;var&apos; identifier
     | var-declaration &apos;%apos; identifier
@@ -2227,5 +2238,5 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  newJavaArray clasz generateDocs PrintWriter enums
  -->
-<!--  LocalWords:  javadoc
+<!--  LocalWords:  javadoc apos dereferenced
  -->

@@ -684,7 +684,7 @@ public class SCRunnerCmd {
 	readConfigFiles(null);
 
 	if (System.getProperty("scrunner.started") == null) {
-	    // If extended the class path  in the call to readConfigFiles,
+	    // If we extended the class path  in the call to readConfigFiles,
 	    // we have to restart, which will read the config file again,
 	    // so we also set the property scrunner.started, which of course
 	    // cannot appear in the config files.
@@ -785,10 +785,18 @@ public class SCRunnerCmd {
 
 	String languageName = null;
 	index = 0;
+	String script = (argv[index].startsWith("-"))? null: argv[index++];
 	// scan ahead to find the language
 	while (index < argv.length && argv[index].startsWith("-")
 	       && !argv[index].equals("-t")) {
-	    if (argv[index].equals("--")) {
+	    if (argv[index].equals("-")) {
+		// This is a special case.  The argument "-" indicates
+		// standard input and should be treated as a file-name
+		// argument.  In this case, a preceding "--" argument
+		// is not needed for the option to be unambiguous. The
+		// index is not incremented.
+		break;
+	    } else if (argv[index].equals("--")) {
 		index++;
 		break;
 	    } else if (argv[index].equals("-t")) {
@@ -947,12 +955,19 @@ public class SCRunnerCmd {
 	argList.add("-classpath");
 	argList.add(sbcp.toString());
 	*/
-	index = 0;
+	index = (script == null)? 0: 1;
 	boolean dryrun = false;
 	boolean listCodeBase = false;
 	while (index < argv.length && argv[index].startsWith("-")
 	       && !argv[index].equals("-t")) {
-	    if (argv[index].equals("--stackTrace")) {
+	    if (argv[index].equals("-")) {
+		// This is a special case.  The argument "-" indicates
+		// standard input and should be treated as a file-name
+		// argument.  In this case, a preceding "--" argument
+		// is not needed for the option to be unambiguous. The
+		// index is not incremented.
+		break;
+	    } else if (argv[index].equals("--stackTrace")) {
 		sbcmd.add("--stackTrace");
 	    } else if (argv[index].equals("--")) {
 		sbcmd.add("--");
@@ -1250,6 +1265,7 @@ public class SCRunnerCmd {
 	}
 	argList.addAll(sbcmd);
 
+	if (script != null) argList.add(script);
 	while (index < argv.length) {
 	    argList.add((argv[index]));
 	    index++;

@@ -5,6 +5,7 @@ scrunner \- run libbzdev Java code from a scripting language
 .B scrunner
 \fB[\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
 .br
+\fB[\fIFILE\fB [\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
 .B scrunner
 .B \-\-listScriptingLanguages
 .B [\fILANGUAGE\fB]...
@@ -29,10 +30,12 @@ option is not 0.
 will try to guess the scripting language from the file extension, but
 the language can be set by using the
 .B \-L
-option. The scripts that are provided are in effect the script produced
-by concatenating the input files  in the order in which they appear.
-When "\fB\-\fR" is used to denote standard input, the options should be
-terminated with "\fB\-\-\fR".
+option. If the input file does not have an extension and the
+.B \-L
+option is not used, the scripting language is assumed to be ESP,
+which is described in the API documentation for the BZDev class library.
+The script that is processed is in effect the script produced
+by concatenating the input files in the order in which they appear.
 .PP
 Initially, the scripting environment contains a single variable named
 .B scripting
@@ -124,7 +127,12 @@ ECMAScript specification).
 .SH OPTIONS
 .TP
 .B \-\-
-End of options.
+End of options.  This option is needed when an input file's name
+begins with
+.B \-
+unless the file name is
+.BR \- ,
+denoting standard input.
 .TP
 .B \-\-listCodeBase
 List all the URLs provided in
@@ -515,4 +523,5 @@ file override those in the system configuration file.
 \"  LocalWords:  makefiles OUTPUTFILE VARNAME IFILENAME rwd fIN vB vI
 \"  LocalWords:  stackTrace hecto giga vL tera peta exa vD yocto atto
 \"  LocalWords:  zepto femto nano milli centi zetta yotta fRor fI
-\"  LocalWords:  Solaris config conf lsnof
+\"  LocalWords:  Solaris config conf lsnof resourcePath plaf PLAF
+\"  LocalWords:  pluggable

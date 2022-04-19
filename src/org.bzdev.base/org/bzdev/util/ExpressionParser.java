@@ -7325,7 +7325,12 @@ public class ExpressionParser implements ObjectParser<Object>
 	    switch(ch) {
 	    case '#':
 		if (processor.scriptingMode) {
-		    if (i + 2 < len) {
+		    if (i == 0 && i+1 < len && s.charAt(i+1) == '!') {
+			// Treat as a comment to allow '#!' scripts.
+			i += 2;
+			while (i < len && s.charAt(i) != SEP_END) i++;
+			continue;
+		    } else if (i + 2 < len) {
 			int isv = i;
 			if (s.charAt(i+1) == '+' && s.charAt(i+2) == 'T') {
 			    tokens.add(new Token(Operator.START_TOKEN_TRACING,
