@@ -903,6 +903,22 @@ public class SCRunner {
 	    }
 	}
 
+	final Writer theWriter = writer;
+	Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+		    if (theWriter != null) {
+			try {
+			    theWriter.flush();
+			    theWriter.close();
+			} catch (Exception eio){}
+		    }
+		    for (OutputStream os: ioOutputMap.values()) {
+			try {
+			    os.flush();
+			    os.close();
+			} catch (Exception eio) {}
+		    }
+	}));
+
 	extensions = new HashSet<String>
 	    (Scripting.getExtensionsByLanguageName(languageName));
 	ScriptingContext tcontext =

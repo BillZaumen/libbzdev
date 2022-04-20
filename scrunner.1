@@ -10,7 +10,7 @@ scrunner \- run libbzdev Java code from a scripting language
 .br
 .br
 .B scrunner
-\fB\-s:[\FISOPTION\fB]... \fIFILE\fB\ [\fIOPTION\fB]... [\fIVALUE\fB]... [[\-t\] \fIFILE\fB]...\fR
+\fB\-s[\FISOPTION\fB]... \fIFILE\fB\ [\fIOPTION\fB]... [\fIVALUE\fB]... [[\-t\] \fIFILE\fB]...\fR
 .br
 .B scrunner
 .B \-\-listScriptingLanguages
@@ -141,10 +141,10 @@ is discouraged (both are vendor extensions not specified by the
 ECMAScript specification).
 .SH OPTIONS
 .TP
-.BR \-s\fR[\fISOPTION ]...
+.BR \-s\fR[\fISOPTION\fR][\fB,\fISOPTION\fR]...
 Specify arguments. This must be the first argument if it is provided. Each
 .I SOPTION
-contains a colon, the letter
+contains, the letter
 .BR B ,
 .BR D ,
 .BR I ,
@@ -152,9 +152,9 @@ contains a colon, the letter
 .BR S ,
 or
 .BR E
-followed by a comma and a variable name, except for
+followed by a colon and then a variable name, except for
 .B E
-which is followed by a comma and the keyword
+which is followed by a colon and the keyword
 .BR true .
 The letters indicate the type of an argument:
 .BR B
@@ -367,7 +367,10 @@ Specify a file
 .I OUTPUTFILE
 for output from scripts.  A value of "\-" indicates standard output,
 which is the default. Standard output can be specified only once for
-the "\fB\-o\fR" and "\fB\-o:\fR" options.
+the "\fB\-o\fR" and "\fB\-o:\fR" options combined. The output stream
+will be automatically flushed when
+.B scrunner
+exits.
 .TP
 .BI \-o: VAR\ \fIFILENAME
 .TQ
@@ -378,8 +381,11 @@ for writing and defines a script variable
 .I VAR
 bound to the output stream for that file.  If
 .I FILENAME
-is "\fB\-\fR", standard output is used.  Standard output can be specified
-only once for the "\fB\-o\fR" and "\fB\-o:\fR" options.
+is "\fB\-\fR", standard output is used.  Standard output can be
+specified only once for the "\fB\-o\fR" and "\fB\-o:\fR" options
+combined. The output stream will be automatically flushed when
+.B scrunner
+exits.
 .TP
 .BI \-\-plaf\  PLAF
 Configures a a pluggable look and feel.  The argument
@@ -566,7 +572,7 @@ and
 .B testscript
 starts with the following line:
 .IP
- #!/usr/bin/scrunner -s:D:a,D:b,E:true
+ #!/usr/bin/scrunner -sD:a,D:b,E:true
 .br
 global.getWriter()println(a + b);.
 .PP
@@ -585,7 +591,7 @@ is executable, then running the command
 .PP
 is equivalent to running
 .IP
- scrunner -s:D:a,D:b,E:true testscript 10 20
+ scrunner -sD:a,D:b,E:true testscript 10 20
 .PP
 which in turn is equivalent to
 .IP
@@ -607,9 +613,11 @@ options can be added. For example
 will print the Java command that is actually executed. These Options can, of
 course add additional arguments such as a directory accessor.
 .PP
-The following 8-line-long program (on Linux systems):
+The following 8-line-long program (on Linux systems) will use an ESP
+script to print the circumference of an ellipse given the lengths of
+the semi-major and semi-minor axes:
 .IP
-#!/usr/bin/scrunner -s:D:a,D:b,E:true
+#!/usr/bin/scrunner -sD:a,D:b,E:true
 import (java.lang.Math);
 import (org.bzdev.math.Functions);
 function circE (a, b) {
@@ -618,8 +626,13 @@ function circE (a, b) {
 }
 global.getWriter().println(circE(a,b));
 .PP
-will use an ESP script to print the circumference of an ellipse given
-the lengths of the semi-major and semi-minor axes.
+Whitespace may appear in the first line at any point after the
+initial
+.BR \-s ,
+provided that the OS treats the text after\
+.B \-s
+as a single argument.  Linux and most Unix systems do this, but not
+all.  It is safer to not use any white space.
 .SH FILES
 .TP 
 .I /etc/bzdev/scrunner.conf\ \fRor\fI\ /etc/opt/bzdev/scrunner.conf

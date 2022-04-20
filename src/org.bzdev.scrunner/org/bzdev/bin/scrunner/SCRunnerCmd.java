@@ -787,13 +787,14 @@ public class SCRunnerCmd {
 	index = 0;
 	ArrayList<String> parmList = new ArrayList<>();
 	boolean autoExitMode = false;
-	if (argv[0].startsWith("-s")) {
-	    String spec = argv[0].substring(2).trim();
-	    if (spec.length() > 0 &&
-		spec.charAt(0) == ':') {
+	if (argv[0].matches("-s[:,BDILSE\\s].*")) {
+	    String spec = argv[0].substring(2);
+	    char ch = spec.charAt(0);
+	    if (ch != 'B' && ch != 'D' && ch != 'I' && ch != 'L'
+		&& ch != 'S' && ch != 'E') {
 		spec = spec.substring(1);
 	    }
-
+	    spec = spec.trim();
 	    String[] terms = spec.split("[:,\\s](\\s*)");
 	    if (terms.length %2 == 1) {
 		System.err.println(errorMsg("notPaired"));
