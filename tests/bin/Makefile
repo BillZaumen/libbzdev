@@ -328,11 +328,11 @@ sctest:
 ecirc:
 	(cd ../.. ; make )
 	mkdir -p classes
-	javac -d classes OutTest.java
 	chmod u+x ./run
 	chmod u+x ecirc.sh
 	./ecirc.sh 10 20
 	chmod u-x ecirc.sh
+	./ecirc
 	chmod u-x ./run
 
 clean:

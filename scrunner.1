@@ -5,7 +5,13 @@ scrunner \- run libbzdev Java code from a scripting language
 .B scrunner
 \fB[\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
 .br
-\fB[\fIFILE\fB [\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
+.B scrunner
+\fIFILE\fB [\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
+.br
+.br
+.B scrunner
+\fB\-s:[\FISOPTION\fB]... \fIFILE\fB\ [\fIOPTION\fB]... [\fIVALUE\fB]... [[\-t\] \fIFILE\fB]...\fR
+.br
 .B scrunner
 .B \-\-listScriptingLanguages
 .B [\fILANGUAGE\fB]...
@@ -36,6 +42,15 @@ option is not used, the scripting language is assumed to be ESP,
 which is described in the API documentation for the BZDev class library.
 The script that is processed is in effect the script produced
 by concatenating the input files in the order in which they appear.
+The second form places one input file before the options, and the third
+form places a
+.BR \-s
+option before that first input file and also creates some arguments as
+values that can be used by a script. The second and third options are
+useful when a script is an executable file and are normally not used
+directly (see the description of the
+.B \-s
+option and the EXECUTABLE SCRIPTS section for details).
 .PP
 Initially, the scripting environment contains a single variable named
 .B scripting
@@ -125,6 +140,45 @@ and
 is discouraged (both are vendor extensions not specified by the
 ECMAScript specification).
 .SH OPTIONS
+.TP
+.BR \-s\fR[\fISOPTION ]...
+Specify arguments. This must be the first argument if it is provided. Each
+.I SOPTION
+contains a colon, the letter
+.BR B ,
+.BR D ,
+.BR I ,
+.BR L ,
+.BR S ,
+or
+.BR E
+followed by a comma and a variable name, except for
+.B E
+which is followed by a comma and the keyword
+.BR true .
+The letters indicate the type of an argument:
+.BR B
+for boolean,
+.BR D
+for double,
+.BR I
+for integer,
+.BR L
+for long, and
+.BR S
+for String.  The corresponding variable names must start with
+a lower or upper case letter or an underscore, followed by any number
+of digits, lower or upper case letters, or underscores.  The letter
+.B E
+indicates that an
+.B \-\-exit
+option should be automatically added. If there are N
+.I SOPTION
+arguments, excluding any  whose type is
+.BR E ,
+the first file name and any options following that file name must
+be the corresponding values. An example is provided in the
+EXECUTABLE SCRIPTS section below.
 .TP
 .B \-\-
 End of options.  This option is needed when an input file's name
@@ -246,7 +300,13 @@ execute it.
 When the scripts provided as arguments to scrunner have been run and
 if there are no exceptions that have not been caught, scrunner will
 exit with a status of 0.  Without this option, scrunner will not exit
-if currently running threads have not run to completion.
+if currently running threads have not run to completion. This is not
+done by default because a script may have configured GUI components
+(e.g., to display a graph).  When the scripts
+.B scrunner
+executes will not have any additional threads running after the scripts
+run to completion, this option may noticeable improve performance,
+particularly for short scripts.
 .TP
 .BI \-i: VAR\ \fIFILENAME
 .TQ
@@ -495,6 +555,71 @@ class path, including entries added via the
 option, followed by an indented line containing the specification version
 for the JAR file and then the implementation version.  If either is
 missing, a "\-" is printed in its place.
+.SH EXECUTABLE SCRIPTS
+.PP
+The
+.B scrunner
+command can be used for making ESP scripts executable. Suppose a
+script is placed in a file name
+.B testscript
+and
+.B testscript
+starts with the following line:
+.IP
+ #!/usr/bin/scrunner -s:D:a,D:b,E:true
+.br
+global.getWriter()println(a + b);.
+.PP
+On Unix/Linux systems, executable files that start with the sequence
+.IP
+.B #!\fIPATHNAME
+.PP
+will run the program specified by
+.I PATHNAME
+with the pathname of the script as its argument, possibly following a
+single options. The result is that, if
+.B testscript
+is executable, then running the command
+.IP
+ ./testscript 10 20
+.PP
+is equivalent to running
+.IP
+ scrunner -s:D:a,D:b,E:true testscript 10 20
+.PP
+which in turn is equivalent to
+.IP
+ scrunner -vD:a:10 -vD:b:20 --exit testscript
+.PP
+which prints the value 30.
+Additional scripts can be added to the command:
+.IP
+ ./testscript 10 20 foo.esp
+.PP
+will print 30 on one line and then run the script
+.BR foo.esp .
+Additional
+.B scrunner
+options can be added. For example
+.IP
+ ./testscript --dryrun 10 20 foo.esp
+.PP
+will print the Java command that is actually executed. These Options can, of
+course add additional arguments such as a directory accessor.
+.PP
+The following 8-line-long program (on Linux systems):
+.IP
+#!/usr/bin/scrunner -s:D:a,D:b,E:true
+import (java.lang.Math);
+import (org.bzdev.math.Functions);
+function circE (a, b) {
+    var e2 = (a*a - b*b)/(a*a);
+    (e2 < 0)? circE(b, a): 4*a*eE(sqrt(e2))
+}
+global.getWriter().println(circE(a,b));
+.PP
+will use an ESP script to print the circumference of an ellipse given
+the lengths of the semi-major and semi-minor axes.
 .SH FILES
 .TP 
 .I /etc/bzdev/scrunner.conf\ \fRor\fI\ /etc/opt/bzdev/scrunner.conf
@@ -522,6 +647,7 @@ file override those in the system configuration file.
 \"  LocalWords:  subdirectory DirectoryAccessor fIFILENAME JOPTION vS
 \"  LocalWords:  makefiles OUTPUTFILE VARNAME IFILENAME rwd fIN vB vI
 \"  LocalWords:  stackTrace hecto giga vL tera peta exa vD yocto atto
-\"  LocalWords:  zepto femto nano milli centi zetta yotta fRor fI
+\"  LocalWords:  zepto femto nano milli centi zetta yotta fRor fI eE
 \"  LocalWords:  Solaris config conf lsnof resourcePath plaf PLAF
-\"  LocalWords:  pluggable
+\"  LocalWords:  pluggable FISOPTION fISOPTION SOPTION testscript
+\"  LocalWords:  fIPATHNAME PATHNAME pathname circE sqrt

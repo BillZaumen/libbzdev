@@ -91,7 +91,7 @@ public class SCRunnerCmd {
 
 	String name = file.getName();
 	int index = name.lastIndexOf('.');
-	if (index++ == 0 || index == name.length()) {
+	if (++index == 0 || index == name.length()) {
 	    return null;
 	}
 	return name.substring(index);
@@ -785,6 +785,47 @@ public class SCRunnerCmd {
 
 	String languageName = null;
 	index = 0;
+	ArrayList<String> parmList = new ArrayList<>();
+	boolean autoExitMode = false;
+	if (argv[0].startsWith("-s")) {
+	    String spec = argv[0].substring(2).trim();
+	    if (spec.length() > 0 &&
+		spec.charAt(0) == ':') {
+		spec = spec.substring(1);
+	    }
+
+	    String[] terms = spec.split("[:,\\s](\\s*)");
+	    if (terms.length %2 == 1) {
+		System.err.println(errorMsg("notPaired"));
+		System.exit(1);
+	    }
+	    for(int i = 0; i < terms.length; i += 2) {
+		String type = terms[i];
+		String variable = terms[i+1];
+		if (type.length() != 1) {
+		    System.err.println(errorMsg("badTypeField"));
+		    System.exit(1);
+		}
+		if (!variable.matches("[A-Za-z_][A-Za-z0-9_]*")) {
+		    System.err.println(errorMsg("badVariable", variable));
+		    System.exit(1);		    }
+		char ctype = type.charAt(0);
+		switch(ctype) {
+		case 'S': case 'I': case 'L': case 'D': case 'B':
+		    parmList.add("-v" + type + ":" + variable);
+		    break;
+		case 'E':
+		    if (variable.equals("true")) {
+			autoExitMode = true;
+		    }
+		    break;
+		default:
+		    System.err.println(errorMsg("parmType", type));
+		    System.exit(1);
+		}
+	    }
+	    index++;
+	}
 	String script = (argv[index].startsWith("-")
 			 && !argv[index].equals("-"))?
 	    null: argv[index++];
@@ -911,6 +952,8 @@ public class SCRunnerCmd {
 	    index++;
 	}
 
+	// need to skip over the arguments that represent values
+	index += parmList.size();
 	if (languageName == null) {
 	    String extension = null;
 	    while (index < argv.length && extension == null) {
@@ -929,7 +972,7 @@ public class SCRunnerCmd {
 		index++;
 	    }
 	    if (extension == null) {
-		languageName = "ECMAScript";
+		languageName = "ESP";
 	    } else {
 		languageName = Scripting.getLanguageNameByExtension(extension);
 	    }
@@ -958,6 +1001,7 @@ public class SCRunnerCmd {
 	argList.add(sbcp.toString());
 	*/
 	index = (script == null)? 0: 1;
+	if (parmList.size() > 0 || autoExitMode) index++;
 	boolean dryrun = false;
 	boolean listCodeBase = false;
 	while (index < argv.length && argv[index].startsWith("-")
@@ -993,6 +1037,13 @@ public class SCRunnerCmd {
 		}
 		sbcmd.add("--plaf");
 		sbcmd.add(argv[index]);
+	    } else if (argv[index].startsWith("-s:")) {
+		if (parmList.size() > 0) {
+		    System.err.println(errorMsg("multipleDashS"));
+		} else {
+		    System.err.println(errorMsg("misplacedDashS"));
+		}
+		System.exit(1);
 	    } else if (argv[index].startsWith("-o:")
 		       || argv[index].startsWith("-i:")
 		       || argv[index].startsWith("-d:")) {
@@ -1265,6 +1316,20 @@ public class SCRunnerCmd {
 	if (listCodeBase) {
 	    argList.add("--listCodeBase");
 	}
+
+	if (autoExitMode) {
+	    argList.add("--exit");
+	}
+	if (index + parmList.size() > argv.length) {
+	    System.err.println(errorMsg("tooFewArgs"));
+	    System.exit(1);
+	}
+	for (String opt: parmList) {
+	    opt = opt + ":" + argv[index];
+	    argList.add(opt);
+	    index++;
+	}
+
 	argList.addAll(sbcmd);
 
 	if (script != null) argList.add(script);

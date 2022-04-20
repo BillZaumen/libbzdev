@@ -187,7 +187,7 @@ public class SCRunner {
 
 	String name = file.getName();
 	int index = name.lastIndexOf('.');
-	if (index++ == 0 || index == name.length())
+	if (++index == 0 || index == name.length())
 	    return null;
 	return name.substring(index);
     }
@@ -247,7 +247,7 @@ public class SCRunner {
 		    }
 		    if (!extensions.contains(ext)) {
 			System.err.println
-			    (errorMsg("illegalExt", info.filename));
+			    (errorMsg("illegalExt", info.filename, ext));
 			/*
 			System.err.println("scrunner: "
 					   + "illegal file extension for "
