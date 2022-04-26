@@ -327,12 +327,13 @@ sctest:
 
 ecirc:
 	(cd ../.. ; make )
-	mkdir -p classes
 	chmod u+x ./run
 	chmod u+x ecirc.sh
 	./ecirc.sh 10 20
 	chmod u-x ecirc.sh
-	./ecirc
+	chmod u+x ecirc2
+	./ecirc2  10 20
+	chmod u-x ecirc2
 	chmod u-x ./run
 
 clean:

@@ -1048,7 +1048,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * @return true if such an object exists; false otherwise
 	 */
 	public boolean exists(String key) {
-	    return vmap.get().containsKey(key);
+	    return vmap.get().containsKey(key)
+		|| functNamesThreadLocal.get().contains(key);
 	}
 
 	/**
@@ -4547,10 +4548,10 @@ public class ExpressionParser implements ObjectParser<Object>
 			Array.set(varray, i++, n);
 		    }
 		} else if (obj instanceof ESPFunction
-			       && argclasses[i]
+			       && types[i]
 			       .getDeclaredAnnotation(FunctionalInterface.class)
 			       != null) {
-			Object o = ((ESPFunction) obj).convert(argclasses[i]);
+		    Object o = ((ESPFunction) obj).convert(types[i]);
 		    if (targ == oargs) {
 			oargs[i++] = o;
 		    } else {
@@ -6752,6 +6753,16 @@ public class ExpressionParser implements ObjectParser<Object>
 	Collections.synchronizedSet(new HashSet<String>());
     */
 
+    // Function names.  These must be defined at the top level of
+    // scripts and a name cannot be overridden once defined.
+    private ThreadLocal<Set<String>> functNamesThreadLocal =
+	new ThreadLocal<>() {
+	    @Override protected Set<String> initialValue() {
+		return new HashSet<String>();
+	    }
+	};
+
+
     private void addFunction(String name,
 			     String[] args,
 			     String orig,
@@ -6822,7 +6833,8 @@ public class ExpressionParser implements ObjectParser<Object>
      * @return true if the variable exists; false otherwise
      */
     public boolean exists(String name) {
-	return vmap.get().containsKey(name);
+	return vmap.get().containsKey(name)
+		|| functNamesThreadLocal.get().contains(name);
     }
 
     /**
@@ -7119,6 +7131,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	return s.substring(i, end);
     }
 
+
     private LinkedList<Token>
 	tokenize(String s, int offset, ArrayList<LinkedList<Token>> tarray)
 	throws ObjectParser.Exception
@@ -7165,6 +7178,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	boolean mustSync = false;
 
 	Set<String> vset = vsetThreadLocal.get();
+	Set<String> functNames = functNamesThreadLocal.get();
+
 	// vset.clear();  clear when parse is called
 	Stack<Set<String>> vsetStack = new Stack<>();
 	vsetStack.push(vset);
@@ -8920,7 +8935,6 @@ public class ExpressionParser implements ObjectParser<Object>
 			    ch = s.charAt(i);
 			    if (Character.isJavaIdentifierStart(ch)) {
 				// function definition, not lambda expression.
-				// TO DO.
 				if (Character.isJavaIdentifierStart(ch)) {
 				    int start2 = i;
 				    while (Character.isJavaIdentifierPart(ch)) {
@@ -8928,7 +8942,15 @@ public class ExpressionParser implements ObjectParser<Object>
 					if (i == len) break;
 					ch = s.charAt(i);
 				    }
-				    next.setValue(s.substring(start2,i));
+				    String fName = s.substring(start2,i);
+				    if (functNames.contains(fName)) {
+					String msg =
+					    errorMsg("fnameInUse", fName);
+					throw new ObjectParser.Exception
+					    (msg, filenameTL.get(), s, i);
+				    }
+				    functNames.add(fName);
+				    next.setValue(fName);
 				} else {
 				    // error
 				    String tmp = s.substring(i, i+1);
@@ -10201,6 +10223,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private Object parse(String s, boolean parseOnly) throws Exception {
 	vsetThreadLocal.get().clear();
+	functNamesThreadLocal.get().clear();
 	Thread currentThread = Thread.currentThread();
 	Thread lastThread = null;
 	if (processor.scriptingMode && noPrefixMode) {

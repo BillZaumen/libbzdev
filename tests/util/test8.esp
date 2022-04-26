@@ -1,0 +1,5 @@
+import (org.bzdev.math.RealValuedFunction);
+
+function fv(x) {x}
+var f = new RealValuedFunction(fv, fv, fv);
+f.valueAt(1.0);

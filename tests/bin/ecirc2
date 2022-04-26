@@ -1,0 +1,8 @@
+#!./run -sD:a,D:b,E:true
+import (java.lang.Math);
+import (org.bzdev.math.Functions);
+function circE (a, b) {
+    var e2 = (a*a - b*b)/(a*a);
+    (e2 < 0)? circE(b, a): 4*a*eE(sqrt(e2))
+}
+global.getWriter().println(circE(a,b));

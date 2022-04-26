@@ -217,9 +217,14 @@ estest5: compile
 estest6: compile
 	@echo ----- ExpressionParser Test '(var.identifier)' -------
 	@$(JAVA) ExprScriptTest6
+
 estest7: compile
 	@echo ----- ExpressionParser Test '(second var.identifier)' -------
 	@$(JAVA) ExprScriptTest7
+
+estest8: compile
+	@echo ----- ExpressionParser Test '(functional interface test)' -------
+	@$(JAVA) ExprScriptTest8
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------
