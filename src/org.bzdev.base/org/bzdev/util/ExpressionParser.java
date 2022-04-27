@@ -4421,6 +4421,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    boolean needObjMaps = false;
 	    for (Object obj: args) {
 		if (obj instanceof ESPFunction) sawf = true;
+		else if (obj instanceof ESPMethodRef) sawf = true;
 		else if (obj instanceof ESPObject) {
 		    sawf = true;
 		    needObjMaps = true;
@@ -4444,6 +4445,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		    if (argclasses[i].equals(ESPFunction.class)) {
 			ESPFunction f = (ESPFunction)args[i];
 			argcount[i] = f.numberOfArguments();
+		    } else if (argclasses[i].equals(ESPMethodRef.class)) {
+			ESPMethodRef mr = (ESPMethodRef)args[i];
+			argcount[i] = mr.numberOfArguments();
 		    } else if (argclasses[i].equals(ESPObject.class)) {
 			argcount[i] = ClassArraySorter.INTERFACE_TEST;
 		        ClassArraySorter.ArgCountMap omap =
@@ -4548,10 +4552,20 @@ public class ExpressionParser implements ObjectParser<Object>
 			Array.set(varray, i++, n);
 		    }
 		} else if (obj instanceof ESPFunction
-			       && types[i]
-			       .getDeclaredAnnotation(FunctionalInterface.class)
-			       != null) {
+			   && types[j]
+			   .getDeclaredAnnotation(FunctionalInterface.class)
+			   != null) {
 		    Object o = ((ESPFunction) obj).convert(types[i]);
+		    if (targ == oargs) {
+			oargs[i++] = o;
+		    } else {
+			Array.set(varray, i++, o);
+		    }
+		} else if (obj instanceof ESPMethodRef
+			   && types[j]
+			   .getDeclaredAnnotation(FunctionalInterface.class)
+			   != null) {
+		    Object o = ((ESPMethodRef) obj).convert(types[i]);
 		    if (targ == oargs) {
 			oargs[i++] = o;
 		    } else {

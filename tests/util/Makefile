@@ -72,6 +72,12 @@ all: compile
 	@$(JAVA) ExprScriptTest5
 	@echo ----- ExpressionParser Test '(var.identifier)' -------
 	@$(JAVA) ExprScriptTest6
+	@echo ----- ExpressionParser Test '(second var.identifier)' -------
+	@$(JAVA) ExprScriptTest7
+	@echo ----- ExpressionParser Test '(functional interface test)' -------
+	@$(JAVA) ExprScriptTest8
+	@echo - ExpressionParser Test '(functional interface, method ref test)' -
+	@$(JAVA) ExprScriptTest9
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
@@ -225,6 +231,10 @@ estest7: compile
 estest8: compile
 	@echo ----- ExpressionParser Test '(functional interface test)' -------
 	@$(JAVA) ExprScriptTest8
+
+estest9: compile
+	@echo - ExpressionParser Test '(functional interface, method ref test)' -
+	@$(JAVA) ExprScriptTest9
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------
