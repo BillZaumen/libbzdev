@@ -150,11 +150,16 @@ contains, the letter
 .BR I ,
 .BR L ,
 .BR S ,
+.BR E ,
+.BR R ,
 or
-.BR E
+.BR T ,
 followed by a colon and then a variable name, except for
-.B E
-which is followed by a colon and the keyword
+.BR E ,
+.BR R ,
+and
+.BR T
+each of which is followed by a colon and the keyword
 .BR true .
 The letters indicate the type of an argument:
 .BR B
@@ -172,13 +177,32 @@ of digits, lower or upper case letters, or underscores.  The letter
 .B E
 indicates that an
 .B \-\-exit
+option should be automatically added, the letter
+.B R
+indicates that the
+.B \-r
+option should be automatically added, and the letter
+.B T
+indicates that the
+.B \-\-stackTrace
 option should be automatically added. If there are N
 .I SOPTION
 arguments, excluding any  whose type is
 .BR E ,
-the first file name and any options following that file name must
-be the corresponding values. An example is provided in the
-EXECUTABLE SCRIPTS section below.
+.BR R ,
+or
+.BR T ,
+the first argument after the
+.B \-s
+option must be a file name for a script, followed by any other
+.B scrunner
+options, in turn followed by the values for the variable names specified
+by the
+.B \-s
+option in the order in which they appear in the
+.B \-s
+option.  Any additional arguments are the file names for scripts.
+An example is provided in the EXECUTABLE SCRIPTS section below.
 .TP
 .B \-\-
 End of options.  This option is needed when an input file's name

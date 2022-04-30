@@ -787,11 +787,18 @@ public class SCRunnerCmd {
 	index = 0;
 	ArrayList<String> parmList = new ArrayList<>();
 	boolean autoExitMode = false;
-	if (argv[0].matches("-s[:,BDILSE\\s].*")) {
+	boolean maxQualityMode = false;
+	boolean autoStackTraceMode = false;
+	if (argv[0].matches("-s[:,BDILSERT\\s].*")) {
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
+	    /*
 	    if (ch != 'B' && ch != 'D' && ch != 'I' && ch != 'L'
-		&& ch != 'S' && ch != 'E') {
+		&& ch != 'S' && ch != 'E' ) {
+		spec = spec.substring(1);
+	    }
+	    */
+	    if (ch == ':' || ch == ',' || Character.isWhitespace(ch)) {
 		spec = spec.substring(1);
 	    }
 	    spec = spec.trim();
@@ -816,8 +823,18 @@ public class SCRunnerCmd {
 		    parmList.add("-v" + type + ":" + variable);
 		    break;
 		case 'E':
-		    if (variable.equals("true")) {
+		    if (variable.equalsIgnoreCase("true")) {
 			autoExitMode = true;
+		    }
+		    break;
+		case 'R':
+		    if (variable.equalsIgnoreCase("true")) {
+			maxQualityMode = true;
+		    }
+		    break;
+		case 'T':
+		    if (variable.equalsIgnoreCase("true")) {
+			autoStackTraceMode = true;
 		    }
 		    break;
 		default:
@@ -1002,7 +1019,12 @@ public class SCRunnerCmd {
 	argList.add(sbcp.toString());
 	*/
 	index = (script == null)? 0: 1;
-	if (parmList.size() > 0 || autoExitMode) index++;
+	if (parmList.size() > 0 || autoExitMode || maxQualityMode
+	    || autoStackTraceMode) {
+	    // This detects a '-s' option, which has to be skipped
+	    // as it was already processed.
+	    index++;
+	}
 	boolean dryrun = false;
 	boolean listCodeBase = false;
 	while (index < argv.length && argv[index].startsWith("-")
@@ -1318,8 +1340,16 @@ public class SCRunnerCmd {
 	    argList.add("--listCodeBase");
 	}
 
+	// The next three 'if' statements handle flags that can be set when
+	// processing "-s" suboptions.
 	if (autoExitMode) {
 	    argList.add("--exit");
+	}
+	if (maxQualityMode) {
+	    argList.add("-r");
+	}
+	if (autoStackTraceMode) {
+	    argList.add("--stackTrace");
 	}
 	if (index + parmList.size() > argv.length) {
 	    System.err.println(errorMsg("tooFewArgs"));

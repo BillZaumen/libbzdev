@@ -1,4 +1,4 @@
-#!./run -sD:a,D:b,E:true
+#!./run -sD:a,D:b,E:true,R:true,T:true
 import (java.lang.Math);
 import (org.bzdev.math.Functions);
 function circE (a, b) {
