@@ -789,6 +789,7 @@ public class SCRunnerCmd {
 	boolean autoExitMode = false;
 	boolean maxQualityMode = false;
 	boolean autoStackTraceMode = false;
+	boolean autoPrintMode = false;
 	if (argv[0].matches("-s[:,BDILSERT\\s].*")) {
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
@@ -825,6 +826,11 @@ public class SCRunnerCmd {
 		case 'E':
 		    if (variable.equalsIgnoreCase("true")) {
 			autoExitMode = true;
+		    }
+		    break;
+		case 'P':
+		    if (variable.equalsIgnoreCase("true")) {
+			autoPrintMode = true;
 		    }
 		    break;
 		case 'R':
@@ -1020,7 +1026,7 @@ public class SCRunnerCmd {
 	*/
 	index = (script == null)? 0: 1;
 	if (parmList.size() > 0 || autoExitMode || maxQualityMode
-	    || autoStackTraceMode) {
+	    || autoStackTraceMode || autoPrintMode) {
 	    // This detects a '-s' option, which has to be skipped
 	    // as it was already processed.
 	    index++;
@@ -1038,6 +1044,8 @@ public class SCRunnerCmd {
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {
 		sbcmd.add("--stackTrace");
+	    } else if (argv[index].equals("--print")) {
+		sbcmd.add("--print");
 	    } else if (argv[index].equals("--")) {
 		sbcmd.add("--");
 		index++;
@@ -1350,6 +1358,9 @@ public class SCRunnerCmd {
 	}
 	if (autoStackTraceMode) {
 	    argList.add("--stackTrace");
+	}
+	if (autoPrintMode) {
+	    argList.add("--print");
 	}
 	if (index + parmList.size() > argv.length) {
 	    System.err.println(errorMsg("tooFewArgs"));

@@ -151,11 +151,13 @@ contains, the letter
 .BR L ,
 .BR S ,
 .BR E ,
+.BR P ,
 .BR R ,
 or
 .BR T ,
 followed by a colon and then a variable name, except for
 .BR E ,
+.BR P ,
 .BR R ,
 and
 .BR T
@@ -178,6 +180,10 @@ of digits, lower or upper case letters, or underscores.  The letter
 indicates that an
 .B \-\-exit
 option should be automatically added, the letter
+.B P
+indicates that the
+.B \-\-print
+option should be automatically added, the letter
 .B R
 indicates that the
 .B \-r
@@ -185,16 +191,18 @@ option should be automatically added, and the letter
 .B T
 indicates that the
 .B \-\-stackTrace
-option should be automatically added. If there are N
+option should be automatically added. The first argument after
+a
+.B \-s
+option must be a file name for a script.  If there are N
 .I SOPTION
-arguments, excluding any  whose type is
+arguments (with N larger than 0), excluding any whose type is
 .BR E ,
+.BR P ,
 .BR R ,
 or
 .BR T ,
-the first argument after the
-.B \-s
-option must be a file name for a script, followed by any other
+the initial script argument must be followed by any other
 .B scrunner
 options, in turn followed by the values for the variable names specified
 by the
@@ -481,6 +489,15 @@ and a mode that is either
 or
 .B rd .
 .TP
+.B \-\-print
+The last object created by the first script run will be printed
+on standard output unless the
+.B \-o
+option is present, in which case the last object will be printed to
+the file provided by the
+.B \-o
+option.
+.TP
 .B \-\-stackTrace
 Print a stack trace if an error occurs when running scripts.
 .TP
@@ -596,9 +613,9 @@ and
 .B testscript
 starts with the following line:
 .IP
- #!/usr/bin/scrunner -sD:a,D:b,E:true
+ #!/usr/bin/scrunner -sD:a,D:b,E:true,P:true
 .br
-global.getWriter()println(a + b);.
+a + b
 .PP
 On Unix/Linux systems, executable files that start with the sequence
 .IP
@@ -615,11 +632,11 @@ is executable, then running the command
 .PP
 is equivalent to running
 .IP
- scrunner -sD:a,D:b,E:true testscript 10 20
+ scrunner -sD:a,D:b,E:true,P:true testscript 10 20
 .PP
 which in turn is equivalent to
 .IP
- scrunner -vD:a:10 -vD:b:20 --exit testscript
+ scrunner -vD:a:10 -vD:b:20 --exit --print testscript
 .PP
 which prints the value 30.
 Additional scripts can be added to the command:
@@ -645,25 +662,20 @@ need a directory accessor or it may be useful to add the
 .B \-\-stackTrace
 flag for debugging.
 .PP
-The following 8-line-long program (on Linux systems) uses an ESP
+The following 6-line-long program (on Linux systems) uses an ESP
 script to print the circumference of an ellipse given the lengths of
 the semi-major and semi-minor axes:
 .IP
-#!/usr/bin/scrunner -sD:a,D:b,E:true
+#!/usr/bin/scrunner -sD:a,D:b,E:true,P:true
 .br
 import (java.lang.Math);
 .br
 import (org.bzdev.math.Functions);
 .br
-function circE(a, b) {
+var ab = Math.max(a,b);
+    var e2 = (a*a - b*b)/(ab*ab);
 .br
-    var e2 = (a*a - b*b)/(a*a);
-.br
-    (e2 < 0)? circE(b, a): 4*a*eE(sqrt(e2))
-.br
-}
-.br
-global.getWriter().println(circE(a,b));
+4.0 * (32 < 0? b: a) * eE(sqrt(abs(e2)));
 .PP
 Additional whitespace may appear in the first line at any point after
 the initial

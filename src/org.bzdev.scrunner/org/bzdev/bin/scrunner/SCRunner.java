@@ -264,13 +264,23 @@ public class SCRunner {
 	    }
 	}
 
+	PrintWriter handlerWriter = null;
+
 	public void run() throws ScriptException {
 	    for (Info info: queue) {
 		try {
 		    Reader reader = new
 			InputStreamReader(info.useStdin? System.in:
 					  info.dfis.open());
-		    info.context.evalScript(info.filename, reader);
+		    if (handlerWriter != null) {
+		       Object obj = info.context.evalScript(info.filename,
+							    reader);
+		       handlerWriter.println(obj);
+		       handlerWriter.flush();
+		       handlerWriter = null;
+		    } else {
+			info.context.evalScript(info.filename, reader);
+		    }
 		} catch (FileNotFoundException e) {
 		    System.err.println(errorMsg("exception", e.getMessage()));
 		    // System.err.println("scrunner: " + e.getMessage());
@@ -300,6 +310,7 @@ public class SCRunner {
 
 
 	boolean stackTrace = false;
+	boolean printMode = false;
 	int trustLevel = 0;
 	boolean showFactories = false;
 	boolean listVersions = false;
@@ -329,6 +340,8 @@ public class SCRunner {
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {
 		stackTrace = true;
+	    } else if (argv[index].equals("--print")) {
+		printMode = true;
 	    } else if (argv[index].equals("-o")) {
 		index++;
 		try {
@@ -971,6 +984,14 @@ public class SCRunner {
 	if (writer != null) context.setWriter(writer);
 
 	handler.checkFiles();
+
+	if (printMode) {
+	    if (writer == null || !(writer instanceof PrintWriter)) {
+		handler.handlerWriter = new PrintWriter(System.out);
+	    } else {
+		handler.handlerWriter = (PrintWriter)writer;
+	    }
+	}
 
 	if (trustLevel == 0) {
 	    System.setSecurityManager(new SecurityManager());

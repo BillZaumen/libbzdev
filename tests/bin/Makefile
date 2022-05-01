@@ -332,8 +332,11 @@ ecirc:
 	./ecirc.sh 10 20
 	chmod u-x ecirc.sh
 	chmod u+x ecirc2
+	chmod u+x ecirc3
 	./ecirc2 --dryrun 10 20
 	./ecirc2  10 20
+	./ecirc3  10 20
+	chmod u-x ecirc3
 	chmod u-x ecirc2
 	chmod u-x ./run
 
