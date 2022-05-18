@@ -1716,7 +1716,6 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 			apg.rvmodeChanged();
 			boolean darkmode = apg.getRVMode();
 			if (darkmode) {
-			    System.out.println("dark mode");
 			    controlPanel.setBackground(controlPanelDMColor);
 			    apg.currentPlayIcon = playIconRV;
 			    apg.currentPauseIcon = pauseIconRV;
