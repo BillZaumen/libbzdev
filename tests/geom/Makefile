@@ -146,6 +146,8 @@ all:
 	$(JAVA) BGPathTest
 	$(JAVA) BGPathTest2
 	$(JAVA) BGPathTest3
+	@echo ------- BezierMapperTest ----------
+	$(JAVA) BezierMapperTest
 	@echo -------- PathIntegralTest --------
 	@$(JAVA) PathIntegralTest
 	@echo -------- SurfaceIntTest --------
@@ -230,6 +232,12 @@ bgsphere1:
 	@echo ------- BGSphere1 ----------
 	$(JAVA) BGSphere1
 
+bgmapper:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BezierMapperTest ----------
+	$(JAVA) BezierMapperTest
 
 builder:
 	(cd ../.. ; make jars)

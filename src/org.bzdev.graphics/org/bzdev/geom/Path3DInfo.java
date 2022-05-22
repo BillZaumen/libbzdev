@@ -3275,11 +3275,11 @@ public class Path3DInfo {
 		pi.next();
 		continue;
 	    case PathIterator3D.SEG_LINETO:
+		hasTangent = getTangent(0.0, tangent, 0, lastx, lasty, lastz,
+					PathIterator3D.SEG_LINETO, coords);
 		lastx = coords[0];
 		lasty = coords[1];
 		lastz = coords[2];
-		hasTangent = getTangent(0.0, tangent, 0, lastx, lasty, lastz,
-					PathIterator3D.SEG_LINETO, coords);
 		justSawMoveTo = false;
 		pi.next();
 		continue;
@@ -3371,11 +3371,11 @@ public class Path3DInfo {
 		pi.next();
 		continue;
 	    case PathIterator3D.SEG_LINETO:
+		hasTangent = getTangent(0.0, tangent, 0, lastx, lasty, lastz,
+					PathIterator3D.SEG_LINETO, coords);
 		lastx = coords[0];
 		lasty = coords[1];
 		lastz = coords[2];
-		hasTangent = getTangent(0.0, tangent, 0, lastx, lasty, lastz,
-					PathIterator3D.SEG_LINETO, coords);
 		if (!hasTangent) {
 		    justSawMoveTo = false;
 		    pi.next();

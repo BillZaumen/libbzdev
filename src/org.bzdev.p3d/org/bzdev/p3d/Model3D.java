@@ -64,7 +64,7 @@ import java.security.*;
  * m3d.addTriangle(...);
  * ...
  * m3d.addTriangle(...);
- * if (m3d.notPrintable(System.out) System.exit(1);
+ * if (m3d.notPrintable(System.out)) System.exit(1);
  * m3d.writeSTL("model test", "model.stl");
  * System.exit(0);
  * </pre></code></blockquote>
