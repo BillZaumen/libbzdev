@@ -1,0 +1,4 @@
+import (java.lang.Math);
+import (org.bzdev.math.RealValuedFunction);
+
+var f = new RealValuedFunction(Math::sin, Math::cos, Math::sin);

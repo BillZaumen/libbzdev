@@ -1045,6 +1045,7 @@ public class BezierGrid implements Shape3D {
      * generated surface.
      * @param wire a 3D path, either open or closed
      * @param inormal the vector that provides an initial normal vector
+     *        (ignored if a normal vector can be computed from the 'wire')
      */
     public static Mapper getMapper(Path3D wire, double[] inormal)
     {
