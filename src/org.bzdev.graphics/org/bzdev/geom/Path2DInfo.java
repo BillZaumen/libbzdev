@@ -6644,7 +6644,10 @@ public class Path2DInfo {
      * preceding a PathIterator.SEG_CLOSE segment is equal to t he
      * initial segment (whose type is first PathIterator.SEG_MOVETO),
      * the terminating PathIterator.SEG_CLOSE segment is not included in
-     * the count.
+     * the count.  For an open path, the number of drawable segments
+     * is one less than the number of drawable knots. For a closed
+     * path, the number of drawable knots and the number of drawable
+     * segments are the same.
      * @param path the path
      * @return the number of drawable segments
      * @throws IllegalStateException if the path does not start with a
@@ -6710,7 +6713,10 @@ public class Path2DInfo {
      * preceding a PathIterator.SEG_CLOSE segment is equal to t he
      * initial segment (whose type is first PathIterator.SEG_MOVETO),
      * the terminating PathIterator.SEG_CLOSE segment is not included in
-     * the count.
+     * the count. For an open path, the number of drawable knots is
+     * one more than the number of drawable segments. For a closed
+     * path, the number of drawable knots and the number of drawable
+     * segments are the same.
      * @param path the path
      * @return the number of drawable segments
      * @throws IllegalStateException if the path does not start with a

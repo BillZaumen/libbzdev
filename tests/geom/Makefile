@@ -801,6 +801,13 @@ cpc:
 	@echo ----- CubicVertexRing ------
 	@$(JAVA) CubicVertexRing
 
+cpc2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ConvexPathCTest2
+
+
 cvring:
 	(cd ../.. ; make jars)
 	mkdir -p classes

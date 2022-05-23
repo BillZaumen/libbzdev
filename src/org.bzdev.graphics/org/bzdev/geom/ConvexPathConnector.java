@@ -622,10 +622,15 @@ public class ConvexPathConnector implements Shape3D {
 	Path2D itpath = Path2DInfo.controlPointPolygon(inner, true, null);
 	double pathlength1 = Path2DInfo.pathLength(ihull);
 	double pathlength2 = Path2DInfo.pathLength(itpath);
+	int nsegs = Math.max(Path2DInfo.numberOfDrawableSegments(ihull),
+			     Path2DInfo.numberOfDrawableSegments(itpath));
+	if (nsegs == 0) nsegs = 1;
 	if (Math.abs((pathlength1 - pathlength2)
-		     /Math.max(pathlength1, pathlength2)) > 1.e-10) {
+		     /Math.max(pathlength1, pathlength2)) > nsegs*1.e-10) {
 	    // If pathlength1 != pathlength 2, tpath must have backtracked
 	    // and crossed itself at some point.
+	    // The factor nsegs accounts for numerical errors in summing
+	    // the lengths of multiple segments.
 	    throw new IllegalArgumentException(errorMsg("innerNotConvex"));
 	}
 
