@@ -96,6 +96,8 @@ public class ESPEngine extends AbstractScriptEngine
 					  classArray4, null);
 	} catch (IllegalAccessException e) {
 	    throw new UnexpectedExceptionError(e);
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 	parser.setScriptingMode();
 	parser.setImportMode();

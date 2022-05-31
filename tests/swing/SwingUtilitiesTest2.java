@@ -29,8 +29,10 @@ public class SwingUtilitiesTest2 {
 	    });
 
 
-	System.setSecurityManager(new SecurityManager());
-	System.out.println("security manager installed");
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	    System.out.println("security manager installed");
+	} catch (UnsupportedOperationException eu) {}
 	SwingUtilities.invokeAndWait(() -> {
 		Document doc = tc.getDocument();
 		try {

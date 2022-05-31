@@ -45,7 +45,9 @@ public class PrinterTest {
 	    aset.add(OrientationRequested.PORTRAIT);
 	    System.out.println(aset.get(OrientationRequested.class));
 	    pg = new PrinterGraphics(pjob, aset, 800, 600);
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 	    g2d = pg.createGraphics();
 	    g2d.setColor(Color.red);
 	    g2d.setFont(new Font("SansSerif", Font.BOLD, 14));

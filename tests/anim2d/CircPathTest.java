@@ -360,7 +360,9 @@ public class CircPathTest {
 	    dir = new File("datmp");
 	    dir.mkdirs();
 	    DirectoryAccessor da = new DirectoryAccessor("datmp");
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 	    a2d2.setRanges(0.0, 0.0, 0.5, 0.5, 25.0, 25.0);
 	    obj = new CircObject(a2d2, "obj", true);
 	    obj.setZorder(0, true);

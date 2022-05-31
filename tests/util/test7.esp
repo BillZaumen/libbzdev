@@ -30,9 +30,9 @@ var.da? function() {
     da.list().forEach(function(name) {
 	da.isDirectory(name) || da.delete(name); void;
     });
-    a2d.initFrames(maxframes, "img", "png", da) ; null
+    a2d.initFrames(maxframes, "img", "png", da);
     a2d.scheduleFrames(0L, maxframes);
-    a2d.run();
+    a2d.run();  null
 }(): function() {
     global.getWriter().println("starting animation");
     global.getWriter().flush();

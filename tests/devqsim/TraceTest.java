@@ -151,11 +151,13 @@ public class TraceTest {
 
 	tsim.allowSetStackTraceMode(true, true);
 
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
 
-	// verify that we do not throw a security exception
-	tsim.setStackTraceMode(true);
-	traceSet4.setStackTraceMode(true);
+	    // verify that we do not throw a security exception
+	    tsim.setStackTraceMode(true);
+	    traceSet4.setStackTraceMode(true);
+	} catch (UnsupportedOperationException eu) {}
 
 	System.exit(0);
     }

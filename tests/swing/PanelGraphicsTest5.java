@@ -9,7 +9,10 @@ import java.io.*;
 public class PanelGraphicsTest5 {
 
     public static void main(String argv[]) throws Exception {
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {}
+
 	PanelGraphics pg1 = PanelGraphics.newFramedInstance
 	    (500, 400, "PanelGraphics 5 ", true, true);
 

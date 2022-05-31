@@ -9,12 +9,12 @@ public class ThreadTest {
 	Properties properties = null;
 	ScriptEngine engine;
 	public OurScriptingContext() {
-	    super("ECMAScript");
+	    super("ESP");
 	    engine = doGetScriptEngine();
 	}
 
 	public OurScriptingContext(Properties properties) {
-	    super("ECMAScript");
+	    super("ESP");
 	    engine = doGetScriptEngine();
 	    this.properties = properties;
 	}
@@ -113,12 +113,14 @@ public class ThreadTest {
 	scripting.putScriptObject("scripting", scripting);
 
 	try  {
+	    scripting.evalScript("import(\"\", [ThreadTest])");
+	    scripting.evalScript("import(java.lang.Thread)");
 	    System.out.println("... should print hello, a blank line,  and "
 			       + "then goodbye");
 	    scripting.evalScript
-		("java.lang.System.out.println(\"hello\");" +
-		 "scripting.evalScript(\"java.lang.System.out.println(\\\"\\\");\");" +
-		 "java.lang.System.out.println(\"goodbye\");");
+		("global.getWriter().println(\"hello\");" +
+		 "scripting.evalScript(\"global.getWriter().println(\\\"\\\");\");" +
+		 "global.getWriter().println(\"goodbye\");");
 
 	    scripting.putScriptObject("x", new Double(10));
 
@@ -129,21 +131,25 @@ public class ThreadTest {
 	    // a script so that the inherited thread local variable
 	    // will be set to the correct value.
 	    scripting.evalScript
-		("java.lang.System.out.println(x); Packages.ThreadTest.setup();");
+		("global.getWriter().println(x); Packages.ThreadTest.setup();");
 	    // need to call toggle 3 times due to the test environment.
 	    // The first call sets up the engine with the default bindings.
 	    // The second call sets up the engine with 'bindings'.
 	    // The third calll restores the default bindings.
 	    System.out.println("execting to see 10, 20, 10, one per line");
 	    toggle();
-	    scripting.engine.eval("java.lang.System.out.println(x)");
+	    scripting.engine.eval("global.getWriter().println(x)");
 	    toggle();
-	    scripting.engine.eval("java.lang.System.out.println(x)");
+	    scripting.engine.eval("global.getWriter().println(x)");
 	    toggle();
-	    scripting.engine.eval("java.lang.System.out.println(x)");
+	    scripting.engine.eval("global.getWriter().println(x)");
 
-	    bindings.put("plstring", "java.lang.System.out.println(\"evaluated plstring\")");
+	    bindings.put("plstring",
+			 "global.getWriter().println(\"evaluated plstring\")");
+	    /*
+	      ESP does not have 'eval' as a built-in function
 	    scripting.evalScript("eval(plstring)", bindings);
+	    */
 
 	    if (scripting.getScriptObject("plstring") != null) {
 		System.out.println("wrong bindings?");
@@ -157,10 +163,10 @@ public class ThreadTest {
 		    public void run() {
 			try {
 			    scripting.evalScript
-				("java.lang.System.out.println(\"thread started\");" +
+				("global.getWriter().println(\"thread started\");" +
 				 "Packages.ThreadTest.notify1();" +
 				 "Packages.ThreadTest.wait2();" +
-				 "java.lang.System.out.println(\"thread completing\");" +
+				 "global.getWriter().println(\"thread completing\");" +
 				 "Packages.ThreadTest.notify3();");
 			} catch (ScriptException se) {
 			    System.out.println("thread: " + se.getMessage());
@@ -171,16 +177,17 @@ public class ThreadTest {
 	    scripting.putScriptObject("thread", thread);
 
 	    scripting.evalScript
-		("java.lang.System.out.println(\"starting thread test\");" +
+		("global.getWriter().println(\"starting thread test\");" +
 		 "thread.start();" +
 		 "Packages.ThreadTest.wait1();" +
-		 "java.lang.System.out.println(\"thread pausing\");" +
+		 "global.getWriter().println(\"thread pausing\");" +
 		 "Packages.ThreadTest.notify2();" +
 		 "Packages.ThreadTest.wait3();" +
-		 "java.lang.System.out.println(\"ending thread test\")");
+		 "global.getWriter().println(\"ending thread test\")");
 
-	    System.setSecurityManager(new SecurityManager());
 
+	    // Warning a scripting context using ESP just be created
+	    // before a security manager is installed.
 	    Properties props = new Properties();
 	    props.setProperty("ECMAScript",
 			      "({test: function(fname)"
@@ -193,6 +200,11 @@ public class ThreadTest {
 			      + "})");
 
 	    scripting = new OurScriptingContext(props);
+
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {System.exit(0);}
+
 	    try {
 		scripting.testP("jtest2");
 		System.out.println

@@ -21,12 +21,18 @@ public class PanelGraphicsTest6 {
 	}
 
 	if (before) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {System.exit(0);}
 	}
 	PanelGraphics.ExitAccessor ea = new PanelGraphics.ExitAccessor();
 
 	if (after) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {
+		System.exit(0);
+	    }
 	}
 
 	PanelGraphics pg = null;

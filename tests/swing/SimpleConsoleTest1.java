@@ -30,7 +30,9 @@ public class SimpleConsoleTest1 {
 	    SwingUtilities.invokeAndWait(() -> {});
 	}
 
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {}
 
 	int len = tc.getLength();
 	System.out.println("tc.getLength() = " + len);

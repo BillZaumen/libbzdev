@@ -9,7 +9,9 @@ public class OSGTest {
     static public void main(String argv[]) {
 	try {
 	    if (argv.length == 0) {
-		System.setSecurityManager(new SecurityManager());
+		try {
+		    System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu) {}
 		System.out.println("preferred image types:");
 		for (String type: OutputStreamGraphics.getImageTypes()) {
 		    System.out.println("    " + type + ", aliases:");
@@ -103,7 +105,9 @@ public class OSGTest {
 		("number of image types = "
 		 + OutputStreamGraphics.getAllImageTypes().length);
 	    */
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 	    OutputStreamGraphics osg = (orientation == null)?
 		OutputStreamGraphics.newInstance(fos, 800, 600, argv[0]):
 		OutputStreamGraphics.newInstance(fos, 800, 600, orientation,

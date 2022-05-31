@@ -9,14 +9,16 @@ import java.io.Flushable;
 
 /**
  * Null security manager for tracing security-manager methods.
-
  * This security manager implements a "null" security policy and is
  * equivalent to setting the security manager to null, but can be
  * configured using the method
  * {@link #setOutput(Appendable) setOutput}
  * to trace the calls made to the security manager's public methods.
- * 
+ * <P>
+ * Deprecated because the SecurityManager class is being removed from
+ * Java.
  */
+@Deprecated
 public class  NullSecurityManager extends SecurityManager {
 
     static String errorMsg(String key, Object... args) {

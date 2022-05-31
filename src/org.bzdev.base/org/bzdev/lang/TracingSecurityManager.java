@@ -9,7 +9,11 @@ import java.security.Permission;
  * Security manager for tracing calls to java.lang.SecurityManager.
  * This security manager adds the ability to trace the
  * calls to its superclass.
+ * <P>
+ * Deprecated becasue the SecurityManager class is being removed
+ * from Java.
  */
+@Deprecated
 public  class TracingSecurityManager extends SecurityManager {
 
     Appendable out = null;

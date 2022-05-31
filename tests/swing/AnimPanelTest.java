@@ -14,7 +14,10 @@ public class AnimPanelTest {
 	    DarkmodeMonitor.init();
 	}
 
+	try {
 	System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {}
+
 
 	Animation2D animation = new Animation2D(400, 250, 1000.0, 40);
 

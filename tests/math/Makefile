@@ -7,6 +7,9 @@ JAVA = java -classpath ../../BUILD/libbzdev.jar:classes
 JAVA2 = java -XX:+AggressiveOpts \
 	-classpath ../../BUILD/libbzdev.jar:classes
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
+
 all:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -44,15 +47,15 @@ all:
 	@echo -------- SplineTest2 ------------
 	$(JAVA) SplineTest2
 	@echo --------- RValuedFunctionTest -------
-	$(JAVA) RValuedFunctionTest
+	$(HAS_JS) && $(JAVA) RValuedFunctionTest
 	@echo ... repeat using ESP
 	$(JAVA) RValuedFunctionTest esp
 	@echo --------- RVFTwoTest -------
-	$(JAVA) RVFTwoTest
+	$(HAS_JS) && $(JAVA) RVFTwoTest
 	@echo ... repeat using ESP
 	$(JAVA) RVFTwoTest esp
 	@echo --------- RVFThreeTest -------
-	$(JAVA) RVFThreeTest
+	$(HAS_JS) && $(JAVA) RVFThreeTest
 	@echo ... repeat using ESP
 	$(JAVA) RVFThreeTest esp
 	@echo --------- BinomialTest -------
@@ -62,7 +65,7 @@ all:
 	@echo -------- FunctionsTest ------------
 	$(JAVA) FunctionsTest
 	@echo ------- RVFVATest ------------
-	$(JAVA) RVFVATest
+	$(HAS_JS) && $(JAVA) RVFVATest
 	@echo ... repeat using ESP
 	$(JAVA) RVFVATest esp
 	@echo -------- BicubicTest ------------
@@ -191,7 +194,7 @@ rvf:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RValuedFunctionTest ------------
-	$(JAVA) RValuedFunctionTest
+	$(HAS_JS) && $(JAVA) RValuedFunctionTest
 	@echo ... repeat using ESP
 	$(JAVA) RValuedFunctionTest esp
 
@@ -200,7 +203,7 @@ rvf2:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFTwoTest ------------
-	$(JAVA) RVFTwoTest
+	$(HAS_JS) && $(JAVA) RVFTwoTest
 	@echo ... repeat using ESP
 	$(JAVA) RVFTwoTest esp
 
@@ -209,7 +212,7 @@ rvf3:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFThreeTest ------------
-	$(JAVA) RVFThreeTest
+	$(HAS_JS) && $(JAVA) RVFThreeTest
 	@echo ... repeat using ESP
 	$(JAVA) RVFThreeTest esp
 
@@ -218,7 +221,7 @@ rvfva:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFVATest ------------
-	$(JAVA) RVFVATest
+	$(HAS_JS) && $(JAVA) RVFVATest
 	@echo ... repeat using ESP
 	$(JAVA) RVFVATest esp
 

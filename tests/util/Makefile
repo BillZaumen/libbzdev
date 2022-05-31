@@ -2,6 +2,8 @@
 JAVA = java -p ../../BUILD -classpath classes --add-modules org.bzdev \
 	-Djava.security.policy=../../BUILD/libbzdev.policy
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
 all: compile
 	@echo -------- ClassTest ---------
 	@$(JAVA) ClassTest
@@ -23,7 +25,7 @@ all: compile
 	@$(JAVA) SciFormatterTest
 	@echo -------- SciFormatter Script Test ----------
 	chmod u+x scrun
-	@./scrun SciFormatterTest.js
+	@$(HAS_JS) && ./scrun SciFormatterTest.js
 	@./scrun SciFormatterTest.esp
 	chmod u-x scrun
 	@echo -------- SafeFormatterTest --------
@@ -60,6 +62,10 @@ all: compile
 	@$(JAVA) ExpressionTest
 	@echo ----- ExpressionParser Script Test -------
 	@$(JAVA) ExprScriptTest
+	@echo ----- ExprScriptTestE  -------
+	@$(JAVA) ExprScriptTestE
+	@echo ----- ... now using the ESPEngine constructor ... -----
+	@$(JAVA) ExprScriptTestE engine
 	@echo ----- ExpressionParser Script Test '(sandboxed)' -------
 	@$(JAVA) ExprScriptTest -s
 	@echo ----- ExpressionParser Test '(multithreading)'  -------
@@ -155,7 +161,7 @@ clonetest: compile
 sctest:
 	(cd ../.. ; make)
 	chmod u+x scrun
-	@./scrun --stackTrace SciFormatterTest.js
+	@$(HAS_JS) && ./scrun --stackTrace SciFormatterTest.js
 	chmod u-x scrun
 
 sctest-esp:
@@ -200,9 +206,19 @@ estest: compile
 	@echo ----- ExpressionParser Test '(script)' -------
 	@$(JAVA) ExprScriptTest
 
+estestE: compile
+	@echo ----- ExprScriptTestE  -------
+	@$(JAVA) ExprScriptTestE
+	@echo ----- ... now using the ESPEngine constructor ... -----
+	@$(JAVA) ExprScriptTestE engine
+
 estest-s: compile
 	@echo ----- ExpressionParser Test '(sandboxed script)' -------
 	@$(JAVA) ExprScriptTest -s
+
+estest1: compile
+	@echo ---- use of fully-qualified fields
+	@$(JAVA) ExprScriptTest1
 
 estest2: compile
 	@echo ----- ExpressionParser Test '(multithreading)'  -------

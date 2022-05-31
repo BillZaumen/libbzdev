@@ -23,8 +23,9 @@ public class DelayTest {
 
 	    DirectoryAccessor daro = new DirectoryAccessor("testdir", true);
 
-
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 
 	    InputStream is1 = dis1.open();
 	    OutputStream os2 = dos2.open();

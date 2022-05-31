@@ -2835,7 +2835,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	public String findField(String name) {
 	    if (sa == null) {
 		if (importMode) {
-		    if (enumSet.size() == 0) {
+		    if (enumSet.size() == 0 && fieldClassSet.size() == 0) {
 			return null;
 		    } else {
 			AccessController.doPrivileged

@@ -7,6 +7,11 @@ LSNOF = java -Djava.security.policy=../../BUILD/libbzdev.policy \
 LSNOF2 = java -Djava.security.policy=../../BUILD/libbzdev.policy \
 	 -p ../../BUILD:/usr/share/bzdev/librdanim-1.3.5.jar -m org.bzdev.lsnof/org.bzdev.bin.lsnof.FactoryPrinter
 
+HAS_JS_TEST = \
+	`java -Dscrunner.usrconf=test.conf -p ../../BUILD \
+		-m org.bzdev.scrunner \
+		--supportsLanguage ECMAScript`
+
 all:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -53,8 +58,9 @@ all:
 	$(LSNOF) --html 'org.bzdev.devqsim.*' > test.html
 	@echo '***** ' RVTest:
 	$(JAVA) RVTest
-	@echo '***** testsim.js *****'
-	java -p ../../BUILD -m org.bzdev.scrunner testsim.js
+	@ if $(HAS_JS_TEST) ; then \
+	echo '***** testsim.js *****' ; \
+	java -p ../../BUILD -m org.bzdev.scrunner testsim.js ; fi
 	@echo '***** testsim.esp *****'
 	java -p ../../BUILD -m org.bzdev.scrunner testsim.esp
 

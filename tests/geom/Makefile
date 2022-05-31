@@ -1,5 +1,8 @@
 JAVA = java  -classpath ../../BUILD/libbzdev.jar:classes
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
+
 all:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -25,7 +28,7 @@ all:
 	@echo --------- BuilderTest3 -------------
 	@$(JAVA) BuilderTest3
 	@echo --------- scripting path-builder tests
-	@java -classpath \
+	@$(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js
 	@java -classpath \
@@ -819,7 +822,7 @@ pbtest:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	@java -classpath \
+	@(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js
 

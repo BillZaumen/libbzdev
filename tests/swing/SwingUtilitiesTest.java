@@ -9,7 +9,9 @@ public class SwingUtilitiesTest {
 	    Toolkit.getDefaultToolkit();
 	}
 
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {}
 
 	System.out.println("hello");
 	SwingUtilities.invokeAndWait(() -> {

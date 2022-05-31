@@ -1,5 +1,7 @@
 JAVA = java -classpath ../../BUILD/libbzdev.jar:classes
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
 all:
 	(cd ../.. ; make jars)
 	mkdir -p classes tmpsrc
@@ -25,7 +27,7 @@ all:
 		classes/META-INF/services/org.bzdev.obnaming.NamedObjectFactory
 	chmod u+x scrun
 	@echo ---- test.js ------
-	@./scrun --classpathCodebase classes/ --stackTrace test.js
+	@$(HAS_JS) && ./scrun --classpathCodebase classes/ --stackTrace test.js
 	@echo ---- test.esp ------
 	@./scrun --classpathCodebase classes/ --stackTrace test.esp
 	chmod u-x scrun

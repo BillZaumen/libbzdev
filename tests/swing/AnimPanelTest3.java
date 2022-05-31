@@ -22,14 +22,19 @@ public class AnimPanelTest3 {
 	}
 
 	if (before) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {System.exit(0);}
+
 	}
 
 	AnimatedPanelGraphics.ExitAccessor ea =
 	    new AnimatedPanelGraphics.ExitAccessor();
 
 	if (after) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {System.exit(0);}
 	}
 	
 	AnimatedPanelGraphics apg = null;

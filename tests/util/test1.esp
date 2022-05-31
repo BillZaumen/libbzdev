@@ -1,0 +1,2 @@
+import (java.awt.Color);
+var black = java.awt.Color.BLACK;

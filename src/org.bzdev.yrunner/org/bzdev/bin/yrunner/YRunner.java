@@ -1015,7 +1015,9 @@ public class YRunner {
 	handler.checkFiles();
 
 	if (trustLevel == 0) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 	} else if (trustLevel == 1) {
 	    System.err.println(errorMsg("noSSM"));
 	    System.exit(1);

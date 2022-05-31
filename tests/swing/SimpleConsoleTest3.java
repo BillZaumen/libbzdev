@@ -35,7 +35,9 @@ public class SimpleConsoleTest3 {
 
 	    if (smBefore) {
 		Toolkit.getDefaultToolkit();
-		System.setSecurityManager(new SecurityManager());
+		try {
+		    System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu) {System.exit(0);}
 	    }
 
 	    SwingUtilities.invokeAndWait(new Runnable () {
@@ -46,7 +48,9 @@ public class SimpleConsoleTest3 {
 		});
 
 	    if (smAfter) {
-		System.setSecurityManager(new SecurityManager());
+		try {
+		    System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu) {System.exit(0);}
 	    }
 
 	    Thread.currentThread().sleep(2000);

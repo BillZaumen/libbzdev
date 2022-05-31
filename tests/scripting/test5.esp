@@ -1,8 +1,8 @@
 import("", [ScriptingTest4, ScriptingTest4.Adapter]);
 
-var listener = new Packages.ScriptingTest4$Adapter
+var listener = new ScriptingTest4.Adapter
                      (scripting, {method1: function(str, val) {
-				      file = new
+				      var file = new
 				      java.io.FileOutputStream("test5.out");
 				      file.close();
 				 }});

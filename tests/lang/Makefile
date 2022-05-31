@@ -4,7 +4,7 @@ JAVA  = java -classpath ../../BUILD/libbzdev.jar:classes \
 JAVA2 = java -classpath ../../BUILD/libbzdev.jar:classes \
 	-Djava.security.policy=dtsm.policy
 
-all: singletest dtsmtest
+all: singletest
 	(cd dmcache ; make)
 	(cd dmsclass ; make)
 	(cd dmtests ; make)
@@ -14,13 +14,15 @@ singletest:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
-	$(JAVA) DebugSMTest 2>&1 && echo Exit Status = 0
-	$(JAVA) DebugSMTest sm 2>&1 || echo Exit Status = $$?
-	$(JAVA) DebugSMTest tsm 2>&1 || echo Exit Status = $$?
-	$(JAVA) DebugSMTest tsm 2 2>&1 || echo Exit Status = $$?
 	$(JAVA) CallTest
 	$(JAVA) ClassSorterTest ../../BUILD/libbzdev.jar
 	$(JAVA) MathOpsTest
+
+# Removed because the SecurityManager class is being removed from Java
+#	$(JAVA) DebugSMTest 2>&1 && echo Exit Status = 0
+#	$(JAVA) DebugSMTest sm 2>&1 || echo Exit Status = $$?
+#	$(JAVA) DebugSMTest tsm 2>&1 || echo Exit Status = $$?
+#	$(JAVA) DebugSMTest tsm 2 2>&1 || echo Exit Status = $$?
 
 calltest:
 	(cd ../.. ; make jars)
@@ -28,6 +30,7 @@ calltest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) CallTest
 
+# No longer used because the SecurityManager class is being removed from Java
 dtsmtest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

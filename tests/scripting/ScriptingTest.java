@@ -34,7 +34,13 @@ public class ScriptingTest {
 	    // inSandbox = false;
 	    // inSandbox = oldInSandbox;
 	    FileReader reader = new FileReader(filename);
-	    if (sm != null) System.setSecurityManager(sm);
+	    if (sm != null) {
+		try {
+		    System.setSecurityManager(sm);
+		} catch (UnsupportedOperationException eu) {
+		    System.exit(0);
+		}
+	    }
 	    try {
 		FileReader fr = new FileReader("Makefile");
 		int ch = fr.read();
@@ -254,7 +260,11 @@ public class ScriptingTest {
 
 	if (argv.length == ind) {
 	    if (sm != null) {
-		System.setSecurityManager(sm);
+		try {
+		    System.setSecurityManager(sm);
+		} catch (UnsupportedOperationException eu) {
+		    System.exit(0);
+		}
 		try {
 		    sm.checkPermission(new
 				       RuntimePermission("setSecurityManager"));

@@ -42,7 +42,11 @@ import java.util.*;
  *    // untrusted code runs here.
  *;   ...
  * </pre></code></blockquote>
+ * <P>
+ * Deprecated because the SecurityManager class is being removed
+ * from Java.
  */
+@Deprecated
 public class DesignatedThreadsSM extends SecurityManager {
 
     static String errorMsg(String key, Object... args) {

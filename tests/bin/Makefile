@@ -325,6 +325,11 @@ sctest:
 	chmod u-x ./run
 	rm -r classes otest.jar
 
+test1:
+	chmod u+x ./run
+	./run --stackTrace test1.esp
+	chmod u-x ./run
+
 ecirc:
 	(cd ../.. ; make )
 	chmod u+x ./run

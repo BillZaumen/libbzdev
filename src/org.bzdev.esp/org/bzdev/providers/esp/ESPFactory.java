@@ -103,6 +103,7 @@ public class ESPFactory implements ScriptEngineFactory {
     
     @Override
     public ScriptEngine getScriptEngine() {
-	return new ESPEngine();
+	ScriptEngine engine = new ESPEngine();
+	return engine;
     }
 }

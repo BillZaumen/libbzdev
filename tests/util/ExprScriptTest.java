@@ -134,6 +134,14 @@ public class ExprScriptTest {
 	parser.parse(s);
 	System.out.println("third parse OK");
 
+	parser = new ExpressionParser();
+	parser.setScriptingMode();
+	parser.setImportMode();
+	parser.setScriptImportMode();
+	parser.setGlobalMode();
+
+	s = "import(java.awt.Color); var black = java.awt.Color.BLACK;";
+	System.out.println("var black...  returns " + parser.parse(s));
 
 	parser = new ExpressionParser();
 	parser.setScriptingMode();

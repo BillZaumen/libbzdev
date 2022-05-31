@@ -994,9 +994,13 @@ public class SCRunner {
 	}
 
 	if (trustLevel == 0) {
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu){}
 	} else if (trustLevel == 1) {
-	    System.setSecurityManager(new ScriptingSecurityManager());
+	    try {
+		System.setSecurityManager(new ScriptingSecurityManager());
+	    } catch (UnsupportedOperationException eu){}
 	}
 	try {
 	    handler.run();

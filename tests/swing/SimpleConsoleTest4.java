@@ -23,7 +23,9 @@ public class SimpleConsoleTest4 {
 
 	    if (smBefore) {
 		Toolkit.getDefaultToolkit();
+		try {
 		System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu) {System.exit(0);}
 	    }
 
 	    final SimpleConsole.ExitAccessor ea
@@ -31,7 +33,9 @@ public class SimpleConsoleTest4 {
 
 	    if (smAfter) {
 		Toolkit.getDefaultToolkit();
-		System.setSecurityManager(new SecurityManager());
+		try {
+		    System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu) {System.exit(0);}
 	    }
 
 	    tc = SimpleConsole.newFramedInstance

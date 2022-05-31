@@ -38,22 +38,30 @@ public class ScriptingTest3 {
 	    Properties props = new Properties();
 	    props.setProperty("ECMAScript",
 			      "({test: function(x,y) {return x + y}})");
-	    ScriptingContext dfsc = new DefaultScriptingContext("ECMAScript");
+	    props.setProperty("ESP",
+			      "{test: function(x,y) {return x + y}}");
+	    // ScriptingContext dfsc=new DefaultScriptingContext("ECMAScript");
+	    ScriptingContext dfsc = new DefaultScriptingContext("ESP");
 	    ExtendedScriptingContext efsc = new ExtendedScriptingContext(dfsc);
 	    dfsc.putScriptObject("scripting", dfsc);
-	    dfsc.evalScript("java.lang.System.out.println(typeof(scripting))");
+	    dfsc.evalScript("import(org.bzdev.drama.DramaSimulation)");
+	    dfsc.evalScript("import(org.bzdev.math.rv.GaussianRV)");
+	    dfsc.evalScript("import(org.bzdev.math.rv.FixedIntegerRV)");
+	    dfsc.evalScript("import(org.bzdev.math.rv.FixedLongRV)");
+	    dfsc.evalScript("import(org.bzdev.math.rv.FixedBooleanRV)");
 	    if (dfsc != dfsc.getScriptObject("scripting")) {
 		System.out.println("problem with get/put for script objects");
 		System.exit(1);
 	    }
-	    dfsc.evalScript("java.lang.System.out.println(scripting.getClass().getName())");
+	    // dfsc.evalScript("global.getWriter().println(scripting.getClass().getName())");
+	    dfsc.evalScript("global.getWriter().println(global.typeof(scripting))");
 	    ScriptingContext dsc = (ScriptingContext) dfsc.evalScript
 		("new org.bzdev.drama.DramaSimulation(scripting)");
 	    System.out.println(dsc.getClass().getName());
 	    try {
 		OurScriptingContext sc = new OurScriptingContext(props, dsc);
 		sc.putScriptObject("result", sc.test(10.0, 20.0));
-		sc.evalScript("java.lang.System.out.println(result)");
+		sc.evalScript("global.getWriter().println(result)");
 	    } catch (Exception e) {
 		e.printStackTrace(System.out);
 	    }
@@ -67,7 +75,7 @@ public class ScriptingTest3 {
 	    try {
 		OurScriptingContext sc = new OurScriptingContext(props, dsc);
 		sc.putScriptObject("result", sc.test(10.0, 20.0));
-		sc.evalScript("java.lang.System.out.println(result)");
+		sc.evalScript("global.getWriter().println(result)");
 	    } catch (Exception e) {
 		e.printStackTrace(System.out);
 	    }
@@ -96,9 +104,11 @@ public class ScriptingTest3 {
 	    Object object = efsc.evalScript
 		("scripting.createArray(java.lang.Double.class, 5)");
 	    System.out.println("created " + object.getClass());
+	    /*
 	    object = efsc.evalScript
 		("scripting.createArray(java.lang.Double.TYPE, 5)");
 	    System.out.println("created " + object.getClass());
+	    */
 	    object = efsc.evalScript
 		("scripting.createArray(\"java.lang.Double\", 5)");
 	    System.out.println("created " + object.getClass());
@@ -114,9 +124,11 @@ public class ScriptingTest3 {
 	    object = efsc.evalScript
 		("scripting.createArray(java.lang.Long.class, 5)");
 	    System.out.println("created " + object.getClass());
+	    /*
 	    object = efsc.evalScript
 		("scripting.createArray(java.lang.Long.TYPE, 5)");
 	    System.out.println("created " + object.getClass());
+	    */
 	    object = efsc.evalScript
 		("scripting.createArray(\"long\", 5)");
 	    System.out.println("created " + object.getClass());
@@ -136,15 +148,17 @@ public class ScriptingTest3 {
 		("scripting.createAndInitArray(java.lang.Double.class, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("dcaObject[0] = " + dcaObject[0]);
+	    /*
 	    double[] daObject = (double[])efsc.evalScript
 		("scripting.createAndInitArray(java.lang.Double.TYPE, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("daObject[0] = " + daObject[0]);
+	    */
 	    dcaObject = (Double[])efsc.evalScript
 		("scripting.createAndInitArray(\"java.lang.Double\","
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("dcaObject[0] = " + dcaObject[0]);
-	    daObject = (double[])efsc.evalScript
+	    double[] daObject = (double[])efsc.evalScript
 		("scripting.createAndInitArray(\"double\", 1.0, 2.0, 3.0)");
 	    System.out.println("daObject[0] = " + daObject[0]);
 
@@ -152,15 +166,17 @@ public class ScriptingTest3 {
 		("scripting.createAndInitArray(java.lang.Integer.class, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("icaObject[0] = " + icaObject[0]);
+	    /*
 	    int[] iaObject = (int[])efsc.evalScript
 		("scripting.createAndInitArray(java.lang.Integer.TYPE, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("iaObject[0] = " + iaObject[0]);
+	    */
 	    icaObject = (Integer[])efsc.evalScript
 		("scripting.createAndInitArray(\"java.lang.Integer\","
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("icaObject[0] = " + icaObject[0]);
-	    iaObject = (int[])efsc.evalScript
+	    int[] iaObject = (int[])efsc.evalScript
 		("scripting.createAndInitArray(\"int\", 1.0, 2.0, 3.0)");
 	    System.out.println("iaObject[0] = " + iaObject[0]);
 
@@ -168,15 +184,17 @@ public class ScriptingTest3 {
 		("scripting.createAndInitArray(java.lang.Long.class, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("lcaObject[0] = " + lcaObject[0]);
+	    /*
 	    long[] laObject = (long[])efsc.evalScript
 		("scripting.createAndInitArray(java.lang.Long.TYPE, "
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("laObject[0] = " + laObject[0]);
+	    */
 	    lcaObject = (Long[])efsc.evalScript
 		("scripting.createAndInitArray(\"java.lang.Long\","
 		 + "1.0, 2.0, 3.0)");
 	    System.out.println("lcaObject[0] = " + lcaObject[0]);
-	    laObject = (long[])efsc.evalScript
+	    long[] laObject = (long[])efsc.evalScript
 		("scripting.createAndInitArray(\"long\", 1.0, 2.0, 3.0)");
 	    System.out.println("laObject[0] = " + laObject[0]);
 

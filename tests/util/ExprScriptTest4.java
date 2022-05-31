@@ -476,7 +476,9 @@ public class ExprScriptTest4 {
 	    }
 	    i++;
 	}
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {System.exit(0);}
 	i = -1;
 	for (String fn: fnames) {
 	    System.out.println("... " + fn);

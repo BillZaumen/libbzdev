@@ -107,7 +107,13 @@ public class ScriptingTest4 {
 
 	    FileReader reader = new FileReader(argv[ind]);
 	    if (sm != null) {
-		System.setSecurityManager(sm);
+		try {
+		    System.setSecurityManager(sm);
+		} catch (UnsupportedOperationException eu) {
+		    // OpenJDK 18 &  later don't support security
+		    // managers
+		    System.exit(0);
+		}
 	    }
 	    
 	    ScriptingContext sc = new DefaultScriptingContext(languageName,

@@ -23,7 +23,11 @@ public class ScriptingTest2 {
 
 	    if (sm != null) {
 		System.out.println("setting security manager...");
-		System.setSecurityManager(sm);
+		try {
+		    System.setSecurityManager(sm);
+		} catch (UnsupportedOperationException eu) {
+		    System.exit(0);
+		}
 		System.out.println("... security manager set");
 	    }
 	    

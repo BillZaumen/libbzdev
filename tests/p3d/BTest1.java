@@ -82,7 +82,9 @@ public class BTest1 {
 	    OutputStreamGraphics osg =
 		OutputStreamGraphics.newInstance(os, WIDTH, HEIGHT, "ps");
 
-	    System.setSecurityManager(new SecurityManager());
+	    try {
+		System.setSecurityManager(new SecurityManager());
+	    } catch (UnsupportedOperationException eu) {}
 
 	    Model3D.Image image = new Model3D.Image (osg);
 

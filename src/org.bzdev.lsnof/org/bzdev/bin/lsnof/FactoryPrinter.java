@@ -800,7 +800,11 @@ public class FactoryPrinter {
 		}
 	    }
 
-	    if (notTrusted) System.setSecurityManager(new SecurityManager());
+	    if (notTrusted) {
+		try {
+		    System.setSecurityManager(new SecurityManager());
+		} catch (UnsupportedOperationException eu){}
+	    }
 	    if (da != null) {
 		Set<NamedObjectFactory> fset = new TreeSet<>
 		    (new Comparator<NamedObjectFactory>() {

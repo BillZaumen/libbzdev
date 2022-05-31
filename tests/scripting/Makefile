@@ -10,30 +10,37 @@ JAVA = $(ENV) $(BIN)java -classpath ../../BUILD/libbzdev.jar:classes \
 JAVA1 = $(ENV) $(BIN)java -classpath ../../BUILD/libbzdev.jar:classes \
 	-Djava.security.policy=`pwd`/sectest.policy
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
+
 all:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ScriptingTest --sandbox
-	$(JAVA) ScriptingTest  test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  test1.js
 	$(JAVA) ScriptingTest  test1.esp
-	$(JAVA) ScriptingTest  --sandbox test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  --sandbox test1.js
 	$(JAVA) ScriptingTest  --sandbox test1.esp
-	$(JAVA) ScriptingTest  --scriptSandbox test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  --scriptSandbox test1.js
 	$(JAVA) ScriptingTest  --scriptSandbox test1.esp
-	$(JAVA) ScriptingTest test2.js ; echo Exit Status = $$?
-	@echo ... EXCEPTION EXPECTED for test2.js
+	if $(HAS_JS) ; then \
+	$(JAVA) ScriptingTest test2.js ; echo Exit Status = $$? ; fi
+	@$(HAS_JS) && echo ... EXCEPTION EXPECTED for test2.js
 	$(JAVA) ScriptingTest test2.esp ; echo Exit Status = $$?
 	@echo ... EXCEPTION EXPECTED for test2.esp
-	$(JAVA) ScriptingTest --sandbox test2.js ; echo Exit Status = $$?
+	if $(HAS_JS) ; then \
+	$(JAVA) ScriptingTest --sandbox test2.js ; echo Exit Status = $$? ; fi
 	$(JAVA) ScriptingTest --sandbox test2.esp ; echo Exit Status = $$?
-	$(JAVA) ScriptingTest --scriptSandbox test2.js ; echo Exit Status = $$?
+	if $(HAS_JS) ; then \
+	$(JAVA) ScriptingTest --scriptSandbox test2.js ; \
+	echo Exit Status = $$? ; fi
 	$(JAVA) ScriptingTest --scriptSandbox test2.esp ; echo Exit Status = $$?
-	$(JAVA) ScriptingTest2 test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 test3.js
 	$(JAVA) ScriptingTest2 test3.esp
-	$(JAVA) ScriptingTest2 --sandbox test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 --sandbox test3.js
 	$(JAVA) ScriptingTest2 --sandbox test3.esp
-	$(JAVA) ScriptingTest2 --scriptSandbox test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 --scriptSandbox test3.js
 	$(JAVA) ScriptingTest2 --scriptSandbox test3.esp
 	@echo ---- private function test with parent ---
 	$(JAVA) ScriptingTest3
@@ -41,33 +48,36 @@ all:
 	$(JAVA) PermissionTest
 	@echo --- Security Test using permissions ---
 	( cd classes; jar cf ../sectest.jar *.class )
-	$(JAVA1) SecTest
+	$(HAS_JS) && $(JAVA1) SecTest
 	$(JAVA1) ThreadTest
 	@echo --- Listener Adapter Test ---
-	$(JAVA) ScriptingTest4 test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 test4.js
 	$(JAVA) ScriptingTest4 test4.esp
 	@echo --- Listener Adapter in sandbox ---
-	$(JAVA) ScriptingTest4 --sandbox test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 --sandbox test4.js
 	$(JAVA) ScriptingTest4 --sandbox test4.esp
 	@echo --- Listener Adapter in scripting sandbox ---
-	$(JAVA) ScriptingTest4 --scriptSandbox test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 --scriptSandbox test4.js
 	$(JAVA) ScriptingTest4 --scriptSandbox test4.esp
 	echo ---- Now try code that will fail in a sandbox ---
-	$(JAVA) ScriptingTest4 --sandbox test5.js || echo ... EXCEPTION OK
+	if $(HAS_JS) ; then \
+	$(JAVA) ScriptingTest4 --sandbox test5.js || echo ... EXCEPTION OK ; fi
 	$(JAVA) ScriptingTest4 --sandbox test5.esp || echo ... EXCEPTION OK
+	if $(HAS_JS) ; then \
 	$(JAVA) ScriptingTest4 --scriptSandbox test5.js \
-		||  echo ... EXCEPTION OK
+		||  echo ... EXCEPTION OK ; fi
 	$(JAVA) ScriptingTest4 --scriptSandbox test5.esp \
 		||  echo ... EXCEPTION OK
+	if $(HAS_JS) ; then \
 	$(JAVA) ScriptingTest4 --trusted test5.js \
-		||  echo ... EXCEPTION NOT EXPECTED
+		||  echo ... EXCEPTION NOT EXPECTED ; fi
 	$(JAVA) ScriptingTest4 --trusted test5.esp \
 		||  echo ... EXCEPTION NOT EXPECTED
 	rm test5.out
 	@echo --- ESP test using javax.script API ---
 	$(JAVA) EPTest
-	@echo --- import test for ECMAScript
-	$(JAVA) ImportTest itest.js
+	@$(HAS_JS) && echo --- import test for ECMAScript
+	$(HAS_JS) && $(JAVA) ImportTest itest.js
 	@echo --- import test for ESP
 	$(JAVA) ImportTest itest.esp
 
@@ -107,6 +117,12 @@ sectest2:
 	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA1) SecTest2
 
+script3:
+	@echo ---- private function test with parent ---
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ScriptingTest3
 
 adapter:
 	(cd ../.. ; make jars)
@@ -135,6 +151,18 @@ itest-esp:
 	mkdir -p classes
 	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ImportTest itest.esp
+
+test1:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ScriptingTest  test1.esp
+
+thread:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA1) ThreadTest
 
 eoltest:
 	(cd ../.. ; make jars)

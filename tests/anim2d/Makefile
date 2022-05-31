@@ -3,6 +3,8 @@ JAVA = java  -classpath ../../BUILD/libbzdev.jar:classes
 SCRUN = java -classpath ../../BUILD/scrunner.jar \
      org.bzdev.bin.scrunner.SCRunnerCmd "$$@"
 
+HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
+
 all:
 	(cd ../.. ; make jars)
 	@echo ----- Factory-listing test ----
@@ -47,7 +49,7 @@ all:
 	@echo --------- PolarTest -----------
 	@$(JAVA) PolarTest
 	@echo ----- Starting Script Factory Test ----
-	$(SCRUN) scriptTest.js
+	$(HAS_JS) && $(SCRUN) scriptTest.js
 	@echo ----- Starting Script Factory Test with an ESP script ----
 	$(SCRUN) scriptTest.esp
 	@echo ----- Starting 2nd Script Factory Test with an ESP script ----
@@ -217,7 +219,7 @@ sfactory:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	@echo ----- Starting Script Factory Test ----
-	$(SCRUN) scriptTest.js
+	$(HAS_JS) && $(SCRUN) scriptTest.js
 
 eptest:
 	(cd ../.. ; make jars)

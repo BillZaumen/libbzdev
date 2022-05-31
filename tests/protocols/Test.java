@@ -108,7 +108,10 @@ public class Test {
 	    + "|jar:file:../../BUILD/libbzdev-base.jar!/org/bzdev/lang/lpack";
 
 	System.setProperty("org.bzdev.protocols.resource.path", path);
-	System.setSecurityManager(new SecurityManager());
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	} catch (UnsupportedOperationException eu) {}
+
 	Handlers.enable();
 
 	URL url = new URL("sresource:hello.txt");

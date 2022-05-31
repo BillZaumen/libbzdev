@@ -4,8 +4,11 @@ public class ClassFinderTest {
 
     public static void main(String argv[]) {
 
-	System.setSecurityManager(new SecurityManager());
-	System.out.println("security manager installed");
+	try {
+	    System.setSecurityManager(new SecurityManager());
+	    System.out.println("security manager installed");
+	} catch (UnsupportedOperationException eu) {}
+
 
 	System.out.println(ClassFinder
 			   .classExists("org.bzdev.graphs.Graph"));
