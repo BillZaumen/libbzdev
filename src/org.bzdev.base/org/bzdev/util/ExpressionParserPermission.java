@@ -9,7 +9,9 @@ import java.security.*;
  * {@link ExpressionParser#ExpressionParser(Class[],Class[],Class[],Class[],Class[])}
  * when any of its arguments is a array whose length is larger than 0.
  *
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public class ExpressionParserPermission extends BasicPermission {
     /**
      * Constructor.

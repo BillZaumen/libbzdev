@@ -36,7 +36,9 @@ import java.security.*;
  * In order to create a subclass of ScriptingContext, both the
  * BZDev library code base and the code base of the scripting context
  * subclass must have a ScriptingContextPermission for the subclass.
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public final class ScriptingContextPermission extends BasicPermission {
 
     static String errorMsg(String key, Object... args) {

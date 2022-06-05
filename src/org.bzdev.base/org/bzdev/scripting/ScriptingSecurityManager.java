@@ -19,7 +19,9 @@ import java.util.*;
  * the scripting context created will never switch modes.  If a
  * scripting context creates a thread, that thread inherits the
  * current mode.
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public class ScriptingSecurityManager extends SecurityManager {
 
     static {

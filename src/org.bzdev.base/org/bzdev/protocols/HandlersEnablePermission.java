@@ -12,7 +12,9 @@ import java.security.*;
  *           "org.bzdev.protocols.enable";
  *    }
  * </pre></code></blockquote>
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public class HandlersEnablePermission extends BasicPermission {
     /**
      * Constructor.

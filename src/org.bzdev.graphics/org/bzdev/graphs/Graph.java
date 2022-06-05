@@ -5544,10 +5544,12 @@ import org.bzdev.util.SafeFormatter;
      public void write(final String type, final String name)
 	 throws IOException
      {
+	 /*
 	 SecurityManager sm = System.getSecurityManager();
 	 if (sm != null && name != null) {
 	     sm.checkWrite(name);
 	 }
+	 */
 	 try {
 	     initACC();
 	     AccessController.doPrivileged
@@ -5576,10 +5578,12 @@ import org.bzdev.util.SafeFormatter;
       */
      public void write(final String type, final File file) throws IOException {
 	 final String name = (file != null? file.getPath(): null);
+	 /*
 	 SecurityManager sm = System.getSecurityManager();
 	 if (sm != null && name != null) {
 	     sm.checkWrite(name);
 	 }
+	 */
 	 // since the security manager (if any) allowed the file to be
 	 // written, we can use a doPrivileged block, which is needed because
 	 // ImageIO.write creates a temporary file and there is no default

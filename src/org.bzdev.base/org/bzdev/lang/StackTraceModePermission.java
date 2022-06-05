@@ -5,7 +5,9 @@ import java.security.*;
  * Permission to allow modifying the stack-trace mode for a
  * Simulation (or one of its subclasses) or a Model3D. Used in
  * their methods named setStackTraceMode.
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public final class StackTraceModePermission extends BasicPermission {
     /**
      * Constructor.

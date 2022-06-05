@@ -132,6 +132,7 @@ public class Simulation extends SimulationHelper
      *            tsallow has the value <code>true</code>
      */
     public void allowSetStackTraceMode(boolean allow, boolean tsallow) {
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(new StackTraceModePermission
@@ -139,6 +140,7 @@ public class Simulation extends SimulationHelper
 	    if (tsallow) sm.checkPermission(new StackTraceModePermission
 					    ("org.bzdev.devqsim.TraceSet"));
 	}
+	*/
 	allowSSTMode = allow;
 	allowSSTModeTS = tsallow;
     }
@@ -195,6 +197,7 @@ public class Simulation extends SimulationHelper
      *            granted for class org.bzdev.devqsim.Simulation
      */
     public void setStackTraceMode(boolean mode) {
+	/*
 	if (!allowSSTMode) {
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
@@ -202,6 +205,7 @@ public class Simulation extends SimulationHelper
 				   ("org.bzdev.devqsim.Simulation"));
 	    }
 	}
+	*/
 	stackTraceMode = mode;
     }
 

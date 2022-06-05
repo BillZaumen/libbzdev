@@ -279,6 +279,7 @@ public class FileAccessor {
 		if (mode.contains("a")) appendable = true;
 	    }
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    String name = (file != null? file.getPath(): null);
@@ -289,6 +290,7 @@ public class FileAccessor {
 		sm.checkWrite(name);
 	    }
 	}
+	*/
 	try {
 	    this.file = file.getCanonicalFile();
 	    if (this.file.exists() && writable) {

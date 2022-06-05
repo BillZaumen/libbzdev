@@ -22,7 +22,9 @@ import java.security.*;
  * {@link PanelGraphics}, {@link SimpleConsole} and
  * {@link SimpleConsole.ExitAccessor} classes from the BZDev class
  * library.
+ * @deprecated The security manager is being removed from Java
  */
+@Deprecated
 public final class ExitPermission extends BasicPermission {
 
     /**

@@ -1350,6 +1350,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	 * Constructor.
 	 */
 	public ExitAccessor() {
+	    allow = true;
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm == null) {
 		allow = true;
@@ -1363,6 +1365,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 		    allow = false;
 		}
 	    }
+	    */
 	}
 	/**
 	 * Return true if closing a frame created with
@@ -1606,6 +1609,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 	boolean ask = false;
 	if (exitOnClose == true) {
 	    if (accessor == null) {
+		ask = false;
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    try {
@@ -1620,6 +1625,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 		} else {
 		    ask = false;
 		}
+		*/
 	    } else {
 		ask = !accessor.allow();
 	    }

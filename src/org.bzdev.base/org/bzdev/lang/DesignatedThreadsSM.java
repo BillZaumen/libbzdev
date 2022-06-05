@@ -43,8 +43,7 @@ import java.util.*;
  *;   ...
  * </pre></code></blockquote>
  * <P>
- * Deprecated because the SecurityManager class is being removed
- * from Java.
+ * @deprecated The security manager is being removed from Java
  */
 @Deprecated
 public class DesignatedThreadsSM extends SecurityManager {

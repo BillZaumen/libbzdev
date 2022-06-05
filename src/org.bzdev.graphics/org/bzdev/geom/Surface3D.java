@@ -234,11 +234,13 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *            granted for the class org.bzdev.geom.Surface3D
      */
     public void setStackTraceMode(boolean mode) {
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(new StackTraceModePermission
 			       ("org.bzdev.geom.Surface3D"));
 	}
+	*/
 	stackTraceMode = mode;
 	/*  not needed as the constructor always initializes tags
 	if (mode == true && tags == null) {
@@ -4634,7 +4636,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 			queue.offer(e);
 			if (!multipleEdges) edgeMap.put(p,e);
 		    }
-		} else 	if (!((upper-lower) == 2 && (reversed || !oriented))) {
+		} else if (!((upper-lower) == 2 && (reversed || !oriented))) {
 		    wellFormed = false;
 		    if (out != null) {
 			try {

@@ -62,14 +62,16 @@ public class DelayedRandomAccessFile {
 	if (name == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}
-	SecurityManager sm = System.getSecurityManager();
+	// SecurityManager sm = System.getSecurityManager();
 	boolean rw = (mode != null) && mode.startsWith("rw");
+	/*
 	if (sm != null) {
 	    sm.checkRead(name);
 	    if (rw) {
 		sm.checkWrite(name);
 	    }
 	}
+	*/
 	try {
 	    this.file = file.getCanonicalFile();
 	    this.mode = mode;

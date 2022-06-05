@@ -290,11 +290,12 @@ public class ImageScaler {
 	    throw new NullPointerException(errorMsg("nullFileName"));
 
 	 String name = (outputFile != null? outputFile.getPath(): null);
+	 /*
 	 SecurityManager sm = System.getSecurityManager();
 	 if (sm != null && name != null) {
 	     sm.checkWrite(name);
 	 }
-
+	 */
 	if (outputFile.exists() && !outputFile.canWrite())
 	    throw new IllegalArgumentException(errorMsg("cannotWrite", name));
 	final BufferedImage scaledImage =
@@ -350,10 +351,12 @@ public class ImageScaler {
 	if (outputFile == null || url == null) 
 	    throw new NullPointerException(errorMsg("nullArgument"));
 	 String name = (outputFile != null? outputFile.getPath(): null);
+	 /*
 	 SecurityManager sm = System.getSecurityManager();
 	 if (sm != null && name != null) {
 	     sm.checkWrite(name);
 	 }
+	 */
 	if (outputFile.exists() && !outputFile.canWrite())
 	    throw new IllegalArgumentException(errorMsg("cannotWrite", name));
 	final BufferedImage scaledImage =

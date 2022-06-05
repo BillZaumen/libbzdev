@@ -44,10 +44,12 @@ public class DelayedFileInputStream {
      */
     public DelayedFileInputStream(File file) throws FileNotFoundException {
 	String name = (file != null? file.getPath(): null);
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkRead(name);
 	}
+	*/
 	if (name == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}

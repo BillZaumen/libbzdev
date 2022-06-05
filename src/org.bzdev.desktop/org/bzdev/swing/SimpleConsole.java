@@ -579,6 +579,8 @@ public class SimpleConsole extends JComponent implements Appendable {
 	 * Constructor.
 	 */
 	public ExitAccessor() {
+	    allow = true;
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm == null) {
 		allow = true;
@@ -591,6 +593,7 @@ public class SimpleConsole extends JComponent implements Appendable {
 		    allow = false;
 		}
 	    }
+	    */
 	}
 
 	/**
@@ -646,6 +649,7 @@ public class SimpleConsole extends JComponent implements Appendable {
 			ExitMode exitMode, ExitAccessor accessor)
 	{
 	    if (accessor == null) {
+		/*
 		if (exitMode == ExitMode.ALWAYS) {
 		    SecurityManager sm = System.getSecurityManager();
 		    if (sm != null) {
@@ -658,6 +662,7 @@ public class SimpleConsole extends JComponent implements Appendable {
 			}
 		    }
 		}
+		*/
 	    } else if (accessor.allow() == false) {
 		exitMode = ExitMode.ASK;
 	    } else {

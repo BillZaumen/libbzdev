@@ -505,7 +505,7 @@ public class BGSphere {
 	    }
 	    System.out.println(" |");
 	}
-	System.out.println("expecting 8.37758e+09 on diagonals, rest 0");
+	System.out.println("expecting 2000 on diagonals, rest 0");
 	System.out.println("momentsOf(...) took " + ((t1 - t0)/1000)
 			   + " microseconds");
 
@@ -537,7 +537,7 @@ public class BGSphere {
 	    }
 	    System.out.println(" |");
 	}
-	System.out.println("expecting 8.37758e+09 on diagonals, rest 0");
+	System.out.println("expecting 2000 on diagonals, rest 0");
 	System.out.println("fast momentsOf(...) took " + ((t1 - t0)/1000)
 			   + " microseconds");
 
@@ -656,7 +656,7 @@ public class BGSphere {
 	    }
 	    System.out.println(" |");
 	}
-	System.out.println("moments[0][1] should be about 4.1888e10");
+	System.out.println("moments[0][1] should be about 10000");
 	p = new Point3D.Double(-100.0, 00.0, -100.0);
 	moments = SurfaceOps.momentsOf(surface, p);
 	System.out.println("moments when p set to (-100, 0, -100)");
@@ -667,7 +667,7 @@ public class BGSphere {
 	    }
 	    System.out.println(" |");
 	}
-	System.out.println("moments[0][2] should be about 4.1888e10");
+	System.out.println("moments[0][2] should be about 10000");
 	p = new Point3D.Double(0.0, -100.0, -100.0);
 	moments = SurfaceOps.momentsOf(surface, p);
 	System.out.println("moments when p set to (0, -100, -100)");
@@ -678,7 +678,7 @@ public class BGSphere {
 	    }
 	    System.out.println(" |");
 	}
-	System.out.println("moments[1][2] should be about 4.1888e10");
+	System.out.println("moments[1][2] should be about 10000");
 
 	// check SurfaceIteratorSplitter
 

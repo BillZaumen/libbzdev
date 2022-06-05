@@ -117,11 +117,13 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	 */
 	public Double(Object tag) {
 	    if (tag == Rectangle3D.STACKTRACE) {
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    sm.checkPermission(new StackTraceModePermission
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
+		*/
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
@@ -184,11 +186,13 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	{
 	    this(x, y, z, w, h, d);
 	    if (tag == Rectangle3D.STACKTRACE) {
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    sm.checkPermission(new StackTraceModePermission
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
+		*/
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
@@ -303,11 +307,13 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	public Float(Object tag) {
 	    this();
 	    if (tag == Rectangle3D.STACKTRACE) {
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    sm.checkPermission(new StackTraceModePermission
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
+		*/
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
@@ -369,11 +375,13 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	{
 	    this(x, y, z, w, h, d);
 	    if (tag == Rectangle3D.STACKTRACE) {
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    sm.checkPermission(new StackTraceModePermission
 				       ("org.bzdev.geom.Rectanlge3D"));
 		}
+		*/
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {

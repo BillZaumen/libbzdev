@@ -419,10 +419,11 @@ atest3: scpolicy.policy
 	$(JAVA3) AnimPanelTest3 --false
 	$(JAVA3) AnimPanelTest3 --true
 	$(JAVA3) AnimPanelTest3 --accessor
-	$(JAVA3) AnimPanelTest3 --false --before
-	$(JAVA3) AnimPanelTest3 --true --before
-	$(JAVA3) AnimPanelTest3 --accessor --before
-	$(JAVA3) AnimPanelTest3 --accessor --after
+
+#	$(JAVA3) AnimPanelTest3 --false --before
+#	$(JAVA3) AnimPanelTest3 --true --before
+#	$(JAVA3) AnimPanelTest3 --accessor --before
+#	$(JAVA3) AnimPanelTest3 --accessor --after
 
 atest3s:
 	(cd ../.. ; make jars)
@@ -432,10 +433,11 @@ atest3s:
 	$(JAVA2) AnimPanelTest3 --false
 	$(JAVA2) AnimPanelTest3 --true
 	$(JAVA2) AnimPanelTest3 --accessor
-	$(JAVA2) AnimPanelTest3 --false --before
-	$(JAVA2) AnimPanelTest3 --true --before
-	$(JAVA2) AnimPanelTest3 --accessor --before
-	$(JAVA2) AnimPanelTest3 --accessor --after
+
+#	$(JAVA2) AnimPanelTest3 --false --before
+#	$(JAVA2) AnimPanelTest3 --true --before
+#	$(JAVA2) AnimPanelTest3 --accessor --before
+#	$(JAVA2) AnimPanelTest3 --accessor --after
 
 hwt:
 	(cd ../.. ; make jars)
@@ -461,9 +463,10 @@ atest3s-fb:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		AnimPanelTest3.java
-	$(JAVA2) AnimPanelTest3 --false --before
-	echo ---------
-	$(JAVA3) AnimPanelTest3 --false --before
+
+#	$(JAVA2) AnimPanelTest3 --false --before
+#	echo ---------
+#	$(JAVA3) AnimPanelTest3 --false --before
 
 
 atest3a: scpolicy.policy
@@ -472,9 +475,10 @@ atest3a: scpolicy.policy
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		AnimPanelTest3.java
 	make classes.jar
-	$(JAVA3) AnimPanelTest3 --false --after
-	$(JAVA3) AnimPanelTest3 --true --after
-	$(JAVA3) AnimPanelTest3 --accessor --after
+
+#	$(JAVA3) AnimPanelTest3 --false --after
+#	$(JAVA3) AnimPanelTest3 --true --after
+#	$(JAVA3) AnimPanelTest3 --accessor --after
 
 
 atest3b: scpolicy.policy
@@ -483,9 +487,10 @@ atest3b: scpolicy.policy
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		AnimPanelTest3.java
 	make classes.jar
-	$(JAVA3) AnimPanelTest3 --false --before
-	$(JAVA3) AnimPanelTest3 --true --before
-	$(JAVA3) AnimPanelTest3 --accessor --before
+
+#	$(JAVA3) AnimPanelTest3 --false --before
+#	$(JAVA3) AnimPanelTest3 --true --before
+#	$(JAVA3) AnimPanelTest3 --accessor --before
 
 dtest:
 	(cd ../.. ; make jars)
@@ -574,12 +579,13 @@ pgtest6: scpolicy.policy
 	$(JAVA3) PanelGraphicsTest6 --none
 	$(JAVA3) PanelGraphicsTest6 --boolean
 	$(JAVA3) PanelGraphicsTest6 --accessor
-	$(JAVA3) PanelGraphicsTest6 --none --before
-	$(JAVA3) PanelGraphicsTest6 --boolean --before
-	$(JAVA3) PanelGraphicsTest6 --accessor --before
-	$(JAVA3) PanelGraphicsTest6 --none --after
-	$(JAVA3) PanelGraphicsTest6 --boolean --after
-	$(JAVA3) PanelGraphicsTest6 --accessor --after
+
+#	$(JAVA3) PanelGraphicsTest6 --none --before
+#	$(JAVA3) PanelGraphicsTest6 --boolean --before
+#	$(JAVA3) PanelGraphicsTest6 --accessor --before
+#	$(JAVA3) PanelGraphicsTest6 --none --after
+#	$(JAVA3) PanelGraphicsTest6 --boolean --after
+#	$(JAVA3) PanelGraphicsTest6 --accessor --after
 
 bgtest6a: scpolicy.policy
 	(cd ../.. ; make jars)
@@ -587,9 +593,10 @@ bgtest6a: scpolicy.policy
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		PanelGraphicsTest6.java
 	make classes.jar
-	$(JAVA3) PanelGraphicsTest6 --boolean --before
-	$(JAVA3) PanelGraphicsTest6 --accessor --before
-	$(JAVA3) PanelGraphicsTest6 --boolean --after
+
+#	$(JAVA3) PanelGraphicsTest6 --boolean --before
+#	$(JAVA3) PanelGraphicsTest6 --accessor --before
+#	$(JAVA3) PanelGraphicsTest6 --boolean --after
 
 
 vtf:

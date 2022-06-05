@@ -5,8 +5,7 @@ import java.security.*;
  * Permission to allow adding a thread as a designated thread to
  * a designated-threads security manager.
  * <P>
- * Deprecated because the SecurityManager class is being removed
- * from Java.
+ * @deprecated The security manager is being removed from Java
  * @see DesignatedThreadsSM
  */
 @Deprecated

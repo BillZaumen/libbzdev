@@ -15,8 +15,7 @@ import java.io.Flushable;
  * {@link #setOutput(Appendable) setOutput}
  * to trace the calls made to the security manager's public methods.
  * <P>
- * Deprecated because the SecurityManager class is being removed from
- * Java.
+ * @deprecated The security manager is being removed from Java
  */
 @Deprecated
 public class  NullSecurityManager extends SecurityManager {

@@ -202,6 +202,8 @@ public class PanelGraphics implements OSGraphicsOps {
 	 * Constructor.
 	 */
 	public ExitAccessor() {
+	    allow = true;
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm == null) {
 		allow = true;
@@ -214,6 +216,7 @@ public class PanelGraphics implements OSGraphicsOps {
 		    allow = false;
 		}
 	    }
+	    */
 	}
 	/**
 	 * Return true if closing a frame created with
@@ -379,6 +382,8 @@ public class PanelGraphics implements OSGraphicsOps {
 	boolean ask = false;
 	if (exitOnClose) {
 	    if (accessor == null) {
+		ask = false;
+		/*
 		SecurityManager sm = System.getSecurityManager();
 		if (sm != null) {
 		    try {
@@ -390,6 +395,7 @@ public class PanelGraphics implements OSGraphicsOps {
 		} else {
 		    ask = false;
 		}
+		*/
 	    } else {
 		ask = !accessor.allow();
 	    }

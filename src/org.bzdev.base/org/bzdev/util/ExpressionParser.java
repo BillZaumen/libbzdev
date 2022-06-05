@@ -1932,11 +1932,13 @@ public class ExpressionParser implements ObjectParser<Object>
 	 *            was not granted.
 	 */
 	public void setScriptingMode() throws IllegalStateException {
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
 		sm.checkPermission(new ExpressionParserPermission
 				   ("org.bzdev.util.ExpressionParser"));
 	    }
+	    */
 	    if (frozen) throw new IllegalStateException
 			    (errorMsg("scriptingModeTooLate"));
 	    scriptingMode = true;
@@ -1954,11 +1956,13 @@ public class ExpressionParser implements ObjectParser<Object>
 	 *            was not granted.
 	 */
 	public void setImportMode() throws IllegalStateException {
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
 		sm.checkPermission(new ExpressionParserPermission
 				   ("org.bzdev.util.ExpressionParser"));
 	    }
+	    */
 	    if (frozen) throw new IllegalStateException
 			    (errorMsg("importModeTooLate"));
 	    importMode = true;
@@ -1977,11 +1981,13 @@ public class ExpressionParser implements ObjectParser<Object>
 	 *            was not granted.
 	 */
 	public void setGlobalMode()  throws IllegalStateException {
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
 		sm.checkPermission(new ExpressionParserPermission
 				   ("org.bzdev.util.ExpressionParser"));
 	    }
+	    */
 	    if (frozen) throw new IllegalStateException
 			    (errorMsg("globalModeTooLate"));
 	    if (epSingleton == null) {
@@ -5833,6 +5839,7 @@ public class ExpressionParser implements ObjectParser<Object>
     public ExpressionParser(Class<?>... classes)
 	    throws IllegalAccessException
     {
+	/*
 	if (classes.length > 0) {
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
@@ -5840,6 +5847,7 @@ public class ExpressionParser implements ObjectParser<Object>
 				   ("org.bzdev.util.ExpressionParser"));
 	    }
 	}
+	*/
 	try {
 	    AccessController.doPrivileged
 		(new PrivilegedExceptionAction<Void>()  {
@@ -5884,6 +5892,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			    Class<?>[] fieldClasses)
 	    throws IllegalAccessException
     {
+	/*
 	if ((returnTypes != null && returnTypes.length > 0)
 	    || (argumentTypes != null && argumentTypes.length > 0)
 	    || (functionClasses != null && functionClasses.length > 0)
@@ -5895,6 +5904,7 @@ public class ExpressionParser implements ObjectParser<Object>
 				   ("org.bzdev.util.ExpressionParser"));
 	    }
 	}
+	*/
 
 	if (returnTypes != null) {
 	    for (Class<?> clasz: returnTypes) {

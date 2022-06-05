@@ -691,10 +691,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	public void write(final String type, final String name)
 	    throws IOException
 	{
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null && name != null) {
 		sm.checkWrite(name);
 	    }
+	    */
 	    try {
 		initACC();
 		AccessController.doPrivileged
@@ -722,10 +724,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	 */
 	public void write(final String type, final File file) throws IOException {
 	    String name = (file != null? file.getPath(): null);
+	    /*
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null && name != null) {
 		sm.checkWrite(name);
 	    }
+	    */
 	    // since the security manager (if any) allowed the file to be
 	    // written, we can use a doPrivileged block, which is needed because
 	    // ImageIO.write creates a temporary file and there is no default
@@ -2412,11 +2416,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *            granted for the class org.bzdev.p3d.Model3D
      */
     public void setStackTraceMode(boolean mode) {
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(new StackTraceModePermission
 			       ("org.bzdev.p3d.Model3D"));
 	}
+	*/
 	stackTraceMode = mode;
     }
 

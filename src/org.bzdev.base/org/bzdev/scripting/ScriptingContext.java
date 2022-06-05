@@ -392,13 +392,14 @@ public class ScriptingContext {
 	    return null;
 	}
 	// do a security check.
+	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission
 		(new ScriptingContextPermission
 		 (getClass().getName(), "swapbindings"));
 	}
-
+	*/
 	BindingSwapper swapper = new BindingSwapper();
 	swapper.engine = engine;
 	swapper.other = threadBindings.get();
@@ -409,6 +410,7 @@ public class ScriptingContext {
     private void checkConstructorPermission(boolean trusted)
 	throws SecurityException
     {
+	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    synchronized(ScriptingContext.class) {
@@ -432,12 +434,14 @@ public class ScriptingContext {
 		}
 	    }
 	}
+	*/
     }
     private void checkPrivileged() {
 	if (parent != null) {
 	    parent.checkPrivileged();
 	    return;
 	}
+	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    final Permission perm =
@@ -456,6 +460,7 @@ public class ScriptingContext {
 			}, privilegedContext);
 	    }
 	}
+	*/
     }
 
     private boolean notTrusted = true;
@@ -1520,10 +1525,12 @@ public class ScriptingContext {
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setWriter"));
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(writerPermission);
 	}
+	*/
 	engine.getContext().setWriter(writer);
     }
 
@@ -1561,10 +1568,12 @@ public class ScriptingContext {
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setErrorWriter"));
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(writerPermission);
 	}
+	*/
 	engine.getContext().setErrorWriter(writer);
     }
 
@@ -1607,10 +1616,12 @@ public class ScriptingContext {
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setReader"));
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(readerPermission);
 	}
+	*/
 	engine.getContext().setReader(reader);
     }
 

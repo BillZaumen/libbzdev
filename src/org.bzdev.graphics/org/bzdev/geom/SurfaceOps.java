@@ -244,7 +244,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
@@ -274,7 +274,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
@@ -310,7 +310,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
@@ -340,7 +340,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
@@ -378,7 +378,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>
@@ -416,7 +416,7 @@ public interface SurfaceOps extends Shape3D {
      * </UL>
      * the moments returned are
      * <BLOCKQUOTE><PRE>
-     *        | &int;x<sup>2</sub>/v dV  &int;xy/v dV  &int;xz/v dV |
+     *        | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      *    M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *        | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
      * <PRE></BLOCKQUOTE>

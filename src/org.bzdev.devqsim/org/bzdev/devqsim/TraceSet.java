@@ -116,6 +116,7 @@ public class TraceSet extends DefaultSimObject {
      *            granted for class org.bzdev.devqsim.TraceSet
      */
     public void setStackTraceMode(boolean mode) {
+	/*
 	if (!sim.allowsSetStackTraceModeTS()) {
 	    SecurityManager sm = System.getSecurityManager();
 	    if (sm != null) {
@@ -123,6 +124,7 @@ public class TraceSet extends DefaultSimObject {
 				   ("org.bzdev.devqsim.TraceSet"));
 	    }
 	}
+	*/
 	stacktraceMode = mode;
     }
 

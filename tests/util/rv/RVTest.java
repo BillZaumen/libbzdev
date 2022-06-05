@@ -726,7 +726,7 @@ public class RVTest {
 	    for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 		    ecov[i][j] /= iterations;
-		    if (Math.abs(ecov[i][j] - cov[i][j])/cov[i][j] > 1.e-2) {
+		    if (Math.abs(ecov[i][j] - cov[i][j])/cov[i][j] > 2.e-2) {
 			System.out.format("ecov[%d][%d]=%g, cov[%d][%d]=%g\n",
 					  i ,j, ecov[i][j], i, j, cov[i][j]);
 			throw new Exception("bad GaussianRVs");

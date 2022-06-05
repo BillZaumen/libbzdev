@@ -74,6 +74,7 @@ public class DirectoryAccessor {
 	if (dir == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    String name = (dir != null? dir.getPath(): null);
@@ -94,6 +95,7 @@ public class DirectoryAccessor {
 		    (errorMsg("directoryAccess", name));
 	    }
 	}
+	*/
 	if (dir.exists() && !dir.isDirectory()) {
 	    throw new FileNotFoundException
 		(errorMsg("notDirectory", dir.getName()));
@@ -140,6 +142,7 @@ public class DirectoryAccessor {
 	if (dir == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    String name = (dir != null? dir.getPath(): null);
@@ -156,6 +159,7 @@ public class DirectoryAccessor {
 		writable = false;
 	    }
 	}
+	*/
 	if (readOnly) writable = false;
 	if (!readable && !writable) {
 	    throw new FileNotFoundException

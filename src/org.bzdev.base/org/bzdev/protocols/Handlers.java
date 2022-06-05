@@ -138,11 +138,13 @@ public class Handlers {
     static public void enable() throws SecurityException
     {
 	if (enabled) return;
+	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(new HandlersEnablePermission
 			       ("org.bzdev.protocols.enable"));
 	}
+	*/
 	AccessController.doPrivileged
 	    (new PrivilegedAction<Void>() {
 		    public Void run() {

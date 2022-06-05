@@ -71,10 +71,12 @@ public class DelayedFileOutputStream {
 	throws FileNotFoundException
     {
 	String name = (file != null? file.getPath(): null);
+	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkWrite(name);
 	}
+	*/
 	if (name == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}
