@@ -153,15 +153,16 @@ contains, the letter
 .BR E ,
 .BR P ,
 .BR R ,
-or
 .BR T ,
-followed by a colon and then a variable name, except for
+or
+.BR U ,
+followed by a colon and a name that is typically a variable name, except for
 .BR E ,
 .BR P ,
 .BR R ,
 and
 .BR T
-each of which is followed by a colon and the keyword
+in which case the name must be the word
 .BR true .
 The letters indicate the type of an argument:
 .BR B
@@ -187,10 +188,14 @@ option should be automatically added, the letter
 .B R
 indicates that the
 .B \-r
-option should be automatically added, and the letter
+option should be automatically added,  the letter
 .B T
 indicates that the
 .B \-\-stackTrace
+option should be automatically added, and the letter
+.B U
+indicates that the
+.B \-\-unsetScripting
 option should be automatically added. The first argument after
 a
 .B \-s
@@ -200,8 +205,9 @@ arguments (with N larger than 0), excluding any whose type is
 .BR E ,
 .BR P ,
 .BR R ,
-or
 .BR T ,
+or
+.BR U ,
 the initial script argument must be followed by any other
 .B scrunner
 options, in turn followed by the values for the variable names specified
@@ -606,7 +612,7 @@ missing, a "\-" is printed in its place.
 .PP
 The
 .B scrunner
-command can be used for making ESP scripts executable. Suppose a
+command can be used for making scripts executable. Suppose a
 script is placed in a file name
 .B testscript
 and
@@ -638,7 +644,9 @@ which in turn is equivalent to
 .IP
  scrunner -vD:a:10 -vD:b:20 --exit --print testscript
 .PP
-which prints the value 30.
+which prints the value 30.  The scripting language is determined by
+the file-name extension and defaults to ESP when there is no extension
+or when the extension is not one for a supported scripting language.
 Additional scripts can be added to the command:
 .IP
  ./testscript 10 20 foo.esp
@@ -666,7 +674,7 @@ The following 6-line-long program (on Linux systems) uses an ESP
 script to print the circumference of an ellipse given the lengths of
 the semi-major and semi-minor axes:
 .IP
-#!/usr/bin/scrunner -sD:a,D:b,E:true,P:true
+#!/usr/bin/scrunner -sD:a,D:b,E:true,P:true,U:true
 .br
 import (java.lang.Math);
 .br

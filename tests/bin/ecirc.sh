@@ -1,5 +1,5 @@
 #!/bin/sh
-./run -L ESP -vD:a:$1 -vD:b:$2 - <<"EOF"
+./run -L ESP -vD:a:$1 -vD:b:$2 --unsetScripting - <<"EOF"
 import (java.lang.Math);
 import (org.bzdev.math.Functions);
 var a;

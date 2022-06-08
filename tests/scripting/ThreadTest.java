@@ -3,6 +3,7 @@ import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.ScriptEngine;
 import java.util.Properties;
+import java.io.FileNotFoundException;
 
 public class ThreadTest {
     static class OurScriptingContext extends DefaultScriptingContext {
@@ -28,7 +29,7 @@ public class ThreadTest {
 	}
 	public Object testP(Object x) throws ScriptException {
 	    return invokePrivateFunction(properties,
-					 ScriptingContext.PFMode.PRIVILEGED,
+					 // ScriptingContext.PFMode.PRIVILEGED,
 					 "test",
 					 x);
 	}
@@ -122,11 +123,11 @@ public class ThreadTest {
 		 "scripting.evalScript(\"global.getWriter().println(\\\"\\\");\");" +
 		 "global.getWriter().println(\"goodbye\");");
 
-	    scripting.putScriptObject("x", new Double(10));
+	    scripting.putScriptObject("x", Double.valueOf(10));
 
 	    bindings = scripting.createBindings();
 	    scripting.putScriptObject("bindings", bindings);
-	    bindings.put("x", new Double(20));
+	    bindings.put("x", Double.valueOf(20));
 	    // need to call createBindingSwapper (via setup()) in
 	    // a script so that the inherited thread local variable
 	    // will be set to the correct value.
@@ -196,15 +197,18 @@ public class ThreadTest {
 	    props.setProperty("ESP",
 			      "import(java.io, FileInputStream);"
 			      + "({test: function(fname)"
-			      + "{return new java.io.FileInputStream(fname)}"
+			      + "{new java.io.FileInputStream(fname)}"
 			      + "})");
 
 	    scripting = new OurScriptingContext(props);
 
+	    /*
 	    try {
 		System.setSecurityManager(new SecurityManager());
 	    } catch (UnsupportedOperationException eu) {System.exit(0);}
+	    */
 
+	    /*
 	    try {
 		scripting.testP("jtest2");
 		System.out.println
@@ -213,6 +217,17 @@ public class ThreadTest {
 	    } catch (Exception e) {
 		System.out.println
 		    ("invokePrivateFunction threw an exception as expected");
+	    }
+	    */
+	    try {
+		scripting.testP("jtest2");
+	    } catch (Exception e) {
+		if (e.getCause().getCause() instanceof FileNotFoundException) {
+		    System.out.println("File \"jtest2\" does not exist"
+				       + "as expected");
+		} else {
+		    throw e;
+		}
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace(System.out);

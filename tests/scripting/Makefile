@@ -12,6 +12,7 @@ JAVA1 = $(ENV) $(BIN)java -classpath ../../BUILD/libbzdev.jar:classes \
 
 HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
 
+JAVA_SKIPPED = echo ... skipping java ...
 
 all:
 	(cd ../.. ; make jars)
@@ -45,7 +46,7 @@ all:
 	@echo ---- private function test with parent ---
 	$(JAVA) ScriptingTest3
 	@echo --- permission test ----
-	$(JAVA) PermissionTest
+	$(JAVA_SKIPPED) PermissionTest
 	@echo --- Security Test using permissions ---
 	( cd classes; jar cf ../sectest.jar *.class )
 	$(HAS_JS) && $(JAVA1) SecTest

@@ -1,7 +1,7 @@
 var out ?= global.getWriter();
 var err ?= global.getErrorWriter();
 
-out.println("... testScript.js started");
+out.println("... testScript.esp started");
 
 import (ATestObject2);
 import (ATestObject2Factory);

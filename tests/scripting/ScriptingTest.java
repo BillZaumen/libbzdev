@@ -20,7 +20,7 @@ import java.awt.image.*;
 
 public class ScriptingTest {
     static boolean inSandbox = false;
-    static SecurityManager sm = null;
+    // static SecurityManager sm = null;
     static ThreadGroup globaltg;
 
     public static class ScriptRunner extends DefaultScriptingContext {
@@ -34,6 +34,7 @@ public class ScriptingTest {
 	    // inSandbox = false;
 	    // inSandbox = oldInSandbox;
 	    FileReader reader = new FileReader(filename);
+	    /*
 	    if (sm != null) {
 		try {
 		    System.setSecurityManager(sm);
@@ -41,6 +42,7 @@ public class ScriptingTest {
 		    System.exit(0);
 		}
 	    }
+	    */
 	    try {
 		FileReader fr = new FileReader("Makefile");
 		int ch = fr.read();
@@ -86,7 +88,8 @@ public class ScriptingTest {
 			}
 		    }
 		};
-	    doScriptSandboxed(testCall);
+	    // doScriptSandboxed(testCall);
+	    testCall.call();
 	    // onScriptEnding();
 	    // engine.put(ScriptEngine.FILENAME, filename);
 	    // engine.eval(reader);
@@ -97,10 +100,10 @@ public class ScriptingTest {
 	    try {
 		Object result =
 		    invokePrivateFunction(props,
-					  ScriptingContext.PFMode.PRIVILEGED,
+					  // ScriptingContext.PFMode.PRIVILEGED,
 					  "test",
-					  new Double(10.0),
-					  new Double(20.0));
+					  Double.valueOf(10.0),
+					  Double.valueOf(20.0));
 		putScriptObject("result", result);
 		evalScript("java.lang.System.out.println(\"result = \" "
 			   + "+ result);");
@@ -114,10 +117,10 @@ public class ScriptingTest {
 	    try {
 		Object result =
 		    invokePrivateFunction(bindings, props,
-					  ScriptingContext.PFMode.PRIVILEGED,
+					  // ScriptingContext.PFMode.PRIVILEGED,
 					  "test",
-					  new Double(10.0),
-					  new Double(20.0));
+					  Double.valueOf(10.0),
+					  Double.valueOf(20.0));
 		putScriptObject("result", result);
 		evalScript("java.lang.System.out.println(\"result = \" "
 			   + "+ result);");
@@ -130,7 +133,8 @@ public class ScriptingTest {
 
 	public void testPrivate2(Properties props, Object object) {
 	    try {
-		invokePrivateFunction(props, ScriptingContext.PFMode.PRIVILEGED,
+		invokePrivateFunction(props,
+				      // ScriptingContext.PFMode.PRIVILEGED,
 				      "printit", object);
 	    } catch (Exception e) {
 		System.out.println("testPrivate2 failed");
@@ -143,7 +147,7 @@ public class ScriptingTest {
 	{
 	    try {
 		invokePrivateFunction(bindings, props,
-				      ScriptingContext.PFMode.PRIVILEGED,
+				      // ScriptingContext.PFMode.PRIVILEGED,
 				      "printit", object);
 	    } catch (Exception e) {
 		System.out.println("testPrivate2 failed");
@@ -239,11 +243,13 @@ public class ScriptingTest {
 				   .getParent(), "foo");
 
 	while (ind < argv.length && argv[ind].startsWith("-")) {
+	    /*
 	    if (argv[ind].equals("--sandbox")) {
 		sm = new SecurityManager();
 	    } else if (argv[ind].equals("--scriptSandbox")) {
 		useScriptSandbox = true;
 	    }
+	    */
 	    ind++;
 	}
 
@@ -259,6 +265,7 @@ public class ScriptingTest {
 	*/
 
 	if (argv.length == ind) {
+	    /*
 	    if (sm != null) {
 		try {
 		    System.setSecurityManager(sm);
@@ -273,6 +280,7 @@ public class ScriptingTest {
 		    System.out.println("Cannot change security manager");
 		}
 	    }
+	    */
 	    System.exit(0);
 	}
 
@@ -305,7 +313,8 @@ public class ScriptingTest {
 	}
 
 	if (useScriptSandbox) {
-	    sm = new ScriptingSecurityManager();
+	    // sm = new ScriptingSecurityManager();
+	    System.exit(0);
 	}
 	try {
 	    sc.evalScript(argv[ind], reader);

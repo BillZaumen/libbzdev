@@ -1,4 +1,4 @@
-#!./run -sD:a,D:b,E:true,P:true
+#!./run -sD:a,D:b,E:true,P:true,U:true
 import (java.lang.Math);
 import (org.bzdev.math.Functions);
 var ab = Math.max(a,b);

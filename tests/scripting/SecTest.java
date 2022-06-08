@@ -15,24 +15,27 @@ public class SecTest {
 	}
 	public Object testN(Object x) throws ScriptException {
 	    return invokePrivateFunction(properties,
-					 ScriptingContext.PFMode.PRIVILEGED,
+					 // ScriptingContext.PFMode.PRIVILEGED,
 					 "test",
 					 x);
 	}
 	public Object testS(Object x) throws ScriptException {
 	    return invokePrivateFunction(properties,
-					 ScriptingContext.PFMode.SANDBOXED,
+					 // ScriptingContext.PFMode.SANDBOXED,
 					 "test",
 					 x);
 	}
 
 	public void testDSPE1() throws Exception {
+	    /*
 	    doScriptPrivileged(new ExceptionedCallable() {
 		    public void call() throws Exception {
 			System.out.println
 			    ((new FileInputStream("test1.js")) != null);
 		    }
 		});
+	    */
+	    System.out.println((new FileInputStream("test1.js")) != null);
 	}
 
 	public void testDSP1() {
@@ -50,12 +53,15 @@ public class SecTest {
 	}
 
 	public InputStream testDSPER1() throws Exception {
+	    /*
 	    return doScriptPrivilegedReturns
 		(new ExceptionedCallableReturns<InputStream>() {
 		    public InputStream call() throws Exception{
 			return (new FileInputStream("test1.js"));
 		    }
 		});
+	    */
+	    return new FileInputStream("test1.js");
 	}
 
 	public InputStream testDSPR1() {
@@ -99,15 +105,19 @@ public class SecTest {
 	}
 
 	public InputStream testDSPER2() throws Exception {
+	    /*
 	    return doScriptPrivilegedReturns
 		(new ExceptionedCallableReturns<InputStream>() {
 		    public InputStream call() throws Exception {
 			return (new FileInputStream("test2.js"));
 		    }
 		});
+	    */
+	    return new FileInputStream("test2.js");
 	}
 
 	public InputStream testDSPR2() {
+	    /*
 	    return doScriptPrivilegedReturns
 		(new CallableReturns<InputStream>() {
 		    public InputStream call() {
@@ -121,6 +131,12 @@ public class SecTest {
 			}
 		    }
 		});
+	    */
+	    try {
+		return new FileInputStream("test2.js");
+	    } catch (Exception e) {
+		return null;
+	    }
 	}
     }
 

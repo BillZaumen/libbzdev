@@ -58,7 +58,7 @@ all:
 	$(LSNOF) --html 'org.bzdev.devqsim.*' > test.html
 	@echo '***** ' RVTest:
 	$(JAVA) RVTest
-	@ if $(HAS_JS_TEST) ; then \
+	@if $(HAS_JS_TEST) ; then \
 	echo '***** testsim.js *****' ; \
 	java -p ../../BUILD -m org.bzdev.scrunner testsim.js ; fi
 	@echo '***** testsim.esp *****'

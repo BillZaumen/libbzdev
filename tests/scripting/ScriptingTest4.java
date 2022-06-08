@@ -82,9 +82,10 @@ public class ScriptingTest4 {
     public static void main(String argv[]) {
 	try {
 	    int ind = 0;
-	    SecurityManager sm = null;
+	    // SecurityManager sm = null;
 	    boolean trusted = false;
 	    while (ind < argv.length && argv[ind].startsWith("-")) {
+		/*
 		if (argv[ind].equals("--sandbox")) {
 		    sm = new SecurityManager();
 		} else if (argv[ind].equals("--scriptSandbox")) {
@@ -93,6 +94,7 @@ public class ScriptingTest4 {
 		    sm = new ScriptingSecurityManager();
 		    trusted = true;
 		}
+		*/
 		ind++;
 	    }
 
@@ -106,6 +108,7 @@ public class ScriptingTest4 {
 	    }
 
 	    FileReader reader = new FileReader(argv[ind]);
+	    /*
 	    if (sm != null) {
 		try {
 		    System.setSecurityManager(sm);
@@ -115,9 +118,13 @@ public class ScriptingTest4 {
 		    System.exit(0);
 		}
 	    }
+	    */
 	    
+	    /*
 	    ScriptingContext sc = new DefaultScriptingContext(languageName,
 							      trusted);
+	    */
+	    ScriptingContext sc = new DefaultScriptingContext(languageName);
 	    sc.putScriptObject("scripting", sc);
 	    sc.evalScript(argv[ind], reader);
 

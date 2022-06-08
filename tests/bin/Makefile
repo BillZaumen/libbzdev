@@ -32,11 +32,11 @@ all:
 		--codebase .../lsnof.jar --dryrun "test.js"
 	if $(HAS_JS_TEST) ; then \
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
-		-J-server -J-Xmn10M --trustLevel=2 \
+		-J-server -J-Xmn10M \
 		--add-modules org.bzdev.lsnof \
 		--codebase .../lsnof.jar   "test10.js" ; fi
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
-		-J-server -J-Xmn10M --trustLevel=2 \
+		-J-server -J-Xmn10M \
 		--add-modules org.bzdev.lsnof \
 		--codebase .../lsnof.jar   "test10.esp"
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
@@ -84,20 +84,11 @@ all:
 	./run test.js ; fi
 	./run test.esp
 	if $(HAS_JS_TEST) ; then \
-	./run --trustLevel=1 test.js ; \
-	./run --trustLevel=2 test.js ; fi
-	./run --trustLevel=1 test.esp
-	./run --trustLevel=2 test.esp
-	@echo ----  trust-level 1 with two tests
-	cp test.js "test 1.js"
-	if $(HAS_JS_TEST) ; then \
-	./run --trustLevel=1 test.js -t "test 1.js" ; fi
-	@echo ---- check use of -t
-	./run --trustLevel=1 -- -t test.js test.js
-	./run --trustLevel=1 -- -t test.esp testA.esp
+	./run test.js ; fi
+	./run test.esp
 	@echo hello > junk
 	if $(HAS_JS_TEST) ; then \
-	./run -i:is junk test3.js ; fi
+	./run -i:is junk  test3.js ; fi
 	./run -i:is junk test3.esp
 	@echo ---- check random access file
 	if $(HAS_JS_TEST) ; then \
@@ -107,7 +98,7 @@ all:
 	mkdir junk
 	if $(HAS_JS_TEST) ; then \
 	./run -d:da junk test5.js ; fi
-	rm -r "test 1.js" junk
+	rm -rf junk
 	@echo ---- check exception handling
 	if $(HAS_JS_TEST) ; then \
 	./run --stackTrace test6.js || echo EXCEPTION EXPECTED ; fi
@@ -116,7 +107,8 @@ all:
 	@echo Generate an error and show that we can print something
 	@echo on the error stream before the normal error handling.
 	if $(HAS_JS_TEST) ; then \
-	./run test7.js > /dev/null || echo EXCEPTION EXPECTED ; fi
+	./run test7.js > /dev/null \
+		|| echo EXCEPTION EXPECTED ; fi
 	@echo --- third exception-handling test
 	@echo Repeat first exception handling test but without a stacktrace
 	if $(HAS_JS_TEST) ; then \
@@ -132,26 +124,28 @@ all:
 	./run test9.esp || echo EXCEPTION EXPECTED
 	@echo print versions of jar files
 	./run --versions
-	@echo run test11.js to see if scripting.importClass works
+	@echo run  test11.js to see if scripting.importClass works
 	if $(HAS_JS_TEST) ; then \
 	./run test11.js ; fi
 	./run test11.esp
 	@echo run test12.js to see if scripting.importClass works
 	if $(HAS_JS_TEST) ; then \
 	./run test12.js ; fi
-	./run test12.esp
+	./run --unsetScripting test12.esp
 	@echo run test13.js to check createFactory with three args
 	if $(HAS_JS_TEST) ; then \
 	./run test13.js ; fi
 	./run test13.esp
-	@echo run test1 4.js to check createFactory with three args
+	@echo run test14.js to check createFactory with three args
 	if $(HAS_JS_TEST) ; then \
 	./run test14.js || ./run --stackTrace test14.js ; fi
 	./run test14.esp || ./run --stackTrace test14.esp
 	@echo test2 with bad codebase
 	if $(HAS_JS_TEST) ; then \
-	./run --codebase .../foo.xyz test2.js || echo "Exception Expected" ; fi
-	./run --codebase .../foo.xyz test2.esp || echo "Exception Expected"
+	./run --codebase .../foo.xyz test2.js \
+		|| echo "Exception Expected" ; fi
+	./run --codebase .../foo.xyz test2.esp \
+		|| echo "Exception Expected"
 	@echo test2 with no codebase
 	if $(HAS_JS_TEST) ; then \
 	./run test2.js ; fi
@@ -187,18 +181,18 @@ rpath:
 
 test10-dry:
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
-		-J-server -J-Xmn10M --trustLevel=2  \
+		-J-server -J-Xmn10M  \
 		--codebase .../lsnof.jar  --dryrun "test10.js"
 
 test10:
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
-		-J-server -J-Xmn10M --trustLevel=2  \
+		-J-server -J-Xmn10M  \
 		--add-modules org.bzdev.lsnof \
 		--codebase .../lsnof.jar "test10.js"
 
 test10-esp:
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
-		-J-server -J-Xmn10M --trustLevel=2  \
+		-J-server -J-Xmn10M \
 		--add-modules org.bzdev.lsnof \
 		--codebase .../lsnof.jar "test10.esp"
 

@@ -11,11 +11,13 @@ public class ScriptingTest2 {
 	    boolean dramaNotRemoved = true;
 	    while (ind < argv.length && argv[ind].startsWith("-")) {
 		System.out.println("options contain " + argv[ind]);
+		/*
 		if (argv[ind].equals("--sandbox")) {
 		    sm = new SecurityManager();
 		} else if (argv[ind].equals("--scriptSandbox")) {
 		    sm = new ScriptingSecurityManager();
 		}
+		*/
 		ind++;
 	    }
 	    System.out.println("[options processed]");

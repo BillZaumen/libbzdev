@@ -790,7 +790,8 @@ public class SCRunnerCmd {
 	boolean maxQualityMode = false;
 	boolean autoStackTraceMode = false;
 	boolean autoPrintMode = false;
-	if (argv[0].matches("-s[:,BDILSERT\\s].*")) {
+	boolean unsetScriptingMode = false;
+	if (argv[0].matches("-s[:,BDILSERTU\\s].*")) {
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
 	    /*
@@ -843,6 +844,11 @@ public class SCRunnerCmd {
 			autoStackTraceMode = true;
 		    }
 		    break;
+		case 'U':
+		    if (variable.equalsIgnoreCase("true")) {
+			unsetScriptingMode = true;
+		    }
+		    break;
 		default:
 		    System.err.println(errorMsg("parmType", type));
 		    System.exit(1);
@@ -855,7 +861,7 @@ public class SCRunnerCmd {
 	    null: argv[index++];
 	// scan ahead to find the language
 	while (index < argv.length && argv[index].startsWith("-")
-	       && !argv[index].equals("-t")) {
+	       /* && !argv[index].equals("-t")*/) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -866,8 +872,10 @@ public class SCRunnerCmd {
 	    } else if (argv[index].equals("--")) {
 		index++;
 		break;
+		/*
 	    } else if (argv[index].equals("-t")) {
 		index++; break;
+		*/
 	    } else if (argv[index].equals("-o")) {
 		index++;
 	    } else if (argv[index].equals("--plaf")) {
@@ -981,7 +989,9 @@ public class SCRunnerCmd {
 	if (languageName == null) {
 	    String extension = null;
 	    while (index < argv.length && extension == null) {
+		/*
 		if (!argv[index].equals("-t")) {
+		*/
 		    if (extension == null) {
 			try {
 			    extension = getExtension(argv[index]);
@@ -992,7 +1002,9 @@ public class SCRunnerCmd {
 			    System.exit(1);
 			}
 		    }
+		/*
 		}
+		*/
 		index++;
 	    }
 	    if (extension == null) {
@@ -1002,6 +1014,7 @@ public class SCRunnerCmd {
 	    }
 	}
 
+	/*
 	if (defs.getProperty("java.security.policy") == null) {
 	    try {
 		File pf = new File(SCRunnerCmd.class.getProtectionDomain()
@@ -1015,6 +1028,7 @@ public class SCRunnerCmd {
 		System.exit(1);
 	    }
 	}
+	*/
 
 	List<String> argList = new LinkedList<String>();
 	readConfigFiles(languageName);
@@ -1026,7 +1040,7 @@ public class SCRunnerCmd {
 	*/
 	index = (script == null)? 0: 1;
 	if (parmList.size() > 0 || autoExitMode || maxQualityMode
-	    || autoStackTraceMode || autoPrintMode) {
+	    || autoStackTraceMode || autoPrintMode || unsetScriptingMode) {
 	    // This detects a '-s' option, which has to be skipped
 	    // as it was already processed.
 	    index++;
@@ -1034,7 +1048,7 @@ public class SCRunnerCmd {
 	boolean dryrun = false;
 	boolean listCodeBase = false;
 	while (index < argv.length && argv[index].startsWith("-")
-	       && !argv[index].equals("-t")) {
+	       /*&& !argv[index].equals("-t")*/) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -1173,12 +1187,16 @@ public class SCRunnerCmd {
 		    System.err.println(msg);
 		    System.exit(1);
 		}
+	    } else if (argv[index].equals("--setScripting")) {
+		sbcmd.add("--setScripting");
+		/*
 	    } else if (argv[index].equals("--trustLevel=0")) {
 		sbcmd.add("--trustLevel=0");
 	    } else if (argv[index].equals("--trustLevel=1")) {
 		sbcmd.add("--trustLevel=1");
 	    } else if (argv[index].equals("--trustLevel=2")) {
 		sbcmd.add("--trustLevel=2");
+		*/
 	    } else if (argv[index].equals("-r")) {
 		sbcmd.add("-r");
 	    } else if (argv[index].startsWith("-r")) {
@@ -1302,6 +1320,8 @@ public class SCRunnerCmd {
 		}
 		sbcmd.add("--supportsLanguage");
 		sbcmd.add(argv[index]);
+	    } else if (argv[index].equals("--unsetScripting")) {
+		sbcmd.add("--unsetScripting");
 	    } else {
 		String msg = errorMsg("unknownCmdOption", argv[index]);
 		System.err.println(msg);
@@ -1362,6 +1382,10 @@ public class SCRunnerCmd {
 	if (autoPrintMode) {
 	    argList.add("--print");
 	}
+	if (unsetScriptingMode) {
+	    argList.add("--unsetScripting");
+	}
+
 	if (index + parmList.size() > argv.length) {
 	    System.err.println(errorMsg("tooFewArgs"));
 	    System.exit(1);

@@ -12,8 +12,7 @@ out.println("hello world");
 
 try {
     fis = new java.io.FileOutputStream("junk");
-    out.println("should have seen an error for trustLevel < 2 and no -t");
 } catch (err) {
     eout.println(err);
-    eout.println("Error for 'junk' expected");
+    eout.println("Error for 'junk' not expected");
 }

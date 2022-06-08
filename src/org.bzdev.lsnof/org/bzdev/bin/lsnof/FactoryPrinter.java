@@ -424,7 +424,7 @@ public class FactoryPrinter {
 	    // make sure a factory can't try to take advantage of
 	    // any permissions a user may have granted to our protection
 	    // domain.
-	    throw new SecurityException(errorMsg("recursive"));
+	    throw new RuntimeException(errorMsg("recursive"));
 	} else {
 	    mainCalled = true;
 	}
@@ -473,8 +473,10 @@ public class FactoryPrinter {
 			System.exit(1);
 		    }
 		    NamedObjectFactory.setDocAPIBase(baseArray[0]);
+		    /*
 		} else if (argv[index].equals("--trusted")) {
 		    notTrusted = false;
+		    */
 		} else if (argv[index].equals("--stackTrace")) {
 		    stackTrace = true;
 		} else if (argv[index].equals("-L")) {
@@ -800,11 +802,13 @@ public class FactoryPrinter {
 		}
 	    }
 
+	    /*
 	    if (notTrusted) {
 		try {
 		    System.setSecurityManager(new SecurityManager());
 		} catch (UnsupportedOperationException eu){}
 	    }
+	    */
 	    if (da != null) {
 		Set<NamedObjectFactory> fset = new TreeSet<>
 		    (new Comparator<NamedObjectFactory>() {

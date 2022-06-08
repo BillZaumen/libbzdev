@@ -27,9 +27,14 @@ public class ScriptingTest3 {
 	}
 	public Object test(Object x, Object y) throws ScriptException {
 	    return invokePrivateFunction(properties,
+					 "test",
+					 x, y);
+	    /*
+	    return invokePrivateFunction(properties,
 					 ScriptingContext.PFMode.PRIVILEGED,
 					 "test",
 					 x, y);
+	    */
 	}
     }
 

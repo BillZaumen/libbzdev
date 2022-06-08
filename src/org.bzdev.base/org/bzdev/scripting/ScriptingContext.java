@@ -22,158 +22,27 @@ import org.bzdev.lang.ExceptionedCallableReturns;
 //@exbundle org.bzdev.scripting.lpack.Scripting
 
 /**
- * Class for running scripts while tracking security status.
- * Threads can alternate between two security modes, depending on whether
- * scripts should be in a security 'sandbox' or not: sandboxed mode
- * and normal mode. The security manager {@link java.lang.SecurityManager}
- * ignores these modes. The security manager
- * {@link org.bzdev.scripting.ScriptingSecurityManager} behaves like
- * {@link java.lang.SecurityManager} when a thread is in sandboxed mode
- * and behaves as if a security manager was not present when a thread is
- * in normal mode. Programs such as scrunner allow one to pick a security
- * level by choosing an appropriate security manager (or non at all)
- * without having to explicitly configure security policies.
+ * Class for running scripts.
+ * A scripting context may also have a "parent" scripting context.
+ * This allows classes such as {@link org.bzdev.devqsim.Simulation}
+ * to be subclasses of {@link ScriptingContext} while an already
+ * configured scripting context's script engine and bindings.
  * <P>
- * The constructors for ScriptingContext allow instances to be configure
- * as trusted or not trusted.  When trusted, a thread's security mode
- * is not changed when public methods that evaluate scripts are called.
- * When not trusted, public methods always  change the thread's security
- * mode to sandboxed, restoring it to the previous mode when the method
- * exits. A scripting context may also have a "parent" scripting context.
- * For those without parents, some of a scripting context's
- * {@link java.security.AccessControlContext access-controller contexts}
- *  are set up when the scripting context is created. How this is
- * done depends on whether a security manager was installed and is
- * described below.  A scripting context that has a parent will
- * inherit these  access-control contexts from the parent.
- * <P>
- * For the following methods
- * <UL>
- *   <LI>{@link ScriptingContext#evalScript(Reader)},
- *   <LI>{@link ScriptingContext#evalScript(String,Reader)},
- *   <LI>{@link ScriptingContext#evalScript(String)},
- *   <LI>{@link ScriptingContext#evalScript(String,Bindings)},
- *   <LI>{@link ScriptingContext#callScriptFunction(String,Object...)},
- *   <LI>{@link ScriptingContext#callScriptFunction(Bindings,String,Object...)},
- *   <LI>{@link ScriptingContext#callScriptMethod(Object,String,Object...)},
- *   <LI>{@link ScriptingContext#callScriptMethod(Bindings,Object,String,Object...)},
- *   </LI>{@link ScriptingContext#doScriptSandboxed(Callable)}
- *   <LI>{@link ScriptingContext#doScriptSandboxedReturns(CallableReturns)},
- *   <LI>{@link ScriptingContext#doScriptSandboxedReturns(ExceptionedCallableReturns)},
- * </UL>
- * if a ScriptingContext is not trusted, the
- * methods run with no permissions. If a ScriptingContext is trusted,
- * the methods run with the permissions granted to ScriptingContext
- * as follows:
- * <UL>
- *   <LI> If the scripting context has a parent, the permissions of the
- *        parent are used, and the next two cases refer to the scripting
- *        context's ancestor that does not have a parent.
- *   <LI> When a scripting context is created before a security manager
- *        is installed, the scripts are run with the permissions
- *        granted to ScriptingContext's protection domain.
- *   <LI> When a scripting context is created after a security manager
- *        is installed, the scripts are run with the permissions granted
- *        to ScriptingContext's protection domain intersected with the
- *        permissions granted to protection domains higher on the call stack
- *        at the time the scripting context was created.
- * </UL>
- * All of these methods are run in sandboxed mode when the scripting context
- * is not trusted, and in the mode currently in effect when the scripting
- * context is trusted (so code running in sandboxed mode cannot elevate its
- * privileges).
- * <P>
- * For the methods
- * <UL>
- *   <LI>{@link ScriptingContext#evalScriptPrivileged(String)},
- *   <LI>{@link ScriptingContext#doScriptPrivileged(Callable)},
- *   <LI>{@link ScriptingContext#doScriptPrivilegedReturns(CallableReturns)},
- *   <LI>{@link ScriptingContext#doScriptPrivilegedReturns(ExceptionedCallableReturns)},
- * </UL>
- * the  permissions are determined as follows:
- * <UL>
- *   <LI> If the scripting context has a parent, the permissions of the
- *        parent are used, and the next two cases refer to the scripting
- *        context's ancestor that does not have a parent.
- *   <LI> When a scripting context is created before a security manager
- *        is installed, the scripts are run with the permissions
- *        granted to ScriptingContext's protection domain.
- *   <LI> When a scripting context is created after a security manager
- *        is installed, the scripts are run with the permissions granted
- *        to ScriptingContext's protection domain intersected with the
- *        permissions granted to protection domains higher on the call stack
- *        at the time the scripting context was created.
- * </UL>
- *  All of these methods run in normal mode, and are protected methods so
- * that a trusted scripting context cannot be used by scripts
- * to elevate privileges.
- * <P>
- * For the methods,
- * <UL>
- *   <LI>{@link ScriptingContext#invokePrivateFunction(Bindings,Properties,PFMode,String,Object...)},
- *   <LI>{@link ScriptingContext#invokePrivateFunction(Properties,PFMode,String,Object...)},
- * </UL>
- * the behavior depends on {@link ScriptingContext.PFMode PFMode}:
- * <UL>
- *   <LI>If PFMode is <CODE>PRIVILEGED</CODE>,
- *       <UL>
- *         <LI> If the scripting context has a parent, the permissions
- *              of the parent are used, and the next two cases refer
- *              to the scripting context's ancestor that does not have
- *              a parent.
- *         <LI> When a scripting context is created before a security
- *              manager is installed, the function is called with the
- *              permissions granted to ScriptingContext's protection
- *              domain.
- *         <LI> When a scripting context is created after a security
- *              manager is installed, the function is called run with
- *              the permissions granted to ScriptingContext's protection
- *              domain intersected with the permissions granted to
- *              protection domains higher on the call stack at the
- *              time the scripting context was created.
- *       </UL>
- *   <LI>If PFMode is <CODE>SANDBOXED</CODE>, the behavior depends on
- *       whether the scripting context is trusted or not.  If the
- *       scripting context is not trusted, the method is called with
- *       no permissions.  If the scripting context is trusted, the
- *       method is called with permissions that are determined as
- *       follows:
- *       <UL>
- *          <LI> If the scripting context has a parent, the
- *               permissions of the parent are used, and the next two
- *               cases refer to the scripting context's ancestor that
- *               does not have a parent.
- *          <LI> When a scripting context is created before a security
- *               manager is installed, the scripts are run with the
- *               permissions granted to ScriptingContext's protection
- *               domain.
- *          <LI> When a scripting context is created after a security
- *               manager is installed, the scripts are run with the
- *               permissions granted to ScriptingContext's protection
- *               domain intersected with the permissions granted to
- *               protection domains higher on the call stack at the
- *               time the scripting context was created.
- *       </UL>
- *        Both of these methods are run in sandboxed mode when the
- *        scripting context is not trusted, and in the mode currently in
- *        effect when the scripting context is trusted.
- *   <LI>If PFMode is <CODE>NORMAL</CODE>, the function is called with
- *       permissions determined by the call stack.
- * </UL>
- * Both methods are protected, so a script running in a sandbox cannot
- * use a trusted scripting context to elevate permissions. These
- * methods allow a script that defines functions to be stored in
- * property files, with the keys denoting supported scripting
- * languages. The class {@link ExtendedScriptingContext}, for example,
- * uses this mechanism to provide methods for importing
- * Java classes into a scripting environment (these methods were added
- * by the author out of frustration with the Rhino to Nashorn transition,
- * where the default mechanism for importing java classes suddenly
- * changed).
- * @see ScriptingSecurityManager
+ * There are several subclasses of {@link ScriptingContext} in this
+ * package. In particular, the class {@link ExtendedScriptingContext},
+ * provides methods for importing Java classes into a scripting
+ * environment (these methods were added by the author out of
+ * frustration with the Rhino to Nashorn transition, where the default
+ * mechanism for importing java classes suddenly changed). The class
+ * {@link DefaultScriptingContext} will look up a scripting language by
+ * name, with the name provided in a constructor.  The default is to
+ * use the
+ * <A HREF="{@docRoot}/org.bzdev.base/org/bzdev/util/doc-files/esp.html">ESP</A>
+ * scripting language (added by the author after the "powers that be"
+ * decided to drop support for Nashorn and finding that GraalVM, the suggested
+ * alternative, did not provide adequate support for multithreading).
  * @see DefaultScriptingContext
  * @see ExtendedScriptingContext
- * @see AccessControlContext
  */
 public class ScriptingContext {
 
@@ -187,7 +56,7 @@ public class ScriptingContext {
 
     // Determine if no security manager was running when this
     // ScriptingContext was created.
-    private final boolean noInitialSM = (System.getSecurityManager() == null);
+    // private final boolean noInitialSM = (System.getSecurityManager() == null);
 
     static final boolean graalVMMode = AccessController.doPrivileged
 	    (new PrivilegedAction<Boolean>() {
@@ -437,11 +306,11 @@ public class ScriptingContext {
 	*/
     }
     private void checkPrivileged() {
+	/*
 	if (parent != null) {
 	    parent.checkPrivileged();
 	    return;
 	}
-	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    final Permission perm =
@@ -557,10 +426,12 @@ public class ScriptingContext {
      *            be created after a security manager was installed.
      */
     public ScriptingContext() throws SecurityException {
+	/*
 	checkConstructorPermission(false);
 	context = noPermContext;
 	privilegedContext = (System.getSecurityManager() == null)? null:
 	    AccessController.getContext();
+	*/
     }
 
 
@@ -571,8 +442,12 @@ public class ScriptingContext {
      *            be created after a security manager was installed or an
      *            attempt was made to create a trusted subclass of
      *            ScriptingContext from inside a sandbox
+     * @deprecated trusted scripting contexts are not applicable when
+     *             the security manager has been eliminated.
      */
+    @Deprecated
     public ScriptingContext(boolean trusted) throws SecurityException {
+	/*
 	if (trusted && inSandbox()) {
 	    throw new SecurityException(errorMsg("trustedInSandbox"));
 	}
@@ -585,6 +460,7 @@ public class ScriptingContext {
 	} else {
 	    context = noPermContext;
 	}
+	*/
     }
 
     /**
@@ -596,8 +472,9 @@ public class ScriptingContext {
      *            be created after a security manager was installed.
      */
     public ScriptingContext(ScriptingContext parent) throws SecurityException {
-	if (parent == null) checkConstructorPermission(false);
+	// if (parent == null) checkConstructorPermission(false);
 	this.parent = parent;
+	/*
 	context = noPermContext;
 	if (parent == null) {
 	    privilegedContext = (System.getSecurityManager() == null)? null:
@@ -605,6 +482,7 @@ public class ScriptingContext {
 	} else {
 	    privilegedContext = parent.privilegedContext;
 	}
+	*/
     }
 
 
@@ -618,14 +496,20 @@ public class ScriptingContext {
      *            be created after a security manager was installed or an
      *            attempt was made to create a trusted subclass of
      *            ScriptingContext from inside a sandbox
+     * @deprecated trusted scripting contexts add nothing when the
+     *             security manager has been eliminated
      */
+    @Deprecated
     public ScriptingContext(ScriptingContext parent, boolean trusted) {
+	/*
 	if (trusted && inSandbox()) {
 	    throw new SecurityException(errorMsg("trustedInSandbox"));
 	}
 	if (parent == null) checkConstructorPermission(trusted);
 	notTrusted = !trusted;
+	*/
 	this.parent = parent;
+	/*
 	if (parent == null) {
 	    privilegedContext = (System.getSecurityManager() == null)? null:
 		AccessController.getContext();
@@ -637,12 +521,16 @@ public class ScriptingContext {
 	} else {
 	    context = noPermContext;
 	}
+	*/
     }
 
     /**
      * Determine if the current thread is in a ScriptingContext sandbox.
      * @return true if in a sandbox; false otherwise
+     * @deprecated there is no sandbox after the security manager has
+     *             been removed from Java
      */
+    @Deprecated
     public static final boolean inSandbox() {
 	    return inSandboxFlag.get();
     }
@@ -676,9 +564,11 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
+	    setBindings(defaultBindings);
+	    return engine.eval(reader, defaultBindings);
+	    /*
 	    try {
-		setBindings(defaultBindings);
 		if (context == null) {
 		    if (privilegedContext == null) {
 			return AccessController.doPrivileged
@@ -708,9 +598,10 @@ public class ScriptingContext {
 	    } catch(PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -742,8 +633,10 @@ public class ScriptingContext {
 	Object oldFileName = engine.get(ScriptEngine.FILENAME);
 	try {
 	    engine.put(ScriptEngine.FILENAME, fileName);
-	    onScriptStarting();
+	    // onScriptStarting();
 	    setBindings(defaultBindings);
+	    return engine.eval(reader, defaultBindings);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -774,9 +667,10 @@ public class ScriptingContext {
 	    } catch(PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    //onScriptEnding();
 	    engine.put(ScriptEngine.FILENAME, oldFileName);
 	}
     }
@@ -804,8 +698,10 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    setBindings(defaultBindings);
+	    return engine.eval(script, defaultBindings);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -836,9 +732,10 @@ public class ScriptingContext {
 	    } catch(PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -870,8 +767,10 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    setBindings(ourBindings);
+	    return engine.eval(script, ourBindings);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -900,9 +799,10 @@ public class ScriptingContext {
 	    } catch(PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
      }
 
@@ -931,6 +831,8 @@ public class ScriptingContext {
 	BindingInfo saved = saveBindings();
 	setBindings(defaultBindings);
 	try {
+	    return engine.eval(script, defaultBindings);
+	    /*
 	    try {
 		if (privilegedContext == null) {
 		    return AccessController.doPrivileged
@@ -962,6 +864,7 @@ public class ScriptingContext {
 	    } catch (PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
 	}
@@ -997,10 +900,23 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    setBindings(defaultBindings);
 	    engine.setBindings(defaultBindings, ScriptContext.ENGINE_SCOPE);
 	    final Invocable inv = (Invocable)engine;
+	    try {
+	    return inv.invokeFunction(functionName, args);
+	    } catch (Exception e) {
+		if (e instanceof ScriptException) {
+		    throw (ScriptException) e;
+		} else if (e instanceof NoSuchMethodException) {
+		    throw (NoSuchMethodException) e;
+		} else {
+		    String msg = errorMsg("unrecognizedException");
+		    throw new Error(msg, e);
+		}
+	    }
+	    /*
 	    try {
 		if (context == null) {
 		    if(privilegedContext == null) {
@@ -1046,9 +962,10 @@ public class ScriptingContext {
 		    throw new Error(msg, ee);
 		}
 	    }
+	    */
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -1092,9 +1009,11 @@ public class ScriptingContext {
 
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    final Invocable inv = (Invocable)engine;
 	    setBindings(ourBindings);
+	    return inv.invokeFunction(functionName, args);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -1140,9 +1059,19 @@ public class ScriptingContext {
 		    throw new Error(msg, ee);
 		}
 	    }
+	    */
+	} catch (Exception e) {
+	    if (e instanceof ScriptException) {
+		    throw (ScriptException) e;
+	    } else if (e instanceof NoSuchMethodException) {
+		throw (NoSuchMethodException) e;
+	    } else {
+		String msg = errorMsg("unrecognizedException");
+		throw new Error(msg, e);
+	    }
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -1177,11 +1106,13 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    engine.setBindings(defaultBindings,
 				     ScriptContext.ENGINE_SCOPE);
 	    setBindings(defaultBindings);
 	    final Invocable inv = (Invocable)engine;
+	    return inv.invokeMethod(scriptObject, methodName, args);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -1228,9 +1159,19 @@ public class ScriptingContext {
 		    throw new Error(msg, ee);
 		}
 	    }
+	    */
+	} catch (Exception e) {
+	    if (e instanceof ScriptException) {
+		throw (ScriptException) e;
+	    } else if (e instanceof NoSuchMethodException) {
+		throw (NoSuchMethodException) e;
+	    } else {
+		String msg = errorMsg("unrecognizedException");
+		throw new Error(msg, e);
+		}
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -1277,9 +1218,11 @@ public class ScriptingContext {
 	}
 	BindingInfo saved = saveBindings();
 	try {
-	    onScriptStarting();
+	    // onScriptStarting();
 	    setBindings(bindings);
 	    final Invocable inv = (Invocable)engine;
+	    return inv.invokeMethod(scriptObject, methodName, args);
+	    /*
 	    try {
 		if (context == null) {
 		    if (privilegedContext == null) {
@@ -1328,9 +1271,19 @@ public class ScriptingContext {
 		    throw new Error(msg, ee);
 		}
 	    }
+	    */
+	} catch (Exception e) {
+	    if (e instanceof ScriptException) {
+		throw (ScriptException) e;
+	    } else if (e instanceof NoSuchMethodException) {
+		throw (NoSuchMethodException) e;
+	    } else {
+		String msg = errorMsg("unrecognizedException");
+		throw new Error(msg, e);
+	    }
 	} finally {
 	    restoreBindings(saved);
-	    onScriptEnding();
+	    // onScriptEnding();
 	}
     }
 
@@ -1522,10 +1475,10 @@ public class ScriptingContext {
 	    throw new UnsupportedOperationException
 		(errorMsg("scriptingNotEnabled"));
 	}
+	/*
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setWriter"));
 	}
-	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(writerPermission);
@@ -1565,10 +1518,10 @@ public class ScriptingContext {
 	    throw new UnsupportedOperationException
 		(errorMsg("scriptingNotEnabled"));
 	}
+	/*
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setErrorWriter"));
 	}
-	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(writerPermission);
@@ -1613,10 +1566,10 @@ public class ScriptingContext {
 	    throw new UnsupportedOperationException
 		(errorMsg("scriptingNotEnabled"));
 	}
+	/*
 	if (inSandbox()) {
 	    throw new SecurityException(errorMsg("setReader"));
 	}
-	/*
 	SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    sm.checkPermission(readerPermission);
@@ -1640,7 +1593,7 @@ public class ScriptingContext {
     }
 
 
-    /**
+    /*
      * Indicate that code should not be run in a scripting-context sandbox.
      * Calls to onExecutionStarting and onExecutionEnding, or to
      * onScriptStarting and onScriptEnding, must occur in pairs with
@@ -1649,13 +1602,14 @@ public class ScriptingContext {
      * @exception SecurityException the current thread is not consistent
      *            with thread group a ScriptingSecurityManager associated
      *            with this object
-     */
+
    private void onExecutionStarting() throws SecurityException {
        sandboxStack.get().push(inSandboxFlag.get());
        inSandboxFlag.set(Boolean.FALSE);
    }
+     */
 
-    /**
+    /*
      * Undo the effects of a previous call to onExecutionStarting.
      * Calls to onExecutionStarting and onExecutionEnding, or to
      * onScriptStarting and onScriptEnding, must occur in pairs with
@@ -1664,10 +1618,11 @@ public class ScriptingContext {
      * @exception SecurityException the current thread is not consistent
      *            with thread group a ScriptingSecurityManager associated
      *            with this object
-     */
+
     private void onExecutionEnding() throws SecurityException {
 	inSandboxFlag.set(sandboxStack.get().pop());
     }
+     */
 
     /**
      * Execute code in privileged mode.
@@ -1691,6 +1646,8 @@ public class ScriptingContext {
     protected final void doScriptPrivileged(final Callable c)
 	throws SecurityException
     {
+	c.call();
+	/*
        checkPrivileged();
 	try {
 	    onExecutionStarting();
@@ -1714,17 +1671,23 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
+	*/
     }
 
     /**
      * Execute code in sandboxed mode.
      * @param c a Callable providing the code to run
      * @exception SecurityException a security exception was thrown,
-                  typically by the Callable c
+     *            typically by the Callable c
+     * @deprecated this method is not needed unless a security manager
+     *             is used
      */
+    @Deprecated
     protected final void doScriptSandboxed(final Callable c)
 	throws SecurityException
     {
+	c.call();
+	/*
 	try {
 	    onScriptStarting();
 	    AccessController.doPrivileged
@@ -1737,6 +1700,7 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
+	*/
     }
 
     /**
@@ -1755,6 +1719,8 @@ public class ScriptingContext {
      */
     protected final void doScriptPrivileged(final ExceptionedCallable c)
 	throws SecurityException, Exception {
+	c.call();
+	/*
 	checkPrivileged();
 	try {
 	    onExecutionStarting();
@@ -1782,6 +1748,7 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
+	*/
     }
 
     /**
@@ -1792,9 +1759,14 @@ public class ScriptingContext {
      * @exception SecurityException a security exception was thrown,
      *            typically  by the ExceptionedCallable c
      * @exception Exception an exception was raised
+     * @deprecated this method is not needed unless a security manager
+     *             is used
      */
+    @Deprecated
     public final void doScriptSandboxed(final ExceptionedCallable c)
 	throws SecurityException, Exception {
+	c.call();
+	/*
 	try {
 	    onScriptStarting();
 	    try {
@@ -1811,6 +1783,7 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
+	*/
     }
 
 
@@ -1824,6 +1797,8 @@ public class ScriptingContext {
     protected final <T> T doScriptPrivilegedReturns(final CallableReturns<T> c)
 	throws SecurityException
     {
+	return c.call();
+	/*
 	checkPrivileged();
 	try {
 	    onExecutionStarting();
@@ -1845,6 +1820,7 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
+	*/
     }
 
     /**
@@ -1854,9 +1830,14 @@ public class ScriptingContext {
      * @return the value produced by running c
      * @exception SecurityException a security exception was thrown,
      *            typically by the CallableReturns c
+     * @deprecated this method is not needed unless a security manager
+     *             is used
      */
+    @Deprecated
     public final <T> T doScriptSandboxedReturns(final CallableReturns<T> c)
 	throws SecurityException {
+	return c.call();
+	/*
 	try {
 	    onScriptStarting();
 	    return AccessController.doPrivileged
@@ -1868,6 +1849,7 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
+	*/
     }
 
     /**
@@ -1881,11 +1863,15 @@ public class ScriptingContext {
      * @exception SecurityException a security exception was thrown, typically
      *            by the ExceptionedCallableReturns c
      * @exception Exception an exception was raised
+     * @deprecated the security manager is being removed from Java.
      */
+    @Deprecated
     protected final <T>
 	T doScriptPrivilegedReturns(final ExceptionedCallableReturns<T> c)
 	throws SecurityException, Exception
     {
+	return c.call();
+	/*
 	try {
 	    checkPrivileged();
 	    onExecutionStarting();
@@ -1911,6 +1897,7 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
+	*/
     }
 
     /**
@@ -1926,11 +1913,16 @@ public class ScriptingContext {
      *            typically by the ExceptionedCallableReturns c
      *            or onExecutionEnding()
      * @exception Exception an exception was raised
+     * @deprecated this method is not needed unless a security manager
+     *             is used
      */
+    @Deprecated
     public final <T>
 	T doScriptSandboxedReturns(final ExceptionedCallableReturns<T> c)
 	throws SecurityException, Exception
     {
+	return c.call();
+	/*
 	try {
 	    onScriptStarting();
 	    try {
@@ -1946,9 +1938,10 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
+	*/
     }
 
-    /**
+    /*
      * Indicate that code will be run in a scripting-context's sandbox.
      * Calls to onExecutionStarting and onExecutionEnding, or to
      * onScriptStarting and onScriptEnding, must occur in pairs with
@@ -1957,15 +1950,16 @@ public class ScriptingContext {
      * @exception SecurityException the current thread is not consistent
      *            with thread group a ScriptingSecurityManager associated
      *            with this object
-     */
+
     private void onScriptStarting() throws SecurityException {
 	if (notTrusted) {
 	    sandboxStack.get().push(inSandboxFlag.get());
 	    inSandboxFlag.set(Boolean.TRUE);
 	}
     }
+    */
 
-    /**
+    /*
      * Undo the effects of a preceding call to onScriptStarting.
      * Calls to onExecutionStarting and onExecutionEnding, or to
      * onScriptStarting and onScriptEnding, must occur in pairs with
@@ -1974,12 +1968,13 @@ public class ScriptingContext {
      * @exception SecurityException the current thread is not consistent
      *            with thread group a ScriptingSecurityManager associated
      *            with this object
-     */
+
     private  void onScriptEnding() throws SecurityException {
 	if (notTrusted) {
 	    inSandboxFlag.set(sandboxStack.get().pop());
 	}
     }
+    */
 
     private HashMap<Properties,Bindings> bindingsMap =
 	new HashMap<Properties,Bindings>();
@@ -1990,7 +1985,11 @@ public class ScriptingContext {
      * This mode is recognized when using
      * {@link ScriptingSecurityManager}, but not when using
      * {@link SecurityManager}.
+     * @deprecated the sandbox mode is meaningful only if a security
+     *             manager is installed, and the security manager is
+     *             being removed from Java
      */
+    @Deprecated
     static public enum PFMode {
 	/**
 	 * Invoke the function in privileged mode.  A script will run
@@ -2094,10 +2093,65 @@ public class ScriptingContext {
      * @exception ScriptException an error occurred during the execution of
      *            the script
      * @exception UnsupportedOperationException no script engine was provided
+     * @deprecated specifyhing mode  is meaningful only if a security
+     *             manager is installed, and the security manager is
+     *             being removed from Java
+     * @see #invokePrivateFunction(Bindings,Properties,String,Object...)
      */
+    @Deprecated
     protected final Object invokePrivateFunction(Bindings bindings,
 						 Properties properties,
 						 PFMode mode,
+						 final String functionName,
+						 final Object... args)
+	throws ScriptException, UnsupportedOperationException
+    {
+	return invokePrivateFunction(bindings, properties, functionName, args);
+    }
+
+    /**
+     * Invoke a function defined by a private script with specified bindings.
+     * The script is stored in a {@link java.util.Properties Properties}
+     * list of properties under a key with the same name that
+     * {@link #getScriptLanguage} returns in order to allow
+     * multiple scripting languages to be supported (EMCAScript, the
+     * official name for Javascript, is supported by the JDK, with
+     * other scripting languages available separately). The script will
+     * be evaluated once in sandbox mode, and must return an object whose
+     * methods will represent the functions that can be called (while
+     * at the implementation level, the methods of an object are called,
+     * the object is not visible to the caller).
+     * The {@link javax.script.Invocable Invocable} interface will
+     * then be used to evaluate the appropriate method without having to
+     * evaluate the script each time this method is called. A separate
+     * object is used for each bindings/properties pair.
+     * <P>
+     * The evaluation of the function is performed in the mode
+     * specified by the third argument.
+     * <P>
+     * Note: this method was added (with a change in the format of the
+     * properties for each language) because testing indicated that
+     * the Graal Javascript implementation, which a time this method
+     * was introduced, is likely to be the replacement for Nashorn, does
+     * not allow a function defined for one set of bindings to be used with
+     * objects defined in another set of bindings. To be sure this method
+     * would work with Graal's scripting languages, the object containing
+     * the methods is now placed in the same bindings used to obtain the
+     * arguments listed in the arguments that follow the function name.
+     * @param bindings the bindings to use when evaluating the
+     *        function
+     * @param properties a properties list containing the script as an
+     *        entry for a given scripting-language name (ECMAScript
+     *        for Javascript)
+     * @param functionName the name of the function to invoke
+     * @param args the function arguments
+     * @return the object produced by the script evaluation
+     * @exception ScriptException an error occurred during the execution of
+     *            the script
+     * @exception UnsupportedOperationException no script engine was provided
+     */
+    protected final Object invokePrivateFunction(Bindings bindings,
+						 Properties properties,
 						 final String functionName,
 						 final Object... args)
 	throws ScriptException, UnsupportedOperationException
@@ -2131,6 +2185,10 @@ public class ScriptingContext {
 		try {
 		    final Invocable inv = (Invocable)engine;
 		    AccessControlContext ourContext = privilegedContext;
+		    return inv.invokeMethod(scriptObject,
+					    functionName,
+					    args);
+		    /*
 		    switch (mode) {
 		    case PRIVILEGED:
 			checkPrivileged();
@@ -2183,7 +2241,9 @@ public class ScriptingContext {
 			    throw new Error(msg, ee);
 			}
 		    }
+		    */
 		} finally {
+		    /*
 		    switch (mode) {
 		    case PRIVILEGED:
 			onExecutionEnding();
@@ -2195,6 +2255,7 @@ public class ScriptingContext {
 		    case NORMAL:
 			// do nothing
 		    }
+		    */
 		}
 	    } catch(NoSuchMethodException e) {
 		throw new ScriptException(e);
@@ -2245,9 +2306,63 @@ public class ScriptingContext {
      * @exception ScriptException an error occurred during the execution of
      *            the script
      * @exception UnsupportedOperationException no script engine was provided
+     * @deprecated specifyhing a mode is meaningful only if a security
+     *             manager is installed, and the security manager is
+     *             being removed from Java
+     * @see #invokePrivateFunction(Properties,String,Object...)
      */
+    @Deprecated
     protected final Object invokePrivateFunction(Properties properties,
 					   PFMode mode,
+					   final String functionName,
+					   final Object... args)
+	throws ScriptException, UnsupportedOperationException
+
+    {
+	return invokePrivateFunction(properties, functionName, args);
+    }
+
+    /**
+     * Invoke a function from a private script.
+     * The script is stored in a {@link java.util.Properties Properties}
+     * list of properties under a key with the same name that
+     * {@link #getScriptLanguage} returns in order to allow
+     * multiple scripting languages to be supported (EMCAScript, the
+     * official name for Javascript, is supported by the JDK, with
+     * other scripting languages available separately). The script will
+     * be evaluated once in sandbox mode, and must return an object whose
+     * methods will represent the functions that can be called (while
+     * at the implementation level, the methods of an object are called,
+     * the object is not visible to the caller).
+     * The {@link javax.script.Invocable Invocable} interface will
+     * then be used to evaluate the appropriate method without having to
+     * evaluate the script each time this method is called. A separate
+     * object is used for each bindings/properties pair, and the
+     * bindings are those currently in effect for this scripting
+     * context's script engine.
+     * <P>
+     * The evaluation of the function is performed in the mode
+     * specified by the second argument.
+     * <P>
+     * Note: this method was added (with a change in the format of the
+     * properties for each language) because testing indicated that
+     * the Graal Javascript implementation, which a time this method
+     * was introduced, is likely to be the replacement for Nashorn, does
+     * not allow a function defined for one set of bindings to be used with
+     * objects defined in another set of bindings. To be sure this method
+     * would work with Graal's scripting languages, the object containing
+     * the methods is now placed in the same bindings used to obtain the
+     * arguments listed in the arguments that follow the function name.
+     * @param properties a properties list containing the script as an entry for
+     *        a given scripting-language name (ECMAScript for Javascript)
+     * @param functionName the name of the function to invoke
+     * @param args the function arguments
+     * @return the object produced by the script evaluation
+     * @exception ScriptException an error occurred during the execution of
+     *            the script
+     * @exception UnsupportedOperationException no script engine was provided
+     */
+    protected final Object invokePrivateFunction(Properties properties,
 					   final String functionName,
 					   final Object... args)
 	throws ScriptException, UnsupportedOperationException
@@ -2259,7 +2374,7 @@ public class ScriptingContext {
 	}
 	return invokePrivateFunction(engine.getBindings
 				     (ScriptContext.ENGINE_SCOPE),
-				     properties, mode, functionName, args);
+				     properties, functionName, args);
     }
 
     /**

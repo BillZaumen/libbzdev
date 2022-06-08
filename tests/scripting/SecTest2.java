@@ -23,10 +23,13 @@ public class SecTest2 {
 	    super(trusted);
 	    init();
 	}
-	public void doit(ScriptingContext.PFMode mode, String name)
+	public void doit(// ScriptingContext.PFMode mode,
+			 String name)
 	    throws Exception
 	{
-	    invokePrivateFunction(props, mode, "open", name);
+	    invokePrivateFunction(props,
+				  // mode,
+				  "open", name);
 	}
     }
 
@@ -36,54 +39,58 @@ public class SecTest2 {
 	OurScriptingContext sc = new OurScriptingContext();
 	sc.putScriptObject("scripting", sc);
 
-	OurScriptingContext tsc = new OurScriptingContext(true);
+	OurScriptingContext tsc = new OurScriptingContext(/*true*/);
 	tsc.putScriptObject("scripting", tsc);
 
+	// System.setSecurityManager(new ScriptingSecurityManager());
 
-	System.setSecurityManager(new ScriptingSecurityManager());
-
+	/*
 	ScriptingContext.PFMode[] modes = {
 	    ScriptingContext.PFMode.NORMAL,
 	    ScriptingContext.PFMode.PRIVILEGED,
 	    ScriptingContext.PFMode.SANDBOXED,
 	};
+	*/
 
 	
 
-	for (ScriptingContext.PFMode mode:  modes) {
-	    System.out.println("mode = " + mode + " ...");
+	// for (ScriptingContext.PFMode mode:  modes) {
+	// System.out.println("mode = " + mode + " ...");
 	    System.out.print("sc: ");
 	    try {
-		sc.doit(mode, "test1.js");
+		sc.doit(// mode,
+			"test1.js");
 		System.out.println("succeeded");
 	    } catch (Exception e) {
 		System.out.println("failed");
 	    }
 	    System.out.print("sc eval: ");
 	    try {
-		sc.putScriptObject("mode", mode);
-		sc.evalScript("scripting.doit(mode,\"test1.js\")");
+		// sc.putScriptObject("mode", mode);
+		sc.evalScript("scripting.doit(/*mode,*/\"test1.js\")");
 		System.out.println("succeeded");
 	    } catch (Exception e) {
 		System.out.println("failed");
 	    }
 	    System.out.print("tsc: ");
 	    try {
-		tsc.doit( mode, "test1.js");
+		tsc.doit(// mode,
+			 "test1.js");
 		System.out.println("succeeded");
 	    } catch (Exception e) {
 		System.out.println("failed");
 	    }
 	    System.out.print("tsc eval: ");
 	    try {
-		tsc.putScriptObject("mode", mode);
-		tsc.evalScript("scripting.doit(mode,\"test1.js\")");
+		// tsc.putScriptObject("mode", mode);
+		tsc.evalScript("scripting.doit(/*mode,*/\"test1.js\")");
 		System.out.println("succeeded");
 	    } catch (Exception e) {
 		System.out.println("failed");
 	    }
 
-	}
+	// }
+
 	System.out.println("Expected:");
 	System.out.println("... mode = NORMAL ...");
 	System.out.println("... sc: succeeded");

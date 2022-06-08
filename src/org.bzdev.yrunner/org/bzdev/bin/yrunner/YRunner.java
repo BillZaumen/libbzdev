@@ -717,10 +717,12 @@ public class YRunner {
 		    */
 		    System.exit(1);
 		}
+		/*
 	    } else if (argv[index].equals("--trustLevel=0")) {
 		trustLevel = 0;
 	    } else if (argv[index].equals("--trustLevel=2")) {
 		trustLevel = 2;
+		*/
 	    } else if (argv[index].equals("-r")) {
 		org.bzdev.math.StaticRandom.maximizeQuality();
 	    } else if (argv[index].startsWith("-r")) {
@@ -1014,6 +1016,7 @@ public class YRunner {
 
 	handler.checkFiles();
 
+	/*
 	if (trustLevel == 0) {
 	    try {
 		System.setSecurityManager(new SecurityManager());
@@ -1022,6 +1025,7 @@ public class YRunner {
 	    System.err.println(errorMsg("noSSM"));
 	    System.exit(1);
 	}
+	*/
 	try {
 	    handler.run(launcher);
 	} catch (Exception e) {

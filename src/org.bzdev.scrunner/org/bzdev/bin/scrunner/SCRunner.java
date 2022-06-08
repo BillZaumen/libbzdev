@@ -312,6 +312,7 @@ public class SCRunner {
 	boolean stackTrace = false;
 	boolean printMode = false;
 	int trustLevel = 0;
+	boolean setScripting = true;
 	boolean showFactories = false;
 	boolean listVersions = false;
 	boolean exit = false;
@@ -327,7 +328,7 @@ public class SCRunner {
 	String plaf = UIManager.getSystemLookAndFeelClassName();
 
 	while (index < argv.length && argv[index].startsWith("-")
-	       && !argv[index].equals("-t")) {
+	       /*&& !argv[index].equals("-t")*/) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -691,12 +692,16 @@ public class SCRunner {
 		    */
 		    System.exit(1);
 		}
+	    } else if (argv[index].equals("--unsetScripting")) {
+		setScripting = false;
+		/*
 	    } else if (argv[index].equals("--trustLevel=0")) {
 		trustLevel = 0;
 	    } else if (argv[index].equals("--trustLevel=1")) {
 		trustLevel = 1;
 	    } else if (argv[index].equals("--trustLevel=2")) {
 		trustLevel = 2;
+		*/
 	    } else if (argv[index].equals("-r")) {
 		org.bzdev.math.StaticRandom.maximizeQuality();
 	    } else if (argv[index].startsWith("-r")) {
@@ -857,6 +862,7 @@ public class SCRunner {
 
 	int ind = index;
 	while (ind < argv.length) {
+	    /*
 	    if (argv[ind].equals("-t")) {
 		ind++;
 		if (ind < argv.length) {
@@ -868,31 +874,23 @@ public class SCRunner {
 			} catch (Exception ee) {
 			    System.err.println
 				(errorMsg("exception", ee.getMessage()));
-			    /*
-			    System.err.println("scrunner: "
-					       + ee.getMessage());
-			    */
-			    System.exit(1);
 			}
 		    }
 		}
 	    } else {
-		if (extension == null) {
-		    try {
-			if (!argv[ind].equals("-")) {
-			    extension = getExtension(argv[ind]);
-			}
-		    } catch (Exception ee) {
-			System.err.println
-			    (errorMsg("exception", ee.getMessage()));
-			/*
-			System.err.println("scrunner: "
-					   + ee.getMessage());
-			*/
-			System.exit(1);
+	    */
+	    if (extension == null) {
+		try {
+		    if (!argv[ind].equals("-")) {
+			extension = getExtension(argv[ind]);
 		    }
+		} catch (Exception ee) {
+		    System.err.println
+			(errorMsg("exception", ee.getMessage()));
+		    System.exit(1);
 		}
 	    }
+	  /*}*/
 	    ind++;
 	}
 
@@ -943,14 +941,14 @@ public class SCRunner {
 
 	while (index < argv.length) {
 	    try {
-		if (argv[index].equals("-t")) {
+		/* if (argv[index].equals("-t")) {
 		    index++;
 		    if (index < argv.length) {
 			handler.add(tcontext, argv[index]);
 		    }
-		} else {
-		    handler.add(context, argv[index]);
-		}
+		} else { */
+		handler.add(context, argv[index]);
+		/*}*/
 	    } catch (Exception e) {
 		System.err.println
 		    (errorMsg("noOpen2", argv[index], e.getMessage()));
@@ -962,7 +960,9 @@ public class SCRunner {
 	    index++;
 	}
 
-	context.putScriptObject("scripting", context);
+	if (setScripting) {
+	    context.putScriptObject("scripting", context);
+	}
 	for (Map.Entry<String,OutputStream>entry: ioOutputMap.entrySet()) {
 	    context.putScriptObject(entry.getKey(), entry.getValue());
 	}
@@ -993,6 +993,7 @@ public class SCRunner {
 	    }
 	}
 
+	/*
 	if (trustLevel == 0) {
 	    try {
 		System.setSecurityManager(new SecurityManager());
@@ -1002,6 +1003,7 @@ public class SCRunner {
 		System.setSecurityManager(new ScriptingSecurityManager());
 	    } catch (UnsupportedOperationException eu){}
 	}
+	*/
 	try {
 	    handler.run();
 	} catch (Exception e) {

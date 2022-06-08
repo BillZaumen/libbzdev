@@ -3,6 +3,7 @@ import org.bzdev.scripting.*;
 public class PermissionTest {
 
     public static void main(String argv[]) throws Exception {
+	/*
 	ScriptingContextPermission granted =
 	    new ScriptingContextPermission("org.bzdev.devqsim.Simulation");
 
@@ -147,7 +148,7 @@ public class PermissionTest {
 	System.out.println("stpgranted & swapbindings: "
 			   +stpgranted.implies(privileged));
 
-
+	*/
 	System.exit(0);
     }
 }
