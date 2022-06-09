@@ -2,7 +2,7 @@ package org.bzdev.geom;
 import org.bzdev.lang.UnexpectedExceptionError;
 import java.util.Locale;
 
-import org.bzdev.lang.StackTraceModePermission;
+// import org.bzdev.lang.StackTraceModePermission;
 import java.awt.Color;
 import java.security.*;
 
@@ -108,12 +108,6 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	 * at (0, 0, 0).
 	 * @param tag a tag naming this object; {@link Rectangle3D#STACKTRACE}
 	 *        to tag this object with a stacktrace
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission
-	 *            org.bzdev.lang.StackTraceModePermission was not
-	 *            granted for the class org.bzdev.geom.Rectangle3D
-	 *            when the tag was the constant
-	 *            {@link Rectangle3D#STACKTRACE}
 	 */
 	public Double(Object tag) {
 	    if (tag == Rectangle3D.STACKTRACE) {
@@ -124,12 +118,15 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
 		*/
+		this.tag = Thread.currentThread().getStackTrace();
+		/*
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
 			    return Thread.currentThread().getStackTrace();
 			}
 		     });
+		*/
 	    } else {
 		this.tag = tag;
 	    }
@@ -173,12 +170,6 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	 * @param d the depth of the object (the length in the Z direction)
 	 * @param tag a tag naming this object; {@link Rectangle3D#STACKTRACE}
 	 *        to tag this object with a stacktrace
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission
-	 *            org.bzdev.lang.StackTraceModePermission was not
-	 *            granted for the class org.bzdev.geom.Rectangle3D
-	 *            when the tag was the constant
-	 *            {@link Rectangle3D#STACKTRACE}
 	 */
 	public Double(double x, double y, double z,
 		      double w, double h, double d,
@@ -193,12 +184,15 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
 		*/
+		this.tag = Thread.currentThread().getStackTrace();
+		/*
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
 			    return Thread.currentThread().getStackTrace();
 			}
 		     });
+		*/
 	    } else {
 		this.tag = tag;
 	    }
@@ -297,12 +291,6 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	 * at (0, 0, 0).
 	 * @param tag a tag naming this object; {@link Rectangle3D#STACKTRACE}
 	 *        to tag this object with a stacktrace
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission
-	 *            org.bzdev.lang.StackTraceModePermission was not
-	 *            granted for the class org.bzdev.geom.Rectangle3D
-	 *            when the tag was the constant
-	 *            {@link Rectangle3D#STACKTRACE}
 	 */
 	public Float(Object tag) {
 	    this();
@@ -314,12 +302,15 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 				       ("org.bzdev.geom.Rectangle3D"));
 		}
 		*/
+		this.tag = Thread.currentThread().getStackTrace();
+		/*
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
 			    return Thread.currentThread().getStackTrace();
 			}
 		     });
+		*/
 	    } else {
 		this.tag = tag;
 	    }
@@ -362,12 +353,6 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	 * @param d the depth of the object (the length in the Z direction)
 	 * @param tag a tag naming this object; {@link Rectangle3D#STACKTRACE}
 	 *        to tag this object with a stacktrace
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission
-	 *            org.bzdev.lang.StackTraceModePermission was not
-	 *            granted for the class org.bzdev.geom.Rectangle3D
-	 *            when the tag was the constant
-	 *            {@link Rectangle3D#STACKTRACE}
 	 */
 	public Float(float x, float y, float z,
 		     float w, float h, float d,
@@ -382,12 +367,15 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 				       ("org.bzdev.geom.Rectanlge3D"));
 		}
 		*/
+		this.tag = Thread.currentThread().getStackTrace();
+		/*
 		this.tag = AccessController.doPrivileged
 		     (new PrivilegedAction<StackTraceElement[]>() {
 			public StackTraceElement[] run() {
 			    return Thread.currentThread().getStackTrace();
 			}
 		     });
+		*/
 	    } else {
 		this.tag = tag;
 	    }

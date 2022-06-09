@@ -1331,17 +1331,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * {@link AnimatedPanelGraphics#newFramedInstance(int,int,double,String,boolean,ExitAccessor,Mode)}
      * or
      * {@link AnimatedPanelGraphics#newFramedInstance(ISWriterOps.AnimationParameters,String,boolean,ExitAccessor,Mode)}
-     * is closed.  When an instance of this class is used in such a
-     * newFramedInstance method, the application will exit if the
-     * console's frame is closed and an instance of this class was
-     * created when there is no security manager installed.  If a
-     * security manager was installed when an instance of this class
-     * was created, closing the frame will result in a dialog box
-     * asking if the application should exit unless the permission
-     * {@link ExitPermission} was granted with a target of
-     * "org.bzdev.swing.AnimatedPanelGraphics" (in which case the
-     * application will immediately exit).
-     * @see ExitPermission
+     * is closed.  
      */
     public static class ExitAccessor {
 	private boolean allow;
@@ -1492,8 +1482,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param accessor an exit accessor that determines if the frame will
      *        ask the user if the application should exit before exiting
      *        the application; null implies that the application will exit
-     *        if either no security manager was installed or the permission
-     *        {@link ExitPermission} was granted for this class
+     *        immediately.
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})
@@ -1566,8 +1555,7 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param accessor an exit accessor that determines if the frame will
      *        ask the user if the application should exit before exiting
      *        the application; null implies that the application will exit
-     *        if either no security manager was installed or the permission
-     *        {@link ExitPermission} was granted for this class
+     *        immediately.
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})

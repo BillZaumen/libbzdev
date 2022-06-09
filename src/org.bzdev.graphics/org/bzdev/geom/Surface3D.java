@@ -1,5 +1,5 @@
 package org.bzdev.geom;
-import org.bzdev.lang.StackTraceModePermission;
+// import org.bzdev.lang.StackTraceModePermission;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.math.Functions;
 import org.bzdev.math.Functions.Bernstein;
@@ -219,19 +219,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * When stacktrace mode is on (true), surface segments are tagged with a
      * stack trace taken at the point when the segment was created.
      * The default value is false.
-     * <P>
-     * When the scrunner command is used, it should be run with the
-     * option --trustLevel=1 or --trustLevel=2. When the trust level is 1,
-     * the -t option is also needed for any script that modifies stack-trace
-     * mode. For the default trust level, the -t option is also needed but
-     * one must also grant the permission
-     * {@link org.bzdev.lang.StackTraceModePermission} for
-     * "{@link org.bzdev.geom.Surface3D}".
      * @param mode true to turn on stacktrace mode; false to turn it off
-     * @exception SecurityException a security manager was installed
-     *            and the permission
-     *            org.bzdev.lang.StackTraceModePermission was not
-     *            granted for the class org.bzdev.geom.Surface3D
      */
     public void setStackTraceMode(boolean mode) {
 	/*

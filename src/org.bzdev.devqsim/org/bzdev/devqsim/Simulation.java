@@ -124,12 +124,6 @@ public class Simulation extends SimulationHelper
      *        {@link TraceSet#setStackTraceMode(boolean)} for trace sets
      *        associated with this simulation cannot
      *        throw a security exception; false otherwise
-     * @exception SecurityException a security manager was installed
-     *            and the permission
-     *            org.bzdev.lang.StackTraceModePermission was not
-     *            granted for the class org.bzdev.devqsim.Simulation,
-     *            and for the class org.bzdev.devqsim.TraceSet when
-     *            tsallow has the value <code>true</code>
      */
     public void allowSetStackTraceMode(boolean allow, boolean tsallow) {
 	/*
@@ -182,19 +176,7 @@ public class Simulation extends SimulationHelper
      * a StackTraceElement array containing the stack trace.
      * This option is useful for modest-sized simulations for debugging
      * purposes.
-     * <P>
-     * When the scrunner command is used, it should be run with the
-     * option --trustLevel=1 or --trustLevel=2. When the trust level is 1,
-     * the -t option is also needed for any script that modifies stack-trace
-     * mode. For the default trust level, the -t option is also needed but
-     * one must also grant the permission
-     * {@link org.bzdev.lang.StackTraceModePermission} for
-     * "{@link org.bzdev.devqsim.Simulation}".
      * @param mode true to turn stack-trace mode on; false to turn it off
-     * @exception SecurityException a security manager was installed
-     *            and the permission
-     *            org.bzdev.lang.StackTraceModePermission was not
-     *            granted for class org.bzdev.devqsim.Simulation
      */
     public void setStackTraceMode(boolean mode) {
 	/*

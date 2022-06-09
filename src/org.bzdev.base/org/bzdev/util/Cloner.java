@@ -54,12 +54,10 @@ public class Cloner {
      * @param obj the object to clone
      * @return a cloned object with the same type as that of its argument
      * @exception CloneNotSupportedException the object could not be cloned
-     * @exception SecurityException the ReflectPermission target
-     *            "suppressAccessChecks" was not granted to Cloner's code base
      */
     @SuppressWarnings("unchecked")
     public static <T> T makeClone(T obj)
-	throws CloneNotSupportedException, SecurityException
+	throws CloneNotSupportedException
     {
 	final Class<?> clazz = obj.getClass();
 	if (obj instanceof Cloneable) {
@@ -139,14 +137,12 @@ public class Cloner {
      * @exception CloneNotSupportedException the object could not be cloned
      *            or the type of a clone did not match the type requested
      *            by the resultClass argument
-     * @exception SecurityException the ReflectPermission target
-     *            "suppressAccessChecks" was not granted to Cloner's code base
      */
     @SuppressWarnings("unchecked")
     @Deprecated
     public static
 	<C,T extends C> C makePartialClone(Class<C> resultClass, T obj)
-	throws CloneNotSupportedException, SecurityException
+	throws CloneNotSupportedException
     {
 	return makeCastedClone(resultClass, obj);
     }
@@ -200,13 +196,11 @@ public class Cloner {
      * @exception CloneNotSupportedException the object could not be cloned
      *            or the type of a clone did not match the type requested
      *            by the resultClass argument
-     * @exception SecurityException the ReflectPermission target
-     *            "suppressAccessChecks" was not granted to Cloner's code base
      */
     @SuppressWarnings("unchecked")
     public static 
 	<C,T extends C> C makeCastedClone(Class<C> resultClass, T obj)
-	throws CloneNotSupportedException, SecurityException
+	throws CloneNotSupportedException
     {
 	final Class<?> clazz = obj.getClass();
 	if (obj instanceof Cloneable) {

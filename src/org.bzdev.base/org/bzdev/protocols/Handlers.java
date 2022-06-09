@@ -1,7 +1,7 @@
 package org.bzdev.protocols;
 import java.io.IOException;
 import java.net.URL;
-import java.net.NetPermission;
+// import java.net.NetPermission;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.HashMap;
@@ -118,22 +118,6 @@ public class Handlers {
      * Handlers property list.
      * Calls to enable() should be made only once - after the first call,
      * subsequent calls are ignored.
-     * <P>
-
-     * When a security manager is in place, the permission
-     * org.bzdev.protocols.HandlersEnablePermission must have been granted
-     * with a target of "org.bzev.protocols.enable" if Handlers.enable()
-     * is called:
-     * <blockquote><code><pre>
-     *    grant ... {
-     *      permission org.bzdev.protocols.HandlersEnablePermission
-     *          "org.bzdev.protocols.enable";
-     *    };
-     * </pre></code></blockquote>
-     * If possible <code>Handlers.enable()</code>
-     * should be called before a security manager is installed, and as
-     * early as possible in a program if it is called at all.
-     * @throws SecurityException the operation was not allowed
      */
     static public void enable() throws SecurityException
     {

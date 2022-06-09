@@ -518,21 +518,6 @@ The name
 .I LANGUAGE
 must be the standard name for the language, not an alias.
 .TP
-.B \-\-trustLevel=\fIN\fB
-The value
-.I N
-can be 0 (the default), 1, or 2.  When 0, after command-line arguments
-are processes, the Java security manager (java.lang.SecurityManager) will
-be installed. When 1, the security manager
-(org.bzdev.scripting.ScriptingSecurityManager) will be installed so that
-Java code will be trusted but scripts will not be trusted (nor java code
-called from a script).  When 2, no security manager will be installed.
-.TP
-.BI \-t \ FILE
-Treat
-.I File
-as trusted (as described above), and end the options.
-.TP
 .BI \-vS: VAR\ VALUE
 .TQ
 .BI \-vS: VAR\fB:\fIVALUE

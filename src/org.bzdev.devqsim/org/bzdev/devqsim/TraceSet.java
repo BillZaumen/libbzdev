@@ -1,6 +1,6 @@
 package org.bzdev.devqsim;
 import org.bzdev.io.AppendableWriter;
-import org.bzdev.lang.StackTraceModePermission;
+// import org.bzdev.lang.StackTraceModePermission;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
@@ -98,22 +98,8 @@ public class TraceSet extends DefaultSimObject {
 
     /**
      * Set the stacktrace mode.
-     * <P>
-     * When the scrunner command is used, it should be run with the
-     * option --trustLevel=1 or --trustLevel=2. When the trust level is 1,
-     * the -t option is also needed for any script that modifies stack-trace
-     * mode. For the default trust level, the -t option is also needed but
-     * one must also grant the permission
-     * {@link org.bzdev.lang.StackTraceModePermission} for
-     * "{@link org.bzdev.devqsim.TraceSet}".  Alternatively,
-     * one may use a trusted script to call the simulation method
-     * {@link Simulation#allowSetStackTraceMode(boolean,boolean)}.
      * @param mode true if a stack trace should be printed when trace
      *       output is displayed; false otherwise
-     * @exception SecurityException a security manager was installed
-     *            and the permission
-     *            org.bzdev.lang.StackTraceModePermission was not
-     *            granted for class org.bzdev.devqsim.TraceSet
      */
     public void setStackTraceMode(boolean mode) {
 	/*

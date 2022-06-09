@@ -1,7 +1,7 @@
 package org.bzdev.p3d;
 // import org.bzdev.io.FISOutputStream;
 import org.bzdev.util.*;
-import org.bzdev.lang.StackTraceModePermission;
+// import org.bzdev.lang.StackTraceModePermission;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.WebEncoder;
 import org.bzdev.geom.PathIterator3D;
@@ -2397,23 +2397,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * explicit tag are tagged with a stack trace taken at the point
      * when the triangle was created.  The default value is false.
      * <P>
-     * When the scrunner command is used, one turns on the necessary
-     * permissions by setting the trust level to 1 or 2. For a trust
-     * level of 1, one should split a script into pieces and use the
-     * -t option for the piece that sets this mode. For a trust level
-     * of 0, one will need to set a custom security policy to grant
-     * the permission
-     * {@link org.bzdev.lang.StackTraceModePermission} for
-     * "{@link org.bzdev.p3d.Model3D}".
-     * and use the '-t' option. Unfortunately, there is currently no way
-     * of obtaining the line number and file name for the position in a
-     * script when a statement in a scripting language was used to create
-     * one or more triangles.
      * @param mode true to turn on stack-trace mode; false to turn it off
-     * @exception SecurityException a security manager was installed
-     *            and the permission
-     *            org.bzdev.lang.StackTraceModePermission was not
-     *            granted for the class org.bzdev.p3d.Model3D
      */
     public void setStackTraceMode(boolean mode) {
 	/*

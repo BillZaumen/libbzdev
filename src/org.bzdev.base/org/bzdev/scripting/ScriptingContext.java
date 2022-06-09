@@ -212,17 +212,15 @@ public class ScriptingContext {
 
     /**
      * Create a binding swapper.
-     * The use of this class requires a ScriptingContextPermission with
-     * a target equal to the current scripting context's fully qualified
-     * class name and with an action that includes the token
-     * swapbindings. It is intended when a script will be run in a
-     * separate thread and then suspend itself.  When a scripting context
-     * runs a script, it puts its default bindings in an inherited
-     * thread-local variable. If new thread is created while that script
-     * is running, those bindings will be inherited.  Then the bindings
-     * that a script will run can be passed to this method, and the
-     * binding swapper can be used to toggle between the two sets of
-     * bindings if the new thread is suspended or restored.
+     * The use of this class is intended for the case where a script
+     * will be run in a separate thread and then suspend itself.  When
+     * a scripting context runs a script, it puts its default bindings
+     * in an inherited thread-local variable. If new thread is created
+     * while that script is running, those bindings will be inherited.
+     * Then the bindings that a script will run can be passed to this
+     * method, and the binding swapper can be used to toggle between
+     * the two sets of bindings if the new thread is suspended or
+     * restored.
      * <P>
      * The caller must ensure that the default bindings are in effect
      * when threads making use of a binding swapper create additional
@@ -250,7 +248,6 @@ public class ScriptingContext {
      *            granted
      */
     protected BindingSwapper createBindingSwapper(Bindings bindings) 
-	throws SecurityException
     {
 	if (engine == null) engine = getScriptEngine();
 	if (engine == null) {
@@ -1463,8 +1460,10 @@ public class ScriptingContext {
 	return scriptLanguage;
     }
 
+    /*
     private static ScriptingContextPermission writerPermission =
 	new ScriptingContextPermission("java.io.Writer");
+    */
 
     /**
      * Set the writer for script output.
@@ -1554,8 +1553,10 @@ public class ScriptingContext {
     }
 
 
+    /*
     private static ScriptingContextPermission readerPermission =
 	new ScriptingContextPermission("java.io.Reader");
+    */
 
     /**
      * Set the reader for script input.
@@ -1998,7 +1999,7 @@ public class ScriptingContext {
     private HashMap<Properties,Bindings> bindingsMap =
 	new HashMap<Properties,Bindings>();
 
-    /**
+    /*
      * Specifies the sandbox mode for
      * {@link #invokePrivateFunction(Properties,PFMode,String,Object...) invokePrivateFunction}.
      * This mode is recognized when using
@@ -2007,10 +2008,9 @@ public class ScriptingContext {
      * @deprecated the sandbox mode is meaningful only if a security
      *             manager is installed, and the security manager is
      *             being removed from Java
-     */
     @Deprecated
     static public enum PFMode {
-	/**
+	**
 	 * Invoke the function in privileged mode.  A script will run
 	 * outside of a sandbox with permissions determined by a
 	 * security policy for a subclass of ScriptingContext. If the
@@ -2018,18 +2018,19 @@ public class ScriptingContext {
 	 * org.bzdev.scripting.ScriptingContextPermission and the actions
 	 * contain the substring "privileged", the permissions for
 	 * the subclass will be used. Otherwise no permissions are granted.
-	 */
+	 *
 	PRIVILEGED,
-	/**
+	**
 	 * Invoke the function in sandboxed mode. A script will run
 	 * inside a sandbox.
-	 */
+	 *
 	SANDBOXED,
-	/**
+	**
 	 * Invoke the function in normal mode.
-	 */
+	 *
 	 NORMAL
     };
+    */
 
     private class BindingsMap {
 	Bindings defaultBindings = getDefaultBindings();
@@ -2071,7 +2072,7 @@ public class ScriptingContext {
     }
     private BindingsMap bindingsMaps = new BindingsMap();
 
-    /**
+    /*
      * Invoke a function defined by a private script with specified bindings.
      * The script is stored in a {@link java.util.Properties Properties}
      * list of properties under a key with the same name that
@@ -2116,7 +2117,6 @@ public class ScriptingContext {
      *             manager is installed, and the security manager is
      *             being removed from Java
      * @see #invokePrivateFunction(Bindings,Properties,String,Object...)
-     */
     @Deprecated
     protected final Object invokePrivateFunction(Bindings bindings,
 						 Properties properties,
@@ -2127,6 +2127,7 @@ public class ScriptingContext {
     {
 	return invokePrivateFunction(bindings, properties, functionName, args);
     }
+     */
 
     /**
      * Invoke a function defined by a private script with specified bindings.
@@ -2285,7 +2286,7 @@ public class ScriptingContext {
     }
 
 
-    /**
+    /*
      * Invoke a function from a private script.
      * The script is stored in a {@link java.util.Properties Properties}
      * list of properties under a key with the same name that
@@ -2329,7 +2330,6 @@ public class ScriptingContext {
      *             manager is installed, and the security manager is
      *             being removed from Java
      * @see #invokePrivateFunction(Properties,String,Object...)
-     */
     @Deprecated
     protected final Object invokePrivateFunction(Properties properties,
 					   PFMode mode,
@@ -2340,6 +2340,7 @@ public class ScriptingContext {
     {
 	return invokePrivateFunction(properties, functionName, args);
     }
+     */
 
     /**
      * Invoke a function from a private script.

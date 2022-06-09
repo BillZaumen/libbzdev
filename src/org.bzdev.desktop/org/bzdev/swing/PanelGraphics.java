@@ -187,13 +187,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * {@link PanelGraphics#newFramedInstance(int,int,String,boolean,ExitAccessor)},
      * the application will exit if the console's frame is closed and
      * an instance of this class was created when there is no security
-     * manager installed.  If a security manager was installed when an
-     * instance of this class was created, closing the frame will result
-     * in a dialog box asking if the application should exit unless the
-     * permission {@link ExitPermission} was granted with the target
-     * "org.bzdev.swing.PanelGraphics" (in which case the application will
-     * immediately exit).
-     * @see ExitPermission
+     * manager installed.
      */
     public static class ExitAccessor {
 	private boolean allow;
@@ -289,8 +283,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * @param accessor an exit accessor that determines if the frame will
      *        ask the user if the application should exit before exiting
      *        the application; null implies that the application will exit
-     *        if either no security manager was installed or the permission
-     *        {@link ExitPermission} was granted for this class
+     *        immediately.
      */
     public static PanelGraphics newFramedInstance(int width,
 						  int height,
@@ -355,8 +348,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * @param accessor an exit accessor that determines if the frame will
      *        ask the user if the application should exit before exiting
      *        the application; null implies that the application will exit
-     *        if either no security manager was installed or the permission
-     *        {@link ExitPermission} was granted for this class
+     *        immediately.
      * @param addButtons true if the frame should include buttons for
      *        printing and writing to files; false otherwise
      */

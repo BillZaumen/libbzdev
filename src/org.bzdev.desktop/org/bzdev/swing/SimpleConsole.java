@@ -564,13 +564,7 @@ public class SimpleConsole extends JComponent implements Appendable {
      * {@link SimpleConsole#newFramedInstance(int,int,String,boolean,ExitAccessor)},
      * the application will exit if the console's frame is closed and
      * an instance of this class was created when there is no security
-     * manager installed.  If a security manager was installed when an
-     * instance of this class was created, closing the frame will result
-     * in a dialog box asking if the application should exit unless the
-     * permission {@link ExitPermission} was granted with the target
-     * "org.bzdev.swing.SimpleConsole" (in which case the application will
-     * immediately exit).
-     * @see ExitPermission
+     * manager installed.
      */
     public static class ExitAccessor {
 	private boolean allow;
@@ -612,12 +606,7 @@ public class SimpleConsole extends JComponent implements Appendable {
      */
     public static enum ExitMode {
 	/**
-	 * The application always exits. If there was a security-manager
-	 * installed when
-	 * {@link SimpleConsole#newFramedInstance(int,int,String,boolean,SimpleConsole.ExitMode)}
-	 * was called and the permission {@link ExitPermission} was not
-	 * granted for the target "org.bzdev.swing.SimpleConsole", the
-	 * mode is treated as if it were {@link SimpleConsole.ExitMode#ASK}.
+	 * The application always exits. 
 	 */
 	ALWAYS,
 	/**
@@ -798,7 +787,6 @@ public class SimpleConsole extends JComponent implements Appendable {
      *        false otherwise.
      * @return a console whose pane is a component of a JFrame.
      * @see SwingUtilities#invokeAndWait(Runnable)
-     * @see ExitPermission
      */
     public static SimpleConsole
 	newFramedInstance(int width, int height, String title,
@@ -828,7 +816,6 @@ public class SimpleConsole extends JComponent implements Appendable {
      * @return a console whose pane is a component of a JFrame.
      * @see SwingUtilities#invokeAndWait(Runnable)
      * @see SimpleConsole.ExitMode
-     * @see ExitPermission
      */
     public static SimpleConsole
 	newFramedInstance(int width, int height, String title,
@@ -863,7 +850,6 @@ public class SimpleConsole extends JComponent implements Appendable {
      *        an application exits when a console's frame is closed
      * @return a console whose pane is a component of a JFrame.
      * @see SwingUtilities#invokeAndWait(Runnable)
-     * @see ExitPermission
      */
     public static SimpleConsole
 	newFramedInstance(int width, int height, String title,
@@ -1067,5 +1053,5 @@ public class SimpleConsole extends JComponent implements Appendable {
 //  LocalWords:  newFramedInstance boolean ExitAccessor ExitMode
 //  LocalWords:  exitTitle accessor IllegalStateException exitMode
 //  LocalWords:  programmatically AnimatedPanelGraphics
-//  LocalWords:  ExitPermission SecurityManager getSecurityManager
+//  LocalWords:  SecurityManager getSecurityManager
 //  LocalWords:  checkPermission SecurityException

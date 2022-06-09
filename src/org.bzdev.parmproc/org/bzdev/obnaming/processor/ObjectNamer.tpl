@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.ResourceBundle;
 $(configFactory:endCF)
 import org.bzdev.scripting.ScriptingContext;
-import org.bzdev.scripting.ScriptingContext.PFMode;
+// import org.bzdev.scripting.ScriptingContext.PFMode;
 import javax.script.ScriptException;
 import java.io.InputStream;
 $(endCF)
@@ -432,7 +432,7 @@ class $(helperClass)
 	}
 	try {
 	    invokePrivateFunction(createScriptProperties,
-				  ScriptingContext.PFMode.SANDBOXED,
+				  // ScriptingContext.PFMode.SANDBOXED,
 				  "createFactories", this, pkg, scriptObject);
 	} catch (ScriptException ee) {
 	    String msg = errorMsg("illformedScriptObject");

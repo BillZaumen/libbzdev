@@ -72,14 +72,6 @@ import org.bzdev.util.ExpressionParser.ESPFunction;
  *          }
  *        });
  * </pre></code></blockquote>
- * <P>
- * Note: the scripting context will ensure that the method is
- * executed with appropriate security restrictions. When the
- * default Java security manager is installed, whatever policy is
- * in effect will determine what the method can do when implemented
- * by a scripting language.  When {@link ScriptingSecurityManager} is
- * installed, the script will have no security restrictions when the
- * a trusted scripting context is used.
  */
 public abstract class ScriptListenerAdapter {
 
@@ -274,6 +266,6 @@ public abstract class ScriptListenerAdapter {
 
 //  LocalWords:  callScriptMethod blockquote pre FooListener src msg
 //  LocalWords:  FooScriptAdapter ScriptListenerAdapter scriptObject
-//  LocalWords:  ScriptingContext ScriptingSecurityManager args
+//  LocalWords:  ScriptingContext args
 //  LocalWords:  ScriptException NoSuchMethodException runtime
 //  LocalWords:  RuntimeException ScriptMethodException
