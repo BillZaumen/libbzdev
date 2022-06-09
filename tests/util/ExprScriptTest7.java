@@ -11,6 +11,16 @@ import java.util.Map;
 public class ExprScriptTest7 {
     public static void main(String argv[]) throws Exception {
 
+	(new Thread() {
+		public void run() {
+		    try {
+			Thread.currentThread().sleep(120000L);
+			System.exit(0);
+		    } catch (Exception e) {
+		    }
+		}
+	    }).start();
+
 	DefaultScriptingContext dsc = new
 	    DefaultScriptingContext();
 	ExtendedScriptingContext sc = new ExtendedScriptingContext(dsc);

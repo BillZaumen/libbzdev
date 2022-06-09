@@ -332,16 +332,18 @@ public class ScriptingContext {
 	*/
     }
 
-    private boolean notTrusted = true;
+    private boolean notTrusted = false;
 
-    /**
+    /*
      * Determine if this scripting context is trusted or not.
      * @return true if it is trusted; false if it is not trusted
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     public boolean isTrusted() {
 	return !notTrusted;
     }
-
+    */
     // Access-control context for scripts. This is used for
     // trusted scripting contexts. A value of null implies all permissions.
     // It is set to a non-null value if the scripting context is created
@@ -524,16 +526,19 @@ public class ScriptingContext {
 	*/
     }
 
-    /**
+    /*
      * Determine if the current thread is in a ScriptingContext sandbox.
      * @return true if in a sandbox; false otherwise
      * @deprecated there is no sandbox after the security manager has
      *             been removed from Java
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     public static final boolean inSandbox() {
 	    return inSandboxFlag.get();
     }
+     */
 
 
     // cache values - will be set before used.
@@ -807,14 +812,16 @@ public class ScriptingContext {
      }
 
 
-    /**
+    /*
      * Evaluate a script provided in a string using privileged mode.
      * @param script the script to evaluate
      * @return the value produced by the script
      * @exception ScriptException an error occurred in the script
      * @exception NullPointerException the script or bindings were null
      * @exception UnsupportedOperationException the script engine is null
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     protected final Object evalScriptPrivileged(final String script)
 	throws ScriptException, UnsupportedOperationException
     {
@@ -832,7 +839,7 @@ public class ScriptingContext {
 	setBindings(defaultBindings);
 	try {
 	    return engine.eval(script, defaultBindings);
-	    /*
+	    -- rest was commented out
 	    try {
 		if (privilegedContext == null) {
 		    return AccessController.doPrivileged
@@ -864,11 +871,11 @@ public class ScriptingContext {
 	    } catch (PrivilegedActionException e) {
 		throw (ScriptException) e.getCause();
 	    }
-	    */
 	} finally {
 	    restoreBindings(saved);
 	}
     }
+    */
 
 
     /**
@@ -1624,7 +1631,7 @@ public class ScriptingContext {
     }
      */
 
-    /**
+    /*
      * Execute code in privileged mode.
      * <P>
      * If the security manger is java.lang.SecurityManager, the
@@ -1642,12 +1649,11 @@ public class ScriptingContext {
      * @param c a Callable providing the code to run
      * @exception SecurityException a security exception was thrown, typically
      *            by the Callable c
-     */
     protected final void doScriptPrivileged(final Callable c)
 	throws SecurityException
     {
 	c.call();
-	/*
+	--- rest had been commented out
        checkPrivileged();
 	try {
 	    onExecutionStarting();
@@ -1671,23 +1677,25 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
-	*/
     }
+     */
 
-    /**
+    /*
      * Execute code in sandboxed mode.
      * @param c a Callable providing the code to run
      * @exception SecurityException a security exception was thrown,
      *            typically by the Callable c
      * @deprecated this method is not needed unless a security manager
      *             is used
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     protected final void doScriptSandboxed(final Callable c)
 	throws SecurityException
     {
 	c.call();
-	/*
+	-- rest was commented out
 	try {
 	    onScriptStarting();
 	    AccessController.doPrivileged
@@ -1700,8 +1708,8 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
-	*/
     }
+    */
 
     /**
      * Execute code, that can throw checked exceptions, in privileged mode.
@@ -1751,7 +1759,7 @@ public class ScriptingContext {
 	*/
     }
 
-    /**
+    /*
      * Execute code, that can throw checked exceptions, inside a
      * scripting context's sandbox.
      * <P>
@@ -1761,12 +1769,15 @@ public class ScriptingContext {
      * @exception Exception an exception was raised
      * @deprecated this method is not needed unless a security manager
      *             is used
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     public final void doScriptSandboxed(final ExceptionedCallable c)
 	throws SecurityException, Exception {
 	c.call();
-	/*
+	-- rest was commented out but that was removed to comment out
+          the whole method
 	try {
 	    onScriptStarting();
 	    try {
@@ -1783,22 +1794,23 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
-	*/
     }
+    */
 
-
-    /**
+    /*
      * Execute code, returning a value, in privileged mode.
      * @param c a CallableReturns providing the code to run
      * @return the value produced by running c
      * @exception SecurityException a security exception was thrown,
      *            typically by the CallableReturns argument
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     protected final <T> T doScriptPrivilegedReturns(final CallableReturns<T> c)
 	throws SecurityException
     {
 	return c.call();
-	/*
+	-- rest had been commented out
 	checkPrivileged();
 	try {
 	    onExecutionStarting();
@@ -1820,10 +1832,10 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
-	*/
     }
+    */
 
-    /**
+    /*
      * Execute code, returning a value, inside a scripting context's sandbox.
      * <P>
      * @param c a CallableReturns providing the code to run
@@ -1832,12 +1844,15 @@ public class ScriptingContext {
      *            typically by the CallableReturns c
      * @deprecated this method is not needed unless a security manager
      *             is used
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     public final <T> T doScriptSandboxedReturns(final CallableReturns<T> c)
 	throws SecurityException {
 	return c.call();
-	/*
+	-- rest of the method was commented out before we commented out
+           the whole method
 	try {
 	    onScriptStarting();
 	    return AccessController.doPrivileged
@@ -1849,10 +1864,10 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
-	*/
     }
+     */
 
-    /**
+    /*
      * Execute code, returning a value and possibly throwing a checked
      * exception, in privileged mode.
      * @param c an ExceptionedCallableReturns providing the code to run
@@ -1864,14 +1879,16 @@ public class ScriptingContext {
      *            by the ExceptionedCallableReturns c
      * @exception Exception an exception was raised
      * @deprecated the security manager is being removed from Java.
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     protected final <T>
 	T doScriptPrivilegedReturns(final ExceptionedCallableReturns<T> c)
 	throws SecurityException, Exception
     {
 	return c.call();
-	/*
+	-- rest had been commented out
 	try {
 	    checkPrivileged();
 	    onExecutionStarting();
@@ -1897,10 +1914,10 @@ public class ScriptingContext {
 	} finally {
 	    onExecutionEnding();
 	}
-	*/
     }
+    */
 
-    /**
+    /*
      * Execute code, returning a value and that can throw a checked exception,
      * inside a scripting context's sandbox.
      * <P>
@@ -1915,14 +1932,16 @@ public class ScriptingContext {
      * @exception Exception an exception was raised
      * @deprecated this method is not needed unless a security manager
      *             is used
-     */
+     * -- removed because the security manager is being removed
+     *    and this method is not used in existing applications
+     *    or libraries.
     @Deprecated
     public final <T>
 	T doScriptSandboxedReturns(final ExceptionedCallableReturns<T> c)
 	throws SecurityException, Exception
     {
 	return c.call();
-	/*
+	-- rest should be commented out
 	try {
 	    onScriptStarting();
 	    try {
@@ -1938,8 +1957,8 @@ public class ScriptingContext {
 	} finally {
 	    onScriptEnding();
 	}
-	*/
     }
+    */
 
     /*
      * Indicate that code will be run in a scripting-context's sandbox.

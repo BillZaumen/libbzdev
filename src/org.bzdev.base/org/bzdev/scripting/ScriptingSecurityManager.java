@@ -36,17 +36,23 @@ public class ScriptingSecurityManager extends SecurityManager {
 
     @Override
     public void checkPermission(Permission perm) {
+	/*
+	  -- commented out because of removing inSandbox
 	if (ScriptingContext.inSandbox()) {
 	    super.checkPermission(perm);
 	}
+	*/
 
     }
 
     @Override
     public void checkPermission(Permission perm, Object context) {
+	/*
+	  -- commented out because of removing inSandbox
 	if (ScriptingContext.inSandbox()) {
 	    super.checkPermission(perm, context);
 	}
+	*/
     }
 
     /*

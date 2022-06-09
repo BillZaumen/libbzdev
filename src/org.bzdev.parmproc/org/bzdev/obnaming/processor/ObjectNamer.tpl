@@ -379,7 +379,7 @@ class $(helperClass)
 	}
 	try {
 	    invokePrivateFunction(configScriptProperties,
-				  ScriptingContext.PFMode.SANDBOXED,
+				  // ScriptingContext.PFMode.SANDBOXED,
 				  "configureFactory", factory, scriptObject);
 	} catch (ScriptException ee) {
 	    String msg = errorMsg("illformedScriptObject");

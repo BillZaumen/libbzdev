@@ -39,6 +39,7 @@ public class SecTest {
 	}
 
 	public void testDSP1() {
+	    /*
 	    doScriptPrivileged(new Callable() {
 		    public void call() {
 			try {
@@ -50,6 +51,7 @@ public class SecTest {
 			}
 		    }
 		});
+	    */
 	}
 
 	public InputStream testDSPER1() throws Exception {
@@ -65,6 +67,7 @@ public class SecTest {
 	}
 
 	public InputStream testDSPR1() {
+	    /*
 	    return doScriptPrivilegedReturns
 		(new CallableReturns<InputStream>() {
 		    public InputStream call() {
@@ -78,18 +81,22 @@ public class SecTest {
 			}
 		    }
 		});
+	    */
 	}
 
 	public void testDSPE2() throws Exception {
+	    /*
 	    doScriptPrivileged(new ExceptionedCallable() {
 		    public void call() throws Exception {
 			System.out.println
 			    ((new FileInputStream("test2.js")) != null);
 		    }
 		});
+	    */
 	}
 
 	public void testDSP2() {
+	    /*
 	    doScriptPrivileged(new Callable() {
 		    public void call() {
 			try {
@@ -102,6 +109,7 @@ public class SecTest {
 			}
 		    }
 		});
+	    */
 	}
 
 	public InputStream testDSPER2() throws Exception {
@@ -250,6 +258,7 @@ public class SecTest {
 		    System.out.println
 			("osc: testN(\"test2.js\") failed as expected");
 		}
+		/*
 		try {
 		    osc.testDSPE1();
 		    osc.testDSP1();
@@ -261,7 +270,9 @@ public class SecTest {
 		} catch (Exception e) {
 		    System.out.println("doScriptPrivileged failure (test1.js)");
 		}
+		*/
 
+		/*
 		try {
 		    osc.testDSPE2();
 		    System.out.println("unexpected success: testDSPE2");
@@ -278,7 +289,7 @@ public class SecTest {
 		    if (osc.testDSPR2() != null)
 		    System.out.println("unexpected success: testDSPR2");
 		} catch (Exception e) { }
-
+		*/
 	    if (checkPolicy) {
 		System.out.println("-- Constructing scripting contexts when "
 				   + "a security manager is installed --");

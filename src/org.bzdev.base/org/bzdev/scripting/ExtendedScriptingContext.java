@@ -69,7 +69,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            be created after a security manager was installed.
      */
     public ExtendedScriptingContext(ScriptingContext parent) {
-	super(parent, parent.isTrusted());
+	super(parent/*, parent.isTrusted()*/);
 	initImporterScript();
     }
 
@@ -2447,7 +2447,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	}
 	try {
 	    invokePrivateFunction(importScriptProperties,
-				  ScriptingContext.PFMode.SANDBOXED,
+				  // ScriptingContext.PFMode.SANDBOXED,
 				  "importClasses",
 				  this, packageName, scriptObject);
 	} catch (ScriptException ee) {
@@ -2496,7 +2496,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	}
 	try {
 	    invokePrivateFunction(finishImportProperties,
-				  ScriptingContext.PFMode.SANDBOXED,
+				  // ScriptingContext.PFMode.SANDBOXED,
 				  "finishImport");
 	} catch (ScriptException ee) {
 	    String msg = errorMsg("illformedScriptObject");

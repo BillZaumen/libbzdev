@@ -207,7 +207,7 @@ public abstract class ScriptListenerAdapter {
 	    try {
 		context.invokePrivateFunction
 		    (listPropScriptProperties,
-		     ScriptingContext.PFMode.SANDBOXED,
+		     // ScriptingContext.PFMode.SANDBOXED,
 		     "recordProperties",
 		     methods, scriptObject);
 	    } catch(ScriptException ee) {

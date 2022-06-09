@@ -945,11 +945,14 @@ public class Simulation extends SimulationHelper
 		    try {
 			state.simulationRunning = false;
 			fireSimulationEnding();
+			callable.call();
+			/*
 			if (parent == null) {
 			    callable.call();
 			} else {
 			    doScriptPrivileged(callable);
 			}
+			*/
 		    } finally {
 			runInitq();
 			fireSimulationStarting();
@@ -1811,11 +1814,14 @@ public class Simulation extends SimulationHelper
 		    }
 		}
 	    };
+	simLoop.call();
+	/*
 	if (parent == null) {
 	    simLoop.call();
 	} else {
 	    doScriptPrivileged(simLoop);
 	}
+	*/
     }
 
     /**
@@ -1878,11 +1884,14 @@ public class Simulation extends SimulationHelper
 		    }
 		}
 	    };
+	simLoop.call();
+	/*
 	if (parent == null) {
 	    simLoop.call();
 	} else {
 	    doScriptPrivileged(simLoop);
 	}
+	*/
     }
 
     /**
@@ -1999,11 +2008,14 @@ public class Simulation extends SimulationHelper
 		    }
 		}
 	    };
+	simLoop.call();
+	/*
 	if (parent == null) {
 	    simLoop.call();
 	} else {
 	    doScriptPrivileged(simLoop);
 	}
+	*/
     }
 
     EvntListenerList listenerList = new EvntListenerList();

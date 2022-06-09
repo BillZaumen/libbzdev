@@ -175,7 +175,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	}
 	try {
 	    invokePrivateFunction(configScriptProperties,
-				  ScriptingContext.PFMode.SANDBOXED,
+				  // ScriptingContext.PFMode.SANDBOXED,
 				  "configurePathBuilder",
 				  this, windingRule, spec);
 	} catch (ScriptException e) {
