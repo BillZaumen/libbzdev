@@ -507,8 +507,7 @@ public class P3d {
      * throws an exception, the exception does not indicate directly
      * which calls were responsible. This method will print the stack
      * traces for those calls (typically addRectangle or addRectangels
-     * methods).  If a security manager prevents the stack traces from
-     * being recorded, nothing will be printed.
+     * methods).
      * @param out the output appendable
      * @param prefix a prefix that starts each line
      * @param builder the {@link SteppedGrid.Builder} that failed

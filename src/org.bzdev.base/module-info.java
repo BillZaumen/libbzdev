@@ -1,10 +1,9 @@
 /**
  * Base module for the BZDev class library.
  * <P>
- * This module provides IO classes, security managers, dynamic
- * methods, mathematical functions, basic statistical analysis,
- * special-purpose protocols, random variables, scripting support,
- * and various utility classes.
+ * This module provides IO classes, dynamic methods, mathematical
+ * functions, basic statistical analysis, special-purpose protocols,
+ * random variables, scripting support, and various utility classes.
  */
 module org.bzdev.base {
     exports org.bzdev.io;

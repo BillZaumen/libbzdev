@@ -233,15 +233,15 @@ double-dispatch use-case")</a>.  This latter approach is far more
 efficient (and comparable to the approach described below) but may
 fail when a sandbox security model is in use due to restrictions on
 generating new classes at run time (e.g., in applets and assuming no
-changes to the Java language).
+changes to the Java language). Recent versions of Java, however, have
+removed the security-manager code.
 <p>
-The <code>DynamicMethod</code> annotation and some related
-annotations provides a design pattern that addresses some of these
-issues by allowing method look-up to be performed more efficiently
-at run time, with all the application code created at compile time
-so that there are no issues with security managers.  A simple
-design pattern must be followed. One declares a dynamic method
-using a <code>DynamicMethod</code> annotation: for example,
+The <code>DynamicMethod</code> annotation and some related annotations
+provides a design pattern that addresses some of these issues by
+allowing method look-up to be performed more efficiently at run time,
+with all the application code created at compile time.  A simple
+design pattern must be followed. One declares a dynamic method using
+a <code>DynamicMethod</code> annotation: for example,
 <pre><code>
  public class Foo {
      {@literal @}DynamicMethod("FooIncrHelper")

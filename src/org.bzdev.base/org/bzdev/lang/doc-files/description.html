@@ -307,7 +307,8 @@ double-dispatch use-case")</a>.  This latter approach is far more
 efficient (and comparable to the approach described below) but may
 fail when a sandbox security model is in use due to restrictions on
 generating new classes at run time (e.g., in applets and assuming no
-changes to the Java language).
+changes to the Java language). Security managers, however, have been
+removed from recent versions of Java.
 <p>
 The <code>DynamicMethod</code> annotation and some related
 annotations provides a design pattern that addresses some of these

@@ -179,15 +179,13 @@ public class PanelGraphics implements OSGraphicsOps {
     JPanel panel;
 
     /**
-     * Class to determine how an application can exit when a
-     * security manager is installed and a window created with
+     * Class to determine how an application can exit,even when a
+     * security manager is installed, given a window created with
      * {@link PanelGraphics#newFramedInstance(int,int,String,boolean,ExitAccessor)}
      * is closed.  When an instance of this class is the last argument
      * for
      * {@link PanelGraphics#newFramedInstance(int,int,String,boolean,ExitAccessor)},
-     * the application will exit if the console's frame is closed and
-     * an instance of this class was created when there is no security
-     * manager installed.
+     * the application will exit if the console's frame is closed.
      */
     public static class ExitAccessor {
 	private boolean allow;

@@ -244,8 +244,6 @@ public class ScriptingContext {
      * and restored.
      * @param bindings the binding to initially swap with an existing binding
      *        when {@link BindingSwapper#swap()} is called
-     * @exception SecurityException permission for this operation was not
-     *            granted
      */
     protected BindingSwapper createBindingSwapper(Bindings bindings) 
     {
@@ -273,10 +271,10 @@ public class ScriptingContext {
 	return swapper;
     }
 
+    /*
     private void checkConstructorPermission(boolean trusted)
 	throws SecurityException
     {
-	/*
 	final SecurityManager sm = System.getSecurityManager();
 	if (sm != null) {
 	    synchronized(ScriptingContext.class) {
@@ -300,10 +298,10 @@ public class ScriptingContext {
 		}
 	    }
 	}
-	*/
     }
+    */
+    /*
     private void checkPrivileged() {
-	/*
 	if (parent != null) {
 	    parent.checkPrivileged();
 	    return;
@@ -326,8 +324,8 @@ public class ScriptingContext {
 			}, privilegedContext);
 	    }
 	}
-	*/
     }
+    */
 
     private boolean notTrusted = false;
 
@@ -421,10 +419,8 @@ public class ScriptingContext {
 
     /**
      * Constructor.
-     * @exception SecurityException this subclass of ScriptingContext cannot
-     *            be created after a security manager was installed.
      */
-    public ScriptingContext() throws SecurityException {
+    public ScriptingContext() {
 	/*
 	checkConstructorPermission(false);
 	context = noPermContext;
@@ -437,15 +433,11 @@ public class ScriptingContext {
     /**
      * Constructor specifying the security mode.
      * @param trusted true if the script context is trusted; false otherwise
-     * @exception SecurityException this subclass of ScriptingContext cannot
-     *            be created after a security manager was installed or an
-     *            attempt was made to create a trusted subclass of
-     *            ScriptingContext from inside a sandbox
      * @deprecated trusted scripting contexts are not applicable when
      *             the security manager has been eliminated.
      */
     @Deprecated
-    public ScriptingContext(boolean trusted) throws SecurityException {
+    public ScriptingContext(boolean trusted)  {
 	/*
 	if (trusted && inSandbox()) {
 	    throw new SecurityException(errorMsg("trustedInSandbox"));
@@ -467,10 +459,8 @@ public class ScriptingContext {
      * Unless methods are overridden, the parent scripting context
      * provides the scripting language, script engine, and bindings.
      * @param parent the parent scripting context; null if there is none.
-     * @exception SecurityException this subclass of ScriptingContext cannot
-     *            be created after a security manager was installed.
      */
-    public ScriptingContext(ScriptingContext parent) throws SecurityException {
+    public ScriptingContext(ScriptingContext parent) {
 	// if (parent == null) checkConstructorPermission(false);
 	this.parent = parent;
 	/*
@@ -485,7 +475,7 @@ public class ScriptingContext {
     }
 
 
-    /**
+    /*
      * Constructor using a parent and specifying a security mode.
      * Unless methods are overridden, the parent scripting context
      * provides the scripting language, script engine, and bindings.
@@ -497,18 +487,14 @@ public class ScriptingContext {
      *            ScriptingContext from inside a sandbox
      * @deprecated trusted scripting contexts add nothing when the
      *             security manager has been eliminated
-     */
     @Deprecated
     public ScriptingContext(ScriptingContext parent, boolean trusted) {
-	/*
 	if (trusted && inSandbox()) {
 	    throw new SecurityException(errorMsg("trustedInSandbox"));
 	}
 	if (parent == null) checkConstructorPermission(trusted);
 	notTrusted = !trusted;
-	*/
 	this.parent = parent;
-	/*
 	if (parent == null) {
 	    privilegedContext = (System.getSecurityManager() == null)? null:
 		AccessController.getContext();
@@ -520,8 +506,8 @@ public class ScriptingContext {
 	} else {
 	    context = noPermContext;
 	}
-	*/
     }
+    */
 
     /*
      * Determine if the current thread is in a ScriptingContext sandbox.
@@ -1468,13 +1454,10 @@ public class ScriptingContext {
     /**
      * Set the writer for script output.
      * @param writer the writer
-     * @exception SecurityException an attempt to set the writer was made
-     *            while inside a sandbox or (if a security manager was
-     *            installed) if permission to set a writer was not granted
      * @exception UnsupportedOperationException scripting was not enabled
      */
     public final void setWriter(Writer writer)
-	throws SecurityException, UnsupportedOperationException
+	throws UnsupportedOperationException
     {
 	if (engine == null)  engine = getScriptEngine();
 	if (engine == null) {
@@ -1511,13 +1494,10 @@ public class ScriptingContext {
     /**
      * Set the writer for script error output.
      * @param writer the writer
-     * @exception SecurityException an attempt to set the writer was made
-     *            while inside a sandbox or (if a security manager was
-     *            installed) if permission to set a writer was not granted
      * @exception UnsupportedOperationException scripting was not enabled
      */
     public final void setErrorWriter(Writer writer)
-	throws SecurityException, UnsupportedOperationException
+	throws UnsupportedOperationException
     {
 	if (engine == null)  engine = getScriptEngine();
 	if (engine == null) {
@@ -1561,13 +1541,10 @@ public class ScriptingContext {
     /**
      * Set the reader for script input.
      * @param reader the reader
-     * @exception SecurityException an attempt to set the reader was made
-     *            while inside a sandbox or (if a security manager was
-     *            installed) if permission to set a reader was not granted
      * @exception UnsupportedOperationException scripting was not enabled
      */
     public final void setReader(Reader reader)
-	throws SecurityException, UnsupportedOperationException
+	throws UnsupportedOperationException
     {
 	if (engine == null)  engine = getScriptEngine();
 	if (engine == null) {
@@ -1722,12 +1699,10 @@ public class ScriptingContext {
      * declared to be final, but this unfortunately precludes allowing
      * protected access in the subclass' package.
      * @param c an ExceptionedCallable providing the code to run
-     * @exception SecurityException a security exception was thrown, typically
-     *            by the ExceptionedCallable c
      * @exception Exception an exception was raised
      */
     protected final void doScriptPrivileged(final ExceptionedCallable c)
-	throws SecurityException, Exception {
+	throws Exception {
 	c.call();
 	/*
 	checkPrivileged();

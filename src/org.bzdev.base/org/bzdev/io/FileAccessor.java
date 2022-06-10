@@ -8,8 +8,8 @@ import java.security.*;
 //@exbundle org.bzdev.io.lpack.IO
 
 /**
- * Class to provide access to a file in the presence of a security
- * manager.  Permission to access the file as specified by a mode
+ * Class to provide access to a file.
+ * Permission to access the file as specified by a mode
  * argument must be granted when a constructor is called. An input
  * stream, output stream, or a RandomAccessFile can then be obtained
  * using the permission granted to this class.
@@ -38,12 +38,13 @@ import java.security.*;
  * For example, a program using a command-line interface might
  * parse the command line and create a FileAccessor for each
  * file that an application was going to open, either for reading
- * or writing. Then the program could install a security manager,
- * after which the application could use the  file accessors to open
+ * or writing. Later, the application could use the file accessors to open
  * input or output streams as needed, ensuring that the maximum number
  * of open files for the JVM is not exceeded: when a FileAccessor is
- * created, the corresponding file is not opened immediately.
- *
+ * created, the corresponding file is not opened immediately.  The
+ * original use case for this class was one in which files had to be
+ * opened after a security manager was installed, but security managers
+ * exist only in earlier versions of Java.
  */
 public class FileAccessor {
 
@@ -69,8 +70,6 @@ public class FileAccessor {
      * Test if the file associated with this file accessor is readable
      * and this file accessor allows reading.
      * @return true if the file is readable; false if not
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean isReadable() {
 	if (readable) {
@@ -89,8 +88,6 @@ public class FileAccessor {
      * Test if the file associated with this file accessor is writable
      * and this file accessor allow writing.
      * @return true if the file is writable; false if not
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean isWritable() {
 	if (writable) {
@@ -109,8 +106,6 @@ public class FileAccessor {
      * Test if the file associated with this file accessor is writable
      * and this file accessor allow writing.
      * @return true if the file is writable; false if not
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean exists() {
 	return AccessController.doPrivileged
@@ -129,8 +124,6 @@ public class FileAccessor {
      * @return the time the file was last modified in milliseconds since
      *     the epoch (00:00:00: GMT, January 1, 1970); 0L if an IO error
      *     occurs
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see File#lastModified()
      */
     public long lastModified()
@@ -147,8 +140,6 @@ public class FileAccessor {
     /**
      * Returns the length of the file referenced by this file accessor.
      * @return the length of the file in bytes
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see File#lastModified()
      */
     public long length()
@@ -177,8 +168,6 @@ public class FileAccessor {
     /**
      * Determine if the file referenced by this file accessor is a directory.
      * @return true if it is a directory; false otherwise
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean isDirectory() {
 	return AccessController.doPrivileged
@@ -194,12 +183,10 @@ public class FileAccessor {
      * @param filename the name of the file to access
      * @exception IOException the file, most likely a portion of
      *            its path cannot be found or is not accessible
-     * @exception SecurityException the caller does not have the permissions
-     *            needed to access a file
      * @exception NullPointerException the argument was null
      */
     public FileAccessor(String filename)
-	throws IOException, SecurityException, NullPointerException
+	throws IOException, NullPointerException
     {
 	this(filename, null);
     }
@@ -219,12 +206,10 @@ public class FileAccessor {
      *        and 'a')
      * @exception IOException the file, most likely a portion of
      *            its path, cannot be found or is not accessible
-     * @exception SecurityException the caller does not have the permissions
-     *            needed to access a file
      * @exception NullPointerException the first argument was null
      */
     public FileAccessor(String filename, String mode) 
-	throws IOException, SecurityException, NullPointerException
+	throws IOException, NullPointerException
     {
 	this(((filename == null)? null: new File(filename)), mode);
     }
@@ -234,12 +219,10 @@ public class FileAccessor {
      * @param file the file to access
      * @exception IOException the file, most likely a portion of
      *            its path cannot be found or is not accessible
-     * @exception SecurityException the caller does not have the permissions
-     *            needed to access a file
      * @exception NullPointerException the argument was null
      */
     public FileAccessor(File file)
-	throws IOException, SecurityException, NullPointerException
+	throws IOException, NullPointerException
     {
 	this(file, null);
     }
@@ -260,12 +243,10 @@ public class FileAccessor {
      *        and 'a')
      * @exception IOException the file, most likely a portion of
      *            its path cannot be found or is not accessible
-     * @exception SecurityException the caller does not have the permissions
-     *            needed to access a file
      * @exception NullPointerException the first argument was null
      */
      public FileAccessor(File file, String mode)
-	 throws IOException, SecurityException, NullPointerException
+	 throws IOException, NullPointerException
     {
 	if (file == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
@@ -321,8 +302,6 @@ public class FileAccessor {
      *         a constructor
      * @exception IOException an IO error occurred or this file accessor
      *         does not allow a file to be read
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public InputStream getInputStream() throws IOException {
 	if (readable) {
@@ -360,8 +339,6 @@ public class FileAccessor {
      *         a constructor
      * @exception IOException an IO error occurred or this file accessor
      *         does not allow a file to be written
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public OutputStream getOutputStream() throws IOException {
 	if (writable) {
@@ -402,8 +379,6 @@ public class FileAccessor {
      *         access to the file specified in a constructor
      * @exception IOException an IO error occurred or this file accessor
      *         does not allow a file to be read or written
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public RandomAccessFile getRandomAccessFile() throws IOException {
 	if (!readable && appendable) {
@@ -449,8 +424,6 @@ public class FileAccessor {
      * @return a directory accessor; null if the file is not a directory
      *         or if this accessor is not readable.
      * @exception IOException an IO error occurred
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public DirectoryAccessor getDirectoryAccessor()
 	throws IOException
@@ -465,8 +438,6 @@ public class FileAccessor {
      * @return a directory accessor; null if the file is not a directory
      *         or if this accessor is not readable.
      * @exception IOException an IO error occurred
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public DirectoryAccessor getDirectoryAccessor(boolean readOnly)
 	throws IOException
@@ -507,8 +478,6 @@ public class FileAccessor {
      * @return true if the deletion was successful; false if not
      * @exception IOException an IO error occurred
      * @exception IllegalStateException this file accessor is not writable
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean delete() throws IOException, IllegalStateException  {
 	if (writable) {
@@ -563,8 +532,6 @@ public class FileAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see StandardCopyOption
      * @see Files
      * @see CopyOption
@@ -629,8 +596,6 @@ public class FileAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see Files
      * @see CopyOption
      * @see StandardCopyOption

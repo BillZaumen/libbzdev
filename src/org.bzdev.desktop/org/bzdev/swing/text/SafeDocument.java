@@ -31,9 +31,6 @@ import javax.swing.SwingUtilities;
  * {@link SwingUtilities#invokeLater(Runnable)} may process other
  * entries on its event queue first, causing m2 to be called, but m2
  * will wait until m1 returns, which cannot occur until m2 returns.
- * An experiment indicated that the behavior of the event queue can
- * change if, for example, a security manager is installed, so initial
- * testing can easily miss cases that could lead to deadlocks.
  */
 public class SafeDocument implements Document {
     Document doc;

@@ -683,8 +683,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -695,7 +693,7 @@ public abstract class OutputStreamGraphics
      */
     public static OutputStreamGraphics
 	newInstance(OutputStream os, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, getDefaultWidth(type, ImageOrientation.NORMAL),
 			   getDefaultHeight(type, ImageOrientation.NORMAL),
@@ -717,8 +715,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -729,7 +725,7 @@ public abstract class OutputStreamGraphics
      */
     public static OutputStreamGraphics
 	newInstance(OutputStream os, String type, boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, getDefaultWidth(type, ImageOrientation.NORMAL),
 			   getDefaultHeight(type, ImageOrientation.NORMAL),
@@ -751,8 +747,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -763,7 +757,7 @@ public abstract class OutputStreamGraphics
      */
     public static OutputStreamGraphics
 	newInstance(OutputStream os, ImageOrientation orientation, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os,
 			   getDefaultWidth(type, orientation),
@@ -792,8 +786,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -805,7 +797,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, ImageOrientation orientation, String type,
 		    boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os,
 			   getDefaultWidth(type, orientation),
@@ -827,8 +819,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -839,7 +829,7 @@ public abstract class OutputStreamGraphics
      */
     public static OutputStreamGraphics 
 	newInstance(OutputStream os, int width, int height, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, ImageOrientation.NORMAL, type,
 			   false);
@@ -867,8 +857,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -880,7 +868,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height, String type,
 		    boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, ImageOrientation.NORMAL, type,
 			   preferAlpha);
@@ -908,8 +896,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -921,7 +907,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    ImageOrientation orientation, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, orientation, type, false);
     }
@@ -954,8 +940,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true the caller requests an alpha channel;
      *        false otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -968,7 +952,7 @@ public abstract class OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    ImageOrientation orientation, String type,
 		    boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	type = type.trim();
 	Class<? extends OutputStreamGraphics> clazz = map.get(type);
@@ -1018,8 +1002,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1031,7 +1013,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, scaleFactor,
 			   ImageOrientation.NORMAL, type, false);
@@ -1065,8 +1047,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1078,7 +1058,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, String type, boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, scaleFactor,
 			   ImageOrientation.NORMAL, type, preferAlpha);
@@ -1112,8 +1092,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1126,7 +1104,7 @@ public abstract class OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, ImageOrientation orientation,
 		    String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, scaleFactor, orientation,
 			   type, false);
@@ -1166,8 +1144,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1180,7 +1156,7 @@ public abstract class OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, ImageOrientation orientation,
 		    String type, boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	OutputStreamGraphics osg = newInstance(os, width, height, orientation,
 					       type, preferAlpha);
@@ -1213,8 +1189,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1226,7 +1200,7 @@ public abstract class OutputStreamGraphics
     public static OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, double xt, double yt, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, scaleFactor, xt, yt, type, false);
     }
@@ -1260,8 +1234,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1274,7 +1246,7 @@ public abstract class OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, double xt, double yt, String type,
 		    boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	OutputStreamGraphics osg = newInstance(os, width, height,
 					       ImageOrientation.NORMAL,
@@ -1313,8 +1285,6 @@ public abstract class OutputStreamGraphics
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1327,7 +1297,7 @@ public abstract class OutputStreamGraphics
 	newInstance(OutputStream os, int width, int height,
 		    double scaleFactor, double xt, double yt,
 		    ImageOrientation orientation, String type)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	return newInstance(os, width, height, scaleFactor, xt, yt,
 			   orientation, type, false);
@@ -1370,8 +1340,6 @@ public abstract class OutputStreamGraphics
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
      * @exception IllegalArgumentException an argument was illegal
-     * @exception SecurityException a security manager does not allow this
-     *            operation
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
@@ -1385,7 +1353,7 @@ public abstract class OutputStreamGraphics
 		    double scaleFactor, double xt, double yt,
 		    ImageOrientation orientation, String type,
 		    boolean preferAlpha)
-	throws IllegalArgumentException, SecurityException, RuntimeException
+	throws IllegalArgumentException, RuntimeException
     {
 	OutputStreamGraphics osg = newInstance(os, width, height,
 					       orientation, type, preferAlpha);

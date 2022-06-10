@@ -135,10 +135,6 @@ public class ZipDocFile extends ZipFile {
      *        {@link ZipFile#OPEN_READ}|{@link ZipFile#OPEN_DELETE})
      * @exception ZipException - if a ZIP format error has occurred
      * @exception IOException - if an I/O error has occurred
-     * @exception SecurityException - if a security manager exists and its
-     *            checkRead method does not allow read access to the file or
-     *            its checkDelete method doesn't allow deleting the file
-     *            when the ZipFile.OPEN_DELETE flag is set.
      * @exception IllegalArgumentException - if the mode argument is invalid
      */
     public ZipDocFile(File file, int mode) throws ZipException, IOException {
@@ -157,10 +153,6 @@ public class ZipDocFile extends ZipFile {
      *        entry's general-purpose flag is set)
      * @exception ZipException - if a ZIP format error has occurred
      * @exception IOException - if an I/O error has occurred
-     * @exception SecurityException - if a security manager exists and its
-     *            checkRead method does not allow read access to the file or
-     *            its checkDelete method doesn't allow deleting the file
-     *            when the ZipFile.OPEN_DELETE flag is set.
      * @exception IllegalArgumentException - if the mode argument is invalid
      */
     public ZipDocFile(File file, int mode, Charset charset)
@@ -188,10 +180,6 @@ public class ZipDocFile extends ZipFile {
      *        entry's general-purpose flag is set)
      * @exception ZipException - if a ZIP format error has occurred
      * @exception IOException - if an I/O error has occurred
-     * @exception SecurityException - if a security manager exists and its
-     *            checkRead method does not allow read access to the file or
-     *            its checkDelete method doesn't allow deleting the file
-     *            when the ZipFile.OPEN_DELETE flag is set.
      */
     public ZipDocFile(String name, Charset charset)
 	throws ZipException, IOException

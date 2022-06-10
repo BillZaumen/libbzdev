@@ -57,6 +57,7 @@ public abstract class SimRandomVariable<T,RV extends RandomVariable<T>>
      * Get the random variable that this named object represents.
      * @return the random variable
      */
+    @SuppressWarnings("unchecked")
     public RV getRandomVariable() {
 	return (RV) rv;
     }
@@ -66,6 +67,7 @@ public abstract class SimRandomVariable<T,RV extends RandomVariable<T>>
      * Typically this will be called in a constructor, not elsewhere.
      * @rv the random variable itself
      */
+    @SuppressWarnings("unchecked")
      protected void setRV(RandomVariable<?> rv) {
 	this.rv = rv;
     }
@@ -75,6 +77,7 @@ public abstract class SimRandomVariable<T,RV extends RandomVariable<T>>
      * @param size the number of random values to provide
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator<T> spliterator(long size) {
 	return ((RV) rv).spliterator(size);
     }

@@ -57,12 +57,7 @@ public class URLClassLoaderOps {
      * The class loader that will be modified is an instance of URLClassLoader,
      * and is found by iterating over parent class loaders until the first
      * one that is an instance of URLClassLoader is found.
-     * If the default security manager is present, the permission
-     * org.bzdev.net.URLClassLoaderOps.URLPermission with a target
-     * "org.bzdev.net.allow.url.class.path" must be granted.
      * @param url the URL to add
-     * @exception SecurityException permission for his operation was not
-     *            granted
      */
     public static void addURL(URL url) {
 	if (closed.get()) return;
@@ -84,12 +79,7 @@ public class URLClassLoaderOps {
      * The class loader that will be modified is an instance of URLClassLoader,
      * and is found by iterating over parent class loaders until the first
      * one that is an instance of URLClassLoader is found.
-     * If the default security manager is present, the permission
-     * org.bzdev.net.URLClassLoaderOps.URLPermission with a target
-     * "org.bzdev.net.allow.url.class.path" must be granted.
      * @param urls the URLs to add
-     * @exception SecurityException permission for his operation was not
-     *            granted
      */
     public static void addURLs(final URL[] urls) {
 	return;

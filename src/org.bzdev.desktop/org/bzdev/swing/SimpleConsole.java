@@ -86,9 +86,6 @@ import java.util.function.Consumer;
  * to {@link SwingUtilities#invokeLater(Runnable)} may process other
  * entries on its event queue first, causing m2 to be called, but m2
  * will wait until m1 returns, which cannot occur until m2 returns.
- * An experiment indicated that the behavior of the event queue can
- * change if, for example, a security manager is installed, so initial
- * testing can easily miss cases that could lead to deadlocks.
  * <P>
 
  * While the SimpleConsole class has Java Swing components
@@ -556,15 +553,13 @@ public class SimpleConsole extends JComponent implements Appendable {
 
 
     /**
-     * Class to determine how an application can exit when a
-     * security manager is installed and a window created with
+     * Class to determine how an application can exit, even when a
+     * security manager is installed, given a window created with
      * {@link SimpleConsole#newFramedInstance(int,int,String,boolean,ExitAccessor)}
      * is closed.  When an instance of this class is the last argument
      * for
      * {@link SimpleConsole#newFramedInstance(int,int,String,boolean,ExitAccessor)},
-     * the application will exit if the console's frame is closed and
-     * an instance of this class was created when there is no security
-     * manager installed.
+     * the application will exit if the console's frame is closed.
      */
     public static class ExitAccessor {
 	private boolean allow;

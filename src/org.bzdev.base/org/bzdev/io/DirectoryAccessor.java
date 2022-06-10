@@ -11,11 +11,9 @@ import java.util.ArrayList;
 //@exbundle org.bzdev.io.lpack.IO
 
 /**
- * Class to provide access to a directory in the presence of a security
- * manager. The constructors allow access to a directory based on the
- * security policy when the constructor is called.  The methods allow
- * access to files and directories based on the permissions granted to
- * the DirectoryAccessor class itself.
+ * Class to provide access to a directory.
+ * The methods allow access to files and directories based on the
+ * permissions specified when this class's constructor is called.
  */
 public class DirectoryAccessor {
 
@@ -28,8 +26,6 @@ public class DirectoryAccessor {
      * existing subdirectories to be accessed with a directory accessor
      * that allows reading.
      * <P>
-     * Note: while the caller cannot explicitly configure a directory
-     * accessor to prevent reading, a security manager can.
      * @return true if the directory accessor allows files to be written
      *         or created; false otherwise
      */
@@ -40,7 +36,7 @@ public class DirectoryAccessor {
      * to be written or new subdirectories to be created with that property.
      * <P>
      * Note: a directory accessor will not allow writing if it was created
-     * in read-only mode or if a security manager forbids writing.
+     * in read-only mode.
      * @return true if the directory accessor allows files to be written
      *         or created; false otherwise
      */
@@ -65,8 +61,6 @@ public class DirectoryAccessor {
      * @param dir the directory
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public DirectoryAccessor(File dir)
 	throws IOException
@@ -133,8 +127,6 @@ public class DirectoryAccessor {
      *        to be written
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public DirectoryAccessor(File dir, boolean readOnly)
 	throws IOException
@@ -237,8 +229,6 @@ public class DirectoryAccessor {
      *            component or is not absolute, or the mode included a
      *            "w" or "a" character when this directory accessor is
      *            read-only
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public FileAccessor createFileAccessor(final File file,
 				final String mode)
@@ -299,8 +289,6 @@ public class DirectoryAccessor {
      * Get an input stream given a file name.
      * @param name the name of the file for which an input stream
      *        will be opened
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public InputStream getInputStream(String name) throws IOException {
 	return getInputStream((name == null)? null: new File(name));
@@ -309,8 +297,6 @@ public class DirectoryAccessor {
     /**
      * Get an input stream given a File.
      * @param file the file for which an input stream will be opened
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public InputStream getInputStream(File file) throws IOException {
 	return createFileAccessor(file).getInputStream();
@@ -321,8 +307,6 @@ public class DirectoryAccessor {
      * The file will be created if it does not already exist.
      * @param name the name of the file for which an output stream
      *        will be opened
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public OutputStream getOutputStream(String name) throws IOException {
 	return getOutputStream((name == null)? null: new File(name));
@@ -334,8 +318,6 @@ public class DirectoryAccessor {
      * @param file the file for which an output stream will be opened
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public OutputStream getOutputStream(File file) throws IOException {
 	if (writable) {
@@ -354,8 +336,6 @@ public class DirectoryAccessor {
      * @exception IOException the file could not be opened, possibly because
      *            a "r" or "a" character in the mode was used with a
      *            read-only directory accessor
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public RandomAccessFile getRandomAccessFile(String filename, String mode) 
 	throws IOException
@@ -373,8 +353,6 @@ public class DirectoryAccessor {
      * @exception IOException the file could not be opened, possibly because
      *            a "r" or "a" character in the mode was used with a
      *            read-only directory accessor
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public RandomAccessFile getRandomAccessFile(File file, String mode)
 	throws IOException
@@ -395,8 +373,6 @@ public class DirectoryAccessor {
      * @param dir the name of the directory to create
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public DirectoryAccessor addDirectory(String dir)
 	throws IOException, IllegalArgumentException,
@@ -421,8 +397,6 @@ public class DirectoryAccessor {
      *      allow directories to be added
      * @exception IllegalArgumentException the argument is a file
      *            with an absolute path name or has a parent directory
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      * @exception NullPointerException the argument was null
      */
     public DirectoryAccessor addDirectory(final File dir) 
@@ -486,8 +460,6 @@ public class DirectoryAccessor {
      * Get a list of the names of files and subdirectories in the
      * directory associated with this directory accessor.
      * @return the names of the files and directories
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public String[] list() {
 	    return AccessController.doPrivileged
@@ -509,8 +481,6 @@ public class DirectoryAccessor {
      * @see #allowsWriting()
      * @exception IOException the directory corresponding to this
      *      directory accessor does not exist or is not readable
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public FileAccessor[] listFileAccessors() throws IOException {
 	String mode = (readable && writable)? "rw":
@@ -562,8 +532,6 @@ public class DirectoryAccessor {
      * @return true if the file or directory is readable; false otherwise
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean canRead(final String filename)
 	throws IOException
@@ -615,8 +583,6 @@ public class DirectoryAccessor {
      * @return true if the file or directory is writable; false otherwise
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean canWrite(final String filename)
 	throws IOException
@@ -665,8 +631,6 @@ public class DirectoryAccessor {
      * @return true if the name refers to a directory; false otherwise
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean isDirectory(final String filename)
 	throws IOException
@@ -715,8 +679,6 @@ public class DirectoryAccessor {
      * @param filename the name of a directory or file name
      * @return true if the name refers an existing file or  directory;
      *         false otherwise
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean exists(final String filename)
     {
@@ -766,8 +728,6 @@ public class DirectoryAccessor {
      * @return true if the file or directory was deleted; false otherwise
      * @exception IllegalStateException this directory accessor does not
      *     allow files to be deleted
-     * @exception SecurityException if DirectoryAccessor's codebase does not
-     *      have the permissions needed for this method
      */
     public boolean delete(final String filename) throws IllegalStateException
     {
@@ -827,8 +787,6 @@ public class DirectoryAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see StandardCopyOption
      * @see Files
      * @see CopyOption
@@ -861,8 +819,6 @@ public class DirectoryAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see Files
      * @see CopyOption
      * @see StandardCopyOption
@@ -896,8 +852,6 @@ public class DirectoryAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see StandardCopyOption
      * @see Files
      * @see CopyOption
@@ -931,8 +885,6 @@ public class DirectoryAccessor {
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
-     * @exception SecurityException if FileAccessor's codebase does not
-     *      have the permissions needed for this method
      * @see Files
      * @see CopyOption
      * @see StandardCopyOption

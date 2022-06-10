@@ -65,15 +65,13 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * This scripting context will be trusted if and only if the parent's
      * scripting context is trusted.
      * @param parent the parent scripting context; null if there is none.
-     * @exception SecurityException this subclass of ScriptingContext cannot
-     *            be created after a security manager was installed.
      */
     public ExtendedScriptingContext(ScriptingContext parent) {
 	super(parent/*, parent.isTrusted()*/);
 	initImporterScript();
     }
 
-    /**
+    /*
      * Constructor specifying a security mode.
      * Unless methods are overridden, the parent scripting context
      * provides the scripting language, script engine, and bindings.
@@ -83,11 +81,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            be created after a security manager was installed or an
      *            attempt was made to create a trusted subclass of
      *            ScriptingContext from inside a sandbox
-     */
     public ExtendedScriptingContext(ScriptingContext parent, boolean trusted) {
 	super(parent, trusted);
 	initImporterScript();
     }
+    */
 
 
     /**
@@ -170,13 +168,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref);
     }
@@ -205,13 +200,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref);
     }
@@ -230,13 +222,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg);
     }
@@ -266,13 +255,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg);
     }
@@ -293,13 +279,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2);
     }
@@ -330,13 +313,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2);
     }
@@ -357,13 +337,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3);
     }
@@ -395,13 +372,10 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3);
     }
@@ -424,14 +398,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4);
     }
@@ -464,14 +435,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4);
     }
@@ -494,14 +462,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5);
     }
@@ -535,14 +500,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5);
     }
@@ -566,14 +528,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6);
     }
@@ -608,14 +567,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6);
     }
@@ -640,14 +596,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
@@ -683,14 +636,11 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
@@ -716,15 +666,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8);
@@ -762,15 +709,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8);
@@ -798,15 +742,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9);
@@ -845,15 +786,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9);
@@ -882,15 +820,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10);
@@ -930,15 +865,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10);
@@ -968,15 +900,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10, Object arg11) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10, arg11);
@@ -1017,15 +946,12 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     * @exception SecurityException the system class loader did not permit this
-     *            operation
      */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10, Object arg11) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10, arg11);
@@ -1120,8 +1046,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      */
     private Object newInstance(Object cref, Object... args) 
 	throws ClassNotFoundException, NoSuchMethodException,
-	       IllegalArgumentException, InvocationTargetException,
-	       SecurityException
+	       IllegalArgumentException, InvocationTargetException
     {
 	Class<?> clazz;
 	if (cref instanceof Class) {
@@ -2153,8 +2078,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * @exception IllegalArgumentException if the method detected a syntax
      *            error in the package name or class name
      * @exception NullPointerException if the class name was null
-     * @exception SecurityException if the required permissions were not
-     *            granted (e.g., with the scripting context was created)
      * @exception UnsupportedOperationException this operation is not
      *            supported (could not add a class to the scripting
      *            environment)
@@ -2163,7 +2086,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      */
     public void importClass(String className)
 	throws ClassNotFoundException, IllegalArgumentException,
-	       NullPointerException, SecurityException,
+	       NullPointerException,
 	       UnsupportedOperationException, ScriptException
     {
 	if (className == null) {
@@ -2259,8 +2182,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * @exception IllegalArgumentException if the method detected a syntax
      *            error in the package name or class name
      * @exception NullPointerException if the class name was null
-     * @exception SecurityException if the required permissions were not
-     *            granted (e.g., with the scripting context was created)
      * @exception UnsupportedOperationException this operation is not
      *            supported (could not add a class to the scripting
      *            environment)
@@ -2269,7 +2190,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      */
     public void importClass(String packageName, String className)
 	throws ClassNotFoundException, IllegalArgumentException,
-	       NullPointerException, SecurityException,
+	       NullPointerException,
 	       UnsupportedOperationException, ScriptException
     {
 	// importClass(packageName, className, false, false);
@@ -2333,10 +2254,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * </pre></code></blockquote>
      * but this function call will fail when the Rhino script engine
      * is used as the specified ECMAScript file will not be found.
-     * Furthermore, the Rhino script engine will assume that
-     * "nashorn:mozilla_compat.js" is a file name and as a result
-     * scrunner (unless run in trusted mode) will throw a security
-     * exception.
      * <P>
      * The importClasses method and importClass methods are provided
      * to to allow a script to import various classes regardless of

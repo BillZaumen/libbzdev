@@ -932,11 +932,14 @@ public class SCRunner {
 
 	extensions = new HashSet<String>
 	    (Scripting.getExtensionsByLanguageName(languageName));
+	/*
 	ScriptingContext tcontext =
 	    new DefaultScriptingContext(languageName, true);
-	ScriptingContext context = new ScriptingContext(tcontext, false);
-	tcontext = new ExtendedScriptingContext(tcontext, true);
-	context = new ExtendedScriptingContext(context, false);
+	*/
+	// ScriptingContext context = new ScriptingContext(tcontext, false);
+	ScriptingContext context = new DefaultScriptingContext(languageName);
+	// tcontext = new ExtendedScriptingContext(tcontext, true);
+	context = new ExtendedScriptingContext(context/*, false*/);
 	Handler handler = new Handler();
 
 	while (index < argv.length) {

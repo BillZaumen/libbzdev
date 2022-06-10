@@ -13,13 +13,16 @@ import java.security.*;
  * <P>
  * An example of when this class may be useful is when an application
  * has to open a long list of files, perhaps passed to the application
- * on the command line, and these files have to be processed with a
- * security manager installed. Each java virtual machine has a limit on the
- * number of files that can be simultaneously opened, so opening all the
- * files (if there are enough of them) and then setting the security
- * manager will not work.  This class avoids that issue by allowing permissions
- * to be checked when the constructor is called and then actually opening
- * the file when it is needed (at a later time).
+ * on the command line, and these files have to be processed later
+ * (the original use case was one in which the files are processed
+ * with a security manager installed, but security managers are not
+ * available in recent versions of Java). Each java virtual machine
+ * has a limit on the number of files that can be simultaneously
+ * opened, so opening all the files (if there are enough of them) all
+ * at once will not work.  This class avoids
+ * that issue by allowing permissions to be checked when the
+ * constructor is called and then actually opening the file when it is
+ * needed (at a later time).
  */
 public class DelayedRandomAccessFile {
     boolean opened = false;

@@ -19,10 +19,6 @@ public class SecTest2 {
 	    super();
 	    init();
 	}
-	public OurScriptingContext(boolean trusted) {
-	    super(trusted);
-	    init();
-	}
 	public void doit(// ScriptingContext.PFMode mode,
 			 String name)
 	    throws Exception

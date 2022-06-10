@@ -13,13 +13,15 @@ import java.security.*;
  * <P>
  * An example of when this class may be useful is when an application
  * has to open a long list of files, perhaps passed to the application
- * on the command line, and these files have to be processed with a
- * security manager installed. Each java virtual machine has a limit on the
- * number of files that can be simultaneously opened, so opening all the
- * files (if there are enough of them) and then setting the security
- * manager will not work.  This class avoids that issue by allowing permissions
- * to be checked when the constructor is called and then actually opening
- * the file when it is needed (at a later time).
+ * on the command line, and these files have to be processed later
+ * (the original use case was one in which a security manager was
+ * installed, but security managers do not exist in later versions of
+ * Java). Each java virtual machine has a limit on the number of files
+ * that can be simultaneously opened, so opening all the files (if
+ * there are enough of them) and then setting the security manager
+ * will not work.  This class avoids that issue by allowing
+ * permissions to be checked when the constructor is called and then
+ * actually opening the file when it is needed (at a later time).
  */
 public class DelayedFileInputStream {
     boolean opened = false;
@@ -65,8 +67,7 @@ public class DelayedFileInputStream {
     
     /**
      * Open the file specified by a constructor.
-     * Security tests for permission to open the file were performed when the
-     * constructor was called.  This method can be called at most one time.
+     * This method can be called at most one time.
      * The file actually opened is the file with the same canonical path name
      * as the file passed to the constructor.
      * @return the input stream for reading the file

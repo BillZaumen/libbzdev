@@ -1326,8 +1326,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
 
 
     /**
-     * Class to determine how an application can exit when a
-     * security manager is installed and a window created with
+     * Class to determine how an application can exit, even when a
+     * security manager is installed, given a window created with
      * {@link AnimatedPanelGraphics#newFramedInstance(int,int,double,String,boolean,ExitAccessor,Mode)}
      * or
      * {@link AnimatedPanelGraphics#newFramedInstance(ISWriterOps.AnimationParameters,String,boolean,ExitAccessor,Mode)}

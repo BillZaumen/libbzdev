@@ -34,14 +34,12 @@ public class ObnamingUtils {
      *        denoting the resource.
      * @exception NullPointerException the path was null
      * @exception IOException an IO error or XML error occurred
-     * @exception SecurityException a security manager was installed
-     *            and the necessary permissions were not granted
      * @see java.lang.Class#getResourceAsStream(String)
      * @see java.util.Properties#loadFromXML(InputStream)
      */
     public static void setPropertiesForXMLResource(Properties properties,
 						   String path)
-	throws IOException, SecurityException, NullPointerException
+	throws IOException, NullPointerException
     {
 	if (path == null) {
 	    throw new NullPointerException("noPath");

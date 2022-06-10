@@ -3,14 +3,14 @@
 scrunner \- run libbzdev Java code from a scripting language
 .SH SYNOPSIS
 .B scrunner
-\fB[\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
+\fB[\fIOPTION\fB]... \fIFILE\fB...\fR
 .br
 .B scrunner
-\fIFILE\fB [\fIOPTION\fB]... [[\-t\] \fIFILE\fB]...\fR
+\fIFILE\fB [\fIOPTION\fB]... \fIFILE\fB...\fR
 .br
 .br
 .B scrunner
-\fB\-s[\FISOPTION\fB]... \fIFILE\fB\ [\fIOPTION\fB]... [\fIVALUE\fB]... [[\-t\] \fIFILE\fB]...\fR
+\fB\-s[\FISOPTION\fB]... \fIFILE\fB\ [\fIOPTION\fB]... [\fIVALUE\fB]...  \fIFILE\fB...\fR
 .br
 .B scrunner
 .B \-\-listScriptingLanguages
@@ -27,11 +27,7 @@ application, typically a simulation or animation. For the first form
 of the command, each input file
 .I IFILE
 is the name of a file containing a script, with a file name of "\fB\-\fR"
-denoting standard input. If preceded by a
-.B \-t
-command-line argument, the script has elevated privileges when the
-.B \-\-trustLevel
-option is not 0.
+denoting standard input.
 .B Scrunner
 will try to guess the scripting language from the file extension, but
 the language can be set by using the
@@ -304,7 +300,7 @@ by "|". Then the images can be accessed by using the
 .B resource
 URL.
 The
-properties "java.system.class.loader", "java.security.manager",
+properties "java.system.class.loader",
 "scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
 option (or the corresponding
 .B \-J

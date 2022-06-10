@@ -67,6 +67,14 @@ public class SecTest {
 	}
 
 	public InputStream testDSPR1() {
+	    try {
+		return (new FileInputStream("test1.js"));
+	    } catch (Exception e) {
+		System.out.println
+		    ("FileInputStream failed " + "(test1.js");
+		return null;
+	    }
+
 	    /*
 	    return doScriptPrivilegedReturns
 		(new CallableReturns<InputStream>() {
@@ -165,7 +173,7 @@ public class SecTest {
 		new DefaultScriptingContext("ECMAScript");
 	    dsc.evalScript("is = new java.io.FileInputStream(\"test2.js\")");
 	    DefaultScriptingContext tdsc =
-		new DefaultScriptingContext("ECMAScript", true);
+		new DefaultScriptingContext("ECMAScript");
 	    tdsc.evalScript("is = new java.io.FileInputStream(\"test2.js\")");
 	    System.setSecurityManager(new SecurityManager());
 	    try {
@@ -296,7 +304,7 @@ public class SecTest {
 		System.out.println("creating new dsc");
 		dsc = new DefaultScriptingContext("ECMAScript");
 		System.out.println("creating new tsc");
-		tdsc = new DefaultScriptingContext("ECMAScript", true);
+		tdsc = new DefaultScriptingContext("ECMAScript");
 		System.out.println("creating new osc");
 		osc = new OurScriptingContext(props);
 		System.out.println("checking script evaluation ...");

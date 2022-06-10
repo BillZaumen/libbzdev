@@ -5,8 +5,7 @@ import javax.script.*;
 /**
  * Default implementation of a scripting context.
  * If no scripting language is specified, or the language passed
- * a {@link DefaultScriptingContext(String)} or
- * {@link DefaultScriptingContext(String,boolean)} is null, the language
+ * to {@link DefaultScriptingContext(String)} is null, the language
  * <A HREF="{@docRoot}/org.bzdev.base/org/bzdev/util/doc-files/esp.html">ESP</A> * is chosen by default. ESP was developed because the default scripting engine
  * for Java-11 has been deprecated and will go away in future releases.
  * Meanwhile the GraalVM implementation of ECMAScript (at least, at the point
@@ -144,7 +143,7 @@ public class DefaultScriptingContext extends ScriptingContext {
 	this(DEFAULT_LANG_NAME);
     }
 
-    /**
+    /*
      * Constructor specifying the language name and the security mode.
      * @param languageName the name of the scripting language; null
      *        for the default,
@@ -154,7 +153,7 @@ public class DefaultScriptingContext extends ScriptingContext {
      *            be created after a security manager was installed or an
      *            attempt was made to create a trusted subclass of
      *            ScriptingContext from inside a sandbox
-     */
+     *
     public DefaultScriptingContext(String languageName,
 				   boolean trusted)
 	throws SecurityException
@@ -162,8 +161,9 @@ public class DefaultScriptingContext extends ScriptingContext {
 	super(trusted);
 	init(languageName);
     }
+     */
 
-    /**
+    /*
      * Constructor specifying the security mode.
      * The default language, ECMAScript, will be used.
      * @param trusted true if the script context is trusted; false otherwise
@@ -171,10 +171,10 @@ public class DefaultScriptingContext extends ScriptingContext {
      *            be created after a security manager was installed or an
      *            attempt was made to create a trusted subclass of
      *            ScriptingContext from inside a sandbox
-     */
     public DefaultScriptingContext(boolean trusted) throws SecurityException {
 	this(DEFAULT_LANG_NAME, trusted);
     }
+     */
 
     @Override
     protected ScriptEngine doGetScriptEngine() {

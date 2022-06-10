@@ -434,8 +434,6 @@ public class ExprScriptTest4 {
 			   "test4j.esp", "test4i.esp", "test4h.esp",
 			   "test4g.esp",  "test4e.esp",
 			   "test4d.esp", "test4c.esp", "test4b.esp"};
-	System.out.println("Try a series of files with"
-			   + " a security manager installed");
 	ExpressionParser[] parsers = new ExpressionParser[fnames.length];
 	String[] srcs = new String[fnames.length];
 	int i = 0;
@@ -476,9 +474,11 @@ public class ExprScriptTest4 {
 	    }
 	    i++;
 	}
+	/*
 	try {
 	    System.setSecurityManager(new SecurityManager());
 	} catch (UnsupportedOperationException eu) {System.exit(0);}
+	*/
 	i = -1;
 	for (String fn: fnames) {
 	    System.out.println("... " + fn);

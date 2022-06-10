@@ -695,7 +695,6 @@ public class ExpressionParser implements ObjectParser<Object>
 			    public Object run()
 				throws IllegalArgumentException,
 				       NullPointerException,
-				       SecurityException,
 				       ObjectParser.Exception
 			    {
 				return Proxy.newProxyInstance
@@ -1796,7 +1795,7 @@ public class ExpressionParser implements ObjectParser<Object>
     // is declared to be public).  Curiously, you can call the
     // method from compiled Java code and that works.
     private static Method findBestMethod(Method m)
-	throws NoSuchMethodException, SecurityException
+	throws NoSuchMethodException
     {
 	Class<?> c = m.getDeclaringClass();
 	Method mm = findBestMethod(c, m);
@@ -1927,9 +1926,6 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * to help implement the ESP scripting language.
 	 * @exception IllegalStateException this method was called
 	 *            after expression-parsing started.
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission "org.bzdev.util.ExpressionParser"
-	 *            was not granted.
 	 */
 	public void setScriptingMode() throws IllegalStateException {
 	    /*
@@ -1951,9 +1947,6 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * expressions are evaluated.
 	 * @exception IllegalStateException this method was called
 	 *            after expression-parsing started.
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission "org.bzdev.util.ExpressionParser"
-	 *            was not granted.
 	 */
 	public void setImportMode() throws IllegalStateException {
 	    /*
@@ -1976,9 +1969,6 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * cannot be changed.
 	 * @exception IllegalStateException this method was called
 	 *            after expression-parsing started.
-	 * @exception SecurityException a security manager was installed
-	 *            and the permission "org.bzdev.util.ExpressionParser"
-	 *            was not granted.
 	 */
 	public void setGlobalMode()  throws IllegalStateException {
 	    /*
@@ -5832,9 +5822,6 @@ public class ExpressionParser implements ObjectParser<Object>
      *        will be used as functions
      * @exception IllegalAccessException a requested class, method, or
      *            field could not be accessed
-     * @exception SecurityException a security manager was installed
-     *            and the permission "org.bzdev.util.ExpressionParser"
-     *            was not granted.
      */
     public ExpressionParser(Class<?>... classes)
 	    throws IllegalAccessException
@@ -5881,9 +5868,6 @@ public class ExpressionParser implements ObjectParser<Object>
      *        may be used.
      * @exception IllegalAccessException a requested class, method, or
      *            field could not be accessed
-     * @exception SecurityException a security manager was installed
-     *            and the permission "org.bzdev.util.ExpressionParser"
-     *            was not granted.
      */
     public ExpressionParser(Class<?>[] returnTypes,
 			    Class<?>[] argumentTypes,

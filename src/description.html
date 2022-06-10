@@ -75,9 +75,10 @@ The packages in this module provide the following:
        normal Java code is not.
   <li> org.bzdev.io provides some IO-related classes. These include a
     Writer class that can write to an Appendable, some classes that
-    allow opening of files or directories to be specified before a
-    security manager restricts access and actually opened afterwards,
-    and classes for reading and writing files in some specialized formats.
+    allow opening of files or directories to be specified in a way that
+    allows the files or directory entries to be opened later.  This was
+    originally meant to work with security managers, which later versions
+    of Java do not support.
   <li> org.bzdev.net and org.bzdev.protocols provide networking classes:
        <ul>
          <li> org.bzdev.net contains classes to augment the java.net package.

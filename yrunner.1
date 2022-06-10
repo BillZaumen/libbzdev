@@ -168,7 +168,7 @@ Define the name of a Java property and give it a value.  See the java
 command for details.  The syntax for this argument is the same as that
 defined for the similarly named option for the
 .B java
-command.  The properties "java.system.class.loader", "java.security.manager",
+command.  The properties "java.system.class.loader",
 "scrunner.sysconf", and "scrunner.usrconf" cannot be altered by this
 option (or the corresponding
 .B \-J
@@ -322,17 +322,6 @@ or
 .TP
 .B \-\-stackTrace
 Print a stack trace if an error occurs when running scripts.
-.TP
-.B \-\-trustLevel=\fIN\fB
-The value
-.I N
-can be 0 (the default) or 2.  When 0, after command-line arguments
-are processes, the Java security manager (java.lang.SecurityManager) will
-be installed. When 2, no security manager will be installed.  The value
-1 is used by
-.B scrunner
-and is not appropriate for
-.BR yrunner .
 .TP
 .BI \-vS: VAR\ VALUE
 .TQ

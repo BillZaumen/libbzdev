@@ -64,9 +64,7 @@ import java.security.*;
  * (typically JAR files, ZIP files, or directories, but possibly resources
  * accessible over a network connection) are provided by the system
  * property described above, and cannot be changed once
- * {@link Handlers#enable()} is called.  Furthermore, unless a specific
- * permission is granted, {@link Handlers#enable()} will fail if called
- * after a security manager is installed. In addition, the path portion
+ * {@link Handlers#enable()} is called.  In addition, the path portion
  * of the URL (the part after "resource:"), is checked so that
  * <ul>
  *  <li> the path does not contain any illegal characters: ones not
