@@ -860,8 +860,7 @@ public class SCRunnerCmd {
 			 && !argv[index].equals("-"))?
 	    null: argv[index++];
 	// scan ahead to find the language
-	while (index < argv.length && argv[index].startsWith("-")
-	       /* && !argv[index].equals("-t")*/) {
+	while (index < argv.length && argv[index].startsWith("-")) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -872,10 +871,6 @@ public class SCRunnerCmd {
 	    } else if (argv[index].equals("--")) {
 		index++;
 		break;
-		/*
-	    } else if (argv[index].equals("-t")) {
-		index++; break;
-		*/
 	    } else if (argv[index].equals("-o")) {
 		index++;
 	    } else if (argv[index].equals("--plaf")) {
@@ -989,22 +984,16 @@ public class SCRunnerCmd {
 	if (languageName == null) {
 	    String extension = null;
 	    while (index < argv.length && extension == null) {
-		/*
-		if (!argv[index].equals("-t")) {
-		*/
-		    if (extension == null) {
-			try {
-			    extension = getExtension(argv[index]);
-			} catch (Exception e) {
-			    String msg =
-				errorMsg("scException", e.getMessage());
-			    System.err.println(msg);
-			    System.exit(1);
-			}
+		if (extension == null) {
+		    try {
+			extension = getExtension(argv[index]);
+		    } catch (Exception e) {
+			String msg =
+			    errorMsg("scException", e.getMessage());
+			System.err.println(msg);
+			System.exit(1);
 		    }
-		/*
 		}
-		*/
 		index++;
 	    }
 	    if (extension == null) {
@@ -1047,8 +1036,7 @@ public class SCRunnerCmd {
 	}
 	boolean dryrun = false;
 	boolean listCodeBase = false;
-	while (index < argv.length && argv[index].startsWith("-")
-	       /*&& !argv[index].equals("-t")*/) {
+	while (index < argv.length && argv[index].startsWith("-")) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -1189,14 +1177,6 @@ public class SCRunnerCmd {
 		}
 	    } else if (argv[index].equals("--setScripting")) {
 		sbcmd.add("--setScripting");
-		/*
-	    } else if (argv[index].equals("--trustLevel=0")) {
-		sbcmd.add("--trustLevel=0");
-	    } else if (argv[index].equals("--trustLevel=1")) {
-		sbcmd.add("--trustLevel=1");
-	    } else if (argv[index].equals("--trustLevel=2")) {
-		sbcmd.add("--trustLevel=2");
-		*/
 	    } else if (argv[index].equals("-r")) {
 		sbcmd.add("-r");
 	    } else if (argv[index].startsWith("-r")) {

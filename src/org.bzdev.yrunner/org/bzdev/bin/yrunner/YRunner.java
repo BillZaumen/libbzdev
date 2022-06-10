@@ -717,12 +717,6 @@ public class YRunner {
 		    */
 		    System.exit(1);
 		}
-		/*
-	    } else if (argv[index].equals("--trustLevel=0")) {
-		trustLevel = 0;
-	    } else if (argv[index].equals("--trustLevel=2")) {
-		trustLevel = 2;
-		*/
 	    } else if (argv[index].equals("-r")) {
 		org.bzdev.math.StaticRandom.maximizeQuality();
 	    } else if (argv[index].startsWith("-r")) {

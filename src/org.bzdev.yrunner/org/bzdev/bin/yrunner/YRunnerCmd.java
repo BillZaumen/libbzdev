@@ -891,16 +891,6 @@ public class YRunnerCmd {
 		    System.err.println(msg);
 		    System.exit(1);
 		}
-		/*
-	    } else if (argv[index].equals("--trustLevel=0")) {
-		sbcmd.add("--trustLevel=0");
-	    } else if (argv[index].equals("--trustLevel=1")) {
-		String msg = errorMsg("trustLevel1");
-		System.err.println(msg);
-		System.exit(1);
-	    } else if (argv[index].equals("--trustLevel=2")) {
-		sbcmd.add("--trustLevel=2");
-		*/
 	    } else if (argv[index].equals("-r")) {
 		sbcmd.add("-r");
 	    } else if (argv[index].startsWith("-r")) {

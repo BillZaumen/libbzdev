@@ -327,8 +327,7 @@ public class SCRunner {
 	int stdoutCount = 1;
 	String plaf = UIManager.getSystemLookAndFeelClassName();
 
-	while (index < argv.length && argv[index].startsWith("-")
-	       /*&& !argv[index].equals("-t")*/) {
+	while (index < argv.length && argv[index].startsWith("-")) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
 		// standard input and should be treated as a file-name
@@ -694,14 +693,6 @@ public class SCRunner {
 		}
 	    } else if (argv[index].equals("--unsetScripting")) {
 		setScripting = false;
-		/*
-	    } else if (argv[index].equals("--trustLevel=0")) {
-		trustLevel = 0;
-	    } else if (argv[index].equals("--trustLevel=1")) {
-		trustLevel = 1;
-	    } else if (argv[index].equals("--trustLevel=2")) {
-		trustLevel = 2;
-		*/
 	    } else if (argv[index].equals("-r")) {
 		org.bzdev.math.StaticRandom.maximizeQuality();
 	    } else if (argv[index].startsWith("-r")) {
@@ -862,23 +853,6 @@ public class SCRunner {
 
 	int ind = index;
 	while (ind < argv.length) {
-	    /*
-	    if (argv[ind].equals("-t")) {
-		ind++;
-		if (ind < argv.length) {
-		    if (extension == null) {
-			try {
-			    if (!argv[ind].equals("-")) {
-				extension = getExtension(argv[ind]);
-			    }
-			} catch (Exception ee) {
-			    System.err.println
-				(errorMsg("exception", ee.getMessage()));
-			}
-		    }
-		}
-	    } else {
-	    */
 	    if (extension == null) {
 		try {
 		    if (!argv[ind].equals("-")) {
@@ -890,7 +864,6 @@ public class SCRunner {
 		    System.exit(1);
 		}
 	    }
-	  /*}*/
 	    ind++;
 	}
 
@@ -944,14 +917,7 @@ public class SCRunner {
 
 	while (index < argv.length) {
 	    try {
-		/* if (argv[index].equals("-t")) {
-		    index++;
-		    if (index < argv.length) {
-			handler.add(tcontext, argv[index]);
-		    }
-		} else { */
 		handler.add(context, argv[index]);
-		/*}*/
 	    } catch (Exception e) {
 		System.err.println
 		    (errorMsg("noOpen2", argv[index], e.getMessage()));
