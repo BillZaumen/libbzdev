@@ -18,10 +18,8 @@ import java.security.*;
  * installed, but security managers do not exist in later versions of
  * Java). Each java virtual machine has a limit on the number of files
  * that can be simultaneously opened, so opening all the files (if
- * there are enough of them) and then setting the security manager
- * will not work.  This class avoids that issue by allowing
- * permissions to be checked when the constructor is called and then
- * actually opening the file when it is needed (at a later time).
+ * there are enough of them) and then processing them
+ * will not work.
  */
 public class DelayedFileInputStream {
     boolean opened = false;
@@ -46,12 +44,6 @@ public class DelayedFileInputStream {
      */
     public DelayedFileInputStream(File file) throws FileNotFoundException {
 	String name = (file != null? file.getPath(): null);
-	/*
-	SecurityManager sm = System.getSecurityManager();
-	if (sm != null) {
-	    sm.checkRead(name);
-	}
-	*/
 	if (name == null) {
 	    throw new NullPointerException(errorMsg("nullArg"));
 	}
