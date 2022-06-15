@@ -44,7 +44,7 @@ public class ScriptingTest3 {
 	    props.setProperty("ECMAScript",
 			      "({test: function(x,y) {return x + y}})");
 	    props.setProperty("ESP",
-			      "{test: function(x,y) {return x + y}}");
+			      "{test: function(x,y) {x + y}}");
 	    // ScriptingContext dfsc=new DefaultScriptingContext("ECMAScript");
 	    ScriptingContext dfsc = new DefaultScriptingContext("ESP");
 	    ExtendedScriptingContext efsc = new ExtendedScriptingContext(dfsc);
@@ -72,11 +72,13 @@ public class ScriptingTest3 {
 	    }
 	    System.out.println("---- now try efsc -----");
 	    efsc.putScriptObject("scripting", efsc);
+	    /*
 	    Object dsim = efsc.evalScript
 		("scripting.create(\"org.bzdev.drama.DramaSimulation\", "
 		 + "scripting)");
 	    dsc = (ScriptingContext) dsim;
 	    System.out.println(dsim.getClass().getName());
+	    */
 	    try {
 		OurScriptingContext sc = new OurScriptingContext(props, dsc);
 		sc.putScriptObject("result", sc.test(10.0, 20.0));
@@ -88,6 +90,7 @@ public class ScriptingTest3 {
 		efsc.evalScript("new org.bzdev.math.rv.GaussianRV(5.0, 2.0)");
 	    System.out.println("grv mean = " + grv.getMean()
 			       + ", sdev = " + grv.getSDev());
+	    /*
 	    grv = (org.bzdev.math.rv.GaussianRV) efsc.evalScript
 		("scripting.create(\"org.bzdev.math.rv.GaussianRV\", 5.0, 2.0)");
 	    System.out.println("grv mean = " + grv.getMean()
@@ -104,7 +107,7 @@ public class ScriptingTest3 {
 		(org.bzdev.math.rv.FixedBooleanRV) efsc.evalScript
 		("scripting.create(\"org.bzdev.math.rv.FixedBooleanRV\", true)");
 	    System.out.println("fbrv.next() = " + fbrv.next());
-
+	    */
 	    System.out.println("----- test createArray -----");
 	    Object object = efsc.evalScript
 		("scripting.createArray(java.lang.Double.class, 5)");

@@ -898,6 +898,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	this.gmap = gmap;
     }
 
+    volatile boolean importsFrozen = false;
+    volatile HashSet<Constructor<?>> blockedConstructors = null;
+    volatile HashSet<Method> blockedMethods = null;
+
     // The global object is an instance of this class.
     private class ESP {
 	/**
@@ -921,6 +925,18 @@ public class ExpressionParser implements ObjectParser<Object>
 	public boolean isArray(Object obj) {
 	    if (obj == null) return false;
 	    return (obj instanceof ESPArray) || obj.getClass().isArray();
+	}
+
+	/**
+	 * Get the type of a Java array whose elements are of a specified
+	 * class.
+	 * @param clasz the class of an array element
+	 * @return the type of an array whose element type is clasz
+	 * @exception NullPointerException if clasz is null
+	 * @exception IllegalArgumentException if clasz is Void.TYPE
+	 */
+	public Class<?> typeForArrayOf(Class<?> clasz) {
+	    return java.lang.reflect.Array.newInstance(clasz, 0).getClass();
 	}
 
 	/**
@@ -1160,7 +1176,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		(map.containsKey(key)? map.get(key): defaultObject);
 	}
 
-	private int importCount = 0;
+	private volatile int importCount = 0;
 
 	/**
 	 * Import classes.
@@ -1189,7 +1205,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		   IllegalStateException
 	{
 	    if (!(processor.scriptingMode && processor.importMode
-		  && scriptImportAllowed)) {
+		  && scriptImportAllowed) || importsFrozen) {
 		throw new IllegalStateException(errorMsg("noImport"));
 	    }
 	    int prevImportCount = importCount;
@@ -1439,6 +1455,153 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	    return VOID;
 	}
+
+	public Object blockImports() {
+	    importsFrozen = true;
+	    return null;
+	}
+
+	public synchronized Object blockConstructor(Class<?> clasz,
+						    Class<?>... argumentClasses)
+	    throws IllegalStateException, NullPointerException,
+		   NoSuchMethodException
+	{
+	    if (importsFrozen == true) {
+		throw new IllegalStateException(errorMsg("noImport"));
+	    }
+	    if (clasz == null) {
+		throw new NullPointerException(errorMsg("nullArg", 1));
+	    }
+	    for (int i = 0; i < argumentClasses.length; i++) {
+		if (argumentClasses[i] == null) {
+		    throw new NullPointerException(errorMsg("nullArg", i+2));
+		}
+	    }
+	    Constructor<?> c = clasz.getConstructor(argumentClasses);
+	    if (blockedConstructors == null) {
+		blockedConstructors = new HashSet<Constructor<?>>();
+	    }
+	    blockedConstructors.add(c);
+	    return null;
+	}
+
+	public synchronized Object blockMethod(Class<?> clasz, String name,
+					       Class<?>... argumentClasses)
+	    throws IllegalStateException, NullPointerException,
+		   NoSuchMethodException
+
+	{
+	    if (importsFrozen == true) {
+		throw new IllegalStateException(errorMsg("noImport"));
+	    }
+	    if (clasz == null) {
+		throw new NullPointerException(errorMsg("nullArg", 1));
+	    }
+	    if (name == null) {
+		throw new NullPointerException(errorMsg("nullArg", 2));
+	    }
+	    for (int i = 0; i < argumentClasses.length; i++) {
+		if (argumentClasses[i] == null) {
+		    throw new NullPointerException(errorMsg("nullArg", i+3));
+		}
+	    }
+	    Method m = clasz.getMethod(name, argumentClasses);
+	    if (blockedMethods == null) {
+		blockedMethods = new HashSet<Method>();
+	    }
+	    blockedMethods.add(m);
+	    return null;
+	}
+
+	/*
+	public synchronized Object blockScriptingCreate() {
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(ExtendedScriptingContext.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class);
+	    blockMethod(String.class,
+			"create", Class.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class,
+			Object.class, Object.class, Object.class);
+	    return null;
+	}
+	*/
     }
 
     private static final HashMap<ObjMethodDescriptor, Method> epobjMethods
@@ -4226,6 +4389,10 @@ public class ExpressionParser implements ObjectParser<Object>
 
 	    Method m = findMethod(fname, argclasses, argcount, objectMaps,
 				  ((target == null)? null: target.getClass()));
+	    if (blockedMethods != null &&
+		blockedMethods.contains(m)) {
+		throw new IllegalStateException(errorMsg("blockedMethod"));
+	    }
 	    return m;
 	}
 
@@ -4468,6 +4635,10 @@ public class ExpressionParser implements ObjectParser<Object>
 
 	    Constructor<?>constr = findConstr(cname, argclasses,
 					      argcount, objectMaps);
+	    if (blockedConstructors != null &&
+		blockedConstructors.contains(constr)) {
+		throw new IllegalStateException(errorMsg("blockedConstructor"));
+	    }
 	    i = 0;
 	    Class<?>[] types = constr.getParameterTypes();
 	    Object[] oargs = new Object[types.length];
@@ -5218,6 +5389,10 @@ public class ExpressionParser implements ObjectParser<Object>
 				} else if (fname.equals("isObject")
 					   && args.length == 1) {
 				    results = ep.isObject(args[0]);
+				} else if (fname.equals("typeForArrayOf")
+					   && args.length == 1) {
+				    Class<?> clz = (Class<?>)args[0];
+				    results = ep.typeForArrayOf(clz);
 				} else if (fname.equals("typeof")
 					   && args.length == 1) {
 				    results = ep.typeof(args[0]);
@@ -5302,6 +5477,35 @@ public class ExpressionParser implements ObjectParser<Object>
 					i++; j++;
 				    }
 				    results = Array.newInstance(c, arguments);
+				} else if (fname.equals("blockImports")
+					   && args.length == 0) {
+				    results = ep.blockImports();
+				} else if (fname.equals("blockConstructor")
+					   && args.length >= 1) {
+				    Class<?> clz = (Class<?>) args[0];
+				    Class<?>[] arguments =
+					new Class<?>[args.length - 1];
+				    for (int i = 1; i < args.length; i++) {
+					arguments[i-1] = (Class<?>)args[i];
+				    }
+				    results = ep.blockConstructor(clz,
+								  arguments);
+				} else if (fname.equals("blockMethod")
+					   && args.length >= 2) {
+				    Class<?> clz = (Class<?>) args[0];
+				    String mname = (String) args[1];
+				    Class<?>[] arguments =
+					new Class<?>[args.length - 2];
+				    for (int i = 2; i < args.length; i++) {
+					arguments[i-2] = (Class<?>)args[i];
+				    }
+				    results = ep.blockMethod(clz, mname,
+							     arguments);
+				    /*
+				} else if (fname.equals("blockScriptingCreate")
+					   && args.length == 0) {
+				    results = ep.blockScriptingCreate();
+				    */
 				} else if (fname.equals("generateDocs")
 					   && args.length == 2
 					   && args[0] instanceof PrintWriter
@@ -6040,7 +6244,7 @@ public class ExpressionParser implements ObjectParser<Object>
 				       Class<?>... classes)
 	    throws IllegalAccessException
     {
-	if (noImport) {
+	if (noImport || importsFrozen) {
 	    throw new IllegalStateException(errorMsg("noImport"));
 	}
 	clearFCN();
@@ -9343,6 +9547,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    } else if (level == 0 && prev == null
 			       && processor.scriptingMode
 			       && scriptImportAllowed
+			       && importsFrozen == false
 			       && variable.equals("import")) {
 			level++;
 			next = new Token(Operator.IMPORT, variable,
@@ -9350,6 +9555,13 @@ public class ExpressionParser implements ObjectParser<Object>
 			tokens.add(next);
 			importStarted = true;
 			finishNeeded = true;
+		    } else if (variable.equals("import")) {
+			// imports not allowed / 'import' is a reserved word.
+			String msg = errorMsg(importsFrozen?
+					      "importBlocked":
+					      "importReserved");
+			throw new ObjectParser.Exception
+			    (msg, filenameTL.get(), s, i);
 		    } else if (variable.equals("synchronized")) {
 			mustSync = true;
 			i--;	  // due to 'for' loop

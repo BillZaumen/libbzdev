@@ -21,7 +21,7 @@ scripting.importClass(null, "TestActorFactory");
 
 out.println("finished imports");
 
-sim = scripting.create(DramaSimulation.class, scripting);
+sim = new DramaSimulation(scripting);
 
 dcf = sim.createFactory("org.bzdev.drama.DoubleConditionFactory");
 icf = sim.createFactory(IntegerConditionFactory.class);

@@ -252,6 +252,10 @@ estest9: compile
 	@echo - ExpressionParser Test '(functional interface, method ref test)' -
 	@$(JAVA) ExprScriptTest9
 
+estest10: compile
+	@echo - ExpressionParser Test '(functional interface, method ref test)' -
+	@$(JAVA) ExprScriptTest10
+
 unitree: compile
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest

@@ -2,7 +2,7 @@
 
 scripting.importClasses("org.bzdev.anim2d", "Animation2D");
 
-a2d = scripting.create("org.bzdev.anim2d.Animation2D", scripting);
+a2d = new org.bzdev.anim2d.Animation2D(scripting);
 print ("created a2d");
 print("\n");
 a2d.createFactories("org.bzdev.anim2d", {

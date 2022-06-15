@@ -1,8 +1,7 @@
 import (org.bzdev.anim2d.Animation2D);
 import (org.bzdev.lang.MathOps);
 
-var a2d = scripting.create(Animation2D.class, scripting,
-			   1920, 1080, 10000.0, asLong(400));
+var a2d = new Animation2D(scripting, 1920, 1080, 10000.0, asLong(400));
 
 
 var array = global.newJavaArray(double.class, 10);

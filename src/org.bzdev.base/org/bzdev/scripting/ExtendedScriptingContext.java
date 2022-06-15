@@ -155,7 +155,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
     }
 
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * no arguments.
      * @param cref the fully-qualified class name of object to be created
@@ -168,15 +168,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * no arguments.
      * <P>
@@ -200,15 +200,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * one argument.
      * @param cref the fully-qualified class name of object to be created
@@ -222,15 +222,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * one argument.
      * <P>
@@ -255,16 +255,16 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg);
     }
+     */
 
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * two arguments.
      * @param cref the class of object to be created
@@ -279,15 +279,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * two arguments.
      * <P>
@@ -313,15 +313,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * three arguments.
      * @param cref the class of object to be created
@@ -337,15 +337,15 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * three arguments.
      * <P>
@@ -372,16 +372,16 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3) 
 	throws ClassNotFoundException, NoSuchMethodException,
 	       IllegalArgumentException, InvocationTargetException
     {
 	return newInstance(cref, arg1, arg2, arg3);
     }
+     */
 
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * four arguments.
      * @param cref the class of object to be created
@@ -398,7 +398,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -406,8 +405,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * four arguments.
      * <P>
@@ -435,7 +435,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -443,8 +442,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * five arguments.
      * @param cref the class of object to be created
@@ -462,7 +462,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -470,8 +469,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * five arguments.
      * <P>
@@ -500,7 +500,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -508,8 +507,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * six arguments.
      * @param cref the class of object to be created
@@ -528,7 +528,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -536,8 +535,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * six arguments.
      * <P>
@@ -567,7 +567,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -575,8 +574,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * seven arguments.
      * @param cref the class of object to be created
@@ -596,7 +596,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -604,8 +603,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * seven arguments.
      * <P>
@@ -636,7 +636,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7) 
 	throws ClassNotFoundException, NoSuchMethodException,
@@ -644,8 +643,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
     {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * eight arguments.
      * @param cref the class of object to be created
@@ -666,7 +666,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8) 
@@ -676,8 +675,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * eight arguments.
      * <P>
@@ -709,7 +709,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8) 
@@ -719,8 +718,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * nine arguments.
      * @param cref the class of object to be created
@@ -742,7 +742,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9) 
@@ -752,8 +751,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * nine arguments.
      * <P>
@@ -786,7 +786,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9) 
@@ -796,8 +795,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * ten arguments.
      * @param cref the class of object to be created
@@ -820,7 +820,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10) 
@@ -830,8 +829,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * ten arguments.
      * <P>
@@ -865,7 +865,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10) 
@@ -875,8 +874,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class name and using a constructor with
      * eleven arguments.
      * @param cref the class of object to be created
@@ -900,7 +900,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(String cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10, Object arg11) 
@@ -910,8 +909,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10, arg11);
     }
+     */
 
-    /**
+    /*
      * Create a new object given its class and using a constructor with
      * eleven arguments.
      * <P>
@@ -946,7 +946,6 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *            or a type conversion error occurred during instantiation
      * @exception InvocationTargetException the constructor invoked threw an
      *            exception
-     */
     public Object create(Class cref, Object arg1, Object arg2, Object arg3,
 			 Object arg4, Object arg5, Object arg6, Object arg7,
 			 Object arg8, Object arg9, Object arg10, Object arg11) 
@@ -956,6 +955,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
 	return newInstance(cref, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
 			   arg8, arg9, arg10, arg11);
     }
+     */
 
     private static boolean classMatch(Class<?> parmClass,
 				      Class<?> argClass) {

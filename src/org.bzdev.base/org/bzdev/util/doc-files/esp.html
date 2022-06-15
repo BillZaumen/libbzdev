@@ -17,13 +17,30 @@
     scripting language. For ease of learning, the syntax is similar to
     that used by ECMA script, although with fewer constructs and some
     minor additions and changes, most adopted from Java. The following
-    sections provide full descriptions of the ESP scripting language
+    sections provide a description of the ESP scripting language
     and how it is configured:
     <UL>
       <LI><A HREF="#overview">Overview</A>.
       <LI><A HREF="#scriptEngine">Script Engines</A>.
       <LI><A HREF="#constructors">Constructors</A>.
-      <LI><A HREF="#syntax">ESP Syntax</A>.
+      <LI><A HREF="#syntax">ESP Syntax</A>:
+	<UL>
+	  <LI> <A HREF="#comments">Comments</A>.
+	  <LI> <A HREF="#primitiveValues">Primitive Values</A>
+	  <LI> <A HREF="#constants">Constants</A>
+	  <LI> <A HREF="#operators">Operators</A>
+	  <LI> <A HREF="#statements">Statements</A>
+	  <LI> <A HREF="#expressions">Expressions</A>
+	  <LI> <A HREF="#vardefs">Variable Definitions</A>
+	  <LI> <A HREF="#vardecls">Variable Declarations</A>
+	  <LI> <A HREF="#functdefs">Function Definitions</A>
+	  <LI> <A HREF="#assignment">Assignment Statement</A>
+	  <LI> <A HREF="#import">Import Statement</A>
+	  <LI> <A HREF="#objects">Objects</A>
+	  <LI> <A HREF="#arrays">Arrays</A>
+	  <LI> <A HREF="#global">The global object</A>
+	  <LI> <A HREF="#tracing">Tracing Options</A>
+	</UL>
       <LI><A HREF="#iteration">Iteration</A>.
       <LI><A HREF="#threading">Threading</A>.
       <LI><A HREF="#bindings">Bindings</A>.
@@ -31,10 +48,11 @@
       <LI><A HREF="#helpers">Helper Classes</A>.
       <LI><A HREF="#examples">Examples</A>.
       <LI><A HREF="#hints">Hints</A>.
+      <LI><A HREF="#security">Security</A>.
       <LI><A HREF="#notes">Implementation Notes</A>.
     </UL>
   <P>
-    In the simplest use case, ESP provides a high level of
+    In the simplest use case, ESP provides a reasonable level of
     security. The
     constructor for this case is
     {@link ExpressionParser#ExpressionParser(Class...)},
@@ -1147,8 +1165,8 @@ array-elements:
     An array element can be dereferenced by following the array
     (include ones provided by expressions) with a <STRONG>[</STRONG>,
     followed by an expression that evaluates to an index, followed by
-    <STRONG>]</STRONG>. An array's indices start at 0. This form can
-    be used as the target for an assignment as well. As objects,
+    <STRONG>]</STRONG>. An array&apos;s indices start at 0. This form
+    can be used as the target for an assignment as well. As objects,
     arrays have the following methods:
     <UL>
       <LI><STRONG>get(</STRONG><I>index</I><STRONG>)</STRONG>. This
@@ -1216,7 +1234,7 @@ array-elements:
     choices.  Finally an the name globalThis was picked, with (as of
     2021) some variation in implementation status. ESP uses the name
     "global", but the ESP global object, unlike the corresponding
-    object in ECMAScript, provides methods but not properties.
+    object in ECMAScript, provides methods but  not properties.
     Furthermore, ESP treats "global" as a reserved word: a statement
     such as "global = 10.0" will fail. This name was chosen because,
     given the history, it is not likely to collide with the names of
@@ -1232,11 +1250,40 @@ array-elements:
   <P>
     The methods associated with <STRONG>global</STRONG> are
     <UL>
-      <LI> <STRONG>ESPObjectType()</STRONG>. This method returns the
+      <LI><STRONG>blockConstructor(</STRONG><I>clasz</I><STRONG>,</STRONG><I>argumentClasses</I><STRONG>...)</STRONG>.
+	For class <I>clasz</I>, this method prevents ESP scripts from
+	using a constructor whose argument classes are given by the
+	remaining arguments. Classes in ESP (as mentioned above) are
+	denoted by a Java class name followed by the
+	string <STRONG>.class</STRONG>. If a constructor takes a
+	variable number of arguments, the argument should be an array
+	type.  The method <STRONG>typeForArrayOf</STRONG> described
+	below will create an array type for the specified component
+	type.
+      <LI><STRONG>blockImports()</STRONG>.  Once this method has been
+	executed, the use of an import statement will result in an
+	error. Because <STRONG>blockImports</STRONG> is a method, it
+	will not be executed until the current file has been parsed or
+	until a line starting with the token <STRONG>###</STRONG> has
+	been parsed. As a result, an <STRONG>import</STRONG> statement
+	that occurs after a call to <STRONG>blockImports</STRONG>, but
+	before the <STRONG>###</STRONG> token or the end of the current
+	file, will still be processed.
+      <LI><STRONG>blockMethod(</STRONG><I>clasz</I><STRONG>,</STRONG><I>name</I><STRONG>,</STRONG><I>argumentClasses</I><STRONG>...)</STRONG>.
+	For class <I>clasz</I>, this method prevents ESP scripts from
+	using a method whose name is <I>name</I> and whose argument
+	classes are given by the remaining arguments. Classes in ESP
+	(as mentioned above) are denoted by a Java class name followed
+	by the string <STRONG>.class</STRONG>. If a constructor takes
+	a variable number of arguments, the argument should be an
+	array type.  The method <STRONG>typeForArrayOf</STRONG>
+	described below will create an array type for the specified
+	component type.
+      <LI><STRONG>ESPObjectType()</STRONG>. This method returns the
 	Java class for expression-parser objects.
-      <LI> <STRONG>ESPArrayType()</STRONG>. This method returns the
+      <LI><STRONG>ESPArrayType()</STRONG>. This method returns the
 	Java class for expression-parser arrays.
-      <LI> <STRONG>exists(</STRONG><I>objectName</I><STRONG>)</STRONG>.
+      <LI><STRONG>exists(</STRONG><I>objectName</I><STRONG>)</STRONG>.
 	This method returns true if the global namespace contains an
 	object with the name given by this method&apos;s argument; false
 	otherwise.
@@ -1254,8 +1301,8 @@ array-elements:
 	using the syntax described in the documentation for
 	{@link org.bzdev.net.URLPathParser}. This method is provided
 	primarily for debugging, but may have other uses. The value it
-	returns, ESP's value <STRONG>void</STRONG>), should be
-	ignored.
+	returns, ESP&apos;s
+	value <STRONG>void</STRONG>), should be ignored.
       <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>)</STRONG>.
 	This method returns the object with the name specified by this
 	method&apos;s argument and stored in the global namespace;
@@ -1319,6 +1366,9 @@ array-elements:
 	whose dimensions are given by the remaining arguments (there must be
 	at least one dimension provided). A maximum of 255 dimensions may be
 	provided (this limit is set by Java).
+      <LI> <STRONG>typeForArrayOf(</STRONG><I>clasz</I><STRONG>)</STRONG>.
+	This method returns the class of a Java array whose element type is
+	<I>clasz</I>.
       <LI> <STRONG>typeof(</STRONG><I>object</I><STRONG>)</STRONG>.
 	This method returns the Java class of the object provided by its
 	argument; null if the argument is null
@@ -1681,7 +1731,7 @@ var nt = new NullTest(null);
     is ambiguous as there are two constructors that could be used.  A
     similar issue exists when the <CODE>set</CODE> method is used.
     With a null argument, each of the following will create a NullTest
-    object with a value of 10 or set an existing NullTest object's value
+    object with a value of 10 or set an existing NullTest object&apos;s value
     to 10:
     <BLOCKQUOTE><CODE><PRE>
 var nt = NullTest(Number::null);
@@ -1690,7 +1740,7 @@ nt.set(NullTest.getNullNumber());
     </PRE></CODE></BLOCKQUOTE>
     Similarly, with a null argument, each of the following will create
     a NullTest object with a value of 20 or set an existing NullTest
-    object's value to 20:
+    object&apos;s value to 20:
     <BLOCKQUOTE><CODE><PRE>
 var nt = NullTest(NString::null);
 nt.set(String::null);
@@ -2039,6 +2089,84 @@ a2d.run();
     directives can produce significant amounts of output, one would typically
     use them for small portions of a script.
 
+    <H2><A NAME="security"></A>Security</H2>
+  <P>
+    Originally, ESP was written under the assumption that the Java
+    security manager could be used to prevent scripts from overwriting
+    files that should not be modified, whether accidentally or maliciously.
+    One could use the <STRONG>scrunner</STRONG> command to define
+    file and directory accessors on the command line that would then givee
+    users access to specific files or directories, while the security
+    manager would prevent scripts from opening arbitrary files.
+    Then, in the middle of 2021, JEP 411 decreed that the security manager,
+    which had been available since the early 1990s, would be removed from
+    Java. As a result, one should
+    <OL>
+      <LI>Place <STRONG>import</STRONG> statements at or near the start of a
+	  script.
+      <LI>Call the global object&apos;s methods
+	<STRONG>blockConstructor</STRONG> and <STRONG>blockMethod</STRONG>
+	to eliminate the use of constructors and methods that might pose
+	a security risk (e.g., using a PrintWriter constructor that opens
+	a file).
+      <LI> Call the global object&apos;s
+	method <STRONG>blockImports</STRONG> (this must follow the
+	calls to <STRONG>blockConstructor</STRONG>
+	and <STRONG>blockMethod</STRONG>) in order to prevent
+	additional classes from being imported (this is useful for
+	restricting the imports that have to be checked manually to a
+	specific file or portion of a script).
+      <LI> Place the sequence described above in its own file or end the
+	sequence with a line containing the token <STRONG>###</STRONG>.
+    </OL>
+  <P>
+    ESP automatically imports the class <STRONG>java.io.PrintWriter</STRONG>
+    which contains constructors that can open a file. One would want to
+    block several constructors:
+    <BLOCKQUOTE><CODE><PRE>
+global.blockConstructor(PrintWriter.class, String.class);
+global.blockConstructor(PrintWriter.class, String.class, String.class);
+global.blockConstructor(PrintWriter.class, String.class, Charset.class);
+    </PRE></CODE></BLOCKQUOTE>
+    If <STRONG>java.nio.charset.Charset</STRONG> has been imported, one will
+    also need
+    <BLOCKQUOTE><CODE><PRE>
+global.blockConstructor(PrintWriter.class, String.class, Charset.class);
+    </PRE></CODE></BLOCKQUOTE>
+  <P>
+    If <STRONG>org.bzdev.anim2d.Animation</STRONG> has been imported, one
+    should call
+    <BLOCKQUOTE><CODE><PRE>
+global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
+    </PRE></CODE></BLOCKQUOTE>
+    to prevent scripts from determing where image files will be stored in
+    the file system.
+  <P>
+    Finally, the global object&apos;s method
+    <STRONG>generateDocs</STRONG> can be used, after the import
+    statements, to get a list of all the classes, constructors, and
+    methods that can be used.  Since the output is an HTML file
+    containing links to API documentation, it is relatively easy to
+    check methods and constructors. Beyond that, one may have to use
+    containers or other operating-system facilities to enforce a
+    security policy.
+  <P>
+    Unless the option <STRONG>--unsetScripting</STRONG> is used, The
+    utility <STRONG>scrunner</STRONG> will provide scripts with a
+    variable named <STRONG>scripting</STRONG> whose value is an
+    instance of {@link org.bzdev.scripting.ExtendedScriptingContext},
+    and that class contains methods that can import classes and run
+    scripts. Unless needed (for example, subclasses of
+    {@link org.bzdev.devqsim.Simulation} have constructors that accept
+    a 'parent' and that parent may be a scripting context), it is
+    safer to use the <STRONG>--unsetScripting</STRONG> options:
+    computing a script to be executed is one way to obscure that code&apos;s
+    intent.  Regardless, the constraints set by calling
+    <STRONG>global.blockConstructor</STRONG>,
+    <STRONG>global.blockMethod</STRONG>, and
+    <STRONG>global.blockImports</STRONG> will apply to the
+    <STRONG>scripting</STRONG> methods that import classes.
+
     <H2><A NAME="notes"></A>Implementation Notes</H2>
   <P>
     ESP was designed to be a rudimentary scripting language, primarily
@@ -2086,7 +2214,7 @@ a2d.run();
       <LI> Stability is important - i.e., one needs to save a script
 	for a long period of time due to it being the input for an
 	application and has to just work without being "maintained"
-	(The intention, at least of ESP's designer, is to resist the
+	(The intention, at least of ESP&apos;s designer, is to resist the
 	natural impulse to add new features and inadvertently modify
 	old ones).
     </UL>
