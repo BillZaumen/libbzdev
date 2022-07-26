@@ -1,0 +1,18 @@
+import(java.io.PrintWriter);
+import(java.nio.charset.Charset);
+import(org.bzdev.util.ClassSorter);
+
+global.blockConstructor(PrintWriter.class, String.class);
+global.blockConstructor(PrintWriter.class, String.class, String.class);
+global.blockConstructor(PrintWriter.class, String.class, Charset.class);
+
+global.blockMethod(ClassSorter.class, "addKey", Class.class);
+		   
+global.blockImports();
+
+###
+
+var pw1 = new PrintWriter(global.getWriter());
+
+var pw = new PrintWriter("foo.txt");
+

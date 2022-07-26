@@ -92,6 +92,10 @@ all: compile
 	@$(JAVA) SupplierTest
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest
+	@echo --- check generateDocs '(with blockConstructor)' -------
+	chmod u+x scrun
+	@./scrun checkPrintWriter.esp > testPW.html
+	chmod u-x scrun
 
 
 test7-sc:
@@ -268,9 +272,14 @@ supplier: compile
 	@echo ---- Supplier Test ----
 	@$(JAVA) SupplierTest
 
+blockTest:
+	chmod u+x scrun
+	@./scrun checkPrintWriter.esp > testPW.html
+	chmod u-x scrun
+
 clean:
 	rm -rf classes
 	(cd rv ; make clean)
 	(cd units ; make clean)
 	rm -f sequence.txt
-	rm -f test.html
+	rm -f test.html testPW.html

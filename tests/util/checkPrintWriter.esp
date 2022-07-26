@@ -1,0 +1,24 @@
+global.blockConstructor(PrintWriter.class,
+                        String.class);
+global.blockConstructor(PrintWriter.class,
+                        String.class, String.class);
+global.blockConstructor(DirectoryAccessor.class,
+                        File.class);
+global.blockConstructor(DirectoryAccessor.class,
+                        File.class, boolean.class);
+global.blockConstructor(DirectoryAccessor.class,
+                        String.class);
+global.blockConstructor(DirectoryAccessor.class,
+                        String.class, boolean.class);
+global.blockConstructor(FileAccessor.class,
+                        File.class);
+global.blockConstructor(FileAccessor.class,
+                        File.class, String.class);
+global.blockConstructor(FileAccessor.class,
+                        String.class);
+global.blockConstructor(FileAccessor.class,
+                        String.class, String.class);
+
+global.generateDocs(global.getWriter(), [
+    "/usr/share/doc/libbzdev-doc/api",
+    "/usr/share/doc/openjdk-11-doc/api"]);

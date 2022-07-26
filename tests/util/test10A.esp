@@ -1,0 +1,4 @@
+var cs = new ClassSorter();
+
+cs.createList();
+cs.addKey(String.class);

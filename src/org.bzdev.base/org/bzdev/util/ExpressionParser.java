@@ -5768,7 +5768,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		    URL url = findDocURL(clasz, fn);
 		    if (url != null) {
 			kmap.put("href", url.toString());
-			String cn = clasz.getName().replace('$','.');
+			// String cn = clasz.getName().replace('$','.');
+			String cn = clasz.getCanonicalName();
 			kmap.put("item", cn + "." + fn);
 			list.add(kmap);
 		    }
@@ -5800,7 +5801,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		URL url = findDocURL(clasz);
 		if (url != null) {
 		    kmap.put("href", url.toString());
-		    kmap.put("item", clasz.getName().replace('$','.'));
+		    // kmap.put("item", clasz.getName().replace('$','.'));
+		    kmap.put("item", clasz.getCanonicalName());
 		    list.add(kmap);
 		}
 	    }
@@ -5821,7 +5823,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		URL url = findDocURL(clasz);
 		if (url != null) {
 		    kmap.put("href", url.toString());
-		    kmap.put("item", clasz.getName().replace('$','.'));
+		    // kmap.put("item", clasz.getName().replace('$','.'));
+		    kmap.put("item", clasz.getCanonicalName());
 		    list.add(kmap);
 		}
 	    }
@@ -5918,6 +5921,22 @@ public class ExpressionParser implements ObjectParser<Object>
 		for (Class<?> clasz: mi.getClasses()) {
 		    for (ClassArraySorter.Key key: mi.getSorted(clasz)) {
 			if (hideString && clasz.equals(String.class)) continue;
+			if (showMethod) {
+			    if (blockedMethods != null) {
+				Method m = mi.getMethod(clasz, key);
+				if (m != null && blockedMethods.contains(m)) {
+				    continue;
+				}
+			    }
+			} else {
+			    if (blockedConstructors != null) {
+				Constructor c = mi.getConstructor(clasz, key);
+				if (c != null
+				    && blockedConstructors.contains(c)) {
+				    continue;
+				}
+			    }
+			}
 			TemplateProcessor.KeyMap kmap =
 			    new TemplateProcessor.KeyMap();
 			sb.setLength(0);
@@ -5949,7 +5968,8 @@ public class ExpressionParser implements ObjectParser<Object>
 			    } else if (c.equals(Boolean.class)) {
 				sb.append("boolean");
 			    } else {
-				sb.append(c.getName().replace('$', '.'));
+				// sb.append(c.getName().replace('$', '.'));
+				sb.append(c.getCanonicalName());
 			    }
 			}
 			sb.append(')');
@@ -10750,7 +10770,8 @@ public class ExpressionParser implements ObjectParser<Object>
      * @return the URL
      */
     public URL findDocURL(Class<?> clasz) {
-	return findDocURL(clasz.getName().replace('$', '.'));
+	// return findDocURL(clasz.getName().replace('$', '.'));
+	return findDocURL(clasz.getCanonicalName());
     }
 
     /**
@@ -10788,7 +10809,8 @@ public class ExpressionParser implements ObjectParser<Object>
      * @return the URL
      */
     public URL findDocURL(Class<?> clasz, String rest) {
-	return findDocURL(clasz.getName().replace('$', '.'), rest);
+	// return findDocURL(clasz.getName().replace('$', '.'), rest);
+	return findDocURL(clasz.getCanonicalName(), rest);
     }
 
     /**

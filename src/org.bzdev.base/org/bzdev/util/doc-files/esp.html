@@ -1257,7 +1257,8 @@ array-elements:
 	denoted by a Java class name followed by the
 	string <STRONG>.class</STRONG>. If a constructor takes a
 	variable number of arguments, the argument should be an array
-	type.  The method <STRONG>typeForArrayOf</STRONG> described
+	type as at runtime Java treats the additional arguments as elements
+	of an array. The method <STRONG>typeForArrayOf</STRONG> described
 	below will create an array type for the specified component
 	type.
       <LI><STRONG>blockImports()</STRONG>.  Once this method has been
@@ -1274,9 +1275,10 @@ array-elements:
 	using a method whose name is <I>name</I> and whose argument
 	classes are given by the remaining arguments. Classes in ESP
 	(as mentioned above) are denoted by a Java class name followed
-	by the string <STRONG>.class</STRONG>. If a constructor takes
+	by the string <STRONG>.class</STRONG>. If a method takes
 	a variable number of arguments, the argument should be an
-	array type.  The method <STRONG>typeForArrayOf</STRONG>
+	array type as Java treats the additional arguments as elements of
+	an array.  The method <STRONG>typeForArrayOf</STRONG>
 	described below will create an array type for the specified
 	component type.
       <LI><STRONG>ESPObjectType()</STRONG>. This method returns the
