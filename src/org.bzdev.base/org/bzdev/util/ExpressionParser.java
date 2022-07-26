@@ -5798,7 +5798,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		new TemplateProcessor.KeyMapList();
 	    for (Class<?> clasz: getReturnClasses()) {
 		TemplateProcessor.KeyMap kmap = new TemplateProcessor.KeyMap();
-		URL url = findDocURL(clasz);
+		Class<?> c = clasz;
+		while (c.isArray()) {
+		    c = c.getComponentType();
+		}
+		URL url = findDocURL(c);
 		if (url != null) {
 		    kmap.put("href", url.toString());
 		    // kmap.put("item", clasz.getName().replace('$','.'));
@@ -5820,7 +5824,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		new TemplateProcessor.KeyMapList();
 	    for (Class<?> clasz: getArgumentClasses()) {
 		TemplateProcessor.KeyMap kmap = new TemplateProcessor.KeyMap();
-		URL url = findDocURL(clasz);
+		Class<?> c = clasz;
+		while (c.isArray()) {
+		    c = c.getComponentType();
+		}
+		URL url = findDocURL(c);
 		if (url != null) {
 		    kmap.put("href", url.toString());
 		    // kmap.put("item", clasz.getName().replace('$','.'));

@@ -1,3 +1,5 @@
+import (java.io.File);
+
 global.blockConstructor(PrintWriter.class,
                         String.class);
 global.blockConstructor(PrintWriter.class,

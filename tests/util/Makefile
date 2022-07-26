@@ -273,9 +273,10 @@ supplier: compile
 	@$(JAVA) SupplierTest
 
 blockTest:
-	chmod u+x scrun
-	@./scrun checkPrintWriter.esp > testPW.html
-	chmod u-x scrun
+	@ (cd ../.. ; make jars)
+	@ chmod u+x scrun
+	./scrun checkPrintWriter.esp > testPW.html
+	@chmod u-x scrun
 
 clean:
 	rm -rf classes
@@ -283,3 +284,4 @@ clean:
 	(cd units ; make clean)
 	rm -f sequence.txt
 	rm -f test.html testPW.html
+	@chmod u-x scrun
