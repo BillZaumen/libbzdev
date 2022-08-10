@@ -34,7 +34,8 @@ public interface Shape3D {
      * as the convex hull for the control points includes all
      * of the surface for parameters in the normal range [0,1]).
      *
-     * @return a bounding rectangular cuboid for this Shape3D
+     * @return a bounding rectangular cuboid for this Shape3D; null
+     *         if the shape does not contain any points
      */
     Rectangle3D getBounds();
 

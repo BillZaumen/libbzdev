@@ -197,12 +197,16 @@ public class SteppedGrid  implements Shape3D {
 	return boundary;
     }
 
-    Rectangle3D r3d = new Rectangle3D.Double();
+    Rectangle3D r3d = null;
+    // Rectangle3D r3d = new Rectangle3D.Double();
 
     @Override
     public Rectangle3D getBounds() {
 	if (!done) throw new IllegalStateException(errorMsg("notDone"));
 	try {
+	    if (r3d == null) {
+		r3d = new Rectangle3D.Double();
+	    }
 	    return Cloner.makeClone(r3d);
 	} catch (CloneNotSupportedException e) {
 	    throw new UnexpectedExceptionError(e);
@@ -463,7 +467,12 @@ public class SteppedGrid  implements Shape3D {
 	SteppedGridLayer sgl = (upper != null)? upper: lower;
 	sgl.addComponent(new SteppedGridLayer.LayerComponent(i, j, height,
 							     placeholder));
-	r3d.add(xs[i], ys[j], sgl.zbase +  height);
+	if (r3d == null) {
+	    r3d = new Rectangle3D.Double(xs[i], ys[j], sgl.zbase +  height,
+					 0.0, 0.0, 0.0);
+	} else {
+	    r3d.add(xs[i], ys[j], sgl.zbase +  height);
+	}
 	r3d.add(xs[i+1], ys[j+1], sgl.zbase + height);
     }
 
@@ -515,7 +524,12 @@ public class SteppedGrid  implements Shape3D {
 								 placeholder));
 	sgl.addComponent(new SteppedGridLayer.LayerComponent(i, j, height,
 								 true));
-	r3d.add(xs[i], ys[j], sgl.zbase + height);
+	if (r3d == null) {
+	    r3d = new Rectangle3D.Double(xs[i], ys[j], sgl.zbase + height,
+					 0.0, 0.0, 0.0);
+	} else {
+	    r3d.add(xs[i], ys[j], sgl.zbase + height);
+	}
 	r3d.add(xs[i+1], ys[j+1], sgl.zbase + height);
     }
 
@@ -662,7 +676,13 @@ public class SteppedGrid  implements Shape3D {
 						 lowerHeight,
 						 lowerIsPlaceholder));
 
-	r3d.add(xs[i], ys[j], upper.zbase +  upperHeight);
+	if (r3d == null) {
+	    r3d = new Rectangle3D.Double(xs[i], ys[j],
+					 upper.zbase +  upperHeight,
+					 0.0, 0.0, 0.0);
+	} else {
+	    r3d.add(xs[i], ys[j], upper.zbase +  upperHeight);
+	}
 	r3d.add(xs[i+1], ys[j+1], upper.zbase + upperHeight);
 	r3d.add(xs[i], ys[j], lower.zbase +  lowerHeight);
 	r3d.add(xs[i+1], ys[j+1], lower.zbase + lowerHeight);
@@ -757,7 +777,13 @@ public class SteppedGrid  implements Shape3D {
 						 lowerHeight,
 						 lowerIsPlaceholder
 						 || !upperIsPlaceholder));
-	r3d.add(xs[i], ys[j], upper.zbase + upperHeight);
+	if (r3d == null) {
+	    r3d = new Rectangle3D.Double(xs[i], ys[j],
+					 upper.zbase + upperHeight,
+					 0.0, 0.0, 0.0);
+	} else {
+	    r3d.add(xs[i], ys[j], upper.zbase + upperHeight);
+	}
 	r3d.add(xs[i+1], ys[j+1], lower.zbase + lowerHeight);
     }
 

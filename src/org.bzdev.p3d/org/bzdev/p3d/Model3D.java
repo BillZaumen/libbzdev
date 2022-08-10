@@ -3983,21 +3983,25 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	}
 	if (cubics.size() > 0) {
 	    Rectangle3D bb = cubics.getBounds();
-	    if (bb.getMaxX() > maxx) maxx = bb.getMaxX();
-	    if (bb.getMaxY() > maxy) maxy = bb.getMaxY();
-	    if (bb.getMaxZ() > maxz) maxz = bb.getMaxZ();
-	    if (bb.getMinX() < minx) minx = bb.getMinX();
-	    if (bb.getMinY() < miny) miny = bb.getMinY();
-	    if (bb.getMinZ() < minz) minz = bb.getMinZ();
+	    if (bb != null) {
+		if (bb.getMaxX() > maxx) maxx = bb.getMaxX();
+		if (bb.getMaxY() > maxy) maxy = bb.getMaxY();
+		if (bb.getMaxZ() > maxz) maxz = bb.getMaxZ();
+		if (bb.getMinX() < minx) minx = bb.getMinX();
+		if (bb.getMinY() < miny) miny = bb.getMinY();
+		if (bb.getMinZ() < minz) minz = bb.getMinZ();
+	    }
 	}
 	if (cubicVertices.size() > 0) {
 	    Rectangle3D bb = cubicVertices.getBounds();
-	    if (bb.getMaxX() > maxx) maxx = bb.getMaxX();
-	    if (bb.getMaxY() > maxy) maxy = bb.getMaxY();
-	    if (bb.getMaxZ() > maxz) maxz = bb.getMaxZ();
-	    if (bb.getMinX() < minx) minx = bb.getMinX();
-	    if (bb.getMinY() < miny) miny = bb.getMinY();
-	    if (bb.getMinZ() < minz) minz = bb.getMinZ();
+	    if (bb != null) {
+		if (bb.getMaxX() > maxx) maxx = bb.getMaxX();
+		if (bb.getMaxY() > maxy) maxy = bb.getMaxY();
+		if (bb.getMaxZ() > maxz) maxz = bb.getMaxZ();
+		if (bb.getMinX() < minx) minx = bb.getMinX();
+		if (bb.getMinY() < miny) miny = bb.getMinY();
+		if (bb.getMinZ() < minz) minz = bb.getMinZ();
+	    }
 	}
     }
     
@@ -4008,6 +4012,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      */
     public double getBoundingBoxX() {
 	computeBoundingBoxIfNeeded();
+	if (minx == Double.POSITIVE_INFINITY) return 0.0;
 	return (maxx - minx);
     }
 
@@ -4018,6 +4023,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      */
     public double getBoundingBoxY() {
 	computeBoundingBoxIfNeeded();
+	if (minx == Double.POSITIVE_INFINITY) return 0.0;
 	return (maxy - miny);
     }
 
@@ -4028,12 +4034,14 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      */
     public double getBoundingBoxZ() {
 	computeBoundingBoxIfNeeded();
+	if (minx == Double.POSITIVE_INFINITY) return 0.0;
 	return (maxz - minz);
     }
 
     /**
      * Get the minimum x coordinate for all objects contained in a 3D model.
-     * @return the minimum value of the x coordinate.
+     * @return the minimum value of the x coordinate; Double.POSITIVE_INFINITY
+     *         if the model is empty
      */
     public double getMinX() {
 	computeBoundingBoxIfNeeded();
@@ -4041,7 +4049,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     }
     /**
      * Get the minimum y coordinate for all objects contained in a 3D model.
-     * @return the minimum value of the y coordinate.
+     * @return the minimum value of the y coordinate; Double.NEGATIVE_INFINITY
+     *         if the model is empty
      */
     public double getMaxX() {
 	computeBoundingBoxIfNeeded();
@@ -4049,7 +4058,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     }
     /**
      * Get the minimum z coordinate for all objects contained in a 3D model.
-     * @return the minimum value of the z coordinate.
+     * @return the minimum value of the z coordinate; Double.POSITIVE_INFINITY
+     *         if the model is empty.
      */
     public double getMinY() {
 	computeBoundingBoxIfNeeded();
@@ -4057,7 +4067,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     }
     /**
      * Get the maximum x coordinate for all objects contained in a 3D model.
-     * @return the maximum value of the x coordinate.
+     * @return the maximum value of the x coordinate; Double.NEGATIVE_INFINITY
+     *         if the model is empty.
      */
     public double getMaxY() {
 	computeBoundingBoxIfNeeded();
@@ -4066,7 +4077,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     /**
      * Get the maximum y coordinate for all objects contained in a 3D model.
-     * @return the maximum value of the y coordinate.
+     * @return the maximum value of the y coordinate; Double.POSITIVE_INFINITY
+     *         if the model is empty.
      */
     public double getMinZ() {
 	computeBoundingBoxIfNeeded();
@@ -4075,7 +4087,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     /**
      * Get the maximum z coordinate for all objects contained in a 3D model.
-     * @return the maximum value of the z coordinate.
+     * @return the maximum value of the z coordinate; Double.NEGATIVE_INFINITY
+     *         if the model is empty.
      */
     public double getMaxZ() {
 	computeBoundingBoxIfNeeded();
@@ -4084,6 +4097,9 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     @Override
     public Rectangle3D getBounds() {
+	if (getMinX() == Double.POSITIVE_INFINITY) {
+	    return null;
+	}
 	return new Rectangle3D.Double(getMinX(), getMinY(), getMinZ(),
 				      getBoundingBoxX(),
 				      getBoundingBoxY(),
