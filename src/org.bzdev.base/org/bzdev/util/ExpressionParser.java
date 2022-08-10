@@ -315,6 +315,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		     Operator.VARIABLE, Operator.VARIABLE_NAME,
 		     Operator.EXIST_TEST, Operator.PARAMETER);
 
+    private static final EnumSet<Operator> notBeforeOBRACKET
+	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
+		     Operator.CLASS);
+
     Thread startingThread = Thread.currentThread();
     AtomicReference<Thread> importThreadRef = new AtomicReference<>();
     AtomicLong threadCount = new AtomicLong();
@@ -8332,6 +8336,12 @@ public class ExpressionParser implements ObjectParser<Object>
 			btest = false;
 			break;
 		    default:
+			if (notBeforeOBRACKET.contains(ptype)) {
+			    String msg = errorMsg("badOBracket");
+			    throw new ObjectParser.Exception(msg,
+							     filenameTL.get(),
+							     s, i);
+			}
 			btest = true;
 		    }
 		}
@@ -9043,6 +9053,18 @@ public class ExpressionParser implements ObjectParser<Object>
 			       equals("class")) {
 			String c = s.substring(start, lastdot);
 			c = c.replaceAll(COMMENT_RE, "").replaceAll("\\s", "");
+			int arrayDepth = 0;
+			int j = skipWhitespace(s, i , len, false);
+			while (j < len && s.charAt(j) == '[') {
+			    j++;
+			    j = skipWhitespace(s, j, len, true);
+			    if (s.charAt(j) == ']') {
+				arrayDepth++;
+				j++;
+				i = j;
+				j = skipWhitespace(s, j, len, false);
+			    }
+			}
 			try {
 			    Class<?> clasz =
 				(c.equals("double")? double.class:
@@ -9050,6 +9072,9 @@ public class ExpressionParser implements ObjectParser<Object>
 				 c.equals("int")? int.class:
 				 c.equals("boolean")? boolean.class:
 				 findClass(c));
+			    if (arrayDepth > 0) {
+				clasz = getArrayClass(clasz, arrayDepth);
+			    }
 			    level++;
 			    next = new Token(Operator.CLASS,
 					     c, offset+i, level);

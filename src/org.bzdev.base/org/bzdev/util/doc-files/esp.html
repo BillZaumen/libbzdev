@@ -322,6 +322,14 @@ var obj = {
 	but the  primitive classes <STRONG>double.class</STRONG>,
 	<STRONG>long.class</STRONG>, <STRONG>int.class</STRONG>
 	and <STRONG>boolean.class</STRONG> are allowed.
+      <LI>A class name followed by <STRONG>.class</STRONG>, followed
+	by a sequence of one or more pairs of opening and closing
+	brackets denotes a multidimensional array, with the number of pairs
+	indicating the number of dimensions.
+	For example, <STRONG>double.class[]</STRONG>) denotes a
+	one-dimensional array of <STRONG>double</STRONG>, and
+	<STRONG>String.class[][]</STRONG> denotes a two-dimensional array
+	of <STRONG>String</STRONG>.
       <LI>ESP objects are not much more than dictionaries. Unlike ECMAScript,
 	there is not a prototype chain, explicit constructors, inheritance,
 	etc.  ECMAScript keywords such as <STRONG>class</STRONG> or
@@ -763,6 +771,7 @@ term: value
     | &apos;this&apos; &apos;.&apos; identifier
     | typed-null
     | method-reference
+    | class
 
 function-call: function-name &apos;(&apos; arguments &apos;)&apos;
 
@@ -792,6 +801,11 @@ qualified-name:  identifier
     | qualified-name &apos;.&apos; identifier
 
 method-reference:  qualified-name &apos;::&apos; identifier
+
+class: class-name &apos;.&apos; &apos;class&apos;
+    | class &apos;[&pos; &apos;]&pos;
+
+class-name: qualified-name
 
 typed-null: qualified-name &apos;::&apos; &apos;null&apos;
     </PRE></BLOCKQUOTE>
@@ -987,11 +1001,11 @@ package-name: qualified-name
     | &apos;"&apos; &apos;"&apos;
     | &apos;"&apos; qualified-name &apos;"&apos;
 
-class-names: class-name
-    | class-names &apos;,&apos; class-names
+class-names: import-class-name
+    | class-names &apos;,&apos; import-class-name
 
-class-name: qualified-name
-    | &apos;"&apos; qualified-name &apos;"&apos;
+import-class-name: class-name
+    | &apos;"&apos; class-name &apos;"&apos;
     </PRE></BLOCKQUOTE>
   <P>
     When there are multiple import statements in a row (that is,
@@ -1260,7 +1274,8 @@ array-elements:
 	type as at runtime Java treats the additional arguments as elements
 	of an array. The method <STRONG>typeForArrayOf</STRONG> described
 	below will create an array type for the specified component
-	type.
+	type, as will following <STRONG>.class</STRONG> with
+	<STRONG>[]</STRONG> (multiple times for a multi-dimensional array).
       <LI><STRONG>blockImports()</STRONG>.  Once this method has been
 	executed, the use of an import statement will result in an
 	error. Because <STRONG>blockImports</STRONG> is a method, it
@@ -1272,15 +1287,16 @@ array-elements:
 	file, will still be processed.
       <LI><STRONG>blockMethod(</STRONG><I>clasz</I><STRONG>,</STRONG><I>name</I><STRONG>,</STRONG><I>argumentClasses</I><STRONG>...)</STRONG>.
 	For class <I>clasz</I>, this method prevents ESP scripts from
-	using a method whose name is <I>name</I> and whose argument
-	classes are given by the remaining arguments. Classes in ESP
-	(as mentioned above) are denoted by a Java class name followed
-	by the string <STRONG>.class</STRONG>. If a method takes
-	a variable number of arguments, the argument should be an
-	array type as Java treats the additional arguments as elements of
-	an array.  The method <STRONG>typeForArrayOf</STRONG>
+	using a method whose name is the string <I>name</I> and whose
+	argument classes are given by the remaining arguments. Classes
+	in ESP (as mentioned above) are denoted by a Java class name
+	followed by the string <STRONG>.class</STRONG>. If a method
+	takes a variable number of arguments, the argument should be
+	an array type as Java treats the additional arguments as
+	elements of an array.  The method <STRONG>typeForArrayOf</STRONG>
 	described below will create an array type for the specified
-	component type.
+	component type, as will following <STRONG>.class</STRONG> with
+	<STRONG>[]</STRONG> (multiple times for a multi-dimensional array).
       <LI><STRONG>ESPObjectType()</STRONG>. This method returns the
 	Java class for expression-parser objects.
       <LI><STRONG>ESPArrayType()</STRONG>. This method returns the

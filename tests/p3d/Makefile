@@ -713,6 +713,13 @@ etest1:
 	@echo --------- ETest1 ----------
 	@$(JAVA) ETest1
 
+corner:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	@echo --------- CornerInserts ----------
+	@$(JAVA) CornerInserts
+
 clean:
 	rm -rf classes
 	rm -f ltmp/*.png

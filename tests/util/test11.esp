@@ -1,0 +1,5 @@
+var out = global.getWriter();
+
+out.println(String.class + ", " + String.class[] + ", " + String.class[][]);
+
+out.flush();
