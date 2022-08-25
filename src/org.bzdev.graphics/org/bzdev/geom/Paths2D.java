@@ -2324,6 +2324,7 @@ public class Paths2D {
 					boolean pccw, boolean ccw)
      {
 	 double dist;
+	 if (dist1 == 0.0 && dist2 == 0.0 && dist3 == 0.0) return 0.0;
 	 if (pccw) {
 	     dist = (ccw)? (dist1 - dist3): (dist1  + dist3);
 	 } else {

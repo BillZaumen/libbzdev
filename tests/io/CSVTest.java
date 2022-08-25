@@ -1,10 +1,32 @@
 import org.bzdev.io.*;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.FileReader;
 
 public class CSVTest {
 
+    static void testInput() throws Exception {
+	InputStream is = new FileInputStream("input.csv");
+	Reader r = new InputStreamReader(is, "UTF-8");
+	CSVReader csvr = new CSVReader(r, false, null);
+	String[] row;
+	System.out.println("--------- input.csv ------------");
+	while ((row = csvr.nextRow()) != null) {
+	    for (int i = 0; i < row.length; i++) {
+		System.out.print(row[i] + "\t");
+	    }
+	    System.out.println();
+	}
+	System.out.println("--------------------------------");
+    }
+
+
     public static void main(String argv[]) throws Exception {
+	testInput();
+
 	String strings[][] = {
 	    {"col1", "col2", "col3"},
 	    {"abc", "\"hello\"", "ef\"g"},
@@ -117,6 +139,31 @@ public class CSVTest {
 	for (int i = 0; i < 3; i++) {
 	    for (int j = 0; j < 3; j++) {
 		if (!strings2[i][j].equals(strings[i+1][j])) {
+		    throw new Exception("string mismatch: (" + i
+					+ "," + j + ")");
+		}
+	    }
+	}
+	r.close();
+
+	in = new FileReader("CSVTest.csv");
+	r = new CSVReader(in, false, null);
+	strings2 = new String[4][];
+        index = 0;
+	System.out.println("reading file including headers");
+	while ((tmp = r.nextRow()) != null) {
+	    strings2[index++] = tmp;
+	    for (int j = 0; j < tmp.length; j++) {
+		System.out.print(tmp[j] + "\t" );
+	    }
+	    System.out.println();
+	}
+	if (index != 4) {
+	    throw new Exception("wrong number of lines");
+	}
+	for (int i = 0; i < 4; i++) {
+	    for (int j = 0; j < 3; j++) {
+		if (!strings2[i][j].equals(strings[i][j])) {
 		    throw new Exception("string mismatch: (" + i
 					+ "," + j + ")");
 		}
