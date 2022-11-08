@@ -197,6 +197,14 @@ public class SuffixArrayTest {
 
 	int[] sequence = {'c', 'a', 'b', 'b', 'a', 'g', 'e'};
 	int[] array = makeSuffixArray(sequence);
+	System.out.println("suffixes:");
+	for (int i = 0; i < array.length; i++) {
+	    System.out.print("    ");
+	    for (int j = array[i]; j < sequence.length; j++) {
+		System.out.print((char)sequence[j]);
+	    }
+	    System.out.println();
+	}
 	int[] expecting = {7, 1, 4, 3, 2, 0, 6, 5};
 	if (array.length != expecting.length) {
 	    System.out.println("length wrong");

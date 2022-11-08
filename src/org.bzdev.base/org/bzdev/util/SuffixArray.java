@@ -846,7 +846,7 @@ public abstract class SuffixArray {
      * Class representing a range in a suffix array resulting
      * from a search for all instances of a subsequence.
      */
-    public class OurRange implements Range {
+    private class OurRange implements Range {
 
 	int seqlength;
 	int length;

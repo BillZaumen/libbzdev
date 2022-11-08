@@ -265,8 +265,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericActor,Set,GenericActor)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -333,8 +333,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericActor,Set,GenericActor,GenericDomain)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -344,8 +344,8 @@ abstract public class GenericSimulation<
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
      * @param domain the domain that must allow communication
-     * @return the names of the MsgFrwdngInfo objects that would be used;
-     *         null if a route is not possible
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that
+     *         would be used; null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(A src,
 				      Set<CommDomainType> commDomainTypes,
@@ -394,8 +394,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericActor,Set,GenericGroup)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -404,8 +404,8 @@ abstract public class GenericSimulation<
      * @param dest the group that will receive a message
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
-     * @return the names of the MsgFrwdngInfo objects that would be used;
-     *         null if a route is not possible
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that
+     *         would be used; null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(A src,
 				      Set<CommDomainType> commDomainTypes,
@@ -461,8 +461,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericActor,Set,GenericGroup,GenericDomain)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -472,8 +472,8 @@ abstract public class GenericSimulation<
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
      * @param domain the domain to use for communication
-     * @return the names of the MsgFrwdngInfo objects that would be used;
-     *         null if a route is not possible
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that
+     *         would be used; null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(A src,
 				      Set<CommDomainType> commDomainTypes,
@@ -522,8 +522,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericGroup,Set,GenericGroup)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -532,8 +532,8 @@ abstract public class GenericSimulation<
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
      * @param dest the group that will receive a message
-     * @return the names of the MsgFrwdngInfo objects that would be used;
-     *         null if a route is not possible
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that
+     *         would be used; null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(G src,
 				      Set<CommDomainType> commDomainTypes,
@@ -588,8 +588,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericGroup,Set,GenericGroup,GenericDomain)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -599,7 +599,7 @@ abstract public class GenericSimulation<
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
      * @param domain the domain to use for communication
-     * @return the names of the MsgFrwdngInfo objects that would be used;
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that would be used;
      *         null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(G src,
@@ -650,8 +650,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * {@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericGroup,Set,GenericActor)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -660,7 +660,7 @@ abstract public class GenericSimulation<
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
      * @param dest the actor that will receive a message
-     * @return the names of the MsgFrwdngInfo objects that would be used;
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that would be used;
      *         null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(G src,
@@ -717,8 +717,8 @@ abstract public class GenericSimulation<
     }
 
     /**
-     * Find the names of the forwarding tables (msgFrwdngInfo) used
-     * by a call to
+     * Find the names of the forwarding tables
+     * ({@link GenericMsgFrwdngInfo}) used by a call to
      * {@link #findCommDomain(GenericGroup,Set,GenericActor,GenericDomain)}.
      * This method is intended primarily as a debugging aid. It can
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
@@ -728,7 +728,7 @@ abstract public class GenericSimulation<
      *        domain is acceptable
      * @param dest the actor that will receive a message
      * @param domain the domain to use for communication
-     * @return the names of the MsgFrwdngInfo objects that would be used;
+     * @return the names of the {@link GenericMsgFrwdngInfo} objects that would be used;
      *         null if a route is not possible
      */
     public String[] findMsgFrwdngInfo(G src,
@@ -1045,5 +1045,5 @@ abstract public class GenericSimulation<
 //  LocalWords:  serverCallable serverRunnable serverTask subclasses
 //  LocalWords:  serverInteractionSimObject serverCallableSimObject
 //  LocalWords:  serverRunnableSimObject serverTaskSimObject Runnable
-//  LocalWords:  msgFrwdngInfo findCommDomain GenericMsgFrwdngInfo
+//  LocalWords:  MsgFrwdngInfo findCommDomain GenericMsgFrwdngInfo
 //  LocalWords:  runnable

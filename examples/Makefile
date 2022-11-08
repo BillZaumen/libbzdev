@@ -20,6 +20,7 @@ all: alljars
 	make run-drama1
 	make run-smartmeter
 	make run-smartmeter-sc
+	make run-smartmeter-esp
 	make run-smartmeter2
 	make run-smartmeter3
 	make run-stephantime
@@ -182,6 +183,15 @@ run-smartmeter-sc: smartmeter.jar
 	./scrun --classpathCodebase smartmeter.jar \
 		-vS:imgtype:png -o:os:smeter-sc.png \
 		-J-Xmx1600m smartmeter/script.js
+	chmod a-x scrun
+
+run-smartmeter-esp: smartmeter.jar
+	chmod a-x scrun
+	chmod u+x scrun
+	./scrun --classpathCodebase smartmeter.jar \
+		-vS:imgtype:png -o:os:smeter-esp.png \
+		-J-Xmx1600m smartmeter/script.esp
+	chmod a-x scrun
 
 run-smartmeter2: smartmeter.jar
 	java -jar smartmeter.jar --usageReduction --type png smeter2.png

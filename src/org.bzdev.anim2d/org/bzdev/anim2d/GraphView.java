@@ -197,8 +197,8 @@ public class GraphView extends DirectedObject2D {
     /**
      * Set the rotation.
      * The argument gives the angle the graph view rotates in the
-     * counterclockwise direction relative to user space, causing
-     * objects in user space to rotate clockwise.
+     * counterclockwise direction in graph coordinate space space, causing
+     * objects in graph coordinate space to rotate clockwise.
      * @param theta the rotation in radians
      */
     @Override
@@ -209,8 +209,8 @@ public class GraphView extends DirectedObject2D {
     /**
      * Set an object's position and orientation.
      * The argument gives the angle the graph view rotates in the
-     * counterclockwise direction relative to user space, causing
-     * objects in user space to rotate clockwise.
+     * counterclockwise direction in graph coordinate space, causing
+     * objects in graph coordinate space to rotate clockwise.
      * The coordinates (x,y) are the coordinates of the view's reference
      * point, which will appear at a specific location in the frame
      * determined when the view was initialized.
@@ -272,13 +272,12 @@ public class GraphView extends DirectedObject2D {
      * Add this object to a graph.
      * A GraphView is a special case. There should be only on in use
      * per graph. It will set up the graph so that the graph displays
-     * a particular range in graph coordinate space. Angles are ignored
-     * so that Graph View will never be rotated. Graphic operations
-     * at a particular time should be performed after a graph's
-     * {@link Graph#add(Graphic) add} method is called for any GraphView
-     * defined for the graph, and after 
-     * {@link #update(double,long) update} is called with the
-     * current time as its argument.
+     * a particular range in graph coordinate space. Angles refer to
+     * the view, not the object.  Graphic operations at a particular
+     * time should be performed after a graph's {@link
+     * Graph#add(Graphic) add} method is called for any GraphView
+     * defined for the graph, and after {@link #update(double,long)
+     * update} is called with the current time as its argument.
      * @param graph the graph on which this object should be drawn
      * @param g2d  (ignored but needed by Graph.Graphics interface)
      * @param g2dGCS  (ignored but needed by Graph.Graphics interface)

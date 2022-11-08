@@ -67,7 +67,7 @@ public class LcplrTiming {
 	System.out.println("Time per lookup (LCP-LR) is "
 			   + (time1-time0)/count);
 
-	System.out.println("Third timeing test");
+	System.out.println("Third timing test");
 	time0 = System.nanoTime();
 	naiveSearch(logfile, target);
 	time1 = System.nanoTime();

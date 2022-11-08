@@ -4,12 +4,19 @@
  * Second type of comment
  */
 
+import(null, [Foo]);
 
+import (java.util.function.LongUnaryOperator);
 import(java.lang, [Math, StringBuilder]);
 import(org.bzdev.lang, MathOps);
 
 global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
 			"/usr/share/doc/openjdk-11-doc/api"]);
+
+var foo = new Foo();
+global.getWriter().println("foo.getI() = " + foo.getI());
+global.getWriter().println("LongUnaryOperator.class = "
+                           + function.LongUnaryOperator.class);
 
 var testq = function (t) { (t < 180)? 1.1: 2.0}
 

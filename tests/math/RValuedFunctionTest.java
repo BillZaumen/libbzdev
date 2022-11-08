@@ -264,24 +264,42 @@ public class RValuedFunctionTest {
 	RealValuedFunction trigfunct7 =
 	    new RealValuedFunction(x -> Math.sin(x));
 
+	RealValuedFunction trigfunct8 =
+	    new RealValuedFunction(Math::sin,
+				   Math::cos,
+				   x -> -Math.sin(x));
+
 	for (int i = 0; i < 1000; i++) {
 	    double x = i * Math.PI / 100.0;
 	    if (Math.abs(trigfunct1.valueAt(x) - trigfunct6.valueAt(x))
 		> 1.e-15) {
-		throw new Exception("trigfunct1 and tirgfunct6 differ");
+		throw new Exception("trigfunct1 and trigfunct6 differ");
 	    }
 	    if (Math.abs(trigfunct1.valueAt(x) - trigfunct7.valueAt(x))
 		> 1.e-15) {
-		throw new Exception("trigfunct1 and tirgfunct6 differ");
+		throw new Exception("trigfunct1 and trigfunct7 differ");
+	    }
+	    if (Math.abs(trigfunct1.valueAt(x) - trigfunct8.valueAt(x))
+		> 1.e-15) {
+		throw new Exception("trigfunct1 and trigfunct8 differ");
 	    }
 	    if (Math.abs(trigfunct1.derivAt(x) - trigfunct6.derivAt(x))
 		> 1.e-15) {
-		throw new Exception("trigfunct1 and tirgfunct6 derivs differ");
+		throw new Exception("trigfunct1 and trigfunct6 derivs differ");
+	    }
+	    if (Math.abs(trigfunct1.derivAt(x) - trigfunct8.derivAt(x))
+		> 1.e-15) {
+		throw new Exception("trigfunct1 and trigfunct8 derivs differ");
 	    }
 	    if (Math.abs(trigfunct1.secondDerivAt(x)
 			 - trigfunct6.secondDerivAt(x)) > 1.e-15) {
 		throw new Exception
-		    ("trigfunct1 and tirgfunct6 second derivs differ");
+		    ("trigfunct1 and trigfunct6 second derivs differ");
+	    }
+	    if (Math.abs(trigfunct1.secondDerivAt(x)
+			 - trigfunct8.secondDerivAt(x)) > 1.e-15) {
+		throw new Exception
+		    ("trigfunct1 and trigfunct8 second derivs differ");
 	    }
 
 	}

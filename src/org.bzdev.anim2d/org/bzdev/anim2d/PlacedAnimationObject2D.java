@@ -119,12 +119,13 @@ public abstract class PlacedAnimationObject2D extends AnimationObject2D {
 
     /**
      * Set an object's position and orientation.
-     * Angles increase in the counterclockwise direction with an
-     * angle of zero corresponding to a subclass-specified direction,
-     * which will typically be one in which the object 'points' towards
-     * the positive x axis from position (0.0,0.0);
-     * The coordinates (x,y) are the coordinates of a subclass-specific
-     * reference point that is in a fixed location relative to the object.
+     * Angles increase in the counterclockwise direction in graph
+     * coordinate space with an angle of zero corresponding to a
+     * subclass-specified direction, which will typically be one in
+     * which the object 'points' towards the positive x axis from
+     * position (0.0,0.0); The coordinates (x,y) are the coordinates
+     * of a subclass-specific reference point that is in a fixed
+     * location relative to the object.
      * @param x the x coordinate in graph coordinate space
      * @param y the y coordinate in graph coordinate space
      * @param angle the angle giving the object's orientation in radians
@@ -164,10 +165,11 @@ public abstract class PlacedAnimationObject2D extends AnimationObject2D {
 
     /**
      * Set an object's angle.
-     * Angles increase in the counterclockwise direction with an
-     * angle of zero corresponding to a subclass-specified direction,
-     * which will typically be one in which the object 'points' towards
-     * the positive x axis from position (0.0,0.0).
+     * Angles increase in the counterclockwise direction in graph
+     * coordinate space with an angle of zero corresponding to a
+     * subclass-specified direction, which will typically be one in
+     * which the object 'points' towards the positive x axis from
+     * position (0.0,0.0).
      * @param angle the angle giving the object's orientation in radians
      */
     public void setAngle(double angle) {

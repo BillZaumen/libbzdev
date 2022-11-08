@@ -3370,8 +3370,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * Constructor specifying strict mode.
      * Strict mode (the default) requires that tests for printability
      * require that all surfaces in a model are closed two-dimensional
-     * manifolds. When strict mode is not active, a even number of triangles
-     * can share two common vertices, provided that the orientations alternate.
+     * manifolds. When strict mode is not active, an even number of
+     * triangles can share a common edge, provided the orientations
+     * of the triangles alternate during a rotation about the common
+     * edge, switching between a clockwise and counterclockwise direction.
      * An example is two "towers" with a triangular cross section that
      * meet at a common edge and that share a common base:
      * <BLOCKQUOTE><PRE>
@@ -3776,6 +3778,8 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * Specify how to Translate new objects after rotating them about (0,0,0).
      * After the rotation, the point at the origin will be moved to point
      * (x2, y2, z2).
+     * THis method is equivalent to calling
+     * {@link #setObjectTranslation(double,double,double,double,double,double) setObjectTranslation(0.0, 0.0, 0.0,x2, y2, z2)}.
      * <P>
      * There is a stack of transformations that includes rotations and
      * translations.  The transformations are applied in order, with
@@ -3839,11 +3843,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * the coordinates. The angle phi specifies an initial rotation
      * of objects counterclockwise about the z-axis of an origin at
      * (x1, y1, z1) set in the last call to
-     * {@link #setObjectTranslation(double,double,double,double,double,double) setObjectTranslation},
-     * with a default of (0,0,0). The angle theta specifies a second
+     * {@link #setObjectTranslation(double,double,double,double,double,double) setObjectTranslation(x1, y1, z1, x2, y2, z2)},
+     * with a default of (0,0,0) for (x1,y1,z1) and (x2,y2,z2).
+     * The angle theta specifies a second
      * rotation about an x axis through (x1, y1, z1), again counter
      * clockwise.  The angle psi specifies a final counterclockwise
-     * rotation about the z axis.
+     * rotation about the z axis.  The object is then translated so that
+     * the point at (x1, y1, z1) will be at (x2, y2, z2)
      * <P>
      * In effect, the angles have the opposite signs from the corresponding
      * angles used by
@@ -7663,7 +7669,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * edge must be traversed no more than twice and to be closed, each edge
      * must be traversed exactly twice, once in each direction. Thus, each
      * edge must be shared by exactly two triangles. A less stringent test
-     * is useful in 3D printing: to cubes that touch on a edge but share
+     * is useful in 3D printing: two cubes that touch on a edge but share
      * a common base are printable, but the surface is not a manifold
      * (although it would be if the cubes were offset from each other by
      * a tiny amount). The constructor {@link #Model3D(boolean)} allows

@@ -12,13 +12,18 @@ var z0 = 0.0;  // base
 // first level
 var z1 ?= 10.0;
 var z2 ?= 20.0;
+// hole width
 var w ?= 30.0;
+// first level width
 var w1 ?= 4.0;
+// second level width
 var w2 ?= 8.0;
 
 // hole height;
 var h ?= 60.0;
+// first level height
 var h1 ?= 4.0;
+// second level height
 var h2 ?= 8.0;
 
 // Add the top horizontal sections

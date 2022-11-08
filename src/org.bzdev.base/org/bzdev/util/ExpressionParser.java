@@ -6339,7 +6339,10 @@ public class ExpressionParser implements ObjectParser<Object>
     void importClasses(String pkg, Object classNames)
 	throws IllegalArgumentException, IllegalAccessException
     {
-	if (pkg != null) pkg = pkg.trim();
+	if (pkg != null) {
+	    pkg = pkg.trim();
+	    if (pkg.equals("null")) pkg = null;
+	}
 	if (classNames instanceof String) {
 	    importClassesAux(pkg, (String)classNames);
 	} else if (classNames instanceof ESPArray) {

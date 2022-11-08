@@ -415,6 +415,7 @@ var obj = {
     ESP&apos;s syntax is described in the following subsections:
     <UL>
       <LI> <A HREF="#comments">Comments</A>.
+      <LI> <A HREF="#reserved">Reserved Words</A>
       <LI> <A HREF="#primitiveValues">Primitive Values</A>
       <LI> <A HREF="#constants">Constants</A>
       <LI> <A HREF="#operators">Operators</A>
@@ -454,6 +455,21 @@ var obj = {
     the script.  This is a special case that allows one to create
     executable scripts.  Typically such a comment will be
     "#!/usr/bin/scrunner".
+    <H3><A NAME="reserved"></A>Reserved Words</H3>
+  <P>
+    ESP has a small number of reserved words:
+    <UL>
+      <LI><B>function</B>. This keyword is used for lambda expressions
+	and function definitions.  It may be used in fully qualified names
+	but should not be used as an identifier.
+      <LI><B>null</B>. This is a constant listed below, but may
+	appear in some <A HREF="#import">import stawtemtns</A>.
+      <LI><B>this</B>. This keyword is used in methods.
+      <LI><B>var</B>.  This keyword indicates that a new variable
+	is being defined. When followed by a period and a variable
+	name, it tests if that variable has been defined.
+    </UL>
+
     <H3><A NAME="primitiveValues"></A>Primitive Values</H3>
   <P>
     ESP recognizes several types of primitive values:
@@ -975,19 +991,23 @@ assignment-statement: variable &apos;=&apos; expression
 
     <H3><A NAME="import"></A>Import Statement</H3>
   <P>
-    Import statements are recognized when import mode and script import
-    mode have been set. The syntax is similar to that used by the methods
-    {@link org.bzdev.scripting.ExtendedScriptingContext#importClass(String,String)}
+    Import statements are recognized when import mode and script
+    import mode have been set. The syntax is similar to that used by
+    the methods {@link
+    org.bzdev.scripting.ExtendedScriptingContext#importClass(String,String)}
     and
     {@link org.bzdev.scripting.ExtendedScriptingContext#importClasses(String,Object)},
-    but where, as a convenience, the package names and class names can be
-    qualified names instead of strings. The variants with an array are
-    provided for cases where multiple classes are imported from the same
+    but where, as a convenience, the package names and class names can
+    be qualified names instead of strings. If a package name is an
+    empty string or the token <STRONG>null</STRONG>, that denotes the
+    unnamed package.  The variants with an array are provided for
+    cases where multiple classes are imported from the same
     package. If the methods that import classes that are defined in
-    {@link org.bzdev.scripting.ExtendedScriptingContext} are used, a line
-    containing <STRONG>###</STRONG> should be inserted at the top level of the script
-    before the classes defined are used: in a few cases, the ESP parser will
-    check a type during the lexical-analysis phase.  This is not required when
+    {@link org.bzdev.scripting.ExtendedScriptingContext} are used, a
+    line containing <STRONG>###</STRONG> should be inserted at the top
+    level of the script before the classes defined are used: in a few
+    cases, the ESP parser will check a type during the
+    lexical-analysis phase.  This is not required when
     the <STRONG>import</STRONG> statements described below are used.
   <P>
     The syntax is as follows:
@@ -999,6 +1019,8 @@ import-statement: &apos;import&apos; &apos;(&apos; package-name &apos;,&apos; cl
 
 package-name: qualified-name
     | &apos;"&apos; &apos;"&apos;
+    | &apos;null&apos;
+    | &apos;"&apos; &apos;null&apos; &apos;"&apos;
     | &apos;"&apos; qualified-name &apos;"&apos;
 
 class-names: import-class-name

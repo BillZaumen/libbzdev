@@ -1,0 +1,7 @@
+scripting.importClass("org.bzdev.anim2d.Animation2D");
+scripting.importClass("java.awt.Color");
+scripting.importClasses("org.bzdev.p3d",
+	["P3d.Rectangle",
+	"Model3D", "Model3DViewFactory"]);
+###
+var m3d = new Model3D();

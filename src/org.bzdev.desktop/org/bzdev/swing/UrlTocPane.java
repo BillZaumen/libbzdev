@@ -32,11 +32,11 @@ import java.io.IOException;
 
 /**
  * UrlTocPane provides a table of contents that associates each entry
- * in a table of contents with a URL.  An instance of the class can
- * be initialized in the same way as an instance of {@link ObjTocPane}
- * and in addition can be initialized from an {@link InputStream} 
- * containing an XML file.  When an XML file is used, the following
- * DTD should be used:
+ * in a table of contents with a URL.
+ * An instance of the class can be initialized in the same way as an
+ * instance of {@link ObjTocPane} and in addition can be initialized
+ * from an {@link InputStream} containing an XML file.  When an XML
+ * file is used, the following DTD should be used:
  * <blockquote><pre>
  * &lt;!ELEMENT toc (node) &gt;
  * &lt;!ELEMENT node (node)*&gt;
@@ -45,30 +45,31 @@ import java.io.IOException;
  *              href CDATA #IMPLIED
  * &gt;
  * </pre></blockquote>
- * A DOCTYPE directive is not necessary.
- * For the attributes of each node, the <CODE>title</CODE> attribute
- * provides the title the GUI will display. The <code>uri</code>
- * attribute provides the URI that will be selected. The attribute
+ * A DOCTYPE directive is not necessary.  For the attributes of each
+ * node, the <CODE>title</CODE> attribute provides the title the GUI
+ * will display. The <code>uri</code> attribute provides the URI,
+ * which must also be a URL, that will be selected. The attribute
  * <CODE>href</CODE> is ignored. The <CODE>href</CODE> attribute is
  * provided for cases in which the XML file will used by a web server
- * and represents the URL that the web server will see after the
- * XML file is converted to HTML (e.g., by an XSTL style sheet).
- * This class ignores the <CODE>href</CODE> field.
- * One may wish to call the method
- * {@link ObjTocPane#setSelectionWithAction(int)} in order to set an
- * initial selection and to notify any previously configured
+ * and represents the URL that the web server will see after the XML
+ * file is converted to HTML (e.g., by an XSTL style sheet).  This
+ * class ignores the <CODE>href</CODE> field.  One may wish to call
+ * the method {@link ObjTocPane#setSelectionWithAction(int)} in order
+ * to set an initial selection and to notify any previously configured
  * action listeners of the selection. The documentation for the class
- * {@link ObjTocPane} contains details regarding action events.
- * <P>
+ * {@link ObjTocPane} contains details regarding action events.  <P>
  * To configure a table of contents programatically, use the method
  * {@link UrlTocPane#addEntry(String,URL)} or
  * {@link UrlTocPane#addEntry(String,String)} and related methods
  * defined in the class {@link ObjTocPane}.  To replace the entries
  * with a new set, use one of the setToc methods or call
- * {@link UrlTocPane#clearToc()} and then programatically add the new
+ * {@linkUrlTocPane#clearToc()} and then programatically add the new
  * entries.  The method {@link ObjTocPane#setSelectionWithAction(int)}
  * calls {@link UrlTocPane#clearToc()} so an explicit call is not
  * necessary in this case.
+ * Finally the method {@link org.bzdev.protocols.Handlers#enable()}
+ * should be called before this class is used so that the DTD can be
+ * read from a JAR file.
  * @author Bill Zaumen
  * @see ObjTocPane
  */

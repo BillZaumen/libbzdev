@@ -17,12 +17,12 @@ public class CommDomainInfo <T> {
 	
     /**
      * Constructor.
-     * All domains will be equal in the case in which only
+     * All domains must be equal in the case in which only
      * one domain participates.
      *
      * @param sd the domain used by the message source
      * @param pd the ancestor domain
-     * @param dd the destination domain
+     * @param dd the destination or next-hop domain
      */
     public CommDomainInfo(T sd, T pd, T dd) {
 	sourceDomain = sd;

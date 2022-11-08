@@ -80,6 +80,12 @@ public class ObjTocPane extends JTree implements TocTree {
 	    this.title = name;
 	    this.obj = obj;
 	}
+	/**
+	 * Return a string representing this object.
+	 * The title is returned because this will typically be
+	 * a readable name for the corresponding object.
+	 * @return the title
+	 */
 	public String toString() {return title;}
 
 	/**

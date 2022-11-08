@@ -32,8 +32,9 @@ public class ProxyInfo {
 
     /**
      * Default preference node name.
-     * This constant is provided as a convenience for use in the
-     * constructor. Its value is "org/bzdev/swing/proxyconf".
+     * This constant is provided as a convenience for use by
+     * {@link ProxyComponent#setPrefNodeName(String)}.
+     *  Its value is "org/bzdev/swing/proxyconf".
      */
     public static final String DEFAULT_PREF_NODE =
 	"org/bzdev/swing/proxyconf";
@@ -99,22 +100,22 @@ public class ProxyInfo {
 
 
     /**
-     * Determine if an HTTP proxy is configured.
+     * Determine if an HTTP proxy is configured by this object
      * @return true if an HTTP proxy  is configured, false otherwise
      */
     public boolean getConfigHttp() {return configHttp;}
     /**
-     * Determine if an HTTPS proxy is configured.
+     * Determine if an HTTPS proxy is configured by this object.
      * @return true if an HTTPS proxy  is configured, false otherwise
      */
     public boolean getConfigHttps() {return configHttps;}
     /**
-     * Determine if an FTP proxy is configured.
+     * Determine if an FTP proxy is configured by this object.
      * @return true if an FTP proxy  is configured, false otherwise
      */
     public boolean getConfigFtp() {return configFtp;}
     /**
-     * Determine if a SOCKS proxy is configured.
+     * Determine if a SOCKS proxy is configured by this object.
      * @return true if a SOCKS proxy  is configured, false otherwise
      */
     public boolean getConfigSocks() {return configSocks;}
