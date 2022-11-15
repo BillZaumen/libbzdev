@@ -47,7 +47,7 @@ var result4 = IntStream.rangeClosed(1, 100)
     .reduce(0, function(a, b) {asInt(a + b)});
 
 var result5 = LongStream.rangeClosed(1, 1000000)
-	    .reduce(0, function(a, b) {asLong(a + b)});
+	    .reduce(0, function(a, b) {/*asLong*/(a + b)});
 
 var result6 = global.isObject(obj);
 

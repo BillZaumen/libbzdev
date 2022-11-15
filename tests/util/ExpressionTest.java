@@ -879,13 +879,11 @@ public class ExpressionTest {
 	    }
 	}
 
-
-
 	s = "= 10 + \"abcde\".length() + function(x, y) {x*x + y*y}(100, 200)";
 	System.out.println("trying " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((double)(Double)value != 50015.0) {
+	if ((int)(Integer)value != 50015) {
 	    throw new Exception();
 	}
 
@@ -951,7 +949,7 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 6) {
+	if ((Integer)value != 6) {
 	    throw new Exception();
 	}
 
@@ -990,7 +988,7 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 8) {
+	if ((Integer)value != 8) {
 	    throw new Exception();
 	}
 
@@ -1158,7 +1156,7 @@ public class ExpressionTest {
 	s = "= plus3(10, 20, 30)";
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 60.0) {
+	if ((Integer)value != 60) {
 	    throw new Exception();
 	}
 
@@ -1166,7 +1164,7 @@ public class ExpressionTest {
 	System.out.println("trying " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 600.0) {
+	if ((Integer)value != 600) {
 	    throw new Exception();
 	}
 
@@ -1174,7 +1172,7 @@ public class ExpressionTest {
 	System.out.println("trying " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 600.0) {
+	if ((Integer)value != 600) {
 	    throw new Exception();
 	}
 
@@ -1186,7 +1184,7 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
-	if ((Double)value != 600.0) {
+	if ((Integer)value != 600) {
 	    throw new Exception();
 	}
 
@@ -1236,7 +1234,7 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	if (value instanceof Number) {
-	    double val = (Double) value;
+	    double val = (Integer) value;
 	    System.out.println("value = " + val);
 	    if (val != 60.0) throw new Exception();
 	} else {
@@ -1301,9 +1299,9 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	if (value instanceof Number) {
-	    double val = (Double) value;
+	    int val = (Integer) value;
 	    System.out.println("value = " + val);
-	    if (val != 35.0) throw new Exception();
+	    if (val != 35) throw new Exception();
 	} else {
 	    throw new Exception();
 	}
@@ -1312,9 +1310,9 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	if (value instanceof Number) {
-	    double val = (Double)value;
+	    int val = (Integer)value;
 	    System.out.println("value = " + val);
-	    if (val != 30.0) throw new Exception();
+	    if (val != 30) throw new Exception();
 	} else {
 	    throw new Exception();
 	}
@@ -1323,9 +1321,9 @@ public class ExpressionTest {
 	System.out.println("trying s " + s);
 	value = parser.parse(s);
 	if (value instanceof Number) {
-	    double val = (Double)value;
+	    int val = (Integer)value;
 	    System.out.println("value = " + val);
-	    if (val != 95.0) throw new Exception();
+	    if (val != 95) throw new Exception();
 	} else {
 	    throw new Exception();
 	}
@@ -1469,9 +1467,9 @@ public class ExpressionTest {
 	    ExpressionParser.ESPObject obj = (ExpressionParser.ESPObject) value;
 	    System.out.println("obj.a = " + obj.get("a"));
 	    System.out.println("obj.b = " + obj.get("b"));
-	    double n1 = (Double)obj.get("a");
-	    double n2 = (Double)obj.get("b");
-	    if (n1 != 11.0 && n2 != 21.0) {
+	    int n1 = (Integer)obj.get("a");
+	    int n2 = (Integer)obj.get("b");
+	    if (n1 != 11 && n2 != 21) {
 		throw new Exception();
 	    }
 	} else {
@@ -1505,9 +1503,9 @@ public class ExpressionTest {
 	    ExpressionParser.ESPObject obj = (ExpressionParser.ESPObject) value;
 	    System.out.println("obj.a = " + obj.get("a"));
 	    System.out.println("obj.b = " + obj.get("b"));
-	    double n1 = (Double)obj.get("a");
-	    double n2 = (Double)obj.get("b");
-	    if (n1 != 11.0 && n2 != 21.0) {
+	    int n1 = (Integer)obj.get("a");
+	    int n2 = (Integer)obj.get("b");
+	    if (n1 != 11 && n2 != 21) {
 		throw new Exception();
 	    }
 	} else {
@@ -1539,9 +1537,9 @@ public class ExpressionTest {
 	    ExpressionParser.ESPFunction f =
 		 (ExpressionParser.ESPFunction) value;
 	    value = f.invoke(1, 2);
-	    if ((Double)value != 3.0) {
+	    if ((Integer)value != 3.0) {
 		System.out.println("value = " + value);
-		throw new Exception ("f(1, 2) != 3.0");
+		throw new Exception ("f(1, 2) != 3");
 	    }
 	} else {
 	    System.out.println("function = " + value);

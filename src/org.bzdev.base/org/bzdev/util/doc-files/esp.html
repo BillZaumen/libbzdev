@@ -463,7 +463,7 @@ var obj = {
 	and function definitions.  It may be used in fully qualified names
 	but should not be used as an identifier.
       <LI><B>null</B>. This is a constant listed below, but may
-	appear in some <A HREF="#import">import stawtemtns</A>.
+	appear in some <A HREF="#import">import statements</A>.
       <LI><B>this</B>. This keyword is used in methods.
       <LI><B>var</B>.  This keyword indicates that a new variable
 	is being defined. When followed by a period and a variable
@@ -479,7 +479,8 @@ var obj = {
       <LI> Long Integers.These use Java syntax but with no support for
 	octal or hexadecimal numbers.  If an integer is within the range
 	allowed for an int, it will normally be interpreted as an
-	32-bit integer. Adding an 'L' will result in a 64-bit integer.
+	32-bit integer. Adding an 'L' to the end of the number, with no
+	intervening whitespace, will result in a 64-bit integer.
       <LI> Double-precision numbers.
       <LI> Booleans. The allowed values are <STRONG>true</STRONG> or
 	<STRONG>false</STRONG>
@@ -556,7 +557,16 @@ BLOCKED
     &apos;throw&apos; (with a String as an argument). These operators
     provide sign inversion, bitwise complement, logical-not, and
     throwing an exception respectively.  These have the highest
-    precedence.  The binary operators, grouped by precedence are shown
+    precedence. For the sign inversion operator, if the following
+    token is 9223372036854775808 or 9223372036854775808L, the sign
+    inversion will be ignored and the number will be replaced with the
+    long integer -9223372036854775808 (the minimum value for a long
+    integer).  Similarly, if the sign inversion operator is followed
+    by the token 2147483648 (but not 2147483648L), the sign inversion
+    operator will be ignored and the number will be replaced with the
+    integer -2147483648.
+  <P>
+    The binary operators, grouped by precedence are shown
     in the following table:
     <TABLE BORDER=1>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
@@ -576,6 +586,30 @@ BLOCKED
       <TR><TD>&amp;&amp;</TD><TD>logical AND</TD></TR>
       <TR><TD>||</TD><TD>logical OR</TD></TR>
     </TABLE>
+    <P>
+    For addition, subtraction, multiplication, and division, the
+    type of the result of binary operation depends on the type
+    of the operands.  The normal behavior is shown in the following
+    table:
+    <TABLE BORDER=1>
+      <TR><TH>Left Operand</TH><TH>Right Operand</TH><TH>Result</TH></TR>
+      <TR><TD>int</TD><TD>int</TD><TD>int</TD></TR>
+      <TR><TD>int</TD><TD>long</TD><TD>long</TD></TR>
+      <TR><TD>int</TD><TD>double</TD><TD>double</TD></TR>
+      <TR><TD>long</TD><TD>int</TD><TD>long</TD></TR>
+      <TR><TD>long</TD><TD>long</TD><TD>long</TD></TR>
+      <TR><TD>long</TD><TD>double</TD><TD>double</TD></TR>
+      <TR><TD>double</TD><TD>int</TD><TD>double</TD></TR>
+      <TR><TD>double</TD><TD>long</TD><TD>double</TD></TR>
+      <TR><TD>double</TD><TD>double</TD><TD>double</TD></TR>
+    </TABLE>
+<P>
+    If the result should be an int, but is out of range, it is
+    promoted to a long, and if the value cannot be represented as an
+    integer, it will be replaced with a double. For example, the value
+    of 2000000000 + 1000000000 in ESP is the long integer 3000000000,
+    whereas in Java, it is -1294967296 (because of Java&apos;s use of 32-bit
+    two&apos;s complement arithmetic).
   <P>
     There is one ternary operator: <STRONG>?</STRONG> with <STRONG>:</STRONG>. This is a conditional
     construct as in Java and has a precedence below that of the binary
@@ -1514,13 +1548,11 @@ array-elements:
     <BLOCKQUOTE><CODE><PRE>
 import(org.bzdev.lang, MathOps);
 LongStream.rangeClosed(1, 1000000)
-          .reduce(0, function(x,y) {asLong(x + y)})
+          .reduce(0, function(x,y) {x + y})
     </PRE></CODE></BLOCKQUOTE>
     The function asLong (which is defined in {@link org.bzdev.lang.MathOps},
-    is needed because ESP is typeless returning a long is necessary because
-    of the functional interface that the "reduce" method uses, and ESP
-    arithmetical operations tend to produce double-precision numbers. If
-    a class has methods with the same name that accept either int or long
+    may be needed to force a value to have a specific type.
+    If a class has methods with the same name that accept either int or long
     arguments, one can preface an integer constant with the letter 'L',
     which will force the value to be interpreted as a long.  For example,
     <BLOCKQUOTE><CODE><PRE>
@@ -2135,7 +2167,7 @@ a2d.run();
     security manager could be used to prevent scripts from overwriting
     files that should not be modified, whether accidentally or maliciously.
     One could use the <STRONG>scrunner</STRONG> command to define
-    file and directory accessors on the command line that would then givee
+    file and directory accessors on the command line that would then give
     users access to specific files or directories, while the security
     manager would prevent scripts from opening arbitrary files.
     Then, in the middle of 2021, JEP 411 decreed that the security manager,
@@ -2179,7 +2211,7 @@ global.blockConstructor(PrintWriter.class, String.class, Charset.class);
     <BLOCKQUOTE><CODE><PRE>
 global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
     </PRE></CODE></BLOCKQUOTE>
-    to prevent scripts from determing where image files will be stored in
+    to prevent scripts from determining where image files will be stored in
     the file system.
   <P>
     Finally, the global object&apos;s method
@@ -2394,7 +2426,7 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  TestActor programmatically integerCondition tmpdir
  -->
-<!--  LocalWords:  doubleCondition subdirectory createObjects png
+<!--  LocalWords:  doubleCondition subdirectory createObjects png JEP
  -->
 <!--  LocalWords:  maxFrames initFrames scheduleFrames codebase didn
  -->
@@ -2406,5 +2438,9 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  newJavaArray clasz generateDocs PrintWriter enums
  -->
-<!--  LocalWords:  javadoc apos dereferenced
+<!--  LocalWords:  javadoc apos dereferenced whitespace runtime
+ -->
+<!--  LocalWords:  blockConstructor argumentClasses typeForArrayOf
+ -->
+<!--  LocalWords:  blockImports blockMethod accessors unsetScripting
  -->

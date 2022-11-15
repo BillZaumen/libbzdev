@@ -86,6 +86,8 @@ all: compile
 	@$(JAVA) ExprScriptTest9
 	@echo ---- ExpressionParser Test '(class for an array)' ----
 	@$(JAVA) ExprScriptTest11
+	@echo - ExpressionParser Test '(implicit casting)' -
+	@$(JAVA) ExprScriptTest12 | cmp - test12.expected || echo failed
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
@@ -265,6 +267,10 @@ estest10: compile
 estest11: compile
 	@echo - ExpressionParser Test '(class for an array)' -
 	@$(JAVA) ExprScriptTest11
+
+estest12: compile
+	@echo - ExpressionParser Test '(implicit casting)' -
+	@$(JAVA) ExprScriptTest12
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------

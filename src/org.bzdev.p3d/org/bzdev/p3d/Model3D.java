@@ -2258,11 +2258,20 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     boolean stackTraceMode = false;
     boolean strict = true;
 
+
+    // To prevent type-cast warnings.
+    private static class TreeSetOfDouble extends TreeSet<Double> {
+	public TreeSetOfDouble() {super();}
+	public TreeSetOfDouble(Collection<? extends Double> c) {super(c);}
+	public TreeSetOfDouble(Comparator<? super Double> c) {super(c);}
+	public TreeSetOfDouble(SortedSet<Double> s) {super(s);}
+    }
+
     // Used for tessellation - we need consistent values at
     // the corners.
-    private TreeSet<Double> xCornerCoords = new TreeSet<>();
-    private TreeSet<Double> yCornerCoords = new TreeSet<>();
-    private TreeSet<Double> zCornerCoords = new TreeSet<>();
+    private TreeSetOfDouble xCornerCoords = new TreeSetOfDouble();
+    private TreeSetOfDouble yCornerCoords = new TreeSetOfDouble();
+    private TreeSetOfDouble zCornerCoords = new TreeSetOfDouble();
 
 
     /**
@@ -2353,10 +2362,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      */
     public double findMinULPRatio() {
 	double min = Double.POSITIVE_INFINITY;
-	List<TreeSet<Double>> list = Arrays.asList(xCornerCoords,
+	List<TreeSetOfDouble> list = Arrays.asList(xCornerCoords,
 						   yCornerCoords,
 						   zCornerCoords);
-	for (TreeSet<Double> cornerCoords: list) {
+	for (TreeSetOfDouble cornerCoords: list) {
 	    double last = Double.NEGATIVE_INFINITY;
 	    boolean first = true;
 	    for (double value: cornerCoords) {
@@ -4463,7 +4472,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     // Used by tessellate to prevent floating-point errors from
     // providing different values for the same coordinate.
-    private double bestCoord(TreeSet<Double>valueSet, double x) {
+    private double bestCoord(TreeSetOfDouble valueSet, double x) {
 	if (ulpFactor == 0.0) return x;
 	Double floor = valueSet.floor(x);
 	Double ceiling = valueSet.ceiling(x);
@@ -4528,9 +4537,9 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    throw new IllegalArgumentException(msg);
 	}
 
-	TreeSet<Double> xvalueSet = (TreeSet<Double>)xCornerCoords.clone();
-	TreeSet<Double> yvalueSet = (TreeSet<Double>)yCornerCoords.clone();
-	TreeSet<Double> zvalueSet = (TreeSet<Double>)zCornerCoords.clone();
+	TreeSetOfDouble xvalueSet = (TreeSetOfDouble)xCornerCoords.clone();
+	TreeSetOfDouble yvalueSet = (TreeSetOfDouble)yCornerCoords.clone();
+	TreeSetOfDouble zvalueSet = (TreeSetOfDouble)zCornerCoords.clone();
 
 
 	cubics.computeBoundary(null, true);

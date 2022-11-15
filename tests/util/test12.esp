@@ -1,0 +1,248 @@
+var out = global.getWriter();
+
+var m = -9223372036854775808L;
+out.println("m = " + m + ", type = " + global.typeof(m));
+
+m = 0 + -9223372036854775808L;
+out.println("m = " + m + ", type = " + global.typeof(m));
+
+m = 0 - -9223372036854775808L;
+out.println("m = " + m + ", type = " + global.typeof(m));
+
+m = -2147483648;
+out.println("m = " + m + ", type = " + global.typeof(m));
+out.println("m = " + m + ", type = " + global.typeof(m));
+m = 0 - -2147483648;
+out.println("m = " + m + ", type = " + global.typeof(m));
+
+var x = 10;
+var y = 20;
+var result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+y = 1L<<62;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+x = 1 << 62;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+x = 9223372036854775807L;
+y = 10;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+x = 9223372036854775807L;
+y = 10;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+x = -9223372036854775807L;
+y = -10;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+x = 2147483647;
+y = 10;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+
+x = -9223372036854775807L;
+y = 10;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+x = 1<<30;
+y = -1 << 29;
+result = x+y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x+y = %s: %s\n", result, global.typeof(result));
+result = y+x;
+out.format("y+x = %s: %s\n", result, global.typeof(result));
+
+out.println("\n-------- Subtraction ---------\n");
+x = 10;
+y = -20;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+y = 1L<<62;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+x = 1 << 62;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+x = 9223372036854775807L;
+y = -10;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+x = 9223372036854775807L;
+y = -10;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+x = -9223372036854775807L;
+y = 10;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+x = 2147483647;
+y = -10;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+
+x = -9223372036854775807L;
+y = -10;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+x = 1<<30;
+y = 1 << 29;
+result = x-y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x-y = %s: %s\n", result, global.typeof(result));
+result = y-x;
+out.format("y-x = %s: %s\n", result, global.typeof(result));
+
+out.println("\n--------- Multiplication ----------\n");
+x = 10.1;
+y = 20;
+result = x*y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x*y = %s: %s\n", result, global.typeof(result));
+result = y*x;
+out.format("y*x = %s: %s\n", result, global.typeof(result));
+
+x = 35;
+y = 25;
+result = x*y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x*y = %s: %s\n", result, global.typeof(result));
+result = y*x;
+out.format("y*x = %s: %s\n", result, global.typeof(result));
+
+x = 350000000;
+y = 250000000;
+result = x*y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x*y = %s: %s\n", result, global.typeof(result));
+result = y*x;
+out.format("y*x = %s: %s\n", result, global.typeof(result));
+
+x = x*x;
+y = 4;
+result = x*y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x*y = %s: %s\n", result, global.typeof(result));
+result = y*x;
+out.format("y*x = %s: %s\n", result, global.typeof(result));
+
+y = 2500000000;
+result = x*y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x*y = %s: %s\n", result, global.typeof(result));
+result = y*x;
+out.format("y*x = %s: %s\n", result, global.typeof(result));
+
+out.println("\n------------ Division -----------\n");
+
+x = 10;
+y = 2;
+result = x/y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x/y = %s: %s\n", result, global.typeof(result));
+result = y/x;
+out.format("y/x = %s: %s\n", result, global.typeof(result));
+
+x = 9223372036854775800L;
+y = 2;
+result = x/y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x/y = %s: %s\n", result, global.typeof(result));
+result = y/x;
+out.format("y/x = %s: %s\n", result, global.typeof(result));
+
+x = 5.05;
+y = 2.5;
+result = x/y;
+out.format("x = %s: %s\n", x, global.typeof(x));
+out.format("y = %s: %s\n", y, global.typeof(y));
+out.format("x/y = %s: %s\n", result, global.typeof(result));
+
+out.flush();

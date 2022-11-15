@@ -1,0 +1,117 @@
+m = -9223372036854775808, type = class java.lang.Long
+m = -9223372036854775808, type = class java.lang.Long
+m = 9.223372036854776E18, type = class java.lang.Double
+m = -2147483648, type = class java.lang.Integer
+m = -2147483648, type = class java.lang.Integer
+m = 2147483648, type = class java.lang.Long
+x = 10: class java.lang.Integer
+y = 20: class java.lang.Integer
+y+x = 30: class java.lang.Integer
+x = 10: class java.lang.Integer
+y = 4611686018427387904: class java.lang.Long
+x+y = 4611686018427387914: class java.lang.Long
+y+x = 4611686018427387914: class java.lang.Long
+x = 1073741824: class java.lang.Integer
+y = 4611686018427387904: class java.lang.Long
+x+y = 4611686019501129728: class java.lang.Long
+y+x = 4611686019501129728: class java.lang.Long
+x = 9223372036854775807: class java.lang.Long
+y = 10: class java.lang.Integer
+x+y = 9.223372036854776E18: class java.lang.Double
+y+x = 9.223372036854776E18: class java.lang.Double
+x = 9223372036854775807: class java.lang.Long
+y = 10: class java.lang.Integer
+x+y = 9.223372036854776E18: class java.lang.Double
+y+x = 9.223372036854776E18: class java.lang.Double
+x = -9223372036854775807: class java.lang.Long
+y = -10: class java.lang.Integer
+x+y = -9.223372036854776E18: class java.lang.Double
+y+x = -9.223372036854776E18: class java.lang.Double
+x = 2147483647: class java.lang.Integer
+y = 10: class java.lang.Integer
+x+y = 2147483657: class java.lang.Long
+y+x = 2147483657: class java.lang.Long
+x = -9223372036854775807: class java.lang.Long
+y = 10: class java.lang.Integer
+x+y = -9223372036854775797: class java.lang.Long
+y+x = -9223372036854775797: class java.lang.Long
+x = 1073741824: class java.lang.Integer
+y = -536870912: class java.lang.Integer
+x+y = 536870912: class java.lang.Integer
+y+x = 536870912: class java.lang.Integer
+
+-------- Subtraction ---------
+
+x = 10: class java.lang.Integer
+y = -20: class java.lang.Integer
+x-y = 30: class java.lang.Integer
+y-x = -30: class java.lang.Integer
+x = 10: class java.lang.Integer
+y = 4611686018427387904: class java.lang.Long
+x-y = -4611686018427387894: class java.lang.Long
+y-x = 4611686018427387894: class java.lang.Long
+x = 1073741824: class java.lang.Integer
+y = 4611686018427387904: class java.lang.Long
+x-y = -4611686017353646080: class java.lang.Long
+y-x = 4611686017353646080: class java.lang.Long
+x = 9223372036854775807: class java.lang.Long
+y = -10: class java.lang.Integer
+x-y = 9.223372036854776E18: class java.lang.Double
+y-x = -9.223372036854776E18: class java.lang.Double
+x = 9223372036854775807: class java.lang.Long
+y = -10: class java.lang.Integer
+x-y = 9.223372036854776E18: class java.lang.Double
+y-x = -9.223372036854776E18: class java.lang.Double
+x = -9223372036854775807: class java.lang.Long
+y = 10: class java.lang.Integer
+x-y = -9.223372036854776E18: class java.lang.Double
+y-x = 9.223372036854776E18: class java.lang.Double
+x = 2147483647: class java.lang.Integer
+y = -10: class java.lang.Integer
+x-y = 2147483657: class java.lang.Long
+y-x = -2147483657: class java.lang.Long
+x = -9223372036854775807: class java.lang.Long
+y = -10: class java.lang.Integer
+x-y = -9223372036854775797: class java.lang.Long
+y-x = 9223372036854775797: class java.lang.Long
+x = 1073741824: class java.lang.Integer
+y = 536870912: class java.lang.Integer
+x-y = 536870912: class java.lang.Integer
+y-x = -536870912: class java.lang.Integer
+
+--------- Multiplication ----------
+
+x = 10.1: class java.lang.Double
+y = 20: class java.lang.Integer
+x*y = 202.0: class java.lang.Double
+y*x = 202.0: class java.lang.Double
+x = 35: class java.lang.Integer
+y = 25: class java.lang.Integer
+x*y = 875: class java.lang.Integer
+y*x = 875: class java.lang.Integer
+x = 350000000: class java.lang.Integer
+y = 250000000: class java.lang.Integer
+x*y = 87500000000000000: class java.lang.Long
+y*x = 87500000000000000: class java.lang.Long
+x = 122500000000000000: class java.lang.Long
+y = 4: class java.lang.Integer
+x*y = 490000000000000000: class java.lang.Long
+y*x = 490000000000000000: class java.lang.Long
+x = 122500000000000000: class java.lang.Long
+y = 2500000000: class java.lang.Long
+x*y = 3.0625E26: class java.lang.Double
+y*x = 3.0625E26: class java.lang.Double
+
+------------ Division -----------
+
+x = 10: class java.lang.Integer
+y = 2: class java.lang.Integer
+x/y = 5: class java.lang.Integer
+y/x = 0.2: class java.lang.Double
+x = 9223372036854775800: class java.lang.Long
+y = 2: class java.lang.Integer
+x/y = 4611686018427387904: class java.lang.Long
+y/x = 2.1684043449710089E-19: class java.lang.Double
+x = 5.05: class java.lang.Double
+y = 2.5: class java.lang.Double
+x/y = 2.02: class java.lang.Double

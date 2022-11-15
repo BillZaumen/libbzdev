@@ -3392,9 +3392,32 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	private Number add(Number n1, Number n2) {
-	    double d1 = n1.doubleValue();
-	    double d2 = n2.doubleValue();
-	    return Double.valueOf(d1+d2);
+	    if (n1 instanceof Double || n2 instanceof Double) {
+		double d1 = n1.doubleValue();
+		double d2 = n2.doubleValue();
+		return Double.valueOf(d1+d2);
+	    } else {
+		long l1 = n1.longValue();
+		long l2 = n2.longValue();
+		long result = l1 + l2;
+		if (n1 instanceof Integer && n2 instanceof Integer) {
+		    if (result <= Integer.MAX_VALUE
+			&& result >= Integer.MIN_VALUE) {
+			return Integer.valueOf((int)result);
+		    } else {
+			return Long.valueOf(result);
+		    }
+		} else {
+		    if ((l1 >= 0 && l2 >= 0 && result < 0)
+			|| (l1 <= 0 && l2 <= 0 && result > 0)) {
+			double d1 = n1.doubleValue();
+			double d2 = n2.doubleValue();
+			return Double.valueOf(d1+d2);
+		    } else {
+			return Long.valueOf(result);
+		    }
+		}
+	    }
 	}
 	
 	private Number changeSign(Number n) {
@@ -3592,21 +3615,84 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	private Number sub(Number n1, Number n2) {
-	    double d1 = n1.doubleValue();
-	    double d2 = n2.doubleValue();
-	    return Double.valueOf(d1 - d2);
+	    if (n1 instanceof Double || n2 instanceof Double) {
+		double d1 = n1.doubleValue();
+		double d2 = n2.doubleValue();
+		return Double.valueOf(d1-d2);
+	    } else {
+		long l1 = n1.longValue();
+		long l2 = n2.longValue();
+		long result = l1 - l2;
+		if (n1 instanceof Integer && n2 instanceof Integer) {
+		    if (result <= Integer.MAX_VALUE
+			&& result >= Integer.MIN_VALUE) {
+			return Integer.valueOf((int)result);
+		    } else {
+			return Long.valueOf(result);
+		    }
+		} else {
+		    if ((l1 >= 0 && l2 <= 0 && result < 0)
+			|| (l1 <= 0 && l2 >= 0 && result > 0)) {
+			double d1 = n1.doubleValue();
+			double d2 = n2.doubleValue();
+			return Double.valueOf(d1-d2);
+		    } else {
+			return Long.valueOf(result);
+		    }
+		}
+	    }
 	}
 
 	private Number mult(Number n1, Number n2) {
-	    double d1 = n1.doubleValue();
-	    double d2 = n2.doubleValue();
-	    return Double.valueOf(d1 * d2);
+	    if (n1 instanceof Double || n2 instanceof Double) {
+		double d1 = n1.doubleValue();
+		double d2 = n2.doubleValue();
+		return Double.valueOf(d1 * d2);
+	    } else {
+		if (n1 instanceof Integer && n2 instanceof Integer) {
+		    long l1 = n1.longValue();
+		    long l2 = n2.longValue();
+		    long result = l1 * l2;
+		    if (result <= Integer.MAX_VALUE
+			&& result >= Integer.MIN_VALUE) {
+			return Integer.valueOf((int)result);
+		    } else {
+			return Long.valueOf(result);
+		    }
+		} else {
+		    double d1 = n1.doubleValue();
+		    double d2 = n2.doubleValue();
+		    double dresult = d1*d2;
+		    long lresult = (long) dresult;
+		    if (dresult == (double)lresult) {
+			return Long.valueOf(lresult);
+		    } else {
+			return Double.valueOf(dresult);
+		    }
+		}
+	    }
 	}
 
 	private Number div(Number n1, Number n2) {
 	    double d1 = n1.doubleValue();
 	    double d2 = n2.doubleValue();
-	    return Double.valueOf(d1 / d2);
+	    double result = d1/d2;
+	    if (n1 instanceof Double || n2 instanceof Double) {
+		return Double.valueOf(result);
+	    } else {
+		long lresult = (long)result;
+		if ((double) lresult == result) {
+		    if (n1 instanceof Integer && n2 instanceof Integer
+			&& lresult <= Integer.MAX_VALUE
+			&& lresult >= Integer.MIN_VALUE) {
+			return Integer.valueOf((int)lresult);
+		    } else {
+			return lresult;
+		    }
+		} else {
+		    return Double.valueOf(result);
+		}
+	    }
 	}
 
 	private Number mod(Number n1, Number n2) {
@@ -8810,10 +8896,35 @@ public class ExpressionParser implements ObjectParser<Object>
 		    i = end - 1; // subtract 1 because the for loop adds 1
 		    try {
 			if (INTEGER_PATTERN.matcher(number).matches()) {
+			    if (prev != null
+				&& prev.getType() == Operator.UNARY_MINUS
+				&& end < len && s.charAt(end) == 'L'
+				&& number.equals("9223372036854775808")) {
+				// Ignore the unary minus and use a
+				// negative number: -Long.MAX_VALUE is
+				// larger than -Long.MIN_VALUE.
+				prev.changeType(Operator.NOOP);
+				number = "-" + number;
+			    }
 			    long lval = Long.parseLong(number);
 			    if (lval > Integer.MAX_VALUE) {
 				next.setValue(Long.valueOf(lval));
+				if (end < len && s.charAt(end) == 'L') {
+				    i++;
+				} else if (lval == (1L + Integer.MAX_VALUE)
+					   && prev != null
+					   && prev.getType()
+					   == Operator.UNARY_MINUS) {
+				    // Ignore the unary minus and set the
+				    // value to the smallest integer because
+				    // Integer.MAX_VALUE = 2147483647 while
+				    // Integer.MIN_VALUE = -2147483648
+				    prev.changeType(Operator.NOOP);
+				    next.setValue(Integer.MIN_VALUE);
+				}
 			    } else {
+				// explicit long case for values that
+				// could be an int.
 				if (end < len && s.charAt(end) == 'L') {
 				    // We found an explicit long integer
 				    next.setValue(Long.valueOf(lval));
