@@ -474,19 +474,22 @@ var obj = {
   <P>
     ESP recognizes several types of primitive values:
     <UL>
-      <LI> Integers. These use Java syntax but with no support for
-	octal or hexadecimal numbers.
-      <LI> Long Integers.These use Java syntax but with no support for
-	octal or hexadecimal numbers.  If an integer is within the range
-	allowed for an int, it will normally be interpreted as an
-	32-bit integer. Adding an 'L' to the end of the number, with no
-	intervening whitespace, will result in a 64-bit integer.
-      <LI> Double-precision numbers.
-      <LI> Booleans. The allowed values are <STRONG>true</STRONG> or
+      <LI> <STRONG>Integers</STRONG>. These use Java syntax but with
+	no support for octal or hexadecimal numbers.
+      <LI> <STRONG>Long Integers</STRONG>.These use Java syntax but
+	with no support for octal or hexadecimal numbers.  If an
+	integer is within the range allowed for an int, it will
+	normally be interpreted as an 32-bit integer. Adding an 'L' to
+	the end of the number, with no intervening whitespace, will
+	result in a 64-bit integer.
+      <LI> <STRONG>Double-precision numbers</STRONG>.
+      <LI> <STRONG>Booleans</STRONG>. The allowed values
+      are <STRONG>true</STRONG> or
 	<STRONG>false</STRONG>
-      <LI> Strings. These are double-quoted strings with &apos;\&apos; indicating
-	the start of an escape sequence. A &apos;\&apos; followed by a character
-	is replaced with that character with the following exceptions:
+      <LI> <STRONG>Strings</STRONG>. These are double-quoted strings
+	with &apos;\&apos; indicating the start of an escape
+	sequence. A &apos;\&apos; followed by a character is replaced
+	with that character with the following exceptions:
 	<UL>
 	  <LI>\b is replaced with a backspace.
 	  <LI>\f is replaced with with a formfeed.
@@ -496,18 +499,22 @@ var obj = {
 	  <LI>\u followed by 4 hexadecimal digits is replaced with
 	    the corresponding UNICODE character.
 	</UL>
-      <LI> Method references.
+      <LI> <STRONG>Method references</STRONG>.
 	A method reference has the same syntax and meaning as in Java
 	and can be used as an argument for Java functions that accept
-	method references. The syntax is shown below.
-      <LI> <STRONG>null</STRONG>. This is just the value null as used
-	by Java, ECMAScript, and various other languages.
-      <LI>A class name, followed by <STRONG>::</STRONG>, followed by
-	<STRONG>null</STRONG> is treated the same as <STRONG>null</STRONG>
-	but with the value tagged with the type given by the class name.
-	This is useful in cases where one would otherwise have to cast a
-	null value to select the desired method or constructor.
-      <LI><STRONG>void</STRONG>. This value is treated like null, but
+	method references. The syntax is shown below. There are some
+	constraints (please see <A HREF="#expressions">Expressions</A>).
+      <LI> <STRONG>null</STRONG>. This is just the value
+	<STRONG>null</STRONG> as used by Java, ECMAScript, and various
+	other languages.
+      <LI><STRONG>Casted nulls</STRONG>. A class name, followed
+	by <STRONG>::</STRONG>, followed by <STRONG>null</STRONG> is
+	treated the same as <STRONG>null</STRONG> but with the value
+	tagged with the type given by the class name.  This is useful
+	in cases where one would otherwise have to cast a null value
+	to select the desired method or constructor.
+      <LI><STRONG>void</STRONG>. This value is treated like
+	<STRONG>null</STRONG>, but
 	indicates that a value is not appropriate as the argument to a
 	function of method.  It will typically be used as the last
 	statement in a function or method that does not return a
@@ -763,7 +770,11 @@ out.println(alf);
 	classes that ESP recognized. These classes are configured by
 	ESP either via an ExpressionParser constructor, the
 	{@link ExpressionParser#addClasses(Class...)} method, or an
-	<A HREF="#import">import statement</A>.
+	<A HREF="#import">import statement</A>. Because of this, and
+	because ESP is typeless, the choice of an overloaded method
+	may not match the one that Java uses.  The use of a lambda
+	expression instead of a method reference will allow the type to
+	be determined when the object used as an argument is available.
     </UL>
   <P>
     Expressions use the following syntax:
@@ -998,6 +1009,31 @@ synchronized function incr() {
     <CODE>incr()</CODE> had not been synchronized, two simultaneous
     calls to <CODE>incr()</CODE> could read the same value of count,
     and set count to one more than that value.
+  <P>
+    Variable definitions in functions and lambda expressions are
+    lexically scoped.  For example, for the script
+    <BLOCKQUOTE><CODE><PRE>
+var value = 10;
+
+function f() {
+   var value = 20;
+   g()
+}
+
+function g() {value}
+
+function h() {
+    var value = 30;
+    value
+}
+    </PRE></CODE></BLOCKQUOTE>
+    calling f() will return 10, and calling h() will return 30. Also,
+    unlike variables, a function call can appear before the function
+    is defined, provided that the function call is lexically within a
+    function or method definition or within a lambda expression.
+    Once a function is called outside of a function, lambda expression,
+    or method body, all functions that are called as a result must
+    have been defined.
 
     <H3><A NAME="assignment"></A>Assignment Statement</H3>
   <P>
@@ -2443,4 +2479,6 @@ a2d.scheduleFrames(0, maxFrames);
 <!--  LocalWords:  blockConstructor argumentClasses typeForArrayOf
  -->
 <!--  LocalWords:  blockImports blockMethod accessors unsetScripting
+ -->
+<!--  LocalWords:  lexically
  -->

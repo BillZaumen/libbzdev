@@ -272,6 +272,10 @@ estest12: compile
 	@echo - ExpressionParser Test '(implicit casting)' -
 	@$(JAVA) ExprScriptTest12
 
+estest13: compile
+	@echo - ExpressionParser Test '(use of Optional methods)' -
+	@$(JAVA) ExprScriptTest13
+
 unitree: compile
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest

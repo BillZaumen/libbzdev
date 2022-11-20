@@ -1727,6 +1727,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	ToLongFunction.class,
 
 	Collectors.class,
+	Optional.class
     };
 
     static HashMap<Class<?>,HashMap<String,Method>> streamTable
