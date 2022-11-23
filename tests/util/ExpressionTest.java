@@ -587,10 +587,22 @@ public class ExpressionTest {
 	parser.setScriptingMode();
 	parser.addClasses(Math.class, MathOps.class);
 
+	s = "(function (t) {(t < 90)? 1.1: (t < 180)? 1.5: 2.2}).invoke(10)";
+	// s = "(function(t){t + 10}).invoke(20)";
+	System.out.println(s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	s = "function (t) {(t < 90)? 1.1: (t < 180)? 1.5: 2.2}(10)";
+	// s = "(function(t){t + 10}).invoke(20)";
+	System.out.println(s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
 	System.out.println("------------------------");
 	ExpressionParser.ESPFunction qf = (ExpressionParser.ESPFunction)
 	    parser.parse("function (t) {(t < 90)? 1.1: (t < 180)? 1.5: 2.2}");
 	System.out.println(qf);
+	parser.set("qf", qf);
+	System.out.println("value = " + value);
 	System.out.println("------------------------");
 	value = qf.invoke(10);
 	System.out.println("value = " + value);
@@ -2262,7 +2274,7 @@ public class ExpressionTest {
 		     (true || false) && (false || true)),
 	    new Pair("= and(true && true, false || true)", true),
 	    new Pair("= and(false || true, true && true)", true),
-	    new Pair("= and(true && false, false || true)", true),
+	    new Pair("= and(true && false, false || true)", false),
 	    new Pair("= or(false || true, true && false)", true),
 	    new Pair("= true ? 1 + 0: 1 + 1", 1),
 	    new Pair("= false ? 1 + 0: 1 + 1", 2),

@@ -7154,6 +7154,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	}
 
+	boolean incrementedLevel = false;
+	boolean incrementedLevel() {return incrementedLevel;}
+	void  incrementingLevel() {incrementedLevel = true;}
+
 
 	Token(Operator type, String s, int index, int level) {
 	    this.type = type;
@@ -8541,6 +8545,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 		parenPeer.incrArgCount();
 		tokens.add(next);
+		if (parenPeer.incrementedLevel()) {
+		    // Add because we set level to that for
+		    // parenPeer a few lines earlier.
+		    level += (1 + LEVEL_OFFSET);
+		}
 		break;
 	    case '[':
 		boolean btest = (prev == null);
@@ -8820,6 +8829,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		    params.add("this");
 		}
 		tokens.add(next);
+		// Fix up for method calls with some operators (.e.g, ==)
+		if (prev != null) {
+		    Operator ptType = prev.getType();
+		    if (ptType == Operator.METHOD
+			|| ptType == Operator.CONSTRUCTOR
+			|| ptType == Operator.FUNCTION) {
+			next.incrementingLevel();
+			level += (1 + LEVEL_OFFSET);
+			// System.out.println("would increment level");
+		    }
+		}
 		break;
 	    case ')':
 		if (prev == null) {
@@ -8832,6 +8852,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		    String msg = errorMsg("unbalancedParens");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
+		}
+		if (parenPeer.incrementedLevel()) {
+		    // System.out.println("would decrement level");
+		    level -= (1 + LEVEL_OFFSET);
+
 		}
 		if (parenPeer != prev) {
 		    parenPeer.incrArgCount();
@@ -9079,7 +9104,9 @@ public class ExpressionParser implements ObjectParser<Object>
 			    && ptype != Operator.CPAREN
 			    && ptype != Operator.CBRACKET
 			    && ptype != Operator.CBRACE
+			    && ptype != Operator.CLASS
 			    && ptype != Operator.STRING)) {
+			System.out.println(ptype);
 			String msg = errorMsg("misplacedDot");
 			throw new ObjectParser.Exception
 			    (msg, filenameTL.get(), s, i);
@@ -9128,7 +9155,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    int methodRefInd = -1;
 		    if (i != len) {
 			ch = s.charAt(i);
-			if (ch == ':' && i < len-1 && s.charAt(i) == ':') {
+			if (ch == ':' && i < len-1 /*&& s.charAt(i) == ':'*/) {
 			    methodRefInd = i;
 			    i += 2;
 			    i = nextIdentIndex(s, i, len);
@@ -9874,6 +9901,41 @@ public class ExpressionParser implements ObjectParser<Object>
 			    int index = variable.lastIndexOf('.');
 			    if (index != -1) {
 				String constant = variable.substring(0, index);
+				if (constant.endsWith(".class")) {
+				    String c = constant.substring
+					(0, constant.length() - 6);
+				    String method = variable.substring(index+1)
+					.replaceAll(COMMENT_RE,"").trim();
+				    System.out.println(constant);
+				    System.out.println(method);
+				    try {
+					Class<?> clasz =
+					    (c.equals("double")? double.class:
+					     c.equals("long")? long.class:
+					     c.equals("int")? int.class:
+					     c.equals("boolean")? boolean.class:
+					     findClass(c));
+					level++;
+					next = new Token(Operator.CLASS,
+							 c, offset+i, level);
+					next.setValue(clasz);
+					tokens.add(next);
+					prev = new Token(Operator.DOT, ".",
+							 offset+start+index,
+							 level);
+					next = new Token(Operator.METHOD,
+							 method,
+							 offset+start+index+1,
+							 level);
+					tokens.add(next);
+					i--;
+					break;
+				    } catch (Exception e) {
+					String msg = e.getMessage();
+					throw new ObjectParser.Exception
+					    (msg, filenameTL.get(), s, i);
+				    }
+				}
 				fname = findField(constant);
 				if (fname != null) {
 				    String method = variable.substring(index+1)

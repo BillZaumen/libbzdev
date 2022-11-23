@@ -1,0 +1,26 @@
+
+var out = global.getWriter();
+out.println(true == true);
+out.println(true == false);
+
+out.flush();
+
+var foo = (true == true) || (false == false);
+out.println("foo = " + foo);
+out.flush();
+function foof() {(true == true) || (false == false)}
+out.println(foof());
+out.flush();
+
+function foo(x) {x};
+
+foo(true==true);
+
+
+function tst(x,y){x == y}
+
+out.println(tst(true,true));
+out.println(tst(true,false));
+out.println(tst(true==true, true==true));
+out.println(tst(true==true, false==true));
+out.flush();

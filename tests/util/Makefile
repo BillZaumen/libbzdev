@@ -88,6 +88,10 @@ all: compile
 	@$(JAVA) ExprScriptTest11
 	@echo - ExpressionParser Test '(implicit casting)' -
 	@$(JAVA) ExprScriptTest12 | cmp - test12.expected || echo failed
+	@echo - ExpressionParser Test '(use of Optional methods)' -
+	@$(JAVA) ExprScriptTest13
+	@echo - ExpressionParser Test '( == in arguments)' -
+	@$(JAVA) ExprScriptTest14
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
@@ -275,6 +279,14 @@ estest12: compile
 estest13: compile
 	@echo - ExpressionParser Test '(use of Optional methods)' -
 	@$(JAVA) ExprScriptTest13
+
+estest14: compile
+	@echo - ExpressionParser Test '( == in arguments)' -
+	@$(JAVA) ExprScriptTest14
+
+estest15: compile
+	@echo - ExpressionParser Test '( .class.METHOD)' -
+	@$(JAVA) ExprScriptTest15
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------
