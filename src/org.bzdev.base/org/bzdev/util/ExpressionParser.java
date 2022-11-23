@@ -23,6 +23,9 @@ import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.OptionalInt;
+import java.util.OptionalDouble;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Stack;
@@ -836,6 +839,42 @@ public class ExpressionParser implements ObjectParser<Object>
 	    } else {
 		return toArray(clasz);
 	    }
+	}
+
+	/**
+	 *  Create a {@link Stream stream} of a specified type
+	 *  backed by this object.
+	 *  The argument determines the type of the stream created:
+	 *  for
+	 *  <UL>
+	 *    <LI><STRONG>int.class</STRONG>, the stream is an
+	 *      {@link IntStream IntStream}.
+	 *    <LI><STRONG>long.class</STRONG>,
+	 *      {@link LongStream LongStream}.
+	 *    <LI><STRONG>double.class</STRONG>,
+	 *      {@link DoubleStream DoubleStream}.
+	 *  </UL>
+	 *  @param clasz either int.class, long.class, or double.class
+	 *  @exception IllegalArgumentException if the argument is not
+	 *             a recognized class
+	 *  @exception NullPointerException if the argument is null
+	 */
+
+	public Object toStream(Class<?> clasz)
+	    throws IllegalArgumentException
+	{
+	    if (clasz == null) {
+		throw new NullPointerException(errorMsg("nullArg", 1));
+	    } else if (clasz.equals(double.class)) {
+		return DoubleStream.of(toDoubleArray());
+	    } else if (clasz.equals(long.class)) {
+		return LongStream.of(toLongArray());
+	    } else if (clasz.equals(int.class)) {
+		return IntStream.of(toIntArray());
+	    } else {
+		throw new IllegalArgumentException(errorMsg("toStreamErr"));
+	    }
+
 	}
 
 	/**
@@ -1657,6 +1696,9 @@ public class ExpressionParser implements ObjectParser<Object>
 	    eparrayMethods.put(new ObjMethodDescriptor("toArray", 1),
 			       ESPArray.class.getMethod("toJavaArray",
 							 Class.class));
+	    eparrayMethods.put(new ObjMethodDescriptor("toStream", 1),
+			       ESPArray.class.getMethod("toStream",
+							 Class.class));
 	    /*
 	    eparrayMethods.put(new ObjMethodDescriptor("toDoubleArray", 0),
 			       ESPArray.class.getMethod("toDoubleArray"));
@@ -1705,18 +1747,27 @@ public class ExpressionParser implements ObjectParser<Object>
 	DoubleConsumer.class,
 	DoublePredicate.class,
 	DoubleSupplier.class,
+	DoubleFunction.class,
+	DoubleToIntFunction.class,
+	DoubleToLongFunction.class,
 	DoubleUnaryOperator.class,
 
 	IntBinaryOperator.class,
 	IntConsumer.class,
 	IntPredicate.class,
 	IntSupplier.class,
+	IntToDoubleFunction.class,
+	IntFunction.class,
+	IntToLongFunction.class,
 	IntUnaryOperator.class,
 
 	LongBinaryOperator.class,
 	LongConsumer.class,
+	LongFunction.class,
 	LongPredicate.class,
 	LongSupplier.class,
+	LongToIntFunction.class,
+	LongToDoubleFunction.class,
 	LongUnaryOperator.class,
 
 	ToDoubleBiFunction.class,
@@ -1727,7 +1778,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	ToLongFunction.class,
 
 	Collectors.class,
-	Optional.class
+	Optional.class,
+	OptionalDouble.class
     };
 
     static HashMap<Class<?>,HashMap<String,Method>> streamTable
@@ -2220,7 +2272,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			       ClassArraySorter.Key fkey,
 			       ClassArraySorter.Key key)
 	    {
-		if (fkey.isAssignableFrom(key)) {
+		if (/*fkey.isAssignableFrom(key)*/key.isAssignableFrom(fkey)) {
 		    Constructor c =  minfo.getConstructor(clasz, key);
 		    return c;
 		} else {
@@ -2266,7 +2318,6 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 	    }
 
-
 	    // fi must be a functional interface so there will be only a
 	    // single method that can be called.
 	    @Override
@@ -2296,6 +2347,11 @@ public class ExpressionParser implements ObjectParser<Object>
 			// no need to synchronize because this is case
 			// occurs in the same thread that created this
 			// method reference
+			/*
+			System.out.println("++++ clasz = " + clasz);
+			System.out.println("++++ method = " + method);
+			System.out.println("++++ fim = " + fim);
+			*/
 			Class<?> nclasz =
 			    findMethodRefClass(clasz, method, fim);
 			if (nclasz == null) {
@@ -2320,9 +2376,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		    boolean isVarArgs = fim.isVarArgs();
 		    Class<?>[] carray = fim.getParameterTypes();
 		    modifyCarray(carray);
+		    /*
+		    System.out.print("carray: ");
+		    for (int iii = 0; iii < carray.length; iii++) {
+			System.out.print(carray[iii]);
+		    }
+		    System.out.println();
+		    */
 		    ClassArraySorter.Key fkey =
 			new ClassArraySorter.Key(carray);
 		    Class<?> rtype = fim.getReturnType();
+		    // System.out.println("++++ rtype = " + rtype);
 		    if (method.equals("new")) {
 			if (!rtype.isAssignableFrom(clasz)) {
 			    String rtName = rtype.getName();
@@ -2346,7 +2410,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			} else {
 			    LinkedList<ClassArraySorter.Key> sorter =
 				minfo.getSorted(clasz);
-			    Collections.reverse(sorter);
+			    // Collections.reverse(sorter);
 			    for (ClassArraySorter.Key key: sorter) {
 				c = constrRefMatch(minfo, isVarArgs, fkey, key);
 				if (c != null) break;
@@ -2360,10 +2424,17 @@ public class ExpressionParser implements ObjectParser<Object>
 			    LinkedList<ClassArraySorter.Key> sorter =
 				minfo.getSorted(clasz);
 			    if (sorter != null) {
-				Collections.reverse(sorter);
+				// Collections.reverse(sorter);
 				fkey.promotePrimitives();
+				/*
+				System.out.println(fkey);
 				for (ClassArraySorter.Key key: sorter) {
-				    boolean tst = fkey.isAssignableFrom(key);
+				    System.out.println("has key " + key);
+				}
+				*/
+				for (ClassArraySorter.Key key: sorter) {
+				    boolean tst = // fkey.isAssignableFrom(key);
+					key.isAssignableFrom(fkey);
 				    m = tst? minfo.getMethod(clasz, key): null;
 				    /*
 				    m = methodRefMatch(minfo, isVarArgs,
@@ -2387,7 +2458,7 @@ public class ExpressionParser implements ObjectParser<Object>
 				LinkedList<ClassArraySorter.Key> sorter =
 				    minfo.getSorted(clasz);
 				if (sorter != null) {
-				    Collections.reverse(sorter);
+				    // Collections.reverse(sorter);
 				    Class<?>[] ncarray =
 					new Class<?>[carray.length-1];
 				    System.arraycopy(carray, 1, ncarray, 0,
@@ -2403,7 +2474,8 @@ public class ExpressionParser implements ObjectParser<Object>
 				    fkey = new ClassArraySorter.Key(ncarray);
 				    for (ClassArraySorter.Key key: sorter) {
 					boolean tst =
-					    fkey.isAssignableFrom(key);
+					    // fkey.isAssignableFrom(key);
+					    key.isAssignableFrom(fkey);
 					m = tst? minfo.getMethod(clasz, key):
 					    null;
 					/*
@@ -2417,13 +2489,14 @@ public class ExpressionParser implements ObjectParser<Object>
 				LinkedList<ClassArraySorter.Key> sorter =
 				    minfo.getSorted(clasz);
 				if (sorter != null) {
-				    Collections.reverse(sorter);
+				    // Collections.reverse(sorter);
 				    fkey = new ClassArraySorter.Key(carray);
 				    fkey.promotePrimitives();
 				    for (ClassArraySorter.Key key: sorter) {
-					m = minfo.getMethod(clasz, key);
+					// m = minfo.getMethod(clasz, key);
 					boolean tst =
-					    fkey.isAssignableFrom(key);
+					    // fkey.isAssignableFrom(key);
+					    key.isAssignableFrom(fkey);
 					m = tst? minfo.getMethod(clasz, key):
 					    null;
 					/*
@@ -2451,6 +2524,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		final Method ourmethod = m;
 		final Constructor ourconstr = c;
 		final boolean isStatic = isStat;
+		/*
+		System.out.println("+++ ourmethod = " + ourmethod);
+		System.out.println("+++ ourconstr = " + ourconstr);
+		System.out.println("+++ isStatic = " + isStatic);
+		*/
 		InvocationHandler handler = new InvocationHandler() {
 			public Object invoke(Object proxy, Method m,
 					     Object[] args)
@@ -4021,8 +4099,8 @@ public class ExpressionParser implements ObjectParser<Object>
 			double d2 = ((Number)n2).doubleValue();
 			return d1 == d2;
 		    } else {
-			Long i1 = ((Number)n1).longValue();
-			Long i2 = ((Number)n2).longValue();
+			long i1 = ((Number)n1).longValue();
+			long i2 = ((Number)n2).longValue();
 			return i1 == i2;
 		    }
 		} else {
@@ -4633,6 +4711,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 	    }
 	    Class<?> dc = m.getDeclaringClass();
+
 	    Object result = m.invoke(target, oargs);
 	    if (result instanceof String || result instanceof Boolean
 		|| result instanceof Number) {
@@ -5619,6 +5698,14 @@ public class ExpressionParser implements ObjectParser<Object>
 			    if (target instanceof BaseStream) {
 				// special case.
 				m = findStreamMethod(fname, target, args);
+				if (m == null) {
+				    String msg =
+					errorMsg("NoStreamMethod", fname, args);
+				    throw new ObjectParser.Exception
+					(msg, opToken.getFileName(), orig,
+					 opToken.getIndex());
+				}
+
 			    } else if (target instanceof ESPArray) {
 				ObjMethodDescriptor d =
 				    new ObjMethodDescriptor(fname, args.length);
@@ -5700,6 +5787,46 @@ public class ExpressionParser implements ObjectParser<Object>
 						return Array.get(target, index);
 					    });
 				    pushValue(stream);
+				} else if (fname.equals("toStream") &&
+					   args.length == 1) {
+				    int len = Array.getLength(target);
+				    Class<?> tsclass = (Class<?>)args[0];
+				    if (tsclass == null) {
+					String msg = errorMsg("nullArg", 1);
+					throw new ObjectParser.Exception
+					    (msg, opToken.getFileName(), orig,
+					     opToken.getIndex());
+				    }
+				    if (tsclass.equals(int.class)) {
+					IntStream stream = IntStream
+					    .range(0, len)
+					    .map((index) -> {
+						    return Array.getInt
+							(target, index);
+						});
+					pushValue(stream);
+				    } else if (tsclass.equals(long.class)) {
+					LongStream stream = IntStream
+					    .range(0, len)
+					    .mapToLong((index) -> {
+						    return Array.getLong
+							(target, index);
+						});
+					pushValue(stream);
+				    } else if (tsclass.equals(double.class)) {
+					DoubleStream stream = IntStream
+					    .range(0, len)
+					    .mapToDouble((index) -> {
+						    return Array.getDouble
+							(target, index);
+						});
+					pushValue(stream);
+				    } else {
+					String msg = errorMsg("toStreamErr");
+					throw new ObjectParser.Exception
+					    (msg, opToken.getFileName(), orig,
+					     opToken.getIndex());
+				    }
 				} else if (fname.equals("parallelStream")
 					   && args.length == 0) {
 				    int len = Array.getLength(target);

@@ -1,18 +1,27 @@
-
-global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
-                        "/usr/share/doc/openjdk-11-doc/api"]);
+import (java.lang.Class);
+import (java.lang.Math);
 
 var out = global.getWriter();
 
-IntStream.range(0, 1000)
-    .peek(out::println)
-    .mapToObj(String::valueOf)
-    .peek(function(x) {out.println(global.typeof(x)); out.println(x); void})
-    .findFirst()
-    .ifPresent(function(x) {out.println(x); void});
+var foo = 210;
 
-/*
-    .peek(out::println)
+global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
+                        "/usr/share/doc/openjdk-11-doc/api"]);
+var dsc = IntStream.class;
+
+
+// var ds = Stream.of(1, -2, 3).mapToInt(function (x){x});
+var sum = [1, -2, 3].toStream(int.class).map(Math::abs)
+    .reduce(0, function(x,y){x+y});
+out.println("sum = " + sum + ", expecting 6");
+out.flush();
+sum == 6 || throw "sum != 6";
+
+sum = [10, -20, 30, 40, -50, 60].toStream(int.class).map(Math::abs)
+	    .reduce(0, function(x,y) {x+y});
+out.println("sum = " + sum + ", expecting 210");
+out.flush();
+sum == 210 || throw "sum != 210";
 
 
 IntStream.range(0, 1000)
@@ -22,15 +31,4 @@ IntStream.range(0, 1000)
     .findFirst()
     .ifPresent(out::println);
 
-var result = 
-IntStream.range(0, 1000)
-    .peek(function(x) {out.println(x); void})
-    .mapToObj(String::valueOf)
-    .peek(function(x) {out.println(x); void})
-    .findFirst();
-out.println(result);
-var pres = result.isPresent();
-out.println(pres);
-result.ifPresent(function(x) {out.println(x); void});
-*/
 out.flush();

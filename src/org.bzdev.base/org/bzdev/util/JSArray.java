@@ -220,7 +220,7 @@ public class JSArray implements Iterable<Object>, JSOps {
     }
 
     /**
-     * Get a sequential stream with this array as its source.
+     * Get a {@link Stream stream} with this array as its source.
      * @return a stream with this array as its source
      */
     public Stream<Object> stream() {

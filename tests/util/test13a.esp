@@ -1,0 +1,6 @@
+var out = global.getWriter();
+
+var tmp = Optional.of("hi");
+
+var tmp1 = Optional.of("hello");
+tmp1.ifPresent(out::println);

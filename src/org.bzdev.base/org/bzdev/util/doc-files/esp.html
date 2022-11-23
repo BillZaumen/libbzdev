@@ -762,19 +762,20 @@ out.println(alf);
 	represented in ESP by objects. As a result, they can be stored
 	in variables or returned as the value of a functions. They
 	can also be called directly, whether from ESP or Java,
-	by using their "invoke" method.
-	The arguments to the "invoke" method are the same that would
-	be used when the method is converted to lambda expression implementing
-	a functional interface. In searching for a method, the class of the
+	by using their "invoke" method. Typically a  method reference is
+	used as an argument that is declared to have type that implements
+	a functional interface.
+	In searching for a method, the class of the
 	value the method returns and the classes of the arguments must be
 	classes that ESP recognized. These classes are configured by
 	ESP either via an ExpressionParser constructor, the
 	{@link ExpressionParser#addClasses(Class...)} method, or an
 	<A HREF="#import">import statement</A>. Because of this, and
 	because ESP is typeless, the choice of an overloaded method
-	may not match the one that Java uses.  The use of a lambda
-	expression instead of a method reference will allow the type to
-	be determined when the object used as an argument is available.
+	may not match the one that Java uses. ESP method references
+	implement the interface
+	{@link org.bzdev.util.ExpressionParser.ESPMethodReference},
+	and can be used by Java if desired.
     </UL>
   <P>
     Expressions use the following syntax:
@@ -1283,8 +1284,16 @@ array-elements:
       <LI><STRONG>add(</STRONG><I>object</I><STRONG>)</STRONG>. Add a
 	new element to the end of the array and return <STRONG>true</STRONG>.
     <LI><STRONG>size()</STRONG>. return the size of an array.
-    <LI><STRONG>stream()</STRONG>. Get a sequential
+    <LI><STRONG>stream()</STRONG>. Get a
       {@link java.util.stream.Stream stream} with this array as its source.
+    <LI><STRONG>toStream(</STRONG><I>type</I><STRONG>)</STRONG>. Get
+      a {@link java.util.stream.Stream stream} of a specified
+      type with this array as its source. The argument <I>type</I> can be
+      <STRONG>int.class</STRONG>, <STRONG>long.class</STRONG>,
+      or <STRONG>double.class</STRONG>, and the classes of the objects
+      returned are {@link java.util.stream.IntStream IntStream},
+      {@link java.util.stream.LongStream LongStream}, and
+      {@link java.util.stream.DoubleStream DoubleStream} respectively.
     <LI><STRONG>parallelStream()</STRONG>. Get a parallel
       {@link java.util.stream.Stream stream} with this array as its source.
     <LI><STRONG>forEach(</STRONG><I>action</I><STRONG>)</STRONG>. Apply
@@ -1605,10 +1614,22 @@ LongStream.rangeClosed(1, 1000000)
     <BLOCKQUOTE><CODE><PRE>
 import (java.lang, Math);
 var list = [10, -20, 30, 40, -50, 60];
-list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
+list.toStream(int.class).map(Math::abs).reduce(0, function(x, y) {x + y});
     </PRE></CODE></BLOCKQUOTE>
-will produce a sum of the absolute values of the numbers
-in <CODE>list</CODE>.
+    will produce a sum of the absolute values of the numbers
+    in <CODE>list</CODE>.  The use of <CODE>toStream(int.class)</CODE> is
+    necessary so that the type of <CODE>map</CODE>&apos;s argument will be
+    a functional interface that the method reference can implement. The
+    script
+    <BLOCKQUOTE><CODE><PRE>
+import (java.lang, Math);
+var list = [10, -20, 30, 40, -50, 60];
+list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
+    </PRE></CODE></BLOCKQUOTE> will result in an error:
+    while <CODE>list.toStream(int.class)</CODE> provides an instance
+    of <CODE>IntStream</CODE>, <CODE>list.stream</CODE> provides an
+    instance of <CODE>Stream&lt;Object&gt;</CODE>, and while each have
+    a <CODE>map</CODE> method, those methods have different signatures.
 
     <H2><A NAME="threading"></A>Threading</H2>
   <P>
@@ -1850,7 +1871,7 @@ nt.set(NullTest.getNullNumber());
     a NullTest object with a value of 20 or set an existing NullTest
     object&apos;s value to 20:
     <BLOCKQUOTE><CODE><PRE>
-var nt = NullTest(NString::null);
+var nt = NullTest(String::null);
 nt.set(String::null);
 nt.set(NullTest.getNullString());
     </PRE></CODE></BLOCKQUOTE>

@@ -391,11 +391,12 @@ public class ClassArraySorter {
 	public void promotePrimitives() {
 	    for (int i = 0; i < value.length; i++) {
 		if (value[i].equals(double.class)) {
-		    value[i] = Number.class;
+		    // value[i] = Number.class;
+		    value[i] = Double.class;
 		} else if (value[i].equals(int.class)) {
-		    value[i] = Number.class;
+		    value[i] = Integer.class;
 		} else if (value[i].equals(long.class)) {
-		    value[i] = Number.class;
+		    value[i] = Long.class;
 		}
 	    }
 	}

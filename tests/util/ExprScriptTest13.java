@@ -16,6 +16,13 @@ public class ExprScriptTest13 {
 	DefaultScriptingContext dsc = new
 	    DefaultScriptingContext();
 	ExtendedScriptingContext sc = new ExtendedScriptingContext(dsc);
+	DefaultScriptingContext dsca = new
+	    DefaultScriptingContext();
+	ExtendedScriptingContext sca = new ExtendedScriptingContext(dsca);
+	DefaultScriptingContext dscb = new
+	    DefaultScriptingContext();
+	ExtendedScriptingContext scb = new ExtendedScriptingContext(dscb);
+
 	sc.setWriter(new PrintWriter(System.out));
 	sc.putScriptObject("scripting", sc);
 
@@ -25,12 +32,20 @@ public class ExprScriptTest13 {
 	sc.putScriptObject("w", w);
 
 	String s = Files.readString(new File("test13.esp").toPath());
+	String sa = Files.readString(new File("test13a.esp").toPath());
+	String sb = Files.readString(new File("test13b.esp").toPath());
 	try {
 	    // Uses the same function for the 1st and 2nd derivatives,
 	    // which is mathematically wrong but we want as few objects
 	    // defined as possible as we are testing how functional
 	    // interfaces are handled.
 	    Object o = sc.evalScript(s);
+	    System.out.println("\f");
+	    System.out.println("----------- test13a.esp ----------");
+	    Object oa = sca.evalScript(sa);
+	    System.out.println("\f");
+	    System.out.println("----------- test13b.esp ----------");
+	    Object ob = scb.evalScript(sb);
 	} catch (Exception e) {
 	    String name = e.getClass().getName();
 	    name = name.replace('$', '.');

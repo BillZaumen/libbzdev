@@ -230,8 +230,8 @@ public class ExpressionTest {
 	}
 
 	static double total = 0.0;
-	public static void add (Number n) {
-	    total += n.doubleValue();
+	public static void add (Object n) {
+	    total += ((Number)n).doubleValue();
 	}
     }
 
@@ -420,28 +420,36 @@ public class ExpressionTest {
 	    s = "= nt2.getValue()";
 	    System.out.println("nt2.getValue() = " + parser.parse(s));
 	    s = "= nt1.set(String::null)";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt2.set(Number::null)";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt1.getValue()";
 	    System.out.println("nt1.getValue() = " + parser.parse(s));
 	    s = "= nt2.getValue()";
 	    System.out.println("nt2.getValue() = " + parser.parse(s));
 	    s = "var null1 = Number::null";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "var null2 = String::null";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt1.set(null1)";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt2.set(null2)";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt1.getValue()";
 	    System.out.println("nt1.getValue() = " + parser.parse(s));
 	    s = "= nt2.getValue()";
 	    System.out.println("nt2.getValue() = " + parser.parse(s));
 	    s = "= nt1.set(NullTest.getNullString())";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt2.set(NullTest.getNullNumber())";
+	    System.out.println(s);
 	    parser.parse(s);
 	    s = "= nt1.getValue()";
 	    System.out.println("nt1.getValue() = " + parser.parse(s));
@@ -790,17 +798,29 @@ public class ExpressionTest {
 	value = parser.parse(s);
 	System.out.println("value = " + value);
 
+	s = "= IntStream.of(1, -2, 3).asDoubleStream().map(Math::abs).sum()";
+	System.out.println("trying " + s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	if (value instanceof Number) {
+	    double val = (Double) value;
+	    if (val != 6.0) {
+		throw new Exception();
+	    }
+	} else {
+		throw new Exception();
+	}
 	s = "var firstlist = [10, -20, 30]";
 	System.out.println("trying " + s);
 	value = parser.parse(s);
-	s = "= firstlist.stream().map(Math::abs)"
+	s = "= firstlist.toStream(int.class).map(Math::abs)"
 	    + ".reduce(0, function(x,y) {x + y})";
 	System.out.println("trying s" + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
 	if (value instanceof Number) {
-	    double val = (Double) value;
-	    if (val != 60.0) {
+	    int val = (Integer) value;
+	    if (val != 60) {
 		throw new Exception();
 	    }
 	} else {
@@ -810,7 +830,7 @@ public class ExpressionTest {
 	s = "var secondlist = [\"One\", \"Two\", \"Three\", \"Four\"]";
 	System.out.println("trying " + s);
 	value = parser.parse(s);
-	s = "= secondlist.stream().reduce(\"\", String::concat)";
+	s = "= secondlist.stream().reduce(\"\", function(x,y){x.concat(y)})";
 	System.out.println("trying s" + s);
 	value = parser.parse(s);
 	System.out.println("value = " + value);
@@ -825,17 +845,6 @@ public class ExpressionTest {
 
 	s = "var sconcat = String::concat";
 	value = parser.parse(s);
-	s = "= secondlist.stream().reduce(\"\", sconcat)";
-	value = parser.parse(s);
-	System.out.println("value = " + value);
-	if (value instanceof String) {
-	    String val = (String) value;
-	    if (!val.equals("OneTwoThreeFour")) {
-		throw new Exception();
-	    }
-	} else {
-	    throw new Exception();
-	}
 	s = "= sconcat.invoke(\"Hello\",\"There\")";
 	value = parser.parse(s);
 	System.out.println("value = " + value);
@@ -991,6 +1000,40 @@ public class ExpressionTest {
 	if ((Integer)value != 8) {
 	    throw new Exception();
 	}
+
+	atst[1] = -2;
+	s = "= atst.toStream(int.class).map(Math::abs).sum()";
+	System.out.println("trying s " + s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	if ((Integer)value != 6) {
+	    throw new Exception();
+	}
+	s = "= atst.toStream(long.class).map(Math::abs).sum()";
+	System.out.println("trying s " + s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	if ((Long)value != 6) {
+	    throw new Exception();
+	}
+	s = "= atst.toStream(double.class).map(Math::abs).sum()";
+	System.out.println("trying s " + s);
+	value = parser.parse(s);
+	System.out.println("value = " + value);
+	if ((Double)value != 6.0) {
+	    throw new Exception();
+	}
+	try {
+	    s = "= atst.stream().map(Math::abs).sum()";
+	    System.out.println("trying s " + s);
+	    value = parser.parse(s);
+	    throw new Exception();
+	} catch(ObjectParser.Exception ope) {
+	    // map needs a method reference for a method whose
+	    // argument is an Object, not a subclass of Object or a
+	    // primitive type.
+	}
+
 
 	s = "= [1, 2, 3][1]";
 	System.out.println("trying s " + s);
