@@ -9906,8 +9906,10 @@ public class ExpressionParser implements ObjectParser<Object>
 					(0, constant.length() - 6);
 				    String method = variable.substring(index+1)
 					.replaceAll(COMMENT_RE,"").trim();
-				    // System.out.println(constant);
-				    // System.out.println(method);
+				    /*
+				    System.out.println(constant);
+				    System.out.println(method);
+				    */
 				    try {
 					Class<?> clasz =
 					    (c.equals("double")? double.class:
