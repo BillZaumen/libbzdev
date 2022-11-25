@@ -287,6 +287,9 @@ estest14: compile
 estest15: compile
 	@echo - ExpressionParser Test '( .class.METHOD)' -
 	@$(JAVA) ExprScriptTest15
+estest16: compile
+	@echo - ExpressionParser Test '( .foreach())' -
+	@$(JAVA) ExprScriptTest16
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------
