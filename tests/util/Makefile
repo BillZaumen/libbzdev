@@ -92,6 +92,10 @@ all: compile
 	@$(JAVA) ExprScriptTest13
 	@echo - ExpressionParser Test '( == in arguments)' -
 	@$(JAVA) ExprScriptTest14
+	@echo - ExpressionParser Test '( .class.METHOD)' -
+	@$(JAVA) ExprScriptTest15
+	@echo - ExpressionParser Test '( .foreach())' -
+	@$(JAVA) ExprScriptTest16
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED

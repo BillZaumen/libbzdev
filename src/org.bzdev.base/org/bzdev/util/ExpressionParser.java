@@ -2371,7 +2371,10 @@ public class ExpressionParser implements ObjectParser<Object>
 			    String msg =errorMsg("noMRClass",cn,method,parms);
 			    throw new IllegalStateException(msg);
 			}
-			clasz = nclasz;
+			// If we switch to nclasz, we need nclasz impoorted,
+			// which makes method references work differenttly
+			// then lambda expressions doing the same thing.
+			// clasz = nclasz;
 		    }
 		    boolean isVarArgs = fim.isVarArgs();
 		    Class<?>[] carray = fim.getParameterTypes();

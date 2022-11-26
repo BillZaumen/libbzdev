@@ -1,4 +1,4 @@
-import(org.bzdev.math.stats, [BasicStats, BasicStats.Sample]);
+import (org.bzdev.math.stats.BasicStats.Sample);
 import(org.bzdev.math.rv, GaussianRV);
 
 var out = global.getWriter();

@@ -1824,7 +1824,7 @@ out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
     Because the lambda expression merely calls a method with the same
     arguments, a much more efficient implementation is possible:
     <BLOCKQUOTE><CODE><PRE>
-import(org.bzdev.math.stats, [BasicStats, BasicStats.Sample]);
+import(org.bzdev.math.stats.BasicStats.Sample);
 import(org.bzdev.math.rv, GaussianRV);
 
 var out = global.getWriter();
@@ -1834,12 +1834,7 @@ rv.stream(1000000).forEach(stats::add);
 out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
     </PRE></CODE></BLOCKQUOTE>
     The use of a method reference instead of a lambda expression will
-    improve execution time by roughly a factor of 10.  Note, however,
-    that the class BasicStat has to be explicitly imported. In this
-    case, the method is looked up before its arguments are available,
-    and as a result, more classes have to be explicitly imported
-    for the method to be recognized (this constraint may be relaxed
-    in future releases).
+    improve execution time by roughly a factor of 10 in this case.
 
     <H3>Typed-Null example</H3>
   <P>
