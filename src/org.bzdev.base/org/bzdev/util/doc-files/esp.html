@@ -583,9 +583,9 @@ BLOCKED
 	  least one argument must be a string.</TD></TR>
       <TR><TD> &lt;&lt; &gt;&gt; &gt;&gt;&gt;</TD><TD> left-shift,
 	  right-shift, or unsigned right-shift respectively.</TD></TR>
-      <TR><TD>&gt; &lt; &gt;= &lt;= instanceof</TD>
+      <TR><TD>&gt; &lt; &gt;= &lt;= instanceof &lt;=&gt;</TD>
 	<TD>greater-than, less-than, greater-than- or-equal-to, equal-to
-	  or instance-of respectively</TD></TR>
+	  instance-of, or swap respectively</TD></TR>
       <TR><TD>==, !=</TD><TD>equals and not equal respectively</TD></TR>
       <TR><TD>&amp;</TD><TD>bitwise AND</TD></TR>
       <TR><TD>^</TD><TD>bitwise exclusive OR</TD></TR>
@@ -593,7 +593,13 @@ BLOCKED
       <TR><TD>&amp;&amp;</TD><TD>logical AND</TD></TR>
       <TR><TD>||</TD><TD>logical OR</TD></TR>
     </TABLE>
-    <P>
+  <P>
+    The swap operator &lt;=&gt; is specific to ESP and exchanges
+    the values of its arguments, which must be two identifiers
+    representing variables (e.g., identifiers defined using the
+    <STRONG>var</STRONG> statement or by the argument list for
+    a function or lambda expression).  The value returned by
+    the swap operator is always <STRONG>true</STRONG>.
     For addition, subtraction, multiplication, and division, the
     type of the result of binary operation depends on the type
     of the operands.  The normal behavior is shown in the following
@@ -1917,6 +1923,40 @@ function printArray(array) {
     The <CODE>printArray</CODE> function can be used when its argument
     is either an ESP array or a Java array.
 
+    <H3>Use of the &lt;=&gt; Operator</H3>
+  <P>
+    If the following example is placed in an executable file
+    named <CODE>ecirc</CODE> on a Linux system, the program
+    <CODE>scrunner</CODE> will be used as an interpreter for
+    ESP.  The program will expect two arguments, both double
+    precision numbers, and will set the variable <CODE>a</CODE>
+    to the first argument and the variable <CODE>b</CODE> to the
+    second argument. The program will also print the last ESP
+    statement executred and will then exit immediately instead
+    of waiting for threads to terminate.  The command line
+    arguments are the lengths of an ellipse&apos;s semi major
+    and semi minor axes, and the program will print the
+    ellipse&apos;s circumference.
+    <BLOCKQUOTE><CODE><PRE>
+#!/usr/bin/scrunner -sD:a,D:b,E:true,P:true
+import (java.lang.Math);
+import (org.bzdev.math.Functions);
+(a &lt; b) &amp;&amp; a &lt;=&gt; b;
+
+var &epsilon; = Math.sqrt(1.0 - (b*b)/(a*a));
+4.0 * a * eE(&epsilon;);
+    </CODE></PRE></BLOCKQUOTE>
+  <P>
+    The swap operator was used so that <CODE>a</CODE> will contain
+    the length of the semi major axis and b will contain the length
+    of the semi minor axis. The function <CODE>eE</CODE> is the
+    complete elliptic integral of the second kind as is implemented
+    by the Java class <CODE>org.bzdev.math.Functions</CODE>.
+    For illustrative purposes, the variable containing the
+    eccentricity of the ellipse is represented by a Greek letter:
+    ESP allows the same characters to appear in identifiers as
+    Java does.
+
     <H3>Drama-Simulation Example</H3>
   <P>
     The file TestActor.java, which defines an actor, contains the following:
@@ -2501,5 +2541,5 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  blockImports blockMethod accessors unsetScripting
  -->
-<!--  LocalWords:  lexically
+<!--  LocalWords:  lexically Casted toStream IntStream DoubleStream
  -->

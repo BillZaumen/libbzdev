@@ -140,6 +140,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	COLON,	       // conditional
 	ASSIGN1,       // assign to a variable
 	ASSIGN2,       // assign to an object property or array element
+	SWAP,	       // swap two variables
 	THROW,
 	// Following are not actually operators but this
 	// is a convenient spot to denote them - it simplifies
@@ -291,7 +292,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		     Operator.EQ, Operator.NE, Operator.GT,
 		     Operator.LT, Operator.GE, Operator.LE,
 		     Operator.LOR, Operator.LAND, Operator.QMARK,
-		     Operator.COLON);
+		     Operator.COLON, Operator.SWAP);
 
     // operators other than binaryOps that cannot appear before a
     // method reference
@@ -306,7 +307,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		     Operator.CLASS, Operator.BOOLEAN, Operator.METHOD,
 		     Operator.LEAVE_ON_STACK, Operator.PARAMETER,
 		     Operator.THROW, Operator.ASSIGN1, Operator.ASSIGN2,
-		     Operator.CONSTRUCTOR);
+		     Operator.CONSTRUCTOR, Operator.SWAP);
 
     private static final EnumSet<Operator> notBeforeString
 	= EnumSet.of(Operator.FUNCTION_KEYWORD, Operator.NEW,
@@ -316,11 +317,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		     Operator.CPAREN, Operator.CLASS, Operator.METHOD_REF,
 		     Operator.CONSTANT, Operator.BOOLEAN, Operator.METHOD,
 		     Operator.VARIABLE, Operator.VARIABLE_NAME,
-		     Operator.EXIST_TEST, Operator.PARAMETER);
+		     Operator.EXIST_TEST, Operator.PARAMETER, Operator.SWAP);
 
     private static final EnumSet<Operator> notBeforeOBRACKET
 	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
-		     Operator.CLASS);
+		     Operator.CLASS, Operator.SWAP);
 
     Thread startingThread = Thread.currentThread();
     AtomicReference<Thread> importThreadRef = new AtomicReference<>();
@@ -3285,7 +3286,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	    return cc.amapTree != null;
 	}
 
-	void putInAmap(String name, Object object) {
+	void putInAmap
+	    (String name, Object object) {
 	    CallContext cc = callContext.get();
 	    boolean needAdd = true;
 	    for (Map<String,Object>map: cc.amapTree) {
@@ -5006,6 +5008,45 @@ public class ExpressionParser implements ObjectParser<Object>
 		    putInAmap(varname, object);
 		} else {
 		    vmap.get().put(varname, object);
+		}
+		break;
+	    case SWAP:
+		{
+		    String name2 = (String) popValue();
+		    String name1 = (String) popValue();
+		    boolean hasAmap = hasAmap();
+		    Object o1;
+		    Object o2;
+		    Map<String,Object> vm = vmap.get();
+		    if (hasAmap && amapContains(name1)) {
+			o1 = getFromAmap(name1);
+		    } else if (vm.containsKey(name1)) {
+			o1 = vm.get(name1);
+		    } else {
+			throw new ObjectParser.Exception
+			    (errorMsg("noValue", name1),
+			     opToken.getFileName(), orig, opToken.getIndex());
+		    }
+		    if (hasAmap && amapContains(name2)) {
+			o2 = getFromAmap(name2);
+		    } else if (vm.containsKey(name2)) {
+			o2 = vm.get(name2);
+		    } else {
+			throw new ObjectParser.Exception
+			    (errorMsg("noValue", name2),
+			     opToken.getFileName(), orig, opToken.getIndex());
+		    }
+		    if (hasAmap && amapContains(name1)) {
+			putInAmap(name1, o2);
+		    } else {
+			vm.put(name1, o2);
+		    }
+		    if (hasAmap && amapContains(name2)) {
+			putInAmap(name2, o1);
+		    } else {
+			vm.put(name2, o1);
+		    }
+		    pushValue(Boolean.TRUE);
 		}
 		break;
 	    case ASSIGN1:
@@ -7653,6 +7694,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	vsetStack.push(vset);
 
 	Token nonNullPrev = null;
+	Token ltPrevToken = null;
 
 	for (int i = 0; i < len; i++) {
 	    char ch = s.charAt(i);
@@ -7732,6 +7774,21 @@ public class ExpressionParser implements ObjectParser<Object>
 		    prev.modLevel(LOGICAL_OFFSET);
 		    continue;
 		}
+	    } else if (ch == '>') {
+		if (ptype == Operator.LE) {
+		    if (ltPrevToken != null) {
+			ltPrevToken.changeType(Operator.VARIABLE_NAME);
+			prev.changeType(Operator.SWAP);
+			prev.setName("<=>");
+			ltPrevToken = null;
+			continue;
+		    } else {
+			// <=> must have a variable as its previous token
+			String msg = errorMsg("varExpectedBefore");
+			throw new ObjectParser.Exception(msg, filenameTL.get(),
+							 s, i);
+		    }
+		}
 	    } else {
 		int iprev = i;
 		i = skipWhitespace(s, i, len, false);
@@ -7753,6 +7810,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		parenPeer = (parenPeers.size() == 0)? null: parenPeers.pop();
 		bracketPeer = (bracketPeers.size() == 0)? null:
 		    bracketPeers.pop();
+		ltPrevToken = null;
 		continue;
 	    }
 	    if (ptype == Operator.PEQ) {
@@ -7804,6 +7862,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		String msg = errorMsg("semicolon");
 		throw new ObjectParser.Exception(msg, filenameTL.get(), s, i);
 	    }
+	    ltPrevToken = null;
+
 	    // Operator ptype = (prev == null)? null: prev.getType();
 	    switch(ch) {
 	    case '#':
@@ -8409,6 +8469,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		    next = new Token(Operator.LSHIFT, "<<", offset+i,
 				     level + SHIFT_OFFSET);
 		} else {
+		    if (ptype == Operator.VARIABLE) {
+			ltPrevToken = prev;
+		    }
 		    next = new Token(Operator.LT, "<", offset+i,
 				     level + RELEQ_OFFSET);
 		}
@@ -9991,6 +10054,9 @@ public class ExpressionParser implements ObjectParser<Object>
 			    next = new Token((functParams? Operator.PARAMETER:
 					      Operator.VARIABLE),
 					     variable, offset+start, level);
+			    if (ptype == Operator.SWAP) {
+				next.changeType(Operator.VARIABLE_NAME);
+			    }
 			    if (functkwSeen) {
 				params.add(variable);
 				vset.add(variable);
@@ -10374,6 +10440,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case THROW:
 	    case ASSIGN1:
 	    case ASSIGN2:
+	    case SWAP:
 		processor.pushOp(token, s);
 		break;
 	    case LOR:

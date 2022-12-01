@@ -1,0 +1,57 @@
+var out = global.getWriter();
+var x = 10;
+var y = 20;
+out.format("%s, %s\n", x, y);
+x <=> y;
+out.format("%s, %s\n", x, y);
+true && x <=> y;
+out.format("%s, %s\n", x, y);
+false && x <=> y;
+(x == 10 || y == 20) || throw "swap unexpected 1";
+false || x <=> y;
+out.format("%s, %s\n", x, y);
+true || x <=> y;
+(x == 20 || y == 10) || throw "swap unexpected 2";
+
+true? x <=> y: false;
+out.format("%s, %s\n", x, y);
+false? true: x <=> y;
+out.format("%s, %s\n", x, y);
+true? x <=> y: x <=> y;
+out.format("%s, %s\n", x, y);
+false? x <=> y: x <=> y;
+out.format("%s, %s\n", x, y);
+x <=> y;
+out.format("%s, %s\n", x, y);
+
+function () {
+  var y = 30;
+  x <=> y;  
+  out.format("%s, %s\n", x, y);
+  x <=> y;
+  out.format("%s, %s\n", x, y);
+}();
+out.format("%s, %s\n", x, y);
+
+function (x) {
+  var y = 30;
+  x <=> y;  
+  out.format("%s, %s\n", x, y);
+}(40);
+out.format("%s, %s\n", x, y);
+
+function () {
+  var y = 30;
+  y <=> x;  
+  out.format("%s, %s\n", x, y);
+  y <=> x;
+  out.format("%s, %s\n", x, y);
+}();
+out.format("%s, %s\n", x, y);
+
+function (x) {
+  var y = 30;
+  y <=> x;  
+  out.format("%s, %s\n", x, y);
+}(40);
+out.format("%s, %s\n", x, y);
