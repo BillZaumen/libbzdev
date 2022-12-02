@@ -1,0 +1,33 @@
+var out = global.getWriter();
+var result = null;
+result = function() {
+10
+}();
+out.println(result);
+result = `{out.println(10)};
+out.flush();
+true && `{var a = 10; var b = 20; a <=> b; out.println(a)};
+
+var c = 10;
+var d = 20;
+c < d? `{out.println(c)}: `{out.println(d)};
+c <=> d;
+c < d? `{out.println(c)}: `{out.println(d)};
+
+c < d? `{out.println(c)}:
+d < c? `{out.println(d)}:
+`{out.println("c = d")};
+c <=> d;
+c < d? `{out.println(c)}:
+d < c? `{out.println(d)}:
+`{out.println("c = d")};
+
+c = 10 ; d = 10;
+c <=> d;
+c < d? `{out.println(c)}:
+d < c? `{out.println(d)}:
+`{out.println("c = d")};
+
+`{var a = 10 ; `{out.println(a)}};
+
+`{}

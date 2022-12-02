@@ -300,6 +300,10 @@ estest17: compile
 	@echo - ExpressionParser Test '( <=> operator)' -
 	@$(JAVA) ExprScriptTest17
 
+estest18: compile
+	@echo - ExpressionParser Test '( ` operator)' -
+	@$(JAVA) ExprScriptTest18
+
 unitree: compile
 	@echo ----- UniTreeNode Test -------
 	@$(JAVA) UniTreeNodeTest

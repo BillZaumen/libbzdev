@@ -108,6 +108,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private static enum Operator {
 	FUNCTION_KEYWORD,
+	BACKQUOTE,		// turn a block into a lambda expression
 	NEW,
 	VAR,
 	QVAR,			// var IDENT ?= ... ;
@@ -7203,6 +7204,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	void  incrementingLevel() {incrementedLevel = true;}
 
 
+	boolean backquoted = false;
+	void setBackquoted() {backquoted = true;}
+	boolean backquoted() {return backquoted;}
+
 	Token(Operator type, String s, int index, int level) {
 	    this.type = type;
 	    name = s;
@@ -8686,7 +8691,30 @@ public class ExpressionParser implements ObjectParser<Object>
 		    bracketPeers.pop();
 		tokens.add(next);
 		break;
+	    case '`':
+		level++; // so we have to decr after each operator
+		next = new Token(Operator.BACKQUOTE, "function",
+				 offset+i, level);
+		vset = new HashSet<String>();
+		vsetStack.push(vset);
+		tokens.add(next);
+		break;
 	    case '{':
+		if (ptype == Operator.BACKQUOTE) {
+		    level += 1 + LEVEL_OFFSET;
+		    next = new Token(Operator.OPAREN, "(", offset+i, level);
+		    tokens.add(next);
+		    next = new Token(Operator.CPAREN, ")", offset+i, level);
+		    next.setArgCount(0);
+		    if (params != null) paramsStack.push(params);
+		    params = new HashSet<String>();
+		    // "this" is a reserved keyword used by
+		    // methods. We don't allow it as the name of a parameter.
+		    params.add("this");
+		    tokens.add(next);
+		    level -= 1 + LEVEL_OFFSET;
+		    expectingOBrace = true;
+		}
 		if (expectingOBrace) {
 		    // expecting a '{' in a function def / lambda expression
 		    expectingOBrace = false;
@@ -8699,6 +8727,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		next = new Token
 		    ((epObjectStarted? Operator.OBJOPENBRACE: Operator.OBRACE),
 		     "{", offset+i, level);
+		if (ptype == Operator.BACKQUOTE) {
+		    prev.changeType(Operator.FUNCTION_KEYWORD);
+		    next.setBackquoted();
+		}
 		if (bracePeer != null) {
 		    if (bracePeer.getType() == Operator.OBJOPENBRACE
 			&& epObjectStarted == false && methodStartSeen) {
@@ -8736,8 +8768,19 @@ public class ExpressionParser implements ObjectParser<Object>
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
 		}
-		level = bracePeer.getLevel();
 		Operator bptype = bracePeer.getType();
+		level = bracePeer.getLevel();
+		if (bptype == Operator.OBRACE
+		    && bracePeer.backquoted()) {
+		    // Need to insert '; true'
+		    tokens.add(new Token(Operator.SEMICOLON, ";", offset+i,
+					 level + SEMICOLON_OFFSET));
+		    next = new Token(Operator.BOOLEAN, "true", offset+i,
+				    level+1);
+		    next.setValue(Boolean.TRUE);
+		    tokens.add(next);
+		}
+
 		next = new Token
 		    (((bptype == Operator.OBJOPENBRACE)? Operator.OBJCLOSEBRACE:
 		      Operator.CBRACE), "}", offset+i, level);
@@ -8772,6 +8815,24 @@ public class ExpressionParser implements ObjectParser<Object>
 		    }
 		}
 		tokens.add(next);
+		if (bptype == Operator.OBRACE &&
+		    next.getBracePeer().backquoted) {
+		    // act as if '()' follows.
+		    next = new Token(Operator.METHOD, "invoke",
+				     offset+i, level);
+		    funct = next;
+		    level += 1 + LEVEL_OFFSET;
+		    next = new Token(Operator.OPAREN, "(", offset+i, level);
+		    if (funct != null) {
+			next.setFunct(funct);
+		    }
+		    tokens.add(next);
+		    next = new Token(Operator.CPAREN, ")", offset+i, level);
+		    next.setFunct(funct);
+		    next.setArgCount(0);
+		    tokens.add(next);
+		    level -= (1 + LEVEL_OFFSET);
+		}
 		break;
 	    case '(':
 		if (epObjectStarted && colonExpected) {

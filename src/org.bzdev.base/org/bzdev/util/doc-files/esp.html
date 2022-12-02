@@ -229,9 +229,11 @@ if (typeof(out) == "undefined") {
 	variable is not already defined or the variable has the value of
 	null.  Aside from an additional test, this operator behave the
 	same as the <STRONG>?=</STRONG> operator.
+      <LI> The operator <STRONG>&lt;=&gt;</STRONG> may appear between
+	two variable names and swaps the values.
       <LI> Java method references may be used as method or function
 	arguments, and may be assigned to variables.
-      <LI> a class name, followed by <STRONG>::</STRONG>;, followed by
+      <LI> A class name, followed by <STRONG>::</STRONG>;, followed by
 	<STRONG>null</STRONG>; denotes the value null but with an associated
 	type.  This value may be assigned to variables or used as
 	function, method, or constructor arguments. It in effect casts
@@ -267,9 +269,10 @@ if (typeof(out) == "undefined") {
       <LI> Objects use ECMAScript syntax with some semantic differences.
 	When a method is defined by providing a method name followed by a
 	parentheses-delimited argument list, the reserved identifier
-	<STRONG>this</STRONG> is an implicit parameter for a method and
-	allows access to the method&apos;s properties. When the value of a
-	property is a lambda expression, there is not an implicit parameter
+	<STRONG>this</STRONG> is an implicit parameter for a method
+	and allows access to the method&apos;s properties. When the
+	value of a property is a lambda expression (e.g., an unnamed
+	function), there is not an implicit parameter
 	named <STRONG>this</STRONG>.
       <LI> Functions and methods may be synchronized by using the
 	<STRONG>synchronized</STRONG> keyword before a function definition,
@@ -294,6 +297,10 @@ var obj = {
 	</PRE></CODE></BLOCKQUOTE>
 	will define a synchronized method that will modify the property
 	<CODE>x</CODE> belonging to the object <CODE>obj</CODE>.
+      <LI> The symbol <STRONG>`</STRONG>, followed by opening curly
+	bracket, a series of statements, and a closing curly bracket
+	represents a lambda expression with no arguments that is immediately
+	called and that always returns <STRONG>true</STRONG>.
       <LI> The expression <STRONG>var.</STRONG><I>IDENTIFIER</I> tests
 	if a variable named <I>IDENTIFIER</I> exists.
       <LI> The keyword <STRONG>void</STRONG> can be used as the final
@@ -635,7 +642,32 @@ BLOCKED
     value. This ternary operator can be nested without the use of
     parentheses: which question mark is paired with which colon can be
     unambiguously determined by incrementing a &apos;depth&apos; when a question
-    mark is seen and decrementing it when a colon is seen.
+    mark is seen and decrementing it when a colon is seen. This operator
+    can be used as a replacement for the traditional if-then-else construct
+    by using lambda expressions. For example,
+    <BLOCKQUOTE><PRE>
+var a = ... ;
+var result = 0;
+(a &lt; 10)? function() {
+     result = a * a;
+}(): (a &lt; 20) function() {
+     result = 2*a;
+}(): function() {
+     result = a + 1;
+}();
+    </PRE></BLOCKQUOTE>
+    This can be shortened to
+    <BLOCKQUOTE><PRE>
+var a = ... ;
+var result = 0;
+(a &lt; 10)? `{
+     result = a * a;
+}: (a &lt; 20)? `{
+     result = 2*a;
+}: `{
+     result = a + 1;
+};
+    </PRE></BLOCKQUOTE>
   <P>
     As with the ternary operator, the operators "&amp;&amp;" and "||"
     skip expressions that do not have to be evaluated to produce the
@@ -646,6 +678,25 @@ BLOCKED
       <LI> the expression x || y will not evaluate y if the value of x
         is &apos;true&apos;.
     </UL>
+    Consequently, these can be used as an equivalent for "if" statements:
+    <BLOCKQUOTE><PRE>
+var x = 10;
+var y = 20;
+(x &lt; y) || function() {x = x * y; true}();
+    </PRE></BLOCKQUOTE>
+  <P>
+    The lambda expression has to return true because the preceding
+    logical operator expects a boolean value, but this can be
+    shortened to
+    <BLOCKQUOTE><PRE>
+var x = 10;
+var y = 20;
+(x &lt; y) || `{x = x * y;};
+    </PRE></BLOCKQUOTE>
+  <P>
+    because <CODE>`{x = x * y;}</CODE> evaluates to
+    <STRONG>true</STRONG>.
+
   <P>
     <H3><A NAME="statements"></A>Statements</H3>
   <P>
@@ -829,6 +880,7 @@ term: value
     | function-call
     | lambda-expression
     | lambda-expression &apos;(&apos; arguments &apos;)&apos;
+    | &apos;`&apos; &apos;{&apos; statements &apos;}&apos;
     | method-call
     | constructor
     | object
@@ -1932,7 +1984,7 @@ function printArray(array) {
     precision numbers, and will set the variable <CODE>a</CODE>
     to the first argument and the variable <CODE>b</CODE> to the
     second argument. The program will also print the last ESP
-    statement executred and will then exit immediately instead
+    statement executed and will then exit immediately instead
     of waiting for threads to terminate.  The command line
     arguments are the lengths of an ellipse&apos;s semi major
     and semi minor axes, and the program will print the
