@@ -310,6 +310,7 @@ public class SCRunner {
 
 
 	boolean stackTrace = false;
+	boolean noAdditionalArgs = false;
 	boolean printMode = false;
 	int trustLevel = 0;
 	boolean setScripting = true;
@@ -340,6 +341,8 @@ public class SCRunner {
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {
 		stackTrace = true;
+	    } else if (argv[index].equals("--noAdditionalArgs")) {
+		noAdditionalArgs = true;
 	    } else if (argv[index].equals("--print")) {
 		printMode = true;
 	    } else if (argv[index].equals("-o")) {
@@ -914,6 +917,11 @@ public class SCRunner {
 	// tcontext = new ExtendedScriptingContext(tcontext, true);
 	context = new ExtendedScriptingContext(context/*, false*/);
 	Handler handler = new Handler();
+
+	if (noAdditionalArgs && argv.length > index+1) {
+	    System.err.println(errorMsg("noAdditionalScripts"));
+	    System.exit(1);
+	}
 
 	while (index < argv.length) {
 	    try {

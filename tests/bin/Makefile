@@ -339,6 +339,14 @@ ecirc:
 	chmod u-x ecirc2
 	chmod u-x ./run
 
+ecircErr:
+	(cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x ecirc2
+	./ecirc2  10 20 ecirc3 || true
+	chmod u-x ecirc2
+	chmod u-x run
+
 clean:
 	rm -fr junk raf tmp.png
 	chmod u-x ./run ./run1

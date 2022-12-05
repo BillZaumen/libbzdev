@@ -787,11 +787,12 @@ public class SCRunnerCmd {
 	index = 0;
 	ArrayList<String> parmList = new ArrayList<>();
 	boolean autoExitMode = false;
+	boolean noAdditionalArgs = false;
 	boolean maxQualityMode = false;
 	boolean autoStackTraceMode = false;
 	boolean autoPrintMode = false;
 	boolean unsetScriptingMode = false;
-	if (argv[0].matches("-s[:,BDILSERTU\\s].*")) {
+	if (argv[0].matches("-s[:,BDILNSERTU\\s].*")) {
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
 	    /*
@@ -827,6 +828,11 @@ public class SCRunnerCmd {
 		case 'E':
 		    if (variable.equalsIgnoreCase("true")) {
 			autoExitMode = true;
+		    }
+		    break;
+		case 'N':
+		    if (variable.equalsIgnoreCase("true")) {
+			noAdditionalArgs = true;
 		    }
 		    break;
 		case 'P':
@@ -1028,7 +1034,8 @@ public class SCRunnerCmd {
 	argList.add(sbcp.toString());
 	*/
 	index = (script == null)? 0: 1;
-	if (parmList.size() > 0 || autoExitMode || maxQualityMode
+	if (parmList.size() > 0 || autoExitMode
+	    || noAdditionalArgs || maxQualityMode
 	    || autoStackTraceMode || autoPrintMode || unsetScriptingMode) {
 	    // This detects a '-s' option, which has to be skipped
 	    // as it was already processed.
@@ -1352,6 +1359,9 @@ public class SCRunnerCmd {
 	// processing "-s" suboptions.
 	if (autoExitMode) {
 	    argList.add("--exit");
+	}
+	if (noAdditionalArgs) {
+	    argList.add("--noAdditionalArgs");
 	}
 	if (maxQualityMode) {
 	    argList.add("-r");
