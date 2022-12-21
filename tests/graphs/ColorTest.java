@@ -208,6 +208,23 @@ public class ColorTest {
 	if (!c1.equals(c2)) {
 	    throw new Exception("c1 != c2");
 	}
+
+	System.out.println("test CSS white");
+	name = "white";
+	c = new Color(255, 255, 255);
+	if (!name.equals(Colors.getCSSName(c))) {
+	    System.out.format("c = %s, code = %x\n", c, c.getRGB());
+	    System.out.println("Colors.getCSSName(c) = "
+			       + Colors.getCSSName(c));
+	    throw new Exception("named color lookup failed");
+	}
+
+	c1 = Colors.getColorByCSS(name);
+	if (!c1.equals(c)) {
+	    System.out.format("%s not %s\n", c1, name);
+	    throw new Exception("getColorByCSS failed");
+	}
+
 	System.out.println("... done");
 
 

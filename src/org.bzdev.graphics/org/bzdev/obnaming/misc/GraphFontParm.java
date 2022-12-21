@@ -182,7 +182,7 @@ public class GraphFontParm {
     @PrimitiveParm(value="color.blue",
 		   lowerBound = "0",
 		   upperBound = "255")
-    public Integer blue = 0;
+    public Integer blue = null;
 
     /**
      * The alpha component of a color.

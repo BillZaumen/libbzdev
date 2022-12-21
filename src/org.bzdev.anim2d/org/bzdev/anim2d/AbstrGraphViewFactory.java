@@ -6,11 +6,11 @@ import org.bzdev.obnaming.annotations.CompoundParmType;
 import org.bzdev.obnaming.annotations.CompoundParm;
 
 import org.bzdev.lang.Callable;
+import org.bzdev.graphs.Graph;
 
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
-
 
 /**
  * Abstract GraphView factory.
@@ -22,10 +22,14 @@ import java.util.HashMap;
  *        left offset to its right offset at which the point specifying the
  *        X coordinate of a GraphView's location appears. This point's
  *        graph coordinate space coordinates are (initialX, initialY).
+ *        The graph is the {@link Graph} used by {@link Animation2D} to
+ *        display an animation.
  *   <li> "yFrameFraction" - the fractional distance from the graph's
  *        lower offset to its upper offset at which the point specifying the
  *        Y coordinate of the graph's location appears.  This point's
  *        graph coordinate space coordinates are (initialX, initialY).
+ *        The graph is the {@link Graph} used by {@link Animation2D} to
+ *        display an animation.
  *   <li> "scaleX" - the scale factor for the X direction (the amount by
  *        which to multiple a distance in graph coordinate space along the
  *        X axis to get the corresponding distance in user space).

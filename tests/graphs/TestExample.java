@@ -7,7 +7,7 @@ import java.io.*;
 import org.bzdev.gio.OutputStreamGraphics;
 import org.bzdev.geom.SplinePath2D;
 import org.bzdev.math.rv.GaussianRV;
-import org.bzdev.util.StaticRandom;
+import org.bzdev.math.StaticRandom;
 
 public class TestExample {
 

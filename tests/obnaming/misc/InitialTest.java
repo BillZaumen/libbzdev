@@ -32,7 +32,8 @@ public class InitialTest {
 	cp.css = "rgb(255,0,0)";
 	color = cp.createColor();
 
-	System.out.format("red = %d, green = %d, blue = %d, alpha = %d\n",
+	System.out.format("rgb(255,0.0): red = %d, green = %d,"
+			  + " blue = %d, alpha = %d\n",
 			  color.getRed(), color.getGreen(), color.getBlue(),
 			  color.getAlpha());
 
@@ -40,10 +41,18 @@ public class InitialTest {
 	cp.css = "red";
 	cp.alpha = 128;
 	color = cp.createColor();
-	System.out.format("red = %d, green = %d, blue = %d, alpha = %d\n",
+	System.out.format("red: red = %d, green = %d, blue = %d, alpha = %d\n",
 			  color.getRed(), color.getGreen(), color.getBlue(),
 			  color.getAlpha());
 
+	cp = new ColorParm();
+	cp.css = "white";
+	cp.alpha = 255;
+	color = cp.createColor();
+	System.out.format("white: red = %d, green = %d,"
+			  + " blue = %d, alpha = %d\n",
+			  color.getRed(), color.getGreen(), color.getBlue(),
+			  color.getAlpha());
 
 
 	BasicStrokeParm bsp = new BasicStrokeParm();
@@ -98,6 +107,8 @@ public class InitialTest {
 
 	System.out.println("\nGraphFontParm:");
 	GraphFontParm gfp = new GraphFontParm();
+	gfp.css="rgb(100, 150, 200)";
+	gfp.alpha = 128;
 	Graph.FontParms fp = gfp.createFontParms();
 	System.out.format("angle = %5.3f, baseline = %s, justification = %s",
 			  fp.getAngle(),
