@@ -123,5 +123,34 @@ public class InitialTest {
 			  + ", italic=%s\n",
 			  f.getName(), f.getSize(),
 			  f.isPlain(), f.isBold(), f.isItalic());
+
+	cp = new ColorParm.RED();
+	Color c1 = cp.createColor();
+	cp.css = "white";
+	Color c2 = cp.createColor();
+	System.out.println(c1 +" " + c2);
+	cp = new ColorParm(new Color(100, 150, 200));
+	System.out.println(cp.createColor());
+	cp.css = "red";
+	System.out.println("rbga = " + cp.getRed()
+			   + ", " + cp.getGreen()
+			   + ", " + cp.getBlue()
+			   + ", " + cp.getAlpha());
+	System.out.println(cp.createColor());
+	cp.alpha = 128;
+	System.out.println("rbga = " + cp.getRed()
+			   + ", " + cp.getGreen()
+			   + ", " + cp.getBlue()
+			   + ", " + cp.getAlpha());
+	Color c3 = cp.createColor();
+	System.out.println(c3 + ", alpha = " + c3.getAlpha());
+	cp.css = null;
+	cp.alpha = null;
+	c3 = cp.createColor();
+	System.out.println(c3 + ", alpha = " +c3.getAlpha());
+	System.out.println("rbga = " + cp.getRed()
+			   + ", " + cp.getGreen()
+			   + ", " + cp.getBlue()
+			   + ", " + cp.getAlpha());
     }
 }

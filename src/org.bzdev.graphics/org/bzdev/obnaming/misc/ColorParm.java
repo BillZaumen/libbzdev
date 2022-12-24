@@ -24,16 +24,20 @@ import java.awt.Color;
  *       for CSS level 3; null if CSS is not used.
  *   <li><code>red</code> - an integer in the range [0,255] giving the red
  *       component of the color (overrides the red component of the css
- *        option).
+ *        option when the css parametercss is not null).
  *   <li><code>green</code> - an integer in the range [0,255] giving the green
  *       component of the color (overrides the green component of the css
- *        option).
+ *        option when the css parametercss is not null).
  *   <li><code>blue</code> - an integer in the range [0,255] giving the blue
  *       component of the color (overrides the blue component of the
- *       css option).
+ *       css option when the css parametercss is not null).
  *   <li><code>alpha</code> - an integer in the range [0,255] giving the alpha
- *       component of the color.
+ *       component of the color. If null, the value will be 255 unless
+ *       the css parameter specifies a value of alpha, in which case that
+ *       value will be used.
  * </ul>
+ * If all of these parameters are null, a default color will be used
+ * (which may be null).
  */
 @CompoundParmType(tipResourceBundle = "*.lpack.ColorParmTips",
 		  labelResourceBundle = "*.lpack.ColorParmLabels",
@@ -78,6 +82,12 @@ public class ColorParm {
 		   upperBound = "255")
     public Integer alpha = null;
 
+    // will be ignored if any of the above is set.
+    private String defaultCSS = null;
+    private Integer defaultRed = null;
+    private Integer defaultGreen = null;
+    private Integer defaultBlue = null;
+    private Integer defaultAlpha = null;
 
     /**
      * An instance of ColorParm whose default constructor
@@ -172,8 +182,8 @@ public class ColorParm {
 
     /**
      * Constructor given a color.
-     * The color provided can be modified by changing the red, green, and
-     * blue fields, but not the css field. This constructor should not be
+     * The color provided can be changed by setting  the red, green,
+     * blue, or css fields. This constructor should not be
      * used to initialize the value of a variable annotated with a
      * {@literal @}CompoundParm annotation.
      * To initialize a variable annotated with a {@literal @}CompoundParm
@@ -182,10 +192,10 @@ public class ColorParm {
      * @param c the color used to configure this object
      */
     public ColorParm(Color c) {
-	red = c.getRed();
-	green = c.getGreen();
-	blue = c.getBlue();
-	alpha = c.getAlpha();
+	defaultRed = c.getRed();
+	defaultGreen = c.getGreen();
+	defaultBlue = c.getBlue();
+	defaultAlpha = c.getAlpha();
     }
 
     /**
@@ -201,58 +211,81 @@ public class ColorParm {
     public ColorParm(String spec) throws IllegalArgumentException {
 	// called to syntax check the argument
 	Colors.getComponentsByCSS(spec);
+	defaultCSS = spec;
 	css = spec;
     }
 
     /**
      * Get the red component for a colorParm.
-     * If other color components are non-null and this component is null,
-     * a default value of 0 is returned.
+     * If other color components are non-null and the red component is null,
+     * a default value of 0 is returned. Otherwise if the CSS component
+     * is non-null, the red component of that color is returned. Otherwise
+     * if a default was provided in a constructor, the red component of that
+     * color is returned.
      * @return the red component of the color; null if no color
-     *         components were provided
+     *         components were provided either explicitly or by specifying
+     *         a default color in a constructor.
      */
     public Integer getRed() {
-	if (red == null && green == null && blue == null && alpha == null)
-	    return null;
-	return (red == null)? 0: red;
+	Color c = createColor();
+	return (c == null)? null: c.getRed();
     }
 
     /**
      * Get the green component for a colorParm.
-     * If other color components are non-null and this component is null,
-     * a default value of 0 is returned.
+     * If other color components are non-null and the green component is null,
+     * a default value of 0 is returned. Otherwise if the CSS component
+     * is non-null, the red component of that color is returned. Otherwise
+     * if a default was provided in a constructor, the green component of that
+     * color is returned.
      * @return the green component of the color; null if no color
-     *         components were provided
+     *         components were provided either explicitly or by specifying
+     *         a default color in a constructor.
      */
     public Integer getGreen() {
-	if (red == null && green == null && blue == null && alpha == null)
-	    return null;
-	return (green == null)? 0: green;
+	Color c = createColor();
+	return (c == null)? null: c.getGreen();
     }
 
     /**
      * Get the blue component for a colorParm.
-     * If other color components are non-null and this component is null,
-     * a default value of 0 is returned.
+     * If other color components are non-null and the blue component is null,
+     * a default value of 0 is returned. Otherwise if the CSS component
+     * is non-null, the blue component of that color is returned. Otherwise
+     * if a default was provided in a constructor, the red component of that
+     * color is returned.
      * @return the blue component of the color; null if no color
-     *          components were provided
+     *          components were provided either explicitly or by specifying
+     *         a default color in a constructor.
      */
     public Integer getBlue() {
-	if (red == null && green == null && blue == null && alpha == null)
-	    return null;
-	return (blue == null)? 0: blue;
+	Color c = createColor();
+	return (c == null)? null: c.getBlue();
     }
 
     /**
      * Get the alpha component for a colorParm.
-     * If other color components are non-null and this component is null,
-     * a default value of 255 is returned.
+     * If other color components are non-null and the alpha component is null,
+     * a default value of 255 is returned. Otherwise if a default alpha
+     * component was provided, that is returned, but if a default alpha
+     * component was not provided (i.e., was null), but other defaults
+     * were provided, 255 is returned.
      * @return the alpha component of the color; null if no color
-     *         components were provided
+     *         components were provided either explicitly or by specifying
+     *         a default value in a constructor.
      */
     public Integer getAlpha() {
-	if (red == null && green == null && blue == null && alpha == null)
-	    return null;
+	if (red == null && green == null && blue == null && alpha == null) {
+	    if (defaultRed == null && defaultGreen == null
+		&& defaultBlue == null && defaultAlpha == null) {
+		if (defaultCSS == null) {
+		    return null;
+		} else {
+		    return 255;
+		}
+	    }
+	    return (defaultAlpha == null)? 255: defaultAlpha;
+	}
 	return (alpha == null)? 255: alpha;
     }
 
@@ -266,6 +299,30 @@ public class ColorParm {
 	int g = 0;
 	int b = 0;
 	int a = 255;
+	if (css == null && red == null && green == null
+	    && blue == null  && alpha == null) {
+	    // use default.
+	    if (defaultCSS != null) {
+		int[] components = Colors.getComponentsByCSS(defaultCSS);
+		r = components[0];
+		g = components[1];
+		b = components[2];
+		if (components.length  == 4) {
+		    a = components[3];
+		}
+	    } else if (defaultRed == null && defaultGreen == null
+		       && defaultBlue == null && defaultAlpha == null) {
+		return null;
+	    } else {
+		// default Red, Green, Blue are set in a constructor
+		// that was given a Color as its argument
+		r = defaultRed;
+		g = defaultGreen;
+		b = defaultBlue;
+		a = defaultAlpha;
+	    }
+	    return new Color(r, g, b, a);
+	}
 	if (css != null) {
 	    int[] components = Colors.getComponentsByCSS(css);
 	    r = components[0];
@@ -274,16 +331,12 @@ public class ColorParm {
 	    if (components.length  == 4) {
 		a = components[3];
 	    }
-	} else if (red == null && green == null && blue == null
-		   && alpha == null) {
-	    return null;
 	}
 
 	r = (red == null)? r: red;
 	g = (green == null)? g: green;
 	b = (blue == null)? b: blue;
 	a = (alpha == null)? a: alpha;
-
 	return new Color(r, g, b, a);
     }
 }
