@@ -39,7 +39,7 @@ var pbc = {
     configurePathBuilder (pb, windingRule, spec) {
       var wr = 
 	  (windingRule == "WIND_EVEN_ODD" || windingRule == Path2D.WIND_EVEN_ODD
-	   || windingRule == pb.constantWIND_RULE_NON_ZERO())?
+	   || windingRule == pb.constantWIND_NON_ZERO())?
 	     pb.constantWIND_EVEN_ODD():
 	  (windingRule == "WIND_NON_ZERO" ||
 	   windingRule == java.awt.geom.Path2D.WIND_NON_ZERO ||

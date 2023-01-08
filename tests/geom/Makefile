@@ -34,6 +34,9 @@ all:
 	@java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.esp
+	@java -classpath \
+		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
+		org.bzdev.bin.scrunner.SCRunnerCmd cwrtest.esp
 	@echo --------- AreaTest -----------------
 	@$(JAVA) AreaTest
 	@echo --------- Point3DTest --------------
@@ -833,6 +836,14 @@ pbtest-esp:
 	@java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace pbtest.esp
+cwrtest-esp:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@java -classpath \
+		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
+		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace cwrtest.esp
+
 
 captest:
 	(cd ../.. ; make jars)
