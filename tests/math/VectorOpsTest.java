@@ -238,5 +238,94 @@ public class VectorOpsTest {
 	    || Math.abs(v[2] - v1[2]/w) > 1.e-10) {
 	    throw new Exception("unitVector failed");
 	}
+	v = VectorOps.createVector(1.0, 2.0, 3.0);
+	if (v[0] != 1.0 || v[1] != 2.0 || v[2] != 3.0) {
+	    throw new Exception("createVector failed");
+	}
+	norm = VectorOps.norm(v);
+	v = VectorOps.createUnitVector(1.0, 2.0, 3.0);
+	if (Math.abs(v[0] - 1.0/norm) > 1.e-01
+	    || Math.abs(v[1] - 2.0/norm) > 1.e-10
+	    || Math.abs(v[2] - 3.0/norm) > 1.e-10) {
+	    throw new Exception("createUnitVector failed");
+	}
+
+	v = VectorOps.createUnitVector3(0.0, 0.0);
+	if (v[0] != 0.0 || v[1] != 0.0 || v[2] != 1.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(3.0, 0.0);
+	if (v[0] != 0.0 || v[1] != 0.0 || v[2] != 1.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+
+	v = VectorOps.createUnitVector3(0.0, Math.PI);
+	if (v[0] != 0.0 || v[1] != 0.0 || v[2] != -1.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(3.0, Math.PI);
+	if (v[0] != 0.0 || v[1] != 0.0 || v[2] != -1.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+
+	v = VectorOps.createUnitVector3(0.0, Math.PI/2);
+	if (v[0] != 1.0 || v[1] != 0.0 || v[2] != 0.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(Math.PI/2, Math.PI/2);
+	if (v[0] != 0.0 || v[1] != 1.0 || v[2] != 0.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(Math.PI, Math.PI/2);
+	if (v[0] != -1.0 || v[1] != 0.0 || v[2] != 0.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(3*Math.PI/2, Math.PI/2);
+	if (v[0] != 0.0 || v[1] != -1.0 || v[2] != 0.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(Math.PI/3, Math.PI/2);
+	if (v[0] != Math.cos(Math.PI/3) || v[1] != Math.sin(Math.PI/3)
+	    || v[2] != 0.0) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+
+	v = VectorOps.createUnitVector3(0.0, Math.PI/3);
+	double sinPI3 = Math.sin(Math.PI/3);
+	double cosPI3 = Math.cos(Math.PI/3);
+	if (v[0] != sinPI3 || v[1] != 0.0 || v[2] != cosPI3) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(Math.PI/2, Math.PI/3);
+	if (v[0] != 0.0 || v[1] != sinPI3 || v[2] != cosPI3) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(Math.PI, Math.PI/3);
+	if (v[0] != -sinPI3 || v[1] != 0.0 || v[2] != cosPI3) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+	v = VectorOps.createUnitVector3(3*Math.PI/2, Math.PI/3);
+	if (v[0] != 0.0 || v[1] != -sinPI3 || v[2] != cosPI3) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+
+	v = VectorOps.createUnitVector3(Math.PI/5, Math.PI/3);
+	double sinPI5 = Math.sin(Math.PI/5);
+	double cosPI5 = Math.cos(Math.PI/5);
+	if (v[0] != cosPI5*sinPI3 || v[1] != sinPI5*sinPI3
+	    || v[2] != cosPI3) {
+	    throw new Exception("createUnitVector3 failed");
+	}
+
+	double[] vv = VectorOps.createVector3(2.0, Math.PI/5, Math.PI/3);
+	if (Math.abs(VectorOps.norm(vv) - 2.0) > 1.e-10) {
+	    throw new Exception("createVector3 failed");
+	}
+	for (int i = 0; i < 3; i++) {
+	    if (Math.abs(v[i] - vv[i]/2) > 1.e-10) {
+		throw new Exception("createVector3 failed");
+	    }
+	}
+	System.exit(0);
     }
 }

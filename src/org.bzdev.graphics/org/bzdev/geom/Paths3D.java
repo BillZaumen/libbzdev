@@ -16,7 +16,8 @@ import org.bzdev.math.VectorOps;
 /**
  * Utility class to create various 3D paths. This class consists of
  * static methods, and is analogous to the class Paths2D but for
- * 3D paths instead of 2D paths.
+ * 3D paths instead of 2D paths. It also includes methods for creating
+ * unit vectors.
  * <P>
  * The operations include creating arcs and reversing existing paths.
  */

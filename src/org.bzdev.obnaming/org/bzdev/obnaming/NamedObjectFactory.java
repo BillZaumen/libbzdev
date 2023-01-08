@@ -3084,7 +3084,7 @@ abstract public class NamedObjectFactory<
 
 
     /**
-     * Add a value provided as a string.
+     * Add a value provided as a string to as set of strings.
      * @param name the name of the entry
      * @param value the value of the object
      * @exception ConfigException an exception encapsulating an
@@ -3173,7 +3173,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Add a value provided as a named object.
+     * Add a value provided as a named object to a set of named objects.
      * @param name the name of the entry
      * @param value the value of the object
      * @exception ConfigException an exception encapsulating an
@@ -3226,7 +3226,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Add a value provided as an enumeration.
+     * Add a value provided as an enumeration to a set of enumerations.
      * @param name the name of the entry
      * @param value the value of the object
      * @exception ConfigException an exception encapsulating an
@@ -3279,7 +3279,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Add a value provided as an int.
+     * Add a value provided as an int to a set of integers.
      * @param name the name of the entry
      * @param value the value of the object
      * @exception ConfigException an exception encapsulating an
@@ -3335,7 +3335,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Add a value provided as a long.
+     * Add a value provided as a long to a set of integers.
      * The long-integer argument will be converted to an int as this
      * method is provided to support polymorphism.
      * @param name the name of the entry
@@ -3366,7 +3366,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Add a value provided as a double.
+     * Add a value provided as a double to a set of integers.
      * The double-precision value will be converted to an int as this
      * method is provided to support polymorphism.
      * @param name the name of the entry
@@ -11812,7 +11812,7 @@ abstract public class NamedObjectFactory<
 
 
     /**
-     * Remove an entry with a key.
+     * Remove an entry with a key from a set of strings.
      * @param name the name of the entry
      * @param key the key
      * @exception IllegalArgumentException the argument does
@@ -11887,7 +11887,7 @@ abstract public class NamedObjectFactory<
 	}
 
     /**
-     * Remove an entry with a named-object key.
+     * Remove an entry with a named-object key from a set of named objects.
      * @param name the name of the entry
      * @param key the key
      * @exception IllegalArgumentException the argument does
@@ -11924,7 +11924,7 @@ abstract public class NamedObjectFactory<
 	}
 
     /**
-     * Remove an entry with an enumeration key.
+     * Remove an entry with an enumeration key from a set of enumerations.
      * @param name the name of the entry
      * @param key the key
      * @exception IllegalArgumentException the argument does
@@ -11960,7 +11960,7 @@ abstract public class NamedObjectFactory<
 	}
 
     /**
-     * Remove an entry with an index.
+     * Remove an entry with an index from a set of integers.
      * @param name the name of the entry
      * @param key the key
      * @exception IllegalArgumentException the argument does
@@ -12000,7 +12000,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Remove a value provided as a long.
+     * Remove a value provided as a long from a set of integers.
      * The long-integer argument will be converted to an int as this
      * method is provided to support polymorphism.
      * @param name the name of the entry
@@ -12021,7 +12021,7 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Remove a value provided as a double.
+     * Remove a value provided as a double from a set of integers.
      * The double-precision value will be converted to an int as this
      * method is provided to support polymorphism.
      * @param name the name of the entry
@@ -12047,7 +12047,8 @@ abstract public class NamedObjectFactory<
 
 
     /**
-     * Remove a compound key provided as two objects.
+     * Remove a compound key provided as two objects, undoing the
+     * corresponding add operation.
      * This is handles a special case - a compound key with two
      * components - and is equivalent to
      * <blockquote><pre>
@@ -12068,7 +12069,8 @@ abstract public class NamedObjectFactory<
     }
 
     /**
-     * Remove an entry with a compound key.
+     * Remove an entry with a compound key, undoing the
+     * corresponding add operation.
      * @param name the name of the entry
      * @param key the key
      * @exception IllegalArgumentException the argument does

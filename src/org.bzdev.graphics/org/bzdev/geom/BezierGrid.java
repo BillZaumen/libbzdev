@@ -25,8 +25,17 @@ import java.io.IOException;
 
 /**
  * Class representing a grid of cubic B&eacute;zier patches.
- * The patches are specified by giving a rectangular grid of points,
- * some of which may be null.  Each element of the grid contains
+ * The patches are specified by providing a rectangular grid of points,
+ * some of which may be null. Most of the constructors specify this
+ * grid directly.  There are two exceptions:
+ * <UL>
+ *   <LI>{@link BezierGrid#BezierGrid(Path2D,BezierGrid.Mapper)}.
+ *   <LI>{@link BezierGrid#BezierGrid(Path2D,Point3DMapper,int,boolean)}.
+ * </UL>
+ * The first argument of these two constructorss is a 2D path representing a
+ * cross section of a tube or wire, and handles a common special case.
+ * <P>
+ * Each element of the grid contains
  * <UL>
  *   <LI> a point on the surface that the grid represents. This
  *        point corresponds to the U-V coordinate (0,0), and may
@@ -608,9 +617,9 @@ public class BezierGrid implements Shape3D {
      * rounded to the nearest 'float' value by first casting the values
      * to a float and then to a double.
      * @param sarray the 's' values at grid points in increasing order
-     * @param uclosed
+     * @param uclosed true if the U direction is closed, false otherwise
      * @param tarray the 't' values at grid points in increasing order
-     * @param vclosed
+     * @param vclosed true if the V direction is closed, false otherwise
      * @param xfunct the function f<sub>x</sub>(s,t) providing the X
      *        coordinate at (s,t)
      * @param yfunct the function f<sub>y</sub>(s,t) providing the Y
@@ -661,9 +670,9 @@ public class BezierGrid implements Shape3D {
      * configured to have its own region. By default, each line connecting
      * two adjacent grid points will be a straight line.
      * @param sarray the 's' values at grid points in increasing order
-     * @param uclosed
+     * @param uclosed true if the U direction is closed, false otherwise
      * @param tarray the 't' values at grid points in increasing order
-     * @param vclosed
+     * @param vclosed true if the V direction is closed, false otherwise
      * @param linear true if lines connecting grid points are straight lines;
      *        false otherwise
      * @param xfunct the function f<sub>x</sub>(s,t) providing the X
@@ -1027,9 +1036,11 @@ public class BezierGrid implements Shape3D {
      * Get a mapper that will apply an indexed affine transform to
      * points along a 2D or 3D curve. The indexes range from 0 to N
      * where N is the value returned by
-     * {@link Path3DInfo#numberOfDrawableSegments(Path3D) Path3DInfo.numberOfDrawableSegments(wire)}.
-     * For each segment along the path 'wire' that starts with a tangent
-     * vector T, a vector N perpendicular to T is set to a unit vector
+     * {@link Path3DInfo#numberOfDrawableSegments(Path3D) Path3DInfo.numberOfDrawableSegments(wire)}.  This mapper treats a two dimensional point (x, y) the
+     * same as the three dimenional point (x, y, 0.0).
+     * <P>
+     * For each segment along the path 'wire' that starts with a unit tangent
+     * vector T, a unit vector N perpendicular to T is set to a unit vector
      * in the direction T &times; (N&prime; &times; T), where N&prime; is
      * the previous value of N. The initial value of N&prime; is the
      * vector given by the argument inormal. For points along a 2 dimensional
@@ -1043,9 +1054,21 @@ public class BezierGrid implements Shape3D {
      * those that precede them or follow them so that straight line segments
      * in the 'wire' path correspond to cylindrical sections along the
      * generated surface.
+     * <P>
+     * The normal vector is represented by an array containing the vector's
+     * X, Y and Z coordinates in that order, and its norm does not matter as
+     * long as it is not zero.  The class {@link org.bzdev.math.VectorOps}
+     * contains methods that can simplify the creation of normal vectors,
+     * specifically
+     * {@link org.bzdev.math.VectorOps#createUnitVector3(double,double)},
+     * which uses spherical coordinates.
      * @param wire a 3D path, either open or closed
      * @param inormal the vector that provides an initial normal vector
      *        (ignored if a normal vector can be computed from the 'wire')
+     * @see org.bzdev.math.VectorOps#createVector(double...)
+     * @see org.bzdev.math.VectorOps#createUnitVector(double...)
+     * @see org.bzdev.math.VectorOps#createVector3(double,double,double)
+     * @see org.bzdev.math.VectorOps#createUnitVector3(double,double)
      */
     public static Mapper getMapper(Path3D wire, double[] inormal)
     {
@@ -1262,7 +1285,19 @@ public class BezierGrid implements Shape3D {
      * This constructor can be used to create 'wires' with the template
      * specifying the cross section, with
      * {@link #getMapper(Path3D,double[])} creating a mapper given the
-     * wire's path.
+     * wire's path.  When {@link #getMapper(Path3D,double[])} is used,
+     * the point (0,0) will be mapped to a point on the 3D path provided
+     * by <CODE>getMapper</CODE>, a unit vector pointing along X axis
+     * in the 2 dimensional space containing the template will be
+     * mapped to the unit normal vector N for a point on the wire's
+     * path. Similarly a unit vector pointing along the Y axis in the
+     * 2 dimensional space containing the template will be mapped to
+     * the unit vector N &times; T, where T is the unit  tangent vector for the
+     * same point on the wire's path.
+     * @param template a two-dimensional path representing a cross section
+     *        of a 'wire'
+     * @param mapper an instance of  {@link BezierGrid.Mapper} that maps
+     *        points on the template to points on the 'wire'
      */
     public BezierGrid(Path2D template, Mapper mapper) {
 	this(template, mapper, mapper.getN(), mapper.isClosed());

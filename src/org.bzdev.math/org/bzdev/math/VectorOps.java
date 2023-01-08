@@ -181,6 +181,8 @@ public class VectorOps {
      * Multiply a vector by a scalar.
      * @param scalar the scalar
      * @param v the vector
+     * @return a vector containing the product of the scalar with
+     *         the argument v (which is not modified)
      */
     public static double[] multiply(double scalar, double[] v) {
 	double[] result = new double[v.length];
@@ -197,6 +199,7 @@ public class VectorOps {
      *        if a new array should be allocated
      * @param scalar the scalar
      * @param v the vector
+     * @return the result vector
      * @exception IllegalArgumentException the vectors differ in length
      */
     public static double[] multiply(double[] result, double scalar, double[] v)
@@ -312,6 +315,7 @@ public class VectorOps {
      * Compute the cross product of two vectors.
      * @param v1 the first vector
      * @param v2 the second vector
+     * @return the cross product of v1 with v2
      * @exception IllegalArgumentException the arrays v1 and v2 do not
      *            have the same length
      */
@@ -346,9 +350,10 @@ public class VectorOps {
      * Compute the cross product of two vectors, storing the results.
      * @param result a vector that will be set to the cross product 
      *        v1 &times; v2; null if a new vector should be allocated
-     * @param v1 the first vector
-     * @param v2 the second vector
-     * @return result, or a new vector if result is null
+     * @param v1 the first vector v<sub>1</sub>
+     * @param v2 the second vector v<sub>2</sub>
+     * @return result, or a new vector equal to
+     *          v<sub>1</sub>&times;v<sub>2</sub> if result is null
      * @exception IllegalArgumentException the arrays v1 and v2 do not
      *            have the same length
      */
@@ -396,7 +401,7 @@ public class VectorOps {
      * such that the vectors fit within their arrays. All vectors have a
      * length of 3.
      * @param result an array holding a vector that will be set to the 
-     *        cross product v1 &times; v2
+     *        cross product v1 &times; v2 at the specified offset
      * @param offset the offset into the array 'result' (the first argument)
      *        at which the vector will be stored; ignored if 'result' is null
      * @param v1 the first vector's array
@@ -759,8 +764,89 @@ public class VectorOps {
 	}
 	return multiply(result, rOffset, 1.0/vnorm, v, vOffset, n);
     }
+
+    /**
+     * Create a vector given its components.
+     * @param xi the components of a vector
+     * @return the vector
+     */
+    public static double[] createVector(double... xi) {
+	// clone in case a JVM tries to reuse vectors representing
+	// arguments.
+	return xi.clone();
+    }
+
+    /**
+     * Create a unit vector given  the components of a parallel vector.
+     * @param xi the components of a vector
+     * @return the vector
+     */
+    public static double[] createUnitVector(double... xi) {
+	double[] v = createVector(xi);
+	return unitVector(v, v);
+    }
+
+    /**
+     * Create a three dimensional unit vector given spherical coordinates.
+     * @param phi the angle around the Z axis in the counterclockwise
+     *            direction, starting from the positive X axis
+     * @param theta the angle from the positive Z axis.
+     * @return the unit vector
+     */
+    public static double[] createUnitVector3(double phi, double theta) {
+	double[] vector = new double[3];
+	if (theta == 0.0) {
+	    vector [0] = 0.0;
+	    vector [1] = 0.0;
+	    vector [2] = 1.0;
+	} else if (theta == Math.PI/2) {
+	    vector[0] = phi == 0.0? 1.0:
+		phi == Math.PI/2? 0.0:
+		phi == Math.PI? -1.0:
+		phi == 3*Math.PI/2? 0.0:
+		Math.cos(phi);
+	    vector[1] = phi == 0.0? 0.0:
+		phi == Math.PI/2? 1.0:
+		phi == Math.PI?  0.0:
+		phi == 3*Math.PI/2? -1.0:
+		Math.sin(phi);
+	    vector[2] = 0.0;
+	} else if (theta == Math.PI) {
+	    vector [0] = 0.0;
+	    vector [1] = 0.0;
+	    vector [2] = -1.0;
+	} else {
+	    double sinTheta = Math.sin(theta);
+	    vector[0] = phi == 0.0? sinTheta:
+		phi == Math.PI/2? 0.0:
+		phi == Math.PI? -sinTheta:
+		phi == 3*Math.PI/2? 0.0:
+		sinTheta*Math.cos(phi);
+	    vector[1] = phi == 0.0? 0.0:
+		phi == Math.PI/2? sinTheta:
+		phi == Math.PI? 0.0:
+		phi == 3*Math.PI/2? -sinTheta:
+		sinTheta*Math.sin(phi);
+	    vector[2] = Math.cos(theta);
+	}
+	return vector;
+    }
+
+    /**
+     * Create a vector given its representation in spherical coordinates.
+     * @param r the length of the vector
+     * @param phi the angle around the Z axis in the counterclockwise
+     *            direction, starting from the positive X axis
+     * @param theta the angle from the positive Z axis.
+     * @return the vector
+     */
+    public static double[] createVector3(double r, double phi, double theta) {
+	double[] result = createUnitVector3(phi, theta);
+	return multiply(result, r, result);
+    }
 }
 
 //  LocalWords:  exbundle IllegalArgumentException incompatibleArrays
-//  LocalWords:  rOffset vOffset subarrays arrayLengthNot sdot
-//  LocalWords:  argArrayTooShort offsetOutOfRange
+//  LocalWords:  rOffset vOffset subarrays arrayLengthNot sdot v's
+//  LocalWords:  argArrayTooShort offsetOutOfRange zeroNorm JVM
+//  LocalWords:  vectLenNotPositive vectorOffset vectorLengths
