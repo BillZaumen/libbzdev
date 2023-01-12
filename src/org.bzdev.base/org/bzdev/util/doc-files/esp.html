@@ -1468,18 +1468,19 @@ array-elements:
 	to be imported has ended. This should be called after a series
 	of calls to <STRONG>importClasses</STRONG>.
       <LI><STRONG>generateDocs(</STRONG><I>w</I><STRONG>,</STRONG><I>list</I><STRONG>)</STRONG>.
-	This method uses a {@link java.io.PrintWriter PrintWriter}
-	<I>w</I> as the output for an HTML document describing the
-	Java classes, interfaces, enums, methods, and fields, that ESP
-	recognizes given the current set of explicit and implicit
-	import statements. The argument <I>list</I> is an ESP list of
-	strings, each providing URLs or file names for the corresponding
-	javadoc-generated API documentation, with the URLs or file names
-	using the syntax described in the documentation for
-	{@link org.bzdev.net.URLPathParser}. This method is provided
-	primarily for debugging, but may have other uses. The value it
-	returns, ESP&apos;s
-	value <STRONG>void</STRONG>), should be ignored.
+	This method uses a {@link java.io.PrintWriter PrintWriter} or
+	an {@link java.io.OutputStream} (which will be replaced with a
+	print writer) <I>w</I> as the output for an HTML document
+	describing the Java classes, interfaces, enums, methods, and
+	fields, that ESP recognizes given the current set of explicit
+	and implicit import statements. The argument <I>list</I> is an
+	ESP list of strings, each providing URLs or file names for the
+	corresponding javadoc-generated API documentation, with the
+	URLs or file names using the syntax described in the
+	documentation for {@link org.bzdev.net.URLPathParser}. This
+	method is provided primarily for debugging, but may have other
+	uses. The value it returns, ESP&apos;s value
+	<STRONG>void</STRONG>), should be ignored.
       <LI> <STRONG>get(</STRONG><I>objectName</I><STRONG>)</STRONG>.
 	This method returns the object with the name specified by this
 	method&apos;s argument and stored in the global namespace;

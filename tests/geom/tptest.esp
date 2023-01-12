@@ -1,0 +1,32 @@
+
+import (java.awt.geom, [Path2D, AffineTransform]);
+import (java.lang.Math);
+import (org.bzdev.math.VectorOps);
+import (org.bzdev.p3d.Model3D);
+import (org.bzdev.geom, [SplinePath2D, SplinePathBuilder,
+			 SplinePathBuilder.CPointType,
+			 BezierGrid, BezierGrid.Mapper,
+			 Paths2D, Paths3D]);
+var out = global.getWriter();
+global.generateDocs(out, [
+    "/usr/share/doc/libbzdev-doc/api",
+    "/usr/share/doc/openjdk-11-doc/api"]);
+out.flush();
+
+var r = 77.0;
+var w = 15.0;
+var x1 = -24;
+var x2 = -37;
+var x3 = -21;
+var x4 = -18;
+var spb = new SplinePathBuilder(scripting);
+
+spb.configure([
+    {type: MOVE_TO, x: 0.0, y: 0.0},
+    {type: SEG_END, x: w, y: 0.0},
+    {type: SEG_END, x: w, y: 5.0},
+    {type: CLOSE}
+]);
+var af = getScaleInstance(-1.0, -1.0);
+var path = spb.getPath();
+var xsect = transformPath(path, af);

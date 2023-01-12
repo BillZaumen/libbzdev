@@ -2347,7 +2347,14 @@ public class ExpressionTest {
 	    new Pair ("= -1 >> 16", -1 >> 16),
 	    new Pair ("= -1 >>> 16", -1 >>> 16),
 	    new Pair ("= 1+2 << 2", 1+2 << 2),
-	    new Pair ("= 1<<2 == 1<<2", 1<<2 == 1<<2)
+	    new Pair ("= 1<<2 == 1<<2", 1<<2 == 1<<2),
+	    new Pair ("= 10L instanceof Long", true),
+	    new Pair ("= 10L instanceof long", true),
+	    new Pair ("= 10 instanceof Integer", true),
+	    new Pair ("= 10 instanceof int", true),
+	    new Pair ("= 10.2 instanceof double", true),
+	    new Pair ("= 10.2 instanceof Double", true),
+	    new Pair ("= \"hello\" instanceof String", true)
 	};
 
 	for (Pair p: pairs) {

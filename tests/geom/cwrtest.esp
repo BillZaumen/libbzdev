@@ -1,0 +1,15 @@
+import (org.bzdev.geom, [SplinePath2D,
+			 SplinePathBuilder,
+			 Path2DInfo]);
+
+var spec = [
+    {type: "MOVE_TO", x: 20.0, y: 30.0},
+    {type: "SEG_END", x: 50.0, y: 60.0}];
+
+var spb = new SplinePathBuilder(scripting);
+spb.configure(spec);
+var path = spb.getPath();
+
+printSegments(path);
+
+

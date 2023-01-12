@@ -3,8 +3,9 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
-import java.io.Reader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.lang.reflect.*;
@@ -5403,6 +5404,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case INSTANCEOF:
 		try {
 		    String className = (String)popValue();
+		    if (className.equals("boolean")) className = "Boolean";
+		    else if (className.equals("double")) className = "Double";
+		    else if (className.equals("int")) className = "Integer";
+		    else if (className.equals("long")) className = "Long";
 		    Object obj = popValue();
 		    Class<?> clasz = findClass(className);
 		    if (obj == null) {
@@ -5723,9 +5728,15 @@ public class ExpressionParser implements ObjectParser<Object>
 				    */
 				} else if (fname.equals("generateDocs")
 					   && args.length == 2
-					   && args[0] instanceof PrintWriter
+					   && (args[0] instanceof PrintWriter
+					       || args[0] instanceof
+					       OutputStream)
 					   && args[1] instanceof JSArray) {
-				    PrintWriter w = (PrintWriter) args[0];
+				    PrintWriter w = 
+					args[0] instanceof PrintWriter?
+					(PrintWriter) args[0]:
+					new PrintWriter((OutputStream)args[0],
+							true, UTF8);
 				    JSArray docs = (JSArray) args[1];
 				    results = ep.generateDocs(w, docs);
 				} else {

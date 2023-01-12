@@ -3,6 +3,8 @@ import org.bzdev.scripting.*;
 import org.bzdev.util.*;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -26,11 +28,17 @@ public class ExprScriptTest13 {
 	sc.setWriter(new PrintWriter(System.out));
 	sc.putScriptObject("scripting", sc);
 
-	PrintWriter w = new PrintWriter(new
-					FileWriter("test13.html",
-						   Charset.forName("UTF-8")));
-	sc.putScriptObject("w", w);
-
+	if (argv.length > 0) {
+	    OutputStream docs = new FileOutputStream(argv[0]);
+	    sc.putScriptObject("docs", docs);
+	    sc.putScriptObject("w", null);
+	} else {
+	    PrintWriter w = new PrintWriter(new
+					    FileWriter("test13.html",
+						       Charset
+						       .forName("UTF-8")));
+	    sc.putScriptObject("w", w);
+	}
 	String s = Files.readString(new File("test13.esp").toPath());
 	String sa = Files.readString(new File("test13a.esp").toPath());
 	String sb = Files.readString(new File("test13b.esp").toPath());

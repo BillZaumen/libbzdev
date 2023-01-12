@@ -87,9 +87,12 @@ all: compile
 	@echo ---- ExpressionParser Test '(class for an array)' ----
 	@$(JAVA) ExprScriptTest11
 	@echo - ExpressionParser Test '(implicit casting)' -
-	@$(JAVA) ExprScriptTest12 | cmp - test12.expected || echo failed
+	@$(JAVA) ExprScriptTest12 | cmp - test12.expected || \
+		( echo failed && exit 1)
 	@echo - ExpressionParser Test '(use of Optional methods)' -
 	@$(JAVA) ExprScriptTest13
+	@$(JAVA) ExprScriptTest13 test13a.html
+	cmp test13.html test13a.html || ( echo failed && exit 1 )
 	@echo - ExpressionParser Test '( == in arguments)' -
 	@$(JAVA) ExprScriptTest14
 	@echo - ExpressionParser Test '( .class.METHOD)' -
@@ -283,6 +286,10 @@ estest12: compile
 estest13: compile
 	@echo - ExpressionParser Test '(use of Optional methods)' -
 	@$(JAVA) ExprScriptTest13
+
+estest13a: compile
+	@echo - ExpressionParser Test '(use of Optional methods)' -
+	@$(JAVA) ExprScriptTest13 test13a.html
 
 estest14: compile
 	@echo - ExpressionParser Test '( == in arguments)' -

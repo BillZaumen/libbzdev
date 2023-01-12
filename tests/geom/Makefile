@@ -844,7 +844,13 @@ cwrtest-esp:
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace cwrtest.esp
 
-
+tptest-esp:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@java -classpath \
+		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
+		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace tptest.esp
 captest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

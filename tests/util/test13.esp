@@ -5,7 +5,9 @@ var out = global.getWriter();
 
 var foo = 210;
 
-global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
+var docs ?= w;
+
+global.generateDocs(docs, ["/usr/share/doc/libbzdev-doc/api",
                         "/usr/share/doc/openjdk-11-doc/api"]);
 var dsc = IntStream.class;
 
