@@ -62,6 +62,7 @@ SYS_MIME_ICON_DIR = $(SYS_ICON_DIR)/scalable/$(MIMETYPES_DIR)
 SYS_MIME_POPICON_DIR = $(SYS_POPICON_DIR)/scalable/$(MIMETYPES_DIR)
 SYS_CONFIGDIR = /etc/bzdev
 SYS_EMACSLISPDIR = /usr/share/emacs/site-lisp
+SYS_EMACSSTARTDIR = /etc/emacs/site-start.d
 ICON_WIDTHS = 16 20 22 24 32 36 48 64 72 96 128 192 256 512
 ICON_WIDTHS2x = 16 24 32 48 64 128 256 512
 
@@ -106,6 +107,7 @@ ICON_DIR = $(DESTDIR)$(SYS_ICON_DIR)
 POPICON_DIR = $(DESTDIR)$(SYS_POPICON_DIR)
 CONFIGDIR = $(DESTDIR)$(SYS_CONFIGDIR)
 EMACSLISPDIR=$(DESTDIR)$(SYS_EMACSLISPDIR)
+EMACSSTARTDIR = $(DESTDIR)$(SYS_EMACSSTARTDIR)
 
 # Shortcut for package directory names
 #
@@ -1936,15 +1938,25 @@ shortcuts:
 	    else ln -s -T ../../src/org.bzdev.p3d/org/bzdev/$$i org/bzdev/$$i \
 		2> /dev/null || echo ... file $$i exists ; fi; done
 
+#
+# Rules for installing an emacs ESP mode.  The implementation will
+# automatically use this mode when a file's suffix is .esp or
+# when the file starts with #!/usr/bin/scrunner followed by a space and an
+# optional scrunner argument or and end of line.  The implementation assumes
+# the Debian package emacs-common was installed.
+
 esp.elc: esp.el
 	rm -f esp.elc
 	emacs --no-splash --batch --eval '(byte-compile-file "esp.el")' --kill
 
 install-emacs-esp: esp.elc esp.el
 	install -d $(EMACSLISPDIR)
+	install -d $(EMACSSTARTDIR)
 	install -m 0644 esp.el $(EMACSLISPDIR)
 	install -m 0644 esp.elc $(EMACSLISPDIR)
+	install -m 0644 99esp.el $(EMACSSTARTDIR)
 
 uninstall-emacs-esp:
 	@rm -f $(EMACSLISPDIR)/esp.elc
 	@rm -f $(EMACSLISPDIR)/esp.el
+	@rm -f $(EMACSSTARTDIR)/99esp.el
