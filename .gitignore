@@ -5,6 +5,7 @@
 *.o
 *.isq
 *.mp4
+esp.elc
 \#*
 /BUILD/
 /org/bzdev/ejws/defaultCerts
