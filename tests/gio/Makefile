@@ -1,5 +1,5 @@
-BATIK = $(shell [ -f /usr/share/java/batik.jar ] && \
-	echo ":/usr/share/java/batik.jar" || \
+BATIK = $(shell [ -f /usr/share/java/libosgbatik.jar ] && \
+	echo ":/usr/share/java/libosgbatik.jar" || \
 	echo "")
 
 JAVA = java  -Djava.security.policy=../../BUILD/libbzdev.policy \
@@ -40,7 +40,7 @@ all:
 	@( $(JAVA2)  OSGTest svg && (echo Exception not seen; exit 1) ) \
 		|| echo Exception Expected
 	@echo ------- OSGTest 10 ----------------
-	[ -f /usr/share/java/batik.jar ] && $(JAVA) OSGTest svg NORMAL \
+	[ -f /usr/share/java/libosgbatik.jar ] && $(JAVA) OSGTest svg NORMAL \
 		|| echo ... skipping
 	@echo ------- OSGTest 10cw ----------------
 	[ -f /usr/share/java/batik.jar ] && $(JAVA) OSGTest svg	\
@@ -77,6 +77,22 @@ ptest2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- PTest------
 	@$(JAVA) PrinterTest2
+
+splitter:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	@echo ------- SplitterTest------
+	@$(JAVA) SplitterTest
+
+osgbi:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	@echo ------- OSGBufferedImage Test ------
+	@$(JAVA) BITest png
+	[ -f /usr/share/java/libosgbatik.jar ] && $(JAVA) BITest svg \
+		|| echo ... skipping
 
 clean:
 	rm -rf classes
