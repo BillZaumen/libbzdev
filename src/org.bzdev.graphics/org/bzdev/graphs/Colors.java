@@ -1,5 +1,6 @@
 package org.bzdev.graphs;
 import org.bzdev.math.*;
+import org.bzdev.util.DisjointSetsUnion;
 
 import java.awt.*;
 import java.awt.color.*;
@@ -216,8 +217,11 @@ public class Colors {
 	map.put("yellowgreen", 0x9acd32);
     }
 
+
     /**
      * Get a set containing the names of CSS colors.
+     * The name "transparent" is not included because there is no
+     * corresponsding color that can be shown.
      * @return a set containing those CSS colors that have names
      */
     public static Set<String> namedCSSColors() {
@@ -225,7 +229,8 @@ public class Colors {
     }
 
     /**
-     * Get a Collection containing the names of CSS colors.
+     * Get a Collection containing the names of CSS colors,
+     * excluding "transparent".
      * @return nameOrder true if the set is ordered by name, false
      *         if it is ordered by value
      * @return a set containing those CSS colors that have names
@@ -242,6 +247,8 @@ public class Colors {
      * are hexidecimal digits representing the red, green, and blue
      * components of a color respectively, with the value sorted in
      * numerical order.
+     * <P>
+     * The CSS color "transparent" is not included.
      * @param c the color
      * @param nameOrder true if the colors are sorted by name; false
      *        if the colors are sorted by RGB values
@@ -273,6 +280,7 @@ public class Colors {
 
     /**
      * Get a set containing the names of CSS colors in a specified range
+     * The color "transparent" is not included.
      * @param lower the starting name for the range (inclusive)
      * @param upper the ending name for the range (exclusive); null for
      *        all keys starting from lower
@@ -294,6 +302,8 @@ public class Colors {
      *         not one with a name recognized by CSS.
      */
     public static String getCSSName(Color c) {
+	if (c.getAlpha() == 0 && c.getRed() == 0 && c.getGreen() == 0
+	    && c.getBlue() == 0) return "transparent";
 	if (c == null) return null;
 	invMapInit();
 	int code = c.getRGB() & 0xffffff;
@@ -432,13 +442,18 @@ public class Colors {
 		    hasalpha = false;
 		} else {
 		    // named colors
-		    hasalpha = false;
-		    Integer rgb = map.get(spec);
-		    if (rgb == null) {
-			throw new IllegalArgumentException
-			    (errorMsg("badSpecCSS", spec));
+		    if (spec.equals("transparent")) {
+			hasalpha = true;
+			rgba = 0;
+		    } else {
+			hasalpha = false;
+			Integer rgb = map.get(spec);
+			if (rgb == null) {
+			    throw new IllegalArgumentException
+				(errorMsg("badSpecCSS", spec));
+			}
+			rgba = rgb;
 		    }
-		    rgba = rgb;
 		}
 	    } catch (NumberFormatException e) {
 		String msg = errorMsg("badSpecCSS", spec);

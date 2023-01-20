@@ -78,7 +78,6 @@ public class ColorTest {
 		}
 	    }
 	    i++;
-
 	}
 
 	int testInd2 = 0;
@@ -224,6 +223,17 @@ public class ColorTest {
 	    System.out.format("%s not %s\n", c1, name);
 	    throw new Exception("getColorByCSS failed");
 	}
+	System.out.println("checking 'transparent'");
+	name = "transparent";
+	c1 = Colors.getColorByCSS(name);
+	if (c1.getAlpha() != 0 && c1.getRed() != 0 && c1.getGreen() != 0
+	    && c1.getBlue() != 0) {
+	    throw new Exception("getColorByCSS failed");
+	}
+	if (!Colors.getCSSName(c1).equals("transparent")) {
+	    throw new Exception("getCSSName failed");
+	}
+
 
 	System.out.println("... done");
 
