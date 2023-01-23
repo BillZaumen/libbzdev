@@ -120,6 +120,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	TIMES,
 	DIVIDEBY,
 	MOD,
+	MATH_MOD,
 	DOT,
 	LSHIFT,			// << operator
 	RSHIFT,			// >> operator
@@ -288,7 +289,8 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private static final EnumSet<Operator> binaryOps
 	= EnumSet.of(Operator.PLUS, Operator.BINARY_MINUS, Operator.TIMES,
-		     Operator.DIVIDEBY, Operator.MOD, Operator.DOT,
+		     Operator.DIVIDEBY, Operator.MOD, Operator.MATH_MOD,
+		     Operator.DOT,
 		     Operator.LSHIFT, Operator.RSHIFT, Operator.URSHIFT,
 		     Operator.AND, Operator.OR, Operator.XOR,
 		     Operator.EQ, Operator.NE, Operator.GT,
@@ -3803,7 +3805,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		long ln1 = n1.longValue();
 		if (n2 instanceof Integer) {
 		    int in2 = n2.intValue();
-		    return Long.valueOf(ln1 % in2);
+		    return Integer.valueOf((int)(ln1 % in2));
 		} else if (n2 instanceof Long) {
 		    long ln2 = n2.longValue();
 		    return Long.valueOf(ln1 % ln2);
@@ -3835,11 +3837,128 @@ public class ExpressionParser implements ObjectParser<Object>
 		    }
 		} else if (n2 instanceof Double) {
 		    double d2 = n2.doubleValue();
-		    double ln2 = Math.round(d2);
+		    long ln2 = Math.round(d2);
 		    if ((double)ln1 == d1 && (double)ln2 == d2) {
-			return Double.valueOf(ln1 % ln2);
+			return Long.valueOf(ln1 % ln2);
 		    } else {
 			return Double.valueOf(d1 % d2);
+		    }
+		}
+	    }
+	    String msg = errorMsg("badMod", n1, n2);
+	    throw new IllegalArgumentException(msg);
+	}
+
+	private Number mathmod(Number n1, Number n2) {
+	    if (n1 instanceof Integer) {
+		int in1 = n1.intValue();
+		if (n2 instanceof Integer) {
+		    int in2 = n2.intValue();
+		    if (in2 <= 0) {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		    int val = in1 % in2;
+		    if (val < 0) val += in2;
+		    return Integer.valueOf(val);
+		} else if (n2 instanceof Long) {
+		    long ln2 = n2.longValue();
+		    if (ln2 <= 0) {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		    long val = in1 % ln2;
+		    return (val < 0)?
+			Long.valueOf(ln2 + val):
+			Integer.valueOf((int)val);
+		} else if (n2 instanceof Double) {
+		    double d2 = n2.doubleValue();
+		    long ln2 = Math.round(d2);
+		    if ((double)ln2 == d2) {
+			if (ln2 <= 0) {
+			    String msg = errorMsg("badMathMod", n1, n2);
+			    throw new IllegalArgumentException(msg);
+			}
+			long val = in1 & ln2;
+			if (val < 0) {
+			    return Long.valueOf(ln2 + val);
+			} else {
+			    return Integer.valueOf((int)val);
+			}
+		    } else {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		}
+	    } else if (n1 instanceof Long) {
+		long ln1 = n1.longValue();
+		if (n2 instanceof Integer) {
+		    int in2 = n2.intValue();
+		    if (in2 <= 0) {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		    int val = (int)(ln1 % in2);
+		    if (val < 0) val += in2;
+		    return Integer.valueOf(val);
+		} else if (n2 instanceof Long) {
+		    long ln2 = n2.longValue();
+		    if (ln2 <= 0) {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		    long val = ln1 % ln2;
+		    if (val < 0) val += ln2;
+		    return Long.valueOf(val);
+		} else if (n2 instanceof Double) {
+		    double d2 = n2.doubleValue();
+		    if (d2 < 0) {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		    long ln2 = Math.round(d2);
+		    if ((double)ln2 == d2) {
+			long val = ln1  % ln2;
+			if (val < 0) val += ln2;
+			return Long.valueOf(val);
+		    } else {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		}
+	    } else if (n1 instanceof Double) {
+		double d1 = n1.doubleValue();
+		long ln1 = Math.round(d1);
+		if (n2 instanceof Integer) {
+		    int in2 = n2.intValue();
+		    if ((double)ln1 == d1) {
+			int val = (int)(ln1 % in2);
+			if (val < 0) val += in2;
+			return Integer.valueOf(val);
+		    } else {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		} else if (n2 instanceof Long) {
+		    long ln2 = n2.longValue();
+		    if ((double)ln1 == d1) {
+			long val = ln1 % ln2;
+			if (val < 0) val += ln2;
+			return Long.valueOf(val);
+		    } else {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
+		    }
+		} else if (n2 instanceof Double) {
+		    double d2 = n2.doubleValue();
+		    long ln2 = Math.round(d2);
+		    if ((double)ln1 == d1 && (double)ln2 == d2) {
+			long val = ln1 % ln2;
+			if (val < 0) val += ln2;
+			return Long.valueOf(val);
+		    } else {
+			String msg = errorMsg("badMathMod", n1, n2);
+			throw new IllegalArgumentException(msg);
 		    }
 		}
 	    }
@@ -5213,6 +5332,18 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(mod(n1, n2));
+		} catch (Exception e) {
+		    throw new ObjectParser.Exception(e.getMessage(), e,
+						     opToken.getFileName(),
+						     orig,
+						     opToken.getIndex());
+		}
+		break;
+	    case MATH_MOD:
+		try {
+		    Number n2 = (Number) popValue();
+		    Number n1 = (Number) popValue();
+		    pushValue(mathmod(n1, n2));
 		} catch (Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -8376,6 +8507,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    if (ptype == Operator.PLUS || ptype == Operator.TIMES
 			|| ptype == Operator.DIVIDEBY || ptype == Operator.NOT
 			|| ptype == Operator.OR || ptype == Operator.XOR
+			|| ptype == Operator.MATH_MOD
 			|| ptype == Operator.MOD) {
 			String msg = errorMsg("syntaxError");
 			throw new ObjectParser.Exception(msg, filenameTL.get(),
@@ -8413,6 +8545,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		if (ptype == Operator.PLUS || ptype == Operator.TIMES
 		    || ptype == Operator.DIVIDEBY || ptype == Operator.NOT
 		    || ptype == Operator.OR || ptype == Operator.XOR
+		    || ptype == Operator.MATH_MOD
 		    || ptype == Operator.MOD) {
 		    String msg = errorMsg("syntaxError");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
@@ -8591,7 +8724,13 @@ public class ExpressionParser implements ObjectParser<Object>
 						     filenameTL.get(), i);
 		}
 		*/
-		next = new Token(Operator.MOD, "%", offset+i, level);
+		int inext = i+1;
+		if (inext < len && s.charAt(inext) == '%') {
+		    next = new Token(Operator.MATH_MOD, "%%", offset+i, level);
+		    i++;
+		} else {
+		    next = new Token(Operator.MOD, "%", offset+i, level);
+		}
 		level--;
 		tokens.add(next);
 		break;
@@ -8904,6 +9043,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    case TIMES:
 		    case DIVIDEBY:
 		    case MOD:
+		    case MATH_MOD:
 		    case LSHIFT:
 		    case RSHIFT:
 		    case URSHIFT:
@@ -10494,6 +10634,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case TIMES:
 	    case DIVIDEBY:
 	    case MOD:
+	    case MATH_MOD:
 	    case LSHIFT:
 	    case RSHIFT:
 	    case URSHIFT:

@@ -584,7 +584,11 @@ BLOCKED
     in the following table:
     <TABLE BORDER=1>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
-      <TR><TD>* / %</TD><TD> multiplication, division, mod respectively</TD></TR>
+      <TR><TD>* / % %%</TD><TD> multiplication, division, mod and
+	  mathemathics mod respectively</TD></TR>. THe mathematics mod
+      operator <STRONG>%%</STRONG> always produces a non-negative number.
+      i %% n is equivalent to (i &lt; 0)? n + (i % n): i % n, and an exception
+      is thrown in i is not an integer and n is not a positive integer.
       <TR><TD>+ -</TD><TD>addition, subtraction respectively, with
       &apos;+&apos; overloaded to handle string concatenation, in which case at
 	  least one argument must be a string.</TD></TR>

@@ -28,7 +28,7 @@ import org.bzdev.swing.table.ITextCellEditor;
 //@exbundle org.bzdev.swing.lpack.Swing
 
 /**
- * Property-editor class.
+74 * Property-editor class.
  * This class supports configuration files that are represented
  * as Java property files using the syntax described in the
  * documentation for {@link java.util.Properties#load(Reader)}.
@@ -38,15 +38,15 @@ import org.bzdev.swing.table.ITextCellEditor;
  * The initial properties may have keys that cannot be edited,
  * although their values can be edited. When this is the case, the
  * background for this portion of the table will have a different
- * color than the rest of the table.  To insert a above a row, or to
+ * color than the rest of the table.  To insert a new row above a row, or to
  * move or delete the row, the entire row must be selected. A table
  * can also be configured to suppress some of the buttons located just
- * above the table. Some keys in the table may consist of one or ore
+ * above the table. Some keys in the table may consist of one or more
  * dashes (minus signs). There are treated as spacers and are ignored
  * when the properties are written or used outside of the editor.
  * <P>
  * Property values may be encrypted using GPG. The keys for these
- * properties start with the substring "ebase74." and the values are
+ * properties start with the substring "ebase64." and the values are
  * stored in an encrypted form. GPG Agent should be configured so that
  * decryption can be used conveniently. To use GPG Agent on Debian
  * Linux systems, add the following lines to the .bashrc script:
@@ -119,7 +119,7 @@ import org.bzdev.swing.table.ITextCellEditor;
  * methods:
  * <UL>
  *   <LI><STRONG>{@link addIcon(Image)}</STRONG> or
- *      <LI><STRONG>{@link addIcon(Class,String)}</STRONG>. These methods
+ *      <STRONG>{@link addIcon(Class,String)}</STRONG>. These methods
  *      provide an icon to display when a configuration editor's window
  *      is iconified.  Normally there are multiple icons, corresponding to
  *      different sizes required by a window manager.
@@ -1136,6 +1136,29 @@ public abstract class ConfigPropertyEditor {
 	Callable callable;
     }
 
+    boolean tableExtensible = true;
+
+    /**
+     * configure the table so that new rows cannot be added and
+     * rows cannot be moved or deleted.
+     */
+    protected void freezeRows() {
+	tableExtensible = false;
+    }
+
+    int extraInitialRows = 10;
+    /**
+     * Set the number of blank rows at the end of the table.
+     * THese rows are added after any rows containing reserved keys.
+     * THe default is 10.  Set to zero if only the reserved rows should
+     * be in the table.
+     * @param count the number of rows
+     */
+    protected void setInitialExtraRows(int count) {
+	extraInitialRows = count;
+    }
+
+
     private void doEdit(Component owner,  Mode mode, Callable continuation,
 			boolean quitCloseMode)
     {
@@ -1160,36 +1183,58 @@ public abstract class ConfigPropertyEditor {
 
 	String[] keys1 = new String[names.size()];
 	keys1 = names.toArray(keys1);
+	/*
+	for (String n: names) {
+	    System.out.println("(names) n = " + n);
+	}
+	*/
 	for (int i = 0; i < keys1.length; i++) {
 	    String key = keys1[i];
 	    if (reserved.contains(key)) {
 		keys1[i] = "";
 	    }
 	}
-	String[] keys = new String[keys1.length + spacers.length]; 
+
+	/*
+	System.out.println("extraInitialRows = " + extraInitialRows);
+	System.out.println("tableExtensible = " + tableExtensible);
+	*/
+
+	int adjustedSpacersLength = spacers.length
+	    - ((extraInitialRows == 0 && !tableExtensible)? 1: 0);
+
+	/*
+	System.out.println("spacers.length = " + spacers.length
+			   + ", adjustedSpacersLength = "
+			   + adjustedSpacersLength);
+	*/
+	String[] keys = new String[keys1.length + adjustedSpacersLength];
+
 	System.arraycopy(keys1, 0, keys, 0, keys1.length);
-	for (int i = 0; i < spacers.length; i++) {
+	for (int i = 0; i < adjustedSpacersLength; i++) {
 	    keys[keys1.length+i] = "";
 	}
 	Arrays.sort(keys);
 	int kind = 0;
 	int sind = 0;
-	for (int i = 0; i < spacers.length; i++) {
+	/*
+	for (int i = 0; i < adjustedSpacersLength; i++) {
 	    System.out.print(" " + spacers[i]);
 	}
 	System.out.println();
+	*/
 	for (String key: reserved) {
 	    keys[kind++] = key;
-	    if (kind == spacers[sind]) {
+	    if (sind < adjustedSpacersLength && kind == spacers[sind]) {
 		keys[kind++] = "-------------";
 		sind++;
 	    }
 	}
+	/*
 	for (int i = 0; i < keys.length; i++) {
 	    System.out.println(keys[i]);
 	}
-
-
+	*/
 
 	Vector<Vector<Object>> data = new Vector<Vector<Object>>(keys.length);
 	for (int i = 0; i < keys.length; i++) {
@@ -1246,8 +1291,13 @@ public abstract class ConfigPropertyEditor {
 				       new OurCellEditor2(editorKeys))
 	};
 
-	InputTablePane ipane = new InputTablePane(colspec, data.size() + 10,
-						  data, true, true, true) {
+	InputTablePane ipane = new InputTablePane(colspec,
+						  len + extraInitialRows,
+						  data,
+						  tableExtensible,
+						  tableExtensible,
+						  tableExtensible) {
+
 		@Override
 		protected boolean prohibitEditing(int row, int col) {
 		    return col == 0 && row < KLEN;

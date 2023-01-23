@@ -234,6 +234,58 @@ public class ColorTest {
 	    throw new Exception("getCSSName failed");
 	}
 
+	try {
+	    c1 = Colors.getColorByCSS("rgb(255,255,255,0.5)");
+	    System.out.println("missing exception");
+	    System.exit(1);
+	} catch (Exception e) {
+	    System.out.println("exception" + e + " expected");;
+	}
+
+	for (String nm: Colors.namedCSSColors()) {
+	    // aqua and cyan are both #00ffff so this test won't work for
+	    // both. Similary fuchsia and magenta have the same code
+	    // as do various names ending in grey versus gray.
+	    if (nm.equals("aqua")) continue;
+	    if (nm.equals("darkgray")) continue;
+	    if (nm.equals("darkslategray")) continue;
+	    if (nm.equals("dimgray")) continue;
+	    if (nm.equals("gray")) continue;
+	    if (nm.equals("lightgray")) continue;
+	    if (nm.equals("lightslategray")) continue;
+	    if (nm.equals("slategray")) continue;
+	    if (nm.equals("fuchsia")) continue;
+	    if (!nm.equals(Colors.getCSS(Colors.getColorByCSS(nm)))) {
+		System.out.println("nm = " + nm);
+		Color cc = Colors.getColorByCSS(nm);
+		System.out.println("cc = " + cc);
+		System.out.println("spec = " + Colors.getCSS(cc));
+		throw new Exception();
+	    }
+	}
+
+	if (!"transparent".equals(Colors
+				  .getCSS(Colors
+					  .getColorByCSS("transparent")))) {
+	    throw new Exception();
+	}
+
+	String nm1 = "rgb(24,34,74)";
+	if (!nm1.equals(Colors.getCSS(Colors.getColorByCSS(nm1)))) {
+		System.out.println("nm1 = " + nm1);
+		Color cc = Colors.getColorByCSS(nm1);
+		System.out.println("cc = " + cc);
+		System.out.println("spec = " + Colors.getCSS(cc));
+	    throw new Exception();
+	}
+	nm1 = "rgba(24,34,74,0.501961)";
+	if (!nm1.equals(Colors.getCSS(Colors.getColorByCSS(nm1)))) {
+		System.out.println("nm1 = " + nm1);
+		Color cc = Colors.getColorByCSS(nm1);
+		System.out.println("cc = " + cc);
+		System.out.println("spec = " + Colors.getCSS(cc));
+	    throw new Exception();
+	}	
 
 	System.out.println("... done");
 

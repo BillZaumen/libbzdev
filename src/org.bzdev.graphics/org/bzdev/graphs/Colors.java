@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
+import java.util.Locale;
 
 //@exbundle org.bzdev.graphs.lpack.Graphs
 
@@ -302,12 +303,48 @@ public class Colors {
      *         not one with a name recognized by CSS.
      */
     public static String getCSSName(Color c) {
+	if (c == null) return null;
 	if (c.getAlpha() == 0 && c.getRed() == 0 && c.getGreen() == 0
 	    && c.getBlue() == 0) return "transparent";
-	if (c == null) return null;
 	invMapInit();
 	int code = c.getRGB() & 0xffffff;
 	return invMap.get(code);
+    }
+
+    /**
+     * Return the CSS specification for a color.
+     * If the color matches a named color, that name is returned.
+     * Otherwise a rgb or rgba specification is returned.
+     * <P>
+     * Some CSS named colors are mapped to the same color, and the
+     * value returned simply picks one. Also, the CSS rgb and rgba
+     * specifications use floating point numbers for the alpha value
+     * whereas Java's Color class uses an integer in the range [0, 255].
+     * If a specification is used to create a color, this method may
+     * return a slightly different specification due to rounding.
+     * @param c the color
+     * @return the CSS specification for the color.
+     */
+    public static String getCSS(Color c) {
+	int alpha = c.getAlpha();
+	int red = c.getRed();
+	int green = c.getGreen();
+	int blue = c.getBlue();
+	if (alpha == 255) {
+	    String name = getCSSName(c);
+	    if (name != null) {
+		return name;
+	    } else {
+		return String.format((Locale)null, "rgb(%d,%d,%d)",
+				     red, green, blue);
+	    }
+	} else if (alpha == 0 && red == 0 && green == 0 && blue == 0) {
+	    return "transparent";
+	} else {
+	    return String.format((Locale)null, "rgba(%d,%d,%d,%g)",
+				 red, green, blue,
+				 alpha/255.0);
+	}
     }
 
     static enum Mode {
@@ -414,6 +451,7 @@ public class Colors {
 	Parser(String spec) throws
 	    IllegalArgumentException
 	{
+	    String original = spec;
 	    try {
 		int[] values;
 		spec = spec.replaceAll("\\p{Space}","").toLowerCase();
@@ -424,20 +462,36 @@ public class Colors {
 		    spec = spec.replace("rgba(", "").replace(")", "");
 		    String[] array = spec.split(",");
 		    hasalpha = true;
+		    if (array.length != 4) {
+			String msg = errorMsg("badSpecCSS", original);
+			throw new IllegalArgumentException(msg);
+		    }
 		    createRGB(Mode.RGBA, array);
 		} else if (spec.startsWith("rgb")) {
 		    spec = spec.replace("rgb(", "").replace(")", "");
 		    String[] array = spec.split(",");
+		    if (array.length != 3) {
+			String msg = errorMsg("badSpecCSS", original);
+			throw new IllegalArgumentException(msg);
+		    }
 		    hasalpha = false;
 		    createRGB(Mode.RGB, array);
 		} else if (spec.startsWith("hsla")) {
 		    spec = spec.replace("hsla(", "").replace(")", "");
 		    String[] array = spec.split(",");
+		    if (array.length != 4) {
+			String msg = errorMsg("badSpecCSS", original);
+			throw new IllegalArgumentException(msg);
+		    }
 		    hasalpha = true;
 		    createRGB(Mode.HSLA, array);
 		} else if (spec.startsWith("hsl")) {
 		    spec = spec.replace("hsl(", "").replace(")", "");
 		    String[] array = spec.split(",");
+		    if (array.length != 3) {
+			String msg = errorMsg("badSpecCSS", original);
+			throw new IllegalArgumentException(msg);
+		    }
 		    createRGB(Mode.HSL, array);
 		    hasalpha = false;
 		} else {
@@ -456,7 +510,7 @@ public class Colors {
 		    }
 		}
 	    } catch (NumberFormatException e) {
-		String msg = errorMsg("badSpecCSS", spec);
+		String msg = errorMsg("badSpecCSS", original);
 		throw new IllegalArgumentException(msg, e);
 	    }
 	}

@@ -91,7 +91,7 @@ config2:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	$(JAVA) ConfigTest config.foo
+	$(JAVA) ConfigTest2
 
 btest:
 	(cd ../.. ; make jars)
