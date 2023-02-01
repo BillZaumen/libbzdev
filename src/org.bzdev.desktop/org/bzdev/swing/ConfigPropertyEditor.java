@@ -17,13 +17,14 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
 
 import org.bzdev.lang.Callable;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.util.CopyUtilities;
-import org.bzdev.swing.table.ITextCellEditor;
+import org.bzdev.swing.TextCellEditor;
 
 //@exbundle org.bzdev.swing.lpack.Swing
 
@@ -135,6 +136,16 @@ import org.bzdev.swing.table.ITextCellEditor;
  *      This method must be called by the constructor, and indicates that
  *      all the reserved keys, and any default values associated with
  *      these, have been provided.
+ * </UL>
+ * The constructor may optionally call the following methods:
+ * <UL>
+ * <LI><STRONG>{@link ConfigPropertyEditor#freezeRows()}</STRONG>.
+ * This method prevents the user from adding, moving, or deleting rows. The
+ * user may, however, change a row's value or key (unless the row is a
+ * reserved row).
+ * <LI><STRONG>{@link ConfigPropertyEditor#setInitialExtraRows(int)}</STRONG>.
+ * This method sets the number of blank table entries that appear after
+ * any predefined keys.
  * </UL>
  * In addition a subclass must define the following methods:
  * <UL>
@@ -348,7 +359,8 @@ public abstract class ConfigPropertyEditor {
     }
 
     private static String encrypt(String value, String[] recipients) {
-	if (value == null) return EMPTY_STRING;
+	if (value == null || value.length() == 0) return EMPTY_STRING;
+	if (recipients.length == 0) return EMPTY_STRING;
 	LinkedList<String> args = new LinkedList<>();
 	args.add("gpg");
 	args.add("-o");
@@ -906,6 +918,18 @@ public abstract class ConfigPropertyEditor {
     private static final Color DEFAULT_NOEDIT_COLOR =
 	new Color (255, 255, 225);
 
+    private static final Color DEFAULT_NOEDIT_COLOR_DM =
+	new Color (64, 64, 0);
+
+    private static Color noEditColor() {
+	Color bg = (Color)UIManager.get("Table.background");
+	int r = bg.getRed();
+	int g = bg.getGreen();
+	int b = bg.getBlue();
+	// return new Color((2*r +128)/3, (2*g+128)/3, b);
+	return new Color(r, g, (3*b)/4);
+    }
+
     private static class OurCellRenderer1 extends DefaultTableCellRenderer {
 	public OurCellRenderer1() {super();}
 
@@ -914,13 +938,17 @@ public abstract class ConfigPropertyEditor {
 	    (JTable table, Object value, boolean isSelected, boolean hasFocus,
 	     int row, int column)
 	{
+	    boolean darkmode = DarkmodeMonitor.getDarkmode();
 	    Component result = super.getTableCellRendererComponent
 		(table, value, isSelected, hasFocus, row, column);
 	    if (isSelected == false && hasFocus == false) {
 		if (!table.isCellEditable(row,column)) {
-		    result.setBackground(DEFAULT_NOEDIT_COLOR);
+
+		    result.setBackground(noEditColor());
 		} else {
-		    result.setBackground(Color.WHITE);
+		    result.setBackground(darkmode?(Color)
+					 UIManager.get("Table.background"):
+					 Color.WHITE);
 		}
 	    }
 	    return result;
@@ -933,17 +961,20 @@ public abstract class ConfigPropertyEditor {
 	    (JTable table, Object value, boolean isSelected, boolean hasFocus,
 	     int row, int column)
 	{
+	    boolean darkmode = DarkmodeMonitor.getDarkmode();
 	    Component result = super.getTableCellRendererComponent
 		(table, value, isSelected, hasFocus, row, column);
 	    if (column == 1) {
 		String key = (String)table.getValueAt(row, 0);
 		if (key != null && key.startsWith("ebase64.")) {
-		    result.setForeground(Color.GREEN.darker().darker());
+		    result.setForeground(darkmode? Color.GREEN.brighter()
+					 .brighter():
+					 Color.GREEN.darker().darker());
 		} else {
-		    result.setForeground(Color.BLACK);
+		    result.setForeground(darkmode? Color.WHITE: Color.BLACK);
 		}
 	    } else {
-		result.setForeground(Color.BLACK);
+		result.setForeground(darkmode? Color.WHITE: Color.BLACK);
 	    }
 	    return result;
 	}
@@ -953,6 +984,7 @@ public abstract class ConfigPropertyEditor {
 	JTable table;
 	int tag = 0;
 	String oldvalue;
+	String oldShortValue;
 	public TaggedTextField() {super();}
     }
 
@@ -965,11 +997,11 @@ public abstract class ConfigPropertyEditor {
     }
 
 
-    private class OurCellEditor1 extends DefaultCellEditor {
+    private class OurCellEditor1 extends TextCellEditor<String> {
 	HashSet<String> keys = null;
 
  	public OurCellEditor1(HashSet<String> keys) {
-	    super(new TaggedTextField());
+	    super(String.class, new TaggedTextField());
 	    this.keys = keys;
 
 	}
@@ -984,6 +1016,23 @@ public abstract class ConfigPropertyEditor {
 						  row, column);
 	    tf.table = table;
 	    tf.oldvalue = oldvalue;
+	    if (oldvalue == null || oldvalue.equals("")) {
+		tf.oldShortValue = null;
+	    } else {
+		if (oldvalue.startsWith(B64KEY_START)) {
+		    oldvalue = oldvalue.substring(B64KEY_START_LEN);
+		} else if (oldvalue.startsWith(EB64KEY_START)) {
+		    oldvalue = oldvalue.substring(EB64KEY_START_LEN);
+		}
+		tf.oldShortValue = oldvalue;
+	    }
+
+	    /*
+	    System.out.format("tf: bg %s, fg %s, caret %s, text = %s\n",
+			      tf.getBackground(), tf.getForeground(),
+			      tf.getCaretColor(), tf.getText());
+	    */
+
 	    return tf;
 	}
 
@@ -997,14 +1046,21 @@ public abstract class ConfigPropertyEditor {
 	}
 	@Override
 	public boolean stopCellEditing() {
+	    // System.out.println("stopCellEditing called");
 	    TaggedTextField tf = (TaggedTextField) getComponent();
 	    String key = tf.getText();
 	    if (key == null) {
+		if (tf.oldShortValue != null) {
+		    keys.remove(tf.oldShortValue);
+		}
 		return super.stopCellEditing();
 	    }
 	    key = key.trim();
 	    if (key.length() == 0) {
 		tf.setText(key);
+		if (tf.oldShortValue != null) {
+		    keys.remove(tf.oldShortValue);
+		}
 		return super.stopCellEditing();
 	    }
 	    if (key.equals(tf.oldvalue)) {
@@ -1013,6 +1069,9 @@ public abstract class ConfigPropertyEditor {
 	    }
 	    if (key.startsWith("-")) {
 		tf.setText(key);
+		if (tf.oldShortValue != null) {
+		    keys.remove(tf.oldShortValue);
+		}
 		return super.stopCellEditing();
 	    }
 	    String shortkey = key;
@@ -1022,35 +1081,40 @@ public abstract class ConfigPropertyEditor {
 		shortkey = key.substring(EB64KEY_START_LEN);
 	    }
 
-	    while (keys.contains(shortkey) || badKey(key)) {
-		key = JOptionPane.showInputDialog(tf.table,
-						  "Key for this row "
-						  + "(null to revert):",
-						  "Key Request",
-						  JOptionPane.PLAIN_MESSAGE);
-		if (key != null) key = key.trim();
-		if (key == null || key.length() == 0) {
-		    key = tf.oldvalue;
-		    tf.setText(key);
-		    return super.stopCellEditing();
+	    if (!shortkey.equals(tf.oldShortValue)) {
+		while ((!shortkey.equals(tf.oldShortValue)
+			&& keys.contains(shortkey))
+		       || badKey(key)) {
+		    key = JOptionPane.showInputDialog
+			(tf.table,"Key for this row (null to revert):",
+			 "Key Request", JOptionPane.PLAIN_MESSAGE);
+		    if (key != null) key = key.trim();
+		    if (key == null || key.length() == 0) {
+			key = tf.oldvalue;
+			tf.setText(key);
+			return super.stopCellEditing();
+		    }
+		    shortkey = key;
+		    if (key.startsWith(B64KEY_START)) {
+			shortkey = key.substring(B64KEY_START_LEN);
+		    } else if (key.startsWith(EB64KEY_START)) {
+			shortkey = key.substring(EB64KEY_START_LEN);
+		    }
 		}
-		shortkey = key;
-		if (key.startsWith(B64KEY_START)) {
-		    shortkey = key.substring(B64KEY_START_LEN);
-		} else if (key.startsWith(EB64KEY_START)) {
-		    shortkey = key.substring(EB64KEY_START_LEN);
+		if (tf.oldShortValue != null) {
+		    keys.remove(tf.oldShortValue);
 		}
+		keys.add(shortkey);
 	    }
-	    keys.add(shortkey);
 	    tf.setText(key);
 	    return super.stopCellEditing();
 	}
     }
 
-    private class OurCellEditor2 extends DefaultCellEditor {
+    private class OurCellEditor2 extends TextCellEditor<String> {
 	HashSet<String> keys = null;
 	public OurCellEditor2(HashSet<String>keys) {
-	    super(new TaggedTextField());
+	    super(String.class, new TaggedTextField());
 	    this.keys = keys;
 
 	}
@@ -1158,10 +1222,104 @@ public abstract class ConfigPropertyEditor {
 	extraInitialRows = count;
     }
 
+    static class Pair {
+	TableCellRenderer renderer;
+	TableCellEditor editor;
+	public Pair(TableCellRenderer r, TableCellEditor e) {
+	    renderer = r; editor = e;
+	}
+	public TableCellRenderer getR() {return renderer;}
+	public TableCellEditor getE() {return editor;}
+    }
+
+    HashMap<String,Pair> map = new HashMap<>();
+
+    /**
+     * @param tail the last component of a key corresponding to some value
+     * The tail is either equal to the key or equal to the last component
+     * of a key after its last '.'.
+     * @param r the table cell renderer to use to display the value
+     *        corresponding to a key
+     * @param e the table cell editor ot use to modify or create a value
+     *        corresponding to a key
+     */
+    public void addRE(String tail, TableCellRenderer r, TableCellEditor e) {
+	map.put(tail, new Pair(r, e));
+    }
+
+    private TableCellRenderer getR(String tail) {
+	Pair p = map.get(tail);
+	return (p == null)? null: p.getR();
+    }
+
+    private TableCellEditor getE(String tail) {
+	Pair p = map.get(tail);
+	return (p == null)? null: p.getE();
+    }
+
+    private static class Ebase64TableCellRenderer extends JLabel
+                           implements TableCellRenderer
+    {
+
+	Border unselectedBorder = null;
+	Border selectedBorder = null;
+	boolean isBordered = true;
+
+	/**
+	 * Constructor.
+	 * @param isBordered true if this cell renderer should use a border;
+	 *                   false otherwise
+	 */
+	public Ebase64TableCellRenderer(boolean isBordered) {
+	    super();
+	    this.isBordered = isBordered;
+	    setOpaque(true); //MUST do this for background to show up.
+	}
+
+	@Override
+	public Component
+	    getTableCellRendererComponent(JTable table, Object value,
+					  boolean isSelected, boolean hasFocus,
+					  int row, int column) {
+	    String s = (value == null)? "": (String) value;
+	    boolean darkmode = DarkmodeMonitor.getDarkmode();
+	    setBackground(null);
+
+	    if (s.trim().equals("")) {
+		setText("");
+	    } else {
+		setText(localeString("encryptedTCR"));
+	    }
+	    if (darkmode) {
+		setForeground(Color.YELLOW.darker());
+	    } else {
+		setForeground(Color.YELLOW.brighter());
+	    }
+	    if (isBordered) {
+		if (isSelected) {
+		    if (selectedBorder == null) {
+			selectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
+									 table.getSelectionBackground());
+		    }
+		    setBorder(selectedBorder);
+		} else {
+		    if (unselectedBorder == null) {
+			unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
+									   table.getBackground());
+		    }
+		    setBorder(unselectedBorder);
+		}
+	    }
+	    return this;
+	}
+    }
+
+    private static final Ebase64TableCellRenderer encryptedTCR
+	= new Ebase64TableCellRenderer(false);
 
     private void doEdit(Component owner,  Mode mode, Callable continuation,
 			boolean quitCloseMode)
-    {
+     {
 	final CallableContainer continuationContainer =
 	    new CallableContainer(continuation);
 	//System.out.println("mode = " + mode);
@@ -1278,6 +1436,7 @@ public abstract class ConfigPropertyEditor {
 	    editorKeys.add(key);
 	}
 
+
 	InputTablePane.ColSpec[] colspec = {
 	    new InputTablePane.ColSpec(localeString("Property"),
 				       "mmmmmmmmmmmmmmm",
@@ -1309,6 +1468,35 @@ public abstract class ConfigPropertyEditor {
 		    } else {
 			return 0;
 		    }
+		}
+		@Override
+		protected TableCellRenderer
+		    getCustomRenderer(JTable tbl, int row, int col)
+		{
+		    if (col != 1) return null;
+		    String key = (String)tbl.getValueAt(row, 0);
+		    if (key == null) return null;
+		    if (key.startsWith("ebase64.")) return encryptedTCR;
+		    int ind = key.lastIndexOf('.');
+		    if (ind != -1) {
+			key = key.substring(ind+1);
+		    }
+		    return getR(key);
+		}
+
+		@Override
+		protected TableCellEditor
+		    getCustomEditor(JTable tbl, int row, int col)
+		{
+		    if (col != 1) return null;
+		    String key = (String)tbl.getValueAt(row, 0);
+		    if (key == null) return null;
+		    if (key.startsWith("ebase64.")) return null;
+		    int ind = key.lastIndexOf('.');
+		    if (ind != -1) {
+			key = key.substring(ind+1);
+		    }
+		    return getE(key);
 		}
 	    };
 

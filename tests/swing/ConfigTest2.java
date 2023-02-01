@@ -3,9 +3,9 @@ import java.util.Properties;
 import javax.swing.*;
 
 import org.bzdev.swing.*;
-import org.bzdev.swing.table.*;
 
-public class ConfigTest {
+
+public class ConfigTest2 {
 
     static class ConfigEditor extends ConfigPropertyEditor {
 	/**
@@ -13,14 +13,19 @@ public class ConfigTest {
 	 */
 	public ConfigEditor() {
 	    super();
-	    addReservedKeys("key1", "key2", "key3");
-	    addReservedKeys("base64.key4", "base64.key5");
-	    addReservedKeys("ebase64.password");
+	    addReservedKeys("width", "height",
+			    "foreground.color",
+			    "background.color",
+			    "error.correction.level");
 	    setupCompleted();
 
-	    setDefaultProperty("key1", "foo");
-	    setDefaultProperty("key2", "$(key1), $(key3)");
-	    setDefaultProperty("key3", "bar");
+	    setDefaultProperty("height", "100");
+	    setDefaultProperty("width", "100");
+	    setDefaultProperty("foreground.color", "black");
+	    setDefaultProperty("background.color", "white");
+	    setDefaultProperty("error.correction.level", "L");
+	    setInitialExtraRows(0);
+	    freezeRows();
 	}
 
 	@Override
@@ -37,26 +42,10 @@ public class ConfigTest {
 
     public static void main(String argv[]) throws Exception {
 
-	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
-	if (systemUI) {
-	    /*
-	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	    */
-	    DarkmodeMonitor.setSystemPLAF();
-	    DarkmodeMonitor.init();
-	}
-
 	ConfigEditor editor = new ConfigEditor();
 
-	editor.addRE("color", new CSSTableCellRenderer(false),
-		   new CSSCellEditor());
-
-	editor.addRE("file", null,
-		     new FileNameCellEditor("ConfigTest file", false));
-
-
-	if (argv.length > (systemUI? 1: 0)) {
-	    File f = new File(argv[systemUI? 1: 0]);
+	if (argv.length > 0) {
+	    File f = new File(argv[0]);
 	    editor.loadFile(f);
 	}
 

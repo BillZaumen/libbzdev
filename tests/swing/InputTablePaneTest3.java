@@ -7,7 +7,6 @@ import javax.swing.text.*;
 import javax.swing.table.*;
 
 import org.bzdev.swing.*;
-import org.bzdev.swing.table.*;
 
 public class InputTablePaneTest3 {
 

@@ -1,4 +1,6 @@
-package org.bzdev.swing.table;
+package org.bzdev.swing;
+import org.bzdev.swing.TextCellEditor;
+
 
 /*
 import java.sql.Time;
@@ -17,6 +19,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import java.awt.event.ActionEvent;
@@ -56,10 +59,10 @@ import javax.swing.text.InternationalFormatter;
  * Java tutorial</A>.  That link includes a copyright and permission
  * to use/modify that example. This class generalizes that example.
  */
-public abstract class ITextCellEditor extends DefaultCellEditor {
+public abstract class ITextCellEditor extends TextCellEditor<Object> {
 
     static private final String resourceBundleName =
-	"org.bzdev.swing.table.lpack.ITextCellEditor";
+	"org.bzdev.swing.lpack.ITextCellEditor";
     static ResourceBundle bundle =
 	ResourceBundle.getBundle(resourceBundleName);
 
@@ -112,7 +115,7 @@ public abstract class ITextCellEditor extends DefaultCellEditor {
     /**
      * Get the formatter for this object.
      * The formatter will be configured by this object's constructor
-     * to use the formatter returned by {@link #getFormat()}.
+     * to use the format returned by {@link #getFormat()}.
      * @return the formatter
      */
     protected abstract InternationalFormatter getFormatter();
@@ -136,7 +139,7 @@ public abstract class ITextCellEditor extends DefaultCellEditor {
 	throws NoConvertException;
 
     /**
-     * Message to use if the new value for a cell is valid.
+     * Message to use if the new value for a cell is not valid.
      * For example, if the value must be a date using a
      * specific date format, this message might be
      * "The value must be a date specified by &lt;br&gt;
@@ -154,7 +157,7 @@ public abstract class ITextCellEditor extends DefaultCellEditor {
      * Constructor.
      */
     public ITextCellEditor() {
-	super(new JFormattedTextField());
+	super(Object.class, new JFormattedTextField());
 	ftf = (JFormattedTextField) getComponent();
 	// tf = new SimpleDateFormat("h:mm a");
 	tf = getFormat();
@@ -186,7 +189,6 @@ public abstract class ITextCellEditor extends DefaultCellEditor {
 
     //Override to invoke setValue on the formatted text field.
     /**
-     * Sets an initial value for the editor.
      * Sets an initial value for the editor. This will cause the
      * editor to stopEditing and lose any partially edited value if
      * the editor is editing when this method is called.
@@ -221,13 +223,39 @@ public abstract class ITextCellEditor extends DefaultCellEditor {
 	    (JFormattedTextField)super
 	    .getTableCellEditorComponent(table, value, isSelected,
 					 row, column);
+
 	if (ftf != null) {
 	    // added a null-value check just in case: not used
 	    // in the example.
 	    ftf.setValue(value);
 	}
+
 	return ftf;
     }
+
+    @Override
+    public Component getTreeCellEditorComponent(JTree tree, Object value,
+						boolean isSelected,
+						boolean expanded,
+						boolean leaf,
+						int row)
+    {
+	JFormattedTextField ftf =
+	    (JFormattedTextField)super
+	    .getTreeCellEditorComponent(tree, value,
+					isSelected, expanded, leaf,
+					 row);
+
+	if (ftf != null) {
+	    // added a null-value check just in case: not used
+	    // in the example.
+	    ftf.setValue(value);
+	}
+
+	return ftf;
+
+    }
+
 
     //Override to ensure that the value remains a java.sql.Time.
     /**

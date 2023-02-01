@@ -6,7 +6,6 @@ import javax.swing.text.*;
 import javax.swing.table.*;
 
 import org.bzdev.swing.*;
-import org.bzdev.swing.table.*;
 
 public class InputTablePaneTest {
 
@@ -86,10 +85,23 @@ public class InputTablePaneTest {
     }
 
     public static void main(String argv[]) throws Exception {
+
+	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
+	if (systemUI) {
+	    /*
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    */
+	    SwingUtilities.invokeLater(() -> {
+		    DarkmodeMonitor.setSystemPLAF();
+		    DarkmodeMonitor.init();
+		});
+	}
+
+
 	SwingUtilities.invokeLater(() -> {
 		setup();
 	    });
-	if (argv.length > 1) {
+	if (argv.length > (systemUI? 2: 1)) {
 	    Thread.currentThread().currentThread().sleep(30000);
 	    System.exit(0);
 	}

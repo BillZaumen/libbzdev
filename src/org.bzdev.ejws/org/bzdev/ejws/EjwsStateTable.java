@@ -10,11 +10,11 @@ public class EjwsStateTable implements HttpSessionOps {
     Map<String,Object> map;
 
     public EjwsStateTable() {
-	map = new HashMap();
+	map = new HashMap<String,Object>();
     }
 
     public EjwsStateTable(int size) {
-	map = new HashMap(size);
+	map = new HashMap<String,Object>(size);
     }
 
     @Override

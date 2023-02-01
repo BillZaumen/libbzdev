@@ -54,6 +54,33 @@ public class InputTablePane extends JPanel {
     }
 
     /**
+     * Get a custom table-cell renderer for a specific row and column.
+     * This method should be overridden if a custom table-cell renderer
+     * is desired.
+     * @param tbl the internal table used by this object.
+     * @param i the row number
+     * @param j the column number
+     * @return the custom cell editor; null for a default
+     */
+    protected TableCellRenderer getCustomRenderer(JTable tbl, int i, int j) {
+	return null;
+    }
+
+    /**
+     * Get a custom cell editor for a specific row and column.
+     * This method should be overridden if a custom table-cell renderer
+     * is desired.
+     * @param tbl the internal table used by this object.
+     * @param i the row number
+     * @param j the column number
+     * @return the custom table-cell renderer; null for a default
+     */
+    protected  TableCellEditor getCustomEditor(JTable tbl, int i, int j) {
+	return null;
+    }
+
+
+    /**
      * Prevent editing of specific rows and columns.
      * The default implementation returns <CODE>false</CODE> for any
      * pair of arguments. If the value returned is dependent on a
@@ -258,6 +285,20 @@ public class InputTablePane extends JPanel {
 	JButton moveDownButton = canMove? new JButton(moveDownStr): null;
 	JButton clearSelectionButton = new JButton(clearSelectionStr);
 
+	if (insertRowButton != null) {
+	    insertRowButton.setToolTipText(errorMsg("inputPaneButtonTip"));
+	}
+	if (deleteRowButton != null) {
+	    deleteRowButton.setToolTipText(errorMsg("inputPaneButtonTip"));
+	}
+	if (moveUpButton != null) {
+	    moveUpButton.setToolTipText(errorMsg("inputPaneButtonTip"));
+	}
+	if (moveDownButton != null) {
+	    moveDownButton.setToolTipText(errorMsg("inputPaneButtonTip"));
+	}
+
+
 	table = new JTable() {
 		public Class<?> getColumnClass(int columnIndex) {
 		    return colspec[columnIndex].clasz;
@@ -266,6 +307,15 @@ public class InputTablePane extends JPanel {
 		    if (prohibitEditing(row, col)) return false;
 		    return colspec[col].tce != null;
 		}
+		public TableCellRenderer getCellRenderer(int row, int col) {
+		    TableCellRenderer r = getCustomRenderer(table, row, col);
+		    return (r != null)? r: super.getCellRenderer(row, col);
+		}
+		public TableCellEditor getCellEditor(int row, int col) {
+		    TableCellEditor e = getCustomEditor(table, row, col);
+		    return (e != null)? e: super.getCellEditor(row, col);
+		}
+
 	    };
 	Vector<String> colHeadings = new Vector<>(colspec.length);
 	for (int i = 0; i < colspec.length; i++) {

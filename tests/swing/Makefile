@@ -87,6 +87,12 @@ config:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ConfigTest
 
+config-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ConfigTest --systemUI
+
 config2:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -192,12 +198,72 @@ otoc:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ObjTocPaneTest $(BG)
 
+tree:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TreeTest
+
+tree-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TreeTest --systemUI
+
+
+table:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest
+
+table-ui:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest --systemUI
+
+table2:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest2
+
+table2-ui:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest2 --systemUI
+
+table3:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest3
+
+table4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest4
+
+table5:
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest5
+
+table6:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) TableTest6
 
 inputtable:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) InputTablePaneTest
+
+inputtable-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest --systemUI
 
 inputtable2:
 	(cd ../.. ; make jars)
@@ -216,6 +282,31 @@ inputtable4:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) InputTablePaneTest4
+
+inputtable4-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest4 --systemUI
+
+inputtable5:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest5 --systemUI
+
+inputtable6:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest6
+
+inputtable6-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) InputTablePaneTest6 --systemUI
+
 
 frametests:
 	make ctest ctest1 ctest1f ctest2 ctest3 ctest3sa ctest3sb
@@ -238,6 +329,20 @@ colorchooser:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar \
 		ColorChooserTest.java
 	$(JAVA) ColorChooserTest
+
+filechooser:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar \
+		FileChooserTest.java
+	$(JAVA) FileChooserTest
+
+filechooser-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar \
+		FileChooserTest.java
+	$(JAVA) FileChooserTest --systemUI
 
 tptest:
 	(cd ../.. ; make jars)
