@@ -489,7 +489,6 @@ public class ClearableFileChooser {
 	    
 	    fl = new FocusListener() {
 		    public void focusGained(FocusEvent fe) {
-			System.out.println("gained");
 			tfHasFocus = true;
 		    }
 		    public void focusLost(FocusEvent fe) {

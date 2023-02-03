@@ -122,6 +122,16 @@ public class InputTablePane extends JPanel {
 
 
     /**
+     * Indicate that a row is about to be deleted
+     * @param row the row number.
+     */
+    protected void beforeRowDeletion(int row) {
+	return;
+    }
+
+
+
+    /**
      * Table-cell editor that indicates that a table's default should
      * be used.  This should be used only with an instance of
      * {@link InputTablePane}.
@@ -495,6 +505,7 @@ public class InputTablePane extends JPanel {
 		    int ind = table.getSelectedRow();
 		    int n = table.getSelectedRowCount();
 		    while (n-- > 0) {
+			beforeRowDeletion(ind);
 			tm.removeRow(ind);
 		    }
 		    table.clearSelection();

@@ -825,15 +825,22 @@ public abstract class ConfigPropertyEditor {
     HashMap<String,Integer> keyMap = new HashMap<>();
     HashMap<String,String[]> otherKeys = new HashMap<>();
 
+    HashSet<String> altKeys = new HashSet<>(32);
+
     /**
      * Add a reserved-key entry where the key can be changed to use
      * various suffixes.
      * @param prefix the start of a key
      * @param suffixes the possibile suffixes following the prefix
      *        and separated from the prefix by a period.
+     * @execption IllegalArgumentException a key is already in use
      */
-    protected void addAltReservedKeys(String prefix, String... suffixes) {
+    protected void addAltReservedKeys(String prefix, String... suffixes)
+	throws IllegalArgumentException
+    {
 	if (ind < 0) {
+	    // should never happen - just catches a ridicularly large
+	    // table.
 	    throw new IllegalStateException(errorMsg("indexWrap"));
 	}
 	final int ourind = reserved.size() + ind;
@@ -850,6 +857,17 @@ public abstract class ConfigPropertyEditor {
 	    Vector<String> vector = new Vector<>(suffixes.length);
 	    for (String s: suffixes) {
 		String key = prefix + "." + s;
+		String shortkey = key;
+		if (key.startsWith(B64KEY_START)) {
+		    shortkey = key.substring(B64KEY_START_LEN);
+		} else if (key.startsWith(EB64KEY_START)) {
+		    shortkey = key.substring(EB64KEY_START_LEN);
+		}
+		if (altKeys.contains(shortkey)) {
+		    throw new IllegalArgumentException
+			(errorMsg("altKeys", key));
+		}
+		altKeys.add(shortkey);
 		vector.add(key);
 		keyMap.put(key, ourind);
 	    }
@@ -1188,7 +1206,8 @@ public abstract class ConfigPropertyEditor {
 
 	    if (!shortkey.equals(tf.oldShortValue)) {
 		while ((!shortkey.equals(tf.oldShortValue)
-			&& keys.contains(shortkey))
+			&& (keys.contains(shortkey)
+			    || altKeys.contains(shortkey)))
 		       || badKey(key)) {
 		    key = JOptionPane.showInputDialog
 			(tf.table,"Key for this row (null to revert):",
@@ -1683,13 +1702,28 @@ public abstract class ConfigPropertyEditor {
 		    }
 		    return getE(key);
 		}
+
+		@Override
+		protected void beforeRowDeletion(int row) {
+		    String key = (String)getValueAt(row, 0);
+		    String shortkey = key;
+		    if (key.startsWith(B64KEY_START)) {
+			shortkey = key.substring(B64KEY_START_LEN);
+		    } else if (key.startsWith(EB64KEY_START)) {
+			shortkey = key.substring(EB64KEY_START_LEN);
+		    }
+		    if (editorKeys.contains(shortkey)) {
+			editorKeys.remove(shortkey);
+		    }
+		}
 	    };
 
 	TableModelListener tml2 = (tme2) -> {
 	    if (tme2.getColumn() == 0) {
 		int row = tme2.getFirstRow();
 		if (row == tme2.getLastRow()) {
-		    if (tme2.getType() == TableModelEvent.UPDATE) {
+		    switch(tme2.getType()) {
+		    case TableModelEvent.UPDATE:
 			String key = (String)ipane.getValueAt(row, 0);
 			String val = defaults.getProperty("key");
 			if (val == null) {
@@ -1697,6 +1731,9 @@ public abstract class ConfigPropertyEditor {
 			} else {
 			    ipane.setValueAt(val, row, 1);
 			}
+			break;
+		    default:
+			break;
 		    }
 		}
 	    }
