@@ -143,7 +143,7 @@ follows:
 	  in selections.
         <LI> {@link UrlTocPane}.  This
 	  component extends ObjTocPane by specializing it so that the
-	  objects it manages are URLs. It's action listeners can
+	  objects it manages are URLs. It&apos;s action listeners can
 	  detect which URL was selected and respond in some
 	  appropriate way.
       </UL>
@@ -159,6 +159,33 @@ follows:
    can send messages to various destinations including an instance of
    {@link SimpleConsole}.  System.err,
    etc., are also supported.
+ <LI> A class {@link InputTablePane} that provides a simplified API for
+   building tables.
+ <LI> A class {@link ConfigPropertyEditor} that makes it possible to
+   use stylized Java property files to configure an application.
+ <LI> A class {@link DarkmodeMonitor} that can detect whether or not
+   dark mode is in effect for systems that support that.
+ <LI> Two chooser-panel classes:
+   <UL>
+     <LI>A class {@link CSSColorChooserPanel} that provides a panel using
+       CSS named colors that can be added to a color chooser.
+     <LI>A class {@link ClearableFileChooser} that creates a file
+       chooser with an extra button to distinguish clearing a file (i.e.
+       providing no file) from canceling the request to choose a file.
+   </UL>
+ <LI> Several cell editors for use in tables or treas:
+   <UL>
+     <LI> A class {@link CSSCellEditor} that provides a cell editor that
+       uses a color chooser and that represents colors by using CSS color
+       specifications.
+     <LI> A class {@link FileNameCellEditor} that provides file names by
+       using a file-chooser dialog box.
+     <LI> A class {@link ITextCellEditor} that provides a cell&apos;s value
+       by using {@link javax.swing.text.InternationalFormatter}.
+     <LI> A class {@link TextCellEditor} that represents objects
+       textually when being edited.
+   </UL>
+
 </UL>
 In addition there are four related packages:
 <UL>
@@ -168,6 +195,8 @@ In addition there are four related packages:
   <LI> {@link org.bzdev.swing.keys}.
     This contains a class that provides only static methods and that
     can look up key events by name.
+  <LI> {@link org.bzdev.swing.table}.
+    This contains a table-cell renderer.
   <LI> {@link org.bzdev.swing.text}.
     This contains a DocumentFilter, and two tread-safe Document
     classes.
@@ -200,5 +229,11 @@ In addition there are four related packages:
  -->
 <!--  LocalWords:  JEditorPane AuthenticationPane HtmlPane
  -->
-<!--  LocalWords:  SwingErrorMessage DocumentFilter
+<!--  LocalWords:  SwingErrorMessage DocumentFilter InputTablePane
+ -->
+<!--  LocalWords:  ConfigPropertyEditor DarkmodeMonitor CSSCellEditor
+ -->
+<!--  LocalWords:  CSSColorChooserPanel ClearableFileChooser
+ -->
+<!--  LocalWords:  FileNameCellEditor ITextCellEditor TextCellEditor
  -->
