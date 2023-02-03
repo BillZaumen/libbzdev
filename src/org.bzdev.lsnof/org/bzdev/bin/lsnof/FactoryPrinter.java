@@ -447,7 +447,8 @@ public class FactoryPrinter {
 	    URL[] urls = noURLs;
 	    String target = null;
 	    String menuFile = null;
-	    int menuWidth = errorMsg("factories").length();
+	    String emsg =  errorMsg("factories");
+	    int menuWidth = emsg.length();
 
 	    while (index < argv.length && argv[index].startsWith("-")) {
 		if (argv[index].equals("--")) {

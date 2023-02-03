@@ -14,10 +14,11 @@ public class ConfigTest {
 	public ConfigEditor() {
 	    super();
 	    addReservedKeys("key1", "key2", "key3");
+	    addAltReservedKeys("input", "url", "file");
 	    addReservedKeys("base64.key4", "base64.key5");
 	    addReservedKeys("ebase64.password");
-	    setupCompleted();
 
+	    setupCompleted();
 	    setDefaultProperty("key1", "foo");
 	    setDefaultProperty("key2", "$(key1), $(key3)");
 	    setDefaultProperty("key3", "bar");
@@ -42,17 +43,21 @@ public class ConfigTest {
 	    /*
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    */
-	    DarkmodeMonitor.setSystemPLAF();
-	    DarkmodeMonitor.init();
+	    SwingUtilities.invokeLater(() -> {
+		    DarkmodeMonitor.setSystemPLAF();
+		    DarkmodeMonitor.init();
+		});
 	}
 
 	ConfigEditor editor = new ConfigEditor();
 
-	editor.addRE("color", new CSSTableCellRenderer(false),
-		   new CSSCellEditor());
+	SwingUtilities.invokeAndWait(() -> {
+		editor.addRE("color", new CSSTableCellRenderer(false),
+			     new CSSCellEditor());
 
-	editor.addRE("file", null,
-		     new FileNameCellEditor("ConfigTest file", false));
+		editor.addRE("file", null,
+			     new FileNameCellEditor("ConfigTest file", false));
+	    });
 
 
 	if (argv.length > (systemUI? 1: 0)) {
@@ -60,7 +65,10 @@ public class ConfigTest {
 	    editor.loadFile(f);
 	}
 
-	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null, true);
+	System.out.println("opening dialog");
+	editor.setSaveQuestion(true);
+	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null,
+		    ConfigPropertyEditor.CloseMode.CLOSE);
 
 	System.out.println("getting config");
 	Properties config = editor.getDecodedProperties();

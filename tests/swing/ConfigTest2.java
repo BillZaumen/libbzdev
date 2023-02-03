@@ -49,7 +49,8 @@ public class ConfigTest2 {
 	    editor.loadFile(f);
 	}
 
-	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null, true);
+	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null,
+		    ConfigPropertyEditor.CloseMode.CLOSE);
 
 	System.out.println("getting config");
 	Properties config = editor.getDecodedProperties();

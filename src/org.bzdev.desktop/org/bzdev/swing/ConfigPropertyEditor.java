@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.border.Border;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
@@ -124,18 +126,22 @@ import org.bzdev.swing.TextCellEditor;
  *      provide an icon to display when a configuration editor's window
  *      is iconified.  Normally there are multiple icons, corresponding to
  *      different sizes required by a window manager.
- *   <LI><STRONG>{@link ConfigPropertyEditor#setDefaultProperty(String,String)}</STRONG>. Some properties have default values, typically in cases were
- *      the defaults are likely to be the ones the user needs. This method
- *      should be used to define what these defaults are.
  *   <LI><STRONG>{@link ConfigPropertyEditor#addReservedKeys(String...)}</STRONG>.
  *      There may be some number of distinguished keys that are nominally
  *      expected to be present. This method will define a group of such
  *      keys. When called multiple times, each group will be separated 
  *      from the others by a series of dashes in a table's first column.
+ *   <LI><STRONG>{@link ConfigPropertyEditor#addAltReservedKeys(String,String...)}</STRONG>.
+ *      This method adds a reserved key that can have multiple values: a
+ *      prefix, followed by a period, followed by a suffix.  A combo box
+ *      will allow one to choose the appropriate key.
  *   <LI><STRONG>{@link ConfigPropertyEditor#setupCompleted()}</STRONG>.
  *      This method must be called by the constructor, and indicates that
  *      all the reserved keys, and any default values associated with
  *      these, have been provided.
+ *   <LI><STRONG>{@link ConfigPropertyEditor#setDefaultProperty(String,String)}</STRONG>. Some properties have default values, typically in cases were
+ *      the defaults are likely to be the ones the user needs. This method
+ *      should be used to define what these defaults are.
  * </UL>
  * The constructor may optionally call the following methods:
  * <UL>
@@ -184,6 +190,12 @@ import org.bzdev.swing.TextCellEditor;
  *            Properties config = editor.getDecodedProperties();
  *        </CODE></PRE></BLOCKQUOTE>
  * </UL>
+ * Finally, {@link ConfigPropertyEditor} is not a Swing or AWT
+ * component, although it uses such components, and its public methods
+ * do not have to be called on the AWT event dispatch thread.  The
+ * rationale is that one use case is for providing a dialog box for
+ * configuring a program that otherwise runs as a command-line program
+ * and exits when done.
  */
 public abstract class ConfigPropertyEditor {
 
@@ -433,6 +445,18 @@ public abstract class ConfigPropertyEditor {
     boolean editingValTF = false;
     Set<String> keySet = new HashSet<String>(32);
     boolean needSave = false;
+    boolean useNeedSave = true;
+
+
+    /**
+     * Set whether or not a warning message about needing to save the
+     * state of the table should be shown.
+     * @param mode true if the user should  be warned to save a
+     *        modified table; false otherwise
+     */
+    public void setSaveQuestion(boolean mode) {
+	useNeedSave = mode;
+    }
 
     private static boolean endsWithIgnoreCase(String string, String tail) {
 	int index = string.length() - tail.length();
@@ -442,6 +466,7 @@ public abstract class ConfigPropertyEditor {
 
     boolean doSave(Component frame, File file, boolean mode,
 		   InputTablePane table) {
+	File origFile = file;
 	Set<String> loop = checkLoops(table);
 	if (loop.size() > 0) {
 	    StringBuffer sb = new StringBuffer();
@@ -504,8 +529,10 @@ public abstract class ConfigPropertyEditor {
 		errorMsg("saveToMsg", file.toString(), eio.getMessage());
 	    JOptionPane.showMessageDialog(frame, msg, errorTitle(),
 					  JOptionPane.ERROR_MESSAGE);
+	    file = origFile;
 	    return false;
 	}
+	this.file = file;
 	return true;
     }
 
@@ -794,6 +821,47 @@ public abstract class ConfigPropertyEditor {
 	sl.add(reserved.size() + (ind++));
     }
 
+    HashMap<Integer,TableCellEditor> editorMap = new HashMap<>();
+    HashMap<String,Integer> keyMap = new HashMap<>();
+    HashMap<String,String[]> otherKeys = new HashMap<>();
+
+    /**
+     * Add a reserved-key entry where the key can be changed to use
+     * various suffixes.
+     * @param prefix the start of a key
+     * @param suffixes the possibile suffixes following the prefix
+     *        and separated from the prefix by a period.
+     */
+    protected void addAltReservedKeys(String prefix, String... suffixes) {
+	if (ind < 0) {
+	    throw new IllegalStateException(errorMsg("indexWrap"));
+	}
+	final int ourind = reserved.size() + ind;
+	String ourkey = prefix + ((suffixes.length == 0)? "":
+				  "." + suffixes[0]);
+	reserved.add(ourkey);
+	if (suffixes.length > 1) {
+	    String[] strings = new String[suffixes.length-1];
+	    System.arraycopy(suffixes, 1, strings, 0, strings.length);
+	    for (int i = 0; i < strings.length; i++) {
+		strings[i] = prefix + "." + strings[i];
+	    }
+	    otherKeys.put(ourkey, strings);
+	    Vector<String> vector = new Vector<>(suffixes.length);
+	    for (String s: suffixes) {
+		String key = prefix + "." + s;
+		vector.add(key);
+		keyMap.put(key, ourind);
+	    }
+	    SwingUtilities.invokeLater(() -> {
+		    editorMap.put(ourind,
+				  new DefaultCellEditor
+				  (new JComboBox<String>(vector)));
+		});
+	}
+	sl.add(reserved.size() + (ind++));
+    }
+
     private int KLEN = 0;
 
     /**
@@ -836,6 +904,28 @@ public abstract class ConfigPropertyEditor {
 	MODELESS
     }
 
+    private void doShowLoadDialog(Component owner) {
+	selectedIndex = -1;
+	File f = null;
+	try {
+	    File cdir = new File(System.getProperty("user.dir"))
+		.getCanonicalFile();
+	    JFileChooser chooser = new JFileChooser(cdir);
+	    FileNameExtensionFilter filter =
+		new FileNameExtensionFilter
+		(extensionFilterTitle(), extension());
+	    chooser.setFileFilter(filter);
+	    chooser.setSelectedFile(file);
+	    int status = chooser.showOpenDialog(owner);
+	    if (status == JFileChooser.APPROVE_OPTION) {
+		file = chooser.getSelectedFile();
+	    }
+	    if (f != null) {
+		loadFile(f);
+	    }
+	} catch (IOException e) {}
+    }
+
     /**
      * Load a file, chosen using a dialog, to set up this editor.
      * This will be called before the editor's top-level window is
@@ -846,39 +936,34 @@ public abstract class ConfigPropertyEditor {
     public void showLoadDialog(Component owner)
 	throws IOException
     {
-	selectedIndex = -1;
-	File f = null;
-	try {
-	    SwingUtilities.invokeAndWait(() -> {
-		    try {
-			File cdir = new File(System.getProperty("user.dir"))
-			    .getCanonicalFile();
-			JFileChooser chooser = new JFileChooser(cdir);
-			FileNameExtensionFilter filter =
-			    new FileNameExtensionFilter
-			    (extensionFilterTitle(), extension());
-			chooser.setFileFilter(filter);
-			chooser.setSelectedFile(file);
-			int status = chooser.showOpenDialog(owner);
-			if (status == JFileChooser.APPROVE_OPTION) {
-			    file = chooser.getSelectedFile();
-			}
-		    } catch (IOException e) {
-		    }
-		});
-	} catch (InterruptedException e) {
-	} catch (InvocationTargetException e) {
-	}
-	if (f != null) {
-	    loadFile(f);
+	if (SwingUtilities.isEventDispatchThread()) {
+	    doShowLoadDialog(owner);
+	} else {
+	    try  {
+		SwingUtilities.invokeAndWait(() -> {
+			doShowLoadDialog(owner);
+		    });
+	    } catch (InterruptedException e) {
+	    } catch (InvocationTargetException et) {
+		et.printStackTrace();
+	    } catch (Exception ee) {
+		ee.printStackTrace();
+	    }
+
 	}
     }
+
+
+
     /**
      * Load a file to set up this editor.
      * This will be called before the editor's top-level window is
      * created.
-     * @param f the file to open.
-     * @exception IOException an IO exception occurred or f was null
+     * <P>
+     * Calling this method will result in the user being prompted
+     * to save changes if values are edited.
+     * @param f the file to open; null if no file should be loaded.
+     * @exception IOException an IO exception occurred
      */
     public void loadFile(File f)
 	throws IOException
@@ -930,8 +1015,25 @@ public abstract class ConfigPropertyEditor {
 	return new Color(r, g, (3*b)/4);
     }
 
+    private static Color reservedEditColor() {
+	Color bg1 = noEditColor();
+	Color bg2 = (Color)UIManager.get("Table.background");
+	int r1 = bg1.getRed();
+	int g1 = bg1.getGreen();
+	int b1 = bg1.getBlue();
+	int r2 = bg2.getRed();
+	int g2 = bg2.getGreen();
+	int b2 = bg2.getBlue();
+	return new Color((r1+r2)/2, (g1+g2)/2, (b1+b2)/2);
+    }
+
+
     private static class OurCellRenderer1 extends DefaultTableCellRenderer {
-	public OurCellRenderer1() {super();}
+	HashMap<Integer,TableCellEditor> editorMap;
+	public OurCellRenderer1(HashMap<Integer,TableCellEditor> editorMap) {
+	    super();
+	    this.editorMap = editorMap;
+	}
 
 	@Override
 	public Component getTableCellRendererComponent
@@ -943,12 +1045,15 @@ public abstract class ConfigPropertyEditor {
 		(table, value, isSelected, hasFocus, row, column);
 	    if (isSelected == false && hasFocus == false) {
 		if (!table.isCellEditable(row,column)) {
-
 		    result.setBackground(noEditColor());
 		} else {
-		    result.setBackground(darkmode?(Color)
-					 UIManager.get("Table.background"):
-					 Color.WHITE);
+		    if (editorMap.get(row) != null) {
+			result.setBackground(reservedEditColor());
+		    } else {
+			result.setBackground(darkmode?(Color)
+					     UIManager.get("Table.background"):
+					     Color.WHITE);
+		    }
 		}
 	    }
 	    return result;
@@ -1314,13 +1419,61 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
-    private static final Ebase64TableCellRenderer encryptedTCR
-	= new Ebase64TableCellRenderer(false);
+    private static Ebase64TableCellRenderer encryptedTCR = null;
+
+    static {
+	if (SwingUtilities.isEventDispatchThread()) {
+	    encryptedTCR = new Ebase64TableCellRenderer(false);
+	} else {
+	    try {
+		SwingUtilities.invokeLater(() -> {
+			encryptedTCR = new Ebase64TableCellRenderer(false);
+		    });
+		// using invokeAndWait causes the process to hang.
+		Toolkit.getDefaultToolkit().sync();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+
+    /**
+     * Mode to determine options for closing a property-editor window
+     * or dialog.
+     */
+    public enum CloseMode {
+	/**
+	 * The program will exit when the property-editor window is
+	 * closed.
+	 */
+	QUIT,
+	/**
+	 * The program will not exit when the property-editor window
+	 * is closed.
+	 */
+	CLOSE,
+	/**
+	 * Menu items will determine if the program exits or continues when
+	 * the property-editor window is closed
+	 */
+	BOTH
+    }
+
+    private JMenuItem closeMenuItem = null;
+    private JMenuItem quitMenuItem = null;
+
+    TableModelListener tml = (tme) -> {needSave = true;};
+
+    private static class TmlAddedContainer {
+	public boolean tmlAdded = false;
+    }
 
     private void doEdit(Component owner,  Mode mode, Callable continuation,
-			boolean quitCloseMode)
+			CloseMode quitCloseMode)
      {
-	final CallableContainer continuationContainer =
+	 selectedIndex = -1;
+	 needSave = false;
+	 final CallableContainer continuationContainer =
 	    new CallableContainer(continuation);
 	//System.out.println("mode = " + mode);
 	Window window = (mode == Mode.JFRAME)?
@@ -1337,7 +1490,23 @@ public abstract class ConfigPropertyEditor {
 	    properties = new Properties();
 	}
 	names.addAll(properties.stringPropertyNames());
-	names.addAll(reserved);
+	for (String nm: reserved) {
+	    if (!names.contains(nm)) {
+		String[] others = otherKeys.get(nm);
+		String kfound = null;
+		if (others != null) {
+		    for (String k: others) {
+			if (names.contains(k)) {
+			    kfound = k;
+			    break;
+			}
+		    }
+		}
+		if (kfound == null) names.add(nm);
+		else names.add(kfound);
+	    }
+	}
+	// names.addAll(reserved);
 
 	String[] keys1 = new String[names.size()];
 	keys1 = names.toArray(keys1);
@@ -1375,6 +1544,7 @@ public abstract class ConfigPropertyEditor {
 	Arrays.sort(keys);
 	int kind = 0;
 	int sind = 0;
+	int mkind = 0;
 	/*
 	for (int i = 0; i < adjustedSpacersLength; i++) {
 	    System.out.print(" " + spacers[i]);
@@ -1382,6 +1552,17 @@ public abstract class ConfigPropertyEditor {
 	System.out.println();
 	*/
 	for (String key: reserved) {
+	    if (properties.getProperty(key) == null) {
+		String[] others = otherKeys.get(key);
+		if (others != null) {
+		    for (String k: others) {
+			if (properties.getProperty(k) != null) {
+			    key = k;
+			    break;
+			}
+		    }
+		}
+	    }
 	    keys[kind++] = key;
 	    if (sind < adjustedSpacersLength && kind == spacers[sind]) {
 		keys[kind++] = "-------------";
@@ -1441,7 +1622,7 @@ public abstract class ConfigPropertyEditor {
 	    new InputTablePane.ColSpec(localeString("Property"),
 				       "mmmmmmmmmmmmmmm",
 				       String.class,
-				       new OurCellRenderer1(),
+				       new OurCellRenderer1(editorMap),
 				       new OurCellEditor1(editorKeys)),
 	    new InputTablePane.ColSpec(localeString("Value"),
 				       "mmmmmmmmmmmmmmm",
@@ -1459,7 +1640,8 @@ public abstract class ConfigPropertyEditor {
 
 		@Override
 		protected boolean prohibitEditing(int row, int col) {
-		    return col == 0 && row < KLEN;
+		    return col == 0 && row < KLEN
+			&& editorMap.get(row) == null;
 		}
 		@Override
 		protected int minimumSelectableRow(int col, boolean all) {
@@ -1488,6 +1670,9 @@ public abstract class ConfigPropertyEditor {
 		protected TableCellEditor
 		    getCustomEditor(JTable tbl, int row, int col)
 		{
+		    if (col == 0) {
+			return editorMap.get(row);
+		    }
 		    if (col != 1) return null;
 		    String key = (String)tbl.getValueAt(row, 0);
 		    if (key == null) return null;
@@ -1500,7 +1685,33 @@ public abstract class ConfigPropertyEditor {
 		}
 	    };
 
-       
+	TableModelListener tml2 = (tme2) -> {
+	    if (tme2.getColumn() == 0) {
+		int row = tme2.getFirstRow();
+		if (row == tme2.getLastRow()) {
+		    if (tme2.getType() == TableModelEvent.UPDATE) {
+			String key = (String)ipane.getValueAt(row, 0);
+			String val = defaults.getProperty("key");
+			if (val == null) {
+			    ipane.setValueAt(null, row, 1);
+			} else {
+			    ipane.setValueAt(val, row, 1);
+			}
+		    }
+		}
+	    }
+	};
+
+	ipane.addTableModelListener(tml2);
+
+	// Use a container so we can change the value of tmlAdded
+	// in a listener.
+	TmlAddedContainer tmlAddedContainer = new TmlAddedContainer();
+
+	if (useNeedSave) {
+	    ipane.addTableModelListener(tml);
+	    tmlAddedContainer.tmlAdded = true;
+	}
 	JPanel panel = new JPanel();
 	panel.setLayout(new BorderLayout());
 	panel.add(ipane, BorderLayout.CENTER);
@@ -1508,6 +1719,50 @@ public abstract class ConfigPropertyEditor {
 	JMenu fileMenu = new JMenu(localeString("File"));
 	fileMenu.setMnemonic(KeyEvent.VK_F);
 	menubar.add(fileMenu);
+	ActionListener qcl = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    ipane.stopCellEditing();
+		    if (tmlAddedContainer.tmlAdded) {
+			ipane.removeTableModelListener(tml);
+			tmlAddedContainer.tmlAdded = false;
+		    }
+		    if (needSave) {
+			String emsg;
+			if (e.getSource() == quitMenuItem) {
+			    emsg = errorMsg("saveQuestionQuit");
+			} else {
+			    emsg = errorMsg("saveQuestionClose");
+			}
+			if (JOptionPane.showConfirmDialog
+				(window, emsg, configTitle(),
+				 JOptionPane.OK_CANCEL_OPTION,
+				 JOptionPane.QUESTION_MESSAGE)
+			    == JOptionPane.OK_OPTION) {
+			    if (!doSave(window, file, false, /*table*/ipane)) {
+				// We couldn't save. Let the user try
+				// again and maybe explicitly cancel or
+				// use save-as to pick a new file.
+				return;
+			    }
+			}
+		    }
+		    window.setVisible(false);
+		    window.dispose();
+		    CloseMode qcm = quitCloseMode;
+		    if (qcm == CloseMode.BOTH) {
+			qcm = (e.getSource() == quitMenuItem)?
+			    CloseMode.QUIT: CloseMode.CLOSE;
+		    }
+		    switch (qcm) {
+		    case QUIT:
+			System.exit(0);
+		    case CLOSE:
+			return;
+		    }
+		}
+	    };
+
+	/*
 	String qctitle = quitCloseMode?
 	    localeString("Quit"): localeString("Close");
 	JMenuItem menuItem =
@@ -1522,34 +1777,28 @@ public abstract class ConfigPropertyEditor {
 				    (KeyEvent.VK_W,
 				     InputEvent.CTRL_DOWN_MASK));
 	}
-	menuItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    ipane.stopCellEditing();
-		    if (needSave) {
-			String emsg = errorMsg("saveQuestion");
-			switch (JOptionPane.showConfirmDialog
-				(window, emsg, configTitle(),
-				 JOptionPane.OK_CANCEL_OPTION,
-				 JOptionPane.QUESTION_MESSAGE)) {
-			case JOptionPane.OK_OPTION:
-				window.setVisible(false);
-				window.dispose();
-				if (quitCloseMode) {
-				    System.exit(0);
-				}
-			default:
-			    return;
-			}
-		    } else {
-			window.setVisible(false);
-			window.dispose();
-			if (quitCloseMode) {
-			    System.exit(0);
-			}
-		    }
-		}
-	    });
+	menuItem.addActionListener(qcl);
 	fileMenu.add(menuItem);
+	*/
+	boolean doBreak = true;
+	JMenuItem menuItem = null;
+	switch (quitCloseMode) {
+	case BOTH:
+	    doBreak = false;
+	case QUIT:
+	    menuItem = new JMenuItem(localeString("Quit"), KeyEvent.VK_Q);
+	    menuItem.addActionListener(qcl);
+	    fileMenu.add(menuItem);
+	    quitMenuItem = menuItem;
+	    if (doBreak) break;
+	case CLOSE:
+	    menuItem = new JMenuItem(localeString("Close"), KeyEvent.VK_W);
+	    menuItem.addActionListener(qcl);
+	    fileMenu.add(menuItem);
+	    closeMenuItem = menuItem;
+	    break;
+	}
+
 	menuItem = new JMenuItem(localeString("Save"), KeyEvent.VK_S);
 	menuItem.setAccelerator(KeyStroke.getKeyStroke
 				(KeyEvent.VK_S,
@@ -1589,6 +1838,10 @@ public abstract class ConfigPropertyEditor {
 	    frame.addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent e) {
 			ipane.stopCellEditing();
+			if (tmlAddedContainer.tmlAdded) {
+			    ipane.removeTableModelListener(tml);
+			    tmlAddedContainer.tmlAdded = false;
+			}
 			save(properties, /*table*/ipane);
 			if (continuationContainer.callable!= null) {
 			    Callable callable = continuationContainer.callable;
@@ -1598,6 +1851,10 @@ public abstract class ConfigPropertyEditor {
 			window.dispose();
 		    }
 		    public void windowClosed() {
+			if (tmlAddedContainer.tmlAdded) {
+			    ipane.removeTableModelListener(tml);
+			    tmlAddedContainer.tmlAdded = false;
+			}
 			if (continuationContainer.callable != null) {
 			    continuationContainer.callable.call();
 			}
@@ -1610,6 +1867,10 @@ public abstract class ConfigPropertyEditor {
 		dialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 			    ipane.stopCellEditing();
+			    if (tmlAddedContainer.tmlAdded) {
+				ipane.removeTableModelListener(tml);
+				tmlAddedContainer.tmlAdded = false;
+			    }
 			    save(properties, /*table*/ipane);
 			    if (continuationContainer.callable != null) {
 				Callable callable =
@@ -1632,6 +1893,10 @@ public abstract class ConfigPropertyEditor {
 	window.setVisible(true);
 	if (mode == Mode.MODAL) {
 	    ipane.stopCellEditing();
+	    if (tmlAddedContainer.tmlAdded) {
+		ipane.removeTableModelListener(tml);
+		tmlAddedContainer.tmlAdded = false;
+	    }
 	    save(properties, /*table*/ipane);
 	    if (continuationContainer.callable != null) {
 		continuationContainer.callable.call();
@@ -1657,36 +1922,43 @@ public abstract class ConfigPropertyEditor {
      * @param continuation a {@link Callable} that provides some code to
      *        run while or just after this editor's top-level window is
      *        closing.
-     * @param quitCloseMode true if, when this editor's window is
-     *        closing and is not a modal dialog, the application
-     *        should quit (exit with an exit code of 0); false if,
-     *        when this editor's window is closing, the application
-     *        will continue running.
+     * @param quitCloseMode {@link CloseMode#QUIT} if the process should
+     *        exit when the editor closes; {@link CloseMode#CLOSE} if
+     *        the process should continue after the editor clsoes, or
+     *        {@link CloseMode#BOTH} if both a Quit and a Close menu
+     *        item should appear in the File menu.
      */
     public void edit(Component owner,  Mode mode, Callable continuation,
-			boolean quitCloseMode)
+			CloseMode quitCloseMode)
     {
-	selectedIndex = -1;
+	// selectedIndex = -1;  (moved to doEdit)
 	if (mode == null) throw new
 			      IllegalArgumentException(errorMsg("noMode"));
 	if (mode == Mode.MODAL) {
-	    try {
-		// System.out.println("invokeAndWait");
-		SwingUtilities.invokeAndWait(() -> {
-			doEdit(owner, mode, continuation, false);
-			// System.out.println("doEdit exited");
-		    });
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-	    } catch (InvocationTargetException et) {
-		et.printStackTrace();
-	    } catch (Exception ee) {
-		ee.printStackTrace();
+	    if (SwingUtilities.isEventDispatchThread()) {
+		doEdit(owner, mode, continuation, quitCloseMode);
+	    } else {
+		try {
+		    // System.out.println("invokeAndWait");
+		    SwingUtilities.invokeAndWait(() -> {
+			    doEdit(owner, mode, continuation, quitCloseMode);
+			    // System.out.println("doEdit exited");
+			});
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException et) {
+		    et.printStackTrace();
+		} catch (Exception ee) {
+		    ee.printStackTrace();
+		}
 	    }
 	} else {
-	    SwingUtilities.invokeLater(() -> {
-		    doEdit(owner, mode, continuation, quitCloseMode);
-		});
+	    if (SwingUtilities.isEventDispatchThread()) {
+		doEdit(owner, mode, continuation, quitCloseMode);
+	    } else {
+		SwingUtilities.invokeLater(() -> {
+			doEdit(owner, mode, continuation, quitCloseMode);
+		    });
+	    }
 	}
     }
 

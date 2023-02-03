@@ -11,6 +11,8 @@ import javax.swing.text.Document;
 import org.bzdev.util.SafeFormatter;
 import java.beans.*;
 
+//@exbundle org.bzdev.swing.lpack.ClearableFileChooser
+
 /**
  * File chooser that can distiguish between canceling the dialog and
  * indicating that no file is provided.

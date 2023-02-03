@@ -236,6 +236,24 @@ public class InputTablePane extends JPanel {
 
     /*private*/ JTable table;
 
+    /**
+     * Adds a listener to the list that is notified each time a
+     * change to the underlying table's  data model occurs.
+     * @param l the TableModelListener
+     */
+    public void addTableModelListener(TableModelListener l) {
+	table.getModel().addTableModelListener(l);
+    }
+
+    /**
+     * Removes a listener from the list that is notified each time a
+     * change to the underlying table's data model occurs.
+     */
+    public void removeTableModelListener(TableModelListener l) {
+	table.getModel().removeTableModelListener(l);
+    }
+
+
     private static final String appendRowStr = errorMsg("appendRow");
     private static final String insertRowStr = errorMsg("insertRow");
     private static final String deleteRowStr = errorMsg("deleteRow");
@@ -538,6 +556,17 @@ public class InputTablePane extends JPanel {
      */
     public Object getValueAt(int rowIndex, int columnIndex) {
 	return tm.getValueAt(rowIndex, columnIndex);
+    }
+
+    /**
+     * Set the valoue of a table cell for this table.
+     * As usual, indicies start at 0.
+     * @param val the new value
+     * @param row the row index into the table
+     * @param col the column index into the table
+     */
+    public void setValueAt(Object val, int row, int col) {
+	tm.setValueAt(val, row, col);
     }
     
     /**

@@ -8,6 +8,8 @@ import javax.swing.table.*;
 import org.bzdev.graphs.Colors;
 import org.bzdev.util.SafeFormatter;
 
+//@exbundle org.bzdev.swing.table.lpack.CSSTableCellRenderer
+
 /*
  * Modified from a tutorial example that containined the following
  * legalease:
@@ -56,7 +58,7 @@ public class CSSTableCellRenderer extends JLabel
                            implements TableCellRenderer {
 
     private static ResourceBundle exbundle = ResourceBundle.getBundle
-	("org.bzdev.swing.table.lpack.CSSCellRenderer");
+	("org.bzdev.swing.table.lpack.CSSTableCellRenderer");
 
     static String errorMsg(String key, Object... args) {
 	return (new SafeFormatter()).format(exbundle.getString(key), args)
@@ -106,7 +108,11 @@ public class CSSTableCellRenderer extends JLabel
                 setBorder(unselectedBorder);
             }
         }
-        setToolTipText(empty? errorMsg("noColor"): spec);
+	if (empty) {
+	    setToolTipText(errorMsg("noColor"));
+	} else {
+	    setToolTipText(spec);
+	}
         return this;
     }
 }

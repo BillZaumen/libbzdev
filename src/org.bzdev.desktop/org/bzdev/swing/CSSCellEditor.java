@@ -11,6 +11,7 @@ import javax.swing.tree.TreeCellEditor;
 import org.bzdev.graphs.Colors;
 import org.bzdev.util.SafeFormatter;
 
+//@exbundle org.bzdev.swing.lpack.CSSCellEditor
 
 /*
  * This class is based on an example in the java tutorials, which
@@ -119,8 +120,9 @@ public class CSSCellEditor extends AbstractCellEditor
 
 	parent = button;
 	dialogParent = button;
+	String msg = errorMsg("pick");
         dialog = JColorChooser.createDialog(dialogParent,
-					    errorMsg("pick"),
+					    msg,
 					    true,  //modal
 					    colorChooser,
 					    this,  //OK button handler

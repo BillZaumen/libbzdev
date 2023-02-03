@@ -5144,18 +5144,20 @@ public class ExpressionParser implements ObjectParser<Object>
 		    } else if (vm.containsKey(name1)) {
 			o1 = vm.get(name1);
 		    } else {
+			String msg = errorMsg("noValue", name1);
 			throw new ObjectParser.Exception
-			    (errorMsg("noValue", name1),
-			     opToken.getFileName(), orig, opToken.getIndex());
+			    (msg, opToken.getFileName(), orig,
+			     opToken.getIndex());
 		    }
 		    if (hasAmap && amapContains(name2)) {
 			o2 = getFromAmap(name2);
 		    } else if (vm.containsKey(name2)) {
 			o2 = vm.get(name2);
 		    } else {
+			String msg = errorMsg("noValue", name2);
 			throw new ObjectParser.Exception
-			    (errorMsg("noValue", name2),
-			     opToken.getFileName(), orig, opToken.getIndex());
+			    (msg,opToken.getFileName(), orig,
+			     opToken.getIndex());
 		    }
 		    if (hasAmap && amapContains(name1)) {
 			putInAmap(name1, o2);
@@ -10157,9 +10159,12 @@ public class ExpressionParser implements ObjectParser<Object>
 			finishNeeded = true;
 		    } else if (variable.equals("import")) {
 			// imports not allowed / 'import' is a reserved word.
-			String msg = errorMsg(importsFrozen?
-					      "importBlocked":
-					      "importReserved");
+			String msg;
+			if (importsFrozen) {
+			    msg = errorMsg("importBlocked");
+			} else {
+			    msg = errorMsg("importReserved");
+			}
 			throw new ObjectParser.Exception
 			    (msg, filenameTL.get(), s, i);
 		    } else if (variable.equals("synchronized")) {

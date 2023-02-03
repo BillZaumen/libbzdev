@@ -85,13 +85,13 @@ config:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	$(JAVA) ConfigTest
+	$(JAVA) ConfigTest $(ARG1)
 
 config-ui:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	$(JAVA) ConfigTest --systemUI
+	$(JAVA) ConfigTest --systemUI $(ARG1)
 
 config2:
 	(cd ../.. ; make jars)
