@@ -68,7 +68,7 @@ public class ConfigTest {
 	System.out.println("opening dialog");
 	editor.setSaveQuestion(true);
 	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null,
-		    ConfigPropertyEditor.CloseMode.CLOSE);
+		    ConfigPropertyEditor.CloseMode.BOTH);
 
 	System.out.println("getting config");
 	Properties config = editor.getDecodedProperties();

@@ -1824,12 +1824,18 @@ public abstract class ConfigPropertyEditor {
 	    doBreak = false;
 	case QUIT:
 	    menuItem = new JMenuItem(localeString("Quit"), KeyEvent.VK_Q);
+	    menuItem.setAccelerator(KeyStroke.getKeyStroke
+				    (KeyEvent.VK_Q,
+				     InputEvent.CTRL_DOWN_MASK));
 	    menuItem.addActionListener(qcl);
 	    fileMenu.add(menuItem);
 	    quitMenuItem = menuItem;
 	    if (doBreak) break;
 	case CLOSE:
 	    menuItem = new JMenuItem(localeString("Close"), KeyEvent.VK_W);
+	    menuItem.setAccelerator(KeyStroke.getKeyStroke
+				    (KeyEvent.VK_W,
+				     InputEvent.CTRL_DOWN_MASK));
 	    menuItem.addActionListener(qcl);
 	    fileMenu.add(menuItem);
 	    closeMenuItem = menuItem;
