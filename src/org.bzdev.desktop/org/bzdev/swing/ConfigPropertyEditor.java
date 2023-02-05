@@ -1337,8 +1337,8 @@ public abstract class ConfigPropertyEditor {
     int extraInitialRows = 10;
     /**
      * Set the number of blank rows at the end of the table.
-     * THese rows are added after any rows containing reserved keys.
-     * THe default is 10.  Set to zero if only the reserved rows should
+     * These rows are added after any rows containing reserved keys.
+     * The default is 10.  Set to zero if only the reserved rows should
      * be in the table.
      * @param count the number of rows
      */

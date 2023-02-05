@@ -7,7 +7,7 @@ package org.bzdev.gio;
  * the {@link org.bzdev.gio.OutputStreamGraphics}'s constructor the
  * svg element's width, height, and viewBox attributes, with the
  * viewBox typically set to "0 0 W H" where W is the width and
- * H is the height.  THe width and height attributes should normally
+ * H is the height.  The width and height attributes should normally
  * use units of points (pt).  For scaling the image, other units
  * and other values may be appropriate.
  * <P>
