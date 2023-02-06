@@ -17,6 +17,7 @@ public class ConfigTest {
 	    addAltReservedKeys("input", "url", "file");
 	    addReservedKeys("base64.key4", "base64.key5");
 	    addReservedKeys("ebase64.password");
+	    addReservedKeys("output.file");
 
 	    setupCompleted();
 	    setDefaultProperty("key1", "foo");
@@ -57,6 +58,10 @@ public class ConfigTest {
 
 		editor.addRE("file", null,
 			     new FileNameCellEditor("ConfigTest file", false));
+
+		editor.addRE("output.file", null,
+			     new FileNameCellEditor("ConfigTest output file",
+						    false));
 	    });
 
 

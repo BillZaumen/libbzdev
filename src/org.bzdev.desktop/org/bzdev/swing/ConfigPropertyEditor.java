@@ -1359,16 +1359,30 @@ public abstract class ConfigPropertyEditor {
     HashMap<String,Pair> map = new HashMap<>();
 
     /**
-     * @param tail the last component of a key corresponding to some value
-     * The tail is either equal to the key or equal to the last component
-     * of a key after its last '.'.
+     * Provide a custom table-cell renderer and/or editor for the
+     * value in the second column of some row.
+     * The key provided in column 1 of a row will be tested against
+     * the tail argument provided by this method.  If there is an
+     * exact match for a key, the renderer or editor is used.
+     * Otherwise the key is replaced by the remainder of the key
+     * after its first period and the test is repeated until there
+     * is a match or the key can no longer by shorted.
+     * If there are multiple possible matches, the longest match is
+     * used.
+     * @param tail the last components of a key.
      * @param r the table cell renderer to use to display the value
-     *        corresponding to a key
-     * @param e the table cell editor ot use to modify or create a value
-     *        corresponding to a key
+     *        corresponding to a key; null if the normal choice is not
+     *        overridden.
+     * @param e the table cell editor to use to modify or create a value
+     *        corresponding to a key; null if the normal choice is not
+     *        overridden.
      */
     public void addRE(String tail, TableCellRenderer r, TableCellEditor e) {
 	map.put(tail, new Pair(r, e));
+    }
+
+    private boolean hasRE(String tail) {
+	return map.containsKey(tail);
     }
 
     private TableCellRenderer getR(String tail) {
@@ -1678,11 +1692,18 @@ public abstract class ConfigPropertyEditor {
 		    String key = (String)tbl.getValueAt(row, 0);
 		    if (key == null) return null;
 		    if (key.startsWith("ebase64.")) return encryptedTCR;
-		    int ind = key.lastIndexOf('.');
-		    if (ind != -1) {
-			key = key.substring(ind+1);
+		    if (hasRE(key)) {
+			return getR(key);
+		    } else {
+			int ind;
+			while ((ind = key.indexOf('.')) != -1) {
+			    key = key.substring(ind+1);
+			    if (hasRE(key)) {
+				return getR(key);
+			    }
+			}
+			return null;
 		    }
-		    return getR(key);
 		}
 
 		@Override
@@ -1696,11 +1717,18 @@ public abstract class ConfigPropertyEditor {
 		    String key = (String)tbl.getValueAt(row, 0);
 		    if (key == null) return null;
 		    if (key.startsWith("ebase64.")) return null;
-		    int ind = key.lastIndexOf('.');
-		    if (ind != -1) {
-			key = key.substring(ind+1);
+		    if (hasRE(key)) {
+			return getE(key);
+		    } else {
+			int ind;
+			while ((ind = key.indexOf('.')) != -1) {
+			    key = key.substring(ind+1);
+			    if (hasRE(key)) {
+				return getE(key);
+			    }
+			}
+			return null;
 		    }
-		    return getE(key);
 		}
 
 		@Override

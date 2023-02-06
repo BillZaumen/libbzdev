@@ -215,7 +215,7 @@ public class TextCellEditor<T> extends DefaultCellEditor {
 		checkAccess(constructor.getModifiers());
 		value = constructor.newInstance(new Object[]{s});
 	    }
-	    System.out.println("value = " + value);
+	    // System.out.println("value = " + value);
 	} catch (Exception e) {
 	    ((JComponent)getComponent())
 		.setBorder(new LineBorder(Color.red));
