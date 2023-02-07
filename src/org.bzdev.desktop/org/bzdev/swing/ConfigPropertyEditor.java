@@ -824,6 +824,7 @@ public abstract class ConfigPropertyEditor {
     HashMap<Integer,TableCellEditor> editorMap = new HashMap<>();
     HashMap<String,Integer> keyMap = new HashMap<>();
     HashMap<String,String[]> otherKeys = new HashMap<>();
+    HashMap<String,String> reverse = new HashMap<>();
 
     HashSet<String> altKeys = new HashSet<>(32);
 
@@ -854,6 +855,9 @@ public abstract class ConfigPropertyEditor {
 		strings[i] = prefix + "." + strings[i];
 	    }
 	    otherKeys.put(ourkey, strings);
+	    for (int i = 0; i < strings.length; i++) {
+		reverse.put(strings[i], ourkey);
+	    }
 	    Vector<String> vector = new Vector<>(suffixes.length);
 	    for (String s: suffixes) {
 		String key = prefix + "." + s;
@@ -1044,7 +1048,6 @@ public abstract class ConfigPropertyEditor {
 	int b2 = bg2.getBlue();
 	return new Color((r1+r2)/2, (g1+g2)/2, (b1+b2)/2);
     }
-
 
     private static class OurCellRenderer1 extends DefaultTableCellRenderer {
 	HashMap<Integer,TableCellEditor> editorMap;
@@ -1368,7 +1371,8 @@ public abstract class ConfigPropertyEditor {
      * after its first period and the test is repeated until there
      * is a match or the key can no longer by shorted.
      * If there are multiple possible matches, the longest match is
-     * used.
+     * used. A match is based on the first argument, not the second
+     * or third.
      * @param tail the last components of a key.
      * @param r the table cell renderer to use to display the value
      *        corresponding to a key; null if the normal choice is not
@@ -1499,6 +1503,136 @@ public abstract class ConfigPropertyEditor {
 
     private static class TmlAddedContainer {
 	public boolean tmlAdded = false;
+    }
+
+    /**
+     * Event for changes to monitored properties belonging to a
+     * {@link ConfigPropertyEditor}.
+     */
+    public static class ConfigPropertyEvent extends java.util.EventObject {
+	String property;
+	String value;
+	ConfigPropertyEvent (ConfigPropertyEditor source,
+			     String property,
+			     String value)
+	{
+	    super(source);
+	    this.property = property;
+	    this.value = value;
+	}
+
+	/**
+	 * Get the property name for this event.
+	 * @return the name of the property
+	 */
+	public String getProperty() {return property;}
+
+	/**
+	 * Get the property value for this event.
+	 * @return the value for the property; null if either the
+	 *         value is null or if the property is not currently
+	 *         in the editor's tables
+	 */
+	public String getValue() {return value;}
+    }
+
+    /**
+     * Listener for changes in ConfigPropertyEditor properties.
+     */
+    @FunctionalInterface
+    public static interface ConfigPropertyListener
+	extends java.util.EventListener
+    {
+	/**
+	 * Indicate that a property change
+	 * @param event the event that was triggered by a property change
+	 */
+	void propertyChanged(ConfigPropertyEvent event);
+    }
+    private Set<ConfigPropertyListener> cplSet = new LinkedHashSet<>();
+
+    private Set<String> monitoredKeys = new HashSet<String>();
+    private Map<String,String> monitorMap = new HashMap<>() {
+	    public String put(String key, String value)
+		throws UnsupportedOperationException,
+		       ClassCastException,
+		       NullPointerException,
+		       IllegalArgumentException
+	    {
+		String result = super.put(key, value);
+		ConfigPropertyEvent event = new	ConfigPropertyEvent
+		    (ConfigPropertyEditor.this, key, value);
+		for (ConfigPropertyListener l: cplSet) {
+		    l.propertyChanged(event);
+		}
+		return result;
+	    }
+
+	    public String remove(Object key)
+	    {
+		String result = super.remove(key);
+		String k = (String)key;
+		if (result != null && monitoredKeys.contains(k)) {
+		    ConfigPropertyEvent event = new ConfigPropertyEvent
+			(ConfigPropertyEditor.this, k, null);
+		    for (ConfigPropertyListener l: cplSet) {
+			l.propertyChanged(event);
+		    }
+		}
+		return result;
+	    }
+	};
+
+    /**
+     * Add a {@link ConfigPropertyListener} to this
+     * {@link ConfigPropertyEditor}.  The listeners will be called
+     * when a monitored property's value has changed.
+     * @parem l the listener to add
+     * @see #monitorProperty(String)
+     */
+    public void addConfigPropertyListener(ConfigPropertyListener l)
+    {
+	cplSet.add(l);
+    }
+
+    /**
+     * Remove a {@link ConfigPropertyListener} from this
+     * {@link ConfigPropertyEditor}.
+     * @parem l the listener to remove
+    public void removeConfigPropertyListener(ConfigPropertyListener l)
+    {
+	cplSet.remove(l);
+    }
+
+    /**
+     * Monitor a property.
+     * @param property the property to monitor
+     * @exception IllegalArgumentException the property's name starts
+     *            with "ebase64.", indicating an encrypted value
+     */
+    protected void monitorProperty(String property)
+	throws IllegalArgumentException
+    {
+	if (property.startsWith("EB64KEY_START")) {
+	    throw new IllegalArgumentException(errorMsg("monitorEB64"));
+	}
+	monitoredKeys.add(property);
+    }
+
+    /**
+     * Get the value for a monitored property.
+     * @param property a propertyy that is being monitored
+     * @return the value for the specified property
+     * @exception IllegalArgumentException the key was not monitored
+     */
+    protected String getMonitoredPropertyValue(String property)
+	throws IllegalArgumentException
+    {
+	if (property == null || !monitoredKeys.contains(property)) {
+	    throw new IllegalArgumentException
+		(errorMsg("notMonitoredKey", property));
+	}
+	return monitorMap.get(property);
     }
 
     private void doEdit(Component owner,  Mode mode, Callable continuation,
@@ -1633,6 +1767,9 @@ public abstract class ConfigPropertyEditor {
 	    row.add(value);
 	    // tm.addRow(row);
 	    data.add(row);
+	    if (monitoredKeys.contains(key) && value != null) {
+		monitorMap.put(key, value);
+	    }
 	}
 	int len = data.size();
 	HashSet<String> editorKeys = new HashSet<>(2*len + 64);
@@ -1743,6 +1880,9 @@ public abstract class ConfigPropertyEditor {
 		    if (editorKeys.contains(shortkey)) {
 			editorKeys.remove(shortkey);
 		    }
+		    if (monitoredKeys.contains(key)) {
+			monitorMap.remove(key);
+		    }
 		}
 	    };
 
@@ -1753,15 +1893,41 @@ public abstract class ConfigPropertyEditor {
 		    switch(tme2.getType()) {
 		    case TableModelEvent.UPDATE:
 			String key = (String)ipane.getValueAt(row, 0);
+			if (otherKeys.containsKey(key)) {
+			    for (String k: otherKeys.get(key)) {
+				if (monitorMap.containsKey(k)) {
+				    monitorMap.remove(k);
+				}
+			    }
+			} else if (reverse.containsKey(key)) {
+			    String k = reverse.get(key);
+			    monitorMap.remove(k);
+			    for (String kk: otherKeys.get(k)) {
+				if (kk == key) continue;
+				monitorMap.remove(kk);
+			    }
+			}
 			String val = defaults.getProperty("key");
 			if (val == null) {
 			    ipane.setValueAt(null, row, 1);
+			    monitorMap.remove(key);
 			} else {
 			    ipane.setValueAt(val, row, 1);
+			    monitorMap.put(key, val);
 			}
 			break;
 		    default:
 			break;
+		    }
+		}
+	    } else if (tme2.getColumn() == 1) {
+		int start = tme2.getFirstRow();
+		int last = tme2.getLastRow();
+		for (int row = start; row <= last; row++) {
+		    String key = (String)ipane.getValueAt(row, 0);
+		    if (monitoredKeys.contains(key)) {
+			monitorMap.put(key,
+				       (String)ipane.getValueAt(row, 1));
 		    }
 		}
 	    }

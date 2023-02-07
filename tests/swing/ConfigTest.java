@@ -23,6 +23,10 @@ public class ConfigTest {
 	    setDefaultProperty("key1", "foo");
 	    setDefaultProperty("key2", "$(key1), $(key3)");
 	    setDefaultProperty("key3", "bar");
+
+	    monitorProperty("input.file");
+	    monitorProperty("output.file");
+
 	}
 
 	@Override
@@ -51,6 +55,11 @@ public class ConfigTest {
 	}
 
 	ConfigEditor editor = new ConfigEditor();
+
+	editor.addConfigPropertyListener((cpe) -> {
+		System.out.println(cpe.getProperty() + " --> "
+				   + cpe.getValue());
+	    });
 
 	SwingUtilities.invokeAndWait(() -> {
 		editor.addRE("color", new CSSTableCellRenderer(false),
