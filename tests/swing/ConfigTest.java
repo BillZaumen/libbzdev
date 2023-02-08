@@ -71,6 +71,10 @@ public class ConfigTest {
 		editor.addRE("output.file", null,
 			     new FileNameCellEditor("ConfigTest output file",
 						    false));
+
+		// when foo changes, bar should be set to null
+		editor.changedPropertyClears("foo", "bar");
+
 	    });
 
 

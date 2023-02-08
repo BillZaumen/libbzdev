@@ -119,7 +119,7 @@ import org.bzdev.swing.TextCellEditor;
  * To create an instance of this class for editing a configuration
  * file for a specific application, a subclass has to be defined The
  * constructor for such a subclass is expected to call the following
- * methods:
+ * methods (most are optional):
  * <UL>
  *   <LI><STRONG>{@link addIcon(Image)}</STRONG> or
  *      <STRONG>{@link addIcon(Class,String)}</STRONG>. These methods
@@ -127,21 +127,36 @@ import org.bzdev.swing.TextCellEditor;
  *      is iconified.  Normally there are multiple icons, corresponding to
  *      different sizes required by a window manager.
  *   <LI><STRONG>{@link ConfigPropertyEditor#addReservedKeys(String...)}</STRONG>.
- *      There may be some number of distinguished keys that are nominally
+ *      There may be some number of distinguished properties that are nominally
  *      expected to be present. This method will define a group of such
  *      keys. When called multiple times, each group will be separated 
  *      from the others by a series of dashes in a table's first column.
  *   <LI><STRONG>{@link ConfigPropertyEditor#addAltReservedKeys(String,String...)}</STRONG>.
- *      This method adds a reserved key that can have multiple values: a
- *      prefix, followed by a period, followed by a suffix.  A combo box
- *      will allow one to choose the appropriate key.
+ *      This method adds a set of reserved properties that will appear
+ *      in a single row. The property names consist of a prefix,
+ *      followed by a period, followed by a suffix.  A combo box will allow
+ *      one to choose the appropriate property. The values can use
+ *      different renderers and editors.
  *   <LI><STRONG>{@link ConfigPropertyEditor#setupCompleted()}</STRONG>.
  *      This method must be called by the constructor, and indicates that
  *      all the reserved keys, and any default values associated with
  *      these, have been provided.
- *   <LI><STRONG>{@link ConfigPropertyEditor#setDefaultProperty(String,String)}</STRONG>. Some properties have default values, typically in cases were
+ *   <LI><STRONG>{@link ConfigPropertyEditor#setDefaultProperty(String,String)}</STRONG>.
+ *      Some properties have default values, typically in cases where
  *      the defaults are likely to be the ones the user needs. This method
  *      should be used to define what these defaults are.
+ *   <LI><STRONG>{@link ConfigPropertyEditor#addRE(String,TableCellRenderer,TableCellEditor)}</STRONG>.
+ *      This method associates a table-cell renderer and editor with the
+ *      final components of a key (components are separated by periods).
+ *      One use is for configuring specialized renderers and editors for
+ *      properties that provide colors.
+ *   <LI><STRONG>{@link changedPropertyClears(String,String...)}</STRONG>
+ *      This method indicates that when one property's value is changed,
+ *      or the property is removed, other properties should have their values
+ *      set to null.  It is useful in cases where the change of one property
+ *      indicates that the value of some other properties is almost certainly
+ *      wrong. Generally these will reserved properties and should be listed
+ *      in close proximity to each other.
  * </UL>
  * The constructor may optionally call the following methods:
  * <UL>
@@ -1122,6 +1137,7 @@ public abstract class ConfigPropertyEditor {
 	return matcher.matches() == false;
     }
 
+    String lastKey = null;
 
     private class OurCellEditor1 extends TextCellEditor<String> {
 	HashSet<String> keys = null;
@@ -1137,6 +1153,7 @@ public abstract class ConfigPropertyEditor {
 						     int row, int column)
 	{
 	    String oldvalue = (String)value;
+	    lastKey = oldvalue == null? null: oldvalue.trim();
 	    TaggedTextField tf = (TaggedTextField)
 		super.getTableCellEditorComponent(table, value, isSelected,
 						  row, column);
@@ -1599,6 +1616,7 @@ public abstract class ConfigPropertyEditor {
      * Remove a {@link ConfigPropertyListener} from this
      * {@link ConfigPropertyEditor}.
      * @parem l the listener to remove
+     */
     public void removeConfigPropertyListener(ConfigPropertyListener l)
     {
 	cplSet.remove(l);
@@ -1634,6 +1652,56 @@ public abstract class ConfigPropertyEditor {
 	}
 	return monitorMap.get(property);
     }
+
+    Map<String,Set<String>> cpcMap = new HashMap<>();
+
+    /**
+     * Indicate that if one property's value changes, various other properties
+     * should have their values set to null.
+     * <P>
+     * THis is useful in cases such as one property providing a file format
+     * and a second providing a file name that is required to have a particular
+     * extension.
+     * @param p a property
+     * @param others a list of properties whose values should be set to
+     *        null if property p changes
+     */
+    public void changedPropertyClears(String p, String... others) {
+	int rcount = 0;
+	for (String s: others) {
+	    if (s.equals(p) || s == null) {
+		rcount++;
+	    }
+	}
+	String[] properties = new String[others.length - rcount];
+	int i = 0;
+	for (String s: others) {
+	    if (s.equals(p) || s == null) continue;
+	    properties[i++] = s;
+	}
+	Arrays.sort(properties);
+	rcount = 0;
+	String last = null;
+	for (String s: properties) {
+	    if (s.equals(last)) {
+		rcount++;
+	    }
+	    last = s;
+	}
+	if (rcount > 0) {
+	    String[] tmp = properties;
+	    properties = new String[properties.length - rcount];
+	    last = null;
+	    i = 0;
+	    for (String s: tmp) {
+		if (s.equals(last)) continue;
+		properties[i++] = s;
+		last = s;
+	    }
+	}
+	cpcMap.put(p, Set.of(properties));
+    }
+
 
     private void doEdit(Component owner,  Mode mode, Callable continuation,
 			CloseMode quitCloseMode)
@@ -1810,8 +1878,15 @@ public abstract class ConfigPropertyEditor {
 
 		@Override
 		protected boolean prohibitEditing(int row, int col) {
-		    return col == 0 && row < KLEN
-			&& editorMap.get(row) == null;
+		    if (row < KLEN) {
+			if (col == 0) {
+			    return editorMap.get(row)== null;
+			} else if (col == 1) {
+			    String key = (String)getValueAt(row, 0);
+			    if (key.trim().charAt(0) == '-') return true;
+			}
+		    }
+		    return false;
 		}
 		@Override
 		protected int minimumSelectableRow(int col, boolean all) {
@@ -1883,6 +1958,17 @@ public abstract class ConfigPropertyEditor {
 		    if (monitoredKeys.contains(key)) {
 			monitorMap.remove(key);
 		    }
+		    Set<String> clearSet = cpcMap.get(key);
+		    if (clearSet != null) {
+			int n = getRowCount();
+			for (int i = 0; i < n; i++) {
+			    String ckey = (String)getValueAt(i, 0);
+			    if (ckey != null && clearSet.contains(ckey)) {
+				setValueAt(null, i, 1);
+				monitorMap.remove(ckey);
+			    }
+			}
+		    }
 		}
 	    };
 
@@ -1907,13 +1993,24 @@ public abstract class ConfigPropertyEditor {
 				monitorMap.remove(kk);
 			    }
 			}
-			String val = defaults.getProperty("key");
-			if (val == null) {
+			if (key == null && lastKey != null) {
+			    String lk = lastKey;
+			    // lastKey = null; // to prevent a stack overflow
 			    ipane.setValueAt(null, row, 1);
-			    monitorMap.remove(key);
-			} else {
-			    ipane.setValueAt(val, row, 1);
-			    monitorMap.put(key, val);
+			    monitorMap.remove(lk);
+			} else if (key != null
+				   && !key.equals(lastKey))  {
+			    monitorMap.remove(lastKey);
+			    String val = defaults.getProperty(key);
+			    if (val == null) {
+				ipane.setValueAt(null, row, 1);
+				monitorMap.remove(key);
+			    } else {
+				ipane.setValueAt(val, row, 1);
+				if (monitoredKeys.contains(key)) {
+				    monitorMap.put(key, val);
+				}
+			    }
 			}
 			break;
 		    default:
@@ -1928,6 +2025,35 @@ public abstract class ConfigPropertyEditor {
 		    if (monitoredKeys.contains(key)) {
 			monitorMap.put(key,
 				       (String)ipane.getValueAt(row, 1));
+		    }
+		    switch(tme2.getType()) {
+		    case TableModelEvent.UPDATE:
+			Set<String> clearSet1 = cpcMap.get(lastKey);
+			Set<String> clearSet2 = cpcMap.get(key);
+			if (clearSet1 != null || clearSet2 != null) {
+			    lastKey = null; // to prevent stack overflow
+			    int n = ipane.getRowCount();
+			    for (int i = 0; i < n; i++) {
+				String ckey = (String)ipane.getValueAt(i, 0);
+				if (ckey != null) {
+				    if (clearSet1 != null
+					&& clearSet1.contains(ckey)) {
+					ipane.setValueAt(null, i, 1);
+					monitorMap.remove(ckey);
+				    }
+				    if (clearSet2 != null
+					&& clearSet2.contains(ckey)) {
+					ipane.setValueAt(null, i, 1);
+					monitorMap.remove(ckey);
+				    }
+				}
+			    }
+			}
+			// clear for next selection
+			lastKey = null;
+			break;
+		    default:
+			break;
 		    }
 		}
 	    }
