@@ -11,10 +11,12 @@
  * a GUI component that configures these properties for the user, with
  * the capability of storing the values persistently as Java preferences.
  * <P>
- * The resource org/bzdev/swing/proxyconf/lpack/ProxyComponent.html contains
- * an HTML page that can be used for documentation (this page uses
+ * The resources org/bzdev/swing/proxyconf/lpack/ProxyComponent.html and
+ * the 'dark mode' equivalent
+ * org/bzdev/swing/proxyconf/lpack/ProxyComponent.dm.html
+ * contain HTML pages that can be used for documentation (these pages use
  * HTML 3.2 because that is the version supported by a JEditorPane).
- * This page depends on the sresource URL scheme, which indicates that
+ * Both pages depend on the sresource URL scheme, which indicates that
  * the resource is located on the application's class path.  If used,
  * <code>org.bzdev.protocols.Handlers.enable()</code> must be called.
 

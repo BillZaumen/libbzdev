@@ -99,6 +99,18 @@ config2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ConfigTest2
 
+proxymenu:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ProxyMenuTest
+
+proxymenu-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ProxyMenuTest --systemUI
+
 btest:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -123,6 +135,13 @@ htest:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) HtmlPaneTest testfile.html
+
+htest-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) HtmlPaneTest --systemUI testfile.html
+
 
 htest2:
 	(cd ../.. ; make jars)

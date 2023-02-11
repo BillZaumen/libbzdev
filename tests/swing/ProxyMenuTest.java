@@ -1,10 +1,22 @@
 import org.bzdev.swing.*;
+import org.bzdev.swing.proxyconf.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class ProxyMenuTest {
     static public void main(String argv[]) throws Exception {
+	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
+	if (systemUI) {
+	    /*
+	      UIManager.setLookAndFeel
+	      (UIManager.getSystemLookAndFeelClassName());
+	    */
+	    SwingUtilities.invokeLater(() -> {
+		    DarkmodeMonitor.setSystemPLAF();
+		    DarkmodeMonitor.init();
+		});
+	}
 	SwingUtilities.invokeLater(() -> {
 		JFrame frame = new JFrame();
 		JFrame dframe = new JFrame();
@@ -33,8 +45,10 @@ public class ProxyMenuTest {
 		    helpMenuItem = new
 			HelpMenuItem("help",
 				     "sresource:/org/bzdev/swing/proxyconf/"
-				     + "ProxyComponent.html",
-				     "Help", 700, 600);
+				     + "lpack/ProxyComponent.html",
+				     "Help", 700, 600,
+				     "sresource:/org/bzdev/swing/proxyconf/"
+				     + "lpack/ProxyComponent.dm.html"				     );
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.exit(1);

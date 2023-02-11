@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.ComponentOrientation;
+import java.beans.PropertyChangeListener;
 
 /**
  * A menu item for displaying help.
@@ -95,12 +96,14 @@ public class HelpMenuItem extends JMenuItem {
     private String titleKey = null;
     private String urlKey = null;
     private String menuItemNameKey = null;
+    private String dmUrlKey = null;
 
     private String menuItemName = null;
     private String title;
     private int xsize;
     private int ysize;
     private URL url;
+    private URL dmURL = null;
 
     JComponent helpPane = null;
 
@@ -142,17 +145,28 @@ public class HelpMenuItem extends JMenuItem {
 	String newtitle = null;
 	String newlabel = null;
 	String newurl = null;
+	String newdmurl = null;
 	if (bundle != null) {
 	    newtitle = bundle.getString(titleKey);
 	    newlabel = bundle.getString(menuItemNameKey);
 	    newurl = bundle.getString(urlKey);
+	    newdmurl = bundle.getString(dmUrlKey);
 	}
-	URL oldurl = url;
-	if (newurl !=  null) {
+	boolean darkmode = DarkmodeMonitor.getDarkmode()
+	    && (this.dmURL != null || this.dmUrlKey != null);
+	URL oldurl = darkmode? dmURL: url;
+	if (newurl != null) {
 	    try {
 		url = new URL(newurl);
 	    } catch (Exception e) {
 		url = null;
+	    }
+	}
+	if (newdmurl != null) {
+	    try {
+		dmURL = new URL(newdmurl);
+	    } catch (Exception e) {
+		dmURL = null;
 	    }
 	}
 	if (newtitle != null) {
@@ -167,26 +181,52 @@ public class HelpMenuItem extends JMenuItem {
 	    setText("");
 	}
 	if (helpPane != null) {
-	    if (url != null) {
-		try {
-		    setURL(url);
-		} catch (IOException e) {
-		    url = oldurl;
-		    return;
-		} catch (org.xml.sax.SAXException ee) {
-		    url = oldurl;
-		    return;
-		} catch (javax.xml.parsers.ParserConfigurationException eee) {
-		    url = oldurl;
-		    return;
-		}
-		if (helpframe != null && helpframe.isDisplayable()) {
-		    helpframe.validate();
+	    if (darkmode) {
+		if (dmURL != null) {
+		    try {
+			setURL(dmURL);
+		    } catch (IOException e) {
+			dmURL = oldurl;
+			return;
+		    } catch (org.xml.sax.SAXException ee) {
+			dmURL = oldurl;
+			return;
+		    } catch (javax.xml.parsers
+			     .ParserConfigurationException eee) {
+			dmURL = oldurl;
+			return;
+		    }
+		    if (helpframe != null && helpframe.isDisplayable()) {
+			helpframe.validate();
+		    }
+		} else {
+		    Container hpane = helpframe.getContentPane();
+		    hpane.remove(helpPane);
+		    helpPane = null;
 		}
 	    } else {
-		Container hpane = helpframe.getContentPane();
-		hpane.remove(helpPane);
-		helpPane = null;
+		if (url != null) {
+		    try {
+			setURL(url);
+		    } catch (IOException e) {
+			url = oldurl;
+			return;
+		    } catch (org.xml.sax.SAXException ee) {
+			url = oldurl;
+			return;
+		    } catch (javax.xml.parsers
+			     .ParserConfigurationException eee) {
+			url = oldurl;
+			return;
+		    }
+		    if (helpframe != null && helpframe.isDisplayable()) {
+			helpframe.validate();
+		    }
+		} else {
+		    Container hpane = helpframe.getContentPane();
+		    hpane.remove(helpPane);
+		    helpPane = null;
+		}
 	    }
 	}
     }
@@ -198,16 +238,34 @@ public class HelpMenuItem extends JMenuItem {
 	    helpframe.applyComponentOrientation(getComponentOrientation());
     }
 
+    PropertyChangeListener pcl = (evt -> {
+	    try {
+		boolean darkmode = DarkmodeMonitor.getDarkmode();
+		URL u = darkmode? dmURL: url;
+		setURL(u);
+	    } catch (Exception pcle) {
+	    }
+	});
 
     private void showHelp() {
 	ResourceBundle bundle;
 	Locale locale = getLocale();
-	URL oldurl = url;
+	boolean darkmode = DarkmodeMonitor.getDarkmode()
+	    && (this.dmURL != null || this.dmUrlKey != null);
+	URL oldurl = darkmode? dmURL: url;
 	if (bundleName != null && (url == null || title == null)) {
 	    bundle = ResourceBundle.getBundle(bundleName, locale);
 	    if (url == null) {
 		try {
 		    url = new URL(bundle.getString(urlKey));
+		} catch (Exception e) {
+		    SwingErrorMessage.display(e);
+		    return;
+		}
+	    }
+	    if (dmURL == null && dmUrlKey != null) {
+		try {
+		    dmURL = new URL(bundle.getString(dmUrlKey));
 		} catch (Exception e) {
 		    SwingErrorMessage.display(e);
 		    return;
@@ -228,13 +286,14 @@ public class HelpMenuItem extends JMenuItem {
 	    helpframe.setSize(xsize, ysize);
 	}
 	Container hpane = helpframe.getContentPane();
-	if (url != null) {
+	URL ourURL = darkmode? dmURL: url;
+	if (ourURL != null) {
 	    try {
-		boolean tocmode =  url.getPath().endsWith(".xml");
+		boolean tocmode =  ourURL.getPath().endsWith(".xml");
 		if (helpPane == null) {
 		    helpPane = (tocmode)?
-			(JComponent)(new HtmlWithTocPane(url)):
-			(JComponent)(new HtmlPane(url));
+			(JComponent)(new HtmlWithTocPane(ourURL)):
+			(JComponent)(new HtmlPane(ourURL));
 		    hpane.setLayout(new BorderLayout());
 		    hpane.add(helpPane, "Center");
 		    if (tocmode) {
@@ -248,8 +307,8 @@ public class HelpMenuItem extends JMenuItem {
 			    setSelectionWithAction(0);
 		    }
 		} else {
-		    if (!url.equals(oldurl)) {
-			setURL(url);
+		    if (!ourURL.equals(oldurl)) {
+			setURL(ourURL);
 		    }
 		}
 		// by default, we want the VM's locale, not the one set
@@ -277,6 +336,7 @@ public class HelpMenuItem extends JMenuItem {
 	} else {
 	    if (helpPane != null) hpane.remove(helpPane);
 	}
+	DarkmodeMonitor.addPropertyChangeListener(pcl);
 	helpframe.setVisible(true);
     }
     
@@ -293,10 +353,28 @@ public class HelpMenuItem extends JMenuItem {
 			String title, int xsize, int ysize)
 	throws IOException
     {
+	this(menuItemName, url, title, xsize, ysize, null);
+    }
+    /**
+     * Constructor with a dark mode option.
+     * @param menuItemName the name to use in the menu item created
+     * @param url the URL for the help-frame's HTML or XML file
+     * @param title the title of the help frame
+     * @param xsize the horizontal size of the frame in points
+     * @param ysize the vertical size of the frame in points
+     * @param dmURL the help-frame's URL for dark mode.
+     * @throws IOException the URL could not be loaded
+     */
+    public HelpMenuItem(String menuItemName, String url,
+			String title, int xsize, int ysize,
+			String dmURL)
+	throws IOException
+    {
 	super(menuItemName);
 	this.menuItemName = menuItemName;
 	this. title = title;
 	this.url = new URL(url);
+	this.dmURL = dmURL == null? null: new URL(dmURL);
 	this.xsize = xsize;
 	this.ysize = ysize;
 	bundleName = null;
@@ -327,8 +405,31 @@ public class HelpMenuItem extends JMenuItem {
 			String urlKey, String titleKey, int xsize, int ysize)
 	throws IOException
     {
+	this(bundleName, menuItemNameKey, urlKey, titleKey, xsize, ysize, null);
+    }
+    /**
+     * Constructor using resource bundles with a dark mode option.
+     * A resource bundle is used to look up the menu-title, help-frame
+     * URL, and help-frame title, from keys, with the names of the keys
+     * provided as arguments.
+     * @param bundleName the name of the resource bundle used to configure
+     *        the help frame.
+     * @param menuItemNameKey the bundle's key for the title to use in the menu
+     *                     item created
+     * @param urlKey the bundle's key for the  URL
+     * @param titleKey the bundle's key for the title of the help frame
+     * @param xsize the horizontal size of the help frame in points
+     * @param ysize the vertical size of the help frame in points
+     * @param dmUrlKey the bundle's key for the content's dark-mode URL
+     * @throws IOException the URL could not be loaded
+     */
+    public HelpMenuItem(String bundleName, String menuItemNameKey,
+			String urlKey, String titleKey, int xsize, int ysize,
+			String dmUrlKey)
+	throws IOException
+    {
 	this(JComponent.getDefaultLocale(), bundleName, menuItemNameKey,
-	     urlKey, titleKey, xsize, ysize);
+	     urlKey, titleKey, xsize, ysize, dmUrlKey);
     }
 
     /**
@@ -351,6 +452,31 @@ public class HelpMenuItem extends JMenuItem {
 			String urlKey, String titleKey, int xsize, int ysize)
 	throws IOException
     {
+	this(locale, bundleName, menuItemNameKey, urlKey, titleKey,
+	     xsize, ysize, null);
+    }
+    /**
+     * Constructor given a locale and resource bundle with a dark mode option.
+     * A resource bundle is used to look up the menu-title, help-frame
+     * URL, and help-frame title, from keys, with the names of the keys
+     * provided as arguments.
+     * @param locale the locale
+     * @param bundleName the name of the resource bundle
+     * @param menuItemNameKey the bundle's key for the title to use in the
+     *        menu item created
+     * @param urlKey the bundle's key for the content's URL
+     * @param titleKey the bundle's key for the title of the help frame
+     * @param xsize the horizontal size of the help frame in points
+     * @param ysize the vertical size of the help frame in points
+     * @param dmUrlKey the bundle's key for the content's dark-mode URL
+     * @throws IOException the URL could not be loaded
+     */
+    public HelpMenuItem(Locale locale,
+			String bundleName, String menuItemNameKey,
+			String urlKey, String titleKey, int xsize, int ysize,
+			String dmUrlKey)
+	throws IOException
+    {
 	super(ResourceBundle.getBundle(bundleName, locale).getString
 	      (menuItemNameKey));
 	this.bundleName = bundleName;
@@ -359,6 +485,7 @@ public class HelpMenuItem extends JMenuItem {
 	this.xsize = xsize;
 	this.ysize = ysize;
 	this.urlKey = urlKey;
+	this.dmUrlKey = dmUrlKey;
 	addActionListener(new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    showHelp();

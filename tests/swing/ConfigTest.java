@@ -26,7 +26,6 @@ public class ConfigTest {
 
 	    monitorProperty("input.file");
 	    monitorProperty("output.file");
-
 	}
 
 	@Override
@@ -77,7 +76,6 @@ public class ConfigTest {
 
 	    });
 
-
 	if (argv.length > (systemUI? 1: 0)) {
 	    File f = new File(argv[systemUI? 1: 0]);
 	    editor.loadFile(f);
@@ -85,6 +83,13 @@ public class ConfigTest {
 
 	System.out.println("opening dialog");
 	editor.setSaveQuestion(true);
+	JMenuItem helpMI = new JMenuItem("Show Help");
+	helpMI.addActionListener((ae) -> {
+		System.out.println("would open help menu");
+	    });
+
+	editor.setHelpMenuItem(helpMI);
+
 	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null,
 		    ConfigPropertyEditor.CloseMode.BOTH);
 

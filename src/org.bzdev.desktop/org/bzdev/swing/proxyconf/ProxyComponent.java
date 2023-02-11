@@ -23,10 +23,13 @@ import java.text.MessageFormat;
  * {@link org.bzdev.swing.ProxyMenuItem} are the ones a GUI will typically
  * use (usually just the menu item as it will handle everything).
  * <P>
- * The resource org/bzdev/swing/proxyconf/lpack/ProxyComponent.html contains
- * an HTML page that can be used for documentation (this page uses
+ * The resource org/bzdev/swing/proxyconf/lpack/ProxyComponent.html and
+ * its 'dark mode' equivalent
+ * org/bzdev/swing/proxyconf/lpack/ProxyComponent.dm.html contain
+ * HTML pages that can be used for documentation (these pages uses
  * HTML 3.2 because that is the version supported by a JEditorPane).
- * This page depends on the sresource URL scheme, which indicates that
+
+ * Both pages depend on the sresource URL scheme, which indicates that
  * the resource is located on the application's class path.  If used,
  * <code>org.bzdev.protocols.Handlers.enable()</code> must be called.
  * @see org.bzdev.swing.proxyconf.ProxyDialog

@@ -402,6 +402,9 @@ DESKTOP_RESOURCES1 = $(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/*.dtd) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/io/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/keys/lpack/*.properties) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/*.properties) \
+	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/*.png) \
+	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/*.css) \
+	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/proxyconf/lpack/*.html) \
 	$(wildcard $(DESKTOP_DIR)/$(BZDEV)/swing/table/lpack/*.properties)
 
 
@@ -706,6 +709,11 @@ BUILD/libbzdev-graphics.jar: $(GRAPHICS_JFILES) $(GRAPHICS_JFILES2) \
 	jar --create --file BUILD/libbzdev-graphics.jar \
 		-m $(GRAPHICS_DIR)/manifest.mf -C mods/org.bzdev.graphics .
 
+PROXYHTML = \
+	org.bzdev.desktop/org/bzdev/swing/proxyconf/lpack/ProxyComponent.html
+PROXYHTMLDM = \
+	org.bzdev.desktop/org/bzdev/swing/proxyconf/lpack/ProxyComponent.dm.html
+
 
 BUILD/libbzdev-desktop.jar: $(DESKTOP_JFILES) $(BASE_JFILES) \
 		$(DESKTOP_JFILES2) $(DESKTOP_RESOURCES1) \
@@ -716,6 +724,8 @@ BUILD/libbzdev-desktop.jar: $(DESKTOP_JFILES) $(BASE_JFILES) \
 		$(DESKTOP_JFILES2)
 	for i in $(DESKTOP_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
+	cat src/$(PROXYHTML) | sed -e 's/stylesheet/stylesheet.dm/' \
+		| sed -e 's/gui-proxy/gui-proxy-dm/' > mods/$(PROXYHTMLDM)
 	jar --create --file BUILD/libbzdev-desktop.jar \
 	    -m $(DESKTOP_DIR)/manifest.mf -C mods/org.bzdev.desktop .
 

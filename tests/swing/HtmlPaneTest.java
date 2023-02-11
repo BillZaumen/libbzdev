@@ -8,10 +8,21 @@ import org.bzdev.protocols.*;
 
 public class HtmlPaneTest {
     public static void main(String argv[]) throws Exception {
+	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
 	try {
-	    URL url = new File(argv[0]).toURI().toURL();
+	    URL url = new File(argv[systemUI? 1: 0]).toURI().toURL();
 	    System.out.println("url = " + url);
 
+	    if (systemUI) {
+		/*
+		  UIManager.setLookAndFeel
+		  (UIManager.getSystemLookAndFeelClassName());
+		*/
+		SwingUtilities.invokeLater(() -> {
+			DarkmodeMonitor.setSystemPLAF();
+			DarkmodeMonitor.init();
+		    });
+	    }
 	    SwingUtilities.invokeLater(() -> {
 		    try {
 			HtmlPane htmlPane = new HtmlPane(url);

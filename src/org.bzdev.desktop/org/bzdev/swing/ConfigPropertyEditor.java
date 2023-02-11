@@ -1416,6 +1416,22 @@ public abstract class ConfigPropertyEditor {
 	return (p == null)? null: p.getE();
     }
 
+    private JMenuItem helpMenuItem = null;
+
+    /**
+     * Provide a menu item for displaying 'help' documentation.
+     * One should be cautious about using an instance of {@link HelpMenuItem}
+     * as the argument to this method due to this menu item's action opening
+     * a new window, which can be problematic with modal dialogs.
+     * <P>
+     * If not called with a  non-null argument, a Help menu will not be
+     * included.
+     * @param helpMenuItem the menuItem; null if there is not such a menu item
+     */
+    public void setHelpMenuItem(JMenuItem helpMenuItem) {
+	this.helpMenuItem = helpMenuItem;
+    }
+
     private static class Ebase64TableCellRenderer extends JLabel
                            implements TableCellRenderer
     {
@@ -2076,6 +2092,12 @@ public abstract class ConfigPropertyEditor {
 	JMenu fileMenu = new JMenu(localeString("File"));
 	fileMenu.setMnemonic(KeyEvent.VK_F);
 	menubar.add(fileMenu);
+	if (helpMenuItem != null) {
+	    JMenu helpMenu = new JMenu(localeString("Help"));
+	    helpMenu.add(helpMenuItem);
+	    menubar.add(helpMenu);
+	}
+
 	ActionListener qcl = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    ipane.stopCellEditing();
