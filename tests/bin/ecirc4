@@ -1,0 +1,17 @@
+#!./run -sD:a,D:b,E:true,P:true,N:true
+import (java.lang.System);
+var err = global.getErrorWriter();
+a <= 0 && `{
+    err.println("The 1st non-option argument must be positive");
+    exit(1)
+ };
+b <= 0 && `{
+    err.println("The 2nd non-option argument must be positive");
+    exit(1)
+ };
+
+import (java.lang.Math);
+import (org.bzdev.math.Functions);
+
+a < b && a <=> b;
+4.0 * a * eE(sqrt(1.0 - (b*b)/(a*a)));
