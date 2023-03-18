@@ -333,6 +333,7 @@ ecirc:
 	chmod u+x ecirc2
 	chmod u+x ecirc3
 	./ecirc2 --dryrun 10 20
+	./ecirc2 -vD:x:30 --dryrun -10 20
 	./ecirc2  10 20
 	./ecirc3  10 20
 	chmod u-x ecirc3
@@ -343,8 +344,13 @@ ecircErr:
 	(cd ../.. ; make )
 	chmod u+x ./run
 	chmod u+x ecirc2
+	chmod u+x ecirc4
 	./ecirc2  10 20 ecirc3 || true
+	./ecirc4 -10 20 || true
+	./ecirc4 -vD:x:20 -10 20 || true
+	./ecirc4 10 -20 || true
 	chmod u-x ecirc2
+	chmod u-x ecirc4
 	chmod u-x run
 
 clean:

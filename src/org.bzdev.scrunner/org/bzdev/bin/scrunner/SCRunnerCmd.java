@@ -786,6 +786,7 @@ public class SCRunnerCmd {
 	String languageName = null;
 	index = 0;
 	ArrayList<String> parmList = new ArrayList<>();
+	boolean shellExec = false;
 	boolean autoExitMode = false;
 	boolean noAdditionalArgs = false;
 	boolean maxQualityMode = false;
@@ -793,6 +794,7 @@ public class SCRunnerCmd {
 	boolean autoPrintMode = false;
 	boolean unsetScriptingMode = false;
 	if (argv[0].matches("-s[:,BDILNSERTU\\s].*")) {
+	    shellExec = true;
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
 	    /*
@@ -1310,6 +1312,9 @@ public class SCRunnerCmd {
 	    } else if (argv[index].equals("--unsetScripting")) {
 		sbcmd.add("--unsetScripting");
 	    } else {
+		if (shellExec && argv[index].matches("-[.,0123456789].*")) {
+		    break;
+		}
 		String msg = errorMsg("unknownCmdOption", argv[index]);
 		System.err.println(msg);
 		System.exit(1);

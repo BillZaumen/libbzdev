@@ -232,7 +232,15 @@ begins with
 .B \-
 unless the file name is
 .BR \- ,
-denoting standard input.
+denoting standard input, or if an option starting with
+.B \-s
+is present and the character following
+.B \-s
+is
+.BR . ,
+.BR , ,
+or a digit.  The latter exception covers the case of an executable
+script whose first non-option argument may be a negative number.
 .TP
 .B \-\-listCodeBase
 List all the URLs provided in
@@ -741,4 +749,5 @@ file override those in the system configuration file.
 \"  LocalWords:  Solaris config conf lsnof resourcePath plaf PLAF sD
 \"  LocalWords:  pluggable FISOPTION fISOPTION SOPTION testscript txt
 \"  LocalWords:  fIPATHNAME PATHNAME pathname circE sqrt whitespace
-\"  LocalWords:  semimajor semiminor ee aa bb aE
+\"  LocalWords:  semimajor semiminor ee aa bb aE suboptions suboption
+\"  LocalWords:  unsetScripting
