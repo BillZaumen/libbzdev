@@ -257,7 +257,9 @@ public class SCRunner {
 		    }
 
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String msg =
+			errorMsg("exception", "scrunner", e.getMessage());
+		    System.err.println(msg);
 		    //System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -282,7 +284,9 @@ public class SCRunner {
 			info.context.evalScript(info.filename, reader);
 		    }
 		} catch (FileNotFoundException e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String msg =
+			errorMsg("exception", "scrunner", e.getMessage());
+		    System.err.println(msg);
 		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -328,6 +332,8 @@ public class SCRunner {
 	int stdoutCount = 1;
 	String plaf = UIManager.getSystemLookAndFeelClassName();
 
+	String scriptname = System.getProperty("scrunner.name", "scrunner");
+
 	while (index < argv.length && argv[index].startsWith("-")) {
 	    if (argv[index].equals("-")) {
 		// This is a special case.  The argument "-" indicates
@@ -360,8 +366,10 @@ public class SCRunner {
 			writer = null;
 		    }
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
-		    System.err.println("scrunner: " + e.getMessage());
+		    String emsg = e.getMessage();
+		    String msg = errorMsg("exception", scriptname, emsg);
+		    System.err.println(msg);
+		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
 	    } else if (argv[index].equals("--plaf")) {
@@ -416,7 +424,9 @@ public class SCRunner {
 			ioOutputMap.put(varName, fos);
 		    }
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String emsg = e.getMessage();
+		    String msg = errorMsg("exception", scriptname, emsg);
+		    System.err.println(msg);
 		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -454,7 +464,9 @@ public class SCRunner {
 		    FileInputStream fis = new FileInputStream(string);
 		    ioInputMap.put(varName, fis);
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String emsg = e.getMessage();
+		    String msg = errorMsg("exception", scriptname, emsg);
+		    System.err.println(msg);
 		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -492,7 +504,9 @@ public class SCRunner {
 		    DirectoryAccessor da = new DirectoryAccessor(string);
 		    ioDirectoryMap.put(varName, da);
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String emsg = e.getMessage();
+		    String msg = errorMsg("exception", scriptname, emsg);
+		    System.err.println(msg);
 		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -522,9 +536,10 @@ public class SCRunner {
 			    }
 			vmap.put(varName, string);
 		    } catch (Exception e) {
-			String msg = e.getMessage();
-			System.err.println
-			    (errorMsg("exception3", "-vS", varName, msg));
+			String m = e.getMessage();
+			String msg =
+			    errorMsg("exception3",scriptname,"-vS",varName,m);
+			System.err.println(msg);
 			/*
 			System.err.println("scrunner -vS:" +varName
 					   +": " +e.getMessage());
@@ -562,8 +577,9 @@ public class SCRunner {
 			    msg = "";
 			}
 			msg = e.getClass().getSimpleName() +" - " + msg;
-			System.err.println
-			    (errorMsg("exception3", "-vB", varName, msg));
+			String m =
+			    errorMsg("exception3",scriptname,"-vB",varName,msg);
+			System.err.println(m);
 			/*
 			System.err.println("scrunner -vB:" +varName
 					   + ": " + msg);
@@ -601,8 +617,9 @@ public class SCRunner {
 			    msg = "";
 			}
 			msg = e.getClass().getSimpleName() +" - " + msg;
-			System.err.println
-			    (errorMsg("exception3", "-vL", varName, msg));
+			String m =
+			    errorMsg("exception3",scriptname,"-vL",varName,msg);
+			System.err.println(m);
 			/*
 			System.err.println("scrunner -vL:" +varName
 					   + ": " + msg);
@@ -640,10 +657,13 @@ public class SCRunner {
 			    msg = "";
 			}
 			msg = e.getClass().getSimpleName() +" - " + msg;
-			System.err.println
-			    (errorMsg("exception3", "-vI", varName, msg));
+			String m =
+			    errorMsg("exception3",scriptname,"-vI",varName,msg);
+			System.err.println(m);
+			/*
 			System.err.println("scrunner -vI:" + varName
 					   + ": " + msg);
+			*/
 			System.exit(1);
 		    }
 		} else 	if (argv[index].startsWith("-vD:")) {
@@ -677,8 +697,9 @@ public class SCRunner {
 			    msg = "";
 			}
 			msg = e.getClass().getSimpleName() +" - " + msg;
-			System.err.println
-			    (errorMsg("exception3", "-vD", varName, msg));
+			String m =
+			    errorMsg("exception3",scriptname,"-vD",varName,msg);
+			System.err.println(m);
 			/*
 			System.err.println("scrunner -vD:" +varName
 					   + ": " + msg);
@@ -739,7 +760,9 @@ public class SCRunner {
 		    RandomAccessFile raf = new RandomAccessFile(string, mode);
 		    ioRandomAccessMap.put(varName, raf);
 		} catch (Exception e) {
-		    System.err.println(errorMsg("exception", e.getMessage()));
+		    String emsg = e.getMessage();
+		    String msg = errorMsg("exception", scriptname, emsg);
+		    System.err.println(msg);
 		    // System.err.println("scrunner: " + e.getMessage());
 		    System.exit(1);
 		}
@@ -863,7 +886,7 @@ public class SCRunner {
 		    }
 		} catch (Exception ee) {
 		    System.err.println
-			(errorMsg("exception", ee.getMessage()));
+			(errorMsg("exception", scriptname, ee.getMessage()));
 		    System.exit(1);
 		}
 	    }
@@ -919,7 +942,7 @@ public class SCRunner {
 	Handler handler = new Handler();
 
 	if (noAdditionalArgs && argv.length > index+1) {
-	    System.err.println(errorMsg("noAdditionalScripts"));
+	    System.err.println(errorMsg("noAdditionalScripts", scriptname));
 	    System.exit(1);
 	}
 

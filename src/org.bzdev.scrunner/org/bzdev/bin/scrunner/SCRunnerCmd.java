@@ -101,6 +101,7 @@ public class SCRunnerCmd {
 	if (System.getProperty(name) != null) return true;
 	if (name.equals("java.system.class.loader")
 	    || name.equals("java.security.manager")
+	    || name.equals("scrunner.name")
 	    || name.equals("scrunner.started")
 	    || name.equals("scrunner.sysconf")
 	    || name.equals("scrunner.usrconf")) {
@@ -602,6 +603,44 @@ public class SCRunnerCmd {
 	} catch (Exception e) {
 	    String msg = errorMsg("codebaseError", codebase, e.getMessage());
 	    System.err.append(msg + "\n");
+	    System.exit(1);
+	}
+    }
+
+    // for positional arguments with "-s"
+    private static void checkArg(String script, String arg) {
+	if (script == null) script = "scrunner";
+	char type = arg.charAt(2);
+	String typename = null;
+	arg = arg.substring(arg.indexOf(":")+1);
+	arg = arg.substring(arg.indexOf(":")+1);
+	try {
+	    switch(type) {
+	    case 'I':
+		typename = "integer";
+		Integer.parseInt(arg.trim());
+		break;
+	    case 'L':
+		typename = "long integer";
+		Long.parseLong(arg.trim());
+		break;
+	    case 'D':
+		typename = "double";
+		Double.parseDouble(arg.trim());
+		break;
+	    case 'B':
+		typename = "boolean";
+		arg = arg.trim();
+		if (!arg.equalsIgnoreCase("true")
+		    && !arg.equalsIgnoreCase("false")) {
+		    throw new Exception(errorMsg("trueFalse"));
+		}
+	    default:
+		return;
+	    }
+	} catch (Exception e) {
+	    String msg = errorMsg("checkArg", script, typename, arg);
+	    System.err.println(msg);
 	    System.exit(1);
 	}
     }
@@ -1334,6 +1373,10 @@ public class SCRunnerCmd {
 	    argList.add("-D" + (name) + "="
 			   + (defs.getProperty(name)));
 	}
+	if (shellExec &&  script != null) {
+	    // used to get a program name for error messages
+	    argList.add("-Dscrunner.name=" + script);
+	}
 
 	if (sbmp.length() > 0) {
 	    argList.add("-p");
@@ -1382,11 +1425,13 @@ public class SCRunnerCmd {
 	}
 
 	if (index + parmList.size() > argv.length) {
-	    System.err.println(errorMsg("tooFewArgs"));
+	    String name = (script == null)? "scrunner": script;
+	    System.err.println(errorMsg("tooFewArgs", name));
 	    System.exit(1);
 	}
 	for (String opt: parmList) {
 	    opt = opt + ":" + argv[index];
+	    checkArg(script, opt);
 	    argList.add(opt);
 	    index++;
 	}
