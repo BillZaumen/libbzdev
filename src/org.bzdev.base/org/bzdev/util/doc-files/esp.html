@@ -584,11 +584,12 @@ BLOCKED
     in the following table:
     <TABLE BORDER=1>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
-      <TR><TD>* / % %%</TD><TD> multiplication, division, mod and
-	  mathemathics mod respectively</TD></TR>. The mathematics mod
-      operator <STRONG>%%</STRONG> always produces a non-negative number.
-      i %% n is equivalent to (i &lt; 0)? n + (i % n): i % n, and an exception
-      is thrown in i is not an integer and n is not a positive integer.
+      <TR><TD>* / % %%</TD><TD> multiplication, division, mod, and
+	  mod as used in mathematics respectively</TD></TR>. The
+	  mathematical mod operator <STRONG>%%</STRONG> always produces
+	  a non-negative number.  i %% n is equivalent to (i &lt; 0)?
+	  n + (i % n): i % n, and an exception is thrown if i is not
+	  an integer and n is not a positive integer.
       <TR><TD>+ -</TD><TD>addition, subtraction respectively, with
       &apos;+&apos; overloaded to handle string concatenation, in which case at
 	  least one argument must be a string.</TD></TR>
@@ -1578,18 +1579,27 @@ array-elements:
     <UL>
       <LI><STRONG>#+T</STRONG> &mdash; this directive turns token-tracing
 	on. A description of each token will appear on standard error
-	when token tracing is enabled.
+	when token tracing is enabled.  Tokens are shown as they appear
+	when processed.  During parsing, some tokens are combined: for example,
+	function names are treated as the value for a function keyword,
+	and the bodies of functions are not shown when a function is defined.
+	This directive is thread-specific, so it will not apply to ESP
+	statements that appear in a different thread.
       <LI><STRONG>#-T</STRONG>  &mdash; this directive turns token-tracing
-	off.
+	off in the current thread.
       <LI><STRONG>#+S</STRONG> &mdash; this directive turns stack-tracing
 	on. Tokens and values pushed and popped from the operator stack
 	and value stack respectively are printed to standard error.
+	This directive is thread-specific, so it will not apply to ESP
+	statements that appear in a different thread.
       <LI><STRONG>#-S</STRONG> &mdash; this directive turns stack-tracing
 	off. In the typical case, ESP will push a token onto the operator
 	stack but not evaluate it until the next token going onto the
 	operator stack is available. This delay allows operator precedence
 	to be handled.  As a result, one should be careful about where
 	stack tracing is disabled.  A useful trick is to place a
+	This directive is thread-specific, so it will not apply to ESP
+	statements that appear in a different thread.
 	<STRONG>###</STRONG> token before a <STRONG>#-S</STRONG> directive
 	in order to force all previously pushed operators to be processed.
 	Note that <STRONG>###</STRONG> token can appear only at the

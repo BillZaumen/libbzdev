@@ -227,6 +227,8 @@ public class ExprScriptTest {
 	    "result21",
 	    "result22",
 	    "result23",
+	    "result24",
+	    "result25",
 	};
 
 	for (int i = 0; i < resultNames.length; i++) {

@@ -929,4 +929,4 @@ bezierbox:
 
 clean:
 	rm -rf classes
-	rm -f *.isq *.png *.stl condtest?.ps condtest?.eps
+	rm -f *.isq *.png *.stl condtest?.ps condtest?.eps circle.ps

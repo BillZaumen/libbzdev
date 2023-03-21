@@ -334,5 +334,5 @@ clean:
 	(cd rv ; make clean)
 	(cd units ; make clean)
 	rm -f sequence.txt
-	rm -f test.html testPW.html
+	rm -f test.html testPW.html test13.html test13a.html
 	@chmod u-x scrun

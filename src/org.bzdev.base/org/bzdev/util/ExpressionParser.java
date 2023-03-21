@@ -327,6 +327,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
 		     Operator.CLASS, Operator.SWAP);
 
+    // for these tokens, when tracing, display the value as well as the name
+    private static final EnumSet<Operator> traceValueSet
+	= EnumSet.of(Operator.FUNCTION_KEYWORD, Operator.VAR);
+
     Thread startingThread = Thread.currentThread();
     AtomicReference<Thread> importThreadRef = new AtomicReference<>();
     AtomicLong threadCount = new AtomicLong();
@@ -2569,6 +2573,14 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	}
 
+	// private boolean stackTracing = false;
+	private ThreadLocal<Boolean> stackTracing =
+	    new ThreadLocal<Boolean>() {
+		@Override protected Boolean initialValue() {
+		    return Boolean.FALSE;
+		}
+	    };
+
 	private class MethodInfo {
 	    boolean addsCompleted = false;
 	    String name;
@@ -3265,8 +3277,6 @@ public class ExpressionParser implements ObjectParser<Object>
 	    return cc.amap.get(name);
 	}
 	*/
-	private boolean stackTracing = false;
-
 
 	private void pushArgMap(UniTreeNode<Map<String,Object>> mapTree) {
 	    CallContext cc = callContext.get();
@@ -3357,7 +3367,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	public void pushValue(Object value) {
-	    if (stackTracing) {
+	    if (stackTracing.get()) {
 		System.err.format("        PUSH %s\n", value);
 	    }
 	    if (value == null) value = NULL;
@@ -3372,7 +3382,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	    Object value =  cc.valueStack.pop();
 	    if (value == NULL) value = null;
-	    if (stackTracing) {
+	    if (stackTracing.get()) {
 		System.err.format("        ... POPPING %s\n", value);
 	    }
 	    return value;
@@ -3439,10 +3449,18 @@ public class ExpressionParser implements ObjectParser<Object>
 
 	// push and eval if necessary.
 	public void pushOp(Token opToken, String orig) {
-	    if (stackTracing) {
-		System.err.format("    PUSH %s (\"%s\"): level=%d\n",
-				  opToken.getType(), opToken.getName(),
-				  opToken.getLevel());
+	    if (stackTracing.get()) {
+		if (traceValueSet.contains(opToken.getType())
+		    && opToken.getValue() != null) {
+		    System.err.format("    PUSH %s (\"%s %s\"): level=%d\n",
+				      opToken.getType(), opToken.getName(),
+				      opToken.getValue(),
+				      opToken.getLevel());
+		} else {
+		    System.err.format("    PUSH %s (\"%s\"): level=%d\n",
+				      opToken.getType(), opToken.getName(),
+				      opToken.getLevel());
+		}
 	    }
 	    while (hasOps()) {
 		Token op = peekOp();
@@ -3466,7 +3484,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		evalOnce(orig);
 		boolean firstTime = true;
 		while (hasValue()) {
-		    if (stackTracing && firstTime) {
+		    if (stackTracing.get() && firstTime) {
 			System.err.println("        ... "
 					   + "(clearing current stack)");
 			firstTime = false;
@@ -5082,7 +5100,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	public void eval(String orig) throws ObjectParser.Exception {
-	    if (stackTracing) {
+	    if (stackTracing.get()) {
 		System.err.println("    CALLING eval");
 	    }
 	    Token op;
@@ -5102,7 +5120,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	private void evalOnce(String orig) throws ObjectParser.Exception {
 	    Token opToken = popOp();
 	    Operator op = opToken.getType();
-	    if (stackTracing) {
+	    if (stackTracing.get()) {
 		if (op == Operator.QVAR
 		    || op == Operator.QQVAR
 		    || op == Operator.VAR) {
@@ -10351,6 +10369,8 @@ public class ExpressionParser implements ObjectParser<Object>
     {
 	// processor.clear();	// in case of a previous failure.
 	processor.ambiguousNames.set(null);
+	tokenTracing.set(false);
+	processor.stackTracing.set(false);
 	if (parseOnly) {
 	    tokenize(s, offset, null);
 	    // The return value will be ignored: matches will return
@@ -10432,7 +10452,13 @@ public class ExpressionParser implements ObjectParser<Object>
 
     // used with some directives to selectively print part of the
     // token stream onto standard error for debugging.
-    private boolean tokenTracing = false;
+
+    private ThreadLocal<Boolean>tokenTracing =
+	new ThreadLocal<Boolean>() {
+	    @Override protected Boolean initialValue() {
+		return Boolean.FALSE;
+	    }
+	};
 
     private void  parseExpression(LinkedList<Token> tokens, String s)
     {
@@ -10443,6 +10469,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	boolean[] qmarkFence = null;
 	Token finalToken = null;
 	java.util.Iterator<Token> reverseIter =tokens.descendingIterator();
+	boolean tokTracing = tokenTracing.get();
 	while (reverseIter.hasNext()) {
 	    // to eliminate any trailing semicolons as
 	    // processing these results in a null value being returned
@@ -10465,8 +10492,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		// we have ">=" instead of ">" because of the order of
 		// evaluation when precedents are the same.
 		if (skipLevel <= level) {
-		    if (false || tokenTracing) {
-			if (tokenTracing) {
+		    if (false || tokTracing) {
+			if (tokTracing) {
 			    System.err
 				.format("... skipping TOKEN %s (\"%s\"): "
 					+ "level=%s\n",
@@ -10486,10 +10513,20 @@ public class ExpressionParser implements ObjectParser<Object>
 		    skipType = null;
 		}
 	    }
-	    if (false || tokenTracing) {
-		if (tokenTracing) {
-		    System.err.format("TOKEN %s (\"%s\"): level=%s\n",
-				      token.getType(), token.getName(), level);
+	    Operator ttype = token.getType();
+	    if (false || tokTracing) {
+		if (tokTracing) {
+		    if (traceValueSet.contains(ttype)
+			&& token.getValue() != null) {
+			System.err.format("TOKEN %s (\"%s %s\"): level=%s\n",
+					  token.getType(),
+					  token.getName(), token.getValue(),
+					  level);
+		    } else {
+			System.err.format("TOKEN %s (\"%s\"): level=%s\n",
+					  token.getType(), token.getName(),
+					  level);
+		    }
 		} else {
 		    System.out.println("... token " + token.getType() +
 				   ", level = " + level
@@ -10505,23 +10542,24 @@ public class ExpressionParser implements ObjectParser<Object>
 				   );
 		}
 	    }
-	    Operator ttype = token.getType();
 	    switch (ttype) {
 	    case START_TOKEN_TRACING:
-		if (tokenTracing == false) {
+		if (tokTracing == false) {
 		    System.err.format("TOKEN %s (\"%s\"): level=%s\n",
 				      ttype, token.getName(), level);
 		}
-		tokenTracing = true;
+		tokTracing = true;
+		tokenTracing.set(tokTracing);
 		continue;
 	    case STOP_TOKEN_TRACING:
-		tokenTracing = false;
+		tokTracing = false;
+		tokenTracing.set(tokTracing);
 		continue;
 	    case START_STACK_TRACING:
-		processor.stackTracing = true;
+		processor.stackTracing.set(true);
 		continue;
 	    case STOP_STACK_TRACING:
-		processor.stackTracing = false;
+		processor.stackTracing.set(false);
 		continue;
 	    case NOOP:
 		continue;

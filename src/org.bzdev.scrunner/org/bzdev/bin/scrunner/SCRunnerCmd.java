@@ -631,8 +631,8 @@ public class SCRunnerCmd {
 	    case 'B':
 		typename = "boolean";
 		arg = arg.trim();
-		if (!arg.equalsIgnoreCase("true")
-		    && !arg.equalsIgnoreCase("false")) {
+		if (!arg.equals("true")
+		    && !arg.equals("false")) {
 		    throw new Exception(errorMsg("trueFalse"));
 		}
 	    default:
@@ -832,7 +832,7 @@ public class SCRunnerCmd {
 	boolean autoStackTraceMode = false;
 	boolean autoPrintMode = false;
 	boolean unsetScriptingMode = false;
-	if (argv[0].matches("-s[:,BDILNSERTU\\s].*")) {
+	if (argv[0].matches("-s[:,BDILNSERPTU\\s].*")) {
 	    shellExec = true;
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
@@ -842,8 +842,9 @@ public class SCRunnerCmd {
 		spec = spec.substring(1);
 	    }
 	    */
-	    if (ch == ':' || ch == ',' || Character.isWhitespace(ch)) {
+	    while  (ch == ':' || ch == ',' || Character.isWhitespace(ch)) {
 		spec = spec.substring(1);
+		ch = (spec.length() == 0)? '\0': spec.charAt(0);
 	    }
 	    spec = spec.trim();
 	    String[] terms = spec.split("[:,\\s](\\s*)");
@@ -855,50 +856,56 @@ public class SCRunnerCmd {
 		String type = terms[i];
 		String variable = terms[i+1];
 		if (type.length() != 1) {
-		    System.err.println(errorMsg("badTypeField"));
-		    System.exit(1);
+		    if (!type.matches("[ENRPTU]+")) {
+			System.err.println(errorMsg("badTypeField"));
+			System.exit(1);
+		    }
 		}
 		if (!variable.matches("[A-Za-z_][A-Za-z0-9_]*")) {
 		    System.err.println(errorMsg("badVariable", variable));
-		    System.exit(1);		    }
-		char ctype = type.charAt(0);
-		switch(ctype) {
-		case 'S': case 'I': case 'L': case 'D': case 'B':
-		    parmList.add("-v" + type + ":" + variable);
-		    break;
-		case 'E':
-		    if (variable.equalsIgnoreCase("true")) {
-			autoExitMode = true;
-		    }
-		    break;
-		case 'N':
-		    if (variable.equalsIgnoreCase("true")) {
-			noAdditionalArgs = true;
-		    }
-		    break;
-		case 'P':
-		    if (variable.equalsIgnoreCase("true")) {
-			autoPrintMode = true;
-		    }
-		    break;
-		case 'R':
-		    if (variable.equalsIgnoreCase("true")) {
-			maxQualityMode = true;
-		    }
-		    break;
-		case 'T':
-		    if (variable.equalsIgnoreCase("true")) {
-			autoStackTraceMode = true;
-		    }
-		    break;
-		case 'U':
-		    if (variable.equalsIgnoreCase("true")) {
-			unsetScriptingMode = true;
-		    }
-		    break;
-		default:
-		    System.err.println(errorMsg("parmType", type));
 		    System.exit(1);
+		}
+		int len = type.length();
+		for (int j = 0; j < len; j++) {
+		    char ctype = type.charAt(j);
+		    switch(ctype) {
+		    case 'S': case 'I': case 'L': case 'D': case 'B':
+			parmList.add("-v" + type + ":" + variable);
+			break;
+		    case 'E':
+			if (variable.equalsIgnoreCase("true")) {
+			    autoExitMode = true;
+			}
+			break;
+		    case 'N':
+			if (variable.equalsIgnoreCase("true")) {
+			    noAdditionalArgs = true;
+			}
+			break;
+		    case 'P':
+			if (variable.equalsIgnoreCase("true")) {
+			    autoPrintMode = true;
+			}
+			break;
+		    case 'R':
+			if (variable.equalsIgnoreCase("true")) {
+			    maxQualityMode = true;
+			}
+			break;
+		    case 'T':
+			if (variable.equalsIgnoreCase("true")) {
+			    autoStackTraceMode = true;
+			}
+			break;
+		    case 'U':
+			if (variable.equalsIgnoreCase("true")) {
+			    unsetScriptingMode = true;
+			}
+			break;
+		    default:
+			System.err.println(errorMsg("parmType", type));
+			System.exit(1);
+		    }
 		}
 	    }
 	    index++;

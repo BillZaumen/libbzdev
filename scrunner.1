@@ -158,27 +158,59 @@ followed by a colon and a name that is typically a variable name, except for
 .BR N ,
 .BR P ,
 .BR R ,
+.BR T ,
+or
+.BR U ,
+in which case the name should be the word
+.B true
+(case insensitive, with any other value treated as
+.BR false ,
+which is the default).
+As a special case, any combination of
+.BR E ,
+.BR N ,
+.BR P ,
+.BR R ,
+.BR T ,
 and
-.BR T
-in which case the name must be the word
+.BR U ,
+may be placed together and followed by a colon and the
+value
 .BR true .
 The letters indicate the type of an argument:
+.br
+.sp 1
 .BR B
 for boolean,
+.br
+.sp 1
 .BR D
 for double,
+.br
+.sp 1
 .BR I
 for integer,
+.br
+.sp 1
 .BR L
 for long, and
+.br
+.sp 1
 .BR S
-for String.  The corresponding variable names must start with
-a lower or upper case letter or an underscore, followed by any number
-of digits, lower or upper case letters, or underscores.  The letter
+for String.
+.br
+.sp 1
+The corresponding variable names must start with a lower or upper case
+letter or an underscore, followed by any number of digits, lower or
+upper case letters, or underscores.  Otherwise the letter
+.br
+.sp 1
 .B E
 indicates that an
 .B \-\-exit
-option should be automatically added; the letter
+option should be automatically added;
+.br
+.sp 1
 .B N
 indicates that no additional arguments should follow those required by
 .BR B ,
@@ -187,26 +219,38 @@ indicates that no additional arguments should follow those required by
 .BR L ,
 and
 .B S
-suboptions; the letter
+suboptions;
+.br
+.sp 1
 .B P
 indicates that the
 .B \-\-print
-option should be automatically added; the letter
+option should be automatically added;
+.br
+.sp 1
 .B R
 indicates that the
 .B \-r
-option should be automatically added; the letter
+option should be automatically added;
+.br
+.sp 1
 .B T
 indicates that the
 .B \-\-stackTrace
-option should be automatically added; the letter
+option should be automatically added;
+.br
+.sp 1
 .B U
 indicates that the
 .B \-\-unsetScripting
-option should be automatically added. The first argument after
+option should be automatically added.
+.br
+.sp 1
+The first argument after
 an
 .B \-s
-option must be a file name for a script.  If there are N
+option must be a file name for a script (for executable scripts,
+this is handled automatically).  If there are N
 .I SOPTION
 arguments (with N larger than 0), excluding any whose type is
 .BR E ,
@@ -681,7 +725,7 @@ The following 6-line-long program (on Linux systems) uses an ESP
 script to print the circumference of an ellipse given the lengths of
 the semi-major and semi-minor axes:
 .IP
-#!/usr/bin/scrunner -sD:a,D:b,E:true,P:true,U:true
+#!/usr/bin/scrunner -sD:a,D:b,ENPU:true
 .br
 import (java.lang.Math);
 .br
@@ -750,4 +794,4 @@ file override those in the system configuration file.
 \"  LocalWords:  pluggable FISOPTION fISOPTION SOPTION testscript txt
 \"  LocalWords:  fIPATHNAME PATHNAME pathname circE sqrt whitespace
 \"  LocalWords:  semimajor semiminor ee aa bb aE suboptions suboption
-\"  LocalWords:  unsetScripting
+\"  LocalWords:  unsetScripting sp ENPU

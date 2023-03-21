@@ -119,10 +119,25 @@ var count = 0;
 synchronized function incr() {
     count = count + 1
 }
-
 incr();
 incr();
 incr();
 incr();
 incr();
 var result23 = count;
+
+count = 0;
+
+var incr2 = synchronized function () {
+    count = count + 1
+};
+
+incr2();
+incr2();
+incr2();
+incr2();
+incr2();
+
+var result24 = count;
+synchronized `{count = count + 1};
+var result25 = count;
