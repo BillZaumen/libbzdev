@@ -330,6 +330,7 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * This is may be needed by the offerToQueue methods of subclasses
      * when a scheduled event is replaced and the time needs to be
      * adjusted before putting it back on the queue.
+     * @param event the event that was removed from a queue
      * @return the last time the event was removed from a queue
      *
      */
@@ -342,6 +343,7 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * Get TaskQueueSimEvent parameters.
      * This is may be needed by the offerToQueue methods of subclasses
      * when a scheduled event is replaced.
+     * @param event an event
      * @return the parameter field of the event
      */
     protected T getEventParameters(TaskQueueSimEvent<T> event) {
@@ -447,14 +449,15 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * @param tpriority the time event priority implied by the parameters
      * @return the simulation event on success; null if the script
      *         cannot be queued
-     * @exception an exception occurred while trying to execute a script
-     *            object's <code>call</code>method
+     * @exception RuntimeException if an exception occurred while trying
+     *            to execute a script object's <code>call</code>method
+     * @exception UnsupportedOperationException if there is no script engine
      */
     protected TaskQueueSimEvent<T> doAddCallScript(final String script,
 						   T parameters,
 						   long interval,
 						   double tpriority)
-	throws UnsupportedOperationException
+	throws RuntimeException, UnsupportedOperationException
     {
 	if (deleting) return null;
 	final Simulation sim = getSimulation();
@@ -505,14 +508,15 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * @param tpriority the time event priority implied by the parameters
      * @return the simulation event on success; null if the object
      *         cannot be queued
-     * @exception an exception occurred while trying to execute a script
-     *            object's <code>call</code>method
+     * @exception RuntimeException if an exception occurred while trying
+     *            to execute a script object's <code>call</code>method
+     * @exception UnsupportedOperationException if there is no script engine
      */
     protected TaskQueueSimEvent<T> doAddCallObject(final Object scriptObject,
 						   T parameters,
 						   long interval,
 						   double tpriority)
-	throws UnsupportedOperationException
+	throws UnsupportedOperationException, RuntimeException
     {
 	if (deleting) return null;
 	final Simulation sim = getSimulation();
@@ -1192,10 +1196,11 @@ abstract public class TaskQueue<T> extends DefaultSimObject
     }
 
 
+    /**
+     * Forcibly set the release policy
+     * @param policy the policy
+     */
     protected void forceSetReleasePolicy(ReleasePolicy policy) {
-	if (releaseCount>0 || addsDuringRelease>0 || cancelsDuringRelease>0) {
-	    throw new IllegalStateException(errorMsg("releasing"));
-	}
 	releasePolicy = policy;
     }
 
@@ -1524,6 +1529,7 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * Find the interval used to schedule a queue entry based on
      * entry's parameters or a default value.
      * @param parameters the parameters for a queue entry
+     * @return the interval in units of simulation ticks
      */
     abstract protected long getInterval(T parameters);
 
@@ -1531,6 +1537,7 @@ abstract public class TaskQueue<T> extends DefaultSimObject
      * Find the time event priority used to schedule a queue entry based
      * on the entry's parameters or a default value of 0.0.
      * @param parameters the parameters for a queue entry
+     * @return the priority
      */
     protected double getTPriority(T parameters) {
 	return 0.0;

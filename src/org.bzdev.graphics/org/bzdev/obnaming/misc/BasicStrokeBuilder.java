@@ -132,7 +132,7 @@ public class BasicStrokeBuilder {
      * Dashed lines are specified by a string consisting of the
      * characters "-" and " ". Each character is replaced with
      * a dash or space whose user-space length is this value.
-     * @retrun the dash increment
+     * @return the dash increment
      */
     public double getDashIncr() {return parm.dashIncrement;}
 

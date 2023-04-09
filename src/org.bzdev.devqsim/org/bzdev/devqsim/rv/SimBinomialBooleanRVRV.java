@@ -6,7 +6,7 @@ import org.bzdev.math.rv.BinomialBooleanRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of boolean valued ranom variables with a binomial distribution.
- * @see org.bzdev.math.rv.BinomialBooleanRV;
+ * @see org.bzdev.math.rv.BinomialBooleanRV
  */
 public class SimBinomialBooleanRVRV
     extends SimBooleanRVRV<BinomialBooleanRV,BinomialBooleanRVRV>

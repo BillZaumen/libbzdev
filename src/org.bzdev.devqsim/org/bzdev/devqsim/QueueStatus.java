@@ -47,6 +47,7 @@ public interface QueueStatus {
 
     /**
      * Determine the maximum number of servers.
+     * @return the maximum number of servers
      */
     int serverCount();
 

@@ -13,7 +13,7 @@ import javax.script.*;
  * evaluated in one thread to be used in a different thread, which is
  * problematic for classes such as {@link org.bzdev.devqsim.Simulation},
  * where code such as
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * import org.bzdev.devqsim.Simulation;
  * import org.bzdev.devqsim.TaskThread;
  *
@@ -32,9 +32,9 @@ import javax.script.*;
  *          sim.run();
  *     }
  * }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * can be used instead of the faster, but less readable equivalent
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * import org.bzdev.devqsim.Simulation;
  * import org.bzdev.lang.Callable;
  *
@@ -56,9 +56,9 @@ import javax.script.*;
  *       sim.run();
  *    }
  * }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The equivalent for ECMAScript is
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * scripting.importClass("org.bzdev.devqsim.Simulation");
  * scripting.importClass("org.bzdev.devqsim.TaskThread");
  *
@@ -73,9 +73,9 @@ import javax.script.*;
  *  }
  *}, 10);
 sim.run()
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * and for ESP is
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * import(org.bzdev.devqsim, [Simulation, TaskThread]);
  *
  * var sim = new Simulation(scripting);
@@ -89,7 +89,7 @@ sim.run()
  *      }
  * }, 10);
  * sim.run()
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  */
 public class DefaultScriptingContext extends ScriptingContext {
     private ScriptEngine engine;

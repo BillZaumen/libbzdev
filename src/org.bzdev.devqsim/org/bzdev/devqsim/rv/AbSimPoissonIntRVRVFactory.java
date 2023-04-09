@@ -14,7 +14,6 @@ import org.bzdev.obnaming.annotations.PrimitiveParm;
  * <P>
  * The parameters this factory provides are the same as the parameters
  * provided by its subclass {@link SimPoissonIntRVRVFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/rv/SimPoissonIntRVRVFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/SimPoissonIntRVRVFactory.html">

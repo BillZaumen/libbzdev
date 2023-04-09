@@ -70,6 +70,10 @@ public class BSpline  extends RealValuedFunction {
     double end = 0.0;
     double period = 0.0;
 
+    /**
+     * Set the control points for this BSpline.
+     * @param cpoints an array containing the control points,
+     */
     protected void setControlPoints(double[] cpoints)
 	throws IllegalArgumentException
     {
@@ -83,10 +87,19 @@ public class BSpline  extends RealValuedFunction {
 	System.arraycopy(cpoints, 0, carray, 0, carray.length);
     }
 
+    /**
+     * Get the control points.
+     * @return the control-point array
+     */
     public double[] getControlPoints() {
 	return (double[])carray.clone();
     }
 
+    /**
+     * Get the control points, storing them in a pre-allocated array.
+     * @param array the array that will contain the control poions.
+     * @return the control-point array (the first argument)
+     */
     public double[] getControlPoints(double[] array) {
 	if (array.length < carray.length) {
 	    throw new IllegalArgumentException(errorMsg("argArrayTooShort"));
@@ -95,6 +108,10 @@ public class BSpline  extends RealValuedFunction {
 	return array;
     }
 
+    /**
+     * Get the number of control points.
+     * @return the number of control points
+     */
     public int getNumberOfControlPoints() {return carray.length;}
 
     /**
@@ -575,6 +592,7 @@ public class BSpline  extends RealValuedFunction {
      *        or BSpline.Mode.PERIODIC); null for the default
      *        (BSpline.Mode.UNCLAMPED)
      * @param x the x values used to create the B-Spline
+     * @return the knot array
      */
     public static double[] createKnots(int degree, int n, Mode mode, double[] x)
     {
@@ -830,7 +848,7 @@ public class BSpline  extends RealValuedFunction {
      * When the argument to N providing the degree of a basis function
      * is below this value, the straightforward implementation is
      * used. Otherwise intermediate results are cached and reused.
-     * @value the cutoff, which must not be negative
+     * @param value the cutoff, which must not be negative
      */
     public static void setCutoff(int value) {
 	if (value < 0)

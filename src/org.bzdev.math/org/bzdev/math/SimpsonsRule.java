@@ -6,21 +6,21 @@ package org.bzdev.math;
  * This class provides an implementation of Simpson's rule for numerical
  * integration. For the simplest case, one will create an anonymous inner
  * class implementing a method named <code>function</code> as follows:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      SimpsonsRule sr = new SimpsonsRule() {
  *        protected double function(double u) {
  *          return u*u + 3;
  *        }
  *      }
- * <pre></code></blockquote>
+ * </code></pre></blockquote>
  * To integrate, one then calls <code>sr.integrate(a, b, n)</code> where
  * <code>a</code> and <code>b</code> are the limits and <code>n</code> is
  * the number of points. Alternatively, one may use a lambda expression
  * to define the function:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      SimpsonsRule sr = SimpsonsRule.newInstance((u) -&gt; u*u+3);
  *      double integral  = sr.integrate(a, b, n);
- * <pre></code></blockquote>
+ * </code></pre></blockquote>
  * <P>
  * The type parameter P, if specified, can be used to provide a class
  * that will store the values of parameters used in computing the function
@@ -29,13 +29,13 @@ package org.bzdev.math;
  * Parameters may also be provided explicitly when an "integrate" method
  * is called. The two-argument "function" should be implemented in this
  * case:
- * <blockquote><code><pre>
- *      GLQuadrature<Data> srp = new SimpsonsRule<Data>() {
+ * <blockquote><pre><code>
+ *      GLQuadrature&lt;Data&gt; srp = new SimpsonsRule&lt;Data&gt;() {
  *        protected double function(double u, Data data) {
  *          return u*u + data.value;
  *        }
  *      }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * When used, this allows one to define parameterized functions - the
  * parameters act as additional arguments that are typically constant during the
  * integration. A parameter is stored, not copied, so it should not be
@@ -44,20 +44,20 @@ package org.bzdev.math;
  * for different values of the parameters, this allows one instance of
  * SimpsonsRule to be used, rather than a separate object for each value.
  * An example of usage is:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     data.value = 3.0;
  *     srp.setParameter(data);
  *     System.out.println(srp.integrate(a, b, n));
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * or
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     data.value = 3.0;
  *     System.out.println(srp.integrateWithP(a, b, n, data));
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * In addition, the methods
  * {@link SimpsonsRule#getArguments(double,double,int)} and
@@ -66,8 +66,8 @@ package org.bzdev.math;
  * (e.g., for a series of integrals where the parameters change but not
  * the range or the number of points).  For example, consider the following
  * code:
- * <blockquote><code><pre>
- *       SimpsonsRule<Data> sr = new SimpsonsRule<Data>() {
+ * <blockquote><pre><code>
+ *       SimpsonsRule&lt;Data&gt; sr = new SimpsonsRule&lt;Data&gt;() {
  *          double[] u5cache = null;
  *          public double[] getArguments(double a, double b, int n) {
  *             double[] results = super.getArguments(a, b, n);
@@ -92,7 +92,7 @@ package org.bzdev.math;
  *              data.value = value;
  *              System.out.println(sr.integrate(args));
  *       }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * As an optimization, the code caches the arguments raised to the
  * fifth power to reduce the number of multiplications needed, assuming
  * <code>list</code> contains multiple elements.   This sort of optimization
@@ -104,12 +104,12 @@ package org.bzdev.math;
  * {@link RealValuedFunction}. While the implementation is trivial in Java,
  * {@link #newInstance newInstance} simplifies the use of this class from
  * a scripting language.  For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *         fs = {valueAt: function(u) {return Math.sin(u);}}
  *         rvf = new RealValuedFunction(scripting, fs);
  *         glq = SimpsonsRule.newInstance(rvf);
  *         integral = rvf.integrate(0.0, Math.PI, 100);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * shows how to use {@link #newInstance newInstance} with ECMAScript.
  * <P>
  * Note: some of the methods are named <code>integrate</code> while
@@ -405,6 +405,7 @@ abstract public class SimpsonsRule<P> {
      * Create a new instance of SimpsonsRule that uses an instance of
      * RealValuedFunction or RealValuedFunctOps as its function.
      * @param f the function
+     * @return the new instance of {@link SimpsonsRule}
      * @exception IllegalArgumentException n is less than 1
      */
     public static SimpsonsRule newInstance(RealValuedFunctOps f) {

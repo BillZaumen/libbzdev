@@ -481,6 +481,11 @@ public class StaticRandom {
 	}
     }
 
+    /**
+     * Generate a long integer with a Poisson distribution
+     * @param lambda the mean for the distribution
+     * @return a random long integer using a Poission distribution
+     */
     public static long poissonCDF(double lambda) {
 	long val = 0;
 	double p = StrictMath.exp(-lambda);
@@ -500,7 +505,7 @@ public class StaticRandom {
      * Generate a random integer with a Poisson distribution.
      * @param lambda the mean value of the distribution
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      */
     public static int poissonInt(double lambda) {
 	return poissonInt(lambda, false);
@@ -523,7 +528,7 @@ public class StaticRandom {
      * @param mode true if table should be used to speed up the
      *        computation; false otherwise
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      * @see PoissonTable#add(double)
      */
     public static int poissonInt(double lambda, boolean mode) {
@@ -579,7 +584,7 @@ public class StaticRandom {
      * Generate a random long integer with a Poisson distribution.
      * @param lambda the mean value of the distribution
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      */
     public static long poissonLong(double lambda) {
 	return poissonLong(lambda, false);
@@ -602,7 +607,7 @@ public class StaticRandom {
      * @param mode true if table should be used to speed up the
      *        computation; false otherwise
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      * @see PoissonTable#add(double)
      */
     public static long poissonLong(double lambda, boolean mode) {
@@ -652,7 +657,7 @@ public class StaticRandom {
      * the value returned is a double.
      * @param lambda the mean value of the distribution
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      */
     public static double poissonDouble(double lambda) {
 	return poissonDouble(lambda, false);
@@ -678,7 +683,7 @@ public class StaticRandom {
      * @param mode true if table should be used to speed up the
      *        computation; false otherwise
      * @return a random number with a Poission distribution
-     * @exception an argument was out of range
+     * @exception IllegalArgumentException an argument was out of range
      * @see PoissonTable#add(double)
      */
     public static double poissonDouble(double lambda, boolean mode) {
@@ -720,11 +725,18 @@ public class StaticRandom {
 
     /**
      * Create a new random variable.
+     * @param <T> the type specified by the first argument
      * @param clasz the class implementing the random variable (must be
      *        a class that implements org.cmdl.math.rv.RandomVariable)
      * @param args arguments that match a constructor for the class
      *        clasz
      * @return a new random variable
+     * @throws InstantiationException if a constructor failed
+     * @throws IllegalAccessException if this method does not have access
+     *         to a method or constructor
+     * @throws IllegalArgumentException if an argument is not appropriate
+     * @throws InvocationTargetException if an exception was wrapped as
+     *         this exception
      */
 
     @SuppressWarnings("unchecked")

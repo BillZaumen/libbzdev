@@ -21,12 +21,17 @@ public class AppendableWriter extends Writer {
 	return IoErrorMsg.errorMsg(key, args);
     }
 
+    /**
+     * Consructor.
+     * @param appendable the appendable to write to
+     */
     public AppendableWriter(Appendable appendable) {
 	if (appendable == null)
 	    throw new NullPointerException(errorMsg("nullArg"));
 	this.appendable = appendable;
     }
 
+    @Override
     public Writer append(char c) throws IOException {
 	synchronized(lock) {
 	    if (appendable == null)
@@ -36,6 +41,7 @@ public class AppendableWriter extends Writer {
 	}
     }
 
+    @Override
     public Writer append(CharSequence csq) throws IOException {
 	synchronized(lock) {
 	    if (appendable == null) throw new IOException(errorMsg("writerClosed"));
@@ -44,6 +50,7 @@ public class AppendableWriter extends Writer {
 	}
     }
 
+    @Override
     public Writer append(CharSequence csq, int start, int end) 
 	throws IOException 
     {
@@ -54,6 +61,7 @@ public class AppendableWriter extends Writer {
 	}
     }
 
+    @Override
     public void write (char[] cbuf, int off, int len) throws IOException {
 	synchronized(lock) {
 	    if (appendable == null) throw new IOException(errorMsg("writerClosed"));
@@ -62,12 +70,14 @@ public class AppendableWriter extends Writer {
 	}
     }
 
+    @Override
     public void flush() throws IOException {
 	synchronized(lock) {
 	    if (appendable == null) throw new IOException(errorMsg("writerClosed"));
 	}
     }
 
+    @Override
     public void close() throws IOException {
 	synchronized(lock) {
 	    if (appendable == null) throw new IOException(errorMsg("writerClosed"));

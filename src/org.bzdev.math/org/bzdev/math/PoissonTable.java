@@ -26,6 +26,10 @@ public final class PoissonTable {
     double[] array;
     int n;
 
+    /**
+     * The maximum value of &lambda; for an instance of
+     * {@link PoissonTable}.
+     */
     public static final double MAX_LAMBDA = 745.0;
 
     static String errorMsg(String key, Object... args) {
@@ -55,6 +59,7 @@ public final class PoissonTable {
     /**
      * Estimate the limit on the integers that can be generated.
      * @param lambda the mean value of a Poisson distribution
+     * @return the limit
      */
     public static int estimateN(double lambda) {
 	if (lambda < 0.0)throw new IllegalArgumentException
@@ -120,8 +125,17 @@ public final class PoissonTable {
 
     private static WeakHashMap<Double,WeakReference<PoissonTable>> map =
 	new WeakHashMap<>(1024, 2.0F);
-    private static HashSet<PoissonTable> set = new HashSet<PoissonTable>(256);
+    private static HashSet<Double> set = new HashSet<Double>(256);
 
+    /**
+     * Get an instance of {@link PoissonTable}.
+     * @param lambda the parameter &lambda; (the mean value for the
+     *        distribution)
+     * @return the table; null if <CODE>lambda is larger than
+     *         {@link #MAX_LAMBDA}, the table was not created, or
+     *         an existing table was removed by garbage collection
+     * @throws IllegalArgumentException if <CODE>lambda</CODE> is negative
+     */
     public static PoissonTable getTable(double lambda)
 	throws IllegalArgumentException
     {
@@ -139,6 +153,14 @@ public final class PoissonTable {
 	return table;
     }
 
+    /**
+     * Create an instance of {@link PoissonTable}.
+     * An existing table may be returned instead if one exists.
+     * @param lambda the parameter &lambda; (the mean value for the
+     *        distribution)
+     * @return the table
+     * @throws IllegalArgumentException if <CODE>lambda</CODE> is negative
+     */
     public static PoissonTable createTable(double lambda)
 	throws IllegalArgumentException
     {
@@ -157,21 +179,33 @@ public final class PoissonTable {
 	return table;
     }
 
+    /**
+     * Add a {@link PoissonTable} so that it cannot be
+     * garbage collected.
+     * @param lambda the &lambda; parameter for the distribution
+     * @return the table
+     */
     public static PoissonTable add(double lambda) {
 	PoissonTable table;
 	synchronized(set) {
 	    table = createTable(lambda);
-	    set.add(table);
+	    set.add(table.lambda);
 	}
 	return table;
     }
 
+    /**
+     * Arragne so that an added {@link PoissonTable} can be
+     * garbage collected.
+     * @param lambda the &lambda; parameter for the distribution
+     * @return the table
+     */
     public static PoissonTable remove(double lambda) {
 	PoissonTable table = null;
 	synchronized(set) {
 	    table = getTable(lambda);
 	    if (table != null) {
-		set.remove(table);
+		set.remove(table.lambda);
 	    }
 	}
 	return table;

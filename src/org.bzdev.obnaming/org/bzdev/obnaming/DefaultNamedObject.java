@@ -13,7 +13,7 @@ package org.bzdev.obnaming;
  * As an example, to create an object namer, a named object, and
  * a factory for the named object, one would define the following
  * classes:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  abstract public class OurNamedObject
  *        extends DefaultNamedObject&lt;OurNamedObject&gt;
  *  {
@@ -36,7 +36,7 @@ package org.bzdev.obnaming;
  *       }
  *  }
  *
- *  abstract public class OurObjectFactory<OBJ extends OurNamedObject>
+ *  abstract public class OurObjectFactory&lt;OBJ extends OurNamedObject&gt;
  *       extends DefaultNOFactory&lt;OurObjectNamer,OurNamedObject,OBJ&gt;
  *  {
  *       ...
@@ -44,7 +44,7 @@ package org.bzdev.obnaming;
  *          super(namer);
  *       }
  *  }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Additional code (indicated by an ellipsis) is, of course, necessary
  * to do anything useful.
  */

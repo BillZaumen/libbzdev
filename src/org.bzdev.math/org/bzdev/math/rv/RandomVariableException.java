@@ -41,7 +41,7 @@ public class RandomVariableException extends RuntimeException {
      * exception's detail message.
      * @param message the detail message
      * @param cause the cause (which is saved for later retrieval by the 
-     *        {@link java.lang.Throwable#getCause()  <code>getCause()</code>}
+     *        {@link java.lang.Throwable#getCause()  getCause()}
      *        method)(A null value is permitted, and indicates that the 
      *        cause is nonexistent or unknown)
      */
@@ -56,7 +56,7 @@ public class RandomVariableException extends RuntimeException {
      * This constructor is useful for runtime exceptions that are
      * little more than wrappers for other throwables.
      * @param cause the cause (which is saved for later retrieval by the 
-     *        {@link java.lang.Throwable#getCause()  <code>getCause()</code>}
+     *        {@link java.lang.Throwable#getCause() getCause()}
      *        method)(A null value is permitted, and indicates that the 
      *        cause is nonexistent or unknown)
      */

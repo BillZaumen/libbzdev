@@ -9,6 +9,8 @@ import java.util.*;
  * over the Enumeration class.  Unfortunately, some APIs require
  * an Enumeration and others require an Iterator. This class provides
  * a bridge between the two APIs.
+ * @param <E> the type of the object produced by this iterator and the
+ *            enumeration it encapsulates
  */
 public class EnumerationIterator<E> implements Iterator<E> {
     Enumeration<E> enumeration;
@@ -43,6 +45,8 @@ public class EnumerationIterator<E> implements Iterator<E> {
     /**
      * Generate an Iterable based on an Enumeration so that a foreach
      * clause can be used.
+     * @param <E> the type of objects produced by the argument
+     *        <CODE>enumeration</CODE>
      * @param enumeration the Enumeration
      * @return an Iterable that will allow the enumeration to be used
      *         by a foreach clause

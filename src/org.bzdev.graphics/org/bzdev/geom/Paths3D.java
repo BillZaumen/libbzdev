@@ -42,6 +42,7 @@ public class Paths3D {
      * @param normal the normal vector at the start of the arc
      * @param radius the radius of the arc
      * @param theta the angular extent of the arc in radians
+     * @return the new arc
      */
     public static Path3D createArc(double startx, double starty, double startz,
 				   double[] tangent, double[] normal,
@@ -68,6 +69,7 @@ public class Paths3D {
      * @param theta the angular extent of the arc in radians
      * @param maxDelta the maximum angular extent of an arc segment
      *        with allowed values in the range (0, 2&pi;/3]
+     * @return the new arc
      */
     public static Path3D createArc(double startx, double starty, double startz,
 				   double[] tangent, double[] normal,

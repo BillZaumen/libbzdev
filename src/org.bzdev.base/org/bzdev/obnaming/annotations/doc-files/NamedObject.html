@@ -3,24 +3,24 @@
 <HEAD>
   <title>Named Objects</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>NamedObject Description</H2>
+<H1>NamedObject Description</H1>
 <P>
 The class that is annotated is a common superclass for
 all named objects associated with a particular object namer. The
-members of the annotation define the name of the named-object's
+members of the annotation define the name of the named-object&apos;s
 helper class, the corresponding helper class for the matching
 object namer, and the class name of the object namer.  The
-named-object's helper constructors all start with the same four
+named-object&apos;s helper constructors all start with the same four
 arguments, the types of which are the object-namer class, a string
 naming the object, a class to classify the object, and a boolean
-flag indicating if the object is to be put into the namer's tables.
-<p>
+flag indicating if the object is to be put into the namer&apos;s tables.
 <pre><code>
-@NamedObject(helperClass="OHelper", 
+{@literal @}NamedObject(helperClass="OHelper",
             namerHelperClass="NHelper",
             namerClass="ATestNamer")
 public class ATestObject extends OHelper implements NamedObjectOps {
@@ -46,12 +46,12 @@ public class OurObject&lt;T1 extends Number, T2 extends Number&gt; {
   }
 }
 
-@NamedObject(helperClass="OHelper", 
+{@literal @}NamedObject(helperClass="OHelper",
              helperSuperclass = "OurObject",
              helperSuperclassTypeParms = "&lt;Integer, Double&gt;",
              helperSuperclassConstrTypes = {
-                 @NamedObject.ConstrTypes({}),
-                 @NamedObject.ConstrTypes(
+                 {@literal @}NamedObject.ConstrTypes({}),
+                 {@literal @}NamedObject.ConstrTypes(
                      value = {"int", "float"},
                      exceptions = {"NegativeArraySizeException"}),
              namerHelperClass="NHelper",
@@ -89,7 +89,7 @@ In this case, the class OHelper will have constructors
        ...
    }
 </code></pre>
-and the class ATestObject's constructors must start with a call to either
+and the class ATestObject&apos;s constructors must start with a call to either
 <pre><code>
        super(namer, name, intern);
 </code></pre>
@@ -102,7 +102,7 @@ constructor. These constructors should also be declared to throw the same
 exceptions that the matching constructor in <code>OHelper</code> does.
 <P>
 Recommended options for the java compiler (we assume the
-command-line syntax used in Sun Microsystem's implementation)
+command-line syntax used in Sun Microsystem&apos;s implementation)
 for non-modular jar files are
 <pre><code>
  javac -d CLASSES -s TMPSRC \
@@ -132,28 +132,28 @@ mods and a subdirectory mods/MODULE where MODULE is the name of the
 module (e.g., com.foo.bar). One will also create a directory tmpsrc
 and a corresponding subdirectory tmpsrc/MODULE.  A typical compiler
 command, assuming the source code is in a directory src, is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE \
          --processor-module-path /usr/share/bzdev \
          src/MODULE/module-info.java src/MODULE/DIR/*.java
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where DIR is the directory corresponding to a package name
 following the usual Java conventions (e.g., com/foo/bar for the
 package com.foo.bar). Placing generated source files in
 tmpsrc/MODULE and the source tree in src/MODULE will make it easy
 to use javadoc to generate documentation: for javadoc the
 options
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    -d TARGET
    --module-path PATH
    --module-source-path src:tmpsrc
    --add-modules MODULES
    --module MODULE
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 and possibly
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    --exclude PACKAGES
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 are useful. For these options,
 <UL>
   <LI> TARGET is the directory that will hold the API documentation

@@ -49,6 +49,7 @@ public class SimLongRV<RV extends LongRandomVariable>
      * @param size the number of random values to provide
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator.OfLong spliterator(long size) {
 	return ((RV) rv).spliterator(size);
     }
@@ -57,6 +58,7 @@ public class SimLongRV<RV extends LongRandomVariable>
      * Get a spliterator for an infinite number of values.
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator.OfLong spliterator() {
 	return ((RV) rv).spliterator();
     }
@@ -70,7 +72,7 @@ public class SimLongRV<RV extends LongRandomVariable>
 	return getRandomVariable().stream(size);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of long values.
      * @param size the number of random values to provide
      * @return the stream
@@ -79,7 +81,7 @@ public class SimLongRV<RV extends LongRandomVariable>
 	return getRandomVariable().parallelStream(size);
     }
 
-    /*
+    /**
      * Get an infinie stream of long values.
      * @return the stream
      */
@@ -87,7 +89,7 @@ public class SimLongRV<RV extends LongRandomVariable>
 	return getRandomVariable().stream();
     }
 
-    /*
+    /**
      * Get an infinie parallel stream of long values.
      * @return the stream
      */

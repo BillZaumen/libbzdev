@@ -6,7 +6,7 @@ import org.bzdev.math.rv.FixedDoubleRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of double-valued random variables with a fixed distribution.
- * @see org.bzdev.math.rv.FixedDoubleRV;
+ * @see org.bzdev.math.rv.FixedDoubleRV
  */
 public class SimFixedDoubleRVRV
     extends SimDoubleRVRV<FixedDoubleRV,FixedDoubleRVRV>

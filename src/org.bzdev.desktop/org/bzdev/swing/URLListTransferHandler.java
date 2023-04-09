@@ -17,7 +17,7 @@ import java.io.IOException;
  * allows the JList to be reordered.
  * <P>
  * A typical use of this class is shown in the following example:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  JList jlist = ...;
  *  File currentDirectory = ...;
  *  TransferHandler th =
@@ -36,7 +36,7 @@ import java.io.IOException;
  *  jlist.setTransferHandler(th);
  *  jlist.setDragEnabled(true);
  *  jlist.setDropMode(DropMode.INSERT);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class URLListTransferHandler extends TransferHandler {
 

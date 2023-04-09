@@ -12,8 +12,8 @@ package org.bzdev.math;
  *    <li> {@link VectorValuedFunction#valueAt(double[],int,double)}. This
  *      method is expected to throw an IllegalArgumentException if its arguments
  *      are out of range.
- * <p>
  * </ul>
+ * <p>
  * If the default behavior (throwing an UnsupportedOperationException)
  * is not appropriate, subclasses should implement one or more of the
  * following methods:

@@ -57,6 +57,7 @@ public class ConnectingLine2D extends AnimationObject2D  {
      *              the second end point.
      * @param getY2 the supplier that provides the Y coordinate of
      *              the second end point.
+     * @return this object
      */
     public ConnectingLine2D configure(DoubleSupplier getX1,
 				      DoubleSupplier getY1,
@@ -83,6 +84,7 @@ public class ConnectingLine2D extends AnimationObject2D  {
      *        the line
      * @param u2 is the parameter u &isin; [0, 1] for the second end
      *        of the line
+     * @return this object
      */
     public ConnectingLine2D configure(double u1, double u2)
     {

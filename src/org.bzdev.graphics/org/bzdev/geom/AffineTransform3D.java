@@ -11,15 +11,15 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * The AffineTransform3D class represents a 3D affine transform.  These
  * transforms are linear transforms represented by the following matrix
  * equation:
- * <code>
  * <pre>
+ * <code>
  *   _   _      _              _   _   _
  *  |  x' |    | m<sub>00</sub> m<sub>01</sub> m<sub>02</sub> m<sub>03</sub> | |  x  |
  *  |  y' |  = | m<sub>10</sub> m<sub>11</sub> m<sub>12</sub> m<sub>13</sub> | |  y  |
  *  |  z' |    | m<sub>20</sub> m<sub>21</sub> m<sub>22</sub> m<sub>23</sub> | |  z  |
  *  |_ 1 _|    |_ 0   0   0  1 _| |_ 1 _|
- * </pre>
  * </code>
+ * </pre>
  * <P>
  * Affine Transformations can be constructed by concatenating a series of
  * translations, scaling transformation, rotations, and shears.  They can
@@ -531,6 +531,7 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      * @param sx the scaling factor in the x direction
      * @param sy the scaling factor in the y direction
      * @param sz the scaling factor in the z direction
+     * @return the transform
      */
     public static AffineTransform3D
 	getScaleInstance(double sx, double sy, double sz)
@@ -677,6 +678,7 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      * @param tx the translation in the X direction
      * @param ty the translation in the Y direction
      * @param tz the translation in the Z direction
+     * @return the transform
      */
     public static AffineTransform3D
 	getTranslateInstance(double tx, double ty, double tz)
@@ -725,6 +727,8 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      * @param dstOff the offset in dstPts at which the first transformed
      *        point will be stored
      * @param numPts the number of points
+     * @exception NoninvertibleTransformException this transform does
+     *            not have an inverse
      */
     public void inverseTransform(double[] srcPts, int srcOff,
 				 double[] dstPts, int dstOff,
@@ -743,6 +747,8 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      * @param ptDst the point to be transformed (a new point will
      *        be created if the value is null)
      * @return the transformed point
+     * @exception NoninvertibleTransformException this transform does
+     *            not have an inverse
      */
     public Point3D inverseTransform(Point3D ptSrc, Point3D ptDst)
 	throws NoninvertibleTransformException
@@ -1546,7 +1552,7 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      *        positive values of theta corresponding to a clockwise
      *        rotation (i.e., a rotation moving from xvec towards
      *        yvec).
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public void
 	setToMap(Point3D p1,double[] xvec1,double[] yvec1,
@@ -1698,7 +1704,7 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      *        rotation (i.e., a rotation moving from xvec towards
      *        yvec).
      * @return the affine transform
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public static AffineTransform3D
        getMapInstance(Point3D p1,double[] xvec1,double[] yvec1,
@@ -1736,7 +1742,7 @@ public class AffineTransform3D implements Transform3D, Cloneable {
      *        positive values of theta corresponding to a clockwise
      *        rotation (i.e., a rotation moving from xvec towards
      *        yvec).
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public void
 	map(Point3D p1,double[] xvec1,double[] yvec1,

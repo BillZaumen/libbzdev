@@ -92,6 +92,7 @@ abstract public class RandomVariableRVN<T extends Number,
     /**
      * Get the next value for a random variable.
      * In general, each value will be independent of the last.
+     * @return the next random variable
      * @exception RandomVariableException the next random variable
      *            could not be generated.
      */
@@ -135,9 +136,10 @@ abstract public class RandomVariableRVN<T extends Number,
 	this.maxClosed = closed;
     }
 
-
     /**
      * Compare two numbers of type T.
+     * @param v1 the first number
+     * @param v2 the second number
      * @return a negative value if v1 $lt; v2, 0 if v1 == v2,
      *         and a positive value if v1 &gt; v2
      */

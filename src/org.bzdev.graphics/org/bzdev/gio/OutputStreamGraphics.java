@@ -459,6 +459,7 @@ public abstract class OutputStreamGraphics
      * @param width the width of the image in user-space coordinates
      * @param height the height of the image in user-space coordinates
      * @param orientation the image orientation
+     * @return the scale factor
      */
     public static double getBBScaleFactor(String type, int width, int height,
 					  ImageOrientation orientation) {
@@ -686,6 +687,7 @@ public abstract class OutputStreamGraphics
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
      *            for the exception)
+     * @return a new instance of OutputStreamGraphics
      * @see #getImageTypes()
      * @see #getImageTypeForFile(File)
      * @see #getImageTypeForFile(String)
@@ -714,6 +716,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -746,6 +749,7 @@ public abstract class OutputStreamGraphics
      * @param orientation the image orientation
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -785,6 +789,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -818,6 +823,7 @@ public abstract class OutputStreamGraphics
      *        (ignored for determining the size of a Postscript image)
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -856,6 +862,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -895,6 +902,7 @@ public abstract class OutputStreamGraphics
      * @param orientation the image orientation
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -939,6 +947,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true the caller requests an alpha channel;
      *        false otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1001,6 +1010,7 @@ public abstract class OutputStreamGraphics
      *        image-format type
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1046,6 +1056,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1091,6 +1102,7 @@ public abstract class OutputStreamGraphics
      * @param orientation the image orientation
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1143,6 +1155,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1188,6 +1201,7 @@ public abstract class OutputStreamGraphics
      *           the point (0.0, 0.0) will be moved to)
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1233,6 +1247,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1284,6 +1299,7 @@ public abstract class OutputStreamGraphics
      * @param orientation the image orientation
      * @param type a string naming an image-format type (valid types are
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause
@@ -1339,6 +1355,7 @@ public abstract class OutputStreamGraphics
      *        discovered by calling {@link #getImageTypes() getImageTypes()}
      * @param preferAlpha true if an alpha channel is requested; false
      *        otherwise
+     * @return a new instance of OutputStreamGraphics
      * @exception IllegalArgumentException an argument was illegal
      * @exception RuntimeException a runtime exception occurred, possibly
      *            due to an error in a service provider (check the cause

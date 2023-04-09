@@ -44,7 +44,7 @@
 	  <TD rowspan="$(hasDoc:endDoc)3$(endDoc)$(noDoc:endDoc)2$(endDoc)"
 	      valign="top">
 	    <TABLE border="0">
-      <TR><TD><CODE><B><A name="$(name)-$(factory)"></A>$(name)</B></CODE>
+      <TR><TD><CODE><B><A ID="$(name)-$(factory)"></A>$(name)</B></CODE>
 	      </TD></TR>
 	      <TR><TD><I>$(label)</I></TD></TR>
 	    </TABLE>

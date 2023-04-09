@@ -20,7 +20,7 @@ import javax.swing.event.AncestorEvent;
  * {@link TextFieldMenuItem#inputValue()}.
  * <P>
  * For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "initial value";
@@ -38,10 +38,10 @@ import javax.swing.event.AncestorEvent;
  *      ...
  *    }
  * }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * If access to the text field is needed, one can use a constructor
  *  that explicitly provides the text field.  For example:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "";
@@ -62,7 +62,7 @@ import javax.swing.event.AncestorEvent;
  *      ...
  *    }
  * }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * IF the text field is a subclass of {@link VTextField}, the class
  * {@link VTextFieldMenuItem} should be used instead as methods such as

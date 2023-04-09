@@ -122,6 +122,7 @@ public @interface DMethodOrder {
      * corresponding to the highest priority value in the array will
      * have its superclass searched first.  The priority value must
      * be zero or negative for arrays and primitive types.
+     * @return the value of this element
      */
     int[] value();
 }

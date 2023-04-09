@@ -18,8 +18,17 @@ public abstract class Point3D implements Cloneable {
      * double-precision coordinates
      */
     public static class Double extends Point3D {
+	/**
+	 * The X coordinate of this point
+	 */
 	public double x;
+	/**
+	 * The Y coordinate of this point
+	 */
 	public double y;
+	/**
+	 * The Z coordinate of this point
+	 */
 	public double z;
 
 	/**
@@ -67,8 +76,17 @@ public abstract class Point3D implements Cloneable {
      * double-precision coordinates
      */
     public static class Float extends Point3D {
+	/**
+	 * The X coordinate of this point
+	 */
 	public float x;
+	/**
+	 * The Y coordinate of this point
+	 */
 	public float y;
+	/**
+	 * The Z coordinate of this point
+	 */
 	public float z;
 
 	/**

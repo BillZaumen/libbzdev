@@ -17,7 +17,6 @@ import org.bzdev.obnaming.misc.*;
  * this factory will configure a grid's parameters: the grid spacing,
  * The factory parameters this factory provides are the same as the parameters
  * provided by its subclass {@link CartesianGrid2DFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/CartesianGrid2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/CartesianGrid2DFactory.html">

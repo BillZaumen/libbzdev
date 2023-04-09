@@ -167,6 +167,7 @@ public class IMenuItem extends JMenuItem {
      * The resource bundle is expected to provide an object that is
      * an Icon when key2 refers to an icon or an Integer when key2 refers
      * to a mnemonic.
+     * @param locale the locale
      * @param bundleName the pathname of a resource bundle
      * @param key1 the resource bundle's key for the text labeling this
      *        menu item

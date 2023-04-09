@@ -25,7 +25,7 @@ package org.bzdev.math;
  * are the squares of the values on the diagonal of S. That is, the
  * eigenvalue for the eigenvector contained in the j<sup>th</sup>
  * column of U, and the eigenvalue for the eigenvector contained in
- * the j<sup>th</sup> column of V are both the square of S<sub>jj<sub>.
+ * the j<sup>th</sup> column of V are both the square of S<sub>jj</sub>.
  * <P>
  * The implementation is based on the one used in the Jama package (a
  * public-domain package provided via a collaboration between
@@ -41,7 +41,7 @@ package org.bzdev.math;
  * for the matrix's transpose and then swap the value of U and V. This
  * works because, if A<sup>T</sup> = USV<sup>T</sup>, then
  * A = (USV<sup>T</sup>)<sup>T</sup> = VS<sup>T</sup>U<sup>T</sup>
- * = VSU<sup>T</sup> (S is diagonal and therefore S<sup>T<sup> = S).
+ * = VSU<sup>T</sup> (S is diagonal and therefore S<sup>T</sup> = S).
  * <P>
  * Note: the definition of the singular value decomposition differs
  * from the one used in
@@ -211,9 +211,11 @@ public class SVDecomp implements java.io.Serializable {
 	this(checkMatrix(A), A.length, A[0].length, true);
     }
 
-    /** Constructor given explicit dimensions.  
-     *  @param A the m by n matrix to decompose, with m &ge; n
-     *  @param m the number of rows
+    /**
+     * Constructor given explicit dimensions.
+     * @param A the m by n matrix to decompose, with m &ge; n
+     * @param m the number of rows
+     * @param n the number of columns
      * @param strict true if A must have exactly the number of
      *        rows and columns required; false if A may have rows
      *        or columns longer than needed, in which case the additional

@@ -26,6 +26,7 @@ public class UnexpectedExceptionError extends Error {
 
     /**
      * Constructor giving a cause for the exception.
+     * @param cause a throwable providing a cause for the error
      */
     public UnexpectedExceptionError(Throwable cause) {
 	super(cause);

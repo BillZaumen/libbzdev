@@ -228,6 +228,7 @@ public class BezierPolynomial extends RealValuedFunction {
      * the coefficient for the B<sup>i,n</sup> term is stored in an
      * array at index i, thus making a<sub>0</sub> the first index in p's
      * coefficient array (which is newly allocated)
+     * @return the coefficients for this polynomial
      */
     public double[] getCoefficientsArray() {return coefficients;}
 
@@ -445,7 +446,7 @@ public class BezierPolynomial extends RealValuedFunction {
      * the quotient or the remainder.
      * This polynomial is not modified.
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy (this method is used
      * by the implementation of this operation for instances of
      * BezierPolynomial).

@@ -3,11 +3,12 @@
 <HEAD>
   <title>The gio package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.gio package</H2>
+<H1>The org.bzdev.gio package</H1>
 
 This package provides classes to generate graphics in various
 output formats and  write them to an output stream. The constructor for
@@ -16,7 +17,7 @@ cannot be called directly. Instead, the method
 {@link OutputStreamGraphics#newInstance(java.io.OutputStream,int,int,java.lang.String)}
 should be used.  This will create an instance of a subclass of
 {@link OutputStreamGraphics} based
-on image's type.  After an instance is created, a user will typically
+on image&apos;s type.  After an instance is created, a user will typically
 call {@link OutputStreamGraphics#createGraphics}
 to get a Graphics2D object for drawing and will perform a series of
 drawing operations using multiple graphics contexts if necessary or
@@ -42,7 +43,7 @@ standard interface for generating new instances of Graphics2D.
 <P>
 A class diagram is shown below (non-public classes are shown in blue):
 <P style="text-align:center">
-<IMG SRC="gio.png" class="imgBackground">
+<IMG SRC="gio.png" class="imgBackground" alt="Diagram">
 <P>
 The class RecordingGraphics2D (which is not public)
 is an inner class of

@@ -7,7 +7,7 @@ package org.bzdev.math;
  * equations. For an independent variable t (which will be called the
  * "parameter" mainly so that a method with a short name
  * {@link #getParam()} can be used to obtain its current value), and a
- * dependent variable <bold>y</bold>(t), the Runge Kutta algorithm
+ * dependent variable <b>y</b>(t), the Runge Kutta algorithm
  * numerically solves the differential equation
  * <blockquote>
  *  y'(t) = f(t, y(t))
@@ -532,6 +532,7 @@ abstract public class RungeKutta<P> {
      * will be passed exactly two arguments when this instance is
      * updated.
      * @param f the function, which must take two arguments
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -556,6 +557,7 @@ abstract public class RungeKutta<P> {
      * @param t0 the initial value of the independent variable with respect
      *           to which one differentiates
      * @param y0 the initial value of the variable for the specified parameter
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -572,6 +574,7 @@ abstract public class RungeKutta<P> {
      * parameter (t) and its second argument is the initial value the
      * Runge-Kutta algorithm's variable (y).
      * @param f the function, which must take two arguments
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -591,6 +594,7 @@ abstract public class RungeKutta<P> {
      * @param t0 the initial value of the independent variable with respect
      *           to which one differentiates
      * @param y0 the initial value of the variable for the specified parameter
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -608,6 +612,7 @@ abstract public class RungeKutta<P> {
      * Runge-Kutta algorithm's variable (y). A lambda expression may
      * be used as the first argument.
      * @param f the function, which must take two arguments
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -629,6 +634,7 @@ abstract public class RungeKutta<P> {
      * @param t0 the initial value of the independent variable with respect
      *           to which one differentiates
      * @param y0 the initial value of the variable for the specified parameter
+     * @return a new instance of {@link RungeKutta}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */

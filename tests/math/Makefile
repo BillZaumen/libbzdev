@@ -47,15 +47,15 @@ all:
 	@echo -------- SplineTest2 ------------
 	$(JAVA) SplineTest2
 	@echo --------- RValuedFunctionTest -------
-	$(HAS_JS) && $(JAVA) RValuedFunctionTest
+	$(HAS_JS) && $(JAVA) RValuedFunctionTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RValuedFunctionTest esp
 	@echo --------- RVFTwoTest -------
-	$(HAS_JS) && $(JAVA) RVFTwoTest
+	$(HAS_JS) && $(JAVA) RVFTwoTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFTwoTest esp
 	@echo --------- RVFThreeTest -------
-	$(HAS_JS) && $(JAVA) RVFThreeTest
+	$(HAS_JS) && $(JAVA) RVFThreeTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFThreeTest esp
 	@echo --------- BinomialTest -------
@@ -65,7 +65,7 @@ all:
 	@echo -------- FunctionsTest ------------
 	$(JAVA) FunctionsTest
 	@echo ------- RVFVATest ------------
-	$(HAS_JS) && $(JAVA) RVFVATest
+	$(HAS_JS) && $(JAVA) RVFVATest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFVATest esp
 	@echo -------- BicubicTest ------------
@@ -194,7 +194,7 @@ rvf:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RValuedFunctionTest ------------
-	$(HAS_JS) && $(JAVA) RValuedFunctionTest
+	$(HAS_JS) && $(JAVA) RValuedFunctionTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RValuedFunctionTest esp
 
@@ -203,7 +203,7 @@ rvf2:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFTwoTest ------------
-	$(HAS_JS) && $(JAVA) RVFTwoTest
+	$(HAS_JS) && $(JAVA) RVFTwoTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFTwoTest esp
 
@@ -212,7 +212,7 @@ rvf3:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFThreeTest ------------
-	$(HAS_JS) && $(JAVA) RVFThreeTest
+	$(HAS_JS) && $(JAVA) RVFThreeTest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFThreeTest esp
 
@@ -221,7 +221,7 @@ rvfva:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	@echo ------- RVFVATest ------------
-	$(HAS_JS) && $(JAVA) RVFVATest
+	$(HAS_JS) && $(JAVA) RVFVATest || echo ... skipping js
 	@echo ... repeat using ESP
 	$(JAVA) RVFVATest esp
 

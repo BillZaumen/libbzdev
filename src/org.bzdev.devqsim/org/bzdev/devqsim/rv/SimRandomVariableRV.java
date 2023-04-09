@@ -64,7 +64,7 @@ public abstract class SimRandomVariableRV
 	return getRandomVariable().stream(size);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of random variables.
      * @param size the number of random values to provide
      * @return the stream
@@ -73,7 +73,7 @@ public abstract class SimRandomVariableRV
 	return getRandomVariable().parallelStream(size);
     }
 
-    /*
+    /**
      * Get an infinie stream of random variables.
      * @return the stream
      */
@@ -81,7 +81,7 @@ public abstract class SimRandomVariableRV
 	return getRandomVariable().stream();
     }
 
-    /*
+    /**
      * Get an infinie parallel stream of random variables.
      * @return the stream
      */

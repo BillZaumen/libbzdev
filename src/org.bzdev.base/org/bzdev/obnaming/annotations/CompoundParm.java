@@ -65,11 +65,13 @@ import java.lang.annotation.*;
 public @interface CompoundParm {
     /**
      * The name of the key.
+     * @return the key name
      */
     String value();
     /**
      * The delimiter separating the key's name from one of its value's
      * names. The delimiter must not be "."
+     * @return the delimiter
      */
     String delimiter() default ".";
 }

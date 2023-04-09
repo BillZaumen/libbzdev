@@ -61,7 +61,7 @@ import java.util.LinkedList;
  * and a corresponding map for a keyed compound parameter with an
  * integer key and name of "timeline":
  * <blockquote>
- * <code><pre>
+ * <pre><code>
  *        {@literal @}CompoundParmType(tipResourceBundle = "*.lpack.TIP_NAME",
  *                          labelResourceBundle = "*.lpack.LABEL_NAME")
  *        static class TimelineEntry {
@@ -70,7 +70,7 @@ import java.util.LinkedList;
  *        {@literal @}KeyedCoumpoundParm("timeline")
  *        Map&lt;Integer,TimelineEntry&gt; timeline =
  *             new HashMap&lt;Integer,Timeline&gt;();
- * </pre></code>
+ * </CODE></PRE>
  * </blockquote>
  * The result is that a new parameter named "timeline.foo" will be
  * defined.  The "timeline" parameter alone can be used to remove
@@ -83,7 +83,7 @@ import java.util.LinkedList;
  * which is required to call the same method with the same arguments
  * on its superclass (nearly always, this should be the first statement):
  * <blockquote>
- * <code><pre>
+ * <pre><code>
  *        {@literal @}Override
  *        protected void addToTimelineRequest(final OBJ obj,
  *                                           int key,
@@ -99,7 +99,7 @@ import java.util.LinkedList;
  *                }
  *            });
  *        }
- * </pre></code>
+ * </CODE></PRE>
  * </blockquote>
  * Each addToTimelineRequest method that wishes to provide some code that
  * will run at the specified time must call addToTimelineResponse
@@ -116,19 +116,19 @@ import java.util.LinkedList;
  * a call is expected, check the initObject methods to make sure that
  * each overrriden method calls super.initObject on the overridden method's
  * argument:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *        {@literal @}Override
  *        protected void initObject(OBJ object) {
  *             super.initObject(object);
  *             ...
  *        }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * In the example above, the class TimelineEntry was annotated with the
  * CompoundParmType annotation. Classes with this annotation cannot
  * have members with a CompoundParm annotation: for example
  * <blockquote>
- * <code><pre>
+ * <pre><code>
  *        {@literal @}CompoundParmType(tipResourceBundle = "*.lpack.TIP_NAME",
  *                          labelResourceBundle = "*.lpack.LABEL_NAME")
  *        static class TimelineEntry {
@@ -136,11 +136,11 @@ import java.util.LinkedList;
  *          {@literal @}CompoundParm("msgFontColor")
  *               ColorParm msgFontColor = new ColorParm();
  *        }
- * </pre></code>
+ * </CODE></PRE>
  * </blockquote>
  * is illegal.  To get the desired effect, use
  * <blockquote>
- * <code><pre>
+ * <pre><code>
  *        {@literal @}CompoundParmType(tipResourceBundle = "*.lpack.TIP_NAME",
  *                          labelResourceBundle = "*.lpack.LABEL_NAME")
  *        static class TimelineEntry {
@@ -156,12 +156,12 @@ import java.util.LinkedList;
  *          {@literal @}PrimitiveParm("msgFontColor.css")
  *             Integer css = null;
  *        }
- * </pre></code>
+ * </CODE></PRE>
  * </blockquote>
  * and to allow msgFontColor to be restored to its default value,
  * add a Parm instance explicitly in the constructor:
  * <blockquote>
- * <code><pre>
+ * <pre><code>
  *    initParm(new Parm("timeline.msgFontColor", int.class, null
  *			 new ParmParser() {
  *			     public void clear(int key) {
@@ -177,7 +177,7 @@ import java.util.LinkedList;
  *			 null,
  *			 null, true, null, true),
  *		 THIS_FACTORY_CLASS_NAME.class);
- * </pre></code>
+ * </CODE></PRE>
  * </blockquote>
  * If msgFontColor is considered to be missing, the red, green, blue, and
  * alpha fields will all be null. When overriding

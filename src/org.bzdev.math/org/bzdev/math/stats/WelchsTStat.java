@@ -47,6 +47,10 @@ public class WelchsTStat extends Statistic {
 	degreesOfFreedom = d;
     }
 
+    /**
+     * Get the number of degrees of freedom for this instance.
+     * @return the number of degress of freedom
+     */
     public double getDegreesOfFreedom() {
 	return degreesOfFreedom;
     }
@@ -194,6 +198,7 @@ public class WelchsTStat extends Statistic {
      * H<sub>0</sub>) and &mu;<sub>1</sub> is the value assumed by an
      * alternate hypothesis H<sub>1</sub>.
      * @param diff the difference of the H1 mean value and the H0 mean value.
+     * @return the noncentrality parameter
      */
     @Override
     public double getNCParameter(double diff) {

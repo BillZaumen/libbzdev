@@ -8,6 +8,7 @@ package org.bzdev.devqsim;
  * loop will call {@link SimulationMonitor#simulationPauses()} once per
  * iteration, and will terminate if {@link SimulationMonitor#simulationPauses()}
  * returns true.
+ * @param <S> the type of a subclass of {@link Simulation}
  */
 abstract public class SimulationMonitor<S extends Simulation> {
    /**
@@ -18,6 +19,10 @@ abstract public class SimulationMonitor<S extends Simulation> {
 
     S sim;
 
+    /**
+     * Get the simulation
+     * @return the simulation
+     */
     protected S getSimulation() {return sim;}
 
     /**

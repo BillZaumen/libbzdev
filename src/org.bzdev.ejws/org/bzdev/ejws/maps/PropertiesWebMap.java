@@ -32,7 +32,7 @@ public class PropertiesWebMap extends WebMap {
 
     /**
      * Constructor.
-     * @param properties a File denoting a directory
+     * @param properties a {@link Properties} instance
      */
     public PropertiesWebMap(Object properties)
 	throws IllegalArgumentException
@@ -50,6 +50,10 @@ public class PropertiesWebMap extends WebMap {
 	}
     }
 
+    /**
+     * Set this opject's properties.
+     * @param properties the properties
+     */
     public void setProperties(Properties properties) {
 	this.properties = properties;
 	pathSet.clear();

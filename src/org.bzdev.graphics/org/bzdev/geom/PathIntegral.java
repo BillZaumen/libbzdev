@@ -427,11 +427,11 @@ public class PathIntegral {
      * Compute the integral over a path specified by a path iterator.
      * @param pi the path iterator
      * @return the path (or line) integral
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 2D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 2D operations
      */
     public double integrate(PathIterator pi)
 	throws IllegalArgumentException, UnsupportedOperationException
@@ -527,11 +527,11 @@ public class PathIntegral {
      * down.
      * @param shape the shape
      * @return the path integral over the boundary of a shape
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 2D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 2D operations
      */
     public double integrate(Shape shape)
 	throws IllegalArgumentException, UnsupportedOperationException
@@ -569,11 +569,11 @@ public class PathIntegral {
      * @param af the affine transform; null for the identity transform
      * @return the path integral over the boundary of a shape modified
      *         by an affine transform
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 2D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 2D operations
      */
     public double integrate(Shape shape, AffineTransform af)
 	throws IllegalArgumentException, UnsupportedOperationException
@@ -597,11 +597,11 @@ public class PathIntegral {
      * Compute the integral over a path specified by a path iterator.
      * @param pi the path iterator
      * @return the path (or line) integral
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator3D#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 3D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator3D#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 3D   operations
      */
     public double integrate(PathIterator3D pi)
 	throws IllegalArgumentException, UnsupportedOperationException
@@ -695,12 +695,13 @@ public class PathIntegral {
 
     /**
      * Perform a line integral over a path.
+     * @param path the path
      * @return the path (or line) integral
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 3D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 3D operations
      */
     public double integrate(Path3D path)
 	throws IllegalArgumentException, UnsupportedOperationException	
@@ -716,11 +717,11 @@ public class PathIntegral {
      * @param path the path
      * @param af the affine transform; null for the identity transform
      * @return the path (or line) integral
-     * @IllegalArgumentException the path is not a valid path (it must
-     *                           start with a {@link PathIterator3D#SEG_MOVETO}
-     *                           segment)
-     * @UnsupportedOperationException this instance does not support 3D
-     *                                operations
+     * @throws IllegalArgumentException the path is not a valid path
+     *         (it must start with a {@link PathIterator3D#SEG_MOVETO}
+     *         segment)
+     * @throws UnsupportedOperationException this instance does not
+     *         support 3D operations
      */
     public double integrate(Path3D path, AffineTransform3D af )
 	throws IllegalArgumentException, UnsupportedOperationException	

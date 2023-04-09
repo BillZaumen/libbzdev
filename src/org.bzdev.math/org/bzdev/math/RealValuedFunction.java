@@ -18,7 +18,7 @@ import javax.script.ScriptException;
  * The class also provides scripting-language support. If a Scripting
  * context is named <code>scripting</code>, the following EMCAScript
  * code will implement a sin function and its derivatives:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunction);
  *     ....
  *     // assume ourObject is a Java class with a method setFunction
@@ -28,10 +28,10 @@ import javax.script.ScriptException;
  *                derivAt: function(x) {return Math.cos(x);},
  *                secondDerivAt: function(x) {return -Math.cos(x);}});
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Alternatively, one may use the following code where the functions
  * defining the derivatives are provided by name:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunction);
  *     ...
  *     function f(x) {return Math.sin(x);}
@@ -42,7 +42,7 @@ import javax.script.ScriptException;
  *     // that takes a RealValuedFunction as its argument.
  *     funct = new RealValuedFunction(scripting, "f", "fp", "fpp");
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class  RealValuedFunction extends RealValuedFunctionVA
     implements RealValuedDomainOps, RealValuedFunctOps
@@ -70,12 +70,26 @@ public class  RealValuedFunction extends RealValuedFunctionVA
 	super(1,1);
     }
 
+    /**
+     * Constructor given a function.
+     * This allows a lambda expression to be used to implement
+     * a real-valued function.
+     * @param function the function itself
+     */
     public RealValuedFunction(RealValuedFunctOps function) {
 	super(1,1);
 	this.function = function;
     }
 
 
+    /**
+     * Constructor given a function and its derivatives.
+     * This allows  lambda expressions to be used to implement
+     * a real-valued function.
+     * @param function the function itself
+     * @param functionp the first derivative of the function
+     * @param functionpp the second derivative of the function
+     */
     public RealValuedFunction(RealValuedFunctOps function,
 			      RealValuedFunctOps functionp,
 			      RealValuedFunctOps functionpp)
@@ -352,6 +366,7 @@ public class  RealValuedFunction extends RealValuedFunctionVA
      * {@link java.lang.UnsupportedOperationException}.
      * @param n 1 for the first derivative; 2 for the second derivative;
      *        0 for the function itself
+     * @return a function providing the derivative of this function
      * @exception IllegalArgumentException n is not 0, 1, or 2.
      * @exception IllegalStateException the function was not fully
      *            initialized.

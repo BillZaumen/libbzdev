@@ -34,11 +34,11 @@ import org.bzdev.lang.MathOps;
  *                       and order i at a point x. These polynomials are
  *                       defined as follows:
  * <blockquote>
- * <pre>
- *                       /n\
- *   Bernstein(i,n,x) = |   |x<sup>i</sup>(1-x)<sup>n-i</sup>
- *                       \i/
- * </pre>
+ * <code>
+ *   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/n\<br>
+ *   Bernstein(i,n,x)&nbsp;=&nbsp;|&nbsp;&nbsp;&nbsp;|x<sup>i</sup>(1-x)<sup>n-i</sup><br>
+ *   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\i/
+ * </code>
  * </blockquote>
  *          <li> dBdx(i,n,x) - computes the first derivative with respect
  *               to x of Bernstein(i,n,x).
@@ -47,12 +47,12 @@ import org.bzdev.lang.MathOps;
  *          <li> B(n, &lambda;, &tau;...) - computes a Bernstein polynomial for
  *               barycentric coordinates, given by
  * <blockquote>
- * <pre>
+ * <code>
  *
- *                 n!
- *    B<sup>n</sup><sub>&lambda;</sub>(&tau;) = __________ &tau;<sub>0</sub><sup>&lambda;<sub>0</sub></sup>&tau;<sub>1</sub><sup>&lambda;<sub>1</sub></sup>...&tau;<sub>m-1</sub><sup>&lambda;<sub>m-1</sub></sup>
- *            &lambda;<sub>1</sub>!&lambda;<sub>2</sub>!...&lambda;<sub>m</sub>!
- * </pre>
+ *    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n!<br>
+ *    B<sup>n</sup><sub>&lambda;</sub>(&tau;) = __________ &tau;<sub>0</sub><sup>&lambda;<sub>0</sub></sup>&tau;<sub>1</sub><sup>&lambda;<sub>1</sub></sup>...&tau;<sub>m-1</sub><sup>&lambda;<sub>m-1</sub></sup><br>
+ *    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lambda;<sub>1</sub>!&lambda;<sub>2</sub>!...&lambda;<sub>m</sub>!
+ * </code>
  * </blockquote>
  *               where m is the length of the vectors &lambda; and
  *               &tau;, and where the sum of the components of
@@ -263,7 +263,6 @@ public class Functions {
      * @deprecated
      * This method has been moved to the class {@link org.bzdev.lang.MathOps}
      * to eliminate a module dependency.
-     * <P>
      * @param a the first integer
      * @param b the second integer
      * @return the greatest common divisor of a and b
@@ -291,7 +290,6 @@ public class Functions {
      * @deprecated
      * This method has been moved to the class {@link org.bzdev.lang.MathOps}
      * to eliminate a module dependency.
-     * <P>
      * @param a the first integer
      * @param b the second integer
      * @return the greatest common divisor of a and b
@@ -399,7 +397,6 @@ public class Functions {
      * @deprecated
      * This method has been moved to the class {@link org.bzdev.lang.MathOps}
      * to eliminate a module dependency.
-     * <P>
      * @param n an integer that is larger than 0
      * @return the base-2 logarithm of n
      * @exception IllegalArgumentException an argument was out of range
@@ -474,7 +471,6 @@ public class Functions {
      * @deprecated
      * This method has been moved to the class {@link org.bzdev.lang.MathOps}
      * to eliminate a module dependency.
-     * <P>
      * @param n an integer that is larger than 0
      * @return the base-2 logarithm of n
      * @exception IllegalArgumentException an argument was out of range
@@ -622,7 +618,7 @@ public class Functions {
      *                where list = generateIndices(n, len) and len is the
      *                number of arguments from and including x0 to the end of
      *                the argument list. This sum is equivalent to
-     *                &sigma;<sub>&lambda;</sub> &beta;<sub>&lambda;</sub>B<sup>n</sub><sub>&lambda;</sub>(&tau;).
+     *                &sigma;<sub>&lambda;</sub> &beta;<sub>&lambda;</sub>B<sup>n</sup><sub>&lambda;</sub>(&tau;).
      *           <li> dsumBdx(xInd, beta, n, x...) - compute the partial
      *                derivative of sumB(beta, n, x0, ... ) with respect to
      *                x<sub>xInd</sub>.
@@ -652,6 +648,7 @@ public class Functions {
      *                respect to x<sub>xInd</sub>, and then
      *                differentiate again with respect to
      *                x<sub>yInd</sub>.
+     *        </UL>
      * </UL>
      */
     public static class Bernstein {
@@ -684,10 +681,11 @@ public class Functions {
 	 * @param result an array holding the coefficients after the degree
 	 *        was raised by r
 	 * @param beta the original coefficients
-	 * @paran n the degree of the polynomials before the degree was
+	 * @param n the degree of the polynomials before the degree was
 	 *        raised
 	 * @param r the degree increment
-	 * @result the new degree (n+r)
+	 * @return the new degree (n+r)
+	 * @exception IllegalArgumentException an argument was out of range
 	 */
 	public static int raiseBy(double[] result, double[] beta, int n, int r)
 	{
@@ -756,9 +754,9 @@ public class Functions {
 	 * The arrays result and beta may be the same array.
 	 * @param result the coefficients for a scaled Bernstein basis
 	 * @param beta the coefficients for a Bernstein basis
-	 * @int n the degree of the Bernstein  polynomials
+	 * @param n the degree of the Bernstein  polynomials
 	 */
-	public static int scale(double[] result, double[] beta, int n) {
+	public static void scale(double[] result, double[] beta, int n) {
 	    for (int i = 1; i < n; i++) {
 		result[i] = beta[i]*Binomial.coefficient(n, i);
 	    }
@@ -766,7 +764,7 @@ public class Functions {
 		result[0] = beta[0];
 		result[n] = beta[n];
 	    }
-	    return n;
+	    // return n;
 	}
 
 	/**
@@ -779,9 +777,9 @@ public class Functions {
 	 * The arrays result and beta may be the same array.
 	 * @param result the coefficients for a scaled Bernstein basis
 	 * @param beta the coefficients for a Bernstein basis
-	 * @int n the degree of the Bernstein  polynomials
+	 * @param n the degree of the Bernstein  polynomials
 	 */
-	public static int unscale(double[] result, double[] beta, int n) {
+	public static void unscale(double[] result, double[] beta, int n) {
 	    for (int i = 1; i < n; i++) {
 		result[i] = beta[i]/Binomial.coefficient(n, i);
 	    }
@@ -789,7 +787,7 @@ public class Functions {
 		result[0] = beta[0];
 		result[n] = beta[n];
 	    }
-	    return n;
+	    // return n;
 	}
 
 	// timing tests indicate that array allocation is a significant
@@ -1470,6 +1468,7 @@ public class Functions {
 	 *        of the vector result
 	 * @param n The degree of the Bernstein polynomials
 	 * @param x the value at which to evaluate the polynomials
+	 * @param I the degree of the derivative
 	 * @exception IllegalArgumentException an argument was out of bounds
 	 */
 	public static void
@@ -3028,6 +3027,7 @@ public class Functions {
      * Compute a Bessel function of the first kind for a real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of the Bessel function at the specified arguments
      * @exception IllegalArgumentException the argument was negative when
      *            the order was not an integer
      */
@@ -3041,6 +3041,7 @@ public class Functions {
      * Compute a Bessel function of the first kind for an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of the Bessel function at the specified arguments
      */
     public static double J(int nu, double x) {
 	return BesselFunction.valueAt(nu, x);
@@ -3074,6 +3075,7 @@ public class Functions {
      * Compute a Bessel function of the second kind for a real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of the function at the specified arguments
      * @exception IllegalArgumentException the argument was negative when
      *            the order was not an integer
      */
@@ -3098,6 +3100,7 @@ public class Functions {
      * Compute a Bessel function of the second kind for an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of function for the given argument and order
      */
     public static double Y(int nu, double x) {
 	double x2 = x/2.0;
@@ -3221,10 +3224,11 @@ public class Functions {
     }
 
     /**
-     * Compute the derivative of modified Bessel function of the first
+     * Compute the derivative of the modified Bessel function of the first
      * kind (I) for a real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of the derivative for the specified arguments
      */
     public static double dIdx(double nu, double x) {
 	return (I(nu-1.0, x) + I(nu+1.0, x))/2.0;
@@ -3235,6 +3239,7 @@ public class Functions {
      * kind (I) for an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
+     * @return the value of the derivative for the specified arguments
      */
     public static double dIdx(int nu, double x) {
 	return (I(nu-1.0, x) + I(nu+1.0, x))/2.0;
@@ -3245,6 +3250,8 @@ public class Functions {
      * real-valued order.
      * @param nu the order of the function (must be larger than -1)
      * @param x the function's argument.
+     * @return the value of a modified Bessel function of the second kind
+     *         for the specified arguments
      * @exception IllegalArgumentException the argument was negative when
      *            the order was not an integer
      */
@@ -3270,6 +3277,8 @@ public class Functions {
      * an integer-valued order.
      * @param nu the order of the function (must be larger than -1)
      * @param x the function's argument.
+     * @return the value of a modified Bessel function of the second kind
+     *         for the specified arguments
      */
     public static double K(int nu, double x) {
 	if (x == 0.0) return Double.POSITIVE_INFINITY;
@@ -3546,7 +3555,7 @@ public class Functions {
 	 * Compute associated Legendre functions with integer coefficients.
 	 * <P>
 	 * Implementation note: Using Rodrigues' formula yields
-	 * P<sup>n</sub><sup>m</sup>(x) = (-1)<sup>m</sup>(1-x<sup>2</sup>)<sup>m/2</sup> (d<sup>n+m</sup>/dx<sup>n+m</sup>)(x<sup>2</sup>-1)<sup>n</sup>.
+	 * P<sub>n</sub><sup>m</sup>(x) = (-1)<sup>m</sup>(1-x<sup>2</sup>)<sup>m/2</sup> (d<sup>n+m</sup>/dx<sup>n+m</sup>)(x<sup>2</sup>-1)<sup>n</sup>.
 	 * The term (x<sup>2</sup>-1)<sup>n</sup> can be expanded using
 	 * the binomial theorem to a sum over i of terms that are equal
 	 * to C(n,i)(-1)<sup>i</sup>x<sup>2(n-i)</sup>.  If we differentiate
@@ -3974,7 +3983,7 @@ public class Functions {
 	 * Create a Legendre polynomial of degree n using a monomial basis.
 	 * @param n the degree of the Legendre polynomial
 	 * @return the polynomial
-	 * @exception the argument was negative
+	 * @exception IllegalArgumentException if the argument was negative
 	 */
 	public static Polynomial asPolynomial(int n)
 	    throws IllegalArgumentException
@@ -3986,7 +3995,7 @@ public class Functions {
 	 * Create a Legendre polynomial of degree n using a Bernstein basis.
 	 * @param n the degree of the Legendre polynomial
 	 * @return the polynomial
-	 * @exception the argument was negative
+	 * @exception IllegalArgumentException the argument was negative
 	 */
 	public static BezierPolynomial asBezierPolynomial(int n)
 		    throws IllegalArgumentException
@@ -4305,7 +4314,7 @@ public class Functions {
 	return prod;
     }
 
-    /*
+    /**
      * Compute the nth root of a real number.
      * @deprecated
      * This method has been moved to the class {@link org.bzdev.lang.MathOps}
@@ -4316,6 +4325,7 @@ public class Functions {
      * @param n the root index (2 for the square root, 3 for the cube root,
      *         etc.)
      * @param x the number whose root is to be computed.
+     * @return the root
      * @exception IllegalArgumentException an argument was out of range
      */
     @Deprecated
@@ -4915,6 +4925,16 @@ public class Functions {
 	}
     }
 
+    /**
+     * Compute the digamma function for an integral argument.
+     * <P>
+     * Note: Because the digamma function with integral arguments is
+     * used in some infinite series, the implementation uses table-lookup
+     * for relatively small values of i (0 &ge; i &lt; 8192) with the
+     * table computed using a recursion relation.
+     * @param i the argument
+     * @return the value of the function given its argument
+     */
     public static double digamma(int i) {
 	if (i <= 0) return Double.NEGATIVE_INFINITY;
 	if (i <= digammaTableSize) {
@@ -5542,7 +5562,6 @@ public class Functions {
      * <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2;</span></sup></span><sub>&theta;=0</sub>
      * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
      * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
-     *<P>
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -6542,6 +6561,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double dMdx(double a, double b, double x)
 	throws IllegalArgumentException
@@ -6558,6 +6578,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double d2Mdx2(double a, double b, double x)
 	throws IllegalArgumentException
@@ -6575,6 +6596,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double dMdx(long a, double b, double x)
 	throws IllegalArgumentException
@@ -6592,6 +6614,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double d2Mdx2(long a, double b, double x)
 	throws IllegalArgumentException
@@ -6609,6 +6632,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double dMdx(long a, long b, double x)
 	throws IllegalArgumentException
@@ -6626,6 +6650,7 @@ public class Functions {
      * @param a the first argument
      * @param b the second argument
      * @param x the third argument
+     * @return the value of the derivative
      */
     public static double d2Mdx2(long a, long b, double x)
 	throws IllegalArgumentException
@@ -6810,6 +6835,7 @@ public class Functions {
 	 * program is org.bzdev.math.Functions$ErfTable (note the use
 	 * of a '$' in the name).
 	 * @param argv command-line arguments (ignored)
+	 * @exception java.io.IOException an IO error occurred
 	 */
 	public static void main(String[] argv) throws java.io.IOException {
 	    java.io.DataOutputStream dos =

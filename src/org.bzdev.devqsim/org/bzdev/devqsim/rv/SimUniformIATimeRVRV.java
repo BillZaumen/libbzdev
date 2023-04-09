@@ -3,12 +3,12 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.UniformIATimeRV;
 import org.bzdev.math.rv.UniformIATimeRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of long-integer valued random variableac, eachrepresenting
  * exponentially distributed interarrival times, that is suitable for
  * modeling arrivals that have a uniform distribution.
- * @see org.bzdev.math.rv.UniformIATimeRV;
+ * @see org.bzdev.math.rv.UniformIATimeRV
  */
 public class SimUniformIATimeRVRV
     extends SimInterarrivalTimeRVRV<UniformIATimeRV,UniformIATimeRVRV>

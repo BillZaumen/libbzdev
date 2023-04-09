@@ -140,6 +140,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 
     /**
      * Get the parameters, providing an array in which to store them.
+     * @param array an array to hold the parameters
      * @return a copy of the parameters array
      * @exception IllegalArgumentException the array dimensions were
      *            too small
@@ -173,6 +174,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 
     /**
      * Get the (chi-square) statistic
+     * @return the statistic
      */
     public Statistic getStat() {
 	return new Statistic() {
@@ -266,7 +268,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
      * array dimensions are larger than the number of parameters,
      * indices with values larger than or equal to the number of
      * parameters will be ignored.
-     * @return an array used to store the covariance values
+     * @param array an array used to store the covariance values
      * @return the covariance matrix.
      * @exception IllegalArgumentException the array dimensions were
      *            too small
@@ -350,6 +352,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
      * @param x the X values for the data points
      * @param y the Y values for the data points
      * @param sigma the standard deviation for y
+     * @return the value of &chi;<sup>2</sup>
      */
     public static double chiSquare(LeastSquaresFit fit, double[] x,
 				    double[] y, double sigma)
@@ -397,6 +400,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
      * @param x the X values for the data points
      * @param y the Y values for the data points
      * @param sigma the standard deviations for the data points
+     * @return the value of &chi;<sup>2</sup>
      */
     public static double chiSquare(LeastSquaresFit fit,
 				    double[] x, double[] y, double[] sigma)
@@ -583,6 +587,10 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	    H = null;
 	}
 
+	/**
+	 * Get the TriangularDecomp object for this least squares fit.
+	 * @return the trianbular decomposition
+	 */
 	protected TriangularDecomp getDecomp() {
 	    if (decomp == null) {
 		if (H != null) {
@@ -1023,6 +1031,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	 * parameters. If {@link LeastSquaresFit#derivAt(double)}
 	 * or {@link LeastSquaresFit#secondDerivAt(double)} are used,
 	 * the basis functions must implement the corresponding derivatives.
+	 * @param <T> a type that implements or extends  RealValuedFunctionops
 	 * @param y the values for y<sub>i</sub>
 	 * @param x the values for x<sub>i</sub>
 	 * @param fs the basis functions
@@ -1150,6 +1159,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	 * parameters. If {@link LeastSquaresFit#derivAt(double)}
 	 * or {@link LeastSquaresFit#secondDerivAt(double)} are used,
 	 * the basis functions must implement the corresponding derivatives.
+	 * @param <T> a subtype of {@link RealValuedFunctOps}
 	 * @param x the values for x<sub>i</sub>
 	 * @param y the values for y<sub>i</sub>
 	 * @param sigma the standard deviation for every y value
@@ -1274,6 +1284,7 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	 * parameters.  If {@link LeastSquaresFit#derivAt(double)}
 	 * or {@link LeastSquaresFit#secondDerivAt(double)} are used,
 	 * the basis functions must implement the corresponding derivatives.
+	 * @param <T> the type of the functions
 	 * @param x the values for x<sub>i</sub>
 	 * @param y the values for y<sub>i</sub>
 	 * @param sigma the standard deviations &sigma;<sub>i</sub> for
@@ -2213,7 +2224,6 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 	 * deviations for given X values.
 	 * The number of X,Y data points must be larger than the number
 	 * of control points.
-	 * <P>
 	 * @param degree the degree of the B-spline that will be created
 	 * @param n the number of control points
 	 * @param mode the mode for the B-spline (either

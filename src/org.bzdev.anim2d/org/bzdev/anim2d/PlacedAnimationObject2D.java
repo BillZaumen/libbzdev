@@ -5,7 +5,6 @@ import java.awt.geom.*;
 
 /**
  * Class representing two-dimensional objects with a position and orientation.
- *
  * The orientation is the angle between a vector parallel to a unit
  * vector, that is parallel to the x axis, and a vector representing
  * the direction in which an object is oriented. The orientation is
@@ -42,7 +41,6 @@ import java.awt.geom.*;
  * rotation. This shape is then used to create a Path2D.Double using
  * the affine transform returned by getAddToTransform() to generate the
  * shape for the current position and angle.
- * <P>
  * <P>
  * Reference points allow an object to be rotated about some other
  * position than (0.0, 0.0) before placing it at some position (x, y).
@@ -196,6 +194,7 @@ public abstract class PlacedAnimationObject2D extends AnimationObject2D {
      * had the value 0.0.  The object will then be rotated about the
      * reference point and the reference point will be translated to
      * the position (x, y).
+     * @return the affine transform
      */
     public AffineTransform getAddToTransform() {
 	AffineTransform af = AffineTransform.getTranslateInstance(x, y);

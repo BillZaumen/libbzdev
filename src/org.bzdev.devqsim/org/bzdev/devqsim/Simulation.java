@@ -323,6 +323,7 @@ public class Simulation extends SimulationHelper
     public final long currentTicks() {return state.currentTicks;}
 
     /**
+     * @return the current time in ticks
      * @deprecated Replaced by {@link #currentTicks()}
      */
     @Deprecated
@@ -1891,7 +1892,7 @@ public class Simulation extends SimulationHelper
      * For example (using ECMAScript), if <code>sim</code> is a simulation,
      * then
      * <blockquote>
-     * <code><pre>
+     * <pre><code>
      *   count = 0;
      *   monitor = sim.createMonitor({
      *     simulationPauses: function(simulation) {
@@ -1902,7 +1903,7 @@ public class Simulation extends SimulationHelper
      *        return false;
      *      }
      *   }
-     * </pre></code>
+     * </CODE></PRE>
      * </blockquote>
      * will make the simulation pause each time 1000 events
      * have been processed.  The argument <code>simulation</code> gives the
@@ -2028,13 +2029,13 @@ public class Simulation extends SimulationHelper
      * Create a simulation listener based on a script object that implements an
      * adapter.
      * In a scripting language, one might write the adapter as follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *    adapter = simulation.createAdapter({
      *       simulationStart: function(sim) {println("simulation start");}
      *       simulationstop: function(sim) {println("simulation stop");}
      *    });
      *    simulation.addSimulationListener(adapter);
-     * </pre></code>
+     * </CODE></PRE>
      * </blockquote>
      * where <code>simulation</code> is an instance of <code>Simulation</code>
      * and the scripting language is ECMAScript.
@@ -2264,6 +2265,7 @@ public class Simulation extends SimulationHelper
      * (for example, {@link org.bzdev.drama.DramaSimulation} adds additional
      * methods for message-related events).
      * @param object the script object implementing the adapter
+     * @return the adapter
      */
     public SimulationListener createAdapter(Object object)
 	throws IllegalArgumentException

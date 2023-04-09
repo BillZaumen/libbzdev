@@ -124,6 +124,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
     /**
      * Constructor given a file.
      * @param f the output file
+     * @throws IOException an IO error occurred
+     * @throws FileNotFoundException the file <CODE>f</CODE> was not found
      */
     public ImageSequenceWriter(File f)
 	throws IOException, FileNotFoundException
@@ -134,6 +136,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
     /**
      * Constructor given a file name.
      * @param fileName the output file name
+     * @throws IOException an IO error occurred
+     * @throws FileNotFoundException the file <CODE>f</CODE> was not found
      */
     public ImageSequenceWriter(String fileName)
 	throws IOException, FileNotFoundException
@@ -144,6 +148,7 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
     /**
      * Constructor given an output stream.
      * @param os the output stream
+     * @throws IOException an IO error occurred
      */
     public ImageSequenceWriter(OutputStream os) throws IOException {
 	super(os, MEDIATYPE);
@@ -523,8 +528,10 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      *    osg.imageComplete();
      *    osg.close();
      * </pre></blockquote>
-     * @return name the name of the output stream
+     * @param name the name of the output stream
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     @Override
     public OSGraphicsOps nextOutputStreamGraphics(String name)
@@ -557,6 +564,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * Images will be stored without any compression and will be given
      * a standard name.
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     @Override
     public OSGraphicsOps nextOutputStreamGraphics()
@@ -590,6 +599,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param level the compression level (0 =&gt; no compression,
      *        9 =&gt; maximum compression)
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     public OSGraphicsOps nextOutputStreamGraphics(boolean compressed,
 							 int level)
@@ -628,6 +639,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param extra a byte sequence to add to the extra field; null if there is
      *        none
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     public OSGraphicsOps nextOutputStreamGraphics(boolean compressed,
 							 int level,
@@ -666,6 +679,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param count the repetition count for the entry corresponding to
      *        the graphics output stream that will be returned
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     @Override
     public OSGraphicsOps nextOutputStreamGraphics(String name, int count)
@@ -705,6 +720,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param count the repetition count for the entry corresponding to
      *        the graphics output stream that will be returned
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     @Override
     public OSGraphicsOps nextOutputStreamGraphics(int count)
@@ -745,6 +762,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param count the repetition count for the entry corresponding to
      *        the graphics output stream that will be returned
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     public OSGraphicsOps nextOutputStreamGraphics(boolean compressed,
 							 int level, int count)
@@ -790,6 +809,8 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      * @param extra a byte sequence to add to the extra field; null if
      *        there is none
      * @return a graphics output stream for drawing an image
+     * @throws IOException if an IO error occurred
+     * @throws IllegalStateException if metadata missing
      */
     public OSGraphicsOps nextOutputStreamGraphics(boolean compressed,
 							 int level, int count,
@@ -817,6 +838,7 @@ public class ImageSequenceWriter extends ZipDocWriter implements ISWriterOps {
      *            was not called
      * @exception IOException if an error occurred while writing the
      *            ZIP file.
+     * @throws IllegalStateException if metadata missing
      */
     @Override
     public void close() throws IllegalStateException, IOException {

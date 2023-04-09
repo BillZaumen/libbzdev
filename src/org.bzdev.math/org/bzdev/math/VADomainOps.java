@@ -15,7 +15,7 @@ public interface VADomainOps {
      */
     public int minArgLength();
 
-    /*
+    /**
      * Get the maximum number of arguments allowed in calls to
      * methods whose arguments are in the domain of a function implementing
      * this interface.  

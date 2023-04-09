@@ -31,15 +31,16 @@ import java.util.Hashtable;
  * <P>
  * For the simplest case, one will create an anonymous inner
  * class implementing a method named <code>mapping</code> as follows
- * (this example returns an array of length m):
- * <blockquote><code><pre>
+ * (this example sets an array of length m):
+ * <blockquote><pre><code>
  *      GLQuadrature glq = new GLQuadrature(n,m) {
  *        protected void mapping(double[] value, int m, double u) {
+ *          double uu3 = u*u+3;
  *          for (int i = 0; i &lt; m; i++) {
- *             value[i] =  u*u + 3;
+ *             value[i] =  uu3 + i*u;
  *        }
  *      }
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * To integrate, one then calls <code>glq.integrate(vector, a, b)</code>
  * where vector is an array of length m, and 
  * <code>a</code> and <code>b</code> are the limits.  Alternatively one
@@ -55,15 +56,15 @@ import java.util.Hashtable;
  * Parameters may also be provided explicitly when an "integrate" method
  * is called. The four-argument "mapping" should be implemented in this
  * case:
- * <blockquote><code><pre>
- *      GLQuadrature<Data> glqp = new GLQuadrature<Data>(3, m) {
+ * <blockquote><pre><code>
+ *      GLQuadrature&lt;Data&gt; glqp = new GLQuadrature&lt;Data&gt;(3, m) {
  *        protected void mapping(double[] value, int m, double u, Data data) {
  *            for (int i = 0; i &lt; m; i++) {
  *                value[i] =  u*u + data.value;
  *            }
  *        }
  *      }
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * When used, this allows one to define parameterized functions - the
  * parameters act as additional arguments that are typically constant during the
  * integration. A parameter is stored, not copied, so it should not be
@@ -72,7 +73,7 @@ import java.util.Hashtable;
  * for different values of the parameters, this allows one instance of
  * GLQuadrature to be used, rather than a separate object for each value.
  * An example of usage is:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     double[] values = new double[m];
@@ -80,14 +81,14 @@ import java.util.Hashtable;
  *     glqp.setParameter(data);
  *     glqp.integrate(value, a, b);
  *     System.out.println(glqp.integrate(a, b));
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * or
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     data.value = 3.0;
  *     glqp.integrateWithP(values, a, b, data));
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * <P>
  * In addition, the methods
  * {@link VectorValuedGLQ#getArguments(double,double)} and
@@ -96,8 +97,8 @@ import java.util.Hashtable;
  * will be used repetitively (e.g., for a series of integrals where
  * the parameters change but not the range or the number of points).
  * For example, consider the following code:
- * <blockquote><code><pre>
- *       GLQuadrature<Data> glq = new GLQuadrature<Data>(3, m) {
+ * <blockquote><pre><code>
+ *       GLQuadrature&lt;Data&gt; glq = new GLQuadrature&lt;Data&gt;(3, m) {
  *          double[] u5cache = null;
  *          public double[] getArguments(double a, double b) {
  *             double[] results = super.getArguments(a, b);
@@ -127,7 +128,7 @@ import java.util.Hashtable;
  *              glq.integrate(values, args);
  *              ...
  *       }
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * As an optimization, the code caches the arguments raised to the
  * fifth power to reduce the number of multiplications needed, assuming
  * <code>list</code> contains multiple elements. This sort of optimization
@@ -137,14 +138,14 @@ import java.util.Hashtable;
  * Finally, the method {@link #newInstance} will construct an instance of
  * GLQuadrature where the mapping is represented by a lambda expression. 
  * For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *         glq = VectorValuedGLQ.newInstance((result, m, u) -&gt; {
  *                  for (int i = 0; i &lt; 10; i++) {
  *                      result[i] = Math.sin(u*u + i);
  *                  }
  *               }, 16, 10);
  *         glq.integrate(integrals, 0.0, Math.PI);
- * </pre></code></blockquote>
+ * </code></pre></blockquote>
  * shows how to use {@link #newInstance newInstance} with ECMAScript.
  * <P>
  * Note: some of the methods are named <code>integrate</code> while
@@ -190,7 +191,7 @@ abstract public class VectorValuedGLQ<P> {
      * @param results an array holding the results, with the minimum
      *        width set by the constructor and read by
      *        {@link #getResultLength()}
-     * @param m the number
+     * @param m the number of elements in the results array that are used
      * @param t the argument for the integration
      */
     protected void mapping(double[] results, int m, double t) {
@@ -207,6 +208,7 @@ abstract public class VectorValuedGLQ<P> {
      * @param results an array holding the results, with the minimum
      *        width set by the constructor and read by
      *        {@link #getResultLength()}
+     * @param m the number of elements in the results array that are used
      * @param t the argument for the integration
      * @param p the parameters
      * @exception UnsupportedOperationException the method was needed
@@ -1362,6 +1364,8 @@ abstract public class VectorValuedGLQ<P> {
      * RealToVectorMap to map a value to the components of a vector.
      * @param map the map
      * @param n the number of points to use
+     * @param m the number of elements in the results array that are used
+     * @return the new instance of VectorValuedGLQ
      * @exception IllegalArgumentException n is less than 1
      */
     public static VectorValuedGLQ newInstance(RealToVectorMap map,

@@ -3,11 +3,11 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.UniformLongRV;
 import org.bzdev.math.rv.UniformLongRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of long-integer valued random variables, each with a uniform
  * distribution.
- * @see org.bzdev.math.rv.UniformLongRV;
+ * @see org.bzdev.math.rv.UniformLongRV
  */
 public class SimUniformLongRVRV
     extends SimLongRVRV<UniformLongRV,UniformLongRVRV>

@@ -110,7 +110,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      *         {@code null} then a {@link StringBuilder} will be created.
      *
      * @param  l
-     *         The {@linkplain java.util.Locale locale} to apply during
+     *         the {@linkplain java.util.Locale locale} to apply during
      *         formatting.  If {@code l} is {@code null} then no localization
      *         is applied.
      */
@@ -461,24 +461,24 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * specified locale, format string, and arguments.
      *
      * @param  l
-     *         The {@linkplain java.util.Locale locale} to apply during
+     *         the {@linkplain java.util.Locale locale} to apply during
      *         formatting.  If {@code l} is {@code null} then no localization
      *         is applied.  This does not change this object's locale that was
      *         set during construction.
      *
      * @param  format
-     *         A format string as described in 
+     *         a format string as described in
      *         {@link java.util.Formatter Formatter}
      *
      * @param  args
-     *         Arguments referenced by the format specifiers in the format
+     *         arguments referenced by the format specifiers in the format
      *         string.  If there are more arguments than format specifiers, the
      *         extra arguments are ignored.  The maximum number of arguments is
      *         limited by the maximum dimension of a Java array as defined by
      *         <cite>The Java&trade; Virtual Machine Specification</cite>.
      *
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
@@ -486,10 +486,10 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      *          section of the formatter class specification.
      *
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
+     *          if this formatter has been closed by invoking its
+     *          {@link #close()} method
      *
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format, Object... args)
 	throws IllegalFormatException, FormatterClosedException
@@ -643,7 +643,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
      *
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format)
 	throws IllegalFormatException, FormatterClosedException
@@ -675,7 +675,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return this formatter
      */
     public VarArgsFormatter format(String format, Object arg1)
 	throws IllegalFormatException, FormatterClosedException
@@ -712,7 +712,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2)
 	throws IllegalFormatException, FormatterClosedException
@@ -747,7 +747,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3)
@@ -784,7 +784,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4)
@@ -822,7 +822,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5)
@@ -861,7 +861,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -902,7 +902,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -947,7 +947,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -993,7 +993,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -1041,7 +1041,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -1090,7 +1090,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(String format, Object arg1, Object arg2,
 			       Object arg3, Object arg4, Object arg5,
@@ -1130,7 +1130,7 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
      *
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format)
 	throws IllegalFormatException, FormatterClosedException
@@ -1150,18 +1150,21 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * variable number of arguments.
      * @param  format
      *         A format string as described in {@link java.util.Formatter Formatter}
+     * @param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  arg1 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format, Object arg1)
 	throws IllegalFormatException, FormatterClosedException
@@ -1184,21 +1187,24 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
      *         A format string as described in {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2)
@@ -1219,22 +1225,25 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2, Object arg3)
@@ -1255,23 +1264,26 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
      * @param  arg4 the first argument used by the format string
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1293,24 +1305,27 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
      * @param  arg4 the first argument used by the format string
      * @param  arg5 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1332,25 +1347,28 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
      * @param  arg4 the first argument used by the format string
      * @param  arg5 the first argument used by the format string
      * @param  arg6 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1373,8 +1391,11 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
@@ -1382,17 +1403,17 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @param  arg5 the first argument used by the format string
      * @param  arg6 the first argument used by the format string
      * @param  arg7 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1418,8 +1439,12 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in
+     *         {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
@@ -1429,16 +1454,16 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @param  arg7 the first argument used by the format string
      * @param  arg8 the first argument used by the format string
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     *          if this formatter has been closed by invoking its
+     *          {@link #close()} method
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1464,8 +1489,12 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
      * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
+     *         a format string as described in
+     *         {@link java.util.Formatter Formatter}
      * @param  arg1 the first argument used by the format string
      * @param  arg2 the first argument used by the format string
      * @param  arg3 the first argument used by the format string
@@ -1475,17 +1504,17 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * @param  arg7 the first argument used by the format string
      * @param  arg8 the first argument used by the format string
      * @param  arg9 the first argument used by the format string
+     * @return  this formatter
      * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
+     *          if a format string contains an illegal syntax, a format
      *          specifier that is incompatible with the given arguments,
      *          insufficient arguments given the format string, or other
      *          illegal conditions.  For specification of all possible
      *          formatting errors, see the {@link java.util.Formatter Formatter}
      *          section of the formatter class specification.
      * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
+     *          if this formatter has been closed by invoking its {@link
      *          #close()} method
-     * @return  This formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1512,29 +1541,33 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @param  arg9 the first argument used by the format string
-     * @param  arg10 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
+     * @param format
+     *        a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @param arg9 the first argument used by the format string
+     * @param arg10 the first argument used by the format string
+     * @return  this formatter
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1561,30 +1594,33 @@ public final class VarArgsFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @param  arg9 the first argument used by the format string
-     * @param  arg10 the first argument used by the format string
-     * @param  arg11 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     *@param l the {@linkplain java.util.Locale locale} to apply during
+     *          formatting.  If {@code l} is {@code null} then no localization
+     *          is applied.
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @param arg9 the first argument used by the format string
+     * @param arg10 the first argument used by the format string
+     * @param arg11 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return  this formatter
      */
     public VarArgsFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1601,13 +1637,11 @@ public final class VarArgsFormatter implements Closeable, Flushable {
     }
 
     /**
-     * Returns the {@code IOException} last thrown by this formatter's {@link
-     * Appendable}.
-     *
-     * <p> If the destination's {@code append()} method never throws
+     * Returns the {@code IOException} last thrown by this formatter's
+     * {@link Appendable}.
+     * <p>If the destination's {@code append()} method never throws
      * {@code IOException}, then this method will always return {@code null}.
-     *
-     * @return  The last exception thrown by the Appendable or {@code null} if
+     * @return  the last exception thrown by the Appendable or {@code null} if
      *          no such exception exists.
      */
     public IOException ioException() {

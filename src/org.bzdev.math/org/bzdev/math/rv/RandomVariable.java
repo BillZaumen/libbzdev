@@ -169,7 +169,8 @@ abstract public class  RandomVariable<T>
      * Get the next value for a random variable.
      * In general, each value will be independent of the last.
      * @return the next value
-     * @exception the next value could not be generated
+     * @exception RandomVariableException if the next value could
+     *            not be generated
      */
     abstract public T next() throws RandomVariableException;
 
@@ -211,6 +212,7 @@ abstract public class  RandomVariable<T>
 	return null;
     }
 
+    @Override
     public Object clone() throws CloneNotSupportedException {
 	return super.clone();
     }

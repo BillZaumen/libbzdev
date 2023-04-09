@@ -3,11 +3,11 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.UniformIntegerRV;
 import org.bzdev.math.rv.UniformIntegerRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of integer-valued random variables, each with a uniform
  * distribution.
- * @see org.bzdev.math.rv.UniformIntegerRV;
+ * @see org.bzdev.math.rv.UniformIntegerRV
  */
 public class SimUniformIntegerRVRV
     extends SimIntegerRVRV<UniformIntegerRV,UniformIntegerRVRV>

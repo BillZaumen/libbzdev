@@ -21,7 +21,6 @@ import java.util.*;
  * some object defined in a scripting language.
  * <P>
  * The parameters this class supports are the following:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/SimFunctionTwoFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/SimFunctionTwoFactory.html">

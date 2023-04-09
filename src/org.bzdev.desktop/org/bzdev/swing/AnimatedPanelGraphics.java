@@ -76,7 +76,7 @@ import java.net.URL;
  * <P>
  * As an example, one can create an animation and display it immediately
  * in a window as follows:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     Animation2D a2d = new Animation2D(400, 250, 1000.0, 40);
  *     AnimatedPanelGraphics apg =
  *      AnimatedPanelGraphics.newFramedInstance
@@ -89,7 +89,7 @@ import java.net.URL;
  *     a2d.scheduleFrames(0, maxframes);
  *     a2d.run();
  *     apg.close();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * <P>
  * While the AnimatedPanelGraphics class has Java 'swing' components
  * associated with it, the constructors and the newFramedInstance methods
@@ -1445,6 +1445,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})
+     * @return the new instance of AnimatedPanelGraphics
+     * @exception IOException - if an IO exception occurred
      * @see Mode
      * @see org.bzdev.gio.ISWriterOps.AnimationParameters
      * @see org.bzdev.anim2d.Animation2D
@@ -1486,6 +1488,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})
+     * @return the new instance
+     * @exception IOException - if an IO exception occurred
      * @see Mode
      * @see org.bzdev.gio.ISWriterOps.AnimationParameters
      * @see org.bzdev.anim2d.Animation2D
@@ -1520,6 +1524,8 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})
+     * @return the new instance
+     * @exception IOException - if an IO exception occurred
      * @see Mode
      * @see org.bzdev.gio.ISWriterOps.AnimationParameters
      * @see org.bzdev.anim2d.Animation2D
@@ -1559,7 +1565,9 @@ public class AnimatedPanelGraphics implements ISWriterOps {
      * @param mode the mode for the AnimatedPanelGraphics that will be
      *        created; null for a default
      *        ({@link AnimatedPanelGraphics.Mode#START_PAUSED_SELECTABLE})
+     * @return the new instance of AnimatedPanelGraphics
      * @see Mode
+     * @exception IOException - if an IO exception occurred
      * @see org.bzdev.gio.ISWriterOps.AnimationParameters
      * @see org.bzdev.anim2d.Animation2D
      */

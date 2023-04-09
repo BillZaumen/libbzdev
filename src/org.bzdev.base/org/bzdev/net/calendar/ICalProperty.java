@@ -90,6 +90,10 @@ public class ICalProperty {
 	}
     }
 
+    /**
+     * Get the delimeters.
+     * @return the delimiters
+     */
     public List<Character> getDelims() {
 	if (values == null) return EMPTY_CHAR_LIST;
 	return Collections.unmodifiableList(delims);

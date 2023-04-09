@@ -49,9 +49,9 @@ public class LeveneStat extends FStat {
      * Z<sub>ij</sub> = |Y<sub>ij</sub> - M<sub>i</sub>|
      * where M<sub>i</sub> is defined as either
      * <OL>
-     * <IT> the mean of the i<sup>th</sup> subgroup.
-     * <IT> the median of the i<sup>th</sup> subgroup.
-     * <IT> the 10% trimmed mean of the i<sup>th</sup> subgroup.
+     * <LI> the mean of the i<sup>th</sup> subgroup.
+     * <LI> the median of the i<sup>th</sup> subgroup.
+     * <LI> the 10% trimmed mean of the i<sup>th</sup> subgroup.
      * </OL>
      * @see LeveneStat
      */

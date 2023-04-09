@@ -106,7 +106,8 @@ public interface RandomVariableOps<T> {
      * Get the next value for a random variable.
      * In general, each value will be independent of the last.
      * @return the next value
-     * @exception the next value could not be generated
+     * @exception RandomVariableException if the next value could
+     *             not be generated
      */
     T next() throws RandomVariableException;
 

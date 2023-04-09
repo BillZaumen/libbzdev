@@ -106,7 +106,6 @@ public interface SurfaceOps extends Shape3D {
      *          <LI> edge 3 is the edge from (0, 1) to (0, 0)
      *       </UL>
      * </UL>
-     * <P>
      * @return the edge numbers for the surface segments adjacent to the
      *         path segments along the boundary; null if the 3D shape
      *         is not well formed
@@ -591,7 +590,7 @@ public interface SurfaceOps extends Shape3D {
      * for a shape with an arbitrary orientation, the following code
      * will transform the object without moving its previous center of
      * mass point or rotation it:
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *     Point3D cm = SurfaceOps.centerOfMassOf(s);
      *     double[][] moments = SurfaceOps.momentsOf(s, cm)
      *     double[][] I = SurfaceOps.toMomentsOfInertia(moments);
@@ -600,7 +599,7 @@ public interface SurfaceOps extends Shape3D {
      *     AffineTransform af = afI.invert().concatenate(at)
      *         .concatenate(afI);
      *     Surface3D ns = new Surface3D.Double(s, af);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * @param principalAxes the principal axes
      * @param rotCenter the point about which to perform a rotation
      *         (e.g., the center of mass)

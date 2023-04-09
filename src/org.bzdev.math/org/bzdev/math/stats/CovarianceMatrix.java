@@ -28,13 +28,20 @@ public abstract class CovarianceMatrix {
 	return StatsErrorMsg.errorMsg(key, args);
     }
 
-    protected int n;
+    private int n;
+
+    /**
+     * The number of data vectors used.
+     */
     protected long count = 0;
-    protected double[] means = null;
-    protected double[] smeans = null;
-    protected double[] emeans = null;
-    protected double[][] matrix = null;
-    protected double[] deltas = null;
+
+    private  double[] means = null;
+
+    private double[] smeans = null;
+
+    private double[] emeans = null;
+    private double[][] matrix = null;
+    private double[] deltas = null;
     boolean completed = false;
 
     /**

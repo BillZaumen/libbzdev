@@ -117,9 +117,10 @@ public abstract class Adder {
 	 * </pre></blockquote>
 	 * To retrieve the total when done, just read the variable
 	 * <code>state.total</code>.
-	 *  As a reminder, use parentheses as shown above as the
-	 *  order of evaluation is important for Kahan's summation algorithm.
-	 *  Alternatively, once can create just the adder's state:
+	 * As a reminder, use parentheses as shown above as the
+	 * order of evaluation is important for Kahan's summation algorithm.
+	 * Alternatively, once can create just the adder's state:
+	 * <blockquote><pre>
 	 *    Adder.Kahan.State state = new Adder.Kahan.State();
 	 *    while (...) {
 	 *       double term = ...
@@ -133,7 +134,7 @@ public abstract class Adder {
 	 * To reset the state when a Kahan adder's state is constructed
 	 * instead of the adder itself, set the <code>c</code>
 	 * and <code>total</code> fields to 0.0:
-	 * </pre></blockquote>
+	 * <blockquote><pre>
 	 *    state.c = 0.0;
 	 *    state.total = 0.0;
 	 * </pre></blockquote>

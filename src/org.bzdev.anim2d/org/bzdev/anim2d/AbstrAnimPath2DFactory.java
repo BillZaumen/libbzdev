@@ -35,22 +35,19 @@ import java.util.TreeMap;
  * key, the following transition diagram shows the sequence of allowed values
  * for this type:
  * <DIV style="text-align:center">
- *     <IMG SRC="doc-files/basicpath.png" class="imgBackground">
+ *     <IMG SRC="doc-files/basicpath.png" class="imgBackground" alt="UML diagram">
  *</DIV>
  * The factory parameters this factory provides are the same as the parameters
  * provided by its subclass {@link AnimationPath2DFactory}
  * (the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html#cpoint.type-org.bzdev.anim2d.AnimationPath2DFactory" target="ftable">cpoint.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
-
  * @see org.bzdev.geom.SplinePathBuilder.CPointType
  * @see org.bzdev.geom.SplinePathBuilder.WindingRule
  * @see org.bzdev.obnaming.misc.BasicStrokeParm.Cap

@@ -251,6 +251,7 @@ public class SafeDocument implements Document {
      * object.
      * @param r an object providing the code to execute in a method named
      *        doit() that will store its return value in r.obj
+     * @return an object
      */
     protected Object doitObject(RunnableWithObj r) {
 	try {

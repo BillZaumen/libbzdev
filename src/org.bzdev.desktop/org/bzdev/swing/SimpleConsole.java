@@ -38,7 +38,7 @@ import java.util.function.Consumer;
  * explicitly keep track of where a message should be displayed.
  * For use with a GUI, the following code will create a menu item that
  * will make a console visible:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    JFrame frame = new JFrame("Application Frame");
  *    menubar = new JMenuBar();
  *    menu = new JMenu("Tools");
@@ -55,7 +55,7 @@ import java.util.function.Consumer;
  *    frame.setVisible(true);
  *    SwingErrorMessage.setAppendable(console);
  *    SwingErrorMessage.setComponent(frame);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * This code will create a menu named "Tools" with an item named
  * "Open Console", which will open a window whose title is "Console"
  * with a width of 800 pixels and a height of 600 pixels. The console window

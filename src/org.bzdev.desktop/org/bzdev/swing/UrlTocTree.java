@@ -25,6 +25,7 @@ public interface UrlTocTree extends TocTree {
      * 
      * @param title A string naming the entry.
      * @param url The URL to associate with the entry;
+     * @throws MalformedURLException if the url is malformed
      * @throws IllegalStateException if this method was called after
      *         a call to <code>entriesCompleted</code>.
      * @see ObjTocPane#entriesCompleted()
@@ -32,7 +33,7 @@ public interface UrlTocTree extends TocTree {
      * @see ObjTocPane#prevLevel()
      */
     public void addEntry(String title, String url) 
-	throws MalformedURLException;
+	throws MalformedURLException, IllegalStateException;
 
     /**
      * Add an entry.
@@ -42,12 +43,13 @@ public interface UrlTocTree extends TocTree {
      * @param url The URL to associate with the entry;
      * @throws IllegalStateException if this method was called after
      *         a call to <code>entriesCompleted</code>.
+     * @throws MalformedURLException if the url is malformed
      * @see ObjTocPane#entriesCompleted()
      * @see ObjTocPane#nextLevel()
      * @see ObjTocPane#prevLevel()
      */
     public void addEntry(String title, URL url) 
-	throws MalformedURLException;
+	throws MalformedURLException, IllegalStateException;
 
 
     /**
@@ -63,6 +65,7 @@ public interface UrlTocTree extends TocTree {
      *         or is not valid.
      * @throws IOException an IO error was seen
      * @throws ParserConfigurationException the XML parser cannot be configured
+     * @throws MalformedURLException if the url is malformed
      */
     public void setToc(URL url, boolean expand, boolean validating)
 	throws FactoryConfigurationError, SAXException, IOException,

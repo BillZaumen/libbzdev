@@ -19,7 +19,7 @@ import javax.swing.event.AncestorEvent;
  * {@link TextAreaButton#inputValue()}.
  * <P>
  * For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * public class Application {
  *    JFrame appFrame = new JFrame("Application");
  *    String value = "initial value";
@@ -39,10 +39,10 @@ import javax.swing.event.AncestorEvent;
  *       ...
  *    }
  * }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
   * If access to the text area is needed, one can use a constructor
  *  that explicitly provides the text are.  For example:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "";
@@ -64,7 +64,7 @@ import javax.swing.event.AncestorEvent;
  *      ...
  *    }
  * }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * The values of -1 in the constructor indicate that the rows and columns
  * in the text area should not be changed by the constructor.
 */

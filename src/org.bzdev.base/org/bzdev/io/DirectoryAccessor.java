@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.CopyOption;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.LinkOption;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.security.*;
 import java.util.ArrayList;
 
@@ -25,7 +27,6 @@ public class DirectoryAccessor {
      * Determine if this directory accessor allows files to be read or
      * existing subdirectories to be accessed with a directory accessor
      * that allows reading.
-     * <P>
      * @return true if the directory accessor allows files to be written
      *         or created; false otherwise
      */
@@ -175,6 +176,7 @@ public class DirectoryAccessor {
      * The file must be specified by a relative path name or relative file
      * and may not include directory components.
      * @param file the name of the file
+     * @return the new file accessor
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
      */
@@ -193,6 +195,9 @@ public class DirectoryAccessor {
      * @param mode the file-accessor mode (a combination of "r", "w", and
      *        "a" as specified by constructors for
      *        {@link FileAccessor FileAccessor}
+     * @return the new file accessor
+     * @exception IOException an IO error occurred, probably due to permissions
+     *            or a missing directory component.
      */
     public FileAccessor createFileAccessor(String file, String mode)
 	throws IOException
@@ -205,6 +210,9 @@ public class DirectoryAccessor {
      * The file must be specified by a relative path name or relative file
      * and may not include directory components.
      * @param file the file to access
+     * @return the new file accessor
+     * @exception IOException an IO error occurred, probably due to permissions
+     *            or a missing directory component.
      */
     public FileAccessor createFileAccessor(final File file)
 	throws IOException
@@ -223,6 +231,7 @@ public class DirectoryAccessor {
      * @param mode the requested file-accessor mode (a combination of
      *        "r", "w", and "a" as specified by constructors for
      *        {@link FileAccessor FileAccessor}
+     * @return the new file accessor
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
      * @exception IllegalArgumentException the specified file has a directory
@@ -289,6 +298,8 @@ public class DirectoryAccessor {
      * Get an input stream given a file name.
      * @param name the name of the file for which an input stream
      *        will be opened
+     * @return the input stream
+     * @exception IOException an IO error occurred
      */
     public InputStream getInputStream(String name) throws IOException {
 	return getInputStream((name == null)? null: new File(name));
@@ -297,6 +308,8 @@ public class DirectoryAccessor {
     /**
      * Get an input stream given a File.
      * @param file the file for which an input stream will be opened
+     * @return the input stream
+     * @exception IOException an IO error occurred
      */
     public InputStream getInputStream(File file) throws IOException {
 	return createFileAccessor(file).getInputStream();
@@ -307,6 +320,8 @@ public class DirectoryAccessor {
      * The file will be created if it does not already exist.
      * @param name the name of the file for which an output stream
      *        will be opened
+     * @return the output stream
+     * @exception IOException an IO error occurred
      */
     public OutputStream getOutputStream(String name) throws IOException {
 	return getOutputStream((name == null)? null: new File(name));
@@ -316,6 +331,7 @@ public class DirectoryAccessor {
      * Get an output stream given a File.
      * The file will be created if it does not already exist.
      * @param file the file for which an output stream will be opened
+     * @return the output stream
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
      */
@@ -333,6 +349,7 @@ public class DirectoryAccessor {
      * @param filename the file name
      * @param mode the mode ("r" or "w") defined by
      *        {@link FileAccessor FileAccessor}
+     * @return the random-access file
      * @exception IOException the file could not be opened, possibly because
      *            a "r" or "a" character in the mode was used with a
      *            read-only directory accessor
@@ -350,6 +367,7 @@ public class DirectoryAccessor {
      * @param file the file
      * @param mode the mode ("r" or "w") defined by
      *        {@link FileAccessor FileAccessor}
+     * @return the random-access file
      * @exception IOException the file could not be opened, possibly because
      *            a "r" or "a" character in the mode was used with a
      *            read-only directory accessor
@@ -371,6 +389,7 @@ public class DirectoryAccessor {
      * relative file and may not include multiple directory
      * components.
      * @param dir the name of the directory to create
+     * @return a new directory accessor
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
      */
@@ -391,6 +410,7 @@ public class DirectoryAccessor {
      * This directory accessor must be writeable or an exception
      * will be thrown.
      * @param dir the directory to create
+     * @return a new directory accessor
      * @exception IOException an IO error occurred, probably due to permissions
      *            or a missing directory component.
      * @exception IllegalStateException this directory accessor does not
@@ -783,7 +803,7 @@ public class DirectoryAccessor {
      * @exception IOException an IO error occurred, possibly due to permissions
      *      or a missing directory component
      * @exception FileAlreadyExistsException if the target file exists but
-     *      cannot be replaced becuase the RPLACE_EXISTING option was not
+     *      cannot be replaced becuase the REPLACE_EXISTING option was not
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
@@ -792,7 +812,8 @@ public class DirectoryAccessor {
      * @see CopyOption
      */
     public void move(String f1, String f2, CopyOption... options)
-	throws IOException,
+	throws IOException, FileAlreadyExistsException,
+	       DirectoryNotEmptyException,
 	       UnsupportedOperationException,
 	       IllegalStateException
     {
@@ -815,7 +836,7 @@ public class DirectoryAccessor {
      * @exception IOException an IO error occurred, possibly due to permissions
      *      or a missing directory component
      * @exception FileAlreadyExistsException if the target file exists but
-     *      cannot be replaced becuase the RPLACE_EXISTING option was not
+     *      cannot be replaced becuase the REPLACE_EXISTING option was not
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory
@@ -824,7 +845,8 @@ public class DirectoryAccessor {
      * @see StandardCopyOption
      */
     public void copy(String f1, String f2, CopyOption... options)
-	throws IOException,
+	throws IOException, FileAlreadyExistsException,
+	       DirectoryNotEmptyException,
 	       UnsupportedOperationException,
 	       IllegalStateException
     {
@@ -872,6 +894,7 @@ public class DirectoryAccessor {
      * to a location in a possibly different directory.
      * File names must not contain directory components.
      * @param f1 the file to copy
+     * @param da the directory accessor
      * @param f2 the name of the target file.
      * @param options copy options, each of which is either
      *        {@link LinkOption#NOFOLLOW_LINKS}
@@ -881,7 +904,7 @@ public class DirectoryAccessor {
      * @exception IOException an IO error occurred, possibly due to permissions
      *      or a missing directory component
      * @exception FileAlreadyExistsException if the target file exists but
-     *      cannot be replaced becuase the RPLACE_EXISTING option was not
+     *      cannot be replaced becuase the REPLACE_EXISTING option was not
      *      specified
      * @exception DirectoryNotEmptyException if the target file exists but
      *       cannot be replaced because it is a non-empty directory

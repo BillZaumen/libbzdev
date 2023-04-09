@@ -16,13 +16,13 @@ import java.util.Hashtable;
  * <P>
  *  For the simplest case, one will create an anonymous inner
  * class implementing a method named <code>function</code> as follows:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      GLQuadrature glq = new GLQuadrature(3) {
  *        protected double function(double u) {
  *          return u*u + 3;
  *        }
  *      }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * To integrate, one then calls <code>glq.integrate(a, b)</code> where
  * <code>a</code> and <code>b</code> are the limits.  Alternatively one
  * may call <code>glq.integrate(a, b, m)</code> where m is the number of
@@ -37,13 +37,13 @@ import java.util.Hashtable;
  * Parameters may also be provided explicitly when an "integrate" method
  * is called. The two-argument "function" should be implemented in this
  * case:
- * <blockquote><code><pre>
- *      GLQuadrature<Data> glqp = new GLQuadrature<Data>(3) {
+ * <blockquote><pre><code>
+ *      GLQuadrature&lt;Data&gt; glqp = new GLQuadrature&lt;Data&gt;(3) {
  *        protected double function(double u, Data data) {
  *          return u*u + data.value;
  *        }
  *      }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * When used, this allows one to define parameterized functions - the
  * parameters act as additional arguments that are typically constant during the
  * integration. A parameter is stored, not copied, so it should not be
@@ -52,20 +52,20 @@ import java.util.Hashtable;
  * for different values of the parameters, this allows one instance of
  * GLQuadrature to be used, rather than a separate object for each value.
  * An example of usage is:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     data.value = 3.0;
  *     glqp.setParameter(data);
  *     System.out.println(glqp.integrate(a, b));
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * or
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     ...
  *     Data data;
  *     data.value = 3.0;
  *     System.out.println(glqp.integrateWithP(a, b, data));
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * In addition, the methods
  * {@link GLQuadrature#getArguments(double,double)} and
@@ -74,8 +74,8 @@ import java.util.Hashtable;
  * (e.g., for a series of integrals where the parameters change but not
  * the range or the number of points).  For example, consider the following
  * code:
- * <blockquote><code><pre>
- *       GLQuadrature<Data> glq = new GLQuadrature<Data>(3) {
+ * <blockquote><pre><code>
+ *       GLQuadrature&lt;Data&gt; glq = new GLQuadrature&lt;Data&gt;(3) {
  *          double[] u5cache = null;
  *          public double[] getArguments(double a, double b) {
  *             double[] results = super.getArguments(a, b);
@@ -101,7 +101,7 @@ import java.util.Hashtable;
  *              data.value = value;
  *              System.our.println(glq.integrate(args));
  *       }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * As an optimization, the code caches the arguments raised to the
  * fifth power to reduce the number of multiplications needed, assuming
  * <code>list</code> contains multiple elements. This sort of optimization
@@ -113,12 +113,12 @@ import java.util.Hashtable;
  * {@link RealValuedFunction}. While the implementation is trivial in Java,
  * {@link #newInstance newInstance} simplifies the use of this class
  * from a scripting language.  For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *         fs = {valueAt: function(u) {return Math.sin(u);}}
  *         rvf = new RealValuedFunction(scripting, fs);
  *         glq = GLQuadrature.newInstance(rvf, 16);
  *         integral = glq.integrate(0.0, Math.PI);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * shows how to use {@link #newInstance newInstance} with ECMAScript.
  * <P>
  * Note: some of the methods are named <code>integrate</code> while
@@ -1087,6 +1087,7 @@ abstract public class GLQuadrature<P> {
      * RealValuedFunction or RealValueFunctOps as its function.
      * @param f the function
      * @param n the number of points to use
+     * @return a new instance of GLQuadrature
      * @exception IllegalArgumentException n is less than 1
      */
     public static GLQuadrature newInstance(RealValuedFunctOps f, int n) {

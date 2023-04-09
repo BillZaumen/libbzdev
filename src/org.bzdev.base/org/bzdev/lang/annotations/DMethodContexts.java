@@ -13,28 +13,28 @@ import java.lang.annotation.*;
  * module (e.g., com.foo.bar). One will also create a directory tmpsrc
  * and a corresponding subdirectory tmpsrc/MODULE.  A typical compiler
  * command, assuming the source code is in a directory src, is
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE \
  *          --processor-module-path /usr/share/bzdev \
  *          src/MODULE/module-info.java src/MODULE/DIR/*.java
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where DIR is the directory corresponding to a package name
  * following the usual Java conventions (e.g., com/foo/bar for the
  * package com.foo.bar). Placing generated source files in
  * tmpsrc/MODULE and the source tree in src/MODULE will make it easy
  * to use javadoc to generate documentation: for javadoc the
  * options
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    -d TARGET
  *    --module-path PATH
  *    --module-source-path src:tmpsrc
  *    --add-modules MODULES
  *    --module MODULE
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * and possibly
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    --exclude PACKAGES
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * are useful. For these options,
  * <UL>
  *   <LI> TARGET is the directory that will hold the API documentation
@@ -61,8 +61,8 @@ public @interface DMethodContexts {
      * annotation processor can only look up one annotation with a
      * given name at a time and a class may implement multiple dynamic
      * methods.
+     * @return the value of this element
      */
-
     DMethodContext[] value();
 }
 

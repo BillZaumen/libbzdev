@@ -264,7 +264,7 @@ public abstract class SuffixArray {
      * (the value at index 0 will be set outside of this method).
      * <P>
      * A typical implementation would use the following code:
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *  protected void fillLCPArray(int[] ourlcpArray, int[] rank) {
      *      int k = 0;
      *      int n = sequence.length;
@@ -282,7 +282,7 @@ public abstract class SuffixArray {
      *	        if (k &gt; 0) k--;
      *      }
      *	}
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * Subclasses will have different types for the
      * variable <code>sequence</code>.
      * @param ourlcpArray the LCP array to fill
@@ -934,6 +934,10 @@ public abstract class SuffixArray {
      */
     public static final class Integer extends SuffixArray {
 
+	/**
+	 * The sequence used to compute this suffix array. It
+	 * must not be modified after being set in a constructor.
+	 */
 	protected int[] sequence;
 	int sequenceLength;
 
@@ -7348,7 +7352,6 @@ public abstract class SuffixArray {
 	 * each additional Unicode character that is used. The integer
 	 * codes for these additional characters will be set by their
 	 * order of occurrence in the string.
-	 * <P>
 	 * @param string a string representing a sequence of characters.
 	 * @param n the estimated size of an alphabet encoded as values in [0,n)
 	 *        where n is positive and no larger than 0xFFFF
@@ -7954,6 +7957,7 @@ public abstract class SuffixArray {
 	 * length, all symbols in the BWT array must be in the alphabet
 	 * and the index must be provided (it will be the value returned
 	 * by a call to {@link #getBWT(int[])}).
+	 * @param <T> the type of the objects that the alphabet represents
 	 * @param bwt the Burrows-Wheeler transform
 	 * @param result the inverse of the Burrons-Wheeler transform
 	 * @param index the index parameter for the Burrows-Wheeler transform

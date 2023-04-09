@@ -12,7 +12,6 @@
  * <B>Please see
  * <A HREF="org/bzdev/anim2d/doc-files/description.html"> the org.bzdev.anim2d description</A>
  * for a description of how to use this module.</B>
- * @moduleGraph
  */
 module org.bzdev.anim2d {
     exports org.bzdev.anim2d;

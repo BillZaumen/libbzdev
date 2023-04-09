@@ -75,7 +75,7 @@ import java.awt.geom.Rectangle2D;
  * in the following example (the triangles making up the model are shown
  * as green lines):
  * <P style="text-align: center">
- * <img src="doc-files/sgexample.png">
+ * <img src="doc-files/sgexample.png" alt="Surface example">
  * <P>
  * If the Z components of all of the horizontal rectangles are sorted,
  * each vertical rectangle will have a lower edge at one Z coordinate
@@ -1054,6 +1054,8 @@ public class SteppedGrid  implements Shape3D {
      * Determine if a component of a stepped grid is filled.
      * @param i the index for this component's position along the X axis
      * @param j the index for this component's position along the Y axis
+     * @param isUpper true if the outside direction faces up; false if
+     *        the outside direction faces down
      * @return true if this component is filled; false if it is not filled
      * @exception IllegalStateException {@link #addsCompleted()} was called
      * @exception IllegalArgumentException the indices were out of range
@@ -1083,6 +1085,8 @@ public class SteppedGrid  implements Shape3D {
      * been added.
      * @param i the index for this component's position along the X axis
      * @param j the index for this component's position along the Y axis
+     * @param isUpper true if the outside direction faces up; false if
+     *        the outside direction faces down
      * @return true if this component is a placeholder; false if it is not
      *         a placeholder
      * @exception IllegalStateException {@link #addsCompleted()} was called
@@ -2719,7 +2723,7 @@ public class SteppedGrid  implements Shape3D {
      * {@link #create()} to generate the stepped grids.
      * <P>
      * For example, if <code>m3d</code> is an instance of Model3D,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *  SteppedGrid.Builder sgb = new SteppedGrid.Builder(m3d, 10.0, -10.0);
      *  sgb.addRectangles(0.0, 0.0, 100.0, 100.0, 0.0, 0.0);
      *  sgb.addRectangles(20.0, 20.0, 60.0, 60.0, 0.0, 0.0, true, false);
@@ -2736,7 +2740,7 @@ public class SteppedGrid  implements Shape3D {
      *  m3d.addTriangle(50.0, 50.0, 30.0,
      *                  20.0, 80.0, 10.0,
      *                  20.0, 20.0, 10.0);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * will create a box with a pyramid at its center. The second call
      * to addRectangles overrides the parameters provided by the first
      * call inside a rectangular area 60 by 60 in size that
@@ -2748,18 +2752,18 @@ public class SteppedGrid  implements Shape3D {
      * {@link Model3D#addTriangle(double,double,double,double,double,double,double,double,double)}.
      * The resulting object is shown in the following image:
      * <P style="text-align: center">
-     * <img src="doc-files/sgbuilder.png">
+     * <img src="doc-files/sgbuilder.png" alt="3D printed object example">
      * <P>
      * Since a stepped grid implements the {@link org.bzdev.geom.Shape3D}
      * interface, one can easily obtain the boundary for a stepped grid
      * (e.g., a closed stepped grid with placeholders):
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *  Path3D boundary = sg.getBoundary();
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * <P>
      * If stepped-grid builder is improperly configured, sgb.create()
      * may throw an exception. The method
-     * {@linkP3d#printSteppedGridBuilderCalls(Appendable,String,SteppedGrid.Builder)}
+     * {@link P3d#printSteppedGridBuilderCalls(Appendable,String,SteppedGrid.Builder)}
      * can be used to print information about which addRectangle or
      * addRectangles methods were responsible.
      * @see SteppedGrid

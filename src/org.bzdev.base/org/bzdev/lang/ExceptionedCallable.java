@@ -11,7 +11,7 @@ package org.bzdev.lang;
 public interface ExceptionedCallable {
     /**
      * The method to call.
-     * @exception an exception was thrown
+     * @exception Exception an exception was thrown
      */
     void call() throws Exception;
 }

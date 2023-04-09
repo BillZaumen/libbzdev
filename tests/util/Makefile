@@ -25,7 +25,7 @@ all: compile
 	@$(JAVA) SciFormatterTest
 	@echo -------- SciFormatter Script Test ----------
 	chmod u+x scrun
-	@$(HAS_JS) && ./scrun SciFormatterTest.js
+	@$(HAS_JS) && ./scrun SciFormatterTest.js || echo -n
 	@./scrun SciFormatterTest.esp
 	chmod u-x scrun
 	@echo -------- SafeFormatterTest --------
@@ -180,7 +180,8 @@ clonetest: compile
 sctest:
 	(cd ../.. ; make)
 	chmod u+x scrun
-	@$(HAS_JS) && ./scrun --stackTrace SciFormatterTest.js
+	@$(HAS_JS) && ./scrun --stackTrace SciFormatterTest.js \
+	|| echo ... skipping SciFormatterTest.js
 	chmod u-x scrun
 
 sctest-esp:

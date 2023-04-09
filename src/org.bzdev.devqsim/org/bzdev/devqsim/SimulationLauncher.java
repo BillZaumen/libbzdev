@@ -30,6 +30,10 @@ public class SimulationLauncher extends ObjectNamerLauncher {
      * by combining the results of parsing YAML files.
      * @param initializer an object describing the additional configuration;
      *        null if there is nothing else to configure
+     * @exception ClassNotFoundException - if a needed class does not exist
+     * @exception IOException - if an IO error occurred
+     * @exception IllegalAccessException - if this method cannot access
+     *            a class, field, method, or constructor
      * @see org.bzdev.obnaming.ObjectNamerLauncher
      * @see org.bzdev.obnaming.ObjectNamerLauncher#combine(JSObject,JSObject...)
      * @see org.bzdev.obnaming.ObjectNamerLauncher#loadFromStream(Class,InputStream,int)
@@ -45,6 +49,10 @@ public class SimulationLauncher extends ObjectNamerLauncher {
 
     /**
      * Constructor.
+     * @exception ClassNotFoundException - if a needed class does not exist
+     * @exception IOException - if an IO error occurred
+     * @exception IllegalAccessException - if this method cannot access
+     *            a class, field, method, or constructor
      */
     public SimulationLauncher()
 	throws ClassNotFoundException, IOException, IllegalAccessException

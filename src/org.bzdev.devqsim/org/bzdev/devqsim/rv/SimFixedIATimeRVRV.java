@@ -7,7 +7,7 @@ import org.bzdev.math.rv.FixedIATimeRVRV;
  * Named random variable using a random variable that generates a
  * sequence of random variables providing interarrival times with a
  * fixed distribution.
- * @see org.bzdev.math.rv.FixedIATimeRV;
+ * @see org.bzdev.math.rv.FixedIATimeRV
  */
 public class SimFixedIATimeRVRV
     extends SimInterarrivalTimeRVRV<FixedIATimeRV,FixedIATimeRVRV>

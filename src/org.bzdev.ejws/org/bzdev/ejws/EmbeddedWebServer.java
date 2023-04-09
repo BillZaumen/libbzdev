@@ -397,6 +397,8 @@ public class EmbeddedWebServer {
 	 * arguments are provided by the
 	 * {@link com.sun.net.httpserver.HttpsServer} implementation.
 	 * @param configurator the configurator
+	 * @return an instance of {@link EmbeddedWebServer.SSLSetup},
+	 *         encapsulating SSL parameters
 	 * @see com.sun.net.httpserver.HttpsConfigurator
 	 */
 	public SSLSetup configurator(Configurator configurator) {
@@ -546,6 +548,7 @@ public class EmbeddedWebServer {
      * @param backlog the TCP backlog (maximum number of pending connections)
      * @param nthreads the number of threads the server will use
      * @param sslSetup the configuration for an HTTPS server; null for HTTP
+     * @exception Exception an error occurred
      */
     public EmbeddedWebServer(int port, int backlog, int nthreads,
 			     SSLSetup sslSetup)
@@ -683,6 +686,7 @@ public class EmbeddedWebServer {
      * Add a filter to the HTTP context associated with a path.
      * @param path the path
      * @param filter to the filter
+     * @return true if the context exists; false otherwise
      */
     public boolean addFilter(String path, Filter filter) {
 	PrefixData data = prefixMap.get(path);
@@ -888,6 +892,7 @@ public class EmbeddedWebServer {
     /**
      * Remove a context.
      * @param p the path used when a context was added.
+     * @return true if a context exists for path p; false otherwise
      */
     public boolean remove(String p) {
 	if (server == null) {
@@ -1014,6 +1019,7 @@ public class EmbeddedWebServer {
      * This method should be used only for debugging.
      * Currently, the only handler that supports tracing is
      * {@link org.bzdev.ejws.FileHandler}.
+     * @param p the prefix whose handler should be traced
      * @param tracer the Appendable for tracing requests and responses
      * @return true if the handler for the prefix supports tracing; false
      *         otherwise
@@ -1036,8 +1042,9 @@ public class EmbeddedWebServer {
      * This method should be used only for debugging.
      * Currently, the only handler that supports tracing is
      * {@link org.bzdev.ejws.FileHandler}.
+     * @param p the prefix whose handler should be traced
      * @param tracer the Appendable for tracing requests and responses
-     * @parm stacktrace true for a stack trace; false otherwise
+     * @param stacktrace true for a stack trace; false otherwise
      * @return true if the handler for the prefix supports tracing; false
      *         otherwise
      */
@@ -1181,6 +1188,7 @@ public class EmbeddedWebServer {
      * The server's thread pool will be shut down in case the server
      * fails to do that.
      * @param delay the delay in seconds before the server is stopped.
+     * @exception Exception an error occurred
      */
     public void stop(int delay) throws Exception {
 	if (!serverRunning) {
@@ -1266,6 +1274,7 @@ public class EmbeddedWebServer {
      * @param className the name of the class of the instance to create
      * @param arg an argument passed to the new instance's constructor
      *        (one argument, of type Object).
+     * @return the new HttpHandler
      * @exception IOException an IO exception occurred during initialization
      * @exception IllegalArgumentException one of the arguments was
      *            illegal.
@@ -1321,6 +1330,7 @@ public class EmbeddedWebServer {
      * @param className the name of the class of the instance to create
      * @param arg an argument passed to the new instance's constructor
      *        (one argument, of type Object).
+     * @return the new web map
      * @exception IOException an IO exception occurred during initialization
      * @exception IllegalArgumentException one of the arguments was
      *            illegal.

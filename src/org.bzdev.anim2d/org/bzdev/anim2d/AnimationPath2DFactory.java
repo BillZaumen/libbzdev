@@ -14,13 +14,13 @@ package org.bzdev.anim2d;
  * key, the following transition diagram shows the sequence of allowed values
  * for this type:
  * <DIV style="text-align:center">
- *     <IMG SRC="doc-files/basicpath.png" class="imgBackground">
+ *     <IMG SRC="doc-files/basicpath.png" class="imgBackground"
+ *      ALT="UML Diagram">
  *</DIV>
  * The parameters this factory supports are shown in the following table
  * (the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html#cpoint.type-org.bzdev.anim2d.AnimationPath2DFactory" target="ftable">cpoint.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationPath2DFactory.html">

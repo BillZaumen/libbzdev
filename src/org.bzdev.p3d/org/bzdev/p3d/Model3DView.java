@@ -18,7 +18,7 @@ import java.awt.Color;
  * <P>
  * To create a video of a 3D model m3d, one will first create an
  * animation a2d of type Animation2D.
- * <code><pre>
+ * <pre><code>
  *      Model3D m3d = new Model3D();
  *      // add elements to the model
  *      ...
@@ -37,7 +37,7 @@ import java.awt.Color;
  *      a2d.initFrames(maxFrameCount, ".../img-", "png");
  *      a2d.scheduleFrames(0, maxFrameCount);
  *      a2d.run();
- * </pre></code>
+ * </CODE></PRE>
  *
  * There should usually be only one Model3DView that is visible
  * at a time because a Model3DView will manipulate the light source,

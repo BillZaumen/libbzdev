@@ -6,7 +6,7 @@ import org.bzdev.math.rv.BinomialDoubleRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of double-valued ranom variable  with a binomial distribution.
- * @see org.bzdev.math.rv.BinomialDoubleRV;
+ * @see org.bzdev.math.rv.BinomialDoubleRV
  */
 public class SimBinomialDoubleRVRV
     extends SimDoubleRVRV<BinomialDoubleRV,BinomialDoubleRVRV>

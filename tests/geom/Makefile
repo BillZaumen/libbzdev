@@ -30,7 +30,8 @@ all:
 	@echo --------- scripting path-builder tests
 	@$(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
-		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js
+		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js \
+		|| echo ... skipping pbtest.js
 	@java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.esp
@@ -827,7 +828,8 @@ pbtest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
-		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js
+		org.bzdev.bin.scrunner.SCRunnerCmd pbtest.js \
+		|| echo ... skipping pbtest.js
 
 pbtest-esp:
 	(cd ../.. ; make jars)

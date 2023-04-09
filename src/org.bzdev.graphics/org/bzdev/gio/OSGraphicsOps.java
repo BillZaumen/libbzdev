@@ -66,6 +66,7 @@ public interface OSGraphicsOps extends GraphicsCreator {
      * implementation of each class or subclass implementing this
      * interface.
      * @see #createGraphics()
+     * @exception IOException - if an IO exception occurred
      */
     void flush() throws IOException;
 

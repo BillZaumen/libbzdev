@@ -7,7 +7,7 @@ import org.bzdev.math.rv.FixedLongRVRV;
  * Named random variable using a random variable that generates a
  * sequence of long-integer-valued random variables with a fixed
  * distribution.
- * @see org.bzdev.math.rv.FixedLongRV;
+ * @see org.bzdev.math.rv.FixedLongRV
  */
 public class SimFixedLongRVRV
     extends SimLongRVRV<FixedLongRV,FixedLongRVRV>

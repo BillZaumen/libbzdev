@@ -171,8 +171,9 @@ public class QRDecomp implements java.io.Serializable {
     }
 
     /** Constructor given explicit dimensions.  
-     *  @param A the m by n matrix to decompose, with m &ge; n
-     *  @param m the number of rows
+     * @param A the m by n matrix to decompose, with m &ge; n
+     * @param m the number of rows
+     * @param n the number of columns
      * @param strict true if A must have exactly the number of
      *        rows and columns required; false if A may have rows
      *        or columns longer than needed, in which case the additional

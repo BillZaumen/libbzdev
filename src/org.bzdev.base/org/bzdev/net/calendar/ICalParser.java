@@ -65,6 +65,7 @@ public class ICalParser implements ICalComponent {
      * of lines as described in
      * <A HREF="https://tools.ietf.org/html/rfc5545">RFC 5545</A>.
      * @param data the byte array containing an iCalendar
+     * @throws IOException an IO error occurred
      */
     public ICalParser(byte[] data) throws IOException {
 	this();
@@ -85,6 +86,7 @@ public class ICalParser implements ICalComponent {
      * @param data the byte array containing an iCalendar
      * @param names a list of additional property names whose values
      *        are text fields
+     * @throws IOException an IO error occurred
      */
     public ICalParser(byte[] data, String[] names) throws IOException {
 	this();

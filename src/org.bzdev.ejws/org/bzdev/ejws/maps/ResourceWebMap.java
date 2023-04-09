@@ -32,11 +32,13 @@ public class ResourceWebMap extends WebMap {
 	return WebMapErrorMsg.errorMsg(key, args);
     }
 
-
     /**
      * Constructor.
      * @param root the initial portion of a resource name (if it does not
      *        end in a '/', a '/' will be appended automatically)
+     * @throws IOException if an IO error ocurred
+     * @throws IllegalArgumentException if the argumnent is not a string
+     *         and not the value null
      */
     public ResourceWebMap(Object root)
 	throws IOException, IllegalArgumentException

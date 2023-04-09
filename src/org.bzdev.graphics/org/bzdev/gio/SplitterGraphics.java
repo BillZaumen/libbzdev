@@ -21,6 +21,8 @@ public class SplitterGraphics extends Graphics  {
 
     /**
      * Constructor.
+     * @param primary the primary {@link Graphics}
+     * @param secondary the secondary {@link Graphics}
      */
     public SplitterGraphics(Graphics primary, Graphics secondary) {
 	super();

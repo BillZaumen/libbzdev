@@ -244,6 +244,7 @@ public class JSUtilities {
 
 	/**
 	 * Set the key for the current nesting level.
+	 * @param value the key
 	 */
 	public void setKey(String value) {
 	    keys.set(level, value);
@@ -340,6 +341,7 @@ public class JSUtilities {
 	 * specific object types.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected void write(Writer w, Object object) throws IOException {
 	    if (object == null) {
@@ -365,6 +367,7 @@ public class JSUtilities {
 	 * Write an object whose type is {@link JSObject}.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected  void write(Writer w, JSObject object)
 	    throws IOException
@@ -388,6 +391,7 @@ public class JSUtilities {
 	 * Write an object whose type is {@link JSArray}.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected void write(Writer w, JSArray object)
 	    throws IOException
@@ -408,6 +412,7 @@ public class JSUtilities {
 	 * Write an object whose type is {@link Boolean}.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected void write(Writer w, Boolean object)
 	    throws IOException
@@ -419,6 +424,7 @@ public class JSUtilities {
 	 * Write an object whose type is {@link Number}.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected void write(Writer w, Number object)
 	    throws IOException
@@ -430,6 +436,7 @@ public class JSUtilities {
 	 * Write an object whose type is {@link String}.
 	 * @param w the writer
 	 * @param object the object
+	 * @throws IOException if an IO error occurred
 	 */
 	protected void write(Writer w, String object)
 	    throws IOException
@@ -515,6 +522,9 @@ public class JSUtilities {
 	 * @param is the input stream (containing a JSON value)
 	 * @param charsetName the name of the charset used by the input
 	 *        stream
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 * @exception UnsupportedEncodingException the charsetName does
@@ -537,6 +547,9 @@ public class JSUtilities {
 	 * @param is the input stream (containing a JSON value)
 	 * @param dec the charset decoder used to turn the
 	 *        input stream into a sequence of characters
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -556,6 +569,9 @@ public class JSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param is the input stream (containing a JSON value)
 	 * @param cs the charset for the input stream
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -575,6 +591,9 @@ public class JSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param buffer the input character sequence  (containing
 	 *        a JSON value)
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -590,6 +609,9 @@ public class JSUtilities {
 	 * {@link JSObject}, {@link JSArray}, {@link String},
 	 * {@link Number}, or {@link Boolean}.
 	 * @param s the input string (containing a JSON value)
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -605,7 +627,9 @@ public class JSUtilities {
 	 * {@link JSObject}, {@link JSArray}, {@link String},
 	 * {@link Number}, or {@link Boolean}.
 	 * @param r the reader
-	 * @return the object.
+	 * @return either a {@link JSObject}, {@link JSArray},
+	 *         {@link String}, {@link Number}, {@link Boolean},
+	 *         or null
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -619,9 +643,16 @@ public class JSUtilities {
 	 */
 	public static class Parser {
 	    Reader r;
+	    /**
+	     * Used internally.
+	     */
 	    protected Locator locator = new Locator();
 	    HashMap<Location,LocationPair> lmap = new HashMap<>();
 
+	    /**
+	     * Tag a location.
+	     * Used internally.
+	     */
 	    protected void tagLocation() {
 		// System.out.println(locator +" --- line " + lineno);
 		lmap.put(new Location(locator),
@@ -639,26 +670,43 @@ public class JSUtilities {
 
 	    int b;
 	    StringBuilder sb = new StringBuilder();
+	    /**
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     */
 	    protected long lineno = 1;
+	    /**
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     */
 	    protected int column = -1;
 
+	    /**
+	     * Get the column
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @return the column
+	     */
 	    protected int getColumn() {return column;}
 
 	    /**
 	     * Specify whether or not comments are allowed and what
 	     * their syntax is. The parsers prune out comments when
 	     * they are skipping over whitespace.
+	     * <P>
+	     * This enum is part of the implementation and is only
+	     * used internally.
 	     */
 	    protected enum CommentMode {
 		/**
 		 * Comments are not allowed.
 		 */
 		NONE,
-		/*
+		/**
 		 * Comments start with '//' and go to the end of the line.
 		*/
 		JS,
-		/*
+		/**
 		 * Comments start with '#' and go to the end of the line.
 		 */
 		YAML
@@ -679,6 +727,7 @@ public class JSUtilities {
 	    /**
 	     * Constructor.
 	     * @param r a reader.
+	     * @throws IOException if an IO error occurred
 	     */
 	    public Parser(Reader r) throws IOException {
 		this.r = r;
@@ -700,6 +749,8 @@ public class JSUtilities {
 
 	    /**
 	     * Read a character.
+	     * @return the next character
+	     * @throws IOException if an IO error occurred
 	     */
 	    protected int nextChar() throws IOException {
 		int prevb = b;
@@ -737,6 +788,7 @@ public class JSUtilities {
 	     * Read a string terminated by an EOL sequence,
 	     * which is not part of the string.
 	     * @return the string
+	     * @throws IOException an IO error occurred
 	     */
 	    protected String readLine() throws IOException {
 		StringBuilder sb = new StringBuilder();
@@ -762,6 +814,13 @@ public class JSUtilities {
 		return sb.toString();
 	    }
 
+	    /**
+	     * Determine if a string has a comment
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @param s a string
+	     * @return true if s has a comment; false otherwise
+	     */
 	    protected boolean hasComment(String s) {
 		int index = -1;
 		int len = s.length();
@@ -839,7 +898,8 @@ public class JSUtilities {
 	    /**
 	     * Get the object generated by a parser.
 	     * @return the object (a Boolean, Integer, Long, Double,
-	     *   JSArray, JSObject, or the value null)
+	     *         JSArray, JSObject, or the value null)
+	     * @throws IOException if an IO error occurred
 	     */
 	    public Object getResults() throws IOException {
 		return parseValueJS(null);
@@ -1020,7 +1080,11 @@ public class JSUtilities {
 	    }
 
 	    /**
-	     * Parse a JSON object.
+	     * Parse a YAML object.
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @param ydata YAML data
+	     * @return the parsed object
 	     * @exception IOException an error occurred
 	     */
 	    protected JSObject parseObject(YAML.Parser.YAMLData ydata)
@@ -1085,6 +1149,8 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a JSON array.
+	     * @param ydata YAML data
+	     * @return the parsed array
 	     * @exception IOException an error occurred
 	     */
 	    protected JSArray parseArray(YAML.Parser.YAMLData ydata)
@@ -1121,6 +1187,8 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a JSON string.
+	     * @return a string
+	     * @throws IOException if an IO error occurred
 	     */
 	    protected String parseString() throws IOException {
 		return parseString(false);
@@ -1411,6 +1479,9 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a JSON value.
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @return a parsed object
 	     * @exception IOException an error occurred
 	     */
 	    protected Object parseValue() throws IOException {
@@ -1419,8 +1490,10 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a JSON value with string mapping.
-	     * @param ydata a function that maps a string to an
-	     *        object
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @param ydata YAML data
+	     * @return the parsed object
 	     * @exception IOException an error occurred
 	     */
 	    protected Object parseValue(YAML.Parser.YAMLData ydata)
@@ -1430,7 +1503,14 @@ public class JSUtilities {
 	    }
 
 
-
+	    /**
+	     * Parse a value for JSON
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @param ydata YAML data
+	     * @return the parsed object
+	     * @throws IOException if an IO error occurred
+	     */
 	    protected Object parseValueJS(YAML.Parser.YAMLData ydata)
 		throws IOException
 	    {
@@ -1653,6 +1733,7 @@ public class JSUtilities {
 	 * @param is the input stream (containing a YAML value)
 	 * @param charsetName the name of the charset used by the input
 	 *        stream
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 * @exception UnsupportedEncodingException the charsetName does
@@ -1675,6 +1756,7 @@ public class JSUtilities {
 	 * @param is the input stream (containing a YAML value)
 	 * @param dec the charset decoder used to turn the
 	 *        input stream into a sequence of characters
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -1694,6 +1776,7 @@ public class JSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param is the input stream (containing a YAML value)
 	 * @param cs the charset for the input stream
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -1713,6 +1796,7 @@ public class JSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param buffer the input character sequence  (containing
 	 *        a YAML value)
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -1728,6 +1812,7 @@ public class JSUtilities {
 	 * {@link JSObject}, {@link JSArray}, {@link String},
 	 * {@link Number}, or {@link Boolean}.
 	 * @param s the input string (containing a YAML value)
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -1743,7 +1828,7 @@ public class JSUtilities {
 	 * {@link JSObject}, {@link JSArray}, {@link String},
 	 * {@link Number}, or {@link Boolean}.
 	 * @param r the reader
-	 * @return the object.
+	 * @return the object created
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -1914,6 +1999,9 @@ public class JSUtilities {
 	    /**
 	     * Determine if {@link #getResults()} can be called
 	     * again to obtain another object.
+	     * This method is part of the implementation and is only
+	     * used internally.
+	     * @return true if there are more values; false otherwise
 	     */
 	    public boolean hasNext() {
 		return termination == Termination.NOT_TERMINATED
@@ -2086,6 +2174,7 @@ public class JSUtilities {
 	    /**
 	     * Constructor.
 	     * @param r a reader.
+	     * @throws IOException if an IO error occurred
 	     */
 	    public Parser(Reader r) throws IOException {
 		super(r);
@@ -2096,6 +2185,8 @@ public class JSUtilities {
 	    /**
 	     * Constructor.
 	     * @param r a reader.
+	     * @param yamlTags YAML tag specifications
+	     * @throws IOException if an IO error occurred
 	     */
 	    public Parser(Reader r, TagSpec... yamlTags) throws IOException {
 		super(r);
@@ -3126,9 +3217,13 @@ public class JSUtilities {
 	     * the results returned by this method and is instead left
 	     * to the caller to handle. The nextIndent argument is the
 	     * value to use as the prevIndent value in a recursive call.
+	     * <P>
+	     * This method is part of the implementation and is only
+	     * used internally.
 	     * @param prevIndent the previous line indentation
 	     * @param nextIndent the next line indentation
-	     *
+	     * @return the object created by parsing
+	     * @throws IOException if an IO error occurred
 	     */
 	    protected Object parseValue(int prevIndent, int nextIndent)
 		throws IOException
@@ -3276,6 +3371,8 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a string.
+	     * This method is part of the implementation and is only
+	     * used internally.
 	     * @param isIdent true if the string is an identifier without
 	     *        double quotes; false otherwise
 	     * @return the string
@@ -3491,9 +3588,11 @@ public class JSUtilities {
 
 	    /**
 	     * Parse a string whose delimiters are single quotes.
+	     * This method is part of the implementation and is only
+	     * used internally.
 	     * @return the string
-	     * throws IOException an error occurred, typically due to the
-	     *        input stream being read
+	     * @throws IOException an error occurred, typically due to the
+	     *         input stream being read
 	     */
 	    protected String parseString1() throws IOException {
 		StringBuilder sb = new StringBuilder();

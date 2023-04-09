@@ -18,7 +18,7 @@ import javax.script.ScriptException;
  * The class also provides scripting-language support. If a Scripting
  * context is named <code>scripting</code>, the following EMCAScript
  * code will implement a function and its derivatives:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionTwo);
  *     ....
  *     // assume ourObject is a Java class with a method setFunction
@@ -33,10 +33,10 @@ import javax.script.ScriptException;
  *                deriv22At: function(x,y) {return -Math.sin(x) * Math.cos(y);}
  *               };
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Alternatively, one may use the following code where the functions
  * defining the derivatives are provided by name:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionTwo);
  *     ...
  *     function f(x,y) {return Math.sin(x) * Math.cos(y);}
@@ -52,7 +52,7 @@ import javax.script.ScriptException;
  *     funct = new RealValuedFunction(scripting, "f", "f1", "f2",
                                       "f11", "f12", "f21", "f22");
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     implements RealValuedFunctTwoOps
@@ -585,7 +585,8 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     /**
      * Get a function that computes the value of partial derivative
      * that would be computed by calling {@link derivAt(int,double...)}.
-     * @param i
+     * @param i an index in the range [0, 1] indicating the argument with
+     *        which to differentiate
      * @return the function
      */
     public final RealValuedFunctTwoOps deriv(int i) {

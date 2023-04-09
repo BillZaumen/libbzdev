@@ -24,6 +24,8 @@ public class Polynomials {
      * The length of the array a must be at least n+1.
      * @param a the polynomial's coefficients using a monomial basis.
      * @param n the degree of the polynomial
+     * @return an array containing the polynomial's coefficients using
+     *         a Bernstein basis.
      * @exception NullPointerException an argument was null
      * @exception IllegalArgumentException an array had the wrong size or
      *            the arguments offset or n had an incorrect value
@@ -43,13 +45,17 @@ public class Polynomials {
      * The length of the array a must be at least n+1 and the length
      * of the array beta, if not null, must be at least offset + n + 1.
      * if beta is null, the coefficients will start at the specified offset
-     * into the array beta.
+     * into the array beta, which will be allocated with a length of
+     * offset + n + 1.
      * @param beta an array that will contain the coefficients using a
      *        Bernstein basis; null if a new array will be allocated
      * @param offset the offset into the array for the 0th Bernstein
      *        coefficient
      * @param a the polynomial's coefficients using a monomial basis.
      * @param n the degree of the polynomial
+     * @return the first argument; a new array that contains the
+     *         coefficients using a Bernstein basis if the first argument
+     *         is null
      * @exception NullPointerException an argument was null
      * @exception IllegalArgumentException an array had the wrong size or
      *            the arguments offset or n had an incorrect value
@@ -686,6 +692,30 @@ public class Polynomials {
     {
 	return add(result, p1, n1, p2, n2, true);
     }
+
+    /**
+     * Add  two polynomials p<sub>1</sub>(x) and p<sub>2</sub>(x) given
+     * their coefficients, optionally pruning the results.
+     * Coefficients are order so that, for a polynomial
+     * p(x) = a<sub>0</sub> + a<sub>1</sub>x + ... + a<sub>n</sub>x<sup>n</sup>,
+     * the coefficient for the x<sup>i</sup> term is stored in an
+     * array at index i, thus making a<sub>0</sub> the first index in p's
+     * coefficient array.
+     * The size of the <CODE>result</CODE> array must be at least
+     *  max(n1+1, n2+1).
+     * <P>
+     * The polynomial may be optionally pruned: when the final coefficients
+     * are zero, those are eliminated from the polynomial by decreasing the
+     * degree that is returned.
+     * @param result an array of coefficients for the polynomial
+     *        p<sub>1</sub>(x)+p<sub>2</sub>(x)
+     * @param p1 the coefficients for p1
+     * @param n1 the degree of p1
+     * @param p2 the coefficients for p2
+     * @param n2 the degree of p2
+     * @param prune true if the result should be pruned; false otherwise
+     * @return the degree of the polynomial p<sub>1</sub>(x)+p<sub>2</sub>(x)
+     */
     public static int add(double[] result, double[] p1, int n1,
 			  double[] p2, int n2, boolean prune)
     {
@@ -715,6 +745,20 @@ public class Polynomials {
 	return n;
     }
 
+    /**
+     * Add two polynomials p<sub>1</sub>(x) and p<sub>2</sub>(x) represented
+     * using coefficients for a Bernstein basis.
+     * The size of the <CODE>result</CODE> array must be at least
+     *  max(n1+1, n2+1), and the basis used will be one appropriate for
+     * the degree returned.
+     * @param result an array of coefficients for the polynomial
+     *        p<sub>1</sub>(x)+p<sub>2</sub>(x)
+     * @param p1 the coefficients for p1
+     * @param n1 the degree of p1
+     * @param p2 the coefficients for p2
+     * @param n2 the degree of p2
+     * @return the degree of the polynomial p<sub>1</sub>(x)+p<sub>2</sub>(x)
+     */
     public static int bezierAdd(double[] result, double[] p1, int n1,
 				double[] p2, int n2)
     {
@@ -741,7 +785,7 @@ public class Polynomials {
      * the remainder
      * <P>
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy.
      * @param p1 the first polynomial (the dividend)
      * @param p2 the second polynomial (the divisor)
@@ -766,7 +810,7 @@ public class Polynomials {
      * quotient or the remainder
      * <P>
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy (this method is used
      * by the implementation of this operation for instances of
      * BezierPolynomial).
@@ -795,7 +839,7 @@ public class Polynomials {
      * the remainder.
      * <P>
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy.
      * @param q a polynomial used to store the quotient; null if
      *        the quotient is not wanted
@@ -851,7 +895,7 @@ public class Polynomials {
      * Divide one Bezier polynomial by another, computing both the quotient and
      * the remainder.
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy (this method is used
      * by the implementation of this operation for instances of
      * BezierPolynomial).
@@ -930,7 +974,7 @@ public class Polynomials {
      * The arrays that are returned should be checked to determine
      * numerical stability of any computation.  For example, the
      * following code
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *	int deg1 = 10;
      *	int deg2 = 1;
      *	double[] p1 = new double[deg1+1];
@@ -955,9 +999,9 @@ public class Polynomials {
      *
      *	int nq = Polynomials.divide(q, r, p1, deg1, p2, deg2);
      *	int nr = Polynomials.getDegree(r, deg1);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * will produce the following values for q and r:
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      * ... q[0] = -8.3546709168710031E18
      * ... q[1] = 9.6690064997045424E16
      * ... q[2] = -1.1190110014092871E15
@@ -969,7 +1013,7 @@ public class Polynomials {
      * ... q[8] = -2687.600364379947
      * ... q[9] = 29.71264968071789
      * ... r[0] = -1.1920075776082903E20
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * Due to a range of 20 orders of magnitude, the value for the
      * coefficients for p<sub>1</sub> and for the product qp<sub>2</sub>+r
      * will differ by amounts that may be comparable to p<sub>1</sub>'s

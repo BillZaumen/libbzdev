@@ -47,7 +47,6 @@ import org.bzdev.math.rv.*;
  * (the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html#object.type-org.bzdev.anim2d.AnimationShape2DFactory" target="ftable">object.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html">

@@ -104,11 +104,18 @@ public class DMClassLoader extends ClassLoader {
 	    });
     }
 
+    /**
+     * Constructor.
+     */
     public DMClassLoader() {
 	super();
 	checkCodeSource();
     }
 
+    /**
+     * Constructor.
+     * @param parent the parent class loader
+     */
     public DMClassLoader(ClassLoader parent) {
 	super(parent);
 	checkCodeSource();
@@ -184,6 +191,11 @@ public class DMClassLoader extends ClassLoader {
 	}
     }
 
+    /**
+     * Load a class.
+     * @param name the class name
+     * @param resolveIt true to resolve it; false otherwise
+     */
     protected Class<?> loadClass(String name, boolean resolveIt)
 	throws ClassNotFoundException
     {

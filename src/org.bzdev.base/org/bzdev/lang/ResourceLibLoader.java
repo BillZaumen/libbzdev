@@ -129,21 +129,21 @@ import org.xml.sax.Attributes;
  * <P>
  * The following code prints the order in which the software will search for
  * a shared-library resource:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *	org.bzdev.lang.ResourceLibLoader rl =
  *	      new org.bzdev.lang.ResourceLibLoader();
  *
- *	java.util.Iterator<String> it = rl.getResources("foo");
+ *	java.util.Iterator&lt;String&gt; it = rl.getResources("foo");
  *	while (it.hasNext()) {
  *	    System.out.println(it.next());
  *	}
  *  }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Will create list the following resource names on a Linux system
  * running Linux version 3.2.0-126-generic on an Intel i3 processor
  * (Java's os.arch system property reports amd64 instead of
    the correct x86_64):
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * libfoo-Linux-3.2.0-126-generic-amd64.so
  * libfoo-Linux-3.2-amd64.so
  * libfoo-Linux-amd64.so
@@ -156,7 +156,7 @@ import org.xml.sax.Attributes;
  * libfoo-Linux-3.2-i386.so
  * libfoo-Linux-i386.so
  * libfoo-i386.so
- * </pre></code></blaockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * The object files are stored as resources. For the example above, a
  * resource with one or more of the names listed above should be used
@@ -334,6 +334,12 @@ public class ResourceLibLoader {
      * Class constructor.
      * Uses the default configuration file in resource
      * org/bzdev/lang/rlibloader.xml
+     * @throws FactoryConfigurationError if ther was an XML factory
+     *         configuration error
+     * @throws SAXException if there was an SAX parser exception
+     * @throws IOException if there was an IO exception
+     * @throws ParserConfigurationException if a parser
+     *          configuration exception
      */
     public ResourceLibLoader() 
 	throws FactoryConfigurationError, SAXException, IOException,
@@ -345,8 +351,13 @@ public class ResourceLibLoader {
     /**
      * Class constructor configured via a resource
      * @param specResource the string naming a resource.
+     * @throws FactoryConfigurationError if ther was an XML factory
+     *         configuration error
+     * @throws SAXException if there was an SAX parser exception
+     * @throws IOException if there was an IO exception
+     * @throws ParserConfigurationException if a parser
+     *          configuration exception
      * @see ClassLoader#getResource(String)
-     *
      */
     public ResourceLibLoader(String specResource) 
 	throws FactoryConfigurationError, SAXException, IOException,
@@ -359,6 +370,12 @@ public class ResourceLibLoader {
      * Class constructor configured via a resource and option.
      * @param specResource the string naming a resource.
      * @param validating true to use a validating parser; false otherwise
+     * @throws FactoryConfigurationError if ther was an XML factory
+     *         configuration error
+     * @throws SAXException if there was an SAX parser exception
+     * @throws IOException if there was an IO exception
+     * @throws ParserConfigurationException if a parser
+     *          configuration exception
      * @see ClassLoader#getResource(String)
      */
      public ResourceLibLoader(String specResource, boolean validating)

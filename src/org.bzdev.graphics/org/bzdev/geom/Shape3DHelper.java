@@ -947,7 +947,7 @@ class Shape3DHelper {
      * to -1.0.  If two or three are set to -1.0, an exception will be thrown.
      * @param type the segment type ({@link SurfaceIterator#CUBIC_TRIANGLE},
      *        {@link SurfaceIterator#PLANAR_TRIANGLE}, or
-     *        {@link SurfaceIteraator#CUBIC_VERTEX})
+     *        {@link SurfaceIterator#CUBIC_VERTEX})
      * @param coords the control-point array for the segment
      * @param u the first parameter for the surface; -1 if the value of
      *        u should be computed from the other two parameters

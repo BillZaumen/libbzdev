@@ -341,6 +341,7 @@ public class AnimationPath2D extends AnimationObject2D {
      * lengths are non-negative.
      * @param u1 the parameter at the first end point of a subpath
      * @param u2 the parameter at the second end point of a subpath
+     * @return the length of the subpath
      * @exception IllegalStateException the path is not a simple path
      *            or the path was not set
      * @exception IllegalArgumentException the parameter is out of bounds
@@ -361,6 +362,7 @@ public class AnimationPath2D extends AnimationObject2D {
      * This is intended for cases where direction is important.
      * @param u1 the parameter at the first end point of a subpath
      * @param u2 the parameter at the second end point of a subpath
+     * @return the distance traversed on a subpath
      * @exception IllegalStateException the path is not a simple path
      * @exception IllegalArgumentException the parameter is out of bounds
      */
@@ -372,7 +374,7 @@ public class AnimationPath2D extends AnimationObject2D {
 	return path.getDistance(u1, u2);
     }
 
-    /*
+    /**
      * Get the distance along a path from its start for a specified
      * path parameter.
      * @param u the path parameter

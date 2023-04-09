@@ -78,6 +78,7 @@ import java.util.NoSuchElementException;
  *     {@link FormDataIterator hasNext()} is called. Otherwise an
  *     {@link java.lang.IllegalStateException IllegalStateException}
  *     will be thrown.
+ * </UL>
  */
 public class FormDataIterator implements Iterator<InputStream> {
 
@@ -507,9 +508,9 @@ public class FormDataIterator implements Iterator<InputStream> {
     /**
      * Constructor.
      * @param is an input stream containing the multipart/form-data object
-     * The boundary is typically obtained by reading the 'boundary'
-     * parameter of a multipart/form-data media type.
-     * @param boundary the boundary
+     * @param boundary the boundary, typically obtained by reading
+     *        the 'boundary' parameter of a multipart/form-data media type
+     * @exception IOException an IO error occurred
      */
     public FormDataIterator(InputStream is, String boundary)
 	throws IOException

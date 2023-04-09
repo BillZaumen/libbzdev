@@ -22,17 +22,15 @@ package org.bzdev.anim2d;
  *(the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html#object.type-org.bzdev.anim2d.AnimationShape2DFactory" target="ftable">object.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationShape2DFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
  * For example, with the <CODE>scrunner</CODE> command, one can use the
  * following ECMAScript code to create a shape:
- * <BLOCkQUOTE><CODE><PRE>
+ * <BLOCkQUOTE><PRE><CODE>
  *   scripting.importClass("org.bzdev.anim2d.Animation2D");
  *   scripting.importClass("org.bzdev.geom.Paths2D");
  *   Animation a2d = new Animation2D(scripting);
@@ -57,7 +55,7 @@ package org.bzdev.anim2d;
  *           {shape: circle2}
  *        ]}
  *   ]);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * In this example, paths are created directly and those paths are
  * used to define the outline for a shape.
  * @see AnimationShape2D

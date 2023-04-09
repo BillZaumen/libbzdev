@@ -5,7 +5,7 @@ import org.bzdev.math.rv.UniformBooleanRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of boolean value with a uniform distribution.
- * @see org.bzdev.math.rv.UniformBooleanRV;
+ * @see org.bzdev.math.rv.UniformBooleanRV
  */
 public class SimUniformBooleanRV extends SimBooleanRV<UniformBooleanRV>
 {

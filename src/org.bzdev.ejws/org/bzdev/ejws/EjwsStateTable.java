@@ -5,14 +5,24 @@ import java.util.HashMap;
 import org.bzdev.net.HttpSessionOps;
 
 
+/**
+ *  Ejws immplenation of the HttpSessionOps interface
+ */
 public class EjwsStateTable implements HttpSessionOps {
 
     Map<String,Object> map;
 
+    /**
+     * Constructor.
+     */
     public EjwsStateTable() {
 	map = new HashMap<String,Object>();
     }
 
+    /**
+     * Constructor specifying an internal table size.
+     * @param size the table size
+     */
     public EjwsStateTable(int size) {
 	map = new HashMap<String,Object>(size);
     }

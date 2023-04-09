@@ -7,9 +7,11 @@ import org.bzdev.math.rv.DoubleRandomVariableRV;
  * Named random variable using a random variable that generates a
  * sequence of double-precision numbers.
  * The type parameters are:
+ * <UL>
  *   <LI> RV - the type for the random variables generate.
  *   <LI> RVRV - the type of the random variable used to generate a
  *        sequence of random variables.
+ * </UL>
  */
 public abstract class SimDoubleRVRV
     <RV extends DoubleRandomVariable,

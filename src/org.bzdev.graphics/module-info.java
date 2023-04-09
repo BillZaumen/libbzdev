@@ -10,8 +10,6 @@
  * to map the names of keyboard keys to the corresponding Java
  * constants, and classes representing various types of curves
  * and classes to obtain data about paths.
- *
- * @moduleGraph
  */
 module org.bzdev.graphics {
     exports org.bzdev.geom;

@@ -32,6 +32,7 @@ public class DelayedFileInputStream {
     /**
      * Constructor given a file name.
      * @param name the name of the file to open for reading
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileInputStream(String name) throws FileNotFoundException {
 	this (name != null ? new File(name): null);
@@ -41,6 +42,7 @@ public class DelayedFileInputStream {
     /**
      * Constructor given a file.
      * @param file the file to open for reading.
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileInputStream(File file) throws FileNotFoundException {
 	String name = (file != null? file.getPath(): null);
@@ -63,6 +65,7 @@ public class DelayedFileInputStream {
      * The file actually opened is the file with the same canonical path name
      * as the file passed to the constructor.
      * @return the input stream for reading the file
+     * @exception FileNotFoundException the file could not be found
      */
     public synchronized InputStream open() throws FileNotFoundException {
 	    if (opened)

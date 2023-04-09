@@ -78,10 +78,8 @@ import java.security.*;
  * </pre></blockquote>
  *  is equivalent to
  * <blockquote><pre>
- * </pre></blockquote>
  *      factory.set("foo", 10);
  *      factory.set("bar", 20);
- * <blockquote><pre>
  * </pre></blockquote>
  * The following code
  * <blockquote><pre>
@@ -183,8 +181,8 @@ import java.security.*;
  * must be used with the same names and in the same order as in the
  * factory definition, and will generally differ from the type parameters
  * shown for the documentation for this class. As an example,
- * <A NAME="pmexample"></A>
- * <BLOCKQUOTE><CODE><PRE>
+ * <A ID="pmexample"></A>
+ * <BLOCKQUOTE><PRE><CODE>
  *     {@literal @}FactoryParmManager(value="AbstractFooFactoryPM")
  *     public abstract class AbstractFooFactory&lt;OBJ extends Foo&gt; {
  *        ...
@@ -194,17 +192,17 @@ import java.security.*;
  *           initParms(pm, AbstractFooFactory.class);
  *        }
  *     }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * would be appropriate for a factory for a subclass of some object
  * defined in the <code>anim2d</code> package --- the class created by the
  * annotation processor is defined as follows:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     class AbstractFooFactoryPM&lt;OBJ extends Foo&gt;
  *        extends ParmManager&lt;AbstractFooFactory&lt;Obj&gt;&gt;
  *     {
  *        ...
  *     }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * If the type for the ParmManager is not expressed exactly as shown
  * above, type-erasure issues will cause a compile-time error.
  * <P>
@@ -284,7 +282,7 @@ abstract public class NamedObjectFactory<
      * {@link IndexedSetter#setIndexed(NamedObjectFactory,int)} to
      * configure a factory, and use the return value to update an index
      * For example,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *       AnimationLayer2DFactory f = ...;
      *       IndexedSetter isetter = ...;
      *       int index = 0;
@@ -294,7 +292,7 @@ abstract public class NamedObjectFactory<
      *       } catch (ConfigException e) {
      *         ...
      *       }
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * <P>
      * This interface is used by some utility programs that can
      * generate Java code (e.g. the EPTS graphics editor).
@@ -312,10 +310,14 @@ abstract public class NamedObjectFactory<
 
     /**
      * Iterator returned by the factory method parmNames().
-     * This interface is provided due to type-erasure issues.
+     * This class is provided due to type-erasure issues.
      */
     public static class ParmNameIterator extends
 	EncapsulatingIterator<String,String> {
+	/**
+	 * Constructor.
+	 * @param it the encapsulated iterator
+	 */
 	public ParmNameIterator(Iterator<String> it) {
 	    super(it);
 	}
@@ -405,6 +407,7 @@ abstract public class NamedObjectFactory<
      * exception created with this method or the variant that specifies a key.
      * @param name the parameter name passed to an "add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, IllegalArgumentException e)
@@ -420,6 +423,7 @@ abstract public class NamedObjectFactory<
      * exception created with this method or the variant that specifies a key.
      * @param name the parameter name passed to an "add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, IllegalStateException e)
@@ -437,6 +441,7 @@ abstract public class NamedObjectFactory<
      * a key.
      * @param name the parameter name passed to an "add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, UnsupportedOperationException e)
@@ -455,6 +460,7 @@ abstract public class NamedObjectFactory<
      * @param name the parameter name passed to an "add" or "set" method
      * @param key the key or index passed to an 'add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, Object key,
@@ -473,6 +479,7 @@ abstract public class NamedObjectFactory<
      * @param name the parameter name passed to an "add" or "set" method
      * @param key the key or index passed to an 'add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, Object key,
@@ -491,6 +498,7 @@ abstract public class NamedObjectFactory<
      * @param name the parameter name passed to an "add" or "set" method
      * @param key the key or index passed to an 'add" or "set" method
      * @param e the exception
+     * @return a new exception
      */
     protected ConfigException
 	newConfigExceptionInstance(String name, Object key,
@@ -509,6 +517,7 @@ abstract public class NamedObjectFactory<
      * @param name the parameter name passed to an "add" or "set" method
      * @param key the key or index passed to an 'add" or "set" method
      * @param e the exception
+     * @return the new exception
      */
     static protected ConfigException
 	newConfigExceptionInstance(String name, Object key,
@@ -731,6 +740,7 @@ abstract public class NamedObjectFactory<
      * its object namer as its argument.
      * @param namer the object namer for the factory
      * @param className the fully-qualified class name of a factory.
+     * @return the new named object factory
      * @exception IllegalArgumentException the factory is not listed in
      *            a META-INF/services/org.bzdev.NamedObjectFactory resource
      *            or the class name does not refer to subclass of
@@ -775,6 +785,7 @@ abstract public class NamedObjectFactory<
      * its object namer as its argument.
      * @param namer the object namer for the factory
      * @param clazz the factory's class
+     * @return the new named object factory
      * @exception IllegalArgumentException the factory is not listed in
      *            a META-INF/services/org.bzdev.NamedObjectFactory resource
      *            or the class name does not refer to subclass of
@@ -970,6 +981,7 @@ abstract public class NamedObjectFactory<
      * The key map contains a single entry named "factories" whose value
      * is a list, each element of which is a key map returned by calling
      * {@link #getTemplateKeyMap() getTemplateKeyMap()} for a given factory.
+     * @param pattern the search pattern
      * @return the key map
      * @see #getTemplateKeyMap()
      */
@@ -1061,6 +1073,7 @@ abstract public class NamedObjectFactory<
      * The key map contains a single entry named "factories" whose value
      * is a list, each element of which is a key map returned by calling
      * {@link #getTemplateKeyMap() getTemplateKeyMap()} for a given factory.
+     * @param pattern the search pattern
      * @return a set of factories.
      * @see #getTemplateKeyMap()
      */
@@ -1645,6 +1658,7 @@ abstract public class NamedObjectFactory<
      *        Javadoc documentation. The class name and fragment must
      *        follow the same conventions used by javadoc.
      * </ul>
+     * @return the template-processor key map for this factory
      */
     public TemplateProcessor.KeyMap getTemplateKeyMap() {
 	TemplateProcessor.KeyMap keymap =
@@ -1950,6 +1964,7 @@ abstract public class NamedObjectFactory<
 
     /**
      * Get a parameter prefix of a compound parameter given the parameter name.
+     * @param parmName the name of the parameter
      * @return the parameter's prefix; null if it is not a compound parameter.
      */
     public String getParmPrefix(String parmName) {
@@ -2514,6 +2529,7 @@ abstract public class NamedObjectFactory<
     /**
      * Set the name of a resource specifying how a GUI should
      * configure this factory.
+     * @param resource the name for the resource
      */
     protected void setLayoutResource(String resource) {
 	layoutResource = resource;
@@ -2550,6 +2566,7 @@ abstract public class NamedObjectFactory<
     /**
      * Return the name of the resource specifying how a GUI should
      * configure this factory.
+     * @return the resource; null if there is none
      */
     public String getLayoutResource() {
 	return layoutResource;
@@ -3564,6 +3581,7 @@ abstract public class NamedObjectFactory<
      * or <code>add</code> methods, just <code>clear</code> methods.
      * A few such methods are provided in order to allow users to
      * conveniently clear a table.
+     * @param name the name of the paraemter
      * @return true if the parameter is clear only; otherwise false
      */
      public boolean isClearOnly(String name) {
@@ -4854,6 +4872,7 @@ abstract public class NamedObjectFactory<
     /**
      * Unset an entry with an index and restore it to the default value.
      * @param name the name of the entry
+     * @param index the index for the entry
      * @exception IllegalArgumentException the argument does
      *            not match an entry
      * @exception UnsupportedOperationException the factory
@@ -4874,6 +4893,7 @@ abstract public class NamedObjectFactory<
      * Unset an entry with a named-object key and restore it to the
      * default value.
      * @param name the name of the entry
+     * @param key the key
      * @exception IllegalArgumentException the argument does
      *            not match an entry
      * @exception UnsupportedOperationException the factory
@@ -4894,6 +4914,7 @@ abstract public class NamedObjectFactory<
      * Unset an entry with an enumeration key and restore it to the
      * default value.
      * @param name the name of the entry
+     * @param key the key for the entry
      * @exception IllegalArgumentException the argument does
      *            not match an entry
      * @exception UnsupportedOperationException the factory
@@ -4914,6 +4935,7 @@ abstract public class NamedObjectFactory<
      * Unset an entry with a compound key and restore it to the
      * default value.
      * @param name the name of the entry
+     * @param key the compound key for the entry
      * @exception IllegalArgumentException the argument does
      *            not match an entry
      * @exception UnsupportedOperationException the factory
@@ -12128,6 +12150,7 @@ abstract public class NamedObjectFactory<
     /**
      * Unset an entry with a key and restore it to the default value.
      * @param name the name of the entry
+     * @param key the key
      * @exception IllegalArgumentException the argument does
      *            not match an entry
      * @exception UnsupportedOperationException the factory
@@ -12729,9 +12752,9 @@ abstract public class NamedObjectFactory<
      * named getSimulation(). For a subclass of SimObjectFactory to
      * create a new object of type <code>Foo</code>, <code>newObject</code>
      * will execute the expression
-     * <code><pre>
+     * <pre><code>
      *      new Foo(getSimulation(), name, willIntern())
-     * </pre></code>
+     * </CODE></PRE>
      * or an equivalent expression, where <code>name</code>  is the
      * argument passed to <code>newObject</code>.
      * @param name the name of the object to be created
@@ -12765,6 +12788,7 @@ abstract public class NamedObjectFactory<
      * Subclasses should that override this method to provide
      * subclass-specific initializations must start with the statement
      * "<code>super.arrayInit(array, offset, n);</code>".
+     * @param <T> the type of the objects that are created
      * @param array an array of objects that were created and
      *        initialized
      * @param offset the starting point in the array
@@ -12785,6 +12809,7 @@ abstract public class NamedObjectFactory<
      * The default method does nothing.  Subclasses that override this
      * method to provide subclass-specific initializations must start
      * with the statement "<code>super.doAfterInits(object);"</code>.
+     * @param object the object whose initialization is to be completed
      */
     protected void doAfterInits(OBJ object) {}
 
@@ -12888,9 +12913,11 @@ abstract public class NamedObjectFactory<
     /**
      * Create named objects with the names generated by the factory and
      * the number of objects determined by an array size.
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored if large enough; otherwise a new array of the same
      *        type is allocated
+     * @return the objects that were created
      * @throws  ArrayStoreException if the runtime type of the specified array
      *          is not a supertype of the runtime type of every object
      *          created
@@ -12905,6 +12932,7 @@ abstract public class NamedObjectFactory<
      * Create named objects with the names generated by the factory.
      * Generally this method should not be overridden as each object is actually
      * created by newObject().
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored if large enough; otherwise a new array of the same
      *        type is allocated
@@ -12926,6 +12954,7 @@ abstract public class NamedObjectFactory<
      * created by newObject().
      * This method is intended for cases in which multiple calls to
      * createObjects will be used to add entries to an array.
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored
      * @param offset the offset into the array at which to start
@@ -12945,11 +12974,13 @@ abstract public class NamedObjectFactory<
 
     /**
      * Create named objects with the number of objects determined by an array.
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored if large enough - otherwise a new array of the same
      *        type is allocated; object names will consist of
      *        a root name, followed by an "_", followed by a number
      * @param root the root of a name
+     * @return the objects that were created
      * @throws  ArrayStoreException if the runtime type of the specified array
      *          is not a supertype of the runtime type of every object
      *          created
@@ -12963,6 +12994,7 @@ abstract public class NamedObjectFactory<
      * Create named objects.
      * Generally this method should not be overridden as each object is actually
      * created by newObject().
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored if large enough; otherwise a new array of the same
      *        type is allocated; object names will consist of
@@ -13006,6 +13038,7 @@ abstract public class NamedObjectFactory<
      * created by newObject().
      * This method is intended for cases where multiple calls to
      * createObjects will be used to add entries to an array.
+     * @param <T> the type of the created objects
      * @param array the array into which the created objects are to be
      *        stored; object names will consist of
      *        a root name, followed by an "_", followed by a number

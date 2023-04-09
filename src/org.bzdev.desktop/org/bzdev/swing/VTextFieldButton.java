@@ -16,7 +16,7 @@ import java.awt.event.*;
  * The implementation of this method should either correct the error
  * or provide the user with enough information that the user will not
  * assume that the value was changed. Some classes such as
- * {@linkPortTextField} have implemented this method in this way. The text
+ * {@link PortTextField} have implemented this method in this way. The text
  * field will respond to the ESCAPE character by aborting a change and
  * keeping the previous value.  The character RETURN (or ENTER) will
  * accept the input as long as it is valid. An OK or CANCEL button can
@@ -28,7 +28,7 @@ import java.awt.event.*;
  * keyboard focus.
  * <P>
  * The following code provides an example of how this class can be used:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * JFrame frame = ...;
  * JMenubar menubar = ...;
  * ...
@@ -53,7 +53,7 @@ import java.awt.event.*;
  * fileMenu.add(portMenuItem);
  * ...
  * menubar.add(fileMenu);
- * </PRE></CODE></BLOCkQUOTE>
+ * </CODE></PRE></BLOCkQUOTE>
  */
 public class VTextFieldButton extends JButton {
     JDialog dialog;
@@ -119,7 +119,7 @@ public class VTextFieldButton extends JButton {
 	    });
     }
  
-    /*
+    /**
      * Constructor given a {@link Dialog} owner.
      * @param owner the window on which a dialog box should be centered
      * @param tf the text field
@@ -138,7 +138,7 @@ public class VTextFieldButton extends JButton {
 	finishInit(owner, tf, msg);
     }
 
-    /*
+    /**
      * Constructor given a {@link Frame} owner.
      * @param tf the text field
      * @param label the menu label
@@ -157,7 +157,7 @@ public class VTextFieldButton extends JButton {
 	finishInit(owner, tf, msg);
     }
 
-    /*
+    /**
      * Constructor given a {@link Window} owner.
      * @param tf the text field
      * @param label the menu label

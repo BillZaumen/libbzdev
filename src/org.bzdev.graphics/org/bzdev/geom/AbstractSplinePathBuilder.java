@@ -45,10 +45,17 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 
     ScriptingContext parent = null;
 
+    /**
+     * Constructor.
+     */
     protected AbstractSplinePathBuilder() {
 	super();
     }
 
+    /**
+     * Constructor given a parent.
+     * @param parent the parant scripting context.
+     */
     protected AbstractSplinePathBuilder(ScriptingContext parent) {
 	super(parent);
 	this.parent = parent;

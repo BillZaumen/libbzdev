@@ -43,7 +43,7 @@ import org.bzdev.lang.MathOps;
  * Then create the RootFinder:
  * <pre><code>
  *    Parameters parameters = new Parameters(1.0, 2.0);
- *    RootFinder<Parameters> rf = new RootFinder.Newton<Parameters>(parameters)
+ *    RootFinder&lt;Parameters&gt; rf = new RootFinder.Newton&lt;Parameters&gt;(parameters)
  *       {
  *          public double function(double x) {
  *             Parameters p = getParameters();
@@ -108,6 +108,7 @@ public abstract class RootFinder<P> {
      * and with the initial arguments that solve requires (which depend on
      * the root-finding algorithm being used).
      * @param initialArgs the initial arguments required by a subclass
+     * @return the root
      * @exception RootFinder.ConvergenceException the method failed to converge
      * @exception MathException an error occurred calling the function f or
      *            one of its derivatives.
@@ -124,6 +125,7 @@ public abstract class RootFinder<P> {
      * x that satisfies f(x, p) = y, where p represents the current parameters.
      * @param y the desired value of f(x, p)
      * @param initialArgs the initial arguments required by a subclass
+     * @return the value of x that satisfies f(x, p) = y
      * @exception RootFinder.ConvergenceException the method failed
      * @exception MathException an error occurred calling the function f or
      *            one of its derivatives.
@@ -144,6 +146,9 @@ public abstract class RootFinder<P> {
 	this.parameters = parameters;
     }
 
+    /**
+     * The iteration limit.
+     */
     protected int maxLimit = 128;
 
     /**
@@ -415,6 +420,7 @@ public abstract class RootFinder<P> {
 	 * {@link RealValuedFunction#secondDerivAt(double)} do not have
 	 * to be implemented as these are not used.
 	 * @param f a function
+	 * @return a new root finder
 	 */
 	public static Brent newInstance(final RealValuedFunctOps f) {
 	    return new Brent() {
@@ -437,6 +443,7 @@ public abstract class RootFinder<P> {
 	 * to be implemented as these are not used.
 	 * @param f a function
 	 * @param ef a function providing the error for f(x)
+	 * @return a new root finder
 	 */
 	public static Brent newInstance(final RealValuedFunctOps f,
 					final RealValuedFunctOps ef)
@@ -1029,6 +1036,7 @@ public abstract class RootFinder<P> {
 	 * method does not have to be implemented as this method is
 	 * not used.
 	 * @param f a function
+	 * @return a new root finder
 	 */
 	public static Newton newInstance(final RealValuedFunction f) {
 	    return new Newton() {
@@ -1054,6 +1062,7 @@ public abstract class RootFinder<P> {
 	 * not used.
 	 * @param f a function
 	 * @param ef a function providing the error for the value f(x)
+	 * @return a new root finder
 	 */
 	public static Newton newInstance(final RealValuedFunction f,
 					 final RealValuedFunctOps ef)
@@ -1082,6 +1091,7 @@ public abstract class RootFinder<P> {
 	 * function and its first derivative.
 	 * @param f the function for the root finder
 	 * @param df the derivative of f
+	 * @return a new root finder
 	 */
 	public static Newton newInstance(final DoubleUnaryOperator f,
 					 final DoubleUnaryOperator df)
@@ -1098,7 +1108,7 @@ public abstract class RootFinder<P> {
 	    };
 	}
 
-	/*
+	/**
 	 * Create a new instance of RootFinder.Newton using
 	 * an instance of  {@link DoubleUnaryOperator}
 	 *  or {@link RealValuedFunctOps}
@@ -1107,6 +1117,7 @@ public abstract class RootFinder<P> {
 	 * @param f the function for the root finder
 	 * @param df the derivative of f
 	 * @param ef a function providing the error in the computation of f
+	 * @return a new root finder
 	 */
 	public static Newton newInstance(final DoubleUnaryOperator f,
 					 final DoubleUnaryOperator df,
@@ -1396,6 +1407,7 @@ public abstract class RootFinder<P> {
 	 * a {@link RealValuedFunction} to provide the root finder's function
 	 * and that function's first and second derivative.
 	 * @param f a function
+	 * @return the new root finder
 	 */
 	public static Halley newInstance(final RealValuedFunction f) {
 	    return new Halley() {
@@ -1420,6 +1432,7 @@ public abstract class RootFinder<P> {
 	 * to provide the error.
 	 * @param f a function
 	 * @param ef a function providing the error in the value f(x)
+	 * @return a new root finder
 	 */
 	public static Halley newInstance(final RealValuedFunction f,
 					 final RealValuedFunctOps ef)
@@ -2676,6 +2689,7 @@ public abstract class RootFinder<P> {
     /**
      * Find the zeros of a {@link Polynomial}.
      * @param p the polynomial
+     * @param res an array to hold the results
      * @return the number of roots; -1 if the degree of the
      *         polynomial is zero.
      * @exception IllegalArgumentException if the array
@@ -5528,6 +5542,7 @@ public abstract class RootFinder<P> {
     /**
      * Find the zeros of a {@link BezierPolynomial}.
      * @param p the polynomial
+     * @param res an array to hold the results
      * @return the number of roots; -1 if the degree of the
      *         polynomial is zero.
      * @exception IllegalArgumentException if the array

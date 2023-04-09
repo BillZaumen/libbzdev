@@ -2047,41 +2047,40 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * <P>
      * Inner classes of the class imported are accessible using the
      * normal dot (".") notation. For example,
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.awt.geom.Path2D");
      *      scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will create an ECMAScript object stored in a variable named
      * Path2D, and the ECMAScript expression Path2D.Double will refer
      * to the class java.awt.geom.Path2D.Double.  In addition, the
      * ECMASCript <code>new</code>operator can be used to create
      * new instances:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.awt.geom.Path2D");
      *      scripting.finishImport();
      *      path = new Path2D.Double();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * <P>
      * As a second example,
-     * <P>
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.util.Locale.Category")
      *      scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will create an ECMAScript variable named Category whose value
      * is the enumeration class java.util.Locale.Category.
      * <P>
      * Note: even for the same scripting language, the type of object
      * created will depended on the specific implementation in use.
      * @param className the fully-qualified name of the class
-     * @exception ClassNotfoundException if the class could not be found
+     * @exception ClassNotFoundException if the class could not be found
      * @exception IllegalArgumentException if the method detected a syntax
      *            error in the package name or class name
      * @exception NullPointerException if the class name was null
      * @exception UnsupportedOperationException this operation is not
      *            supported (could not add a class to the scripting
      *            environment)
-     * @exception ScriptExtension an error occurred executing a script
+     * @exception ScriptException an error occurred executing a script
      * @see #finishImport()
      */
     public void importClass(String className)
@@ -2153,39 +2152,37 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * <P>
      * Inner classes of the class imported are accessible using the
      * normal dot (".") notation. For example,
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.awt.geom", "Path2D")
      *      scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will create an ECMAScript object stored in a variable named
      * Path2D, and the ECMAScript expression Path2D.Double will refer
      * to the class java.awt.geom.Path2D.Double. In addition, the
      * ECMASCript <code>new</code>operator can be used to create
      * new instances:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.awt.geom.Path2D");
      *      scripting.finishImport();
      *      path = new Path2D.Double();
-     * </pre></code></blockquote>
-     * <P>
+     * </CODE></PRE></blockquote>
      * As a second example,
-     * <P>
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      scripting.importClass("java.util", "Locale.Category")
      *      scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will create an ECMAScript variable named Category whose value
      * is the enumeration class java.util.Locale.Category.
      * @param packageName the name of the class' package.
      * @param className the class's name, excluding its package name
-     * @exception ClassNotfoundException if the class could not be found
+     * @exception ClassNotFoundException if the class could not be found
      * @exception IllegalArgumentException if the method detected a syntax
      *            error in the package name or class name
      * @exception NullPointerException if the class name was null
      * @exception UnsupportedOperationException this operation is not
      *            supported (could not add a class to the scripting
      *            environment)
-     * @exception ScriptExtension an error occurred executing a script
+     * @exception ScriptException an error occurred executing a script
      * @see #finishImport()
      */
     public void importClass(String packageName, String className)
@@ -2249,9 +2246,9 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * Java-8 uses the Nashhorn ECMAScript implementation, which does
      * not contain these two functions, allows them to be defined by
      * calling
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *       load("nashorn:mozilla_compat.js");
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * but this function call will fail when the Rhino script engine
      * is used as the specified ECMAScript file will not be found.
      * <P>
@@ -2274,25 +2271,25 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * this class when scrunner is used), and if it uses ECMAScript,
      * the following script fragment will import several classes from
      * the anim2d package:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *   scripting.inputClasses("org.bzdev.anim2d",
      *                          ["Animation2D",
      *                           "AnimationLayer2D",
      *                           "GraphView]);
      *   scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * The classes imported will be the classes <code>Animation2D</code>,
      * <code>AnimationLayer2D</code>, and <code>GraphView</code>, stored
      * using variables with the same names respectively.
      * The ECMAScript expressions that refer to the inner classes are
      * AnimationLayer2D.Type and GraphView.ZoomMode (both are enumerations).
      * Similarly, the statement
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *   scripting.inputClasses("org.bzdev.anim2d",
      *                          ["AnimationLayer2D.Type",
      *                           "GraphView.ZoomMode]);
      *   scripting.finishImport();
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will define ECMAScript variables named Type and ZoomMode and
      * their values represent the enumeration classes
      * org.bzdev.anim2d.AnimationLayer2D.Type and
@@ -2305,7 +2302,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      * As an aside, the ECMA scripting engine that comes with Java 7 and
      * Java 8 allow one to construct an object named JavaImporter, with
      * packages provided as arguments. For example,
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *
      *      classes = new JavaImporter(java.util, java.io);
      *      ...
@@ -2313,7 +2310,7 @@ public class ExtendedScriptingContext extends ScriptingContext {
      *         var list = new LinkedList();
      *         ...
      *      }
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * <P>
      * There is a recommendation to use JavaImporter to minimize the
      * size of the scripting engine's global name space. This

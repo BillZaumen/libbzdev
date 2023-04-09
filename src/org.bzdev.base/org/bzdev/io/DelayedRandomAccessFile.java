@@ -41,6 +41,7 @@ public class DelayedRandomAccessFile {
      * @param name the name of the file to open
      * @param mode the access mode
      * @see java.io.RandomAccessFile
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedRandomAccessFile(String name, String mode)
 	throws FileNotFoundException
@@ -57,6 +58,7 @@ public class DelayedRandomAccessFile {
      * {@link java.io.RandomAccessFile RandomAccessFile}.
      * @param file the file to open
      * @param mode the access mode
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedRandomAccessFile(File file, String mode)
 	throws FileNotFoundException
@@ -93,6 +95,7 @@ public class DelayedRandomAccessFile {
      * The file actually opened is the file with the same canonical path name
      * as the file passed to the constructor.
      * @return the output stream for reading the file
+     * @exception FileNotFoundException the file could not be found
      */
     public synchronized RandomAccessFile open() throws FileNotFoundException {
 	if (opened)

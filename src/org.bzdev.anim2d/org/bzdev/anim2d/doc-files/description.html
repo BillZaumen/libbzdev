@@ -3,17 +3,17 @@
 <HEAD>
   <title>The org.bzdev.anim2d Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<P>
-<H2>The org.bzdev.anim2d package</H2>
+<H1>The org.bzdev.anim2d package</H1>
 
 Please see the <A HREF="#scripting">scripting example</A> section for
 an example.
 
-<H3>Introduction</H3>
+<H2>Introduction</H2>
 
 As described in the
 <A HREF="../package-summary.html">package summary</A>, this package,
@@ -22,7 +22,7 @@ dimensional animations, typically "stick figures" or simple graphics
 although any level of complexity is possible.  The class hierarchy is
 illustrated in the following diagram:
 <P style="text-align: center">
-<img src="anim2d.png" class="imgBackground">
+<img src="anim2d.png" class="imgBackground" alt="Diagram">
 <P>
 Factory classes are mostly abstract and make use of generics
 with a type parameter named Obj that extends the class paired
@@ -57,7 +57,7 @@ classes are CartesianGrid2D and PolarGrid, which add a grid to
 an animation, often as a reference aid while an animation is being
 developed.
 
-<H3><A NAME="scripting"></A>Scripting example</H3>
+<H2><A ID="scripting"></A>Scripting example</H2>
 
 When scripting is used, animation objects are typically created
 using factories: a concise notation using scripting-language objects
@@ -76,27 +76,27 @@ scripting-language implementation to another, even for the
 same language, so having a standard method makes scripts
 more portable. It is also useful to set a variable that will
 allow one to write to standard output, again for similar reasons:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 scripting.importClass("org.bzdev.anim2d.Animation2D");
 scripting.importClass("org.bzdev.anim2d.KinematicOps2D");
 scripting.importClass("org.bzdev.swing.AnimatedPanelGraphics");
 scripting.importClass("org.bzdev.util.units.MKS");
 var out = scripting.getWriter();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 If the ESP scripting language is used, the 'scripting' statements
 should be followed by
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 ###
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 so that the imports are processed before the rest of the file is
 scanned.  Alternatively, for ESP, one may use its 'import' statement:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import (org.bzdev.anim2d.Animation2D);
 import (org.bzdev.anim2d.KinematicOps2D);
 import (org.bzdev.swing.AnimatedPanelGraphics);
 import (org.bzdev.util.units.MKS);
 var out = scripting.getWriter();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 in which case the line with '###' is not needed.
 <P>
 The next step is to create an animation. The construct uses the
@@ -128,7 +128,7 @@ set up by calling
 When scale factors are measured off of an image, the program EPTS can
 be used to determine the distances in user space between two points whose
 separation in graph-coordinate space is known.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 
 
 var frameWidth= 656.0;
@@ -140,7 +140,7 @@ var dist = MKS.feet(23.0);
 var scalef = idist / dist;
 
 a2d.setRanges(0.0, 0.0, 0.0, 0.0, scalef, scalef);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The variable <CODE>da</CODE>, when set, will usually be set by the scrunner
 program based on a command-line argument.  Its value will be a
 directory accessor. If a directory accessor is defined,
@@ -151,21 +151,21 @@ handles the case where <CODE>da</CODE> is not defined by a variable
 The class {@link org.bzdev.swing.AnimatedPanelGraphics} provides a GUI
 component in which an animation can be displayed. The ECMAScript code
 is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 
 if (typeof da === 'undefined') {
     var apg = AnimatedPanelGraphics.newFramedInstance(a2d,
 						      "Roundabout",
 						      true, true, null);
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 whereas the corresponding ESP code is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 
 var apg = var.da? null:
     AnimatedPanelGraphics.newFramedInstance(a2d, "Roundabout",
 				            true, true, null);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
 To configure an animation, one will need several factories. The
 following code creates factories by using the method
@@ -177,7 +177,7 @@ the name of an ECMAScript variable that will reference the factor and
 where the property's value is a string giving a simple name for the
 class.
 
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 a2d.createFactories("org.bzdev.anim2d", {
     alf: "AnimationLayer2DFactory",
     pathf: "AnimationPath2DFactory"
@@ -186,12 +186,12 @@ a2d.createFactories("org.bzdev.anim2d", {
 a2d.createFactories("org.bzdev.roadanim", {
     cf: "CarFactory",
 });
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Because the createFactories method creates new scripting-language
 variables, when using ESP these statements should be followed by
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 ###
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 in order to create the variables before proceeding.
 <P>
 Next the factories are used to create objects that will appear in the
@@ -207,7 +207,7 @@ The code then creates a background image using a PNG file with the
 appropriate scaling. The URL searches for a resource given a search
 path containing directories and/or JAR files that is set up on the
 <CODE>scrunner</CODE> command line.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 var BLUE = {red: 0, green: 0, blue: 255};
 var iscale = (dist/idist);
 
@@ -221,13 +221,13 @@ alf.createObject("background", [
 	 imageScaleX: iscale, imageScaleY: iscale}
 ]}]);
 
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 A path that an object will follow is defined as well: the
 variable <CODE>path1pts</CODE> contains the path specification
 and is used by a factory to create the actual path.  In addition,
 some variables are defined for common configuration options that
 will be used later.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 var pathConfig = [
     {withPrefix: "color", config: BLUE},
     {withPrefix: "stroke", config: {width: 2.0, gcsMode: false}}
@@ -261,13 +261,13 @@ var path1 = pathf.createObject("path1", [
     pathConfig,
     {withPrefix: "cpoint", withIndex: path1pts}]);
 
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The next step is to create an animation object named <CODE>car</CODE>
 a few useful variables are defined, and are used in the <CODE>car</CODE>
 object's timeline.  Timelines are used to configure an object so that
 the object's properties change at a specific time.
 
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 var toff = 0.2
 var t1 = 0.2;
 
@@ -289,7 +289,7 @@ cf.createObject("car1", [
 	{time: t1+2*tau+toff, acceleration: 0.0, velocity: MKS.mph(25)}
     ]}
 ]);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Finally, some methods are used to estimate the number of frames
 needed, the simulation is configured to accept that many frames,
 and the frames are added to the simulation. If the variable
@@ -297,7 +297,7 @@ and the frames are added to the simulation. If the variable
 is not defined), the corresponding object is closed.  Closing it
 indicates that all the frames it needs are ready so the animation can
 start running.  The ECMAScript code is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 var itau = 20.0;
 var maxframes = a2d.estimateFrameCount(itau);
 if (typeof da === 'undefined') {
@@ -312,9 +312,9 @@ a2d.run();
 if (!(typeof apg === 'undefined')) {
     apg.close();
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 whereas the ESP code is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 var itau = 20.0;
 var maxframes = a2d.estimateFrameCount(itau);
 var.da? a2d.initFrames(maxframes, "img", "png", da):
@@ -325,20 +325,20 @@ a2d.scheduleFrames(0, maxframes);
 a2d.run();
 
 var.da? void: apg.close();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 To run this script, use
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 	scrunner -Dorg.bzdev.protocols.resource.path=images \
 		 --codebase .../librdanim.jar  <U>FILE</U>
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 or
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       mkdir -p tmp2
       rm -r tmp2/*.png
       scrunner -Dorg.bzdev.protocols.resource.path=images \
 		 --codebase .../librdanim.jar -d:da tmp2  <U>FILE</U>
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where <CODE><U>FILE</U></CODE> is video2.js if ECMAScript is used or
 video2.esp if ESP is used.
 The first option runs the animation without a directory accessor.

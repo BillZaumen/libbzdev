@@ -23,7 +23,7 @@ import java.lang.annotation.*;
  *    }
  *
  *    {@literal @}FactoryParmManager("OurFactoryParmManager")
- *    public class OurFactory<Obj extends NamedObject1> extends ... {
+ *    public class OurFactory&lt;Obj extends NamedObject1&gt; extends ... {
  *       {@literal @}KeyedCompoundParm("map")
  *       Map&lt;OurNamedObject,MapValue&gt; hashmap = new HashMap&lt;&gt;();
  *       ...
@@ -48,6 +48,7 @@ import java.lang.annotation.*;
  * </pre></blockquote>
  * will create the entries show in the following table:
  * <table>
+ *  <caption>&nbsp;</caption>
  *  <tr><th>key</th><th>object.size</th><th>object.base</th></tr>
  *  <tr><td>1</td><td>10</td><td>20</td></tr>
  *  <tr><td>2</td><td>10</td><td>0</td></tr>
@@ -77,8 +78,8 @@ import java.lang.annotation.*;
  *    }
  *
  *    {@literal @}FactoryParmManager("OurFactory2ParmManager")
- *    public class OurFactory2<Obj extends NamedObject2>
- *       extends OurFactory<Obj>
+ *    public class OurFactory2&lt;Obj extends NamedObject2&gt;
+ *       extends OurFactory&lt;Obj&gt;
  *    {
  *       {@literal @}KeyedCompoundParm("map")
  *       Map&lt;OurNamedObject,MapValue2&gt; hashmap2 = new HashMap&lt;&gt;();
@@ -96,9 +97,10 @@ import java.lang.annotation.*;
  * </pre></blockquote>
  * will result in the values in the following table:
  * <table>
- *  <tr><th>key</th><th>object.size</th><th>object.base</th>
+ *  <caption>&nbsp;</caption>
+  *  <tr><th>key</th><th>object.size</th><th>object.base</th>
  *       <th>object.size2</th><th>object.base2</th></tr>
- *  <tr><td>1</td><td>10</td><td>20<td><td>100</td><td>200</td></tr4>
+ *  <tr><td>1</td><td>10</td><td>20<td><td>100</td><td>200</td></tr>
  *  <tr><td>2</td><td>10</td><td>0<td><td>100</td><td>200</td></tr>
  *  <tr><td>3</td><td>10</td><td>30<td><td>100</td><td>200</td></tr>
  * </table>
@@ -113,11 +115,13 @@ import java.lang.annotation.*;
 public @interface KeyedCompoundParm {
     /**
      * The name of the key.
+     * @return the name of the key
      */
     String value();
     /**
      * The delimiter separating the key's name from one of its value's
-     * names. The delimiter must not be "."
+     * names.
+     * @return the delimiter
      */
     String delimiter() default ".";
 }

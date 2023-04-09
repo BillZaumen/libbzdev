@@ -1153,8 +1153,8 @@ public class SplinePath2D extends Path2D.Double {
      * implicit moveTo operation to this point. The point specified by
      * the last elements in the x and y arrays should not repeat this
      * initial point.  The implicit moveTo may result in the path
-     * containing multiple moveTo segments back to back.  * @param x
-     * the x coordinates to use, one for each knot
+     * containing multiple moveTo segments back to back.
+     * @param x the x coordinates to use, one for each knot
      * @param y the y coordinates to use, one for each knot
      * @exception IllegalArgumentException the arguments were illegal, typically
      *            because the lengths of the arrays differ

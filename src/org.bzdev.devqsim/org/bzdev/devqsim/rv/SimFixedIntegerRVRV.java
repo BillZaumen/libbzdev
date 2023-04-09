@@ -6,7 +6,7 @@ import org.bzdev.math.rv.FixedIntegerRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of integer-valued random variables with a fixed distribution.
- * @see org.bzdev.math.rv.FixedIntegerRV;
+ * @see org.bzdev.math.rv.FixedIntegerRV
  */
 public class SimFixedIntegerRVRV
     extends SimIntegerRVRV<FixedIntegerRV,FixedIntegerRVRV>

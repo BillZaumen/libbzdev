@@ -79,6 +79,7 @@ public interface ONLauncherProvider extends ONLauncherData
     /**
      * Get the class for the {@link ObjectNamerLauncher} that this
      * this provider will help create.
+     * @return the class
      */
     Class<? extends ObjectNamerLauncher> onlClass();
 }

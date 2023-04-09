@@ -235,7 +235,6 @@ public class NurbsArray extends VectorValuedFunction {
      * <blockquote>
      * &nbsp;&nbsp;&nbsp;&nbsp; m - p - 1 = n.
      * </blockquote>
-
      * where each control point and weight consists of 1 + &lt;the
      * number of dimension&gt; double-precision numbers. For each control
      * point and weight, the array contains the coordinates of the
@@ -282,6 +281,7 @@ public class NurbsArray extends VectorValuedFunction {
      * </ul>
      * Note: Copying of control points must be considered when fitting
      * a periodic spline to a function or a set of data points.
+     * @param dim the dimension of the vector
      * @param degree a non-negative integer giving the  degree of the
      *        NURBS to be constructed
      * @param knots the knots for the NURBS to be constructed

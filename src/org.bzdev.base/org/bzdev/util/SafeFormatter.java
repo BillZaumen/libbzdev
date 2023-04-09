@@ -451,6 +451,11 @@ public final class SafeFormatter {
 	return sb.toString();
     }
 
+    /**
+     * Get a count of the number of formatting directivves in a format string
+     * @param format the format string
+     * @return the number of formatting directives
+     */
     public static int getDirectiveCount(String format) {
 	int count = 0;
 	Matcher m = p.matcher(format);

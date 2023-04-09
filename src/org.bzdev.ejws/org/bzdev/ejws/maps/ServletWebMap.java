@@ -29,23 +29,23 @@ public class ServletWebMap extends WebMap {
      * an instance of {@link ServletWebMap}. The constructor's
      * arguments provide
      * <UL>
-     *   <IT><B>a servlet adapter.</B> This object determines the behavior
+     *   <LI><B>a servlet adapter.</B> This object determines the behavior
      *       of a {@link ServletWebMap}. Its interface is designed so that
      *       it can plugged into a servlet designed as a 'wrapper' class,
      *       in addition to its use with
      *       {@link org.bzdev.ejws.EmbeddedWebServer} so that the same
      *       code can be used in both environments.
-     *   <IT><B>a parameter map.</B> This is a {@link java.util.Map map}
+     *   <LI><B>a parameter map.</B> This is a {@link java.util.Map map}
      *     whose keys and values are both strings. It is used to provide
      *     data for configuring a servlet adapter. These parameters should
      *     have the same keys as those that would be used by the
      *     ServletConfig method getInitParameters when configuring a servlet.
-     *   <IT><B>a flag.</B> The value is 'true' if the servlet adapter
+     *   <LI><B>a flag.</B> The value is 'true' if the servlet adapter
      *     uses the 'query' field in a URL or URI, and false
      *     otherwise. When false, {@link org.bzdev.ejws.FileHandler}
      *     will automatically generate a 404 response code if a query
      *     is present.
-     *   <IT><B>a variable number of HTTP methods.</B> These list the
+     *   <LI><B>a variable number of HTTP methods.</B> These list the
      *        HTTP methods that are supported. If no methods are provided
      *        a default is used.
      * </UL>

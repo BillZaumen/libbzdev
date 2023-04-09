@@ -41,7 +41,7 @@ import javax.swing.event.AncestorEvent;
  * </code></blockquote>
  * If access to the text field is needed, one can use a constructor
  *  that explicitly provides the text field.  For example:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * public class Application {
  *    JFrame appFrame;
  *    String value = "";
@@ -63,7 +63,7 @@ import javax.swing.event.AncestorEvent;
  *      ...
  *    }
  * }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * IF the text field is a subclass of {@link VTextField}, the class
  * {@link VTextFieldButton} should be used instead as methods such as

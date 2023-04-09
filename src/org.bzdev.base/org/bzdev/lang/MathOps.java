@@ -229,7 +229,7 @@ public class MathOps {
      * one cast a double-precision method to an integer and
      * {@link Math#round(double)} returns a long integer.
      * @param value the value to round
-     * @retun the value rounded to the nearest integer
+     * @return the value rounded to the nearest integer
      * @exception IllegalArgumentException the value is out of range
      *            and cannot be converted to an integer
      */
@@ -341,6 +341,7 @@ public class MathOps {
      * @param n the root index (2 for the square root, 3 for the cube root,
      *         etc.)
      * @param x the number whose root is to be computed.
+     * @return the nth root
      * @exception IllegalArgumentException an argument was out of range
      */
 

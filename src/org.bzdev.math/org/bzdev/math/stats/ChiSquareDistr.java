@@ -56,6 +56,7 @@ public class ChiSquareDistr extends ProbDistribution {
 
     /**
      * Get the non-centrality parameter.
+     * @return the non-centrality parameter
      * @exception IllegalStateException this object is not a
      *            non-central &Chi;<sup>2</sup> distribution
      */

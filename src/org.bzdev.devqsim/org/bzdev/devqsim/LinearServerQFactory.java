@@ -6,7 +6,6 @@ import org.bzdev.obnaming.ParmParser;
 /**
  *  Abstract Factory for server queues that maintain a linear ordering.
  * <P>
- * <P>
  * AbstrPrioritySQFactory inherits the factory parameters
  * "queueServer" and "deletePolicy" from its superclass
  * {@link ServerQueueFactory} and the parameters "timeline", "timeline.time",

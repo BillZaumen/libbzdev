@@ -1,20 +1,21 @@
-}<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <HTML lang="en">
 <HEAD>
   <title>The org.bzdev.p3d Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-  <H2>The org.bzdev.p3d package</H2>
+  <H1>The org.bzdev.p3d package</H1>
 Please see
 <UL>
   <LI><A HREF="#intro">the introduction</A> for an overview.
   <LI><A HREF="#examples">the examples</A> for coding examples.
 </UL>
 
-<H3><A NAME="intro"></A>Introduction</H3>
+<H2><A ID="intro"></A>Introduction</H2>
 
 The class {@link Model3D} creates 3D images.  The images consist of a
 set of triangles in which the order of the vertices determines the
@@ -31,7 +32,7 @@ Model3D#addTriangle(double,double,double,double,double,double,double,double,doub
 and {@link
 Model3D#addTriangle(double,double,double,double,double,double,double,double,double,java.awt.Color,Object)},
 There are similar methods named addFlippedTriangle that reverse the
-triangle's orientation given the same arguments.  One can also call
+triangle&apos;s orientation given the same arguments.  One can also call
 the {@link Model3D} method {@link Model3D#addModel(Model3D)} or {@link
 Model3D#addModel(Model3D,Object)} to import all the triangles from
 another model.  One can additionally set transforms to modify the
@@ -153,13 +154,13 @@ A typical use of this package is as follows:
     
 </OL>
 
-<H3><A NAME="examples"></A>Examples</H3>
+<H2><A ID="examples"></A>Examples</H2>
 
 The following program, which uses {@link SteppedGrid.Builder}
 to simplify constructing a 3D model, will create a file suitable for a 3D
 printer and will provide a sequence of images showing the object from
 various viewpoints:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import java.io.FileOutputStream;      
 import org.bzdev.p3d.*;
 
@@ -188,11 +189,11 @@ public class Example {
 	m3d.writeSTL("Example STL File", "example.stl");
     }
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The arguments
 for {@link org.bzdev.p3d.SteppedGrid.Builder#addRectangles(double,double,double,double,double,double) addRectangles},
 {@link org.bzdev.p3d.SteppedGrid.Builder#removeRectangles(double,double,double,double) removeRectangles},
-and {@Link org.bzdev.p3d.Model3D#createImageSequence(java.io.OutputStream,String,int,int,double,double,double,double,boolean) createImageSequence}
+and {@link org.bzdev.p3d.Model3D#createImageSequence(java.io.OutputStream,String,int,int,double,double,double,boolean) createImageSequence}
 are described in the API documentation for this package.
     </div>
 </BODY>

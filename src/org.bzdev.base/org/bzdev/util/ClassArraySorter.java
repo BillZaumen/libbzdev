@@ -165,7 +165,7 @@ public class ClassArraySorter {
     /**
      * Table mapping strings to integers.
      * This class is a trivial extension of the class
-     * {@link HashMap HashMap<String,Integer>}, and is provided
+     * {@link HashMap HashMap&lt;String,Integer&gt;}, and is provided
      * because of Java-related issues with creating arrays of generic
      * classes.
      */
@@ -423,11 +423,13 @@ public class ClassArraySorter {
 	 * If the existing array is as long as or longer than the
 	 * array that is needed, that array will be used.  Otherwise a
 	 * new array will be allocated.
+	 * @param array to store the values; null if a new array should
+	 *        be allocated
 	 * @return an array containing classes in the same order in which
 	 *         they were entered
 	 */
 	public Class<?>[] toArray(Class<?>[] array) {
-	    if (array.length < value.length) {
+	    if (array == null || array.length < value.length) {
 		array = new Class<?>[value.length];
 	    }
 	    System.arraycopy(value, 0, array, 0, value.length);
@@ -454,6 +456,8 @@ public class ClassArraySorter {
 	 * Check that each class in this Key is assignable from the
 	 * corresponding class in the argument Key.
 	 * @param key the argument key
+	 * @return true if the classes in this key are assignable from
+	 *         the classes in the argument key; false othewise
 	 */
 	public boolean isAssignableFrom(Key key) {
 	    return isAssignableFrom(key, false);
@@ -505,6 +509,8 @@ public class ClassArraySorter {
 	 * @param key the argument key
 	 * @param cast true if the argument key's numerical types should be
 	 *        cast to this key's type.
+	 * @return true if the classes in this key are assignable from
+	 *         the classes in the argument key; false othewise
 	 */
 	public boolean isAssignableFrom(Key key, boolean cast) {
 	    Class<?>[] classArray = key.value;

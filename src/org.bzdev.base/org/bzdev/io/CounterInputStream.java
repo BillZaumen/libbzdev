@@ -90,7 +90,6 @@ public class CounterInputStream extends InputStream {
      * Repositions this stream to the position at the time the
      * <code>mark</code> method was last called on this input stream.
      * <p> The general contract of <code>reset</code> is:
-     * <p>
      * <ul>
      * <li> If the method <code>markSupported</code> returns
      * <code>true</code>, then:

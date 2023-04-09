@@ -290,6 +290,7 @@ public abstract class Statistic {
      * Typically the argument will be the difference
      * between some offset value and a current value.
      * @param arg the argument
+     * @return the noncentrality parameter
      */
     public double getNCParameter(double arg)
 	throws IllegalArgumentException, IllegalStateException,

@@ -222,6 +222,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      *         or is not valid.
      * @throws IOException an IO error was seen
      * @throws ParserConfigurationException the XML parser cannot be configured
+     * @throws MalformedURLException if the url is malformed
      */
     public HtmlWithTocPane(String url)
 	throws FactoryConfigurationError, SAXException, IOException,
@@ -243,7 +244,8 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      *         or is not valid.
      * @throws IOException an IO error was seen
      * @throws ParserConfigurationException the XML parser cannot be configured
-     */
+     * @throws MalformedURLException if the url is malformed
+    */
     public HtmlWithTocPane(String url, boolean expand)
 	throws FactoryConfigurationError, SAXException, IOException,
 	       ParserConfigurationException, MalformedURLException
@@ -265,6 +267,7 @@ public class HtmlWithTocPane extends JComponent implements UrlTocTree {
      *         or is not valid.
      * @throws IOException an IO error was seen
      * @throws ParserConfigurationException the XML parser cannot be configured
+     * @throws MalformedURLException if the url is malformed
      */
     public HtmlWithTocPane(String url, boolean expand, boolean validating)
 	throws FactoryConfigurationError, SAXException, IOException,

@@ -233,8 +233,8 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * be based on the value before this scaling factor is applied (e.g,
      * the valuel when this scaling factor is 1.0).
      * @param scaleFactor the scaleFactor
-     * @exception the scale factor is not a positive double-precision
-     *            number
+     * @exception IllegalArgumentException if the scale factor is not
+     *             a positive double-precision number
      * @see Graph.Axis#setAxisScale(double)
      */
     public void setAxisScale(double scaleFactor)
@@ -567,6 +567,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      *        in graph coordinate space units
      * @param counterclockwise the angular direction to follow to
      *        reach a graph's labels and tick marks
+     * @return a new axis
      */
     protected abstract T newAxisInstance(double startX, double startY,
 					 Graph.Axis.Dir direction,
@@ -664,44 +665,44 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * an instance of Graph named graph was created. Also assume
      * an instance of AccessBuilder.Linear named ab was created as
      * follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *    AxisBuilder.Linear ab =
      *      new AxisBuilder.Linear(graph, 0.0, 0.0, 10.0, true, LABEL);
      *    ab.setMaximumExponent(0);
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * where LABEL is a string providing a label for the graph. The
      * graph will be 10 units long and the most coarsely spaced tick
      * marks will be spaced by 1 unit in graph coordinate space.
      * The following figure shows the effects of successive calls
      * to addTickSpec when the first call's second argument is false.
      * <P style="text-align: center">
-     * <img src="doc-files/axis3.png" class="imgBackground">
+     * <img src="doc-files/axis3.png" class="imgBackground" alt="axis example">
      *<P>
      * The following figure shows the effects of successive calls
      * to addTickSpec when the first call's second argument is true.
      * In this case, the first call consumes two levels, so the
      * second call to addTickSpec sets its level to 2.
      * <P style="text-align: center">
-     * <img src="doc-files/axis4.png" class="imgBackground">
+     * <img src="doc-files/axis4.png" class="imgBackground" alt="axis example">
      *<P>
      * For the use of a divisor, consider an axis builder created as
      * follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *    AxisBuilder.Linear ab =
      *      new AxisBuilder.Linear(graph, 0.0, 0.0, 10.0, true, LABEL);
      *    ab.setMaximumExponent(0);
      *    ab.setNumberOfSteps(4);
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * Successive calls to addTickSpec then behave as shown in the
      * next figure:
      * <P style="text-align: center">
-     * <img src="doc-files/axis5.png" class="imgBackground">
+     * <img src="doc-files/axis5.png" class="imgBackground" alt="axis example">
      *<P>
      * Finally, the following provides examples of the full sequence of
      * operations needed to create a graph and its axes.
      * <P>
      * Example 1:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      Graph graph = new Graph(...);
      *      graph.setRanges(...)
      *      graph.setOffsets(...);
@@ -721,13 +722,13 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      *      ...
      *      graph.draw(xab.createAxis());
      *      graph.draw(yab.createAxis());
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * The code above creates axes with large tick marks at 0.0, 1.0,
      * ... 10.0, a medium-length tick mark at 0.5, 1,5, etc., and
      * small tick marks spaced by 0.1 units in graph coordinate space.
      * <P>
      * Example 2:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      Graph graph = new Graph(...);
      *      graph.setRanges(...)
      *      graph.setOffsets(...);
@@ -739,7 +740,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      *      xab.addTickSpec(1, 2, null);
      *      xab.addTickSpec(2, 4, null);
      *      graph.draw(xab.createAxis());
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * The code above creates an axis layed out like a ruler covering
      * a distance of 12 inches with numbers labeling each inch, and
      * with a shorter tick at half-inch points and the shortest tick
@@ -1162,8 +1163,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * The following figure shows the effect of calling these
      * methods:
      * <P style="text-align: center">
-     * <img src="doc-files/axis6.png" class="imgBackground">
-     *<P>
+     * <img src="doc-files/axis6.png" class="imgBackground" alt="axis example">
      */
     public static class Log extends AxisBuilder<Graph.LogAxis> {
 	/**
@@ -1311,6 +1311,9 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 *        power; false otherwise.
 	 * @param format the format string used to construct a tick-mark
 	 *        label; null if no label should be shown
+	 * @param mFormat the format string used to construct a tick-mark
+	 *        label in the middle of a decade; null if no label should
+	 *        be shown
 	 */
 	public void addTickSpec(int level, boolean middle, String format,
 				String mFormat) {
@@ -1425,6 +1428,9 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 * @param level a non-negative integer specifying the dimensions of
 	 *        tick marks and the separation between a tick
 	 *        mark and any tick-mark label
+	 * @param depth the depth for the tick mark
+	 * @param divisor the divisor
+	 * @param cutoff the cutoff
 	 */
 	public void addTickSpec(int level, int depth, int divisor,
 				int cutoff)
@@ -1778,7 +1784,7 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      * the units are mixed.
      * <P>
      * As an example, the following code
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *  ...
      *  AxisBuilder.ClockTime ab;
      *  ab = new AxisBuilder.ClockTime(graph,
@@ -1797,10 +1803,12 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
      *  ab.addTickSpec(2, AxisBuilder.Spacing.MINUTES, null);
      *  graph.draw(ab.createAxis());
      *  ...
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * will produce the following axis:
      * <P style="text-align: center">
-     * <img style="width: 100%; height: auto" src="doc-files/clocktime.png"  class="imgBackground">
+     * <img style="width: 100%; height: auto" src="doc-files/clocktime.png"
+     *  class="imgBackground" alt="clock-time axis example">
+     * </P>
      */
     public static class ClockTime extends AxisBuilder<Graph.Axis> {
 
@@ -2130,10 +2138,10 @@ public abstract class AxisBuilder<T extends Graph.Axis> {
 	 * The divisor indicates the number of intervals separating
 	 * ticks. For example, for an axis builder <CODE>cab</CODE>,
 	 * calling
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 *       cab.setNumberOfSteps(10);
 	 *       cab.addTickSpec(level, 5);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * will place ticks at a fifth of a second intervals.
 	 * @param level the tick level, where larger numbers indicated
 	 *        smaller or thinner ticks

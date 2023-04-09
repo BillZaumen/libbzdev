@@ -176,6 +176,7 @@ public interface ISWriterOps {
      *    osg.close();
      * </pre></blockquote>
      * @return a graphics output stream for drawing an image
+     * @exception IOException - if an IOException occurred
      */
     OSGraphicsOps nextOutputStreamGraphics()
 	throws IllegalStateException, IOException;
@@ -201,6 +202,7 @@ public interface ISWriterOps {
      * is interpreted is class specific.
      * @param name the name for this output stream
      * @return a graphics output stream for drawing an image
+     * @exception IOException - if an IOException occurred
      */
     OSGraphicsOps nextOutputStreamGraphics(String name)
 	throws IllegalStateException, IOException;
@@ -225,6 +227,7 @@ public interface ISWriterOps {
      * @param count the repetition count for the entry corresponding to
      *        the graphics output stream that will be returned
      * @return a graphics output stream for drawing graphics
+     * @exception IOException - if an IOException occurred
      */
     OSGraphicsOps nextOutputStreamGraphics(int count)
 	throws IllegalStateException, IOException;
@@ -255,6 +258,7 @@ public interface ISWriterOps {
      * @param count the repetition count for the entry corresponding to
      *        the graphics output stream that will be returned
      * @return a graphics output stream for drawing graphics
+     * @exception IOException - if an IOException occurred
      */
     OSGraphicsOps nextOutputStreamGraphics(String name, int count)
 	throws IllegalStateException, IOException;
@@ -262,6 +266,7 @@ public interface ISWriterOps {
 
     /**
      * Close this writer.
+     * @exception IOException - if an IOException occurred
      */
     void close() throws IllegalStateException, IOException;
 }

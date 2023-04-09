@@ -2,7 +2,7 @@ package org.bzdev.devqsim.rv;
 import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.DetermIATimeRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of interarrival times (long integers) with a
  * deterministic distribution.

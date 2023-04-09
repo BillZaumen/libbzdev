@@ -355,6 +355,8 @@ abstract public class LinearServerQueue<QS extends QueueServer>
      * @param scriptObject the script object specifying the task to be queued.
      * @param delay the delay to wait before the task is
      *              restarted once scheduled.
+     * @param scriptSimEventCallable an object in a scripting language
+     *        representing a {@link SimEventCallable}
      * @return true if the task was restarted by the queue; false if it
      *         was canceled or could not be queued
      */

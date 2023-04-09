@@ -51,7 +51,8 @@ public class UniTreeNode<T> implements Iterable<T> {
 
     /**
      * Add a node to this tree.
-     * @parem element  the element to add to this tree
+     * @param element  the element to add to this tree
+     * @return the new node
      */
     public UniTreeNode<T> add(T element) {
 	return new UniTreeNode<T>(element, this);
@@ -59,8 +60,10 @@ public class UniTreeNode<T> implements Iterable<T> {
 
     /**
      * Add a node to a tree.
+     * @param <T> the type of the element to add to this tree
      * @param element  the element to add to this tree
      * @param tree an existing tree
+     * @return the new node
      */
     public static <T> UniTreeNode<T> addTo(T element, UniTreeNode<T> tree) {
 	return new UniTreeNode<T>(element, tree);

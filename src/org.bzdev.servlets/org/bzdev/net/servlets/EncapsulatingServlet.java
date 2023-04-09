@@ -21,13 +21,13 @@ import org.bzdev.net.HttpMethod;
  * Subclasses are expected to provide a constructor with no arguments
  * that creates an instance of {@link ServletAdapter} and passes it to
  * the constructor of this class.  For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *  public class OurServlet extends EncapsulatingServlet {
  *     public OurServlet() {
  *       super(new OurAdapter());
  *     }
  *  }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * <P>
  * To use this class, A JAR file containing the servlet API must be
  * on the classpath or accessible via the module path.  For releases
@@ -459,9 +459,9 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      * Called by the server (via a service method) to allow a servlet to
      * handle a GET request.
      * Please see the HttpServlet method doGet for a full description.
-     * @param req an {@link javax.servlet.http.ServletRequest} object that
+     * @param req an {@link javax.servlet.http.HttpServletRequest} object that
      *        contains the request the client has made to the servlet.
-     * @param res an {@link javax.servlet.http.ServletResponse} object that
+     * @param res an {@link javax.servlet.http.HttpServletResponse} object that
      *        contains the response the client has made to the servlet.
      * @exception IOException an IO error occurred during processing
      * @exception ServletException if the request for the GET could not
@@ -487,9 +487,9 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      * Called by the server (via a service method) to allow a servlet to
      * handle a POST request.
      * Please see the HttpServlet method doPost for a full description.
-     * @param req an {@link javax.servlet.http.ServletRequest} object that
+     * @param req an {@link javax.servlet.http.HttpServletRequest} object that
      *        contains the request the client has made to the servlet.
-     * @param res an {@link javax.servlet.http.ServletResponse} object that
+     * @param res an {@link javax.servlet.http.HttpServletResponse} object that
      *        contains the response the client has made to the servlet.
      * @exception IOException an IO error occurred during processing
      * @exception ServletException if the request for the POST could not
@@ -514,9 +514,9 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      * Called by the server (via a service method) to allow a servlet to
      * handle a PUT request.
      * Please see the HttpServlet method doPut for a full description.
-     * @param req an {@link javax.servlet.http.ServletRequest} object that
+     * @param req an {@link javax.servlet.http.HttpServletRequest} object that
      *        contains the request the client has made to the servlet.
-     * @param res an {@link javax.servlet.http.ServletResponse} object that
+     * @param res an {@link javax.servlet.http.HttpServletResponse} object that
      *        contains the response the client has made to the servlet.
      * @exception IOException an IO error occurred during processing
      * @exception ServletException if the request for the PUT could not
@@ -542,9 +542,9 @@ public abstract class EncapsulatingServlet extends HttpServlet {
      * handle a DELETE request.
      * Please see the HttpServlet method doDelete for a full description.
      * for a full description.
-     * @param req an {@link javax.servlet.http.ServletRequest} object that
+     * @param req an {@link javax.servlet.http.HttpServletRequest} object that
      *        contains the request the client has made to the servlet.
-     * @param res an {@link javax.servlet.http.ServletResponse} object that
+     * @param res an {@link javax.servlet.http.HttpServletResponse} object that
      *        contains the response the client has made to the servlet.
      * @exception IOException an IO error occurred during processing
      * @exception ServletException if the request for the PUT could not
@@ -598,7 +598,7 @@ public abstract class EncapsulatingServlet extends HttpServlet {
     /**
      * Destroy a servlet.
      * Please see
-     * {@link javax.servlet.http.HttpServlet#destry()} for a full description.
+     * {@link javax.servlet.http.HttpServlet#destroy()} for a full description.
      */
     @Override
     public final void destroy() {

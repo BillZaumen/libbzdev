@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.devqsim Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The discrete-event simulation package</H2>
+<H1>The discrete-event simulation package</H1>
 
 Please see
 <UL>
@@ -15,7 +16,7 @@ Please see
   <LI><A HREF="#examples">the examples</A> for some coding examples.
 </UL>
 
-<H3><A NAME="intro"></A>Introduction</H3>
+<H2><A ID="intro"></A>Introduction</H2>
 
 This package provides the basic mechanisms needed for scheduling
 calls and tasks, managing simulation time, and for queuing
@@ -40,7 +41,7 @@ The following diagram shows a high-level view of the structure of
 this package, except for "factory" classes, emphasizing the classes
 used to write simulations:
 <P style="text-align: center">
-<img src="devqsim.png" class="imgBackground">
+<img src="devqsim.png" class="imgBackground" alt="Diagram">
 <P>
 A Callable can be scheduled directly.  For a task thread, one normally
 schedules a Runnable and the simulation will then create the task thread.
@@ -62,7 +63,7 @@ debugging, but it can also be used if a GUI needs to track a simulation
 for purposes of updating the contents of a window.  These classes and
 how they interact is shown in the following figure:
 <P style="text-align: center">
-<img src="monitoring.png" class="imgBackground">
+<img src="monitoring.png" class="imgBackground" alt="Diagram">
 <P>
 The class DefaultSimAdapter implements SimulationListener but
 provide defaults to make it easy to write a listener that responds
@@ -82,7 +83,7 @@ defined by packages that implement extensions of the current
 package for specific kinds of simulations.  The class hierarchy for
 simulation events is shown in the following figure:
 <P style="text-align: center">
-<img src="events.png" class="imgBackground">
+<img src="events.png" class="imgBackground" alt="Diagram">
 <ul>
   <li> The class {@link SimulationEvent}
     can be subclassed to add more types of events.  This is done in
@@ -129,16 +130,16 @@ separate from the animation code.
 Factory classes can be used to configure simulation objects. The
 class hierarchy is shown in the following diagram:
 <P style="text-align: center">
-<img src="dqfactories.png" class="imgBackground">
+<img src="dqfactories.png" class="imgBackground" alt="Diagram">
 <P>
 The class hierarchy follows the guidelines suggested for the
 org.bzdev.obnaming package. where abstract factory classes with
 type parameters follow the class hierarchy for the objects the
 factories create, and non-abstract subclasses of these allow
 objects to be created.
-<H3><A NAME="examples"></A>Examples</H3>
+<H2><A ID="examples"></A>Examples</H2>
 As an example, the following program
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import org.bzdev.devqsim.Simulation;
 import org.bzdev.devqsim.TaskThread;
 
@@ -164,7 +165,7 @@ public class stest {
 	sim.run();
     }
 }
-</BLOCKQUOTE></PRE></CODE>
+</BLOCKQUOTE></CODE></PRE>
 will create a simulation that schedules several events. The scheduleCall
 method's first argument is an object whose type is
 {@link org.bzdev.lang.Callable}, which provides a single method named 'call'.
@@ -181,7 +182,7 @@ The corresponding program when scripting is used is shown below. The
 program must be run by using the scrunner command, which predefines
 the variable <CODE>scripting</CODE>, an instance of
 {@link org.bzdev.scripting.ExtendedScriptingContext}.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 scripting.importClass("org.bzdev.devqsim.Simulation");
 scripting.importClass("org.bzdev.devqsim.TaskThread");
 
@@ -205,7 +206,7 @@ sim.scheduleTaskObject(function() {
 }, sim.getTicks(3.0));
 
 sim.run();
-</BLOCKQUOTE></PRE></CODE>
+</BLOCKQUOTE></CODE></PRE>
 <P>
 More complex examples would define subclasses of
 {@link org.bzdev.devqsim.SimObject}.  One can override the protected method
@@ -218,7 +219,7 @@ also create various queues and place instances of
 {@link org.bzdev.devqsim.TaskThread} on them (for a TaskThread, placing
 it on a queue automatically causes the thread to pause).
 For example,
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 scripting.importClass("org.bzdev.devqsim.Simulation");
 scripting.importClass("org.bzdev.devqsim.TaskThread");
 
@@ -253,7 +254,7 @@ var callable = {
 sim.scheduleCallObject(callable, 0.0);
 
 sim.run();
-</BLOCKQUOTE></PRE></CODE>
+</BLOCKQUOTE></CODE></PRE>
 <P>
 In this example, the call to <CODE>createFactories</CODE> creates a
 factory named <CODE>fifof</CODE>. Its first argument is a package name

@@ -99,6 +99,7 @@ public @interface DMethodOptions {
      * <pre><code>
      *    javac -Aorg.bzdev.lang.DMethodOptions.lockingMode=NONE ...  FILE.java
      * </code></pre>
+     * @return the value of this element
      */
     Locking lockingMode() default Locking.MUTEX;
 
@@ -111,6 +112,7 @@ public @interface DMethodOptions {
      * The default is false.
      * <P>
      * This should only be set to true for debugging.
+     * @return the value of this element
      */
     boolean traceMode() default false;
 
@@ -128,6 +130,7 @@ public @interface DMethodOptions {
      * methods. The values should be changed from the default ones
      * only if performance measurements or tracing show that there is
      * a good reason to do that.
+     * @return the value of this element
      */
     int limitFactor() default 1;
 }

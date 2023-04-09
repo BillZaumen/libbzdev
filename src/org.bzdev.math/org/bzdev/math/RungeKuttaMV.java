@@ -5,10 +5,10 @@ import org.bzdev.lang.UnexpectedExceptionError;
 /**
  * Multi-variable implementation of the Runge Kutta algorithm.
  * For an independent variable t, and a vector of dependent
- * variables <bold>y</bold>(t),
+ * variables <B>y</B>(t),
  * the Runge Kutta algorithm numerically solves the differential equation
  * <blockquote>
- *  <bold>y</bold>'(t) = f(t, <bold>y</bold>(t))
+ *  <B>y</B>'(t) = f(t, <B>y</B>(t))
  * </blockquote>
  * The method {@link #getParam()} returns the independent variable
  * while the method {@link #getValue(int)} and {@link #getDeriv(int)} return
@@ -160,6 +160,8 @@ abstract public class RungeKuttaMV<P> {
     /**
      * Get the current value of the derivative of a dependent variable
      * @param index the index of a dependent variable
+     * @return the current value of the derivative for a specified
+     *         dependent variable
      */
     public final double getDeriv(int index) {
 	if (needDeriv) {
@@ -424,7 +426,7 @@ abstract public class RungeKuttaMV<P> {
      * Get an array of tolerance, indexed by the indices of the
      * dependent variables.
      * @param array the array in which to store the values
-     * @exception IndexOutOfBoundException the argument array is too small
+     * @exception IndexOutOfBoundsException the argument array is too small
      *            to contain the tolerances
      * @exception NullPointerException the argument was null
      */

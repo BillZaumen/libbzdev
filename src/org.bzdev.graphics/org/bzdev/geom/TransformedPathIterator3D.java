@@ -32,11 +32,11 @@ public class TransformedPathIterator3D implements PathIterator3D {
      * Because the path iterator passed to this constructor will be
      * modified by this object's methods, it is a good practice to
      * call the constructor as follows
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      PathIterator3D pi = ...
      *      AffineTransform3D at = ...
      *      pi = new TransformedPathIterator3D(pi, at);
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * to avoid having multiple references that modify the same object.
      * @param pi the path iterator
      * @param at the affine transform; null if there is none.
@@ -66,11 +66,11 @@ public class TransformedPathIterator3D implements PathIterator3D {
      * Because the path iterator passed to this constructor will be
      * modified by this object's methods, it is a good practice to
      * call the constructor as follows
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      PathIterator pi = ...
      *      Transform3D at = ...
      *      pi = new TransformedPathIterator(pi, at);
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * to avoid having multiple references that modify the same object.
      * @param pi the path iterator
      * @param tf the  transform; null if there is none.

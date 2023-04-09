@@ -52,6 +52,7 @@ public interface Shape3D {
      * transform over the region containing the control points.
      * @param tform a transform to apply to each control point; null
      *        for the identity transform
+     * @return a surface iterator
      */
     SurfaceIterator getSurfaceIterator(Transform3D tform);
 
@@ -71,6 +72,7 @@ public interface Shape3D {
      *        for the identity transform
      * @param level the number of levels of partitioning (each additional
      *        level splits the previous level into quarters)
+     * @return a surface iterator
      */
     SurfaceIterator getSurfaceIterator(Transform3D tform, int level);
 
@@ -124,7 +126,7 @@ public interface Shape3D {
      *       be returned.
      *  <LI> if the filter and neighbor are both null, an arbitrary
      *       subpath will be returned.
-     * <UL>
+     * </UL>
      * @param neighbor the test point; null if just the filter should
      *        be used
      * @param filter the control-point filter; null for no filtering

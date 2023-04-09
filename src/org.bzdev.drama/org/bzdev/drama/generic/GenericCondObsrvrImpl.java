@@ -184,6 +184,8 @@ public abstract class GenericCondObsrvrImpl
      * implementation of doConditionChange(Set<C>)) at some later time
      * depending on whether condition-queue mode is set.
      * @param c the condition that changed
+     * @param mode the mode for the condition change
+     * @param source the object that changed the condition
      */
     abstract protected void doConditionChange(C c, ConditionMode mode,
 					      SimObject source);

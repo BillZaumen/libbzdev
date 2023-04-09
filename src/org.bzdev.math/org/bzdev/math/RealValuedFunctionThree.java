@@ -19,7 +19,7 @@ import javax.script.ScriptException;
  * The class also provides scripting-language support. If a Scripting
  * context is named <code>scripting</code>, the following EMCAScript
  * code will implement a function and its derivatives:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionThree);
  *     ....
  *     // assume ourObject is a Java class with a method setFunction
@@ -55,10 +55,10 @@ import javax.script.ScriptException;
  *                deriv33At: function(x,y,z) {return 0.0;}
  *               };
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Alternatively, one may use the following code where the functions
  * defining the derivatives are provided by name:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionThree);
  *     ...
  *     function f(x,y,z) {return Math.sin(x) * Math.cos(y) * z;}
@@ -82,7 +82,7 @@ import javax.script.ScriptException;
 				      "f21", "f22", "f23",
                                       "f31", "f32", "f33");
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class  RealValuedFunctionThree extends RealValuedFunctionVA
     implements RealValuedFunctThreeOps
@@ -475,6 +475,7 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
      * thrown regardless of the arguments.
      * @param x the 1st coordinate
      * @param y the 2nd coordinate
+     * @param z the 3rd coordinate
      * @return true if the point (x, y) is in this function's
      *         domain; false otherwise
      * @exception UnsupportedOperationException domain membership
@@ -765,7 +766,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     /**
      * Get a function that computes the value of partial derivative
      * that would be computed by calling {@link derivAt(int,double...)}.
-     * @param i
+     * @param i the index of the argument (0 for the first argument, 1
+     *        for the second, etc.)
      * @return the function
      */
     public final RealValuedFunctThreeOps deriv(int i) {

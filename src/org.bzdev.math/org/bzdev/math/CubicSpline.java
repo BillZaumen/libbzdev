@@ -200,6 +200,7 @@ public abstract class CubicSpline extends RealValuedFunction {
      * [-inversionLimit, 1+inversionLimit] to be accepted, with values
      * outside of the interval [0, 1] replaced by 0 or 1, whichever is
      * closer.  The use of an inversion limit allows for round-off errors.
+     * @return the inversion limit
      */
     public abstract double getInversionLimit();
 
@@ -211,6 +212,7 @@ public abstract class CubicSpline extends RealValuedFunction {
      * [-inversionLimit, 1+inversionLimit] to be accepted, with values
      * outside of the interval [0, 1] replaced by 0 or 1, whichever is
      * closer.  The use of an inversion limit allows for round-off errors.
+     * @param limit the invrsion limit
      */
    public abstract  void setInversionLimit(double limit);
 

@@ -230,6 +230,7 @@ public class CopyUtilities {
      * @param is the input stream
      * @param a is the object used to store the copy
      * @param charset the character encoding used by the input stream.
+     * @exception IOException an IO error occurred.
      */
     public static void copyStream(InputStream is, Appendable a,
 				  Charset charset)
@@ -379,8 +380,8 @@ public class CopyUtilities {
      * be a primitive type.  The ArrayList must not be modified
      * while this method is executing.
      * @param list the array list to copy
-     * int start the starting offset
-     * int end the index just past the last element to copy
+     * @param start the starting offset
+     * @param end the index just past the last element to copy
      * @return an array containing the elements of the list
      */
     public static float[] toFloatArray(ArrayList<Float> list,

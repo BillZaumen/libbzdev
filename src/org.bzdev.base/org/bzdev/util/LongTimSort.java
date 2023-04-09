@@ -78,9 +78,9 @@ import java.util.*;
  *   <LI> The call to Arrays.checkStartAndEnd was reimplemented as
  *        a private static method as it does not exist in OpenJDK-7.
  * </UL>
- * These modifications were made because <code>TimSort&lt;int&gt; is
+ * These modifications were made because <code>TimSort&lt;int&gt;</code> is
  * not a legal parameterized type in Java.  A typical use case is
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     char[] seqence = ...;
  *     long[] array = new long[sequence.length];
  *     for (int i = 0; i &lt; sequence.length; i++) {
@@ -104,7 +104,7 @@ import java.util.*;
  *          }  
  *     };
  *     LongTimSort.sort(array, ic);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * This use case occurs in the implementation of SuffixArray as an
  * optimization when the array size is small.
  */

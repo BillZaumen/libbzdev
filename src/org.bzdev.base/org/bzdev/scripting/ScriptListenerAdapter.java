@@ -28,7 +28,7 @@ import org.bzdev.util.ExpressionParser.ESPFunction;
  * for the adapter is provided by a scripting language.
  * <P>
  * Example:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    public interface FooListener {
  *        void method1(Object src, int status);
  *        void method2(Object src, String msg);
@@ -60,9 +60,9 @@ import org.bzdev.util.ExpressionParser.ESPFunction;
  *            callScriptMethod("method2", src, msg);
  *        }
  *    }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * In a script one can create the adapter with code such as
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    var adapter = new FooScriptAdapter(scripting, {
  *          method1(src, status) {
  *             ...
@@ -71,7 +71,7 @@ import org.bzdev.util.ExpressionParser.ESPFunction;
  *             ...
  *          }
  *        });
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public abstract class ScriptListenerAdapter {
 

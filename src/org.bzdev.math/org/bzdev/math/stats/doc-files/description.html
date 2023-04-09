@@ -3,16 +3,17 @@
 <HEAD>
   <title>The org.bzdev.math.stats Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.math.stats package</H2>
+<H1>The org.bzdev.math.stats package</H1>
 
 This package contains several statistics-related classes.
 The class hierarchy is shown in the following diagram:
 <P style="text-align: center">
-<img src="stats.png" class="imgBackground">
+<img src="stats.png" class="imgBackground" alt="Diagram">
 <P>
 One will typically use the stats package as follows:
 <UL>
@@ -67,7 +68,7 @@ One will typically use the stats package as follows:
                 the probability of a type I error, defined as the probability
                 that the null hypothesis is in fact true when the test
                 indicated that it is false.
-           <LI> For a given value of &alpha;, the statistic's critical
+           <LI> For a given value of &alpha;, the statistic&apos;s critical
                 value is the value of the statistic for which the
                 p value would be numerically equal to &alpha;.  depending
                 on the situation, one may use one or two critical values.
@@ -82,7 +83,7 @@ One will typically use the stats package as follows:
         statistic and distribution used. Methods that help compute
         the noncentrailty parameter exist but these methods may
         throw an UnsupportedOperationException if the
-        statistic's distribution does not have a noncentrality
+        statistic&apos;s distribution does not have a noncentrality
         parameter or if the specific method is not appropriate.
         Each statistic that supports such a method should document
         the use of such methods.  The use of a noncentral

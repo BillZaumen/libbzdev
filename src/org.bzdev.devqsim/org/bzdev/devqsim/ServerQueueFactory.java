@@ -65,6 +65,7 @@ public abstract class ServerQueueFactory<OBJ extends ServerQueue<T,QS>,
     /**
      * Get the base class of the objects implementing the QueueServer
      * interface for this factory.
+     * @return the base class
      */
     protected abstract Class<QS> getQueueServerClass();
 

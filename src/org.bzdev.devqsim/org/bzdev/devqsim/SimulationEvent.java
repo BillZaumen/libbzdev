@@ -54,6 +54,7 @@ abstract public class SimulationEvent
 
     /**
      * get the time field
+     * @return the time in units of ticks
      */
     public long getTime() {
 	return time;
@@ -115,6 +116,7 @@ abstract public class SimulationEvent
      * An event is pending if it has been scheduled on the event queue
      * but not yet been processed.  It is not pending while the event
      * is being processed.
+     * @return true if this event is pending; false otherwise
      */
 
     public boolean isPending() {return pending;}

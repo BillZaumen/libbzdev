@@ -75,7 +75,7 @@ public class ClearableFileChooser {
     public static final int CANCEL_OPTION = JFileChooser.CANCEL_OPTION;
 
     /**
-     * REturn value if clear is chosen.
+     * Return value if clear is chosen.
      */
     public static final int CLEAR_OPTION = 2;
 
@@ -142,8 +142,9 @@ public class ClearableFileChooser {
 
     /**
      * Adds a filter to the list of user choosable file filters.
-     *  For information on setting the file selection mode, see 
-     *  {@link #setFileSelectionMode(int)}.
+     * For information on setting the file selection mode, see
+     * {@link #setFileSelectionMode(int)}.
+     * @param filter the file filter
      */
     public void addChoosableFileFilter(FileFilter filter) {
 	fileChooser.addChoosableFileFilter(filter);
@@ -219,6 +220,7 @@ public class ClearableFileChooser {
     /**
      * Gets the string that goes in the dialog's title bar.
      * @see #setDialogTitle
+     * @return the title
      */
     public String getDialogTitle() {
 	return fileChooser.getDialogTitle();
@@ -429,7 +431,18 @@ public class ClearableFileChooser {
 
     /**
      * Show a file-chooser dialog.
+     * The exit status for the dialog is either
+     * <UL>
+     *   <LI> {@link #APPROVE_OPTION}. This is the same as
+     *        {@link JFileChooser#APPROVE_OPTION}.
+     *   <LI> {@link #CANCEL_OPTION}. This is the same as
+     *        {@link JFileChooser#CANCEL_OPTION}.
+     *   <LI> {@link #ERROR_OPTION}. This is the same as
+     *        {@link JFileChooser#ERROR_OPTION}.
+     *   <LI> {@link #CLEAR_OPTION}. The value is 2.
+     * </UL>
      * @param parent the component on which the dialog may be centered
+     * @return the dialog's exit status
      */
     public int showDialog(Component parent)
     {

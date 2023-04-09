@@ -88,6 +88,12 @@ abstract public class WebMap {
 	EnumSet.of(HttpMethod.TRACE, HttpMethod.HEAD, HttpMethod.GET);
     /**
      * Indicate the methods this WebMap can implement
+     * If not called, this web map can implement {@link HttpMethod#TRACE},
+     * {@link HttpMethod#HEAD}, and {@link HttpMethod#GET}.  When this
+     * method is called, the list of methods is cleared and the method
+     * {@link HttpMethod#TRACE} is automatically added
+     * whether or not it is present in the argument list.
+     * @param methods the HTTP methods that this web map can implment
      */
     protected void setMethods(HttpMethod... methods) {
 	methodSet.clear();
@@ -235,6 +241,12 @@ abstract public class WebMap {
 	}
     }
 
+    /**
+     * Convert an instance of {@link Headers} to an instance of
+     * {@link HeaderOps}.
+     * @param headers the headers
+     * @return the converted object
+     */
     public static HeaderOps asHeaderOps(final Headers headers) {
 	return new HeaderOps() {
 	    @Override
@@ -902,7 +914,6 @@ abstract public class WebMap {
 	/**
 	 * Set whether or not a response uses compression or some other
 	 * transfer encoding.
-	 * <P>
 	 * @param encoding the encoding ("identity", "gzip", "compress", and
 	 *        "deflate" are standard values); null defaults to "identity"
 	 */
@@ -1169,6 +1180,10 @@ abstract public class WebMap {
 	    return os;
 	}
 
+	/**
+	 * Check if the response was generated and sent.
+	 * @return true if the response was sent; false otherwise
+	 */
 	public boolean handledResponse() {
 	    return is == null && exchange != null && sentResponse;
 	}
@@ -1206,6 +1221,10 @@ abstract public class WebMap {
      * Create a new instance of a WebMap subclass given a class name.
      * @param root a parameter used by the subclass' constructor
      * @param className the name of the subclass
+     * @return the new web map
+     * @exception IOException an IO error occurred
+     * @exception IllegalArgumentException an argument prevented this
+     *            method from running
      */
     public static WebMap newInstance(Object root, String className)
 	throws IOException, IllegalArgumentException {
@@ -1232,6 +1251,10 @@ abstract public class WebMap {
      * the subclass' constructor accepts.
      * @param root a parameter used by the subclass' constructor
      * @param clasz the class of the new instance
+     * @return the new web map
+     * @exception IOException an IO error occurred
+     * @exception IllegalArgumentException an argument prevented this
+     *            method from running
      */
     public static WebMap newInstance(Object root,
 					Class<? extends WebMap> clasz)
@@ -1304,6 +1327,7 @@ abstract public class WebMap {
      * {@link #addWelcome(String)} adds possible welcome file locations.
      * @return an instance of Info containing an input stream for reading
      *         the "welcome" file; null if none exists.
+     * @exception IOException an IO error occurred
      */
     public Info getWelcomeInfo() throws IOException {
 	for (String path: welcomeList) {
@@ -1329,6 +1353,7 @@ abstract public class WebMap {
      * @param base the path (which must end in "/").
      * @return an instance of Info containing an input stream for reading
      *         the "welcome" file; null if none exists.
+     * @exception IOException an IO error occurred
      */
     public Info getWelcomeInfo(String base) throws IOException {
 	if (base == null || base.length() == 0) {
@@ -1355,6 +1380,11 @@ abstract public class WebMap {
 
     private HashMap<Object,String> emap = new HashMap<Object,String>();
 
+    /**
+     * The mapping between an error type and a location
+     * @return the map
+     * @see #addErrorEntry(Object,String)
+     */
     protected HashMap<Object,String> getEmap() {return emap;}
 
     /*
@@ -1581,8 +1611,7 @@ abstract public class WebMap {
      * @param path the path portion of a URI
      * @return an Info specifying
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     protected Info getInfoFromPath(String path)
@@ -1614,12 +1643,8 @@ abstract public class WebMap {
      *         and providing an input stream for that resource or
      *         handling a request directly; null if the requested resource
      *         could not be found and the caller should handle the error
-     * @return an Info object describing properties of a resource and
-     *          providing an input stream to the resource or
-     *         handling the request directly
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception
-     *            occurred
+     * @exception EjwsException an ejws exception occurred
      */
     protected abstract Info getInfoFromPath(String prepath, String path,
 					    String query, String fragment,
@@ -1636,8 +1661,8 @@ abstract public class WebMap {
      *         for an HTML page describing an error) and providing an
      *         input stream for that resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getErrorInfo(int code, String protocol, HttpExchange t)
@@ -1656,8 +1681,8 @@ abstract public class WebMap {
      *         for an HTML page describing an error) and providing an
      *         input stream for that resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getErrorInfo(int code, Object key,
@@ -1846,8 +1871,8 @@ abstract public class WebMap {
      *         for an HTML page describing an error) and providing an
      *         input stream for that resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getErrorInfo(String exceptionType)
@@ -1897,8 +1922,8 @@ abstract public class WebMap {
      * @return an Info object describing properties of a resource an
      *         providing an input stream to the resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getInfo(URI uri) throws IOException, EjwsException {
@@ -1936,8 +1961,8 @@ abstract public class WebMap {
      * @return an Info object describing properties of a resource an
      *         providing an input stream to the resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getInfo(String prepath, HttpExchange t)
@@ -1980,8 +2005,8 @@ abstract public class WebMap {
      * @return an Info object describing properties of a resource an
      *         providing an input stream to the resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getInfo(String prepath, URI uri)
@@ -2018,8 +2043,8 @@ abstract public class WebMap {
      * @return an Info object describing properties of a resource an
      *         providing an input stream to the resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getInfo (String path) throws IOException, EjwsException {
@@ -2040,8 +2065,8 @@ abstract public class WebMap {
      * @return an Info object describing properties of a resource an
      *         providing an input stream to the resource
      * @exception IOException an IO error occurred.
-     * @exception an ejws exception, which may be thrown by getInfoFromPath,
-     *            occurred
+     * @exception EjwsException an ejws exception, which may be thrown
+     *             by getInfoFromPath, occurred
      * @see #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)
      */
     public Info getInfo (String prepath, String path)
@@ -2087,6 +2112,13 @@ abstract public class WebMap {
 	return false;
     }
 
+    /**
+     * Remove a GZIP suffix from a path.
+     * The default provides .gz as the suffix.
+     * @param path the path
+     * @return the path without the suffix
+     * @see #addGzipSuffix(String)
+     */
     public String stripGZipSuffix(String path) {
 	int index = path.lastIndexOf(".");
 	String suffix;
@@ -2408,9 +2440,9 @@ abstract public class WebMap {
      * A consequence of this is that the subclass should track what
      * has actually been configured at each step so that the
      * configuration can be undone safely.
+     * @exception Exception an error occurred
      * @see #deconfigure()
      * @see #isConfigured()
-
      */
     protected void configure() throws Exception {
     }

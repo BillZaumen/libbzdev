@@ -582,7 +582,7 @@ public class SubdivisionIterator implements SurfaceIterator {
      * The mapping between the original control points and their offsets
      * into the array is shown in the following table:
      * <DIV style="text-align: center;">
-     * <TABLE border="2">
+     * <TABLE border="1"><caption>&nbsp;</caption>
      *  <TR> <TD>P<sub>003</sub><TD>0 <TD>P<sub>012</sub> <TD>3
      *  <TD>P<sub>021</sub> <TD>6  <TD>P<sub>030</sub> <TD>9
      *   <TD>P<sub>102</sub> <TD>12

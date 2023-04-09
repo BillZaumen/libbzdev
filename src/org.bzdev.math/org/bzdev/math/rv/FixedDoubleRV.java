@@ -24,7 +24,8 @@ public class FixedDoubleRV extends DoubleRandomVariable {
 	return value;
     }
 
-    public void setMinimum(double min, boolean closed) 
+    @Override
+    public void setMinimum(Double min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (min > value): (min >= value)) 
@@ -40,8 +41,8 @@ public class FixedDoubleRV extends DoubleRandomVariable {
 	super.tightenMinimum(min, closed);
     }
 
-
-    public void setMaximum(double max, boolean closed) 
+    @Override
+    public void setMaximum(Double max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (max < value):(max <= value))

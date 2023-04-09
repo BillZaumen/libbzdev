@@ -21,7 +21,7 @@ import javax.script.ScriptException;
  * The class also provides scripting-language support. If a Scripting
  * context is named <code>scripting</code>, the following EMCAScript
  * code will implement a sin function and its derivatives:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionVA);
  *     ....
  *     // assume ourObject is a Java class with a method setFunction
@@ -53,10 +53,10 @@ import javax.script.ScriptException;
  *                                }
  *               });
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Alternatively, one may use the following code where the functions
  * defining the derivatives are provided by name:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     importClass(org.bzdev.RealValuedFunctionVA);
  *     ...
  *     function f(array) {
@@ -87,7 +87,7 @@ import javax.script.ScriptException;
  *     // that takes a RealValuedFunction as its argument.
  *     funct = new RealValuedFunctionVA(scripting, "f", "f1", "f2");
  *     ourObject.setFunction(funct);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class RealValuedFunctionVA
     implements VADomainOps, RealValuedFunctVAOps
@@ -635,6 +635,7 @@ a     */
      *     }
      * </pre></blockquote>
      * @param args the arguments to the function.
+     * @return the Jacobian
      * @exception IllegalArgumentException the function's argument(s)
      *            were out of range
      * @exception UnsupportedOperationException  the operation is
@@ -681,6 +682,7 @@ a     */
      * @param offset the offset determining the variable at which to start
      *        differentiating
      * @param args the arguments to the function.
+     * @return the Jacobian
      * @exception IllegalArgumentException the function's argument(s)
      *            were out of range
      * @exception UnsupportedOperationException  the operation is
@@ -853,9 +855,11 @@ a     */
 	 * to the basis functions and the remainder will represent parameters
 	 * for the basis functions, both in the same order as that used
 	 * by this constructor.
+	 * @param<T> an interface that extends {@link RealValuedFunctOps}
 	 * @param args a non-zero number of real valued functions of
 	 *        one argument
-	 * @exception an argument was null or no arguments were provided
+	 * @exception IllegalArgumentException an argument was null or
+	 *            no arguments were provided
 	 */
 	@SafeVarargs
 	public <T extends RealValuedFunctOps> Linear(T... args)

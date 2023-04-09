@@ -249,13 +249,13 @@ public abstract class BasicStats implements Cloneable {
 	 * <P>
 	 * If rv is a random variable that returns a stream of double values,
 	 * the following example shows a typical use of this method:
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 * BasicStats stats = rv.parallelStream(1000000)
 	 *   .mapToObj(Double::valueOf)
 	 *   .reduce(BasicStats.Sample.identity(),
 	 *	    BasicStats::add,
 	 *	    BasicStats::addAll);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * The method mapToObj is needed because the reduce method is
 	 * a method of {@link Stream} but not {@link DoubleStream}.
 	 * When used with a parallel stream, the mapToObj method;'s argument
@@ -348,13 +348,13 @@ public abstract class BasicStats implements Cloneable {
 	 * <P>
 	 * If rv is a random variable that returns a stream of double values,
 	 * the following example shows a typical use of this method:
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 * BasicStats stats = rv.parallelStream(1000000)
 	 *   .mapToObj(Double::valueOf)
 	 *   .reduce(BasicStats.Population.identity(),
 	 *	    BasicStats::add,
 	 *	    BasicStats::addAll);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * The method mapToObj is needed because the reduce method is
 	 * a method of {@link Stream} but not {@link DoubleStream}.
 	 * When used with a parallel stream, the mapToObj method;'s argument

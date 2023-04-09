@@ -1191,6 +1191,8 @@ public class SurfaceIntegral  {
      * @param transform the transform to apply to the surface
      * @param parallel true if the integral should be done in parallel;
      *        false if it should be done sequentially
+     * @param size an estimate of the number of elements (triangles and
+     *        cubic patches) comprising the surface
      * @return the value of the surface integral over the transformed
      *         surface
      * @exception IllegalArgumentException the surface should have been
@@ -1345,6 +1347,12 @@ public class SurfaceIntegral  {
 	double[][] fargsCTv;
 
 	SurfaceIntegral[] siarray = null;
+
+	/**
+	 * Constructor.
+	 * @param si a surface integral
+	 * @param rest additional surface integrals
+	 */
 	public Batched(SurfaceIntegral si, SurfaceIntegral... rest) {
 	    siarray = new SurfaceIntegral[1+rest.length];
 	    this.ncp = si.ncp;

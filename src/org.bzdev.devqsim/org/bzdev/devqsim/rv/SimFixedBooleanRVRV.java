@@ -3,10 +3,10 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.FixedBooleanRV;
 import org.bzdev.math.rv.FixedBooleanRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of boolean valued random variables with a fixed distribution.
- * @see org.bzdev.math.rv.FixedBooleanRV;
+ * @see org.bzdev.math.rv.FixedBooleanRV
  */
 public class SimFixedBooleanRVRV
     extends SimBooleanRVRV<FixedBooleanRV,FixedBooleanRVRV>

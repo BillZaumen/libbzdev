@@ -5,9 +5,9 @@ package org.bzdev.math;
  * This interpolator computes values by using the following
  * expression:
  * <blockquote>
- * <Big><pre>
- *      <Big>&sum;</Big><sub>|&lambda;|=3</sub> &beta;<sub>&lambda;</sub>B<sup>3</sup><sub>&lambda;</sub>(u,v,w)
- * </pre></Big>
+ * <pre><span style="font-size: 125%;">
+ *      <span style="font-size: 200%">&sum;</span><sub>|&lambda;|=3</sub> &beta;<sub>&lambda;</sub>B<sup>3</sup><sub>&lambda;</sub>(u,v,w)
+ * </span></pre>
  * </blockquote>
  * where u + v + w = 1, &lambda;= (&lambda;<sub>1</sub>,&lambda;<sub>2</sub>,&lambda;<sub>3</sub>)
  * represent three indices, each in the range [0,3], and
@@ -16,12 +16,12 @@ package org.bzdev.math;
  * B<sup>3</sup><sub>&lambda;</sub>(u,v,w)
  * is a Bernstein polynomial of degree 3 over a triangle specified by
  * barycentric coordinates (u, v, w), and is defined by the equation
- * <blockquote><Big>
- * <pre>
+ * <blockquote>
+ * <pre><span style="font-size:125%;">
  *                  3!
  * B<sup>3</sup><sub>&lambda;</sub>(u,v,w) = -------- u<sup>&lambda;<sub>1</sub></sup>v<sup>&lambda;<sub>2</sub></sup>w<sup>&lambda;<sub>3</sub></sup>
  *              &lambda;<sub>1</sub>!&lambda;<sub>2</sub>!&lambda;<sub>3</sub>!
- * </pre></Big>
+ * </span></pre>
  * </blockquote>
  * <P>
  * By convention, we will use (u,v) as independent variables and set
@@ -61,11 +61,9 @@ package org.bzdev.math;
  * instead of (u, w).  Some of the constructors allow a range for x
  * and a range for y to be specified. in this case
  * <blockquote>
- * <pre>
  *     u = (x - x<sub>min</sub>) / (x<sub>max</sub> - x<sub>min</sub>)
- *
+ * <br>
  *     v = (y - y<sub>min</sub>) / (y<sub>max</sub> - y<sub>min</sub>)
- * </pre>
  * </blockquote>
  * The default values are x<sub>min</sub> = 0, x<sub>max</sub> = 1,
  * y<sub>min</sub> = 0, and y<sub>max</sub> = 1.  For the defaults,

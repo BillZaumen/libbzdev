@@ -83,11 +83,13 @@ public class RedirectWebMap extends WebMap {
 	}
     }
 
-    public WebMap.Info getWeb() {
+    @Override
+    public WebMap.Info getWebxml() {
 	// we are just redirecting so no point in parsing a Web-Inf/web.xml file
 	return null;
     }
 
+    @Override
     public WebMap.Info getWelcomeInfo() throws IOException {
 	URL url;
 	try {

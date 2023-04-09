@@ -189,7 +189,6 @@ public interface HttpServerResponse {
     /**
      * Set whether or not a response uses compression or some other
      * transfer encoding.
-     * <P>
      * @param encoding the encoding ("identity", "gzip", "compress", and
      *        "deflate" are standard values); null defaults to "identity"
      */
@@ -235,7 +234,7 @@ public interface HttpServerResponse {
      * Determine if this response has been committed.
      * A response is committed if its status code and headers have
      * been written.
-     * @returnt true if this response has been committed; false otherwise
+     * @return true if this response has been committed; false otherwise
      */
     boolean isCommitted();
 }

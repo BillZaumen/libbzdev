@@ -31,6 +31,9 @@ PKG_VERSION = $(VERSION)$(PKG_BUILD)
 JROOT := $(shell while [ ! -d src -a `pwd` != / ] ; do cd .. ; done ; pwd)
 
 JAVA_VERSION = 11
+JAVAC = javac --release $(JAVA_VERSION)
+JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected -package \
+	-Xdoclint:all,-missing,-html
 
 all: jars
 
@@ -591,7 +594,7 @@ BUILD/libbzdev-base.jar: $(BASE_JFILES) $(BASE_RESOURCES1) $(BASE_RESOURCES2) \
 		$(BASE_MODINFO)
 	mkdir -p mods/org.bzdev.base
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.base $(BASE_DIR)/module-info.java \
+	$(JAVAC) -d mods/org.bzdev.base $(BASE_DIR)/module-info.java \
 		$(BASE_JFILES) $(BASE_JFILES2)
 	for i in $(BASE_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
@@ -602,7 +605,7 @@ BUILD/libbzdev-base.jar: $(BASE_JFILES) $(BASE_RESOURCES1) $(BASE_RESOURCES2) \
 BUILD/libbzdev-servlets.jar: $(SERVLETS_JFILES)
 	mkdir -p mods/org.bzdev.servlets
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.servlets -p $(SERVLETS_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.servlets -p $(SERVLETS_BUILD_PATH) \
 		$(SERVLETS_JFILES)
 	jar --create --file BUILD/libbzdev-servlets.jar \
 		--manifest=$(SERVLETS_DIR)/manifest.mf \
@@ -613,7 +616,7 @@ BUILD/libbzdev-esp.jar: $(ESP_JFILES) $(ESP_RESOURCES1) $(ESP_MODINFO) \
 		$(ESP_JFILES2)
 	mkdir -p mods/org.bzdev.esp
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.esp -p BUILD/libbzdev-base.jar \
+	$(JAVAC) -d mods/org.bzdev.esp -p BUILD/libbzdev-base.jar \
 		$(ESP_MODINFO) $(ESP_JFILES) $(ESP_JFILES2)
 	for i in $(ESP_RESOURCES); do mkdir -p mods/`dirname $$i` ;\
 		cp src/$$i mods/$$i ; done
@@ -623,7 +626,7 @@ BUILD/libbzdev-dmethods.jar: $(DMETHODS_JFILES) $(DMETHODS_RESOURCES1) \
 		$(DMETHODS_MODINFO) $(DMETHODS_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.dmethods
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.dmethods -p BUILD/libbzdev-base.jar \
+	$(JAVAC) -d mods/org.bzdev.dmethods -p BUILD/libbzdev-base.jar \
 		$(DMETHODS_DIR)/module-info.java $(DMETHODS_JFILES)
 	for i in $(DMETHODS_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
@@ -636,7 +639,7 @@ BUILD/libbzdev-math.jar: $(MATH_JFILES) $(MATH_JFILES2) \
 		$(MATH_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.math
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.math -p BUILD/libbzdev-base.jar \
+	$(JAVAC) -d mods/org.bzdev.math -p BUILD/libbzdev-base.jar \
 		$(MATH_DIR)/module-info.java $(MATH_JFILES) $(MATH_JFILES2)
 	for i in $(MATH_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
@@ -648,7 +651,7 @@ BUILD/libbzdev-obnaming.jar: $(OBNAMING_JFILES) $(OBNAMING_JFILES1) \
 		$(OBNAMING_MODINFO) $(OBNAMING_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.obnaming
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.obnaming -p $(BASE_MATH_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.obnaming -p $(BASE_MATH_BUILD_PATH) \
 		$(OBNAMING_DIR)/module-info.java $(OBNAMING_JFILES) \
 		$(OBNAMING_JFILES1) $(OBNAMING_JFILES2)
 	for i in $(OBNAMING_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -660,7 +663,7 @@ BUILD/libbzdev-parmproc.jar: $(PARMPROC_JFILES) $(PARMPROC_RESOURCES1) \
 		$(PARMPROC_MODINFO) $(PARMPROC_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.obnaming
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.parmproc -p \
+	$(JAVAC) -d mods/org.bzdev.parmproc -p \
 		$(BASE_MATH_BUILD_PATH):BUILD/libbzdev-obnaming.jar \
 		$(PARMPROC_DIR)/module-info.java $(PARMPROC_JFILES)
 	for i in $(PARMPROC_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -680,7 +683,7 @@ BUILD/libbzdev-ejws.jar: $(EJWS_JFILES) $(EJWS_RESOURCES1) $(EJWS_MODINFO) \
 		$(EJWS_DIR)/manifest.mf BUILD/ejwsCerts.jks
 	mkdir -p mods/org.bzdev.ejws
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.ejws -p $(EJWS_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.ejws -p $(EJWS_BUILD_PATH) \
 		$(EJWS_DIR)/module-info.java $(EJWS_JFILES)
 	for i in $(EJWS_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
@@ -701,7 +704,7 @@ BUILD/libbzdev-graphics.jar: $(GRAPHICS_JFILES) $(GRAPHICS_JFILES2) \
 		$(GRAPHICS_RESOURCES1) \
 		$(GRAPHICS_MODINFO) $(GRAPHICS_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.graphics
-	javac -d mods/org.bzdev.graphics -p $(GRAPHICS_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.graphics -p $(GRAPHICS_BUILD_PATH) \
 		$(GRAPHICS_DIR)/module-info.java $(GRAPHICS_JFILES) \
 		$(GRAPHICS_JFILES2)
 	for i in $(GRAPHICS_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -719,7 +722,7 @@ BUILD/libbzdev-desktop.jar: $(DESKTOP_JFILES) $(BASE_JFILES) \
 		$(DESKTOP_JFILES2) $(DESKTOP_RESOURCES1) \
 		$(DESKTOP_MODINFO) $(DESKTOP_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.desktop
-	javac -d mods/org.bzdev.desktop -p $(DESKTOP_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.desktop -p $(DESKTOP_BUILD_PATH) \
 		$(DESKTOP_DIR)/module-info.java $(DESKTOP_JFILES) \
 		$(DESKTOP_JFILES2)
 	for i in $(DESKTOP_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -734,7 +737,7 @@ BUILD/libbzdev-devqsim.jar: $(DEVQSIM_JFILES) $(DEVQSIM_JFILES1) \
 		$(DEVQSIM_MODINFO) $(DEVQSIM_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.devqsim
 	mkdir -p BUILD tmpsrc/org.bzdev.devqsim
-	javac -d mods/org.bzdev.devqsim -p $(DEVQSIM_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.devqsim -p $(DEVQSIM_BUILD_PATH) \
 		--processor-path $(PROC_PATH) -s tmpsrc/org.bzdev.devqsim \
 		$(DEVQSIM_DIR)/module-info.java $(DEVQSIM_JFILES) \
 		$(DEVQSIM_JFILES2)
@@ -749,7 +752,7 @@ BUILD/libbzdev-drama.jar: $(DRAMA_JFILES) $(DRAMA_JFILES2) \
 		$(DRAMA_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.drama
 	mkdir -p BUILD tmpsrc/org.bzdev.drama 
-	javac -d mods/org.bzdev.drama -p $(DRAMA_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.drama -p $(DRAMA_BUILD_PATH) \
 		--processor-path $(PROC_PATH) -s tmpsrc/org.bzdev.drama \
 		$(DRAMA_DIR)/module-info.java $(DRAMA_JFILES) $(DRAMA_JFILES2)
 	for i in $(DRAMA_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -763,7 +766,7 @@ BUILD/libbzdev-anim2d.jar: $(ANIM2D_JFILES) $(ANIM2D_JFILES2) \
 		$(ANIM2D_MODINFO) $(ANIM2D_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.anim2d
 	mkdir -p BUILD tmpsrc/org.bzdev.anim2d
-	javac -d mods/org.bzdev.anim2d -p $(ANIM2D_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.anim2d -p $(ANIM2D_BUILD_PATH) \
 		--processor-path $(PROC_PATH) -s tmpsrc/org.bzdev.anim2d \
 		$(ANIM2D_DIR)/module-info.java $(ANIM2D_JFILES) \
 		$(ANIM2D_JFILES2)
@@ -778,7 +781,7 @@ BUILD/libbzdev-p3d.jar: $(P3D_JFILES) $(P3D_JFILES2) \
 		$(P3D_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.p3d
 	mkdir -p BUILD tmpsrc/org.bzdev.p3d
-	javac -d mods/org.bzdev.p3d -p $(P3D_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.p3d -p $(P3D_BUILD_PATH) \
 		--processor-path $(PROC_PATH) -s tmpsrc/org.bzdev.p3d \
 		$(P3D_DIR)/module-info.java $(P3D_JFILES) $(P3D_JFILES2)
 	for i in $(P3D_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -797,7 +800,7 @@ BUILD/libbzdev-p3d.jar: $(P3D_JFILES) $(P3D_JFILES2) \
 BUILD/libbzdev.jar: src/org.bzdev/module-info.java src/org.bzdev/manifest.mf \
 		$(JARS)
 	mkdir -p mods/org.bzdev
-	javac -d mods/org.bzdev -p BUILD src/org.bzdev/module-info.java
+	$(JAVAC) -d mods/org.bzdev -p BUILD src/org.bzdev/module-info.java
 	jar --create --file BUILD/libbzdev.jar -m src/org.bzdev/manifest.mf \
 		-C mods/org.bzdev .
 
@@ -808,7 +811,7 @@ BUILD/lsnof.jar: $(LSNOF_JFILES) $(LSNOF_RESOURCES1) $(LSNOF_MODINFO) \
 		$(LSNOF_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.lsnof
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.lsnof -p $(APP_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.lsnof -p $(APP_BUILD_PATH) \
 		$(LSNOF_DIR)/module-info.java $(LSNOF_JFILES) $(LSNOF_JFILES2)
 	for i in $(LSNOF_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
 		cp src/$$i mods/$$i ; done
@@ -824,7 +827,7 @@ BUILD/scrunner.jar: $(SCRUNNER_JFILES) $(SCRUNNER_RESOURCES1) \
 		$(SCRUNNER_MODINFO) $(SCRUNNER_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.scrunner
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.scrunner -p $(APP_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.scrunner -p $(APP_BUILD_PATH) \
 		$(SCRUNNER_DIR)/module-info.java $(SCRUNNER_JFILES) \
 		$(SCRUNNER_JFILES2)
 	for i in $(SCRUNNER_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -841,7 +844,7 @@ BUILD/yrunner.jar: $(YRUNNER_JFILES) $(YRUNNER_RESOURCES1) \
 		$(YRUNNER_MODINFO) $(YRUNNER_DIR)/manifest.mf
 	mkdir -p mods/org.bzdev.yrunner
 	mkdir -p BUILD
-	javac -d mods/org.bzdev.yrunner -p $(APP_BUILD_PATH) \
+	$(JAVAC) -d mods/org.bzdev.yrunner -p $(APP_BUILD_PATH) \
 		$(YRUNNER_DIR)/module-info.java $(YRUNNER_JFILES) \
 		$(YRUNNER_JFILES2)
 	for i in $(YRUNNER_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
@@ -1458,7 +1461,8 @@ saved:
 	       cp src/$$i/description.html $(JROOT_JAVADOCS)/$$i ; done
 
 $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
-		src/overview.html src/description.html stylesheet.css \
+		src/overview.html src/description.html \
+		stylesheet.css description.css \
 		src/FactoryOverview.html
 	rm -rf $(JROOT_JAVADOCS)
 	mkdir -p $(JROOT_JAVADOCS)
@@ -1467,7 +1471,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		$(MATH_DIR)/$(BZDEV)/math/doc-files/DefaultFFT.txt
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
 		|| echo --main-stylesheet stylesheet.css`; \
-	javadoc -d $(JROOT_JAVADOCS) \
+	$(JAVADOC) -d $(JROOT_JAVADOCS) \
 		--module-path BUILD:$(SERVLETS_BUILD_PATH1) \
 		$$styleoption \
 		--module-source-path src:tmpsrc \
@@ -1478,9 +1482,9 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
 		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -E -v -e '^Generating' \
-		| grep -E -v -e '^Copying file'| grep -v javax\\.servlet\\.http
-	@echo '(18 warnings expected due to javax.servlet.http [not shown])'
+		| grep -E -v -e '^Copying file'
 	mkdir -p $(JROOT_JAVADOCS)/doc-files
+	cp description.css $(JROOT_JAVADOCS)/description.css
 	cp src/description.html $(JROOT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
@@ -1494,7 +1498,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	mkdir -p $(JROOT_ALT_JAVADOCS)
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
 		|| echo --main-stylesheet stylesheet.css`; \
-	javadoc -d $(JROOT_ALT_JAVADOCS) \
+	$(JAVADOC) -d $(JROOT_ALT_JAVADOCS) \
 		--module-path BUILD$(SERVLETS_BUILD_PATH) \
 		$$styleoption \
 		--module-source-path src:tmpsrc \
@@ -1508,6 +1512,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -v javax\\.servlet\\.http
 	@echo '(18 warnings expected due to javax.servlet.http [not shown])'
 	mkdir -p $(JROOT_ALT_JAVADOCS)/doc-files
+	cp description.css $(JROOT_ALT_JAVADOCS)/description.css
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done

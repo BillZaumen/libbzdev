@@ -54,6 +54,7 @@ abstract public class GenericSimulation<
      * with the subtype of the object determined at run time. It is
      * needed in part because type parameters cannot be used as the
      * names of constructors.
+     * @return the simulation's factory
      */
     public F getFactory() {return factory;}
 
@@ -758,7 +759,6 @@ abstract public class GenericSimulation<
      * @param domain the domain to use for communication
      * @return an object specifying the domains needed to look up delays
      *         and message filters; null if there are none
-     * @return the domain that allows communication; null if there is none
      * @exception IllegalArgumentException src's domain set contains
      *            domains at a given priority level that have incompatible
      *            modes.

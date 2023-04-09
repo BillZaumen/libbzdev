@@ -7,11 +7,10 @@ import org.bzdev.drama.generic.*;
  * of a simulation, but that are not represented by actors or other
  * more specific simulation objects.  Domains and user-defined
  * condition observers will be notified when a condition changes.
- * <p>
+ * <P>
  * Conditions can be used for a variety of purposes, including turning
  * on or off debugging for all the actors associated with a given
  * domain.  The simplest conditions simply provide a value.
- * <p>
  * <P>
  * When a condition changes its state, the object that changed the state
  * is expected to call notifyObservers() followed by completeNotification().

@@ -3,11 +3,12 @@
 <HEAD>
   <title>Object Namers</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>ObjectNamer Description</H2>
+<H1>ObjectNamer Description</H1>
 
 An object-namer class is paired with a corresponding named-object
 class that is a common superclass of all named objects that can be
@@ -24,7 +25,7 @@ As a simple example, to add an object-namer capability to a class
 that must extend ScriptingContext and that uses TestObject as its
 named-object class, one would use the following class definition:
 <pre><code>
-@ObjectNamer(helperClass = "NHelper",
+{@literal @}ObjectNamer(helperClass = "NHelper",
              helperSuperclass = "org.bzdev.scripting.ScriptingContext",
              objectClass = "TestObject",
              objectHelperClass = "OHelper")
@@ -38,13 +39,13 @@ helper class.
 For a more complex example, suppose the superclass uses type parameters
 and has multiple constructors, some of which may throw exceptions:
 <pre><code>
-@ObjectNamer(helperClass = "NHelper",
+{@literal @}ObjectNamer(helperClass = "NHelper",
              helperSuperclass = "NumberStore",
              helperSuperclassTypeParms = "&lt;Integer&gt;"
              helperSuperclassConstrTypes =
              {
-               @ObjectNamer.ConstrTypes({"int"}),
-               @ObjectNamer.ConstrTypes(
+               {@literal @}ObjectNamer.ConstrTypes({"int"}),
+               {@literal @}ObjectNamer.ConstrTypes(
                    values = {"int", "float"},
                    exceptions = {"IllegalArgumentException"}),
              objectClass = "TestObject",
@@ -68,7 +69,7 @@ helper class will have two constructors, the first of which has
 an argument that is an int, and the second of which has two arguments
 (an int and a double).  The class TestNamer's constructor will have
 to have constructors that call its superclass' constructors with
-the arguments defined in the @ObjectNamer annotation.
+the arguments defined in the {@literal @}ObjectNamer annotation.
 Finally, ObjectNamerOps is provided so that javadocs will document
 public methods for object namers.  Its use is not mandatory.
 <P>
@@ -103,28 +104,28 @@ mods and a subdirectory mods/MODULE where MODULE is the name of the
 module (e.g., com.foo.bar). One will also create a directory tmpsrc
 and a corresponding subdirectory tmpsrc/MODULE.  A typical compiler
 command, assuming the source code is in a directory src, is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE \
          --processor-module-path /usr/share/bzdev \
          src/MODULE/module-info.java src/MODULE/DIR/*.java
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where DIR is the directory corresponding to a package name
 following the usual Java conventions (e.g., com/foo/bar for the
 package com.foo.bar). Placing generated source files in
 tmpsrc/MODULE and the source tree in src/MODULE will make it easy
 to use javadoc to generate documentation: for javadoc the
 options
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    -d TARGET
    --module-path PATH
    --module-source-path src:tmpsrc
    --add-modules MODULES
    --module MODULE
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 and possibly
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    --exclude PACKAGES
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 are useful. For these options,
 <UL>
   <LI> TARGET is the directory that will hold the API documentation

@@ -36,7 +36,7 @@ enough so that the diagram will show at least an indirect dependency.
 Two  modules, org.bzdev.dmethods and org.bzdev.parmproc, are not shown
 as these are used only for annotation processing.
 
-<H2><A NAME="base"></A>The module org.bzdev.base</H2>
+<H2><A ID="base"></A>The module org.bzdev.base</H2>
 The module <CODE>org.bzdev.base</CODE> provides basic operations. The
 following diagram shows the packages this module contains:
 <P>
@@ -88,7 +88,7 @@ The packages in this module provide the following:
   <li> org.bzdev.util.units provides classes for converting from one
        set of units to another.
 </UL>
-<H2><A NAME="math"></A>The module org.bzdev.math</H2>
+<H2><A ID="math"></A>The module org.bzdev.math</H2>
 The module <CODE>org.bzdev.math</CODE> provides special functions,
 various numerical algorithms, random variables, and statistics.
  The
@@ -124,7 +124,7 @@ The packages in this module provide the following:
        an FFT (Fast Fourier Transform).
 </UL>
 
-<H2><A NAME="graphics"></A>The module org.bzdev.graphics</H2>
+<H2><A ID="graphics"></A>The module org.bzdev.graphics</H2>
 
 The module <CODE>org.bzdev.graphics</CODE> provides graphs and IO operatios
 involving geometry, graphics-based IO operations, graphs, and packages that
@@ -167,7 +167,7 @@ The packages in this module provide the following:
        fonts.
 </UL>
 
-<H2><a NAME="desktop"></A>The module org.bzdev.desktop</H2>
+<H2><A ID="desktop"></A>The module org.bzdev.desktop</H2>
 
 The module <CODE>org.bzdev.base</CODE> provides graphics and desktop
 operations. The following diagram shows the packages this module contains:
@@ -200,7 +200,7 @@ The packages in this module provide the following:
        be entered into a text component.
 </ul>
 
-<H2><A NAME="devqsim"></A>The module org.bzdev.devqsim</H2>
+<H2><A ID="devqsim"></A>The module org.bzdev.devqsim</H2>
 
 The module <CODE>org.bzdev.devqsim</CODE> provides discrete event
 and queuing simulation.  The folloowing diagram shows the packages
@@ -232,7 +232,7 @@ The package
     methods for creating them.
 </UL>
 
-<H2><A NAME="drama"></A>The module org.bzdev.drama</H2>
+<H2><A ID="drama"></A>The module org.bzdev.drama</H2>
 
 The module <CODE>org.bzdev.drama</CODE> provides discrete event
 simulations using a message-passing paradigm. The following diagram
@@ -268,7 +268,7 @@ The package
     flavors of drama-like simulations.
 </UL>
 
-<H2><A NAME="ejws"></A>The module org.bzdev.ejws</H2>
+<H2><A ID="ejws"></A>The module org.bzdev.ejws</H2>
 
 The module <CODE>org.bzdev.base</CODE> provides an embedded web server
 based on the Java package com.sun.net.httpserver that is part of the
@@ -297,7 +297,7 @@ These packages are described below:
   <LI>
 </UL>
 
-<H2><A NAME="servlets"></A>The module org.bzdev.servlets</H2>
+<H2><A ID="servlets"></A>The module org.bzdev.servlets</H2>
 <P>
 The module
 <A HREF="../org.bzdev.servlets/module-summary.html">org.bzdev.servlets</A>
@@ -321,7 +321,7 @@ The current name for the servlet-API module is servlet.api although that
 may change.
 
 
-<H2><A NAME="rest"></A>The remaining modules</H2>
+<H2><A ID="rest"></A>The remaining modules</H2>
 
 The remaining modules, like the org.bzdev.servlets module, are ones
 with one package (sometimes a substantial package) per module. The
@@ -358,7 +358,7 @@ following diagram shows these modules and their packages:
     package for generating complex shapes, and it can use the org.bzdev.graph
     class to create images.
 </UL>
-<H2><A name="compile"></A>Compilation</H2>
+<H2><A ID="compile"></A>Compilation</H2>
 <P>
 The following instructions are appropriate for Debian Linux and
 other distributions that put libraries in the same locations.
@@ -366,16 +366,16 @@ The procedure depends on whether Java modules are used or not.
 <P>
 To compile without modules and without annotation processors,
 assuming the compiled classes will be put in the directory classes
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javac -d classes -classpath /usr/share/java/libbzdev.jar \
              JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 To compile without modules and with annotation processors, add a
 directory tmpsrc to hold the generated source-code files:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javac -d classes -classpath /usr/share/java/libbzdev.jar \
              -s tmpsrc JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 In both cases JAVA_FILE should be a path whose components reflect the
 package hierarchy. For example, the class com.foo.pkg.Foo will be in
 the file com/foo/pkg/Foo.java.
@@ -385,16 +385,16 @@ should be in subdirectories of a directory traditionally named
 src. These subdirectories should have names matching a module name
 (for example, com.foo.mod). The compiled code goes into similar
 subdirectories of a directory named mods:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javac -d mods/com.foo.mod -p /usr/share/bzdev JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 In this example, src/com.foo.mod must contain a file named
 module-info.java:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       module com.foo.mod {
         ....
       }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 In addition, a Java source file for the class com.foo.pkg.Foo.java
 in the module com.foo.mod must be in the directory
 src/com.foo.mod/com/foo/pkg/Foo.java, with all modules and packages
@@ -402,41 +402,41 @@ being compiled following this pattern.
 <P>
 To compile with modules and with annotation, the javac command above
 should be changed to
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javac -d mods/com.foo.mod -p /usr/share/bzdev \
           -s tmpsrc/com.foo.mod \
           --processor-module-path /usr/share/bzdev \
           src/com.foo.mod/module-info.java JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 When javadoc is used to generate API documentation, the command for
 the previous example without modules when annotation processing is not
 used is:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javadoc -d APIDIR -sourcepath . \
           -classpath classes JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 When annotation processing is used, this command becomes
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javadoc -d APIDIR -sourcpath .:tmpsrc \
           -classpath classes JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where APIDIR is the directory that will contain the API documentation.
 Similarly, when modules are used without annotation processing, the
 javadoc command is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javadoc -d APIDIR --module-path JARDIR \
           --add-modules com.foo.mod \
           --module com.foo.mod JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where JARDIR is a directory that contains the JAR files for the modules.
 When annotations are used, this becomes
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       javadoc -d APIDIR --module-path JARDIR \
           --module-source-path src:tmpsrc \
           --add-modules com.foo.mod \
           --module com.foo.mod JAVA_FILE...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 There is a minor detail to watch: the options <CODE>--module-path</CODE>,
 <CODE>module-source-path</CODE>, and <CODE>--add-modules</CODE> allow
@@ -449,13 +449,13 @@ their parameters.  The program <CODE>lsnof</CODE> can generate documentation
 describing a factory's parameters. When modules are not used the command
 is
 
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       lsnof -d APIDIR --classpathCodebase JARFILE CLASSNAME...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 and when modules are used, the command is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       lsnof -d APIDIR --module-path JARDIR CLASSNAME...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 While fully-qualified class names can be provided explicitly, lsnof
 also supports a wildcard syntax described in the lsnof man page and
 elsewhere.  In both cases, the documentation will appear in a
@@ -464,13 +464,13 @@ used to prevent collisions with Java package names). If a factory's
 fully qualified class name is <CODE>org.foo.pkg.Factory</CODE>, one
 can place the parameter documentation in an IFRAME by using an IFRAME
 whose source attribute is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    SRC="{@docRoot}/factories-api/org/foo.pkg/Factory.html"
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The javadoc program will replace <CODE>{@docRoot}</CODE> with the API
 directory (APIDIR in this example).
 
-<H2><A name="libraries"></A>Libraries</H2>
+<H2><A ID="libraries"></A>Libraries</H2>
 
 The JAR files for the libbzdev modules should be available in a single
 directory.  On Debian Linux systems, unless modified by a package

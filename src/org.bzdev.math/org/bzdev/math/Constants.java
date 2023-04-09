@@ -17,6 +17,9 @@ public class Constants {
     }
 
 
+    /**
+     * Euler's Constant.
+     */
     public static final double EULERS_CONSTANT =
 	0.57721566490153286060651209008240243104215933593992;
 

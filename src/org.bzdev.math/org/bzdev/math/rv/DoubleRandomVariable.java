@@ -297,7 +297,7 @@ abstract public class DoubleRandomVariable extends RandomVariable<Double>
 	return StreamSupport.doubleStream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of double values.
      * @param size the number of random values to provide
      * @return the stream
@@ -306,7 +306,7 @@ abstract public class DoubleRandomVariable extends RandomVariable<Double>
 	return StreamSupport.doubleStream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinite stream of double values.
      * @return the stream
      */
@@ -314,7 +314,7 @@ abstract public class DoubleRandomVariable extends RandomVariable<Double>
 	return StreamSupport.doubleStream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinite parallel stream of double values.
      * @return the stream
      */

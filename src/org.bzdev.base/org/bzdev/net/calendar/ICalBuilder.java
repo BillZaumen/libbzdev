@@ -25,7 +25,7 @@ import org.bzdev.util.TemplateProcessor.KeyMapList;
  * Users of this class should be familiar with this RFC. This class
  * uses several additional classes as shown in the following diagram:
  * <P style="text-align: center">
- * <img src="doc-files/ICalBuilder.png" class="imgBackground">
+ * <img src="doc-files/ICalBuilder.png" class="imgBackground" alt="Class Diagram">
  * <P>
  * Users of this class will first create an instance of it and also
  * instances of inner classes representing iCalendar components. Then
@@ -551,13 +551,13 @@ public class ICalBuilder {
 	 * where NAME is a string containing letters (alpha characters),
 	 * digits, and "-".
 	 * The component's properties will be delimited by the lines
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 *    BEGIN:&lt;X-NAME&gt;
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * and
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 *    END:&lt;X-NAME&gt;
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * Each property should be added using the methods
 	 * {@link ICalBuilder.Base#addProperty(String,String,boolean,String...)}
 	 * or
@@ -578,13 +578,13 @@ public class ICalBuilder {
 	 * where NAME is a string containing letters (alpha characters),
 	 * digits, and "-".
 	 * The component's properties will be delimited by the lines
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 *    BEGIN:&lt;X-NAME&gt;
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * and
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 *    END:&lt;X-NAME&gt;
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * <P>
 	 * The initial properties are provided by the second argument.
 	 * Each element of this array represents a line that starts
@@ -994,7 +994,7 @@ public class ICalBuilder {
 	 * and
 	 * <A HREF="https://tools.ietf.org/html/rfc5545#section-3.2.1">
 	 * ALTREP</A>.
-	 * @parm comment the comment.
+	 * @param comment the comment.
 	 * @param parameters the parameters for this property
 	 */
 	public void addComment(String comment, String... parameters) {
@@ -1140,6 +1140,7 @@ public class ICalBuilder {
 	 * <A HREF="https://tools.ietf.org/html/rfc5545#section-3.2.1">
 	 * ALTREP</A>.
 	 * @param contact the contact
+	 * @param parameters  the parameters as defined in RFC 5545
 	 * @exception IllegalArgumentException the argument was null
 	 */
 
@@ -1171,6 +1172,8 @@ public class ICalBuilder {
 	 * parameters.  The language parameter
 	 * <A HREF="https://tools.ietf.org/html/rfc5545#section-3.2.10">
 	 * LANGUAGE</A> may be useful as well.
+	 * @param uri a URI denoting an attendee
+	 * @param params additional parameters as defined in RFC 5545
 	 */
 	public void addAttendee(String uri, String... params) {
 	    if (uri == null) {
@@ -2275,7 +2278,7 @@ public class ICalBuilder {
 	 * @param type the type of the alarm
 	 *        ({@link ICalBuilder.AlarmType#AUDIO},
 	 *         {@link ICalBuilder.AlarmType#DISPLAY},
-	 *          or {@lijnk ICalBuilder.AlarmType#EMAIL}).
+	 *          or {@link ICalBuilder.AlarmType#EMAIL}).
 	 * @param fromStart true if the alarm is offset from the
 	 *        start of the event; false if the alarm is offset from
 	 *        the end of the event;
@@ -2545,6 +2548,7 @@ public class ICalBuilder {
     /**
      * Apply the RFC 5545 encoding rules to a string.
      * @param text the string to encode
+     * @return the encoded string
      */
     public static String escape(String text) {
 	return text.replace("\\", "\\\\").replace(",", "\\,")
@@ -2693,6 +2697,7 @@ public class ICalBuilder {
     /**
      * Apply RFC 5545 line-folding rules to a line of text
      * @param text a line of text
+     * @return the line-folded text
      */
     public static String fold(String text) {
 	byte[] bytes = text.getBytes(UTF8);
@@ -2741,10 +2746,11 @@ public class ICalBuilder {
     /**
      * Write an iCalendar object to an output stream().
      * @param os the output stream
-     * @close true if the writer constructed from the output stream should
-     *        be closed when the iCalendar object is complete; false otherwise
-     * @exception IOException an error occurred while writing to the output
-     *            stream
+     * @param close true if the writer constructed from the output
+     *        stream should be closed when the iCalendar object is
+     *        complete; false otherwise
+     * @exception IOException an error occurred while writing to the
+     *            output stream
      */
     public void write(OutputStream os, boolean close) throws IOException {
 	TemplateProcessor.KeyMap map = new TemplateProcessor.KeyMap();

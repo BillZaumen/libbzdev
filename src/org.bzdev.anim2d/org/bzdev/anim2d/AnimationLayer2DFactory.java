@@ -48,14 +48,14 @@ package org.bzdev.anim2d;
  * allowed sequences of <CODE>object.type</CODE> values for these
  * paths are shown in the following diagram:
  * <DIV style="text-align: center">
- * <img src="doc-files/layerpath.png" class="imgBackground">
+ * <img src="doc-files/layerpath.png" class="imgBackground"
+ *      ALT="UML Diagram">
  * </DIV>
  * <P>
  * The parameters this factory supports are shown in the following table
  *(the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html#object.type-org.bzdev.anim2d.AnimationLayer2DFactory" target="ftable">object.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html">

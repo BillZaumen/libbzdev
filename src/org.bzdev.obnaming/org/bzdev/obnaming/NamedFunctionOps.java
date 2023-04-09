@@ -22,6 +22,8 @@ public interface NamedFunctionOps extends NamedObjectOps, RealValuedFunctOps {
 
     /**
      * Determine if the minimum value for the domain is in the domain
+     * @return true if the domain's minimum value is in the domain; false
+     *         otherwise
      */
     boolean domainMinClosed();
 
@@ -33,6 +35,8 @@ public interface NamedFunctionOps extends NamedObjectOps, RealValuedFunctOps {
 
     /**
      * Determine if the maximum value for the domain is in the domain
+     * @return true if the maximum value for the domain is in the domain;
+     *         false otherwise
      */
     boolean domainMaxClosed();
 

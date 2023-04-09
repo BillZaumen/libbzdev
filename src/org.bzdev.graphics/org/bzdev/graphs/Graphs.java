@@ -186,6 +186,9 @@ public class Graphs {
 		subspacingColor;
 	}
 
+	/**
+	 * The default stroke width for a Cartesian grid.
+	 */
 	public static final double STROKE_WIDTH = 2.0;
 
 	private double strokeWidth = STROKE_WIDTH;

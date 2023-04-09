@@ -184,6 +184,9 @@ public interface ObjectParser<T> {
 	 * @param prefix the prefix
 	 * @param verbose true if fully-qualified class names should be
 	 *        shown; false for just the final component of the class name
+	 * @param showLocation true to show the location for an error message;
+	 *        false otherwise
+	 * @return the error message
 	 */
 	public String getMessage(String prefix,
 				 boolean verbose,
@@ -251,14 +254,14 @@ public interface ObjectParser<T> {
      * to distinguish strings that must be evaluated from strings that
      * should not be evaluated.  For example, when using ObjectNamerLauncher
      * with YAML,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *     - = 10 + 20
-     * </PRE><CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * would be treated as an expression whose value is 30. By
      * contrast,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *     - !!str = 10 + 20
-     * </PRE><CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * would be interpretted as the string "= 10 + 20".  This is
      * actually handled in two passes. During the first, sequences that
      * could be ESP expressions or statements are replaced with objects

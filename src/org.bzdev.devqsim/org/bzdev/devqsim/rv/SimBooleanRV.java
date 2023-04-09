@@ -52,7 +52,7 @@ public class SimBooleanRV<RV extends BooleanRandomVariable>
 	return getRandomVariable().stream(size);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of boolean values.
      * @param size the number of random values to provide
      * @return the stream
@@ -61,7 +61,7 @@ public class SimBooleanRV<RV extends BooleanRandomVariable>
 	return getRandomVariable().parallelStream(size);
     }
 
-    /*
+    /**
      * Get an infinie stream of boolean values.
      * @return the stream
      */
@@ -69,7 +69,7 @@ public class SimBooleanRV<RV extends BooleanRandomVariable>
 	return getRandomVariable().stream();
     }
 
-    /*
+    /**
      * Get an infinie parallel stream of boolean values.
      * @return the stream
      */

@@ -110,8 +110,9 @@ public interface SurfaceIterator
     Color currentColor();
 
     /**
-     * Return true if a segment is from an oriented surface;
-     * false otherwise
+     * Determine if a segment is from an oriented surface.
+     * @return true if a segment is from an oriented surface;
+     *         false otherwise
      */
     boolean isOriented();
 

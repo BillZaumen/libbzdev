@@ -26,6 +26,11 @@ public class ConditionInfo {
      */
     public SimObject getSource() {return source;}
 
+    /**
+     * Constructor.
+     * @param mode the mode for a condition change
+     * @param source the source for a condition change
+     */
     public ConditionInfo(ConditionMode mode, SimObject source) {
 	this.mode = mode;
 	this.source = source;

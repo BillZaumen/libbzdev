@@ -35,7 +35,6 @@ import org.bzdev.obnaming.misc.*;
  * stacking order (z-order) for the objects it will create.
  * The factory parameters are the same as those provided by
  * its subclass {@link PolarGridFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/PolarGridFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/PolarGridFactory.html">

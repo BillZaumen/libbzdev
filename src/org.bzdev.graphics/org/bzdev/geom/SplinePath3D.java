@@ -849,6 +849,7 @@ public class SplinePath3D extends Path3D.Double {
      * coordinates.
      * @param xf the cubic spline providing the x coordinates
      * @param yf the cubic spline providing the y coordinates
+     * @param zf the cubic spline providing the z coordinates
      * @param connect true if the appended spline is to be connected to
      *        this path with a lineTo operation; false if a moveTo
      *        operation will be used instead

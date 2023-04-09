@@ -6,6 +6,7 @@ import java.util.function.Function;
  * Functional interface for mapping one point in a two or three dimensional
  * space to another object when creating a sequence of objects distinguished
  * by an index.
+ * @param <R> the type of the objects returned with this mapper is applied
  * @see BezierGrid
  */
 @FunctionalInterface
@@ -31,7 +32,7 @@ public interface Point3DMapper<R> {
 	/**
 	 * The second argument to
 	 * {@link Point3DMapper#apply(int,Point3D,Type,Point3D...)} is
- in 	 * the first intermediate control point of a cubic B&eacute;zier
+	 * the first intermediate control point of a cubic B&eacute;zier
 	 * curve.
 	 */
 	FIRST_CUBIC,
@@ -89,6 +90,8 @@ public interface Point3DMapper<R> {
      * calls {@link #apply(int,Point3D,Type,Point3D...)}.
      * @param n the index
      * @param p the point to map to another point
+     * @param type the type of control point that describes the second
+     *         argument; null if not provided
      * @param bounds there are no optional arguments if p is a
      *        spline's knot or an end point of a Path3D segment;
      *        otherwise (i.e., p is an intermediate control point)
@@ -113,8 +116,11 @@ public interface Point3DMapper<R> {
      * and then applies the argument mapping.
      * (This method is provided for consistency with the interfaces
      * in the package {@link java.util.function}.)
+     * @param <V> the type of the object returned by the function
+     *            <CODE>after</CODE>.
      * @param after the function to apply on the result of this object's
      *        apply method
+     * @return the composed mapper
      */
     default <V> Point3DMapper<V>
 	andThen(Function<? super R, ? extends V> after)

@@ -216,6 +216,7 @@ public class JSObject implements JSOps {
     /**
      * Get the object associated with a key for this map, cast to a
      * specified type.
+     * @param <T> the type for the argument <CODE>clasz</CODE>
      * @param key the key
      * @param clasz the class of the object that will be
      *        returned.
@@ -246,7 +247,7 @@ public class JSObject implements JSOps {
      * @return the key map
      * @exception JSArray.ConversionException a {@link JSArray}
      *  contained another {@link JSArray}
-     * @see JSArray.toKeyMapList(String)
+     * @see JSArray#toKeyMapList(String)
      */
     public TemplateProcessor.KeyMap toKeyMap()
 	throws JSArray.ConversionException

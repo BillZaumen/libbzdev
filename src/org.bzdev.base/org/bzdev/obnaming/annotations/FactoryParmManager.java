@@ -19,11 +19,11 @@ import java.lang.annotation.*;
  * files (with directories matching the package hierarchy).
  * <P>
  * To compile when using Java modules, use
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE	\
  *          --processor-module-path /usr/share/bzdev		\
  *          src/MODULE/module-info.java src/MODULE/DIR/*.java
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where MODULE is the name of the module and DIR is the directory
  * corresponding to a package name following the usual Java conventions
  * (e.g., com/foo/bar for the package com.foo.bar). Placing generated
@@ -51,6 +51,7 @@ public @interface FactoryParmManager {
      * If the class name is an empty string, a ParmManager will not
      * be created. Setting <CODE>value</CODE> to an empty string is
      * useful in some special/unusual cases.
+     * @return the class name
      */
     String value();
 
@@ -70,6 +71,8 @@ public @interface FactoryParmManager {
      * When provided, the key for a tip is a parameter name. The value
      * is a string suitable for use by a tool tip, and will also be
      * used in lsnof documentation for a short summary of a parameter.
+     * @return the class name for a resource bundle for tips; an empty
+     *         string if there is none
      */
     String tipResourceBundle() default "";
 
@@ -92,6 +95,8 @@ public @interface FactoryParmManager {
      * Swing panel or dialog box, but is also used in lsnof-generated
      * documentation. The label is a title, so most of the words in it
      * should be capitalized.
+     * @return the class name for a resource bundle for labels; an empty
+     *         string if there is none
      */
     String labelResourceBundle() default "";
 
@@ -113,6 +118,8 @@ public @interface FactoryParmManager {
      * <CODE>JDOC</CODE> element are handled is described above and in
      * the documentation for
      * {@link org.bzdev.obnaming.NamedObjectFactory#getTemplateKeyMap()}.
+     * @return the class name for a resource bundle for documentation; an empty
+     *         string if there is none
      */
     String docResourceBundle() default "";
 
@@ -127,6 +134,8 @@ public @interface FactoryParmManager {
      * element is provided, the class being annotated must use type
      * parameters and the last type parameter in the list must refer to
      * the type of the named object that the factory will create.
+     * @return the simple name for a standard factory; an empty
+     *         string if there is none
      */
     String stdFactory() default "";
 
@@ -135,6 +144,7 @@ public @interface FactoryParmManager {
      * This allows the name of the constructor's argument to be
      * set to a more mnemonic value than the default as that
      * argument is displayed in javadoc-generated documentatio
+     * @return The name of the constructor's argument
      */
     String namerVariable() default "namer";
 
@@ -142,6 +152,7 @@ public @interface FactoryParmManager {
      * The documentation string for the constructor's argument.
      * This is the string that follows the name of a constructor's
      * argument in an {@literal @}param statement in a Javadoc comment.
+     * @return the documentation string
      */
     String namerDocumentation() default "the object namer";
 
@@ -149,6 +160,7 @@ public @interface FactoryParmManager {
      * When an IFRAME is used to display the parameter documentation for
      * a standard factory, the IFRAME will be configured using a style.
      * This element allows that style to be changed.
+     * @return the style for an IFRAME
      */
     String iframeStyle() default
 	"width:95%;height:500px;border:3px solid steelblue";
@@ -156,6 +168,8 @@ public @interface FactoryParmManager {
     /**
      * Determine if the standard factory's parameter documentation should
      * be shown in an HTML IFRAME in the standard factory's documentation
+     * @return true if the standard factory's parameter documentation should
+     *         be shown in an HTML IFRAME; false otherwise
      */
     boolean showParameterDocumentation() default true;
 }

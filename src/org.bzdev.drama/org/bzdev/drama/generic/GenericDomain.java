@@ -70,12 +70,14 @@ abstract public class GenericDomain <
      * If a reference to the child domain is kept, it should be
      * a weak reference so that it will not inhibit garbage collection
      * of the child.
+     * @param child the child domain that was added
      */
     protected void onChildAdd(D child) {}
 
     /**
      * Handle destruction of a child domain.
      * This allows any action performed by onChildAdd to be undone.
+     * @param child the child domain that is to be eliminated
      */
     protected void onChildRemove(D child) {}
 
@@ -720,6 +722,7 @@ abstract public class GenericDomain <
      * @param ancestorDomain the closest common ancestor for the source
      *        and destination domains
      * @param destDomain the domain for a message destination
+     * @return the new communication domain
      */
     protected final CommDomainInfo<D> createCommDomainInfo(D srcDomain,
 							   D ancestorDomain,
@@ -1391,6 +1394,7 @@ abstract public class GenericDomain <
      * this domain. It is a good practice when overriding this
      * method to call super.onJoinedDomain with the same
      * arguments.
+     * @param actor the actor that is to leave this domain
      */
     protected void onLeftDomain(A actor) {}
 

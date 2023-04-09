@@ -71,6 +71,7 @@ public class BezierVertex implements Shape3D {
 
     /**
      * Get this object's tag.
+     * @return the tag
      */
     public Object getTag() {
 	return tag;
@@ -240,6 +241,9 @@ public class BezierVertex implements Shape3D {
 	flipped = reverse;
     }
 
+    /**
+     * Reverse the orientation of this object.
+     */
     public void flip() {
 	flipped = !flipped;
     }
@@ -252,6 +256,7 @@ public class BezierVertex implements Shape3D {
 
     /**
      * Set the default color for this shape.
+     * @param c the color
      */
     public void setColor(Color c) {
 	defaultColor = c;
@@ -284,6 +289,8 @@ public class BezierVertex implements Shape3D {
      * for which an explicit color has been specified.
      * When a color for a specific index has been provided, that color is
      * returned; otherwise the default color (if any) is returned.
+     * @param i the index of a B&eacute;zier triangle contained in this
+     *        B&eacute;zier vertex
      * @return the color
      */
     public Color getColor(int i) {
@@ -295,6 +302,7 @@ public class BezierVertex implements Shape3D {
 
     /**
      * Print this object's control points.
+     * @exception IOException an IO error occurred
      */
     public void print() throws IOException {
 	print(System.out);
@@ -303,6 +311,7 @@ public class BezierVertex implements Shape3D {
     /**
      * Print this object's control points, specifying an output.
      * @param out the output
+     * @exception IOException an IO error occurred
      */
     public void print(Appendable out) throws IOException {
 	print("", out);
@@ -313,6 +322,7 @@ public class BezierVertex implements Shape3D {
      * Each line will start with the prefix (typically some number
      * of spaces).
      * @param prefix the prefix
+     * @exception IOException an IO error occurred
      */
     public void print(String prefix) throws IOException {
 	print(prefix, System.out);
@@ -324,6 +334,7 @@ public class BezierVertex implements Shape3D {
      * of spaces).
      * @param prefix the prefix
      * @param out the output
+     * @exception IOException an IO error occurred
      */
     public void print(String prefix, Appendable out) throws IOException {
 	out.append(String.format("%snumber of cubic vertices: %d\n", prefix,

@@ -28,6 +28,10 @@ public class P3d {
 	 * when viewed from the direction the normal vector points and
 	 * corresponding to the use of a right-hand rule for determining
 	 * the direction of the normal vector.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -60,6 +64,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -87,6 +95,10 @@ public class P3d {
 	 * <blockquote>
 	 * (x1, y1, z)----&gt;(x3,y1,z)----&gt;(x3,y3,z)----&gt;(x1,y3,z)
 	 * </blockquote>
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -111,6 +123,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -140,6 +156,10 @@ public class P3d {
 	 * when viewed from the direction the normal vector points and
 	 * corresponding to the use of a right-hand rule for determining
 	 * the direction of the normal vector.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -175,6 +195,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -204,6 +228,10 @@ public class P3d {
 	 * <blockquote>
 	 * (x1, y1, z)----&gt;(x3,y1,z)----&gt;(x3,y3,z)----&gt;(x1,y3,z)
 	 * </blockquote>
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -231,6 +259,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -263,6 +295,10 @@ public class P3d {
 	 * when viewed from the direction the normal vector points and
 	 * corresponding to the use of a right-hand rule for determining
 	 * the direction of the normal vector.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -299,6 +335,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param x1 the x coordinate of the first vertex.
 	 * @param y1 the y coordinate of the first vertex.
@@ -329,6 +369,10 @@ public class P3d {
 	 * <blockquote>
 	 * (x1, y1, z)----&gt;(x3,y1,z)----&gt;(x3,y3,z)----&gt;(x1,y3,z)
 	 * </blockquote>
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -357,6 +401,10 @@ public class P3d {
 	 * <P>
 	 * Flipped rectangles are useful when paired with one that is not
 	 * flipped, as most of the arguments will be the same.
+	 * @param <T> the type of an implementation of
+	 *            {@link Model3DOps.Triangle}
+	 * @param <M> the type of an implementation of
+	 *            {@link Model3DOps  Model3DOps&lt;T&gt;}
 	 * @param m3d the model to which the rectangle should be added.
 	 * @param z the z coordinate of the rectangle's vertices.
 	 * @param x1 the x coordinate of the first vertex.
@@ -511,6 +559,7 @@ public class P3d {
      * @param out the output appendable
      * @param prefix a prefix that starts each line
      * @param builder the {@link SteppedGrid.Builder} that failed
+     * @throws IOException if an IO error occurred
      */
     public static void printSteppedGridBuilderCalls(Appendable out,
 						   String prefix,

@@ -6,7 +6,8 @@ import java.math.BigInteger;
  * Class for computing binomial coefficients.
  * The methods are all static.  One computes a single binomial
  * coefficient and the others use the equation
- * <P><PRE>
+ * <br>
+ * <PRE>
  *    / n \       / n-1 \      /  n-1 \
  *    |   |   =  |       |  + |        |
  *    \ m /       \ m-1 /      \   m  /
@@ -51,19 +52,19 @@ public class Binomial {
     /**
      * Compute a binomial coefficient C(n,m).
      * The normal notation is
-     * <P> <pre>
+     * <blockquote><pre>
      *    / n \          n!
      *    |   |   =   --------
      *    \ m /       m!(n-m)!
-     * </pre>
+     * </pre></blockquote>
      * The value is computed using the relation
-     * <P> <pre>
+     * <blockquote> <pre>
      *     C(n,k) = (n/k)C(n-1,k-1)
-     * </pre>
-     * <P> and
-     * <P> <pre>
+     * </pre> </blockquote>
+     * and
+     * <blockquote><pre>
      *     C(n,k) = C(n,n-k)
-     * </pre><P>
+     * </pre></blockquote>
      * in order that integer multiplication does not overflow at
      * intermediate steps.  The maximum value of n is 64 due to
      * limits on the size of numbers that can be represented as
@@ -71,9 +72,9 @@ public class Binomial {
      * @param n a non-negative number
      * @param m a non-negative number less than or equal to n
      * @return the binomial coefficient C(n,m)
-     * @exception an argument is out of range
+     * @exception IllegalArgumentException an argument is out of range
      */
-    public static long C(int n, int m) {
+    public static long C(int n, int m) throws IllegalArgumentException {
 	/*
 	if (m > n/2) {
 	    if (n < 0 || m < 0 || m > n)
@@ -111,19 +112,19 @@ public class Binomial {
     /**
      * Compute a binomial coefficient C(n,m) as a double-precision number.
      * The normal notation is
-     * <P> <pre>
+     * <blockquote><pre>
      *    / n \          n!
      *    |   |   =   --------
      *    \ m /       m!(n-m)!
-     * </pre>
+     * </pre></blockquote>
      * The for n &lt; 65, the value is computed using the relation
-     * <P> <pre>
+     * <blockquote><pre>
      *     C(n,k) = (n/k)C(n-1,k-1)
-     * </pre>
-     * <P> and
-     * <P> <pre>
+     * </pre></blockquote>
+     * and
+     * <blockquote><pre>
      *     C(n,k) = C(n,n-k)
-     * </pre><P>
+     * </pre></blockquote>
      * in order that integer multiplication does not overflow at
      * intermediate steps.  For larger values of n, the coefficients cannot
      * be expressed as long integers (signed with 64 bits). For this case,

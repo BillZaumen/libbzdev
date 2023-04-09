@@ -572,6 +572,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	/**
 	 * Call this function.
 	 * @param fargs this function's arguments
+	 * @return the result of invoking this function
 	 * @exception IllegalArgumentException an argument was not appropriate
 	 */
 	public Object invoke(Object... fargs) throws IllegalArgumentException {
@@ -688,6 +689,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	/**
 	 * Convert this function into an implementation of a
 	 * functional interface.
+	 * @param<T> the type of the functional interface's class.
 	 * @param fi the functional interface's class
 	 * @return an instance of the functional interface that
 	 *         will call this function.
@@ -741,6 +743,12 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	// fi must be an interface.
+	/**
+	 * Convert this object to one with a specified class
+	 * @param<T> the type for the class <CODE>fi</CODE>
+	 * @param fi the class to which this object is to be converted
+	 * @return an object of type T
+	 */
 	public <T> T convert(Class<T>fi) {
 	    InvocationHandler handler = new InvocationHandler() {
 		    public Object invoke(Object proxy, Method m, Object[] args)
@@ -864,6 +872,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	 *      {@link DoubleStream DoubleStream}.
 	 *  </UL>
 	 *  @param clasz either int.class, long.class, or double.class
+	 * @return the stream
 	 *  @exception IllegalArgumentException if the argument is not
 	 *             a recognized class
 	 *  @exception NullPointerException if the argument is null
@@ -1388,10 +1397,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	 * line when scrunner is used to run this script.  The second will
 	 * usually be an ESP array, all of whose elements are strings. These
 	 * strings will be URLs.  For example,
-	 * <BLOCkQUOTE><CODE><PRE>
+	 * <BLOCkQUOTE><PRE><CODE>
 	 *  global.generateDocs(w, ["/usr/share/doc/libbzdev-doc/api",
                                     "/usr/share/doc/librdanim-doc/api"]);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * <P>
 	 * The 'docs' arguments is a list of strings.  Each string
 	 * can contain multiple URLS or file names, with '|' used
@@ -1985,11 +1994,14 @@ public class ExpressionParser implements ObjectParser<Object>
 	 *        the specified arguments.
 	 * </UL>
 	 * @param fargs this function's arguments
+	 * @return the value produced by invoking this function.
 	 * @exception IllegalArgumentException an argument was not appropriate
+	 * @exception IllegalAccessException a class or method was not
+	 *            accessible
 	 * @exception NoSuchMethodException the method could not be found
-	 * @exception InvocatgionTargetException the operation failed when
+	 * @exception InvocationTargetException the operation failed when
 	 *            the method or constructor was being executed
-	 * @exception InstantiaionException a constructor failed
+	 * @exception InstantiationException a constructor failed
 	 */
 	Object invoke(Object... fargs) throws IllegalArgumentException,
 					      NoSuchMethodException,
@@ -1999,6 +2011,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
 	/**
 	 * Convert this object to a functional interface.
+	 * @param <T> the type for the class <CODE>functionalInterface</CODE>
 	 * @param functionalInterface the class for the functional interface
 	 * @return an object that implements the functional interface
 	 */
@@ -6651,6 +6664,7 @@ public class ExpressionParser implements ObjectParser<Object>
      * {@link #ExpressionParser(Class[],Class[],Class[],Class[],Class[])}.
      * Primitive classes are ignored.
      * @param classes the classes to add
+     * @exception IllegalAccessException a class or method is not accessible
      */
     public void addClasses(Class<?>... classes) throws IllegalAccessException {
 	Thread currentThread = Thread.currentThread();
@@ -6872,6 +6886,11 @@ public class ExpressionParser implements ObjectParser<Object>
      * classes used to define functions.
      * @param fname the name of the function
      * @return the method
+     * @exception IllegalStateException classes are missing or fname does
+     *            not name a method that is recognized
+     * @exception NoSuchMethodException a method does not exist
+     * @exception IllegalArgumentException fname is not syntactically
+     *            the name of a method
      */
     public Method findRVFMethod (String fname)
 	throws IllegalStateException, NoSuchMethodException,
@@ -11514,6 +11533,7 @@ public class ExpressionParser implements ObjectParser<Object>
      * final component in the path is "api" and that directory will
      * contain a file named either element-list or package-list.
      * @param apis a list of the URLS for javadoc directories
+     * @exception IOException an IO error occurred
      */
     public void createAPIMap(List<URL> apis) throws IOException {
 	for (URL url: apis) {

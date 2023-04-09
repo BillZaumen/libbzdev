@@ -13,8 +13,6 @@ class RootWebMap extends WebMap {
      * @param fragment the fragment portion of a URI
      * @param requestInfo an object encapsulating request data
      *        (headers, input streams, etc.)
-     * @return an Info object describing properties of a resource and
-     *         providing an input stream to the resource
      * @return null in all cases
      */
     protected WebMap.Info getInfoFromPath(String prepath,

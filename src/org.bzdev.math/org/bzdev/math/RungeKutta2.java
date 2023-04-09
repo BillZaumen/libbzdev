@@ -7,7 +7,7 @@ import java.util.Arrays;
  * equations.  For an independent variable t (which will be called the
  * "parameter" mainly so that a method with a short name
  * {@link #getParam()} can be used to obtain its current value), and a
- * dependent variable <bold>y</bold>(t), the Runge Kutta algorithm
+ * dependent variable <b>y</b>(t), the Runge Kutta algorithm
  * is used to numerically solves the differential equation
  * <blockquote>
  *  y''(t) = f(t, y(t), y'(t))
@@ -121,8 +121,11 @@ abstract public class RungeKutta2<P> {
      * This is also done in the constructor.
      *  @param t0 the value of the parameter with respect to which
      *         one differentiates
-     *  @param y0 the value of the variables for the initial value of
+     *  @param y0 the value of the variable for the initial value of
      *         the parameter with respect to which one differentiates
+     *  @param yp0 the value of the derivative of the variable for the
+     *         initial value of the parameter with respect to which
+     *         one differentiates
      */
     public void setInitialValues(double t0, double y0, double yp0) {
 	t = t0;
@@ -647,6 +650,7 @@ abstract public class RungeKutta2<P> {
      * the derivative of the variable with respect to the parameter
      * (i.e,, dy/dt).
      * @param f the function, which must take three arguments
+     * @return a new instance of {@link RungeKutta2}
      */
     public static RungeKutta2 newInstance(RealValuedFunctionThree f)
     {
@@ -661,13 +665,13 @@ abstract public class RungeKutta2<P> {
      * Runge-Kutta algorithm's variable (y), and its third argument is
      * the derivative of the variable with respect to the parmaeter
      * (i.e,, dy/dt).
-     * <P>
      * @param f the function, which must take exactly three arguments
      * @param t0 the initial value of the parameter with respect to which one
      *           differentiates
      * @param y0 the initial value of the variable for the specified parameter
      * @param yp0 the initial value of the derivative of the variable
      *            for the specified parameter (i.e., dy/dt evaluated at t0)
+     * @return a new instance of {@link RungeKutta2}
      * @exception IllegalArgumentException the function f cannot take two
      *            arguments
      */
@@ -687,6 +691,7 @@ abstract public class RungeKutta2<P> {
      * <P>
      * The function may be a lambda expression.
      * @param f the function, which must take three arguments
+     * @return a new instance of {@link RungeKutta2}
      */
     public static RungeKutta2 newInstance(RealValuedFunctThreeOps f)
     {
@@ -709,6 +714,7 @@ abstract public class RungeKutta2<P> {
      * @param y0 the initial value of the variable for the specified parameter
      * @param yp0 the initial value of the derivative of the variable
      *            for the specified parameter (i.e., dy/dt evaluated at t0)
+     * @return a new instance of {@link RungeKutta2}
      */
     public static RungeKutta2 newInstance(RealValuedFunctThreeOps f,
 					 double t0, double y0, double yp0) {

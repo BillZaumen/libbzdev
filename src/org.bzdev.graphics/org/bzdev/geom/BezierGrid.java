@@ -88,7 +88,8 @@ import java.io.IOException;
  * at  indices (i, j), the end points for each edge of the patch
  * are shown in the following table.
  * <BLOCKQUOTE>
- * <TABLE border="2">
+ * <TABLE border="1">
+ *   <CAPTION>&nbsp;</CAPTION>
  *   <TR>
  *       <TH><TH>Starting<BR>(u,v)<TH>Ending<BR>(uv)
  *           <TH>Starting<BR> indices<TH>Ending<BR>indices
@@ -159,11 +160,11 @@ import java.io.IOException;
  * are used for configuring these splines.
  * <P>
  * For example, in order to create the following object,
- * <CENTER>
- *     <IMG SRC="doc-files/bgsphere.png">
- * </CENTER>
+ * <P style="text-align:center">
+ *     <IMG SRC="doc-files/bgsphere.png" alt="sphere">
+ * </P>
  * one can first create a grid representing a half of a sphere:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *	int N = 41; // grid height and width
  *	int NC = N/2; // grid center point.
  *	Point3D[][] array1 = new Point3D[N][N];
@@ -209,23 +210,23 @@ import java.io.IOException;
  *	    }
  *	}
  *	BezierGrid grid1 = new BezierGrid(array1);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * Note that the value of z for each point adds a constant 10.0 to
  * each value, which translates the grid upwards.
  * After this grid is created, it can be modified by removing the
  * vertices above a specific latitude (note that the area removed
  * has boundary that corresponds to a series of points with a
  * constant latitude).
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *	grid1.remove(NC-3, NC-3, 6, 6);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The half sphere now has a boundary with two components (two
  * distinct continuous, closed paths).  For these, we set a user
  * defined spline in order to make sure that splines will be
  * created going through these vertices and that the spline will
  * be a cyclic one (the argument of true for endSpline makes the
  * spline a cyclic spline).
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *	grid1.startSpline(NC-3, NC-3);
  *	grid1.moveU(6);
  *	grid1.moveV(6);
@@ -239,29 +240,29 @@ import java.io.IOException;
  *	grid1.moveU(-(N-1));
  *	grid1.moveV(-(N-1));
  *	grid1.endSpline(true);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The next step is to create the bottom half of the sphere.
  * A constructor (please see the documentation for
  * {@link BezierGrid#BezierGrid(BezierGrid,boolean,UnaryOperator)}
  * for restrictions) allows one to reproduce the configuration of an
  * existing grid, with a lambda expression mapping previous vertex
  * locations into new ones:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
 	BezierGrid grid2 = new BezierGrid(grid1, true, (p) -&gt; {
 		double x = p.getX();
 		double y = p.getY();
 		double z = - p.getZ();
 		return new Point3D.Double(x, y, z);
 	    });
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The argument <CODE>true</CODE> indicates that grid2 should have its
  * orientation reversed compared to grid1.
  * At this point, one can create a surface and append the two grids.
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
 	Surface3D surface = new Surface3D.Double();
 	surface.append(grid1);
 	surface.append(grid2);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The next step is to create an array of grids (it will just contain a
  * single element). This grid will have two vertices in its U direction,
  * and will connect grid1 to grid2. The argument 'false' prevents the
@@ -271,23 +272,23 @@ import java.io.IOException;
  * its half sphere.  Because there are only two vertices in the U direction,
  * the call to createConnectionsTo generates a cylinder.
  * The newly created grid is appended to the surface.
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *	BezierGrid[] connections =
  *	    grid1.createConnectionsTo(grid2, false, NC-3, NC-3);
  *	for (BezierGrid g: connections) {
  *	    surface.append(g);
  *	}
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * Similarly, one can create a second set of grids, this time with
  * 11 vertices in the U direction.
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *      connections = grid1.createConnectionsTo(grid2, 11, false, 0, 0);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * In the U direction index 0 and 10 represent V values that match the
  * boundaries at the widest points of the two half spheres (grid1 and grid2).
  * The remaining vertices have to be configured manually. For an example,
  * this is done as follows:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *      BezierGrid cgrid = connections[0];
  *      int limu = cgrid.getUArrayLength() ;
  *      int limv = cgrid.getVArrayLength();
@@ -305,18 +306,18 @@ import java.io.IOException;
  *        }
  *      }
  *	surface.append(cgrid);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The result is a 'bulge' connecting the two half spheres, with
  * the bulge using a sinusoidal shape.  Finally, one can create
  * a series of images using methods from the p3d package:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *      Model3D m3d = new Model3D();
  *      m3d.append(surface);
  *      m3d.setTessellationLevel(2);
  *      m3d.createImageSequence
  *          (new FileOutputStream("images.isq"),
  *           "png", 8, 6, 0.0, 0.0, 0.0, false);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  */
 public class BezierGrid implements Shape3D {
     
@@ -400,9 +401,9 @@ public class BezierGrid implements Shape3D {
      * removed, and  all points along that lie are in the same region, then
      * the spline created will be a cyclic one.  When closed, one should
      * not duplicate an end point: the expected behavior occurs automatically.
-     * @parem nu the number of vertices in the U direction
+     * @param nu the number of vertices in the U direction
      * @param uclosed true if the U direction is close; false otherwise
-     * @parem nv the number of vertices in the V direction
+     * @param nv the number of vertices in the V direction
      * @param vclosed true if the V direction is closed; false otherwise
      */
     public BezierGrid(int nu, boolean uclosed, int nv, boolean vclosed) {
@@ -420,9 +421,9 @@ public class BezierGrid implements Shape3D {
      * When the argument <CODE>linear</COdE> is true, each grid point is
      * configured to have its own region. By default, each line connecting
      * two adjacent grid points will be a straight line.
-     * @parem nu the number of vertices in the U direction
+     * @param nu the number of vertices in the U direction
      * @param uclosed true if the U direction is close; false otherwise
-     * @parem nv the number of vertices in the V direction
+     * @param nv the number of vertices in the V direction
      * @param vclosed true if the V direction is closed; false otherwise
      * @param linear true if lines connecting grid points are straight lines;
      *        false otherwise
@@ -733,7 +734,7 @@ public class BezierGrid implements Shape3D {
      * If, for example, a {@link BezierGrid} grid1 represents a 'top'
      * half of a sphere centered on (0,0,0), with the boundary of
      * grid1 having Z values of zero,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *    BezierGrid grid2 = new BezierGrid(grid1, true, (p) -&gt; {
      *         double z = p.getZ();
      *         if (z &gt; 0) z = -z;
@@ -743,7 +744,7 @@ public class BezierGrid implements Shape3D {
      *    Surface3D surface = new Surface3D.Double();
      *    surface.append(grid1);
      *    surface.append(grid2);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * will create the 'bottom' half of the sphere.  If the configuration
      * for grid 1 is changed (e.g., by adding splines to represent paths
      * with a constant 'latitude'), the corresponding changes will not
@@ -758,13 +759,13 @@ public class BezierGrid implements Shape3D {
      * {@link #setRemainingControlPoints(int,int,double[])} have been called,
      * one may have to use these methods on the newly created grid to get
      * the desired results.  For example, consider the following statements:
-     * <BLOCKQUOTE> <CODE><PRE>
+     * <BLOCKQUOTE> <PRE><CODE>
      *   BezierGrid grid1 = new BezierGrid(array);
      *   BezierGrid grid2 = grid1.subgrid(10,10,6,2);
      *   BezierGrid grid3 = new BezierGrid(grid2, false, (p) -&gt; {
      *         return p;
      *       });
-     * </PRE></CODE> </BLOCKQUOTE>
+     * </CODE></PRE> </BLOCKQUOTE>
      * One might expect grid2 and grid 3 to be identical. They may not
      * be identical because the splines for grid2 are those computed
      * for grid1, but grid1 and grid3, except for some special cases,
@@ -1013,11 +1014,14 @@ public class BezierGrid implements Shape3D {
 	/**
 	 * Get the number of points in the U direction for the
 	 * BezierGrid to be constructed.
+	 * @return the number of points
 	 */
 	int getN();
 	/**
 	 * Determine if the BezierGrid to be constructed is closed in
 	 * the U direction.
+	 * @return true if the grid is closed in the U direction; false
+	 *         otherwise
 	 */
 	boolean isClosed();
 
@@ -1065,6 +1069,7 @@ public class BezierGrid implements Shape3D {
      * @param wire a 3D path, either open or closed
      * @param inormal the vector that provides an initial normal vector
      *        (ignored if a normal vector can be computed from the 'wire')
+     * @return the mapper
      * @see org.bzdev.math.VectorOps#createVector(double...)
      * @see org.bzdev.math.VectorOps#createUnitVector(double...)
      * @see org.bzdev.math.VectorOps#createVector3(double,double,double)
@@ -1276,7 +1281,7 @@ public class BezierGrid implements Shape3D {
      * Constructor given a 2D path and a Mapper.
      * The mapper can be created by {@link#getMapper(Path3D,double[])}
      * and that mapper will be used to create the points along the
-     * grid. Control points for two-dimensional path <CODE> template
+     * grid. Control points for two-dimensional path <CODE>template</CODE>
      * will be mapped and set for control points along the V axis. The
      * number of points long the U axis is given by
      * {@link Mapper#getN()} and whether or not the U direction is
@@ -1393,7 +1398,7 @@ public class BezierGrid implements Shape3D {
      * strip that can be 3D printed, one can start with a template
      * representing a rectangle, and apply an affine transformation to
      * create copies at points along the strip:
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *   int N = 64;
      *   int M = 4;
      *
@@ -1427,7 +1432,7 @@ public class BezierGrid implements Shape3D {
      *      }
      *  }
      *  BezierGrid mgrid = grid.subgrid(0, 0, N+1, M+1);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * The U values for a full grid cover an angular extent of of
      * 4&pi; so that corresponding points match at the ends and so
      * that the splines in the U direction are cyclic. Because the V
@@ -1446,6 +1451,7 @@ public class BezierGrid implements Shape3D {
      *        subgrid
      * @param m the number of grid points in the V direction for the
      *        subgrid
+     * @return the subgrid
      */
     public BezierGrid subgrid(int i, int j, int n, int m) {
 	createSplines();
@@ -1902,7 +1908,8 @@ public class BezierGrid implements Shape3D {
      * @param rest an array holding the remaining control points; null
      *        if these should be cleared
      * @return true if a patch exists for this point; false if it does not
-     * @exception an argument was out of range or the array was too small
+     * @exception IllegalArgumentException an argument was out of range
+     *            or the array was too small
      */
     public boolean setRemainingControlPoints(int i, int j, double[] rest)
 	throws IllegalArgumentException
@@ -1951,9 +1958,12 @@ public class BezierGrid implements Shape3D {
      * @param coords an array that will hold the remaining control points
      * @return true if a patch exists for this point with explicit
      *         values for the remaining control points; otherwise false
-     * @exception an argument was out of range or the array was too small
+     * @exception IllegalArgumentException if an argument was out of
+     *            range or the array was too small
      */
-    public boolean getRemainingControlPoints(int i, int j, double[] coords) {
+    public boolean getRemainingControlPoints(int i, int j, double[] coords)
+	throws IllegalArgumentException
+    {
 	if (coords == null || coords.length < 12) {
 	    throw new IllegalArgumentException(errorMsg("argarraylength"));
 	}
@@ -2241,7 +2251,7 @@ public class BezierGrid implements Shape3D {
      * @param i the U index of the grid point
      * @param j the V index of the grid point
      * @param coords the control points.
-     * @exeption IllegalArgumentException if an argument is out of range
+     * @exception IllegalArgumentException if an argument is out of range
      * @exception IllegalStateException if a patch may not be set
      * @see #getPatch(int,int,double[])
      */

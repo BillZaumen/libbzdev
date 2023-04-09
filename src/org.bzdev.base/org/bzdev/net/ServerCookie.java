@@ -295,8 +295,8 @@ public interface ServerCookie {
 
     /**
      * Get the maximum age in seconds for this cookie.
-     * @returrn the maximum age in seconds; -1 (the default) if the cookie will
-     *          persist until a browser shuts down
+     * @return the maximum age in seconds; -1 (the default) if the cookie will
+     *         persist until a browser shuts down
      * @see #setMaxAge(int)
      */
     int getMaxAge();
@@ -309,6 +309,7 @@ public interface ServerCookie {
 
     /**
      * Get the path to which the client should return this cookie;
+     * @return the path
      */
     String getPath();
 
@@ -346,7 +347,7 @@ public interface ServerCookie {
      * Please see
      *  <A HREF="https://tools.ietf.org/html/rfc6265#section-5.2.2">RFC 6265</A>
      * for a description of the allowed characters.
-     * @parem comment the comment.
+     * @param comment the comment.
      */
     void setComment(String comment);
 
@@ -445,6 +446,7 @@ public interface ServerCookie {
      * Create a new instance of {@link ServerCookie}.
      * @param name the name of the cookie
      * @param value the value of the cookie 
+     * @return the new instance of {@link ServerCookie}
      */
     static ServerCookie newInstance(String name, String value) {
 	return new ServerCookieUtils.Cookie(name, value);

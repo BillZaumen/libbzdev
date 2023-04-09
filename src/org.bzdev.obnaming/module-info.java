@@ -10,7 +10,6 @@
  * <P><B>Please see
  * <A HREF="org/bzdev/obnaming/doc-files/description.html">the package description</A>
  * for an extended description of the {@link org.bzdev.obnaming} package.</B>
- * @moduleGraph
  */
 module org.bzdev.obnaming {
     exports org.bzdev.obnaming;

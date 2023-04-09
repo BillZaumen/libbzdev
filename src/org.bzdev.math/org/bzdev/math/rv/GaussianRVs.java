@@ -265,7 +265,7 @@ public class GaussianRVs {
 	return StreamSupport.stream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of double-valued arrays.
      * @param size the number of random values to provide
      * @return the stream
@@ -274,7 +274,7 @@ public class GaussianRVs {
 	return StreamSupport.stream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinie stream of double-valued arrays.
      * @return the stream
      */
@@ -282,7 +282,7 @@ public class GaussianRVs {
 	return StreamSupport.stream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinie parallel stream of double-valued arrays.
      * @return the stream
      */

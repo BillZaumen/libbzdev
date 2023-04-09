@@ -92,6 +92,7 @@ public class Path2DInfo {
      *        null is equivalent to an identity transform
      * @param x the cubic spline for the X coordinates
      * @param y the cubic spline for the Y coordinates
+     * @return the path iterator
      */
     public static PathIterator getPathIterator(AffineTransform af,
 					       CubicSpline x, CubicSpline y)
@@ -1177,6 +1178,7 @@ public class Path2DInfo {
      *        preceding Y coordinates
      * @param degree the degree of the B&eacute;zier curve (this is one half
      *        the minimum length for the coords array).
+     * @return the path parameter
      */
     public static double getMinDistBezierParm(Point2D p, double x0, double y0,
 					      double[] coords, int degree)
@@ -3689,6 +3691,12 @@ public class Path2DInfo {
 
     /**
      * Get the type of a path-iterator item, formatted as a string
+     * @param type the type of a path-iterator segment: either
+     *        {@link PathIterator#SEG_MOVETO},
+     *        {@link PathIterator#SEG_LINETO},
+     *        {@link PathIterator#SEG_QUADTO},
+     *        {@link PathIterator#SEG_CUBICTO}, or
+     *        {@link PathIterator#SEG_CLOSE}
      * @return a string describing the type
      */
     public static String getTypeString(int type) {
@@ -4427,12 +4435,13 @@ public class Path2DInfo {
      * Java's AWT classes in which the positive Y axis points downwards.
      * @param path the path
      * @return true if the path is counterclockwise; false if it is clockwise
-     * @exception the path is not a simple loop (a path terminated by a
+     * @exception IllegalArgumentException the path is not a simple
+     *            loop (a path terminated by a
      *            {@link PathIterator#SEG_CLOSE} segment, with no other
-     *            {@link PathIterator#SEG_CLOSE} segments along
-     *            the path) or the region enclosed by the path has
-     *            zero area or the path crosses itself (in such a way
-     *            that the area computed is zero)
+     *            {@link PathIterator#SEG_CLOSE} segments along the
+     *            path) or the region enclosed by the path has zero
+     *            area or the path crosses itself (in such a way that
+     *            the area computed is zero)
      */
     public static boolean isCounterclockwise(Path2D path)
 	throws IllegalArgumentException
@@ -4463,12 +4472,13 @@ public class Path2DInfo {
      * Java's AWT classes in which the positive Y axis points downwards.
      * @param path the path
      * @return true if the path is clockwise; false if it is counterclockwise
-     * @exception the path is not a simple loop (a path terminated by a
+     * @exception IllegalArgumentException the path is not a simple
+     *            loop (a path terminated by a
      *            {@link PathIterator#SEG_CLOSE} segment, with no other
-     *            {@link PathIterator#SEG_CLOSE} segments along
-     *            the path) or the region enclosed by the path has
-     *            zero area or the path crosses itself (in such a way
-     *            that the area computed is zero)
+     *            {@link PathIterator#SEG_CLOSE} segments along the
+     *            path) or the region enclosed by the path has zero
+     *            area or the path crosses itself (in such a way that
+     *            the area computed is zero)
      */
     public static boolean isClockwise(Path2D path)
 	throws IllegalArgumentException
@@ -6039,7 +6049,7 @@ public class Path2DInfo {
      * <A href="http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html">
      *this web page</A>.
      * @param moments the moments
-     * @areturn an array of vectors, each providing an axis.
+     * @return an array of vectors, each providing an axis.
      */
     public static double[][] principalAxes(double[][] moments)
     {
@@ -6237,6 +6247,8 @@ public class Path2DInfo {
      * used is exact.  Time complexity is linear in the number of path
      * segments.
      * @param pi a path iterator.
+     * @param at an affine transform to apply to each point provided by
+     *        the path iterator <CODE>pi</CODE>; null if none is used
      * @return the area of the shape specified by the path iterator pi
      * @exception IllegalArgumentException the winding rule is not correct.
      */
@@ -6367,7 +6379,6 @@ public class Path2DInfo {
      * Entry i contains the X and Y coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
-     * <P>
      * @param s the shape or path
      */
     public static void printSegments(Shape s) {
@@ -6536,7 +6547,9 @@ public class Path2DInfo {
      * @return the patch component going through (x, y), with its
      *         segments shifted cyclically so that the returned path
      *         starts at the point (x, y).
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException the path contains a control
+     *            point other than {@link PathIterator#SEG_MOVETO}
+     *            immediately after {@link PathIterator#SEG_CLOSE}
      */
     public static Path2D shiftClosedPath(Path2D path, double x, double y) {
 	Path2D path1 = (path instanceof Path2D.Float)?

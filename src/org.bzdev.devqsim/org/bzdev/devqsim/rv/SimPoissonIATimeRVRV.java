@@ -3,13 +3,13 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.PoissonIATimeRV;
 import org.bzdev.math.rv.PoissonIATimeRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of long-integer valued random variables
  * (representing exponentially distributed
  * interarrival times) that are suitable for modeling arrivals that have a
  * Poisson distribution.
- * @see org.bzdev.math.rv.PoissonIATimeRV;
+ * @see org.bzdev.math.rv.PoissonIATimeRV
  */
 public class SimPoissonIATimeRVRV
     extends SimInterarrivalTimeRVRV<PoissonIATimeRV,PoissonIATimeRVRV>

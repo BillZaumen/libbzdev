@@ -40,6 +40,7 @@ abstract public class GenericFactory<
 
     /**
      * Create an uninterned domain member.
+     * @return a new domain member
      */
     abstract public DM createDomainMember();
 

@@ -15,6 +15,7 @@ public class DMethodParameters {
     /**
      * Set the output to use for tracing when method tracing is enabled.
      * The default is System.out.
+     * @param out the appendable to use for the output
      */
     public static void setTracingOutput(Appendable out) {
 	if (out == null) out = System.out;

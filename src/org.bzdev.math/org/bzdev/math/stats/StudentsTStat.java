@@ -44,6 +44,10 @@ public abstract class StudentsTStat extends Statistic {
 	degreesOfFreedom = d;
     }
 
+    /**
+     * Get the degress of freedom.
+     * @return the degress of freedom
+     */
     public int getDegreesOfFreedom() {
 	return degreesOfFreedom;
     }
@@ -125,7 +129,7 @@ public abstract class StudentsTStat extends Statistic {
      * for two data sets is statistically significant.
      * <P>
      * "<A href="http://www.chem.uoa.gr/applets/AppletTtest/Appl_Ttest2.html">
-     * Student's t-test: Comparison of two means<A>" has a
+     * Student's t-test: Comparison of two means</A>" has a
      * description of the test.
      * If the data sets are X<sub>1</sub> and X<sub>2</sub>, then the statistic
      * is t = (<span style="text-decoration: overline">X</span><sub>1</sub>

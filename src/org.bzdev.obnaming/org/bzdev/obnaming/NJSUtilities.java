@@ -46,6 +46,9 @@ public class NJSUtilities {
      */
     public static class JSON extends JSUtilities.JSON {
 
+	/**
+	 * Constructor.
+	 */
 	protected JSON() {}
 	private static JSON json = new JSON();
 
@@ -118,6 +121,7 @@ public class NJSUtilities {
 	 * @param is the input stream (containing a JSON value)
 	 * @param charsetName the name of the charset used by the input
 	 *        stream
+	 * @return the result of parsing
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 * @exception UnsupportedEncodingException the charsetName does
@@ -138,6 +142,7 @@ public class NJSUtilities {
 	 * @param is the input stream (containing a JSON value)
 	 * @param dec the charset decoder used to turn the
 	 *        input stream into a sequence of characters
+	 * @return the result of parsing
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -155,6 +160,7 @@ public class NJSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param is the input stream (containing a JSON value)
 	 * @param cs the charset for the input stream
+	 * @return the result of parsing
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -172,6 +178,7 @@ public class NJSUtilities {
 	 * {@link Number}, or {@link Boolean}.
 	 * @param buffer the input character sequence  (containing
 	 *        a JSON value)
+	 * @return the result of parsing
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */
@@ -184,6 +191,7 @@ public class NJSUtilities {
 	 * {@link JSObject}, {@link JSArray}, {@link String},
 	 * {@link Number}, or {@link Boolean}.
 	 * @param s the input string (containing a JSON value)
+	 * @return the result of parsing
 	 * @exception IOException an error occurred while reading from
 	 *            the input stream
 	 */

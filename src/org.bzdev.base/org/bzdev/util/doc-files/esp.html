@@ -3,11 +3,12 @@
 <HEAD>
   <title>ExpressionParser and ESP</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
   <BODY>
     <div style="margin-left: 2em">
-  <H2>ExpressionParser and the ESP scripting language</H2>
+  <H1>ExpressionParser and the ESP scripting language</H1>
   <P>
     The class {@link ExpressionParser} is an instance of
     {@link ObjectParser} that was originally written to allow strings
@@ -179,7 +180,7 @@
     including ones used to help generate documentation for the classes
     that a given instance has available.
 
-    <H2><A NAME="overview"></A>Overview</H2>
+    <H2><A ID="overview"></A>Overview</H2>
   <P>
     Programmers familiar with Java and ECMAScript can learn how to use
     ESP with very little effort, and those familiar with ECMAScript
@@ -213,15 +214,15 @@
 	variable is already defined, the expression is not evaluated.
 	This allows default values to be readily provided: the ESP
 	statement
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 var out ?= global.getWriter();
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	is equivalent to the ECMAScript statements
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 if (typeof(out) == "undefined") {
     out = scripting.getWriter();
 }
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	(The scrunner command will run a script with a predefined
 	variable named <STRONG>scripting</STRONG>.)
       <LI> A variable definition can use the <STRONG>??=</STRONG> operator to
@@ -277,24 +278,24 @@ if (typeof(out) == "undefined") {
       <LI> Functions and methods may be synchronized by using the
 	<STRONG>synchronized</STRONG> keyword before a function definition,
 	a method definition, or a lambda expression. For example,
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 var x = 0;
 synchronized function increment() {
     x = x + 1
 }
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	will define a function named <CODE>increment</CODE> that can be
 	used concurrently in multiple threads to increment the variable
 	<CODE>x</CODE>.  The function will be synchronized on the
 	expression parser itself. Similarly
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 var obj = {
     x: 0,
     synchronized increment() {
         this.x = this.x + 1
     }
 }
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	will define a synchronized method that will modify the property
 	<CODE>x</CODE> belonging to the object <CODE>obj</CODE>.
       <LI> The symbol <STRONG>`</STRONG>, followed by opening curly
@@ -354,7 +355,7 @@ var obj = {
     defining various configurations, were some simple computation may be
     desired.
 
-    <H2><A NAME="scriptEngine"></A>The Script Engine</H2>
+    <H2><A ID="scriptEngine"></A>The Script Engine</H2>
     The BZDev class library contains an script engine that implements
     ESP. This script engine has the following properties:
     <UL>
@@ -373,7 +374,7 @@ var obj = {
 	java.io.Reader, java.io.PrintWriter, java.nio.CharBuffer.
     </UL>
 
-    <H2><A NAME="constructors"></A>Constructors</H2>
+    <H2><A ID="constructors"></A>Constructors</H2>
     {@link ExpressionParser} has two constructors:
     <UL>
       <LI> {@link ExpressionParser#ExpressionParser(Class...)} creates an
@@ -417,7 +418,7 @@ var obj = {
     {@link ExpressionParser#setImportMode()} has been called before any
     script has been executed.
 
-    <H2><A NAME="syntax"></A>ESP Syntax</H2>
+    <H2><A ID="syntax"></A>ESP Syntax</H2>
   <P>
     ESP&apos;s syntax is described in the following subsections:
     <UL>
@@ -439,7 +440,7 @@ var obj = {
       <LI> <A HREF="#tracing">Tracing Options</A>
     </UL>
 
-    <H3><A NAME="comments"></A>Comments</H3>
+    <H3><A ID="comments"></A>Comments</H3>
   <P>
     Two types of comments are recognized in scripting mode. One
     starts with the token &apos;//&apos; (unless within a string), and continues
@@ -462,7 +463,7 @@ var obj = {
     the script.  This is a special case that allows one to create
     executable scripts.  Typically such a comment will be
     "#!/usr/bin/scrunner".
-    <H3><A NAME="reserved"></A>Reserved Words</H3>
+    <H3><A ID="reserved"></A>Reserved Words</H3>
   <P>
     ESP has a small number of reserved words:
     <UL>
@@ -477,7 +478,7 @@ var obj = {
 	name, it tests if that variable has been defined.
     </UL>
 
-    <H3><A NAME="primitiveValues"></A>Primitive Values</H3>
+    <H3><A ID="primitiveValues"></A>Primitive Values</H3>
   <P>
     ESP recognizes several types of primitive values:
     <UL>
@@ -529,8 +530,7 @@ var obj = {
 	is <STRONG>void</STRONG>, that value is converted
 	to <STRONG>null</STRONG>.
     </UL>
-  <P>
-    <H3><A NAME="constants"></A>Constants</H3>
+    <H3><A ID="constants"></A>Constants</H3>
   <P>
     Constants in ESP include numbers and strings as one would expect,
     but also enumeration constants and the fields of Java objects that
@@ -563,8 +563,7 @@ BLOCKED
     <CODE>BLOCKED</CODE>, but the variable is defined after the
     first output line was printed. Meanwhile, the use of the constant
     <CODE>State.BLOCKED</CODE> resolves the ambiguity.
-  <P>
-    <H3><A NAME="operators"></A>Operators</H3>
+    <H3><A ID="operators"></A>Operators</H3>
   <P>
     Operators are a subset of the operators provided by Java.  Unary
     operators are &apos;-&apos;, &apos;~&apos; and &apos;!&apos; and
@@ -582,7 +581,7 @@ BLOCKED
   <P>
     The binary operators, grouped by precedence are shown
     in the following table:
-    <TABLE BORDER=1>
+    <TABLE BORDER=1><caption>&nbsp;</caption>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
       <TR><TD>* / % %%</TD><TD> multiplication, division, mod, and
 	  mod as used in mathematics respectively</TD></TR>. The
@@ -616,7 +615,7 @@ BLOCKED
     type of the result of binary operation depends on the type
     of the operands.  The normal behavior is shown in the following
     table:
-    <TABLE BORDER=1>
+    <TABLE BORDER=1><caption>&nbsp;</caption>
       <TR><TH>Left Operand</TH><TH>Right Operand</TH><TH>Result</TH></TR>
       <TR><TD>int</TD><TD>int</TD><TD>int</TD></TR>
       <TR><TD>int</TD><TD>long</TD><TD>long</TD></TR>
@@ -701,9 +700,7 @@ var y = 20;
   <P>
     because <CODE>`{x = x * y;}</CODE> evaluates to
     <STRONG>true</STRONG>.
-
-  <P>
-    <H3><A NAME="statements"></A>Statements</H3>
+    <H3><A ID="statements"></A>Statements</H3>
   <P>
     Statements are described by the following grammar:
     <BLOCKQUOTE><PRE>
@@ -731,7 +728,7 @@ statement: <A HREF="#expressions">expression</A>
     causes the preceding statements to be evaluated before parsing
     continues. It is provided to handle cases in which variables are
     defined via side effects: for example, the following script
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.anim2d, [Animation2D,
 			  AnimationLayer2DFactory,
 			  AnimationPath2DFactory]);
@@ -746,7 +743,7 @@ a2d.createFactories("org.bzdev.anim2d", {
 });
 out.println("list factories created");
 out.println(alf);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will generate an error because, while the
     <CODE>createFactories</CODE> method will define two
     variables <CODE>alf</CODE> and <CODE>apf</CODE>, but those
@@ -783,7 +780,7 @@ out.println(alf);
     can be detected faster than if the previous statements were actually
     run.  If one does not want to use the &apos;###&apos; syntax, an alternative
     is to declare some variable in advance. For example,
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.anim2d, [Animation2D,
 			  AnimationLayer2DFactory,
 			  AnimationPath2DFactory]);
@@ -799,13 +796,13 @@ a2d.createFactories("org.bzdev.anim2d", {
 });
 out.println("list factories created");
 out.println(alf);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The disadvantage in using variable declarations in this example
     is that the declarations and the createFactory call have to be
     kept in sync. That is trivial when one or two factories are being
     created, but awkward if there are a sizable number.
 
-    <H3><A NAME="expressions"></A>Expressions</H3>
+    <H3><A ID="expressions"></A>Expressions</H3>
   <P>
     Expressions in general the same meaning as in Java or ECMAScript,
     although both languages have more operators that ESP does.
@@ -872,7 +869,7 @@ term: value
     | term &apos;%&apos; value
     | &apos;-&apos; term
 	
-<A NAME="value"></A>value: number
+<A ID="value"></A>value: number
     | true
     | false
     | null
@@ -935,7 +932,7 @@ class-name: qualified-name
 typed-null: qualified-name &apos;::&apos; &apos;null&apos;
     </PRE></BLOCKQUOTE>
 
-    <H3><A NAME="vardefs"></A>Variable Definitions</H3>
+    <H3><A ID="vardefs"></A>Variable Definitions</H3>
   <P>
     Variable definitions always start with the keyword
     <STRONG>var</STRONG>, and assignments to variables that are not
@@ -973,47 +970,47 @@ var-definition : &apos;var&apos; identifier &apos;=&apos; expression
     expression or within a top-level function, the previously defined
     variables in all enclosing lambda expressions and any top-level
     function, are visible.  For example
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var a = 10;
 function f(x) {
     var b = x + a;
     b + function(y) {y+b+a}(x)
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will return the value 2x+20 as both a and b are visible in the
     inner lambda expression.  On the other hand
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var a = 10;
 function f(x) {
     b + function(y) {y+b}(x)
     var b = x + a;
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will result in an exception being thrown because b is not visible
     in the lambda expression <STRONG>function(y){y+b}</STRONG>. By
     contrast
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var a = 10;
 function f(x) {
     var b = x + a;
     b + function(y) {y+a}(x)
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will work as expected.
   <P>
     When a var statement occurs inside a function, any
     variable with the same name is shadowed (i.e., not directly
     accessible). For example
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var c = 10;
 function g(x) {
     var c = 30;
     x+c
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will return the value x+30 instead of x + 10.
 
-    <H3><A NAME="vardecls"></A>Variable Declarations</H3>
+    <H3><A ID="vardecls"></A>Variable Declarations</H3>
   <P>
     Variable declarations indicate that an identifier represents
     a variable but does not provide a value for it. The syntax is
@@ -1023,10 +1020,10 @@ var-declaration: &apos;var&apos; identifier
     </PRE></BLOCKQUOTE>
     A variable that is declared may or may not exist, but existence
     of a variable can be tested.  For example,
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var foo;
 println(" foo exists = " + var.foo);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will print "foo exists = false" unless <CODE>foo</CODE> is externally
     defined, in which case the output will be "foo exists = true".
     These declarations can be used when variables are created as a side
@@ -1034,7 +1031,7 @@ println(" foo exists = " + var.foo);
     <CODE>###</CODE> syntax), or when a variable may be defined
     externally (for example, via the scrunner command line).
 
-    <H3><A NAME="functdefs"></A>Function Definitions</H3>
+    <H3><A ID="functdefs"></A>Function Definitions</H3>
   <P>
     Function definitions uses a syntax based on ECMAScript: the
     keyword <STRONG>function</STRONG>, followed a function name,
@@ -1062,12 +1059,12 @@ function-statement: expression
     function call will be synchronized on the expression parser
     itself. In a multi-threaded application, this will allow code such
     as
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var count = 0;
 synchronized function incr() {
     count = count + 1;
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     to work correctly: the variable <CODE>count</CODE> will record
     the number of times <CODE>incr()</CODE> was called. If
     <CODE>incr()</CODE> had not been synchronized, two simultaneous
@@ -1076,7 +1073,7 @@ synchronized function incr() {
   <P>
     Variable definitions in functions and lambda expressions are
     lexically scoped.  For example, for the script
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var value = 10;
 
 function f() {
@@ -1090,7 +1087,7 @@ function h() {
     var value = 30;
     value
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     calling f() will return 10, and calling h() will return 30. Also,
     unlike variables, a function call can appear before the function
     is defined, provided that the function call is lexically within a
@@ -1099,7 +1096,7 @@ function h() {
     or method body, all functions that are called as a result must
     have been defined.
 
-    <H3><A NAME="assignment"></A>Assignment Statement</H3>
+    <H3><A ID="assignment"></A>Assignment Statement</H3>
   <P>
     Assign statements allow the values of previously defined
     variables (that is, ones  defined used a
@@ -1123,7 +1120,7 @@ assignment-statement: variable &apos;=&apos; expression
    | value &apos;[&apos; expression &apos;]&apos; &apos;=&apos; expression
     </PRE></BLOCKQUOTE>
 
-    <H3><A NAME="import"></A>Import Statement</H3>
+    <H3><A ID="import"></A>Import Statement</H3>
   <P>
     Import statements are recognized when import mode and script
     import mode have been set. The syntax is similar to that used by
@@ -1179,7 +1176,7 @@ import-class-name: class-name
     As a general rule, a class, or a superclass declaring a method
     must be imported before that method is used. In a few cases, such
     an import is done implicitly. For example, when the following script
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.anim2d, [Animation2D,
                           AnimationLayer2DFactory,
                           AnimationPath2DFactory]);
@@ -1190,22 +1187,22 @@ a2d.createFactories("org.bzdev.anim2d", {
     alf: "AnimationLayer2DFactory",
     apf: "AnimationPath2DFactory"
 });
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     is passed to <CODE>scrunner</CODE>, the call to
     <STRONG>createFactories</STRONG> will create two new variables
     name <STRONG>alf</STRONG> and <STRONG>apf</STRONG> by processing
     the object
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 {
   alf: "AnimationLayer2DFactory",
   apf: "AnimationPath2DFactory"
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     with the help of a private script. This private script contains
     the statement
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     which allows methods defined by
     {@link org.bzdev.obnaming.ObjectNamerOps} to be used, including
     those that return an instance of
@@ -1228,7 +1225,7 @@ import(org.bzdev.obnaming, [ObjectNamerOps, NamedObjectFactory]);
     typically a top-level script will set everything up, with import
     statements occurring first.
 
-    <H3><A NAME="objects"></A>Objects</H3>
+    <H3><A ID="objects"></A>Objects</H3>
   <P>
     ESP objects are basically dictionaries that map properties to values,
     and that provide methods to access and modify the values associated
@@ -1280,47 +1277,47 @@ object-element: identifier &apos;:&apos; value
     of arguments. Those user-declared methods, however, can be executed
     by first dereferencing them and then calling the function that was
     returned. For example,
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var obj = {
     propertyNames() {"property names"}
 };
 obj["propertyNames"]();
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will return the string "property names", whereas
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var obj = {
     propertyNames() {"property names"}
 };
 obj.propertyNames();
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will return a set of property names.
   <P>
     On the other hand, if the ESP object (obj) is passed to a Java
     method as an argument whose type is an interface declared by the
     Java code
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 public interface Foo {
     String propertyNames();
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     then the user-defined method will be used to implement the Java
     interface.
   <P>
     Because ESP methods are implemented as ESP functions with a hidden
     argument, the following code
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var obj = {
     counter: 0,
     increment() {this.counter = asInt(this.counter + 1)}
 }
 var f = obj["increment"];
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will define an ESP function named <STRONG>f</STRONG> and calling
     <STRONG>f()</STRONG> repeatedly will generate a series of increasing
     integer values (the class {@link org.bzdev.lang.MathOps} has to be
     imported for the function <STRONG>asInt</STRONG> to be accessible.)
 
-    <H3><A NAME="arrays"></A>Arrays</H3>
+    <H3><A ID="arrays"></A>Arrays</H3>
   <P>
     ESP arrays are similar to ECMAScript arrays and Java objects whose
     type is {@link java.util.ArrayList}. The syntax is essentially the
@@ -1404,7 +1401,7 @@ array-elements:
     not be accessible. The <A HREF="#solve">System of Linear Equations</A>
     example shows one case.
 
-    <H3><A NAME="global"></A>The global object</H3>
+    <H3><A ID="global"></A>The global object</H3>
   <P>
     ECMAScript assumes the existence of a global object, but the name
     of this object was not specified initially, resulting in
@@ -1571,7 +1568,7 @@ array-elements:
 	Java array. An exception will be thrown otherwise.
     </UL>
 
-    <H3><A NAME="tracing"></A>Directives for Tracing</H3>
+    <H3><A ID="tracing"></A>Directives for Tracing</H3>
   <P>
     ESP supports 4 directives that configure tracing. These can appear
     anywhere that a token can appear, but are ignored if inside comments
@@ -1611,7 +1608,7 @@ array-elements:
     one gets can be quite long, and often  the user is interested only in
     the behavior of a few statements.
 
-    <H2><A NAME="iteration"></A>Iteration</H2>
+    <H2><A ID="iteration"></A>Iteration</H2>
   <P>
     ESP does not provide any explicit iteration constructs, other than
     recursion. Java, however, provides the packages {@link java.util.stream}
@@ -1663,48 +1660,48 @@ array-elements:
   <P>
     As an example, the following script will add the numbers
     between 1 and 1000000.
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.lang, MathOps);
 LongStream.rangeClosed(1, 1000000)
           .reduce(0, function(x,y) {x + y})
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The function asLong (which is defined in {@link org.bzdev.lang.MathOps},
     may be needed to force a value to have a specific type.
     If a class has methods with the same name that accept either int or long
     arguments, one can preface an integer constant with the letter 'L',
     which will force the value to be interpreted as a long.  For example,
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.lang, MathOps);
 LongStream.rangeClosed(1, 1000000)
           .reduce(0L, function(x,y) {20L})
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The use of the 'L' notation is mostly for clarity: ESP will convert
     32-bit integer values to long values when needed for method
     or function calls. An explicit choice might be needed if methods are
     overloaded.
   <P>
     As a second example,
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import (java.lang, Math);
 var list = [10, -20, 30, 40, -50, 60];
 list.toStream(int.class).map(Math::abs).reduce(0, function(x, y) {x + y});
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will produce a sum of the absolute values of the numbers
     in <CODE>list</CODE>.  The use of <CODE>toStream(int.class)</CODE> is
     necessary so that the type of <CODE>map</CODE>&apos;s argument will be
     a functional interface that the method reference can implement. The
     script
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import (java.lang, Math);
 var list = [10, -20, 30, 40, -50, 60];
 list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
-    </PRE></CODE></BLOCKQUOTE> will result in an error:
+    </CODE></PRE></BLOCKQUOTE> will result in an error:
     while <CODE>list.toStream(int.class)</CODE> provides an instance
     of <CODE>IntStream</CODE>, <CODE>list.stream</CODE> provides an
     instance of <CODE>Stream&lt;Object&gt;</CODE>, and while each have
     a <CODE>map</CODE> method, those methods have different signatures.
 
-    <H2><A NAME="threading"></A>Threading</H2>
+    <H2><A ID="threading"></A>Threading</H2>
   <P>
     The <A HREF="bindings">bindings</A> {@link ExpressionParser} uses
     by default are thread-safe&mdash;they use synchronized
@@ -1727,7 +1724,7 @@ list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
     is multithreaded. Again, this is not an issue for subclasses
     of {@link org.bzdev.devqsim.Simulation}.
 
-    <H2><A NAME="bindings"></A>Bindings</H2>
+    <H2><A ID="bindings"></A>Bindings</H2>
   <P>
     Bindings are provided primarily to support the Java Scripting API.
     For ExpressionParser, a binding is simply a map whose keys are
@@ -1746,12 +1743,12 @@ list.stream().map(Math::abs).reduce(0, function(x, y) {x + y});
     When a function or method is executed, the bindings it uses are
     the bindings in effect when the function or method was defined.
     As an example, consider the variable and function
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var count = 0;
 synchronized function incr() {
     count = count + 1;
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     defined above, and suppose this code was run when the bindings
     were <CODE>bindings1</CODE>.  If the function <CODE>incr</CODE> is
     copied or moved to a new set of bindings, <CODE>bindings2</CODE>,
@@ -1759,19 +1756,19 @@ synchronized function incr() {
     to <CODE>bindings2</CODE> will modify the value of <CODE>count</CODE>
     in <CODE>bindings1</CODE>.
 
-    <H2><A NAME="api"></A>The ESP API</H2>
+    <H2><A ID="api"></A>The ESP API</H2>
 
     The data structures that ESP uses to represent functions, objects,
     and arrays can be used directly in Java programs.
 
-    <H3>The ESPArray class </H3>
+    <H2>The ESPArray class </H2>
   <P>
     The {@link org.bzdev.util.ExpressionParser.ESPArray} class is a
     subclass of {@link org.bzdev.util.JSArray} and provides no
     additional public methods. An ESPArray and a JSArray are, however,
     treated differently internally.
 
-    <H3>The ESPFunction class </H3>
+    <H2>The ESPFunction class </H2>
   <P>
     The class {@link org.bzdev.util.ExpressionParser.ESPFunction} provides
     provides a method
@@ -1779,14 +1776,14 @@ synchronized function incr() {
     that will call the corresponding ESP function.  For example, the
     following script defines a function that computes the square
     root of the sum of the square of two values:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 function foo(x, y) {Math.sqrt(x*x + y*y)}
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     If <CODE>foo</CODE> is a java variable  containing
     <CODE>foo</CODE>&apos;s ESPFunction, then
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 	  foo.invoke(30.0, 40.0)
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     will return the value 5.0.
   <P>
     This class also provide method
@@ -1794,7 +1791,7 @@ function foo(x, y) {Math.sqrt(x*x + y*y)}
     that will convert this function to an implementation of a functional
     interface.
 
-    <H3>The ESPMethodReference Interface</H3>
+    <H2>The ESPMethodReference Interface</H2>
   <P>
     ESP method references are represented by implementations of the
     interface {@link ExpressionParser.ESPMethodReference}.  This
@@ -1812,12 +1809,12 @@ function foo(x, y) {Math.sqrt(x*x + y*y)}
     all or nearly all cases, the use of the "convert" method is handled
     automatically by ESP.
 
-    <H3>The ESPObject class</H3>
+    <H2>The ESPObject class</H2>
   <P>
     The class {@link org.bzdev.util.ExpressionParser.ESPObject} is a
     subclass of {@link org.bzdev.util.JSObject}.
     {@link org.bzdev.util.JSObject} is similar to
-    {@linkjava.util.Map}, with <STRONG>put</STRONG>, <STRONG>get</STRONG>, and
+    {@link java.util.Map}, with <STRONG>put</STRONG>, <STRONG>get</STRONG>, and
     <STRONG>remove</STRONG> methods to insert retrieve, or remove entries.
     The method {@link org.bzdev.util.JSObject#toKeyMap()} is provided so
     that template processing can be used to print a representation of
@@ -1826,7 +1823,7 @@ function foo(x, y) {Math.sqrt(x*x + y*y)}
     This method converts the object into an implementation of an
     interface defining a series of methods.
 
-    <H2><A NAME="helpers"></A>Helper classes</H2>
+    <H2><A ID="helpers"></A>Helper classes</H2>
   <P>
     There are a few classes in the BZDev class library that are
     sometimes needed when writing ESP scripts and that are not
@@ -1860,11 +1857,11 @@ var stroke = (new BasicStrokeBuilder())
 	java.awt.Color} constructors.
     </UL>
 
-    <H2><A NAME="examples"></A>Examples</H2>
+    <H2><A ID="examples"></A>Examples</H2>
   <P>
     The following examples illustrate how to use ESP.
 
-    <H3>Iteration Example</H3>
+    <H2>Iteration Example</H2>
   <P>
     Iteration in ESP, as mentioned above, is based the Java package
     {@link java.util.stream}. The following example uses two
@@ -1872,7 +1869,7 @@ var stroke = (new BasicStrokeBuilder())
     for random variables and {@link org.bzdev.math.stats} for a
     class that computes the mean and standard deviation of a sequence of
     numbers.  The implementation is straightforward:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.math.stats, BasicStats.Sample);
 import(org.bzdev.math.rv, GaussianRV);
 
@@ -1881,7 +1878,7 @@ var rv = new GaussianRV(10.0, 1.0);
 var stats = new BasicStats.Sample();
 rv.stream(1000000).forEach(function (x) {stats.add(x)});
 out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The first step is to import two classes:
     {@link org.bzdev.math.stats.BasicStats.Sample}, which computes
     the mean and standard deviation for a representative sample of a data
@@ -1896,7 +1893,7 @@ out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
   <P>
     Because the lambda expression merely calls a method with the same
     arguments, a much more efficient implementation is possible:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.math.stats.BasicStats.Sample);
 import(org.bzdev.math.rv, GaussianRV);
 
@@ -1905,14 +1902,14 @@ var rv = new GaussianRV(10.0, 1.0);
 var stats = new BasicStats.Sample();
 rv.stream(1000000).forEach(stats::add);
 out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The use of a method reference instead of a lambda expression will
     improve execution time by roughly a factor of 10 in this case.
 
-    <H3>Typed-Null example</H3>
+    <H2>Typed-Null example</H2>
   <P>
     Suppose there is a Java class defined as follows
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 public class NullTest {
     int value;
     public NullTest(Number n) {value = 10;}
@@ -1925,34 +1922,34 @@ public class NullTest {
     public static Number getNullNumber() {return null;}
     public static String getNullString() {return null;}
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The ESP statement
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var nt = new NullTest(null);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     is ambiguous as there are two constructors that could be used.  A
     similar issue exists when the <CODE>set</CODE> method is used.
     With a null argument, each of the following will create a NullTest
     object with a value of 10 or set an existing NullTest object&apos;s value
     to 10:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var nt = NullTest(Number::null);
 nt.set(Number::null);
 nt.set(NullTest.getNullNumber());
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     Similarly, with a null argument, each of the following will create
     a NullTest object with a value of 20 or set an existing NullTest
     object&apos;s value to 20:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var nt = NullTest(String::null);
 nt.set(String::null);
 nt.set(NullTest.getNullString());
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     Providing a type for null does not affect equality:
     <CODE>(Number::null == String::null)</CODE> has the value
     <CODE>true</CODE>.
 
-    <H3><A NAME="solve"></A>System of Linear Equations</H3>
+    <H2><A ID="solve"></A>System of Linear Equations</H2>
   <P>
     A system of linear equations can be written a Ax = y where
     A is a matrix and x and y are vectors. One can create the
@@ -1990,7 +1987,7 @@ function printArray(array) {
     The <CODE>printArray</CODE> function can be used when its argument
     is either an ESP array or a Java array.
 
-    <H3>Use of the &lt;=&gt; Operator</H3>
+    <H2>Use of the &lt;=&gt; Operator</H2>
   <P>
     If the following example is placed in an executable file
     named <CODE>ecirc</CODE> on a Linux system, the program
@@ -2004,7 +2001,7 @@ function printArray(array) {
     arguments are the lengths of an ellipse&apos;s semi major
     and semi minor axes, and the program will print the
     ellipse&apos;s circumference.
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 #!/usr/bin/scrunner -sD:a,D:b,E:true,P:true
 import (java.lang.Math);
 import (org.bzdev.math.Functions);
@@ -2024,10 +2021,10 @@ var &epsilon; = Math.sqrt(1.0 - (b*b)/(a*a));
     ESP allows the same characters to appear in identifiers as
     Java does.
 
-    <H3>Drama-Simulation Example</H3>
+    <H2>Drama-Simulation Example</H2>
   <P>
     The file TestActor.java, which defines an actor, contains the following:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import org.bzdev.devqsim.*;
 import org.bzdev.drama.*;
 import org.bzdev.lang.*;
@@ -2060,7 +2057,7 @@ public class TestActor extends Actor {
 	}
     }
 }
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
   <P>
     The annotations allow dynamic methods to be used for processing
     messages that an actor receives. The use of these avoids the need
@@ -2070,7 +2067,7 @@ public class TestActor extends Actor {
   <P>
     An ESP script that can run this script (assume the file name is test.esp)
     is:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 var err ?= global.getErrorWriter();
 var out ?= global.getWriter();
 
@@ -2116,7 +2113,7 @@ sim.addSimulationListener(adapter);
 a2.addSimulationListener(adapter);
 
 sim.run();
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The variable <CODE>scripting</CODE> is defined automatically by the
     scrunner command. By passing it to the constructor for the simulation,
     the simulation can use the scripting environment to perform tasks such
@@ -2142,21 +2139,21 @@ sim.run();
     useful for debugging.
   <P>
     The following commands will compile the Java code:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 mkdir -p classes tmpsrc
 javac -d classes -classpath /usr/share/bzdev/libbzdev.jar -s tmpsrc *.java
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
   <p>
     The following command will run the script using the scrunner
     command:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 scrunner --classpathCodebase classes/ test.esp
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
 
-    <H3>Animation Example</H3>
+    <H2>Animation Example</H2>
   <P>
     The following example creates a simple animation.
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.anim2d, [Animation2D, AnimationPath2DFactory,
 			  GraphViewFactory, AnimationLayer2DFactory]);
 import(org.bzdev.util.units.MKS);
@@ -2215,7 +2212,7 @@ a2d.initFrames(maxFrames, "col-", "png", tmpdir);
 a2d.scheduleFrames(0, maxFrames);
 
 a2d.run();
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     The list (and nested objects for the "background" object are not
     shown due to length, but is available in the &apos;examples&apos; directory&apos;s
     &apos;layer&apos; subdirectory. The code functions as follows:
@@ -2250,19 +2247,19 @@ a2d.run();
 	that object should be configured. In some cases, the values are
 	the results of function calls.
       <LI> The statement
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 tmpdir.listFileAccessors().forEach(function(fa){fa.delete()});
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	removes all the files from the temporary directory to avoid
 	inadvertently mixing images from different runs.
       <LI> The sequence of statements
-	<BLOCKQUOTE><CODE><PRE>
+	<BLOCKQUOTE><PRE><CODE>
 var maxFrames = a2d.estimateFrameCount(10.0);
 out.println("maxFrames = " + maxFrames);
 a2d.initFrames(maxFrames, "col-", "png", tmpdir);
 a2d.scheduleFrames(0, maxFrames);
 a2d.run();
-	</PRE></CODE></BLOCKQUOTE>
+	</CODE></PRE></BLOCKQUOTE>
 	computes the number of frames created by the animation,
 	provides a pattern for names of the files used to store these
 	frames, provides an object (tmpdir) that provides access to a
@@ -2270,7 +2267,7 @@ a2d.run();
 	animation to create the frames.
    </UL>
 
-    <H2><A NAME="hints"></A>Hints</H2>
+    <H2><A ID="hints"></A>Hints</H2>
   <P>
     ESP is actually rather strict about what types it recognizes. As
     a result, when importing classes, it is usually necessary to import
@@ -2325,7 +2322,7 @@ a2d.run();
     directives can produce significant amounts of output, one would typically
     use them for small portions of a script.
 
-    <H2><A NAME="security"></A>Security</H2>
+    <H2><A ID="security"></A>Security</H2>
   <P>
     Originally, ESP was written under the assumption that the Java
     security manager could be used to prevent scripts from overwriting
@@ -2359,22 +2356,22 @@ a2d.run();
     ESP automatically imports the class <STRONG>java.io.PrintWriter</STRONG>
     which contains constructors that can open a file. One would want to
     block several constructors:
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 global.blockConstructor(PrintWriter.class, String.class);
 global.blockConstructor(PrintWriter.class, String.class, String.class);
 global.blockConstructor(PrintWriter.class, String.class, Charset.class);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     If <STRONG>java.nio.charset.Charset</STRONG> has been imported, one will
     also need
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 global.blockConstructor(PrintWriter.class, String.class, Charset.class);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
   <P>
     If <STRONG>org.bzdev.anim2d.Animation</STRONG> has been imported, one
     should call
-    <BLOCKQUOTE><CODE><PRE>
+    <BLOCKQUOTE><PRE><CODE>
 global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
-    </PRE></CODE></BLOCKQUOTE>
+    </CODE></PRE></BLOCKQUOTE>
     to prevent scripts from determining where image files will be stored in
     the file system.
   <P>
@@ -2403,7 +2400,7 @@ global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
     <STRONG>global.blockImports</STRONG> will apply to the
     <STRONG>scripting</STRONG> methods that import classes.
 
-    <H2><A NAME="notes"></A>Implementation Notes</H2>
+    <H2><A ID="notes"></A>Implementation Notes</H2>
   <P>
     ESP was designed to be a rudimentary scripting language, primarily
     intended for tasks such as setting up simulations, animations, or other
@@ -2481,7 +2478,7 @@ global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
     object or array to configure a factory without needing a script
     engine.
 
-   <H3>Performance</H3>
+   <H2>Performance</H2>
   <P>
     In some cases, ESP is significantly faster than the Nashorn ECMAScript
     implementation.  For example, consider the scripts layer.js and

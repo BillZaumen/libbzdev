@@ -29,6 +29,10 @@ public final class DefaultLauncher extends ObjectNamerLauncher {
      * by combining the results of parsing YAML files.
      * @param initializer an object describing the additional configuration;
      *        null if there is nothing else to configure
+     * @exception ClassNotFoundException a class could not be found
+     * @exception IOException an IO error occurred
+     * @exception IllegalAccessException - if this method cannot access
+     *            a class, field, method, or constructor
      * @see org.bzdev.obnaming.ObjectNamerLauncher
      * @see org.bzdev.obnaming.ObjectNamerLauncher#combine(JSObject,JSObject...)
      * @see org.bzdev.obnaming.ObjectNamerLauncher#loadFromStream(Class,InputStream,int)
@@ -44,6 +48,10 @@ public final class DefaultLauncher extends ObjectNamerLauncher {
 
     /**
      * Constructor.
+     * @exception ClassNotFoundException a class could not be found
+     * @exception IOException an IO error occurred
+     * @exception IllegalAccessException - if this method cannot access
+     *            a class, field, method, or constructor
      */
     public DefaultLauncher()
 	throws ClassNotFoundException, IOException, IllegalAccessException

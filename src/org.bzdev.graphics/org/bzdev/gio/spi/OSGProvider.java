@@ -11,10 +11,10 @@ import org.bzdev.gio.OutputStreamGraphics;
  * and that file should be included in the jar file.
  * For a modular jar file, the module-info.jar file's module
  * declaration should contain
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     uses org.bzdev.graphs.spi.SymbolProvider;
  *     provides org.bzdev.graphs.spi.SymbolProvider with ...;
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where "<CODE>...</CODE>" is a comma-separated list of the
  * fully-qualified class names of the SymbolProvider providers that
  * the JAR file contains.
@@ -49,8 +49,9 @@ public interface OSGProvider {
     /**
      * Get the media type (MIME type) for an image
      * type supported by this provider.
+     * @param imageType the name of a format for an image
      * @return the media type; null if the image type is
-     * not supported by this provider.
+     *         not supported by this provider.
      */
     String getMediaType(String imageType);
 
@@ -58,6 +59,7 @@ public interface OSGProvider {
      * Get the file-name suffixes for an image type supported by
      * this provider.
      * Suffixes are the same as file-name extensions.
+     * @param imageType the name of a format for an image
      * @return a list of file name suffixes; null if
      *         this provider does not support an image type.
      */

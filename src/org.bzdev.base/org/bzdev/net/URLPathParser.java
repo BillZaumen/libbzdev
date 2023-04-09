@@ -68,6 +68,8 @@ public class URLPathParser {
      * <code>user.home</code>).
      * @param urlPath the string representation of multiple URLs or files,
      *        separated by "|"
+     * @return an array of URLs
+     * @throws MalformedURLException if there was a syntax error
      */
     public static URL[] getURLs(String urlPath) throws MalformedURLException {
 	return getURLs(null, urlPath);
@@ -88,6 +90,7 @@ public class URLPathParser {
      *        null indicates the current working directory
      * @param urlPath the string representation of multiple URLs or files,
      *        separated by "|"
+     * @return an array of URLs
      * @exception MalformedURLException a URL was malformed
      */
     public static URL[] getURLs(File dir, String urlPath)
@@ -122,6 +125,7 @@ public class URLPathParser {
      *        separated by "|"
      * @param threeDotDir the directory that will replace a leading file-name
      *        component equal to "..."; null for no replacement
+     * @return an array of URLs
      * @exception MalformedURLException a URL was malformed
      * @exception SecurityException a security exception occurred (most likely
      *            because the system property user.home could not be accessed)
@@ -160,6 +164,7 @@ public class URLPathParser {
      *        component equal to "..."; null for no replacement
      * @param output an Appendable to log output for a file-name test; null
      *        a file-name test is not wanted
+     * @return an array of URLs
      * @exception MalformedURLException a URL was malformed
      * @exception SecurityException a security exception occurred (most likely
      *            because the system property user.home could not be accessed)

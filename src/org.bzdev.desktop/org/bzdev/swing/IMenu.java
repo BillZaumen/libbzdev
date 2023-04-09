@@ -89,21 +89,33 @@ public class IMenu extends JMenu {
 	super();
     }
 
+    /**
+     * Constructor with an action.
+     * @param a the action
+     */
     public IMenu(Action a) {
 	super(a);
     }
 
+    /**
+     * Constructor with a label.
+     * @param s the label
+     */
     public IMenu(String s) {
 	super(s);
     }
 
+    /**
+     * Constructor with a label and a tear-off mode.
+     * @param s the label
+     * @param b true if the menu item can be torn off; false otherwise
+     */
     public IMenu(String s, boolean b) {
 	super(s,b);
     }
 
     /**
      * Constructor to create and install an internationalized menu.
-     *
      * @param bundleName the name of a resource bundle.
      * @param key the key used to look up the menu's name from the bundle
      *            named by bundleName.
@@ -124,10 +136,27 @@ public class IMenu extends JMenu {
 	this.bundleName = bundleName;
     }
 
+    /**
+     * Constructor to create and install an internationalized menu with
+     * a tear-off mode.
+     * @param bundleName the name of a resource bundle.
+     * @param key the key used to look up the menu's name from the bundle
+     *            named by bundleName.
+     * @param b true if the menu item can be torn off; false otherwise
+     */
     public IMenu(String bundleName, String key, boolean b) {
 	this(JComponent.getDefaultLocale(), bundleName, key, b);
     }
 
+    /**
+     * Constructor to create and install an internationalized menu with
+     * a tear-off mode, specifying a locale.
+     * @param locale the locale
+     * @param bundleName the name of a resource bundle.
+     * @param key the key used to look up the menu's name from the bundle
+     *            named by bundleName.
+     * @param b true if the menu item can be torn off; false otherwise
+     */
     public IMenu(Locale locale, String bundleName, String key, boolean b) {
 	super(getTextFromBundle(locale, bundleName, key), b);
 	this.textKey = key;

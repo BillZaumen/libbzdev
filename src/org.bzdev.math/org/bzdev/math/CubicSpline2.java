@@ -1311,6 +1311,7 @@ public class CubicSpline2 extends CubicSpline {
 	}
     }
 
+    /*
     public int testSearch(double y) throws Exception {
 	if (!isStrictlyMonotonic()) {
 	    return -1;
@@ -1333,7 +1334,7 @@ public class CubicSpline2 extends CubicSpline {
 	    return ind;
 	}
     }
-
+    */
     private double inversionLimit = 1.0e-8;
 
     /**

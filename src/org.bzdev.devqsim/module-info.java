@@ -11,7 +11,6 @@
  * <B>Please see
  * <A HREF="org/bzdev/devqsim/doc-files/description.html">the org.bzdev.devqsim package description</A>
  * for an extended description of this module's use.</A></B>
- * @moduleGraph
  */
 module org.bzdev.devqsim {
     exports org.bzdev.devqsim;

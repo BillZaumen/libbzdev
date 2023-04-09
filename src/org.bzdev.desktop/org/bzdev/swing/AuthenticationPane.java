@@ -27,8 +27,9 @@ public class AuthenticationPane extends JComponent {
 
     /**
      * Get an authenticator for network authentication requests.
-     *@param comp the component on which a dialog box should be centered
-     *       when an authentication request is given to the user
+     * @param comp the component on which a dialog box should be centered
+     *        when an authentication request is given to the user
+     * @return an authenticator
      */
     public static Authenticator getAuthenticator(final Component comp) {
 	return new Authenticator() {

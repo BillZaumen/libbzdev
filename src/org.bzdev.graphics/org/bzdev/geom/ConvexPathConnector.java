@@ -447,6 +447,7 @@ public class ConvexPathConnector implements Shape3D {
 
     /**
      * Set this object's tag.
+     * @param tag the tag
      */
     public void setTag(Object tag) {
 	this.tag = tag;
@@ -454,6 +455,7 @@ public class ConvexPathConnector implements Shape3D {
 
     /**
      * Get this object's tag.
+     * @return the tag
      */
     public Object getTag() {
 	return tag;
@@ -1215,6 +1217,7 @@ public class ConvexPathConnector implements Shape3D {
 
     /**
      * Set the  color for this shape.
+     * @param c the color; null if the color should not be defined
      */
     public void setColor(Color c) {
 	color = c;
@@ -1238,6 +1241,7 @@ public class ConvexPathConnector implements Shape3D {
      * in barycentric coordinates: v1 followed by v3 followed by v2, where
      * the sequence v1 followed by v2 followed by v3 gives the orientation
      * using the right-and rule.
+     * @exception IOException an IO error occurred.
      */
     public void print() throws IOException {
 	print(System.out);
@@ -1250,6 +1254,7 @@ public class ConvexPathConnector implements Shape3D {
      * the sequence v1 followed by v2 followed by v3 gives the orientation
      * using the right-and rule.
      * @param out the output
+     * @exception IOException an IO error occurred.
      */
     public void print(Appendable out) throws IOException {
 	print("", out);
@@ -1265,6 +1270,7 @@ public class ConvexPathConnector implements Shape3D {
      * the sequence v1 followed by v2 followed by v3 gives the orientation
      * using the right-and rule.
      * @param prefix the prefix
+     * @exception IOException an IO error occurred.
      */
     public void print(String prefix) throws IOException {
 	print(prefix, System.out);
@@ -1281,6 +1287,7 @@ public class ConvexPathConnector implements Shape3D {
      * using the right-and rule.
      * @param prefix the prefix
      * @param out the output
+     * @exception IOException an IO error occurred.
      */
     public void print(String prefix, Appendable out) throws IOException {
 	int len = types.length;

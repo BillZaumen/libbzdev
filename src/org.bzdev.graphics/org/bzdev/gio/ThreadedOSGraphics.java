@@ -77,6 +77,7 @@ public abstract class ThreadedOSGraphics
 	 * This method is required to call a ThreadedOSGraphics
 	 * paint method and is called by the constructor of a
 	 * ThreadedOSGraphics.
+	 * @throws Exception an error occurred
 	 */
 	void writeGraphics() throws Exception;
     }
@@ -106,7 +107,7 @@ public abstract class ThreadedOSGraphics
      * <P>
      * The default implementation returns a value of 1.0 and that value
      * will not be used to add an affine transformation.
-     *
+     * @param orientation the image orientation
      * @return the scale factor
      */
     protected double getImplScaleFactor(ImageOrientation orientation) {
@@ -118,11 +119,11 @@ public abstract class ThreadedOSGraphics
      * This method may be called multiple times.  A subclass may
      * have to override this method to make it visible to other
      * classes in a package. This should be done as follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *    protected void paint(Graphics2D g2d) {
      *       super.paint(g2d);
      *    }
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * It is intended to be called from a thread that the constructor
      * for this class (ThreadedOSGraphics) creates where the
      * writeGraphics method of a GraphicsWriter is called.  The method
@@ -190,7 +191,7 @@ public abstract class ThreadedOSGraphics
      * This should be set by subclasses if an error occurs. After
      * it is called with a non-null argument, subsequent calls are
      * ignored.
-     * @exception e the exception
+     * @param e the exception
      */
     protected void setWriteException(Exception e) {
 	if (writeException == null) writeException = e;

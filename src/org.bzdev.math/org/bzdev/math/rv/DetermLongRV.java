@@ -45,7 +45,8 @@ public class DetermLongRV extends LongRandomVariable {
     }
 
 
-    public void setMinimum(long min, boolean closed) 
+    @Override
+    public void setMinimum(Long min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (min > minvalue): (min >= minvalue)) 
@@ -53,7 +54,8 @@ public class DetermLongRV extends LongRandomVariable {
 	super.setMinimum(min, closed);
     }
 
-    public void setMaximum(long max, boolean closed) 
+    @Override
+    public void setMaximum(Long max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (max < maxvalue):(max <= maxvalue))

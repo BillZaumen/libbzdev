@@ -3,7 +3,6 @@ package org.bzdev.anim2d;
 /**
  * Factory for creating Caresian (rectilinear) grids.
  * The parameters this factory supports are shown in the following table:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/CartesianGrid2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/CartesianGrid2DFactory.html">

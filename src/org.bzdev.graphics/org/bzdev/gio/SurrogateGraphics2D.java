@@ -69,6 +69,7 @@ public class SurrogateGraphics2D extends Graphics2D  {
      * instance of SurrogateGraphics2D.
      * @param preferAlpha true if the buffered image should have an alpha
      *        channel; false otherwise
+     * @return the image type as an enumeration constant
      */
     public static Graph.ImageType getGraphImageType(boolean preferAlpha) {
 	return Graph.ImageType.getImageType(getBIType(preferAlpha));

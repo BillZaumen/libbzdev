@@ -57,6 +57,7 @@ import java.lang.annotation.*;
 public @interface PrimitiveParm {
     /**
      * The name of the parameter.
+     * @return the parameter name
      */
     String value();
     /**
@@ -103,26 +104,33 @@ public @interface PrimitiveParm {
      *       different value (the factory must be explicitly coded to
      *       call the random variable's next() method to do this).
      *       </UL>
+     * @return the random-variable mode
      */
     boolean rvmode() default false;
     /**
      * The upper bound for a parameter's value; the string "null" if
      * there is none.
+     * @return the upper bound
      */
     String upperBound() default "null";
     /**
      * A boolean that is true if the upper bound is included
      * in the parameter's range; false if it is not.
+     * @return true if the upper bound is included
+     *         in the parameter's range; false if it is not
      */
     boolean upperBoundClosed() default true;
     /**
      * The lower bound for a parameter's value; the string "null" if
      * there is none.
+     * @return the lower bound
      */
     String lowerBound() default "null";
     /**
      * A boolean that is true if the lower bound is included
      * in the parameter's range; false if it is not.
+     * @return true if the lower bound is included
+     *        in the parameter's range; false if it is not.
      */
     boolean lowerBoundClosed() default true;
 }

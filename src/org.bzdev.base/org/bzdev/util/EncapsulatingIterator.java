@@ -14,6 +14,8 @@ import java.util.*;
  * <P>
  * One use is in conjunction with a template processor, where objects of
  * type Iterator&lt;TemplateProcessor.KeyMap&gt; can be used for iteration.
+ * @param <T> the type of the values produced by an existing iterator
+ * @param <E> the type of the values produced by this iterator
  */
 public abstract class EncapsulatingIterator<E,T> implements Iterator<E> {
 
@@ -22,6 +24,10 @@ public abstract class EncapsulatingIterator<E,T> implements Iterator<E> {
     }
 
     private Iterator<T> it;
+    /**
+     * Constructor.
+     * @param it the iterator to encapsulate
+     */
     public EncapsulatingIterator(Iterator<T> it) {
 	this.it = it;
     }

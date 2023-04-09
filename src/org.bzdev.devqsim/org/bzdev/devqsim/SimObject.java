@@ -667,7 +667,7 @@ abstract public class SimObject extends SimObjectHelper
      *  <LI> for the first subclasses of this class that implements
      *       <code>printConfiguration(String,String,boolean,PrintWriter)</code>,
      *       use the following comment:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *  /**
      *   * Print this simulation object's configuration.
      *   * Documentation for the use of this method is provided by 
@@ -682,12 +682,12 @@ abstract public class SimObject extends SimObjectHelper
      *   * {@literal @}param printName {{@literal @}inheritDoc}
      *   * {@literal @}param out {{@literal @}inheritDoc}
      *   *{@literal /}
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       If the 
      *       <code>printConfiguration(String,String,boolean,PrintWriter)</code>
      *       prints something after invoking the same method on its
      *       superclass,  add the following before the parameter declarations:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *   * In addition, the configuration that is printed includes the
      *   * following items.
      *   * &lt;P&gt;
@@ -695,7 +695,7 @@ abstract public class SimObject extends SimObjectHelper
      *   * &lt;UL&gt;
      *   *     ...
      *   * &lt;/UL&gt;
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       where the link is to the subclass overriding this method and
      *       the unnumbered list contains items describing each line or
      *       set of lines in the output.
@@ -703,7 +703,7 @@ abstract public class SimObject extends SimObjectHelper
      *       <code>printConfiguration(String,String,boolean,PrintWriter)</code> and
      *       that are following these conventions, use the following
      *       javadoc comment:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *  /**
      *   * {{@literal @}inheritDoc}
      *   * &lt;P&gt;
@@ -716,13 +716,13 @@ abstract public class SimObject extends SimObjectHelper
      *   * {@literal @}param printName {{@literal @}inheritDoc}
      *   * {@literal @}param out {{@literal @}inheritDoc}
      *   *{@literal /}
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       For this case, if no superclass contains the following, it should
      *       be added after the first {@literal @}inheritDoc directive:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *   * In addition, the configuration that is printed includes the
      *   * following items.
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *  <LI> For separate libraries, the {@literal @}inheritDoc mechanism
      *       will not be able to find text to copy as access to the
      *       source code is needed by the <code>javadoc</code> program.
@@ -945,7 +945,7 @@ abstract public class SimObject extends SimObjectHelper
      *  <LI> for the first subclasses of this class that implements
      *       <code>printState(String,String,boolean,PrintWriter)</code>
      *       use the following comment:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *  /**
      *   * Print this simulation object's state.
      *   * Documentation for the use of this method is provided by
@@ -960,12 +960,12 @@ abstract public class SimObject extends SimObjectHelper
      *   * {@literal @}param printName {{@literal @}inheritDoc}
      *   * {@literal @}param out {{@literal @}inheritDoc}
      *   *{@literal /}
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       If the method
      *       <code>printState(String,String,boolean,PrintWriter)</code>
      *       prints something after invoking the same method on its
      *       superclass, add the following before the parameter declarations:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *   * In addition, the state that is printed includes the
      *   * following items.
      *   * &lt;P&gt;
@@ -973,7 +973,7 @@ abstract public class SimObject extends SimObjectHelper
      *   * &lt;UL&gt;
      *   *     ...
      *   * &lt;/UL&gt;
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       where the link is to the subclass overriding this method and
      *       the unnumbered list contains items describing each line or
      *       set of lines in the output.
@@ -981,7 +981,7 @@ abstract public class SimObject extends SimObjectHelper
      *       <code>printState(String,String,boolean,PrintWriter)</code> and
      *       that are following these conventions, use the following
      *       javadoc comment:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *  /**
      *   * {{@literal @}inheritDoc}
      *   * Defined in {{@literal @}link ...}:
@@ -993,13 +993,13 @@ abstract public class SimObject extends SimObjectHelper
      *   * {@literal @}param printName {{@literal @}inheritDoc}
      *   * {@literal @}param out {{@literal @}inheritDoc}
      *   *{@literal /}
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *       For this case, if no superclass contains the following, it should
      *       be added after the first {@literal @}inheritDoc directive:
-     *       <blockquote><code><pre>
+     *       <blockquote><pre><code>
      *   * In addition, the state that is printed includes the
      *   * following items.
-     *       </pre></code></blockquote>
+     *       </CODE></PRE></blockquote>
      *  <LI> For separate libraries, the {@literal @}inheritDoc mechanism
      *       will not be able to find text to copy as access to the
      *       source code is needed by the <code>javadoc</code> program.
@@ -1234,10 +1234,10 @@ abstract public class SimObject extends SimObjectHelper
      * attribute a callable to a simulation object when this would not
      * otherwise be possible.  It specifically supports task queues and
      * server queues.
+     * @param <Server> the type of a server for the callable
      * @param callable the callable
      * @return a binding of the current object with the callable.
      */
-
     protected final <Server extends QueueServer>
     SimObjQueueCallable<Server> bindCallable(QueueCallable<Server> callable)
     {
@@ -1269,6 +1269,7 @@ abstract public class SimObject extends SimObjectHelper
      * attribute a callable to a simulation object when this would not
      * otherwise be possible.  It specifically supports task queues and
      * server queues.
+     * @param <Server> the type of a server for the callable
      * @param callable the callable
      * @param tag a descriptive string
      * @return a binding of the current object with the callable.
@@ -1301,6 +1302,7 @@ abstract public class SimObject extends SimObjectHelper
      * attribute a runnable to a simulation object when this would not
      * otherwise be possible.  It specifically supports task queues and
      * server queues.
+     * @param <Server> the type of a server for the runnable
      * @param runnable the queue runnable
      * @return a binding of the current object with the runnable.
      */
@@ -1334,6 +1336,7 @@ abstract public class SimObject extends SimObjectHelper
      * attribute a runnable to a simulation object when this would not
      * otherwise be possible.  It specifically supports task queues and
      * server queues.
+     * @param <Server> the type of a server for the runnable
      * @param runnable the runnable
      * @param tag a descriptive string
      * @return a binding of the current object with the runnable.

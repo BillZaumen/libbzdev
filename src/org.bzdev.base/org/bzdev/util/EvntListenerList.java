@@ -26,6 +26,7 @@ public class EvntListenerList {
      * class t.
      * The full list is comprised of a collection of sublists, each
      * distinguished by a class t that serves as a key naming a sublist.
+     * @param <T> the type of the class provided by the first argument
      * @param t the class for the listener
      * @param l the listener, whose type or supertype must match the one
      *        provided by the argument t
@@ -53,7 +54,7 @@ public class EvntListenerList {
      * superclass.
      * The full list is comprised of a collection of sublists, each
      * distinguished by a class t that serves as a key naming a sublist.
-     * @parem t the class or a superclass serving as a key for listeners
+     * @param t the class or a superclass serving as a key for listeners
      * @return the number of listeners
      */
     public int getListenerCount(Class<?> t) {
@@ -86,6 +87,7 @@ public class EvntListenerList {
      * Get an array of listeners of a particular type.
      * The full list is comprised of a collection of sublists, each
      * distinguished by a class t that serves as a key naming a sublist.
+     * @param <T> the type for the class <CODE>t</CODE>
      * @param t the class (or superclass) of a listener that is used
      *        as a key
      * @return a list of the listeners matching the key
@@ -118,6 +120,7 @@ public class EvntListenerList {
      * one of its superclasses must match the class t.  The full list
      * is comprised of a collection of sublists, each distinguished by
      * a class t that serves as a key naming a sublist.
+     * @param <T> the type for the class <CODE>t</CODE>
      * @param t the class for the listener
      * @param l the listener, whose type or supertype must match the one
      *        provided by the argument t

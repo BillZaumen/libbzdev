@@ -12,8 +12,8 @@ package org.bzdev.util;
  * <P>
  * The reason for providing this class is that Java does not allow one
  * to use a primitive type as a type parameter:
- * <code>Comparator<int></code> will generate a compile-time error,
- * although <code>Comparator<Integer></code> can be used in some cases
+ * <code>Comparator&lt;int&gt;</code> will generate a compile-time error,
+ * although <code>Comparator&lt;Integer&gt;</code> can be used in some cases
  * due to autoboxing.
  * <P>
  * One use of this class is in the {@link SuffixArray} implementation,

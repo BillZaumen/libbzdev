@@ -28,9 +28,9 @@ package org.bzdev.math;
 ( column-major order, and vice versa, by using the
  * {@link #transpose(double[],int,int,double[],int,int,boolean)}
  * method. For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *      MatrixOps.transpose(matrix, 20, 20, matrix, 20, 20, true);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * <P>
  * With a flat representation, matrices can be interleaved.  In this
  * form, each element of the matrix is a vector, with each element in
@@ -46,13 +46,13 @@ package org.bzdev.math;
  * representation uses a sequence of three double-precision numbers for
  * each control point, with the control points in column-major order.
  * For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *      double[] controlPoints = {
  *                   P<sub>00x</sub>, P<sub>00y</sub>, P<sub>00z</sub>,
  *                   P<sub>10x</sub>, P<sub>10y</sub>, P<sub>10z</sub>,
  *                   ...
  *               };
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where <CODE>P<sub>ijx</sub></CODE> is the X component of the control point
  * P<sub>ij</sub>, etc.
  */
@@ -249,7 +249,7 @@ public class MatrixOps {
      * @param A the first matrix
      * @param B the second matrix
      * @return the matrix sum A+B
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public static double[] add(double[] A, double[] B)
 	throws IllegalArgumentException
@@ -1999,6 +1999,7 @@ public class MatrixOps {
      * Multiply a matrix by a scalar
      * @param s the scalar
      * @param matrix a matrix
+     * @return the product matrix
      */
     public static double[][] multiply(double s, double[][] matrix)
     {
@@ -2012,6 +2013,7 @@ public class MatrixOps {
      * @param result the matrix to store the results
      * @param s the scalar
      * @param matrix a matrix
+     * @return the product matrix
      * @exception IllegalArgumentException the dimensions of the matrices
      *             are not compatible
      */
@@ -2044,6 +2046,7 @@ public class MatrixOps {
      * The matrices may be identical.
      * @param s the scalar
      * @param matrix a matrix
+     * @return the product matrix
      * @exception IllegalArgumentException the dimensions of the matrices
      *             are not compatible
      */
@@ -2090,6 +2093,7 @@ public class MatrixOps {
      * @param m the number of columns
      * @param R the result matrix
      * @param offsetR the index into R at which the results should be stored
+     * @param s the scalar
      * @param A the  matrix being multiplied
      * @param offsetA the offset into A for the first matrix
      * @param indR the index specifying  the component of the vector
@@ -2434,7 +2438,7 @@ public class MatrixOps {
      * (X, Y, or Z).  This matrix is then multiplied with two fixed
      * matrices.  This method allows the multiplication to be done in
      * place. For example,
-     * <BlOCKQUOTE><CODE><PRE>
+     * <BlOCKQUOTE><PRE><CODE>
      *   for (int k = 0; k &lt; 3; k++) {
      *       MatrixOps.multiply(C, 4, 4, 0,
      *                          P, 4, 4, patchOffset,
@@ -2444,7 +2448,7 @@ public class MatrixOps {
      *                         k, 3,
      *                         0, 1);
      *   }
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * will perform one of these multiplications. The matrix SR is a
      * constant matrix - the same for X, Y, and Z - so its elements are
      * a one dimensional vector (i.e., a single number). The other
@@ -2481,9 +2485,10 @@ public class MatrixOps {
      * @param indB the index of the vector component for B to use for this
      *        computation
      * @param vlenB the vector length for an element of B
-     * @exception the vector lengths are not incorrect or an array is
-     *            not long enough to hold the specified number of rows
-     *            and columns, or the offsets are not appropriate
+     * @exception IllegalArgumentException if the vector lengths are
+     *            not incorrect or an array is not long enough to hold
+     *            the specified number of rows and columns, or the
+     *            offsets are not appropriate
      */
     public static void multiply(double[] C, int mC, int nC, int offsetC,
 				double[] A, int mA, int nA, int offsetA,
@@ -2492,6 +2497,7 @@ public class MatrixOps {
 				int indC, int vlenC,
 				int indA, int vlenA,
 				int indB, int vlenB)
+	throws IllegalArgumentException
     {
 	if (C == A) {
 	    if (vlenC != vlenA) {
@@ -2558,7 +2564,8 @@ public class MatrixOps {
     /**
      * Subtract two matrices.
      * @param A the first matrix
-     * @param B the second matrix * @return the matrix difference A-B
+     * @param B the second matrix
+     * @return the matrix difference A-B
      * @exception IllegalArgumentException The matrix dimensions are
      *            not consistent
      */
@@ -2608,7 +2615,7 @@ public class MatrixOps {
      * @param A the first matrix
      * @param B the second matrix
      * @return the matrix difference A-B
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException if the arguments are not valid
      */
     public static double[] subtract(double[] A, double[] B)
 	throws IllegalArgumentException

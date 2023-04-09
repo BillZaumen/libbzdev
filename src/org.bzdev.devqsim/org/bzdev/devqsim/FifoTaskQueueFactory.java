@@ -3,7 +3,6 @@ package org.bzdev.devqsim;
 /**
  * Factory for creating FifoTaskQueues.
  * The parameters are defined as follows:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/FifoTaskQueueFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/FifoTaskQueueFactory.html">

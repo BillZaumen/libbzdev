@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.obnaming Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.obnaming package</H2>
+<H1>The org.bzdev.obnaming package</H1>
 
 The following topics are described below:
 <UL>
@@ -17,7 +18,7 @@ The following topics are described below:
   <LI><A HREF="#factoryExamples">examples for named-object factories</A>.
 </UL>
 
-<H3><A NAME="namers"></A>Object namers and named objects</H3>
+<H2><A ID="namers"></A>Object namers and named objects</H2>
 
 It is sometimes useful to be able to look up objects by name, and it
 is also useful to be able to find the names of those objects, perhaps
@@ -51,13 +52,13 @@ There are two cases:
 Both object-namer cases are shown in the following figure (the helper
 classes created by an annotation processor are shown in blue).
 <P style="text-align: center">
-  <img src="obnaming.png" class="imgBackground">
+  <img src="obnaming.png" class="imgBackground" alt="Diagram">
 <P>
 The figure above indicates that named objects are registered with
 object namers (via operations that occur when constructors are called),
 and that the helpers, when used, are specified by annotations.
 
-<H3><A NAME="factories"></A>Factories for named objects</H3>
+<H2><A ID="factories"></A>Factories for named objects</H2>
 
 In addition, this package provides a framework for creating
 factories to configure named objects.  This framework provides common
@@ -66,7 +67,7 @@ about the factory.
 The following figure shows the relationship between various classes
 related to factories:
 <P style="text-align: center">
- <img src="factory.png" class="imgBackground">
+ <img src="factory.png" class="imgBackground" alt="Diagram">
 <P>
 The class {@link NamedObjectFactory}
 is a generic class.  A subclass will use its own class name as the
@@ -87,7 +88,7 @@ double, and boolean), strings, and random variables.  If the desired
 type is that of a named object, the object is referenced by name and
 the object namer is used to find the object itself.
 
-<H3><A NAME="namerExamples"></A>Examples for object namers</H3>
+<H2><A ID="namerExamples"></A>Examples for object namers</H2>
 
 As an example, if an object namer does not have a superclass, one
 can simply extend the classes
@@ -201,7 +202,7 @@ public class TestNamer extends NHelper
 </code></pre>
 The object namer will be configures so that the common superclass
 of all named objects is TestObject. The annotation describes the
-constructors of the helper's superclass (NumberStore), which has 
+constructors of the helper&apos;s superclass (NumberStore), which has
 similar constructors.  TestNamer must extend the helper class (NHelper)
 and may implement ObjectNamerOps<TestObject> so that Javadocs can
 obtain documentation about various methods.
@@ -239,7 +240,7 @@ The namerClass method is not actually needed, but is required for
 documentation reasons. It makes it easier to find the corresponding
 object namer.
 
-<H3><A NAME="factoryExamples"></A>Examples for named-object factories</H3>
+<H2><A ID="factoryExamples"></A>Examples for named-object factories</H2>
 
 Factory classes will typically be arranged in a specific class
 hierarchy, a convention that is useful but not mandatory. For
@@ -251,12 +252,11 @@ of these classes: a set of abstract factories that are paired with
 these classes and additional factories to create specific objects.
 This is illustrated by the following UML diagram:
 <P style="text-align: center">
-<img src="example.png" class="imgBackground">
+<img src="example.png" class="imgBackground" alt="Diagram">
 <P>
 In this example, the non-abstract factory classes will create the actual
 objects, while the abstract factories will perform initializations
 appropriate for the class each abstract factory configures.
-<P>
 <P>
 When coded directly, the documentation for
 {@link org.bzdev.obnaming.NamedObjectFactory NamedObjectFactory} and
@@ -299,7 +299,7 @@ This class contains three variables. Two are integer-valued and one
 has a value that is an IntegerRandomVariable.
 <P>
 A factory to create this class can be written as follows:
-<blockquote><code><pre>
+<blockquote><pre><code>
 import org.bzdev.obnaming.*;
 import org.bzdev.bzdev.math.rv.*;
 
@@ -341,7 +341,7 @@ public class TestObject2Factory
        object.setValue3(value3.next());
     }
  }
-</pre></code></blockquote>
+</CODE></PRE></blockquote>
 The {@link org.bzdev.obnaming.annotations.PrimitiveParm} annotations
 give the name of the parameter. The type of the parameter is
 determined by the type of the field being annotated.  When rvmode() is
@@ -353,7 +353,7 @@ initialized. The factory class' constructor is expected to create
 a {@link ParmManager} object when
 annotations are used, and use
 the {@link ParmManager} to initialize the
-factory's parameters.  The method named clear() should use the
+factory&apos;s parameters.  The method named clear() should use the
 {@link ParmManager}
 {@link ParmManager#setDefaults(org.bzdev.obnaming.NamedObjectFactory)} method to
 restore parameters to their default values. Finally the factory must
@@ -372,13 +372,13 @@ META-INF/services/org.bzdev.obnaming.NamedObjectFactory and
 included in the same jar file as the factory, and in a module-info.java
 file when modules are used, where the module-info.java file contains
 the statement that matches the pattern
-<code><pre>
+<pre><code>
      provides org.bzdev.obnaming.NamedObjectFactory with
         FACTORY[, FACTORY]*;
-</pre></code>
+</CODE></PRE>
 where each instance of FACTORY is replaced with the fully-qualified
 path name of a factory class. For example,
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
     module com.foo {
       exports com.foo.pkg;
       requires org.bzde.base;
@@ -388,7 +388,7 @@ path name of a factory class. For example,
          com.foo.pkg.Factory2,
          com.foo.pkg.Factory3;
     }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Using both forms allows the JAR file to be used with and without
 modules.
 <P>

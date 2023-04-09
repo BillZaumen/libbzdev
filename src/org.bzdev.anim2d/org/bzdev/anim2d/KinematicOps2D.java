@@ -123,7 +123,6 @@ public class KinematicOps2D {
      * Get the final velocity along a path when moving for a specified
      * time with a specified initial tangent velocity and with
      * constant tangential acceleration.
-     * <P>
      * @param t the time spent traversing the path
      * @param v0 the initial velocity tangent to the path
      * @param a the acceleration tangent to the path
@@ -155,6 +154,7 @@ public class KinematicOps2D {
      * @param t the time spent traversing the path
      * @param v1 the initial tangential velocity
      * @param v2 the final tangential velocity.
+     * @return the acceleration
      */
     public static double accelGivenTVV(double t, double v1, double v2) {
 	if (v1 == v2) return 0.0;

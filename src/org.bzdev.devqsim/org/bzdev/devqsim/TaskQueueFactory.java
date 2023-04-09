@@ -11,14 +11,12 @@ import org.bzdev.obnaming.ParmParser;
  * <P>
  * The parameters this factory provides are the same as the parameters
  * provided by its subclass {@link LifoTaskQueueFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/LifoTaskQueueFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/LifoTaskQueueFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
  * @see org.bzdev.devqsim.TaskQueue
  * @see org.bzdev.devqsim.TaskQueue.ReleasePolicy
  * @see org.bzdev.devqsim.QueueDeletePolicy

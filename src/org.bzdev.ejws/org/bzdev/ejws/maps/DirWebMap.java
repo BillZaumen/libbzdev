@@ -36,6 +36,9 @@ public class DirWebMap extends WebMap {
      * Constructor.
      * @param root a File representing the directory within which
      * resources will be found.
+     * @exception IOException an IO error occurred
+     * @exception IllegalArgumentException The argument is not an
+     *            instance of {@link File}
      */
     public DirWebMap(Object root)
 	throws IOException, IllegalArgumentException

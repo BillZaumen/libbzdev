@@ -33,10 +33,10 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
-
     public static double[] merge(double[]... args)
 	throws IllegalArgumentException
     {
@@ -84,6 +84,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
@@ -135,6 +136,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
@@ -186,6 +188,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
@@ -237,6 +240,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
@@ -288,6 +292,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */
@@ -339,6 +344,7 @@ public class ArrayMerger {
      * element has been used from each argument array. This
      * is then repeated for the second element of each argument
      * array, etc.
+     * @param args the arrays to merge
      * @return an array containing the elements of the argument
      *         arrays
      */

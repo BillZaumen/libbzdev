@@ -266,6 +266,7 @@ public class BSplineArray extends VectorValuedFunction {
      * </ul>
      * Note: Copying of control points must be considered when fitting
      * a periodic spline to a function or a set of data points.
+     * @param dim the dimenions for this vector-valued function
      * @param degree a non-negative integer giving the  degree of the
      *        B-spline to be constructed
      * @param knots the knots for the B-spline to be constructed
@@ -487,6 +488,7 @@ public class BSplineArray extends VectorValuedFunction {
      * points, mode, and a set of Y values for given X values.
      * The number of X,Y data points must be larger than the number
      * of control points.
+     * @param dim the dimenions for this vector-valued function
      * @param degree the degree of the B-spline that will be created
      * @param n the number of control points
      * @param mode the mode for the B-spline (either
@@ -511,6 +513,7 @@ public class BSplineArray extends VectorValuedFunction {
      * deviations for given X values.
      * The number of X,Y data points must be larger than the number
      * of control points.
+     * @param dim the dimenions for this vector-valued function
      * @param degree the degree of the B-spline that will be created
      * @param n the number of control points
      * @param mode the mode for the B-spline (either

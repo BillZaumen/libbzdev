@@ -219,6 +219,8 @@ abstract public class Path3D implements Cloneable {
 	 * Each control point of the 2D path is converted to a 3D point
 	 * by using the same X and Y values and setting the Z value to
 	 * 0 and this new point is then transformed.
+	 * @param initialCapacity the initial number of path segments
+	 *        allocated in an expandable table
 	 * @param path the 2D path
 	 * @param tform the transform to apply to each control point
 	 */
@@ -664,6 +666,8 @@ abstract public class Path3D implements Cloneable {
 	 * Each control point of the 2D path is converted to a 3D point
 	 * by using the same X and Y values and setting the Z value to
 	 * 0 and this new point is then transformed.
+	 * @param initialCapacity the number of control points that can be
+	 *        stored before tables are automatically expanded
 	 * @param path the 2D path
 	 * @param tform the transform to apply to each control point
 	 */
@@ -1080,6 +1084,8 @@ abstract public class Path3D implements Cloneable {
      * The iterator will ignore new segments added after the call to this
      * method, but {@link #reset()} should not be called while
      * this path iterator is in use.
+     * @param tform the transform to apply to control points; null if there
+     *        is none
      * @return a path iterator for this path
      */
     public abstract PathIterator3D getPathIterator(Transform3D tform);
@@ -1197,8 +1203,6 @@ abstract public class Path3D implements Cloneable {
      *
     /**
      * Get the last point on a path.
-     * @return the first point along the path; null if the path is
-     *         empty
      * @return the last point; null if the path is empty or closed
      *         at its end
      */

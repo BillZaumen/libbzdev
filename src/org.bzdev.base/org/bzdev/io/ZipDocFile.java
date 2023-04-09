@@ -378,6 +378,7 @@ public class ZipDocFile extends ZipFile {
      * have a repetition count of n contribute a value of n to the
      * count returned.
      * @return the number of entries
+     * @throws IOException if an IO error occurred
      */
     public int getRequestedEntryCount() throws IOException {
 	setup();
@@ -390,6 +391,7 @@ public class ZipDocFile extends ZipFile {
      * The repetition count associated with each of these entries is
      * ignored.
      * @return the number of entries
+     * @throws IOException if an IO error occurred
      */
     public int getActualEntryCount() throws IOException {
 	setup();

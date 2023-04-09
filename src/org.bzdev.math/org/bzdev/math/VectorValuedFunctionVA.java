@@ -11,11 +11,18 @@ public abstract class VectorValuedFunctionVA implements VADomainOps {
 	return MathErrorMsg.errorMsg(key, args);
     }
 
+    /**
+     * The dimenion for the vectors that will be returned.
+     * <P>
+     * This value is read-only.
+     */
     protected int dim;
 
     /**
      * Get the dimension of the vectors returned by a vector-valued
      * function.
+     * @return the dimension of the vectors returned by this vector-valued
+     *         function
      */
    public int getDimension() {
 	return dim;

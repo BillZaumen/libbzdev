@@ -193,6 +193,7 @@ public class SurfaceIteratorSplitter {
 
     /**
      * Get the number of subiterators.
+     * @return the number of subiterators
      */
     public int size() {
 	return childIterators.length;
@@ -200,9 +201,9 @@ public class SurfaceIteratorSplitter {
 
     /**
      * Get the i<sup>th</sup> subiterator.
-
      * @param index the index for the subiterator (an integer in the
      *        range [0, n) where n is the number of subiterators)
+     * @return the i<sup>th</sup> subiterator
      */
     public SurfaceIterator getSurfaceIterator(int index) {
 	if (index < 0 || index >= childIterators.length) {

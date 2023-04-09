@@ -27,7 +27,8 @@ all:
 		classes/META-INF/services/org.bzdev.obnaming.NamedObjectFactory
 	chmod u+x scrun
 	@echo ---- test.js ------
-	@$(HAS_JS) && ./scrun --classpathCodebase classes/ --stackTrace test.js
+	@$(HAS_JS) && ./scrun --classpathCodebase classes/ \
+		--stackTrace test.js || echo ... skipping test.js
 	@echo ---- test.esp ------
 	@./scrun --classpathCodebase classes/ --stackTrace test.esp
 	chmod u-x scrun

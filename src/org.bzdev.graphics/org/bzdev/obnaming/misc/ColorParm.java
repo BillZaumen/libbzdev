@@ -206,7 +206,7 @@ public class ColorParm {
      * annotation, use one the inner classes or create a subclass with
      * a zero-argument constructor that will create the desired color.
      * @param spec the CSS color specification
-     * @exception the specification was ill formed
+     * @exception IllegalArgumentException if the specification was ill formed
      */
     public ColorParm(String spec) throws IllegalArgumentException {
 	// called to syntax check the argument

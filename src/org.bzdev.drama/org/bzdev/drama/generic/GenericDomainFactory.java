@@ -105,6 +105,10 @@ abstract public class GenericDomainFactory<
 
     Set<C> conditionSet = new LinkedHashSet<C>();
 
+    /**
+     * Get the set of conditions associated with this domain factory
+     * @return a set of conditions
+     */
     public Set<C> getConditionSet() {
 	return Collections.unmodifiableSet(conditionSet);
     }

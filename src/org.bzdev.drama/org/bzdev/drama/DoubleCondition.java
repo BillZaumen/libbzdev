@@ -18,11 +18,11 @@ public class DoubleCondition extends Condition
      * Set a condition's value.
      * Calling this method does not notify domains of the change.
      * A subclass may have to override this method as follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      protected void setValue(double value) {
      *          super.setValue(value);
      *      }
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * in order to make the method accessible to classes in the
      * subclass' package.
      * @param value the new value

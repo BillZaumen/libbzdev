@@ -3,17 +3,17 @@
 <HEAD>
   <title>The org.bzdev.scripting Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.scripting package</H2>
+<H1>The org.bzdev.scripting package</H1>
 
 This package provides several classes shown in the following UML
 diagram:
 <P style="text-align: center">
-<img src="scripting.png" class="imgBackground">
-<P>
+<img src="scripting.png" class="imgBackground" alt="Diagram">
 <UL>
   <LI>ScriptingContext provides protected methods for specifying a script
     engine,the default bindings to use (the scope is the one specified
@@ -21,7 +21,7 @@ diagram:
     <CODE>ENGINE_SCOPE</CODE>),the script language (which should be
     the official name such as ECMAScript for JavaScript).  Subclasses
     should implement these methods unless configured to use a parent
-    ScriptingContext, in which case the parent's script and bindings
+    ScriptingContext, in which case the parent&apos;s script and bindings
     are used.
     A ScriptingContext can have a parent scripting context.  The parent
     will provide the actual scripting operations, but may have a different
@@ -31,7 +31,6 @@ diagram:
     the scripting languages that a Java implementation supports (this
     may depend on the class path or module path).
 </UL>
-<P>
 <P>
 The class ScriptingContext itself does not directly enable
 scripting: several methods need to be implemented to enable it.

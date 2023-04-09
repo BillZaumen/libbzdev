@@ -14,11 +14,12 @@ public abstract class ProbDistribution implements RealValuedDomainOps {
 
 
     /**
-     * Determine if this distribution is symmetric about 0.
+     * Determine if this distribution is symmetric about x.
      * A distribution is symmetric if its probability density f
      * satisfies f(x+y) = f(x-y) and that if x+y is in f's domain,
      * so is x-y.  Equivalently, it must satisfy Q(x+y) = P(x-y).
-
+     * @param x the point about which to test if this distribution is
+     *        symmaetric
      * @return true if it is symmetric; false otherwise.
      */
     public abstract boolean isSymmetric(double x);

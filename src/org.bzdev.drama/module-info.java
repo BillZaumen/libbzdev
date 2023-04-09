@@ -16,7 +16,6 @@
  * <P><B>
  * Please see <A HREF="org/bzdev/drama/doc-files/description.html">the Drama package description<A>
  * for the description of a basic actor-based simulation package.</B>
- * @moduleGraph
  */
 module org.bzdev.drama {
     exports org.bzdev.drama;

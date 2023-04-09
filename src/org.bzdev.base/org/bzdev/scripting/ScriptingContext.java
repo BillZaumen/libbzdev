@@ -244,6 +244,7 @@ public class ScriptingContext {
      * and restored.
      * @param bindings the binding to initially swap with an existing binding
      *        when {@link BindingSwapper#swap()} is called
+     * @return the new binding swapper
      */
     protected BindingSwapper createBindingSwapper(Bindings bindings) 
     {
@@ -1070,11 +1071,12 @@ public class ScriptingContext {
      * Evaluate a script object's method.
      * @param scriptObject the script object whose method is to be invoked
      * @param methodName the name of the method to invoke
-
      * @param args the arguments
      * @return the value computed by the method
      * @exception ScriptException an exception occurred in a script object's
      *            method
+     * @exception NoSuchMethodException the method does not exist or the
+     *            arguments do not match
      * @exception UnsupportedOperationException scripting is not supported
      * @exception IllegalArgumentException the scriptObject was null or
      *            is not an object recognized by the scripting language
@@ -1167,9 +1169,9 @@ public class ScriptingContext {
 
     /**
      * Evaluate a script object's method using specified bindings.
+     * @param bindings the bindings
      * @param scriptObject the script object whose method is to be invoked
      * @param methodName the name of the method to invoke
-
      * @param args the arguments
      * @return the value computed by the method
      * @exception ScriptException an exception occurred in a script object's

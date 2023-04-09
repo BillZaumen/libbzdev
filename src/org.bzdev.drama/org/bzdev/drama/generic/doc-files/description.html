@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.drama.generic Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.drama.generic package</H2>    
+<H1>The org.bzdev.drama.generic package</H1>
 
 This package provides the core functionality common to a number of
 simulation <i>flavors</i> - simulation packages that are optimized
@@ -25,7 +26,7 @@ Because the use of generics is rather complex, a simplified
 illustration of the design pattern that simulation flavors makes
 use of should be helpful. Suppose we define two classes,
 GenericFoo and GenericBar as follows:
-<code><pre>
+<pre><code>
 abstract class 
 GenericFoo&lt;F extends GenericFoo&lt;F,B&gt;,B extends GenericBar&lt;F,B&gt;&gt;
 {
@@ -38,14 +39,14 @@ GenericBar&lt;F extends GenericFoo&lt;F,B&gt;,B extends GenericBar&lt;F,B&gt;&gt
   F getFoo() {returns null;}
   B getBar() {returns null;}
 }
-</pre></code>
+</CODE></PRE>
 To make use of these classes, it is necessary to create subclasses
 of the corresponding generic classes (both of them, not just one).
 For example
-<code><pre>
+<pre><code>
 class Foo extends GenericFoo&lt;Foo,Bar&gt; {}
 class Bar extends GenericFoo&lt;Foo,Bar&gt; {}
-</pre></code>
+</CODE></PRE>
 Then for Foo and Bar, even though the methods are actually
 implemented by their superclasses, getFoo() will return a
 value of type Foo and getBar() will return a value of type Bar.
@@ -72,14 +73,14 @@ The org.bzdev.devqsim package defines a Simulation class and a
 SimObject class at the top of the class hierarchy, as illustrated
 in the following UML class diagram:
 <p style="ext-align: center">
-<img src="genericdrama.png" class="imgBackground">
+<img src="genericdrama.png" class="imgBackground" alt="Diagram">
 <p>
 With a few exceptions
 (e.g., {@link GenericSimulation}),
 classes in this package inherit
 from {@link GenericSimObject}, which is
 necessary for any class that can be looked up by name from the
-simulation's tables.  The
+simulation&apos;s tables.  The
 class {@link GenericFactory} provides a
 standard interface to allow
 the {@link GenericSimulation} class to
@@ -173,7 +174,7 @@ or a set if actors. The following state-transition diagram shows
 the process for the case in which messages are sent directly,
 specifying a delay to account for propagation time:
 <P style="text-align:center">
-<img src="message1.png" class="imgBackground">
+<img src="message1.png" class="imgBackground" alt="Diagram">
 <P>
 If a delay is not provided,  a domain is used to obtain the
 delay. The domain can be provided explicitly.  In addition
@@ -183,7 +184,7 @@ drop them, and is provided to represent noisy communication
 channels. This process
 is illustrated by the following state-transition diagram:
 <P style="text-align:center">
-<img src="message2.png" class="imgBackground">
+<img src="message2.png" class="imgBackground" alt="Diagram">
 <P>
 The corresponding methods defined
 by {@link GenericActor} are named "send"
@@ -194,7 +195,7 @@ MessageSimulationEvent (used internally in this package)
 and post that on the event queue.  The class structure is illustrated
 in the following diagram:
 <P style="text-align:center">
-<IMG SRC="gevents.png" class="imgBackground">
+<IMG SRC="gevents.png" class="imgBackground" alt="Diagram">
 <P>
 The classes shown in gray and light blue are classes from the
 org.bzdev.devqsim package.  The classes in the org.bzdev.drama.generic
@@ -205,7 +206,7 @@ that are in the org.bzdev.drama.common package.
 Finally, a number of abstract classes provide support for factories,
 as shown in the following diagram:
 <P style="text-align:center">
-<IMG SRC="gdfactories.png" class="imgBackground">
+<IMG SRC="gdfactories.png" class="imgBackground" alt="Diagram">
 <P>
 These can be subclassed to create various factories. See
 {@link org.bzdev.devqsim.SimObjectFactory} and

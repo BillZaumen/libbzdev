@@ -28,6 +28,12 @@ public class DramaSimulationLauncher extends SimulationLauncher {
      * by combining the results of parsing YAML files.
      * @param initializer an object describing the additional configuration;
      *        null if there is nothing else to configure
+     * @exception ClassNotFoundException a class needed to initialize
+     *            this object could not be found
+     * @exception IOException an IO error occurred
+     * @exception IllegalAccessException if a Constructor object is
+     *            enforcing Java language access control and the underlying
+     *            constructor is inaccessible.
      * @see org.bzdev.obnaming.ObjectNamerLauncher
      * @see org.bzdev.obnaming.ObjectNamerLauncher#combine(JSObject,JSObject...)
      * @see org.bzdev.obnaming.ObjectNamerLauncher#loadFromStream(Class,InputStream,int)
@@ -44,6 +50,12 @@ public class DramaSimulationLauncher extends SimulationLauncher {
 
     /**
      * Constructor.
+     * @exception ClassNotFoundException a class needed to initialize
+     *            this object could not be found
+     * @exception IOException an IO error occurred
+     * @exception IllegalAccessException if a Constructor object is
+     *            enforcing Java language access control and the underlying
+     *            constructor is inaccessible.
      */
     public DramaSimulationLauncher() 
 	throws ClassNotFoundException, IOException, IllegalAccessException

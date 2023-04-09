@@ -258,6 +258,7 @@ public class InputTablePane extends JPanel {
     /**
      * Removes a listener from the list that is notified each time a
      * change to the underlying table's data model occurs.
+     * @param l the table model listener to remove
      */
     public void removeTableModelListener(TableModelListener l) {
 	table.getModel().removeTableModelListener(l);

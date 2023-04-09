@@ -1,13 +1,14 @@
-<!DOCTYPE HTML>
+!DOCTYPE HTML>
 <HTML lang="en">
 <HEAD>
   <title>Factory Parameter Managers</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>FactoryParmManager Description</H2>
+<H1>FactoryParmManager Description</H1>
 <P>
 The <CODE>FactoryParmManager</CODE> annotation may be applied to the
 class definition for a subclass of NamedObjectFactory, and will be
@@ -15,7 +16,7 @@ ignored if applied to other classes.  If the subclass of
 NamedObjectFactory is a generic class, the corresponding ParmManager
 will also be a generic class with the same type parameters. The class
 name of the ParmManager is specified by this
-annotation's <CODE>value</CODE> element.
+annotation&apos;s <CODE>value</CODE> element.
 <P>
 Additional elements can be provided for CompoundParmType in order
 to specify resource bundles used for tips, labels, and parameter
@@ -42,7 +43,7 @@ inserted as-is into HTML documents and must be
 formatted so that they can fit between a <CODE>&lt;DIV&gt;</CODE>
 element and a matching <CODE>&lt;/DIV&gt;</CODE>. The additional
 element is named JDOC and its contents use the same convention
-as the Javadoc @link directive. The class name and optional
+as the Javadoc {@literal @}link directive. The class name and optional
 method or field will be turned into a link to the corresponding API
 documentation.
 <P>
@@ -55,8 +56,8 @@ environment, assume that the delimiter will be ".".
 The ParmManager class that is generated will have the same type
 parameters as the factory it annotates. These must be replicated
 literally when an instance is defined. For example,
-* <BLOCKQUOTE><CODE><PRE>
-    @FactoryParmManager(value="AbstractFooFactoryPM")
+<BLOCKQUOTE><PRE><CODE>
+    {@literal @}FactoryParmManager(value="AbstractFooFactoryPM")
     public abstract class AbstractFooFactory&lt;OBJ extends Foo&gt; {
        ...
        AbstractFooFactory&lt;OBJ&gt; pm;
@@ -65,7 +66,7 @@ literally when an instance is defined. For example,
           initParms(pm, AbstractFooFactory.class);
        }
     }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 If this is not done, type-erasure errors will occur at compile time.
 <P>
 In actual use, one will also specify various resource bundles. These
@@ -81,10 +82,10 @@ specify
       text that can be used for a detailed description.
 </UL>
 Each resource bundle defines a series of properties whose keys are the
-factory's parameter names. With resource bundles, the previous example
+factory&apos;s parameter names. With resource bundles, the previous example
 becomes
-<BLOCKQUOTE><CODE><PRE>
-    @FactoryParmManager(value="AbstractFooFactoryPM",
+<BLOCKQUOTE><PRE><CODE>
+    {@literal @}FactoryParmManager(value="AbstractFooFactoryPM",
                    labelResourceBundle="*.lpack.FooFactoryLabels",
                    tipResourceBundle="*.lpack.FooFactoryTips",
                    DocumenationResourceBundle="*.lpack.FooFactoryDocs")
@@ -96,7 +97,7 @@ becomes
           initParms(pm, AbstractFooFactory.class);
        }
     }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The wildcards expands to the current package.  When wildcards are
 used the properties must be placed in a subpackage whose first
 component is "lpack". With java modules, this package must be an
@@ -114,8 +115,8 @@ code for these additional factories is similar.  For the typical case,
 one can add an element, <CODE>stdFactory</CODE>, to the FactoryParmManager
 annotation so that this factory will be automatically generated. For
 example,
-<BLOCKQUOTE><CODE><PRE>
-    @FactoryParmManager(value="AbstractFooFactoryPM",
+<BLOCKQUOTE><PRE><CODE>
+    {@literal @}FactoryParmManager(value="AbstractFooFactoryPM",
                    labelResourceBundle="*.lpack.FooFactoryLabels",
                    tipResourceBundle="*.lpack.FooFactoryTips",
                    DocumenationResourceBundle="*.lpack.FooFactoryDocs",
@@ -130,7 +131,7 @@ example,
           initParms(pm, AbstractFooFactory.class);
        }
     }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 In this example, the type of factory that creates a 'Foo' object is
 FooFactory, its single-argument constructor has an argument named "sim",
 and the Javadoc comment for "sim" is "the simulation".  The
@@ -144,23 +145,23 @@ In some unusual cases, one may want to use a FactoryParmManager
 annotation when no ParmManager is needed (e.g., when creating
 a subclass that removes a factory parameter defined by a superclass.
 In this case, the value element can be set to an empty string:
-<BLOCKQUOTE><CODE><PRE>
-    @FactoryParmManager(value="",
+<BLOCKQUOTE><PRE><CODE>
+    {@literal @}FactoryParmManager(value="",
                    stdFactory="Foo1Factory",
                    namerVariable="a2d",
                    namerDocumentation="the animation")
     public abstract class AbstractFoo1Factory&lt;OBJ extends Foo1&gt;
-    extends AbstractFooFactory<Obj>
+    extends AbstractFooFactory&lt;Obj&gt;
     {
        protected AbstractFoo1Factory(Animation2D a2d) {
           super(a2d);
           removeParm("foobar");
        }
     }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 Recommended options for the java compiler (we assume the
-command-line syntax used in Sun Microsystem's implementation)
+command-line syntax used in Sun Microsystem&apos;s implementation)
 for non-modular jar files are
 <pre><code>
  javac -d CLASSES -s TMPSRC \
@@ -182,15 +183,15 @@ non-abstract factory provided in a JAR file, one per line, in the file
 META-INF/services/org.bzdev.obnaming.NamedObjectFactory
 </blockquote>
 that will appear in the same JAR file (this uses the same
-conventions as those used by Java's service-provider interface).
+conventions as those used by Java&apos;s service-provider interface).
 In particular, the program lsnof uses the information contained in
 this file. When creating javadoc files (for the non-modular case)
 one can use the following commands
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
     javadoc -d TARGET -sourcepath .:TMPSRC \
        -classpath CLASSES \
        FILES...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where TARGET is the directory that will contain the API documentation
 generated by javadoc and FILES are the files to document, and should
 include the source files in TMPSRC.
@@ -200,28 +201,28 @@ mods and a subdirectory mods/MODULE where MODULE is the name of the
 module (e.g., com.foo.bar). One will also create a directory tmpsrc
 and a corresponding subdirectory tmpsrc/MODULE.  A typical compiler
 command, assuming the source code is in a directory src, is
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    javac -d mods/MODULE -p /usr/share/bzdev -s tmpsrc/MODULE \
          --processor-module-path /usr/share/bzdev \
          src/MODULE/module-info.java src/MODULE/DIR/*.java
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where DIR is the directory corresponding to a package name
 following the usual Java conventions (e.g., com/foo/bar for the
 package com.foo.bar). Placing generated source files in
 tmpsrc/MODULE and the source tree in src/MODULE will make it easy
 to use javadoc to generate documentation: for javadoc the
 options
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    -d TARGET
    --module-path PATH
    --module-source-path src:tmpsrc
    --add-modules MODULES
    --module MODULE
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 and possibly
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    --exclude PACKAGES
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 are useful, where
 <UL>
   <LI> TARGET is the directory that will hold the API documentation
@@ -239,19 +240,19 @@ are useful, where
 </UL>
 The module-info file should contain a 'provides' clause (which is necessary
 for the program <CODE>lsnof</CODE> to recognize factories):
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 module ... {
      provides org.bzdev.obnaming.NamedObjectProcessor with
         FACTORY_LIST;
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where FACTORY_LIST is a comma-separated list of the factories in
 the module that are not abstract classes.
 One will typically want to use the program lsnof as well. For example
 lsnof corresponding the javadoc options shown above are
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
    lsnof -d TARGET --module-path PATH CLASSNAME...
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 where TARGET and PATH match the valued provided for the javadoc
 command shown above. Multiple class names should be provided, one
 for each factory.  lsnof allows wildcards in the class name, but in
@@ -263,10 +264,10 @@ in the directory TARGET/factories-api and it is useful to include
 this documentation the factory's full API documentation by using
 an HTML IFRAME.  If the factory's fully qualified class name is
 org.foo.pkg.Factory, then the SRC attribute for an IFRAME in this
-factory's javadoc comments would be
-<BLOCKQUOTE><CODE><PRE>
+factory&apos;s javadoc comments would be
+<BLOCKQUOTE><PRE><CODE>
  SRC="{@docRoot}/factories-api/org/foo/pkg/Factory.html"
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 If lsnof is used to generate documentation the FactoryParmManager
 elements <CODE>labelResourceBundle</CODE> and <CODE>tipResourceBundle</CODE>
 must be defined.  In many cases,<CODE>docResourceBundle</CODE> bundle

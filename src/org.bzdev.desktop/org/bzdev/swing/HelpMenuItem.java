@@ -47,7 +47,7 @@ import java.beans.PropertyChangeListener;
  * URL file:///PATH/toc.xml, where PATH should be replace by a path
  * from the root directory to the directory that contains toc.xml, and
  * that toc.xml contains the following:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  &lt;?xml version="1.0" ?&gt;
  * &lt;!DOCTYPE toc SYSTEM "sresource:/org/bzdev/swing/toc.dtd"&gt;
  * &lt;toc&gt;
@@ -61,13 +61,13 @@ import java.beans.PropertyChangeListener;
  *     &lt;node title="chapter3" uri="file:///PATH/manual.html#terminal" /&gt;
  *   &lt;/node&gt;
  * &lt;/toc&gt;
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Also suppose that the file manual.html is accessed using the URL
  * file:///PATH/manual.html and that manual.html is an HTML 3.2 file
  * with anchors names "gui", "output", "request", "prefs", menus", and
  * "terminal". Then the following code will create on-line help for an
  * application and make it accessible from a "Help" menu.
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    JFrame frame = new JFrame("Application");
  *    JMenuBar menubar = new JMenuBar();
  *    ...
@@ -80,7 +80,7 @@ import java.beans.PropertyChangeListener;
  *    ...
  *    frame.setJMenuBar(menubar);
  *    ...
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Other constructors can be used when internationalization is needed.
  * For a HelpMenuItem, the internationalized constructors uses a
  * resource bundle to look up the titles and uris based on a locale.

@@ -20,11 +20,11 @@ public class BooleanCondition extends Condition
      * Set the value for the condition.
      * Calling this method does not notify domains of the change.
      * A subclass may have to override this method as follows:
-     * <blockquote><code><pre>
+     * <blockquote><pre><code>
      *      protected void setValue(boolean value) {
      *          super.setValue(value);
      *      }
-     * </pre></code></blockquote>
+     * </CODE></PRE></blockquote>
      * in order to make the method accessible to classes in the
      * subclass' package.
      * @param value the value

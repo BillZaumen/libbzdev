@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.graphs Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.graphs package</H2>
+<H1>The org.bzdev.graphs package</H1>
 
 Please visit the following links for specific topics:
 <UL>
@@ -18,7 +19,7 @@ Please visit the following links for specific topics:
   <LI><A HREF="#overlays">overlays</A>.
   <LI><A HREF="#drawing">using graphs as canvases</A>.
 </UL>
-<H3>Introduction</H3>
+<H2>Introduction</H2>
 The {@link Graph} class is the class that represents a graph. Java
 graphics uses two coordinate systems, using the term "device space"
 for an integer-valued coordinate system tied directly to how an output
@@ -61,7 +62,7 @@ parameters to be specified, and tick-marks on axes to be specified.
 Several interfaces allow objects to define how they should be drawn, as
 illustrated in the following UML diagram:
 <P style="text-align: center">
-<img src="graphs.png" class="imgBackground">
+<img src="graphs.png" class="imgBackground" alt="Diagram">
  *<P>
 The interfaces whose names being with Graph.User specify objects
 in user-space coordinates, and are intended for drawing icons that
@@ -82,42 +83,42 @@ CSS specification, HSL (Hue, Saturation, Lightness) values, wavelength
 for a monochromatic color, or a spectrum.  A method is also provided
 to return the spectrum for blackbody radiation.
 
-<H3><A NAME="linear"></A>Creating linear graphs</H3>
+<H2><A ID="linear"></A>Creating linear graphs</H2>
 
 The following example shows how to use the {@link org.bzdev.graphs} package
 to create graphs with linear axes. One will first import the
 relevant packages:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import java.awt.*;
 import java.awt.geom.*;
 import java.io.*;
 import org.bzdev.graphs.*;
 import org.bzdev.gio.*;
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
 To create a graph whose width is 800 points and whose height is 600 points
 for an image format (e.g., PNG), use
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graph graph = new Graph(800, 600);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 To create a graph whose width is 800 points and whose height is 600 points
 for an SVG (this requires that a service-provider package be installed)
 or Postscript file (this example uses SVG), use
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       OutputStream os = new FileOutputStream("graph.svg");
       OutputStreamGraphics =
           OutputStreamGraphics.newInstance(800, 600, "svg");
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Then configure the graph so that the X values range from 0.0 to 500.0
 and the Y values range from 0.0 to 400.0. We will also leave a margin
 of 75 points to reserve space for axes labels, etc.:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.setOffsets(75, 50, 75, 50);
       graph.setRanges(0.0, 500.0, 0.0, 400.0);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The left and bottom margins are larger to leave room for tick marks
 and labels.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       AxisBuilder.Linear abx =
           new AxisBuilder.Linear(graph, 0.0, 0.0, 500.0, true, "X Axis");
       abx.setMaximumExponent(2);
@@ -133,44 +134,44 @@ and labels.
       aby.addTickSpec(0, 0, true, "%1.0f");
       aby.addTickSpec(2, 1, false, null);
       aby.addTickSpec(3, 5, null);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 After the axes are created, the following code will draw them:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.draw(abx.createAxis());
       graph.draw(aby.createAxis());
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 To complete the graph, first step is to create something to draw:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Line2D line = new Line2D.Double(10.0, 10.0, 490.0, 350.0);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 To draw the shape created, a graphics context (an instance of
 {@link java.awt.Graphics2D} has to be configure to provide a drawing
 color and a stroke width. Once that is done, the shape can be drawn:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graphics2D g2d = graph.createGraphics();
       g2d.setColor(Color.BLACK);
       g2d.setStroke(new BasicStroke(1.5F));
       graph.draw(g2d, line);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 By using the {@link Graph} method
 {@link Graph#draw(java.awt.Graphics2D,java.awt.Shape)},
-The shape's boudary will use graph coordinate space units and the
+The shape&apos;s boudary will use graph coordinate space units and the
 width of the stroke used to draw it will use user-space units.
 <P>
 To output the graph, use
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       g2d.write("png", "graph.png");
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 for image-file formats
 or
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       g2d.write();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 for SVG, Postscript, or any case in which an instance of
 {@link org.bzdev.gio.OutputStreamGraphics} was used in the
-graph's constructor.
+graph&apos;s constructor.
 
-<H3><A NAME="log"></A>Creating a logarithmic axis</H3>
+<H2><A ID="log"></A>Creating a logarithmic axis</H2>
 
 If an axis is a logarithmic axis, the values plotted on that
 axis should be the logarithm to base 10 of the value to be
@@ -180,29 +181,29 @@ should similarly be the logarithm to base 10 of the values at the
 limits of the range. With the X axis as an example, where the X values
 go from 0.1 to 100.0 and the Y values go from 0.0 to 40.0, the range
 is set by
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.setRanges(-1.0, 2.0, 0.0, 40.0);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 and the X axis is created by
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       AxisBuilder.Log ab =
          new AxisBuilder.Log(graph, -1.0, 0.0, 3.0, true, "X Axis");
       ab.addTickSpec(0, true, "%1.1f");
       ab.addTickSpec(2, 1);
       graph.draw(ab.createAxis());
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
-<H3><A NAME="clock"></A>Creating as clock-time graphs</H3>
+<H2><A ID="clock"></A>Creating as clock-time graphs</H2>
 When a distance of 1.0 in user space corresponds to one second in
 time, on can use the class {@link AxisBuilder.ClockTime} to create
 an axis:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       AxisBuilder.ClockTime abct =
       new AxisBuilder.ClockTime(graph, 0.0, 0.0, MKS.hours(1.0), true,
                                 "Time (minutes)");
       abct.setSpacings(AxisBuilder.Spacing.SECONDS,
                        AxisBuilder.Spacing.MINUTES);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The origin of the axis will be (0,0) in GCS units, and the length will
 be one hour (3600 seconds). The axis will be horizontal, and the axis
 will have a label, "Time".
@@ -210,33 +211,33 @@ will have a label, "Time".
 Next a series of tick specifications are added.  The format
 string syntax is defined in the initial description of the
 class {@link AxisBuilder.ClockTime}.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       abct.addTickSpec(0, AxisBuilder.Spacing.MINUTES, "%3$d");
       ab.addTickSpec(1, AxisBuilder.Spacing.THIRTY_SECONDS);
       ab.addTickSpec(2, AxisBuilder.Spacing.FIFTEEN_SECONDS);
       ab.addTickSpec(3, AxisBuilder.Spacing.TEN_SECONDS);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Finally the axis is added to the graph.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.draw(abct.createAxis());
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
-<H3><A NAME="symbols"></A>Adding symbols</H3>
+<H2><A ID="symbols"></A>Adding symbols</H2>
 
 The {@link org.bzdev.graphs} package predefines a set of
 symbols (more can be added by using a
-{@Link org.bzdev.graphs.spi service provider interface}).
+{@link org.bzdev.graphs.spi service provider interface}).
 <P>
   One will first create a symbol factory, possibly configure
-  it, perhaps to change a symbol's color, and then create a
+  it, perhaps to change a symbol&apos;s color, and then create a
   symbol, looking up the symbol by name (names can be found
   by calling {@link Graph.SymbolFactory#getSymbolNames()}):
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graph.SymbolFactory sf = new Graph.SymbolFactory();
       Graph.Symbol symbol1 = sf.newSymbol("SolidCircle");
       sf.setColor(Color.RED);
       Graph.Symbol symbol2 = sf.newSymbol("SolidCircle");
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 To draw a symbol, one will use on the of the following
 methods:
@@ -259,21 +260,21 @@ methods:
     This method draws a symbol with asymmetric error bars in the X direction.
 </UL>
 For example,
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.draw(symbol1, 100.0, 150.0)
       graph.drawEY(symbol2, 150.0, 200.0, 20.0);
       graph.drawEY(symbol2, 200.0, 200.0, 10.0, 15.0);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
-<H3><A NAME="overlays"></A>Overlays</H3>
+<H2><A ID="overlays"></A>Overlays</H2>
 
 The use of graph coordinate space as described, particularly when axes
 are added to a graph, does not work very well when curves with different
 units are displayed on the same graph (for example, pressure and temperature).
 This can be handled by creating a second graph as follows:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graph graph2 = new Graph(graph1, true);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 The argument <CODE>graph1</CODE> indicates that <CODE>graph2</CODE>
 will have the same dimensions as <CODE>graph1</CODE> and the argument
 <CODE>true</CODE> indicates that both graph1 and graph2 share the same
@@ -284,7 +285,7 @@ When the graph is finally drawn, using either graph for output, the
 resulting graph will reflect what was drawn for both of the two
 graphs.
 
-<H3><A NAME="drawing"></A>Using graphs as canvases</H3>
+<H2><A ID="drawing"></A>Using graphs as canvases</H2>
 
 When used for drawing, the method
 {@link Graph#setRanges(double,double,double,double,double,double)}
@@ -308,43 +309,43 @@ will normally be used. Its arguments are
 </UL>
 Typically offsets will be set to zero (the default) as there is no need to
 leave room for axes. For example,
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       graph.setRanges(0.0, 0.0, 0.5, 0.5, sf, sf);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 will place (0.0, 0.0) in graph coordinate space at the center of the
 graph.  For drawings of 2D objects, the X and Y scale factors will
 typically be identical.
 <P>
 Drawing in Java requires obtaining an instance of
 {@link java.awt.Graphics2D}.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graphics2D g2d = graph.createGraphics();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 Once obtained, one can configure various properties such as
 colors and strokes.  When used with a {@link Graph} draw method,
 the positions of points are provided in graph coordinate space
 whereas stroke width are provided in user-space units.  For example
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       g2d.setColor(Color.BLACK);
       g2d.setStroke(new BasicStroke(2.0F));
       Shape shape = ...;
       graph.draw(g2d, shape);
-</PRE></CODE></BLOCKQUOTE>
-will draw the outline of a shape, assuming it's points represent
+</CODE></PRE></BLOCKQUOTE>
+will draw the outline of a shape, assuming it&apos;s points represent
 GCS values, using a stroke width of 2 points in user space.
 <P>
 By contrast, the following declaration:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       Graphics2D g2dGCS = graph.createGraphicsGCS();
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 will create a graphics context that will always use graph coordinate
 space:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
       g2dGCS.setColor(Color.BLACK);
       g2dGCS.setStroke(new BasicStroke(2.0F));
       Shape shape = ...;
       g2dGCS.draw(shape);
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 will draw the same shape as in the previous example, but
 with the stroke's width numerically equal to 2.0 in graph coordinate
 space, not user space.

@@ -47,7 +47,7 @@ import java.util.regex.*;
  * the headers in column order.  Calling {@link CSVReader#nextRow()} will
  * similarly return the fields of the next row in the input, finally
  * returning null when the end of the input is reached. For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     Reader in = new FileReader("input.csv");
  *     CSVReader r = new CSVReader(in, true);
  *     String[] headers = r.getHeaders();
@@ -56,7 +56,7 @@ import java.util.regex.*;
  *         ...
  *     }
  *     r.close();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * One may also use the {@link java.io.Reader} <code>read</code> methods
  * to read a field, followed by a call to {@link CSVReader#nextField()}
  * to go to the next field.

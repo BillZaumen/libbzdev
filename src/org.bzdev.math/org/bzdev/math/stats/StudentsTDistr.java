@@ -233,6 +233,7 @@ public class StudentsTDistr extends ProbDistribution {
      * @param t the value at which the probability density is computed
      * @param nu the number of degrees of freedom &nu;
      * @param mu the noncentrality parameter &mu;
+     * @return the probability density for the given arguments
      */
     public static double pd(double t, int nu, double mu) {
 	double musq = mu*mu;
@@ -261,6 +262,7 @@ public class StudentsTDistr extends ProbDistribution {
      * @param t the value at which the probability density is computed
      * @param nu the number of degrees of freedom &nu;
      * @param mu the noncentrality parameter &mu;
+     * @return the value of the cumulative distribution function
      */
     public static double P(double t, int nu, double mu) {
 	if (t < 0) return 1.0 - P(-t, nu, -mu);
@@ -300,6 +302,8 @@ public class StudentsTDistr extends ProbDistribution {
      * @param t the value at which the probability density is computed
      * @param nu the number of degrees of freedom &nu;
      * @param mu the noncentrality parameter &mu;
+     * @return the complement of the cumulative distribution evaluated
+     *         at the given arguments
      */
     public static double Q(double t, int nu, double mu) {
 	if (t < 0) return P(-t, nu, -mu);

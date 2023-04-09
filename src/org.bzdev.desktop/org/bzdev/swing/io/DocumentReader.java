@@ -67,6 +67,10 @@ public class DocumentReader extends Reader {
 	}
     }
 
+    /**
+     * Constructor.
+     * @param doc the document reader's document
+     */
     public DocumentReader(Document doc) {
 	super();
 	this.doc = doc;

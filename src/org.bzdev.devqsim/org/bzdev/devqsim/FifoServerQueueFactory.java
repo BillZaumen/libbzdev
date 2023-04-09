@@ -10,7 +10,6 @@ package org.bzdev.devqsim;
  * "timeline.traceSetMode", "timeline.traceSets", and "traceSets" from
  * {@link SimObjectFactory}.
  * <P>
- * <P>
  * Subclasses that are not abstract should set the type parameter QS
  * and implement the method
  * {@link ServerQueueFactory#getQueueServerClass() getQueueServerClass}
@@ -22,14 +21,14 @@ package org.bzdev.devqsim;
  * Subclasses that are not abstract classes must implement the method
  * {@link ServerQueueFactory#getQueueServerClass() getQueueServerClass}.
  * For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *   public class FooFifoSQFactory extends FifoServerQueueFactory&lt;Foo&gt; {
  *       Class&lt;Foo&gt; getQueueServerClass() {returns Foo.class;}
  *       public FooPrioritySQFactory(Simulation sim) {
  *         super(sim);
  *       }
  *   }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * @see org.bzdev.devqsim.TaskQueue
  * @see org.bzdev.devqsim.TaskQueue.ReleasePolicy
  * @see org.bzdev.devqsim.QueueDeletePolicy

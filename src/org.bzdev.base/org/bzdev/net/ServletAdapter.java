@@ -53,7 +53,7 @@ import java.io.IOException;
  *       {@link javax.servlet.http.HttpServletResponse#setContentLengthLong(long)}.
  *  <LI> {@link HttpServerRequest#getMediaType()} should be replaced with
  *       a method call.  A suitable method is:
- *       <BLOCKQUOTE><CODE><PRE>
+ *       <BLOCKQUOTE><PRE><CODE>
  *         private String getMediaType(HttpServletRequest req) {
  *	      String mediaType = req.getHeader("content-type").trim();
  *	      if (mediaType == null) return "application/octet-stream";
@@ -64,7 +64,7 @@ import java.io.IOException;
  *	         return mediaType.substring(0, firstsc).trim();
  *	     }
  *         }
- *       </PRE></CODE></BLOCKQUOTE>
+ *       </CODE></PRE></BLOCKQUOTE>
  * </UL>
  * Porting a servlet adapter, rather then using
  * {@link org.bzdev.net.servlets.EncapsulatingServlet} to create a
@@ -156,7 +156,7 @@ public interface ServletAdapter {
      * {@link HttpServerResponse#sendError(int)} has been called.
      * Instead, use an {@link java.io.IOException}.
      * @param req the request object
-     * @parm res the response object
+     * @param res the response object
      * @exception ServletException the request could not be handled
      * @exception IOException an input-output error occurred while the
      *            request was being handled
@@ -177,7 +177,7 @@ public interface ServletAdapter {
      * {@link HttpServerResponse#sendError(int)} has been called.
      * Instead, use a {@link java.io.IOException}.
      * @param req the request object
-     * @parm res the response object
+     * @param res the response object
      * @exception ServletException the request could not be handled
      * @exception IOException an input-output error occurred while the
      *            request was being handled
@@ -198,7 +198,7 @@ public interface ServletAdapter {
      * {@link HttpServerResponse#sendError(int)} has been called.
      * Instead, use a {@link java.io.IOException}.
      * @param req the request object
-     * @parm res the response object
+     * @param res the response object
      * @exception ServletException the request could not be handled
      * @exception IOException an input-output error occurred while the
      *            request was being handled
@@ -219,7 +219,7 @@ public interface ServletAdapter {
      * {@link HttpServerResponse#sendError(int)} has been called.
      * Instead, use a {@link java.io.IOException}.
      * @param req the request object
-     * @parm res the response object
+     * @param res the response object
      * @exception ServletException the request could not be handled
      * @exception IOException an input-output error occurred while the
      *            request was being handled

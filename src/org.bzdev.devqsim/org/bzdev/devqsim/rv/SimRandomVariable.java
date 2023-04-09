@@ -65,7 +65,7 @@ public abstract class SimRandomVariable<T,RV extends RandomVariable<T>>
     /**
      * Set the random variable.
      * Typically this will be called in a constructor, not elsewhere.
-     * @rv the random variable itself
+     * @param rv the random variable itself
      */
     @SuppressWarnings("unchecked")
      protected void setRV(RandomVariable<?> rv) {
@@ -86,6 +86,7 @@ public abstract class SimRandomVariable<T,RV extends RandomVariable<T>>
      * Get a spliterator for an infinite number of values.
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator<T> spliterator() {
 	return ((RV) rv).spliterator();
     }

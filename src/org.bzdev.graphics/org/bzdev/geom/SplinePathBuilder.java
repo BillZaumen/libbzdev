@@ -23,9 +23,9 @@ import java.util.ArrayList;
  * The sequence of points, based on their types, is shown in
  * the following diagram, where a transition corresponds to adding a
  * new point to the SplinePath2D builder:
- * <P>
  * <P style="text-align:center">
- * <IMG SRC="doc-files/pathbuilder.png" class="imgBackground">
+ * <IMG SRC="doc-files/pathbuilder.png" class="imgBackground" alt="UML diagram">
+ * </P>
  * <P>
  * The line colors are not significant - they are just used to
  * make it obvious that lines cross rather than join. Bidirectional
@@ -54,7 +54,7 @@ import java.util.ArrayList;
  *         <code>SEG_END</code> or <code>SEG_END_PREV</code>, a straight line
  *         (unless the line will have a length of zero) will connect the
  *         previous point to the point specified by the last point whose
- *         type is <code>MOVE_TO</code> or <code><MOVE_TO_NEXT></code>. If a
+ *         type is <code>MOVE_TO</code> or <code>MOVE_TO_NEXT</code>. If a
  *         sequence of <code>SPLINE</code> or <code>SPLINE_FUNCTION</code>
  *         points is terminated by a <code>CLOSE</code> point, there are
  *         two cases:
@@ -103,7 +103,7 @@ import java.util.ArrayList;
  * <P>
  * For example, with ECMAScript, <CODE>scrunner</CODE>  the following
  * statements can be used to configure a  path:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     var path1 = [
  *        {type: "MOVE_TO", x: 20.0, y: 30.0},
  *        {type: "SEG_END", x: 50.0, y: 60.0}];
@@ -119,7 +119,7 @@ import java.util.ArrayList;
  *
  *     pb.configure("WIND_EVEN_ODD", pathspec);
  *     var path = pb.getPath();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  *  The program <CODE>epts</CODE> can generate the path specifications while
  *  providing a graphical user interface to aid in constructing the
  *  paths.
@@ -370,15 +370,39 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 		      labelResourceBundle = "*.lpack.SPBuilderCPntLabels",
 		      docResourceBundle = "*.lpack.SPBuilderCPntDocs")
     public static class CPoint {
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("type") public CPointType type = null;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("x") public double x = 0.0;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("y") public double y = 0.0;
 
 	// following used only for SPLINE_FUNCTION case
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("xf") public NamedFunctionOps xfOps = null;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("yf") public NamedFunctionOps yfOps = null;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("t1") public double t1 = 0.0;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("t2") public double t2 = 0.0;
+	/**
+	 * Field implementing a factory parameter.
+	 */
 	@PrimitiveParm("n")  public int n = 0;
 
 	static String errorMsg(String key, Object... args) {

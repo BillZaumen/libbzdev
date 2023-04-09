@@ -1657,20 +1657,21 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         If a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         If this formatter has been closed by invoking its {@link
+     *         #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format, Object arg1)
 	throws IllegalFormatException, FormatterClosedException
@@ -1694,21 +1695,22 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format
+     *        a format string as described in {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its {@link
+     *         #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2)
@@ -1729,22 +1731,23 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2, Object arg3)
@@ -1765,23 +1768,24 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format
+     *        a format string as described in {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1803,20 +1807,22 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @throws IllegalFormatException if a format string contains an
+     *          illegal syntax, a format specifier that is
+     *          incompatible with the given arguments, insufficient
+     *          arguments given the format string, or other illegal
+     *          conditions.  For specification of all possible
+     *          formatting errors, see the
+     *          {@link java.util.Formatter Formatter} section of the
+     *          formatter class specification.
      * @throws  FormatterClosedException
      *          If this formatter has been closed by invoking its {@link
      *          #close()} method
@@ -1842,25 +1848,26 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1883,26 +1890,27 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -1928,26 +1936,27 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
      * @return  This formatter
      */
     public SciFormatter format(Locale l, String format,
@@ -1974,28 +1983,29 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @param  arg9 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *       {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @param arg9 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,
@@ -2022,28 +2032,29 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @param  arg9 the first argument used by the format string
-     * @param  arg10 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @param arg9 the first argument used by the format string
+     * @param arg10 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
      * @return  This formatter
      */
     public SciFormatter format(Locale l, String format,
@@ -2071,30 +2082,31 @@ public final class SciFormatter implements Closeable, Flushable {
      * {@link #format(String,Object...)} and is provided because some
      * scripting languages do not recognize Java methods that have a
      * variable number of arguments.
-     * @param  format
-     *         A format string as described in {@link java.util.Formatter Formatter}
-     * @param  arg1 the first argument used by the format string
-     * @param  arg2 the first argument used by the format string
-     * @param  arg3 the first argument used by the format string
-     * @param  arg4 the first argument used by the format string
-     * @param  arg5 the first argument used by the format string
-     * @param  arg6 the first argument used by the format string
-     * @param  arg7 the first argument used by the format string
-     * @param  arg8 the first argument used by the format string
-     * @param  arg9 the first argument used by the format string
-     * @param  arg10 the first argument used by the format string
-     * @param  arg11 the first argument used by the format string
-     * @throws  IllegalFormatException
-     *          If a format string contains an illegal syntax, a format
-     *          specifier that is incompatible with the given arguments,
-     *          insufficient arguments given the format string, or other
-     *          illegal conditions.  For specification of all possible
-     *          formatting errors, see the {@link java.util.Formatter Formatter}
-     *          section of the formatter class specification.
-     * @throws  FormatterClosedException
-     *          If this formatter has been closed by invoking its {@link
-     *          #close()} method
-     * @return  This formatter
+     * @param l the locale
+     * @param format a format string as described in
+     *        {@link java.util.Formatter Formatter}
+     * @param arg1 the first argument used by the format string
+     * @param arg2 the first argument used by the format string
+     * @param arg3 the first argument used by the format string
+     * @param arg4 the first argument used by the format string
+     * @param arg5 the first argument used by the format string
+     * @param arg6 the first argument used by the format string
+     * @param arg7 the first argument used by the format string
+     * @param arg8 the first argument used by the format string
+     * @param arg9 the first argument used by the format string
+     * @param arg10 the first argument used by the format string
+     * @param arg11 the first argument used by the format string
+     * @throws IllegalFormatException
+     *         if a format string contains an illegal syntax, a format
+     *         specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other
+     *         illegal conditions.  For specification of all possible
+     *         formatting errors, see the {@link java.util.Formatter Formatter}
+     *         section of the formatter class specification.
+     * @throws FormatterClosedException
+     *         if this formatter has been closed by invoking its
+     *         {@link #close()} method
+     * @return this formatter
      */
     public SciFormatter format(Locale l, String format,
 			       Object arg1, Object arg2,

@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.lang Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The package org.bzdev.lang.annotations</H2>
+<H1>The package org.bzdev.lang.annotations</H1>
 
 Please see
 <UL>
@@ -19,7 +20,7 @@ Please see
     material and an example using the visitor design pattern.
 </UL>
 
-<H3>Introduction</H3>
+<H2>Introduction</H2>
 
 Normally Java looks up an object&apos;s method at run time but bases the
 lookup on the method&apos;s signature (specifically the types of the
@@ -91,12 +92,12 @@ a DMethodContext annotation, specifying a local helper, for that method,
 and must call the local helper&apos;s <code>register</code> method in a static
 initializer, calling <code>register</code> with no arguments.
 
-<H3><A NAME="example"></A>An example</H3>
+<H2><A ID="example"></A>An example</H2>
 
 An example for the use of a dynamic method when the dynamic method is
 specified in a class is the following (note: when referring to a helper
 in a different package, the fully qualified class name must be used):
-<code><pre>
+<pre><code>
 public class Foo {
      {@literal @}DynamicMethod("FooIncrHelper")
      public  Number incr(Number x) throws Exception {
@@ -111,7 +112,7 @@ public class Bar extends Foo {
         return Integer.valueOf(x + 1);
     }
 }
-</pre></code>
+</CODE></PRE>
 The call to dispatch will throw a runtime exception named
 {@link org.bzdev.lang.MethodNotPresentException}
 if no method that matches the arguments is found. This exception can be
@@ -121,7 +122,7 @@ located in the org.bzdev.lang package.
 If <code>incr</code> was declared in an interface, an implementation must
 appear in the least specific class(es) that implement that interface.
 For example:
-<code><pre>
+<pre><code>
 public interface Incrementer {
      {@literal @}DynamicMethod("FooIncrementerHelper")
      public Number incr(Number x) throws Exception;
@@ -147,11 +148,11 @@ public class Bar extends Foo {
         return Integer.valueOf(x + 1);
     }
 }
-</pre></code>
+</CODE></PRE>
 <P>
 For compilation please follow the procedures outlined in
 <A HREF="../../../../../../doc-files/description.html#compile">the BZDev class library description</A>.
-<H3><A NAME="background"><A>Background</H3>
+<H2><A ID="background"><A>Background</H2>
 <p> Several other approaches have been used to create similar
 capabilities.
 <p>

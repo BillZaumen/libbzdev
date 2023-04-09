@@ -49,6 +49,7 @@ public class SimIntegerRV<RV extends IntegerRandomVariable>
      * @param size the number of random values to provide
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator.OfInt spliterator(long size) {
 	return ((RV) rv).spliterator(size);
     }
@@ -57,6 +58,7 @@ public class SimIntegerRV<RV extends IntegerRandomVariable>
      * Get a spliterator for an infinite number of values.
      * @return the spliterator
      */
+    @SuppressWarnings("unchecked")
     public Spliterator.OfInt spliterator() {
 	return ((RV) rv).spliterator();
     }
@@ -70,7 +72,7 @@ public class SimIntegerRV<RV extends IntegerRandomVariable>
 	return getRandomVariable().stream(size);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of integer values.
      * @param size the number of random values to provide
      * @return the stream
@@ -79,7 +81,7 @@ public class SimIntegerRV<RV extends IntegerRandomVariable>
 	return getRandomVariable().parallelStream(size);
     }
 
-    /*
+    /**
      * Get an infinie stream of integer values.
      * @return the stream
      */
@@ -87,7 +89,7 @@ public class SimIntegerRV<RV extends IntegerRandomVariable>
 	return getRandomVariable().stream();
     }
 
-    /*
+    /**
      * Get an infinie parallel stream of integer values.
      * @return the stream
      */

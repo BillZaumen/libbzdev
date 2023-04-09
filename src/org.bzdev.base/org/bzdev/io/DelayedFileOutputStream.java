@@ -34,6 +34,7 @@ public class DelayedFileOutputStream {
     /**
      * Constructor given a file name.
      * @param name the name of the file to open for writing
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileOutputStream(String name)
 	throws FileNotFoundException
@@ -44,6 +45,7 @@ public class DelayedFileOutputStream {
     /**
      * Constructor given a file.
      * @param file the file to open for writing.
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileOutputStream(File file)throws FileNotFoundException {
 	this(file, false);
@@ -54,6 +56,9 @@ public class DelayedFileOutputStream {
      * Constructor given a file name and a flag to indicate if one
      * should append to the file rather than replace it.
      * @param name the name of the file to open for writing
+     * @param append true if the file should be opened for appending
+     *        data; false if the file is overridden
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileOutputStream(String name, boolean append)
 	throws FileNotFoundException
@@ -67,6 +72,7 @@ public class DelayedFileOutputStream {
      * to the file rather than replace it.
      * @param file the file to open for writing.
      * @param append true if the file is opened in append mode; false otherwise
+     * @exception FileNotFoundException the file could not be found
      */
     public DelayedFileOutputStream(File file, boolean append)
 	throws FileNotFoundException
@@ -92,6 +98,7 @@ public class DelayedFileOutputStream {
      * opened is the file with the same canonical path name as the
      * file passed to the constructor.
      * @return the output stream for writing the file
+     * @exception FileNotFoundException the file could not be found
      */
     public synchronized FileOutputStream open() throws FileNotFoundException {
 	    if (opened)

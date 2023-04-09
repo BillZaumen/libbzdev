@@ -641,6 +641,7 @@ public class BasicSplinePath2D extends SplinePath2D {
      * the distance from the start of the path to a point along the
      * path represented by a path parameter.  This method returns the
      * number of points used to construct this spline.
+     * @return the number of intervals
      */
     public int getIntervalNumber() {
 	return numberOfIntervals;
@@ -2247,6 +2248,7 @@ public class BasicSplinePath2D extends SplinePath2D {
      * lengths are non-negative.
      * @param u1 the parameter at the first end point of a subpath
      * @param u2 the parameter at the second end point of a subpath
+     * @return the length of the subpath
      * @exception IllegalStateException the path is not a simple path
      * @exception IllegalArgumentException the parameter is out of bounds
      */
@@ -2267,6 +2269,7 @@ public class BasicSplinePath2D extends SplinePath2D {
      * This is intended for cases where direction is important.
      * @param u1 the parameter at the first end point of a subpath
      * @param u2 the parameter at the second end point of a subpath
+     * @return the distance traversed on a subpath
      * @exception IllegalStateException the path is not a simple path
      * @exception IllegalArgumentException the parameter is out of bounds
      */

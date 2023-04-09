@@ -5,14 +5,12 @@ import org.bzdev.anim2d.Animation2D;
  * Factory for creating instances of Mode3DView.
  * <P>
  * The parameters this factory uses defined as follows:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/p3d/Model3DViewFactory.html"  style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/p3d/Model3DViewFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
  */
 public class Model3DViewFactory extends AbstrM3DViewFactory<Model3DView> {
 

@@ -22,7 +22,7 @@ import org.bzdev.graphs.Colors;
  * allow the color to be selected by  using an array of swatches or
  * to be selected by name.  A separate control sets the Alpha value.
  * The typical usage of this class is as follows:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    Component c ... ;
  *    Color color = ... ;
  *
@@ -42,7 +42,7 @@ import org.bzdev.graphs.Colors;
  *              });
  *        dialog.setVisible(true);
  *   }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * 
  */
 public class CSSColorChooserPanel extends AbstractColorChooserPanel {

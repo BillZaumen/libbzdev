@@ -10,16 +10,16 @@ import java.security.*;
  * The return type for <CODE>clone()</CODE> is <CODE>Object</CODE>,
  * so one may have to cast the type returned by this method in order
  * to use the value returned by it: for example
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * Path2D path1 = ...
  * Path2D path2 = (Path2D)path1.clone();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * By contrast, the method {link Cloner#makeClone(Object)} does not
  * require a cast.
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * Path2D path1 = ...;
  * Path2D path2 = Cloner.makeClone(path1);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * <P>
  * In a few corner cases, {@link Cloner#makeClone(Object)} will not
  * work.  The class {@link java.awt.geom.Path2D.Double}, for example,
@@ -29,17 +29,17 @@ import java.security.*;
  * The class {@link org.bzdev.geom.SplinePath2D} is such a subclass
  * (it only adds additional methods, not fields). As a result, the
  * code
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * SplinePath2D path1 = ...;
  * Path2D.Double path2 = Cloner.makeClone(path1);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * will fail because {@link Cloner#makeClone(Object)} would cast the
  * cloned object to <CODE>SplinePath2D</CODE>. For this case, one
  * can use the method {@link Cloner#makeCastedClone(Class,Object)}:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  * SplinePath2D path1 = ...;
  * Path2D.Double path2 = Cloner.makeCastedClone(Path2D.Double.class, path1);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The first argument of this method provides the compile-time class
  * for the object that will be returned.
  */
@@ -51,6 +51,7 @@ public class Cloner {
 
     /**
      * Clone an object.
+     * @param <T> the type of the object to cllone
      * @param obj the object to clone
      * @return a cloned object with the same type as that of its argument
      * @exception CloneNotSupportedException the object could not be cloned
@@ -130,6 +131,8 @@ public class Cloner {
      * Partially clone an object.
      * @deprecated The name of this method was confusing. Please
      * use {@link #makeCastedClone(Class,Object)} instead.
+     * @param <C> the type of the cloned object
+     * @param <T> the type of the value to clone
      * @param resultClass a superclass or interface of the object that will be
      *        returned
      * @param obj the object to clone
@@ -165,29 +168,31 @@ public class Cloner {
      * {@link org.bzdev.geom.SplinePath2D} is a good example. The
      * following code will create a clone of an instance of
      * SplinePath2D:
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *      SplinePath2D spath = ...;
      *      Path2D path =
      *          Cloner.makeCastedClone(Path2D.Double.class, spath);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * At runtime, this is equivalent to
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *      SplinePath2D spath = ...;
      *      Path2D path = (Path2D.Double)(spath.clone());
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * but with compile-time tests to ensure that Path2D.Double is in
      * fact a superclass of SplinePath2D. Such a test is not automatic
      * because spath.clone() has a compile-time type of <CODE>Object</CODE>.
      * Note that
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *      SplinePath2D spath = ...;
      *      Path2D path =  Cloner.makeClone(Path2D.Double.class, spath);
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * would have failed because the compile-type type of the makeClone
      * method would be the compile-time type of spath (i.e., SplinePath2D)
      * and the actual object returned is an instance of Path2D.Double.
      * <P>
      * Note: This method will not clone an array.
+     * @param <C> the type of the cloned object
+     * @param <T> the type of the value to clone
      * @param resultClass a superclass or interface of the object that will be
      *        returned
      * @param obj the object to clone

@@ -1,6 +1,6 @@
 package org.bzdev.ejws;
 
-/*
+/**
  * EJWS Exception class.
  * This class is provided so that the method
  * {@link WebMap#getInfoFromPath(String,String,String,String,WebMap.RequestInfo)}

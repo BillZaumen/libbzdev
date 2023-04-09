@@ -45,6 +45,7 @@ public class BinarySTLParser {
      * If the model is configures to use object transformations,
      * (rotations and translation), those will be applied.
      * @param m3d the model
+     * @exception IOException an IO exception occurred
      */
     public void addToModel(Model3D m3d) throws IOException {
 	is.skip(80);

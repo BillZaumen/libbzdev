@@ -288,7 +288,7 @@ abstract public class LongRandomVariable extends RandomVariable<Long>
 	return StreamSupport.longStream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of long values.
      * @param size the number of random values to provide
      * @return the stream
@@ -297,7 +297,7 @@ abstract public class LongRandomVariable extends RandomVariable<Long>
 	return StreamSupport.longStream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinite stream of long values.
      * @return the stream
      */
@@ -305,7 +305,7 @@ abstract public class LongRandomVariable extends RandomVariable<Long>
 	return StreamSupport.longStream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinite parallel stream of long values.
      * @return the stream
      */

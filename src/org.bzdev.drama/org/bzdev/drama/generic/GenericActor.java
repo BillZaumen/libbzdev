@@ -268,6 +268,7 @@ abstract public class GenericActor<
      * @param dest the destination
      * @param domain the domain determining message delay, message handling,
      *        and what message filter (if any) to use
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(A dest, D domain) {
 	return sim.findMsgFrwdngInfo(thisInstance(),
@@ -351,6 +352,7 @@ abstract public class GenericActor<
      * @param dest the destination
      * @param domain the domain determining message delay, message handling,
      *        and what message filter (if any) to use
+     * @return the names of formatting tables
      */
     public String[] findMsgFrwdngInfo(G dest, D domain) {
 	return sim.findMsgFrwdngInfo(thisInstance(),
@@ -446,6 +448,7 @@ abstract public class GenericActor<
      * @param dest the destination
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(A dest,
 				      Set<CommDomainType> commDomainTypes)
@@ -538,6 +541,7 @@ abstract public class GenericActor<
      * @param dest the destination
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(G dest,
 				      Set<CommDomainType> commDomainTypes)
@@ -612,6 +616,7 @@ abstract public class GenericActor<
      * be used to determine which subclasses of {@link GenericMsgFrwdngInfo}
      * to instrument.
      * @param domain the domain specifying the recipient actors
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(D domain)
     {
@@ -670,6 +675,7 @@ abstract public class GenericActor<
      * @param dests the domain specifying the recipient actors
      * @param domain the domain determining message delay, message handling,
      *        and what message filter (if any) to use
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(D dests, D domain)
     {
@@ -732,6 +738,7 @@ abstract public class GenericActor<
      * @param dests the domain specifying the recipient actors
      * @param commDomainTypes the types of domains to allow; null if any
      *        domain is acceptable
+     * @return the names of the forwarding tables
      */
     public String[] findMsgFrwdngInfo(D dests,
 				      Set<CommDomainType> commDomainTypes)

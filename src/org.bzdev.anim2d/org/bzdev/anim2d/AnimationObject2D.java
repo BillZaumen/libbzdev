@@ -144,6 +144,7 @@ public abstract class AnimationObject2D extends SimObject
      * portions of the object within the animation's frame will actually be
      * visible to the user, and being visible does not prevent another
      * object from appearing over the current object.
+     * @param visible true if the object should be visible; false otherwise
      */
     public void setVisible(boolean visible) {
 	setZorder(zorder, visible);
@@ -180,7 +181,6 @@ public abstract class AnimationObject2D extends SimObject
      * Users generally do not have to call this method directly:
      * it will be called at the appropriate point when frames are
      * scheduled.
-     * <P>
      * @param g the graph to which this object will be added
      * @see Animation2D#scheduleFrames(long,int)
      */
@@ -200,7 +200,6 @@ public abstract class AnimationObject2D extends SimObject
      * Users generally do not have to call this method directly:
      * it will be called at the appropriate point when frames are
      * scheduled.
-     * <P>
      * @param g the graph to which this object will be added
      * @param g2d the graphics context in user space for the graph g
      * @param g2dGCS the graphics context in graph coordinate space for

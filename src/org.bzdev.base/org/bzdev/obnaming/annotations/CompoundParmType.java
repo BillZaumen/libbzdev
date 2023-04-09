@@ -86,6 +86,7 @@ public @interface CompoundParmType {
      * will be replaced with the package name of the class being annotated.
      * If no value is provided or the value is an empty string, a tip
      * resource bundle is not configured.
+     * @return the class name
      */
     String tipResourceBundle() default "";
 
@@ -100,6 +101,7 @@ public @interface CompoundParmType {
      * will be replaced with the package name of the class being annotated.
      * If no value is provided or the value is an empty string, a label
      * resource bundle is not configured.
+     * @return the class name
      */
     String labelResourceBundle() default "";
 
@@ -114,6 +116,7 @@ public @interface CompoundParmType {
      * will be replaced with the package name of the class being annotated.
      * If no value is provided or the value is an empty string, a label
      * resource bundle is not configured.
+     * @return the class name
      */
     String docResourceBundle() default "";
 }

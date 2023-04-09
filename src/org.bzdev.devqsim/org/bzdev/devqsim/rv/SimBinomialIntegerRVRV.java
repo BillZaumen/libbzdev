@@ -6,7 +6,7 @@ import org.bzdev.math.rv.BinomialIntegerRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of integer valued random variables with a binomial distribution.
- * @see org.bzdev.math.rv.BinomialIntegerRV;
+ * @see org.bzdev.math.rv.BinomialIntegerRV
  */
 public class SimBinomialIntegerRVRV
     extends SimIntegerRVRV<BinomialIntegerRV,BinomialIntegerRVRV>

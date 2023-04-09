@@ -15,11 +15,16 @@ public class FixedIATimeRV extends InterarrivalTimeRV {
 
     private long value;
 
+    /**
+     * Get the value this random variable always produces.
+     * @return the value
+     */
     public long getValue() {
 	return value;
     }
 
-    public void setMinimum(long min, boolean closed) 
+    @Override
+    public void setMinimum(Long min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (min > value): (min >= value)) 
@@ -28,7 +33,8 @@ public class FixedIATimeRV extends InterarrivalTimeRV {
 	super.setMinimum(min, closed);
     }
 
-    public void setMaximum(long max, boolean closed) 
+    @Override
+    public void setMaximum(Long max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (max < value):(max <= value))

@@ -29,6 +29,9 @@ public class ZipWebMap extends WebMap {
     /**
      * Constructor.
      * @param root a File denoting a directory
+     * @throws IOException if an IO error occurred
+     * @throws IllegalArgumentException if root is not an instance of
+     *         {@link File}
      */
     public ZipWebMap(Object root)
 	throws IOException, IllegalArgumentException

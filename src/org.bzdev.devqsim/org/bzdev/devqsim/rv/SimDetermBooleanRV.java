@@ -5,7 +5,7 @@ import org.bzdev.math.rv.DetermBooleanRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of boolean value with a deterministic distribution.
- * @see org.bzdev.math.rv.DetermBooleanRV;
+ * @see org.bzdev.math.rv.DetermBooleanRV
  */
 public class SimDetermBooleanRV extends SimBooleanRV<DetermBooleanRV>
 {

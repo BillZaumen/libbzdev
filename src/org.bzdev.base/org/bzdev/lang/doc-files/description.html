@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.lang Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.lang package</H2>
+<H1>The org.bzdev.lang package</H1>
 
 For specific topics, please see
 <UL>
@@ -17,7 +18,7 @@ For specific topics, please see
   <LI><A HREF="#misc">miscellaneous classes</A>.
 </UL>
 
-<H3><A NAME="callable"></A>The Callable interface</H3>
+<H2><A ID="callable"></A>The Callable interface</H2>
 
 Starting with the initial version of Java (1.0), Java has provided an
 interface named <CODE>Runnable</CODE> with a single method named
@@ -77,13 +78,13 @@ related interfaces:
     that does not take any arguments. It may throw an exception (any
     subclass of java.lang.Exception).
 </UL>
-<H3><A NAME="lib"></A>Library loading</H3>
+<H2><A ID="lib"></A>Library loading</H2>
 <p>
 The class ResourceLibLoader supports looking up and loading a resource
 containing a shared library. A naming convention is used to allow the
 correct resource to be obtained for a given version of the operating
 system and a given machine architecture.
-<H3><A NAME="dmethods"></A>Dynamic Methods</H3>
+<H2><A ID="dmethods"></A>Dynamic Methods</H2>
 <p>
 Normally Java looks up an object&apos;s method at run time but bases the
 lookup on the method&apos;s signature (specifically the types of the
@@ -150,9 +151,9 @@ system class loader is set to org.bzdev.lang.DMClassLoader, the
 <code>register</code> method will be called automatically. One can change
 the system class loader to DMClassLoader by setting the following option
 for the java command:
-<code><pre>
+<pre><code>
  java -Djava.system.class.loader=org.bzdev.lang.DMClassLoader ...
-</pre></code>
+</CODE></PRE>
 <p>
 For hints on how to use the compiler and what to include in JAR
 files, see the documentation for <code>DynamicMethod</code>.
@@ -160,7 +161,7 @@ files, see the documentation for <code>DynamicMethod</code>.
 An example for the use of a dynamic method when the dynamic method is 
 specified in a class is the following (note: when referring to a helper
 in a different package, the fully qualified class name must be used):
-<code><pre>
+<pre><code>
 public class Foo {
      {@literal @}DynamicMethod("FooIncrHelper")
      public  Number incr(Number x) throws Exception {
@@ -179,7 +180,7 @@ public class Bar extends Foo {
         return Integer.valueOf(x + 1);
     }
 }
-</pre></code>
+</CODE></PRE>
 The call to dispatch will throw a runtime exception named
 {@link org.bzdev.lang.MethodNotPresentException MethodNotPresentException>}
 if no method that matches the arguments is found. This exception can be
@@ -189,7 +190,7 @@ located in the org.bzdev.lang package.
 If <code>incr</code> was declared in an interface, an implementation must
 appear in the least specific class(es) that implement that interface.
 For example:
-<code><pre>
+<pre><code>
 public interface Incrementer {
      {@literal @}DynamicMethod("FooIncrementerHelper")
      public Number incr(Number x) throws Exception;
@@ -220,12 +221,12 @@ public class Bar extends Foo {
         return Integer.valueOf(x + 1);
     }
 }
-</pre></code>
+</CODE></PRE>
 <P>
 <B>For compilation, see the instructions in the
 <A href="../../../../../doc-files/description.html#compile">BZDev library description</A></B>.
 
-<H4>Background</H4>
+<H3>Background</H3>
 <p> Several other approaches have been used to create similar
 capabilities.
 <p>
@@ -611,7 +612,7 @@ for
   <LI> {@link org.bzdev.lang.annotations.DMethodImpl}.
   <LI> {@link org.bzdev.lang.annotations.DMethodContext}.
 </UL>
-<H3><A NAME="misc"></A>Miscellaneous classes</H3>
+<H2><A ID="misc"></A>Miscellaneous classes</H2>
 Finally, there are several miscellaneous classes:
 <UL>
   <LI><CODE>ClassFinder</CODE>. This class provides static methods that

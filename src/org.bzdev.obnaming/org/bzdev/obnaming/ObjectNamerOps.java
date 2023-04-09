@@ -52,6 +52,7 @@ public interface ObjectNamerOps<TO extends NamedObjectOps> {
      * Get a set of objects from a object namer's tables.
      * The objects are those for which either their classes or
      * one of their superclasses match the class passed as an argument.
+     * @param <T> the type specified by the argument clazz
      * @param clazz the class of the objects to get.
      * @return a collection containing  all interned objects whose class
      *         or one of its superclasses matches the class clazz passed
@@ -69,6 +70,7 @@ public interface ObjectNamerOps<TO extends NamedObjectOps> {
    /**
      * Get a named object with a particular name, provided that
      * the object is a subclass of a specific class.
+     * @param <T> the type specified by the argument clazz
      * @param name the name of the object
      * @param clazz the class of the object
      * @return the object or null if the object cannot be found
@@ -138,13 +140,13 @@ public interface ObjectNamerOps<TO extends NamedObjectOps> {
      * factory class (excluding its package name, which is provided by
      * the first argument).
      * For example, with ECMAScript for one of these subclasses,
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      *    a2d = new Animation2D(scripting, ...);
      *    a2d.createFactories("org.bzdev.anim2d", {
      *       alf: "AnimationLayer2DFactory",
      *       gvf: "GraphViewFactory"
      *    });
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * will create two ECMAScript variables whose names are alf and gvf.
      * <P>
      * Unless explicitly implemented, this method will throw an
@@ -168,6 +170,7 @@ public interface ObjectNamerOps<TO extends NamedObjectOps> {
       * The factory must have a single-argument constructor that takes
       * its object namer as its argument.
       * @param className the fully-qualified class name of a factory
+      * @return a new factory
       * @exception IllegalArgumentException the factory is not listed in
       *            a META-INF/services/org.bzdev.NamedObjectFactory resource
       *            or the class name does not refer to subclass of
@@ -181,6 +184,7 @@ public interface ObjectNamerOps<TO extends NamedObjectOps> {
       * The factory must have a single-argument constructor that takes
       * its object namer as its argument.
       * @param clazz the factory's class
+      * @return a new factory
       * @exception IllegalArgumentException the factory is not listed in
       *            a META-INF/services/org.bzdev.NamedObjectFactory resource
       *            or the class name does not refer to subclass of

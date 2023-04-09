@@ -7,7 +7,7 @@ import org.bzdev.math.rv.BinomialLongRVRV;
  * Named random variable using a random variable that generates a
  * sequence of long-integer valued random variables with a binomial
  * distribution.
- * @see org.bzdev.math.rv.BinomialLongRV;
+ * @see org.bzdev.math.rv.BinomialLongRV
  */
 public class SimBinomialLongRVRV
     extends SimLongRVRV<BinomialLongRV,BinomialLongRVRV>

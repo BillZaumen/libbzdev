@@ -16,8 +16,6 @@
  *     this module.
  * </UL>
  * </B>
- * <P>
- * @moduleGraph
  */
 module org.bzdev.p3d {
     exports org.bzdev.p3d;

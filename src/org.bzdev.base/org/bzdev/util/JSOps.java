@@ -33,6 +33,7 @@ public interface JSOps {
      * Get an identity.
      * This method should be used only by classes implementing this
      * interface.
+     * @return a new value to use as an identity
      */
     default long nextIdentity() {
 	return JSObject.computeNextIdentity();

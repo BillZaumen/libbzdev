@@ -296,7 +296,7 @@ public class DefaultFFT extends FFT {
      * @param fft an existing FFT
      * @param mode the normalization mode ({@link Mode#NORMAL},
      *        {@link Mode#SYMMETRIC},r {@link Mode#REVERSED})
-     * @exception the first argument was null
+     * @exception IllegalArgumentException if the first argument was null
      */
     public DefaultFFT(DefaultFFT fft, Mode mode)
 	throws IllegalArgumentException

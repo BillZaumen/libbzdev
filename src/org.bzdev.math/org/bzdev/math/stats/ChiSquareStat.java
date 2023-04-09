@@ -394,14 +394,14 @@ public class ChiSquareStat extends Statistic {
      * E<sub>i</sub>, and the standard deviation is the standard deviation
      * for X<sub>i</sub>. The &Chi;<sup>2</sub> distribution assumes that
      * these ratios have a normal distribution with unit variances and a
-     * mean of 0.  For a noncentral &Chi;<sup>2</sub> distribution, the
+     * mean of 0.  For a noncentral &Chi;<sup>2</sup> distribution, the
      * ratios are assumed to have a non-zero mean. The noncentrality
      * parameter &lambda; is defined by
      * &lambda; = &sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub>, where
      * &mu;<sub>i</sub> is the mean value of the i<sup>th</sup> ratio.
      * <P>
      * If there are k degrees of freedom, but additional terms in the
-     * &Chi;</sup>2</sup> sum, it is possible to define k variables
+     * &Chi;<sup>2</sup> sum, it is possible to define k variables
      * z<sub>i</sub> so that &Chi;</sup>2</sup> = z<sub>1</sub><sup>2</sup>
      *  + ... + z<sub>k</sub><sup>2</sup>, where the mean of each z<sub>i</sub>
      * is zero and its standard deviation is 1. The same value for &lamba;

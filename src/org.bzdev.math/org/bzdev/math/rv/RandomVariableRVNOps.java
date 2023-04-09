@@ -80,9 +80,31 @@ public interface RandomVariableRVNOps<T extends Number,
     void setMaximum(T max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException;
 
+    /**
+     * Set the manimum value for a random variable, provided the new
+     * value is higher than the previous value.
+     * @param min minimum value.
+     * @param closed true if the minimum value is part of the range;
+     *        false if it is a lower bound on the range
+     * @throws UnsupportedOperationException the random variable's type does
+     *         not have an order imposed on it or the operation is not
+     *         supported for implementation reasons
+     * @throws IllegalArgumentException an argument is out of range
+     */
     void tightenMinimum(T min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException;
 
+    /**
+     * Set the maximum value for a random variable, provided the new
+     * value is lower than the previous value.
+     * @param max maximum value.
+     * @param closed true if the minimum value is part of the range;
+     *        false if it is a lower bound on the range
+     * @throws UnsupportedOperationException the random variable's type does
+     *         not have an order imposed on it or the operation is not
+     *         supported for implementation reasons
+     * @throws IllegalArgumentException an argument is out of range
+     */
     void tightenMaximum(T max, boolean closed) 
 	throws UnsupportedOperationException, IllegalArgumentException;
 }

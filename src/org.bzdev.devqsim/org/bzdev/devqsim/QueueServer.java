@@ -22,7 +22,7 @@ public interface QueueServer {
      * In all cases, the value of <code>getInterval()</code> excludes
      * the interval associated with the parameters passed to the server
      * queue when the entry is queued.
-     * 
+     * @return the interval in units of simulation ticks
      */
     long getInterval();
 }

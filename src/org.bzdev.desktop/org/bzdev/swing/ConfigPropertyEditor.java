@@ -827,6 +827,7 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Add a set of reserved keys.
+     * @param keys the keys
      */
     protected void addReservedKeys(String... keys) {
 	if (ind < 0) {
@@ -849,7 +850,7 @@ public abstract class ConfigPropertyEditor {
      * @param prefix the start of a key
      * @param suffixes the possibile suffixes following the prefix
      *        and separated from the prefix by a period.
-     * @execption IllegalArgumentException a key is already in use
+     * @exception IllegalArgumentException a key is already in use
      */
     protected void addAltReservedKeys(String prefix, String... suffixes)
 	throws IllegalArgumentException
@@ -969,6 +970,7 @@ public abstract class ConfigPropertyEditor {
      * created.
      * @param owner the component on which any file-chooser dialog should
      *        be centered; null if there is none
+     * @exception IOException an IO error occurred
      */
     public void showLoadDialog(Component owner)
 	throws IOException
@@ -1620,7 +1622,7 @@ public abstract class ConfigPropertyEditor {
      * Add a {@link ConfigPropertyListener} to this
      * {@link ConfigPropertyEditor}.  The listeners will be called
      * when a monitored property's value has changed.
-     * @parem l the listener to add
+     * @param l the listener to add
      * @see #monitorProperty(String)
      */
     public void addConfigPropertyListener(ConfigPropertyListener l)
@@ -1631,7 +1633,7 @@ public abstract class ConfigPropertyEditor {
     /**
      * Remove a {@link ConfigPropertyListener} from this
      * {@link ConfigPropertyEditor}.
-     * @parem l the listener to remove
+     * @param l the listener to remove
      */
     public void removeConfigPropertyListener(ConfigPropertyListener l)
     {
@@ -2417,6 +2419,7 @@ public abstract class ConfigPropertyEditor {
      * Keys starting with 'base64.' will have their value Base-64 encoded and
      * keys starting with 'ebase64.' will have their valued encrypted with GPG
      * and then Base-64 encoded.
+     * @return the properties, encoded if necessary
      */
     public Properties getEncodedProperties() {
 	Properties results = new Properties();
@@ -2426,7 +2429,6 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Get the decoded properties.
-
      * Base-64 encryption will be removed for unencrypted properties
      * and all string substitution will be performed before the
      * results are returned. For keys starting with the component

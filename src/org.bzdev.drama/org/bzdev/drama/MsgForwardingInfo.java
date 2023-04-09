@@ -34,7 +34,8 @@ import org.bzdev.drama.generic.*;
  * <ul>
  *   <li> if a2  sends a message to a3 :
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -51,7 +52,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if a1 sends a message to adom:
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -69,7 +71,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if a1 sends a message to a2 :
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -88,7 +91,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if a1 sends a message to atop :
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -107,7 +111,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if a1 sends a message to a5:
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -127,7 +132,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if a1 sends a message to a6:
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -148,7 +154,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if atop sends a message to a5:
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -166,7 +173,8 @@ import org.bzdev.drama.generic.*;
  *   </div>
  *   <li> if atop sends a message to a6:
  *   <div style="margin-left: 25%; margin-right: 25%">
- *   <table border="2">
+ *   <table border="1">
+ *     <caption>&nbsp;</caption>
  *           <colgroup align="center">
  *           <colgroup align="center">
  *           <colgroup align="center">
@@ -194,7 +202,7 @@ public class MsgForwardingInfo
 	    Domain,DomainMember,DramaFactory,Group>
 {
 
-    /*
+    /**
      * Constructor.
      * @param sim the simulation
      * @param name the name of this object; null for

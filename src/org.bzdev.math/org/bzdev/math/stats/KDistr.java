@@ -185,6 +185,7 @@ public class KDistr extends ProbDistribution {
      * accuracy improving as n &rarr; &infin;.
      * @param x the argument representing a statistic
      * @param n the number of variates
+     * @return the cumulative probability for the given arguments
      */
     public static double PL(double x, int n) {
 	if (x == 0.0) return 0.0;
@@ -205,6 +206,8 @@ public class KDistr extends ProbDistribution {
      * QL(x,n) = 1 - PL(x,n)
      * @param x the argument representing a statistic
      * @param n the number of variates
+     * @return the complement of the cumulative probabilty for the given
+     *         arguments
      */
     public static double QL(double x, int n) {
 	return 1.0 - PL(x,n);
@@ -234,6 +237,7 @@ public class KDistr extends ProbDistribution {
      * distribution.
      * @param d the argument representing a statistic
      * @param n the number of variates
+     * @return the cumulative probability for the given arguments
      */
     public static double P(double d, int n) {
 	double nd = n*d;
@@ -301,6 +305,8 @@ public class KDistr extends ProbDistribution {
      * Numerically, Q(x,n) = 1 - P(x,n).
      * @param x the argument representing a statistic
      * @param n the number of variates
+     * @return the complement of the cumulative probability for the
+     *         given arguments
      */
     public static double Q(double x, int n) {
 	return 1.0 - P(x, n);

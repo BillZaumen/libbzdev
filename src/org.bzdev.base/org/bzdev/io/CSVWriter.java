@@ -40,7 +40,7 @@ import java.io.IOException;
  * making up a field, followed by {@link CSVWriter#nextField()} to
  * create the field, and clear the input for the next field.
  * <P> For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *   int ncols = 5;
  *   Writer out = new PrintWriter("output.csv", "US-ASCII");
  *   CSVWriter w = new CSVWriter(out, ncols);
@@ -48,9 +48,9 @@ import java.io.IOException;
  *   w.writeRow(...)
  *   ...
  *   w.close();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  *  Alternatively, one can write the rows as follows:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *   int nrows = 20;
  *   int ncols = 5;
  *   String data[][] = {
@@ -64,7 +64,7 @@ import java.io.IOException;
  *          w.writeField(data[i][j]);
  *      }
  *   }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * The call to {@link CSVWriter#writeField(String)} can be replaced
  * with a series of calls to the <code>write</code> methods defined by
  * the {@link java.io.Writer} class, followed by a call to
@@ -255,6 +255,7 @@ public class CSVWriter extends Writer {
      * Write a single field.
      * A call to {@link #nextField()} is implicit.
      * @param string the field
+     * @exception IOException an IO error occurred
      */
     public void writeField(String string) throws IOException {
 	synchronized(lock) {
@@ -322,6 +323,7 @@ public class CSVWriter extends Writer {
      * Start a new field.
      * If the field is the last field in a row, a new
      * row will be started automatically. 
+     * @exception IOException an IO error occurred
      */
     public void nextField() throws IOException {
 	synchronized(lock) {
@@ -347,6 +349,7 @@ public class CSVWriter extends Writer {
      * {@link #nextField()} was not called, an implicit call to
      * {@link #nextField()} will be added. If called at the
      * start of a row, a row with empty fields will be written.
+     * @exception IOException an IO error occurred
      */
     public void nextRow() throws IOException {
 	synchronized(lock) {
@@ -368,6 +371,7 @@ public class CSVWriter extends Writer {
     /**
      * Terminate the current row unless the current row is empty.
      * The row will be padded with empty fields if it is too short.
+     * @exception IOException an IO error occurred
      */
     public void nextRowIfNeeded() throws IOException {
 	if (field.length() > 0 || index != 0) nextRow();

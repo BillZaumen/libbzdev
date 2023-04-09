@@ -20,7 +20,7 @@ import javax.print.attribute.standard.*;
  * <P>
  * As an example, one can print a graph to the default printer
  * as follows:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * import org.bzdev.graph.*;
  * import org.bzdev.gio.*;
  * ...
@@ -30,12 +30,12 @@ import javax.print.attribute.standard.*;
  *     Graph graph = new Graph(pg);
  *     ...
  *     graph.write();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * The implementation of <code>graph.write()</code> calls
  * <code>pg.imageComplete()</code>, which initiates the actual printing.
  * <P>
  * To allow the user to choose a printer, one can call
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      ...
  *	PrinterJob pjob = PrinterJob.getPrinterJob();
  *      if (pjob.printDialog()) {
@@ -43,13 +43,13 @@ import javax.print.attribute.standard.*;
  *          ...
  *      }
  *   PrinterJob job = 
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * In this case, the orientation will be chosen to maximize the size of
  * the printed image.
  * <P>
  * To allow the user to choose a printer, orientation, and other
  * properties, use
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * import bzdev.gio.PrinterGraphics;
  * import java.awt.print.*;
  * import javax.print.attribute.*;
@@ -61,7 +61,7 @@ import javax.print.attribute.standard.*;
  *          PrinterGraphics pg = new PrinterGraphics(pjob, aset, width, height);
  *          ...
  *      }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 public class PrinterGraphics implements OSGraphicsOps {
 
@@ -193,6 +193,7 @@ public class PrinterGraphics implements OSGraphicsOps {
      * scaled.
      * @param landscape true if a landscape orientation should be used;
      *        false if a portrait orientation should be used
+     * @throws PrinterException if printing failed
      */
     public PrinterGraphics(boolean landscape)
 	throws PrinterException
@@ -207,6 +208,7 @@ public class PrinterGraphics implements OSGraphicsOps {
      * @param aset the print job's attributes; null for defaults
      * @param landscape true if a landscape orientation should be used;
      *        false if a portrait orientation should be used
+     * @throws PrinterException if printing failed
      */
     public PrinterGraphics(PrinterJob pjob, PrintRequestAttributeSet aset,
 			   boolean landscape)

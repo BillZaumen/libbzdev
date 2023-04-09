@@ -32,7 +32,7 @@ abstract public class RandomVariableRV<T, RV extends RandomVariable<T>>
      * its arguments is a random variable unless that subclass overrides
      * {@link RandomVariable#getCharacteristics()}.
      * @param args the random variables to check
-     * @see {@link RandomVariable#characteristics()}
+     * @see RandomVariable#getCharacteristics()
      */
     protected void determineIfOrdered(RandomVariable... args) {
 	for (RandomVariable rv: args) {
@@ -61,7 +61,7 @@ abstract public class RandomVariableRV<T, RV extends RandomVariable<T>>
 	return StreamSupport.stream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of random variables.
      * @param size the number of random values to provide
      * @return the stream
@@ -70,7 +70,7 @@ abstract public class RandomVariableRV<T, RV extends RandomVariable<T>>
 	return StreamSupport.stream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinite stream of random variables.
      * @return the stream
      */
@@ -78,7 +78,7 @@ abstract public class RandomVariableRV<T, RV extends RandomVariable<T>>
 	return StreamSupport.stream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinite parallel stream of random variables.
      * @return the stream
      */

@@ -17,16 +17,56 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface DMethodHelperInfo {
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     String helper() default "";
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     String baseType() default "";
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     String[] baseArgType() default {};
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     String[] baseThrowables() default {};
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     String baseReturnType() default "";
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     int[] baseOrder() default {};
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     boolean baseIsVarArgs() default false;
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     DMethodOptions.Locking baseLockingMode() default
 	DMethodOptions.Locking.MUTEX;
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     boolean traceMode() default false;
+    /**
+     * Private element.
+     * @return the value of this element
+     */
     int limitFactor() default 1;
 }
 

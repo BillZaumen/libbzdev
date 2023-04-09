@@ -132,6 +132,7 @@ public abstract class ITextCellEditor extends TextCellEditor<Object> {
      * expression
      *  <CODE>new java.sql.Date(((java.util.Date)o).getTime())</CODE>.
      * @param o the object
+     * @return the converted object
      * @exception NoConvertException if the argument cannot be converted
      *       to the desired type
      */

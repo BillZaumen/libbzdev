@@ -54,6 +54,7 @@ public interface HttpSessionOps {
     /**
      * Get the session implementation associated with a session ID.
      * @param sid the session ID
+     * @return the session implementation
      */
    Object get(String sid);
 }

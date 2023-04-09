@@ -18,7 +18,6 @@ public class ClassFinder {
      * package name, and a dollar sign separates a inner classes from outer
      * classes.
      * <P>
-     * <P>
      * One use case for this method is an Output Stream Graphics provider
      * that checks if a particular class library is present.
      * @param name the binary class name of a class

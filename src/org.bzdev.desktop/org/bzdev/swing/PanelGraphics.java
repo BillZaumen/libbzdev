@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
  * a screen instead of being written to a file.
  * <P>
  * Users of this class will typically write the following code:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  import org.bzdev.swing.PanelGraphics;
  *  import javax.swing.JPanel;
  *  ...
@@ -55,9 +55,9 @@ import java.util.ResourceBundle;
  *      ...
  *      // display the results
  *      pg.imageComplete();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * Alternatively, one may use the newFramedInstance method:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  import org.bzdev.swing.PanelGraphics;
  *  import javax.swing.JPanel;
  *  ...
@@ -68,10 +68,10 @@ import java.util.ResourceBundle;
  *      ...
  *      // display the results
  *      pg.imageComplete();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * To create a graph, one can use the following statements:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  import org.bzdev.swing.PanelGraphics;
  *  import org.bzdev.graph.*;
  *  import javax.swing.JPanel;
@@ -81,16 +81,16 @@ import java.util.ResourceBundle;
  *      // perform normal graph operations to create the graph
  *      ...
  *     graph.write();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * The graph will be displayed in the panel.  If the frame was created
  * so that it is not visible, one can call
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      pg.setVisible(true);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * or
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      pg.getPanelWindow().setVisible(true);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * to make it visible.
  * <P>
  * While the PanelGraphics class has Java 'swing' components
@@ -212,9 +212,9 @@ public class PanelGraphics implements OSGraphicsOps {
 	}
 	/**
 	 * Return true if closing a frame created with
-	 * {@link PanelGraphics#newFramedInstance(String,int,int,boolean,ExitAccessor)}
+	 * {@link PanelGraphics#newFramedInstance(int,int,String,boolean,ExitAccessor)}
 	 * or
-	 * {@link PanelGraphics#newFramedInstance(String,int,int,boolean,ExitAccessor,boolean)}
+	 * {@link PanelGraphics#newFramedInstance(int,int,String,boolean,ExitAccessor,boolean)}
 }	 * can cause an application to exit; false if the user must confirm
 	 * that the application will exit.
 	 */
@@ -251,6 +251,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * @param visible true if the frame is visible; false otherwise
      * @param exitOnClose true if the application should exit when the
      *        frame closes; false if the frame should be hidden.
+     * @return the new instance of PanelGraphics
      */
     public static PanelGraphics newFramedInstance(int width,
 						  int height,
@@ -282,6 +283,7 @@ public class PanelGraphics implements OSGraphicsOps {
      *        ask the user if the application should exit before exiting
      *        the application; null implies that the application will exit
      *        immediately.
+     * @return the new instance of PanelGraphics
      */
     public static PanelGraphics newFramedInstance(int width,
 						  int height,
@@ -314,6 +316,7 @@ public class PanelGraphics implements OSGraphicsOps {
      *        frame closes; false if the frame should be hidden.
      * @param addButtons true if the frame should include buttons for
      *        printing and writing to files; false otherwise
+     * @return the new instance of PanelGraphics
      */
     public static PanelGraphics newFramedInstance(final int width,
 						  final int height,
@@ -349,6 +352,7 @@ public class PanelGraphics implements OSGraphicsOps {
      *        immediately.
      * @param addButtons true if the frame should include buttons for
      *        printing and writing to files; false otherwise
+     * @return the new instance of PanelGraphics
      */
     public static PanelGraphics newFramedInstance(final int width,
 						  final int height,
@@ -941,6 +945,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * Create a new set of graphics contexts.
      * @param mode true if the object created will be used after
      *        its apply method is called; false otherwise
+     * @return a graphics creator
      */
     public Creator newPanelGraphicsCreator(boolean mode) {
 	return new Creator(mode);
@@ -953,6 +958,7 @@ public class PanelGraphics implements OSGraphicsOps {
      * @param mode true if the object created will be used after
      *        its app method is called; false otherwise
      * @param count a positive integer giving the repetition count
+     * @return a graphics creator
      * @see Creator#getRepetitionCount()
      */
     public Creator newPanelGraphicsCreator(boolean mode, int count) {

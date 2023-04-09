@@ -12,8 +12,8 @@ package org.bzdev.util;
  * <P>
  * The reason for providing this class is that Java does not allow one
  * to use a primitive type as a type parameter:
- * <code>Comparator<long></code> will generate a compile-time error,
- * although <code>Comparator<Long></code> can be used in some cases
+ * <code>Comparator&lt;long&gt;</code> will generate a compile-time error,
+ * although <code>Comparator&lt;Long&gt;</code> can be used in some cases
  * due to autoboxing.
  * @see java.util.Comparator
  */

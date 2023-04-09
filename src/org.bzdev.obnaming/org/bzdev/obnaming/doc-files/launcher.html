@@ -3,11 +3,12 @@
 <HEAD>
   <title>Object-Namer Launchers</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>Object-namer launchers</H2>
+<H1>Object-namer launchers</H1>
 <P>
   The abstract class {@link org.bzdev.obnaming.ObjectNamerLauncher} is
   the base class for object-namer launchers.  An object-namer launcher
@@ -35,7 +36,7 @@
     <LI><A HREF="#genDoc">Generating class documentation</A>.
   </UL>
 
-  <H3><A NAME="instantiation"></A>Instantiating an object namer</H3>
+  <H2><A ID="instantiation"></A>Instantiating an object namer</H2>
 <P>
   While a constructor can be used directly, normally and object-namer
   launcher will be created by using a <CODE>newInstance</CODE> method:
@@ -64,7 +65,7 @@
   try-with-resources block, in which case the call to
   {@link org.bzdev.obnaming.ObjectNamerLauncher#close()} is implicit.
 
-  <H3><A NAME="use"></A>Using an object namer</H3>
+  <H2><A ID="use"></A>Using an object namer</H2>
 <P>
   An object namer processes text in either JSON or YAML format.  The
   methods that process text are
@@ -92,7 +93,7 @@
       <UL>
         <LI> a statement starting with "=" will be evaluated.
         <LI> a "var" statement will set a variable with a specified
-          name, and its variant using '?=" will provide a default
+          name, and its variant using "?=" will provide a default
           values if the variable is not set externally. The variant
           using "??=" will provide a default value if the variable is
           either not defined or has the value null.
@@ -104,20 +105,20 @@
       <UL>
         <LI> For YAML, once can force the value to be an string by
           using "!!str" tag. For example
-          <BLOCKQUOTE><CODE><PRE>
+          <BLOCKQUOTE><PRE><CODE>
 execute: !!str var foo = 10
-          </PRE></CODE></BLOCKQUOTE>
+          </CODE></PRE></BLOCKQUOTE>
           If the string is a quoted string (delimited by double
           quotes) or a YAML multi-line string, it is assumed to
           be a string. To make such a string an expression, on
           may use a tag:
-          <BLOCKQUOTE><CODE><PRE>
+          <BLOCKQUOTE><PRE><CODE>
 execute: !bzdev!esp "var foo = 10"
-          </PRE></CODE></BLOCKQUOTE>
+          </CODE></PRE></BLOCKQUOTE>
         <LI> For JSON, one can use "=" with a quoted string. For example
-          <BLOCKQUOTE><CODE><PRE>
+          <BLOCKQUOTE><PRE><CODE>
 execute: "= \"var foo = 10\""
-          </PRE></CODE></BLOCKQUOTE>
+          </CODE></PRE></BLOCKQUOTE>
       </UL>
       Such a conflict should occur rarely, if at all, in practice.
     <LI> <B>factories</B>. The value is either an object or a sequence
@@ -127,7 +128,7 @@ execute: "= \"var foo = 10\""
       of factories.  The value for a context is a list with two
       elements.  The first element is a variable name for an
       object namer. The second is the package in which the
-      factories provided by that context's factories are located.
+      factories provided by that context&apos;s factories are located.
     <LI><B>define</B>. This section allows one to provide YAML anchors
       to avoid repetition and is otherwise ignored. This is needed
       because the variable provided by an expression parser cannot be used
@@ -164,7 +165,7 @@ execute: "= \"var foo = 10\""
   example, has options that set scripting-language variables and some
   of these methods are used by yrunner for that purpose.
 
-  <H3><A NAME="subclassing"></A>Subclassing an object-namer launcher</H3>
+  <H2><A ID="subclassing"></A>Subclassing an object-namer launcher</H2>
 <P>
   A subclass of {@link org.bzdev.obnaming.ObjectNamerLauncher} is
   expected to have two constructors: one with no arguments and one
@@ -210,10 +211,10 @@ execute: "= \"var foo = 10\""
   there are 8 spaces per tab. Allowing tabs is convenient when using some
   text editors (e.g., emacs).
 
-  <H3><A NAME="configSyntax"></A>Configuring object-namer launchers</H3>
+  <H2><A ID="configSyntax"></A>Configuring object-namer launchers</H2>
 
   The YAML file loaded by a constructor lists classes and how they can
-  be used in an object-namer launcher's scripting environment. A
+  be used in an object-namer launcher&apos;s scripting environment. A
   a more detailed description is provided by the API documentation for
   {@link org.bzdev.util.ExpressionParser}, but that documentation
   does not describe a YAML representation of the same data.
@@ -256,7 +257,7 @@ execute: "= \"var foo = 10\""
       YAML aliases can be used to minimize the replication of class names.
   </UL>
   
-  <H3><A NAME="SPIs"></A>The SPIs for object-namer launchers</H3>
+  <H2><A ID="SPIs"></A>The SPIs for object-namer launchers</H2>
 
   Both <CODE>yrunner</CODE> and the
   <A HREF="#instantiate"><CODE>newInstance</CODE></A> methods will
@@ -295,7 +296,7 @@ execute: "= \"var foo = 10\""
   the <CODE>org.bzdev.math</CODE> package, an implementation of
   {@link org.bzdev.lang.spi.ONLauncherData}, is only a few lines of
   code:
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
 package org.bzdev.providers.math;
 import java.io.InputStream;
 import java.util.ResourceBundle;
@@ -320,7 +321,7 @@ public class MathLauncherData implements ONLauncherData {
 	    .getString("description");
     }
 }
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
   A file in the same directory named <CODE>MathLauncherData.yaml</CODE>
   contains a list of classes that this service provider makes
   accessible. The use of a resource bundle allows the description to be
@@ -329,7 +330,7 @@ public class MathLauncherData implements ONLauncherData {
   Similarly for the <CODE>org.bzdev.devqsim</CODE> package the implantation
   of {@link org.bzdev.obnaming.spi.ONLauncherProvider}. is also only a few
   lines of code long:
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
 package org.bzdev.providers.devqsim;
 import java.io.InputStream;
 import java.util.ResourceBundle;
@@ -359,7 +360,7 @@ public class SimulationLauncherProvider implements ONLauncherProvider {
 	    .getString("description");
     }
 }
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
   In this case, <CODE>SimulationLauncher</CODE> is placed in the
   <CODE>org.bzdev.devqsim</CODE> package along with the resource
   <CODE>SimulationLauncher.yaml</CODE>, primarily because Java 11
@@ -367,35 +368,35 @@ public class SimulationLauncherProvider implements ONLauncherProvider {
   when Java modules are used.
 <P>
   The module-info.jar file for org.bzdev.math contains the statement
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
     provides org.bzdev.lang.spi.ONLauncherData with
 	org.bzdev.providers.math.MathLauncherData,
         ...
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
   and the file META-INF/services/org.bzdev.lang.spi.ONLaucherData
   will contain the line
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
 org.bzdev.providers.math.MathLauncherData
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
 <P>
   Similarly the module-info.jar file for org.bzdev.devqsim contains
   the statement
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
     provides org.bzdev.obnaming.spi.ONLauncherProvider with
 	org.bzdev.providers.devqsim.SimulationLauncherProvider;
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
   and the file META-INF/services/org.bzdev.obnaming.spi.ONLauncherProvider
   contains the line
-  <BLOCKQUOTE><CODE><PRE>
+  <BLOCKQUOTE><PRE><CODE>
 org.bzdev.providers.devqsim.SimulationLauncherProvider
-  </PRE></CODE></BLOCKQUOTE>
+  </CODE></PRE></BLOCKQUOTE>
 <P>
   Providing both a META-INF/services file and an entry in a
   module-info.jar file should be redundant, but some releases of Java,
   or at least of openjdk, need both if the service provider is to work
   as expected whether or not Java modules are used.
 
-  <H3><A NAME="genDoc"></A>Generating class documentation</H3>
+  <H2><A ID="genDoc"></A>Generating class documentation</H2>
 <P>
   The class {@link org.bzdev.obnaming.ObjectNamerLauncher} contains
   methods for querying its expression parser to recover information
@@ -421,7 +422,7 @@ org.bzdev.providers.devqsim.SimulationLauncherProvider
 <P>
     The method {@link ObjectNamerLauncher#createAPIMap(List)} will set
     up a map that associated class names with a URL for their API
-    documentation. It's argument is a list of URLs that point to the
+    documentation. It&apos;s argument is a list of URLs that point to the
     top-level directories for API documentation generated by
     javadoc. Several methods return a
     {@link org.bzdev.util.TemplateProcessor.KeyMapList} that will

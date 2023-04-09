@@ -122,6 +122,7 @@ public class EjwsUtilities {
      * @param encoding the character encoding used by the HTML generated
      * @param webmap the instance of WebMap that called this method
      * @return a WebMap.Info instance for the directory listing
+     * @exception IOException an IO exception occurred
      */
     public static WebMap.Info printHtmlDir(File dir, String uri,
 					   String encoding,
@@ -152,6 +153,7 @@ public class EjwsUtilities {
      * @param encoding the character encoding used by the HTML generated
      * @param webmap the instance of WebMap that called this method
      * @param os the output stream on which to print the file
+     * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(File dir, String uri,
 				    String encoding, OutputStream os,
@@ -242,15 +244,15 @@ public class EjwsUtilities {
      * The directory name will consist of the URI string concatenated with
      * the zpath string. In a typical case, the URI will end with a '/'
      * and the zpath string will not start with a '/'.
-     * <P>
      * @param file a zip file,
      * @param uri a URI or path for the zip file or a directory in
      *        the zip file
-     * @parm  zprepath the initial part of a zip-file entry's name
+     * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the remainder of the zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param webmap the instance of WebMap that called this method
      * @return a WebMap.Info instance for the directory listing
+     * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(File file, String uri, String zprepath, String zpath,
@@ -276,11 +278,12 @@ public class EjwsUtilities {
      * @param is an input stream used to read a file in ZIP format
      * @param uri a URI or path name for the zip file or a directory in
      *        the zip file
-     * @parm  zprepath the initial part of a zip-file entry's name
+     * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param webmap the instance of WebMap that called this method
      * @return a WebMap.Info instance for the directory listing
+     * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(InputStream is, String uri, String zprepath,
@@ -315,6 +318,7 @@ public class EjwsUtilities {
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
      * @param webmap the instance of WebMap that called this method
+     * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(File file, String uri, String zpath,
 				    String encoding, OutputStream os,
@@ -340,10 +344,12 @@ public class EjwsUtilities {
      * and the zpath string will not start with a '/'.
      * @param is an input stream for a file in Zip format
      * @param uri a URI for the directory
+     * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
      * @param webmap the instance of WebMap that called this method
+     * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(InputStream is, String uri,
 				    String zprepath, String zpath,
@@ -427,10 +433,12 @@ public class EjwsUtilities {
      * and the zpath string will not start with a '/'.
      * @param zipfile an input stream for a file in Zip format
      * @param uri a URI for the directory
+     * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param webmap the instance of WebMap that called this method
      * @return a WebMap.Info instance for the directory listing
+     * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(ZipFile zipfile, String uri, String zprepath, String zpath,
@@ -461,10 +469,12 @@ public class EjwsUtilities {
      * and the zpath string will not start with a '/'.
      * @param zipfile a zip file
      * @param uri a URI for the directory
+     * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
      * @param webmap the instance of WebMap that called this method
+     * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(ZipFile zipfile, String uri,
 				    String zprepath, String zpath,
@@ -555,6 +565,7 @@ public class EjwsUtilities {
      * @param webmap the instance of WebMap that called this method
      * @return an object encapsulating the directory listing and information
      *         useful for displaying the listing.
+     * @exception IOException an IO exception occurred
      */
     static public WebMap.Info printHtmlDir(Set<String> pathSet,
 					   String prefix,
@@ -584,6 +595,7 @@ public class EjwsUtilities {
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream
      * @param webmap the instance of WebMap that called this method
+     * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(Set<String> pathSet, String prefix,
 				    String encoding, OutputStream os,

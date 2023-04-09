@@ -63,7 +63,7 @@ import java.io.IOException;
  * {@link UrlTocPane#addEntry(String,String)} and related methods
  * defined in the class {@link ObjTocPane}.  To replace the entries
  * with a new set, use one of the setToc methods or call
- * {@linkUrlTocPane#clearToc()} and then programatically add the new
+ * {@link UrlTocPane#clearToc()} and then programatically add the new
  * entries.  The method {@link ObjTocPane#setSelectionWithAction(int)}
  * calls {@link UrlTocPane#clearToc()} so an explicit call is not
  * necessary in this case.

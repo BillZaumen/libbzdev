@@ -73,9 +73,9 @@ package org.bzdev.math;
  * <a href="http://www.idav.ucdavis.edu/education/CAGDNotes/Matrix-Cubic-Bezier-Patch/Matrix-Cubic-Bezier-Patch.html">A matrix representation of a cubic b&eacute;zier patch</a>.
  * <P>
  * The interpolated value of f(u,v) can be written as
- * <pre>
+ * <br>
  * [1 u u<sup>2</sup> u<sup>3</sup>] M P M<sup>T</sup> [1 v v<sup>2</sup> v<sup>3</sup>]<sup>T</sup>
- * </pre>
+ * <br>
  * where M is a constant matrix given in the citation and P is a matrix
  * of control points.  The interpolated value is
  * P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub> summed over i and j

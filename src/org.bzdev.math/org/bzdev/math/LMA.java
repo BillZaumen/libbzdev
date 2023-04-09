@@ -84,6 +84,7 @@ public class LMA {
      *        be computed
      * @param args an array of values for each argument, the last of
      *        which is the parameters array
+     * @return the sum of the squares
      */
     public static double sumSquares(RealValuedFunctionVA rf,
 				    double[]... args)
@@ -201,6 +202,7 @@ public class LMA {
      * @param mode the mode (NORMAL, LEAST_SQUARES, WEIGHTED_LEAST_SQUARES)
      * @param args an array of values for each argument, the last of
      *        which is the parameters array used in each function call
+     * @return sum of the squares
      */
     public static double sumSquares(RealValuedFunctionVA rf,
 				    Mode mode,

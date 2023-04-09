@@ -205,6 +205,7 @@ public class Paths2D {
      *        negative Y axis
      * @param theta the angular extent of the arc (if negative, the arc
      *        will form a cusp with the specified path)
+     * @return the arc
      * @exception IllegalArgumentException an arc cannot be created
      *            given the parameters
      * @exception NullPointerException the path argument was null
@@ -234,6 +235,7 @@ public class Paths2D {
      * @param maxDelta the maximum angular extent for each cubic B&eacute;zier
      *        segment making up the arc, with values in the range
      *        (0.0, 2&pi;/3]
+     * @return the arc
      * @exception IllegalArgumentException an arc cannot be created
      *            given the parameters
      * @exception NullPointerException the path argument was null

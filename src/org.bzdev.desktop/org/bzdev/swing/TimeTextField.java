@@ -60,6 +60,17 @@ public class TimeTextField extends VTextField {
     private long defaultValue = 0;
     private long value;
 
+    /**
+     * Parse a string representing the a time interval
+     * The format is [[DIGITS:]DIGITS:]DIGITS[.DIGITS] where DIGITS is a
+     * series of one or more digits.  The optional part before and including
+     * the first colon represents hours, and the optional part before the second
+     * colon represents minutes. The next secion is a decimal number giving
+     * the time in seconds.
+     * @param value the string to parse
+     * @return the time in milliseconds
+     * @throws Exception an exception occurred
+     */
     static public long parseTime(String value)
 	throws Exception 
     {

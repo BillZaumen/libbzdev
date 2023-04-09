@@ -304,7 +304,7 @@ abstract public class IntegerRandomVariable extends RandomVariable<Integer>
 	return StreamSupport.intStream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of integer values.
      * @param size the number of random values to provide
      * @return the stream
@@ -313,7 +313,7 @@ abstract public class IntegerRandomVariable extends RandomVariable<Integer>
 	return StreamSupport.intStream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinie stream of integer values.
      * @return the stream
      */
@@ -321,7 +321,7 @@ abstract public class IntegerRandomVariable extends RandomVariable<Integer>
 	return StreamSupport.intStream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinite parallel stream of integer values.
      * @return the stream
      */

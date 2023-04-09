@@ -101,6 +101,7 @@ public @interface DMethodImpl {
      * This class name is used as a key to distinguish various
      * dynamic methods.  It must be a fully qualified name if
      * the helper is not in the current package.
+     * @return the value of this element
      */
     String value();
 }

@@ -49,7 +49,7 @@ all:
 	@echo --------- PolarTest -----------
 	@$(JAVA) PolarTest
 	@echo ----- Starting Script Factory Test ----
-	$(HAS_JS) && $(SCRUN) scriptTest.js
+	$(HAS_JS) && $(SCRUN) scriptTest.js || echo ... skipping scriptTest.js
 	@echo ----- Starting Script Factory Test with an ESP script ----
 	$(SCRUN) scriptTest.esp
 	@echo ----- Starting 2nd Script Factory Test with an ESP script ----
@@ -219,7 +219,7 @@ sfactory:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	@echo ----- Starting Script Factory Test ----
-	$(HAS_JS) && $(SCRUN) scriptTest.js
+	$(HAS_JS) && $(SCRUN) scriptTest.js || echo ... skipping scriptTest.js
 
 eptest:
 	(cd ../.. ; make jars)

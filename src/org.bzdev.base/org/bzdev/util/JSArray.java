@@ -249,6 +249,7 @@ public class JSArray implements Iterable<Object>, JSOps {
     /**
      * Convert this object to an array, storing it in an array with
      * a specified component type.
+     * @param <T> the type provided by the class <CODE>clasz</CODE>
      * @param clasz the class of the array components
      * @return the array
      * @exception ArrayStoreException if the argument is not a superclass
@@ -397,6 +398,7 @@ public class JSArray implements Iterable<Object>, JSOps {
      * a specified component type.
      * The matrix is represented by a two-dimensional Java array and
      * all rows must have the same number of elements.
+     * @param <T> the type provided by the class <CODE>clasz</CODE>
      * @param clasz the class of the matrix components
      * @return the array
      * @exception IllegalStateException the conversion failed
@@ -676,6 +678,7 @@ public class JSArray implements Iterable<Object>, JSOps {
     /**
      * Get the value stored in this object for a specified index, cast
      * to a specified type.
+     * @param <T> the type provided by the class <CODE>clasz</CODE>
      * @param index the index
      * @param clasz the class of the result
      * @return the object stored at the specified index
@@ -698,7 +701,7 @@ public class JSArray implements Iterable<Object>, JSOps {
      *         <OL>
      *            <LI> A new key-map list will be created by calling
      *                 the element's method
-     *                 <CODE>toKeyMapList(defaultKey)<CODE>,
+     *                 <CODE>toKeyMapList(defaultKey)</CODE>,
      *                 where <CODE>defaultKey</CODE> is the argument to
      *                 this method.
      *            <LI> The element will be replaced with a new key map

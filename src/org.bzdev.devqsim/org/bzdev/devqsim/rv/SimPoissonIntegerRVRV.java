@@ -3,10 +3,10 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.PoissonIntegerRV;
 import org.bzdev.math.rv.PoissonIntegerRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of integer-valued random variables with a binomial distribution.
- * @see org.bzdev.math.rv.PoissonIntegerRV;
+ * @see org.bzdev.math.rv.PoissonIntegerRV
  */
 public class SimPoissonIntegerRVRV
     extends SimIntegerRVRV<PoissonIntegerRV,PoissonIntegerRVRV>

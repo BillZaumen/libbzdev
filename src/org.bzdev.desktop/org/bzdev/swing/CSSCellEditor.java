@@ -81,7 +81,7 @@ public class CSSCellEditor extends AbstractCellEditor
     JButton button;
     JColorChooser colorChooser;
     JDialog dialog;
-    protected static final String EDIT = "edit";
+    private static final String EDIT = "edit";
 
     /**
      * Constructor.

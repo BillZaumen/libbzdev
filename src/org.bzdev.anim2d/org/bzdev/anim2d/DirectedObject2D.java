@@ -211,9 +211,9 @@ public abstract class DirectedObject2D extends PlacedAnimationObject2D {
      * To override the behavior that this class provides, one should
      * override
      *{@link #setPathImplementation(org.bzdev.geom.BasicSplinePath2D,double,double,boolean,double)}.
+     * @param objectPath the path to set
      * @param time0 the increment from the current time
      *        at which the path should be set.
-     *
      */
     public final void setPath(AnimationPath2D objectPath, double time0) {
 	setPath(objectPath, 0.0, 0.0, defaultAngleRelative(), time0);
@@ -984,6 +984,7 @@ public abstract class DirectedObject2D extends PlacedAnimationObject2D {
      * This is intended for cases where direction is important.
      * @param u1 the parameter at the first end point of a subpath
      * @param u2 the parameter at the second end point of a subpath
+     * @return the distance
      * @exception IllegalStateException the path is not a simple path
      * @exception IllegalArgumentException the parameter is out of bounds
      */

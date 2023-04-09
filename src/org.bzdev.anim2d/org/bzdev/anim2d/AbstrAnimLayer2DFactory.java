@@ -72,7 +72,8 @@ import java.io.IOException;
  * The allowed sequences of object.type values for these paths are shown
  * in the following diagram:
  * <DIV style="text-align: center">
- * <img src="doc-files/layerpath.png" class="imgBackground">
+ * <img src="doc-files/layerpath.png" class="imgBackground"
+ *      ALT="UML Diagram">
  * </DIV>
  * <P>
  * The factory parameters this factory provides are the same as the parameters
@@ -80,7 +81,6 @@ import java.io.IOException;
  * (the documentation for
  * <CODE><A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html#object.type-org.bzdev.anim2d.AnimationLayer2DFactory" target="ftable">object.type</A></CODE>
  * describes which "object" parameters are used for a given type):
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html" style="width:95%;height:500px;border: 3px solid steelblue" name="ftable">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/anim2d/AnimationLayer2DFactory.html">

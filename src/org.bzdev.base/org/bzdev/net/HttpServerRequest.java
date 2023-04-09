@@ -60,6 +60,7 @@ public interface HttpServerRequest {
     /**
      * Get an attribute.
      * @param name the attribute name
+     * @return the attribute
      */
     Object getAttribute(String name);
 
@@ -77,6 +78,7 @@ public interface HttpServerRequest {
      * ServletContext when using a servlet (see the the Jarkarta Servlet
      * API v4.0.3 for a description of this class).
      * @param name the attribute name
+     * @return the attribute
      */
     Object getContextAttribute(String name);
 
@@ -204,6 +206,7 @@ public interface HttpServerRequest {
 
     /**
      * Return the query string
+     * @return the query string
      */
     String getQueryString();
 
@@ -212,7 +215,6 @@ public interface HttpServerRequest {
      * Request parameters are extra information sent with the request.
      * For HTTP, parameters are contained in a URL's query string
      * or posted form data.
-     * <P>
      * @return an immutable java.util.Map containing parameter names
      *         as keys and parameter values as map values.
      */
@@ -382,6 +384,7 @@ public interface HttpServerRequest {
     /**
      * Determine if a user is in a specified role.
      * If roles have not been implemented, this method returns false.
+     * @param role the role
      * @return true if the user is in a specified role; false
      *         otherwise
      */

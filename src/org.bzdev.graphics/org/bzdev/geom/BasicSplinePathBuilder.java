@@ -9,9 +9,9 @@ import org.bzdev.scripting.ScriptingContext;
  * The sequence of points, based on their types, is shown in
  * the following diagram, where a transition corresponds to adding a
  * new point to the BasicSplinePath2D builder:
- * <P>
  * <P style="text-align:center">
- * <IMG SRC="doc-files/basicbuilder.png" class="imgBackground">
+ * <IMG SRC="doc-files/basicbuilder.png" class="imgBackground"
+ *  ALT="UML diagram">
  * <P>
  * The line colors are not significant - they are just used to
  * make it obvious that lines cross rather than join. Bidirectional
@@ -44,7 +44,7 @@ import org.bzdev.scripting.ScriptingContext;
  *         <code>SEG_END_PREV</code>, a straight line (unless the line
  *         will have a length of zero) will connect the previous point
  *         to the point specified by the last point whose type is
- *         <code>MOVE_TO</code> or <code><MOVE_TO_NEXT></code>. If a
+ *         <code>MOVE_TO</code> or <code>MOVE_TO_NEXT</code>. If a
  *         sequence of <code>SPLINE</code> or
  *         <code>SPLINE_FUNCTION</code> points is terminated by a
  *         <code>CLOSE</code> point, the point immediately before the
@@ -91,7 +91,7 @@ import org.bzdev.scripting.ScriptingContext;
  * <P>
  * For example, with ECMAScript, <CODE>scrunner</CODE>  the following
  * statements can be used to configure a  path:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     var path1 = [
  *        {type: "MOVE_TO", x: 20.0, y: 30.0},
  *        {type: "SEG_END", x: 50.0, y: 60.0}];
@@ -107,7 +107,7 @@ import org.bzdev.scripting.ScriptingContext;
  *
  *     pb.configure("WIND_EVEN_ODD", pathspec);
  *     var path = pb.getPath();
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  *  The program <CODE>epts</CODE> can generate the path specifications while
  *  providing a graphical user interface to aid in constructing the
  *  paths.

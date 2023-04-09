@@ -19,6 +19,10 @@ import java.util.Collections;
 public class CommDomainType {
     String name;
 
+    /**
+     * Get the name for this domain type.
+     * @return the name
+     */
     public String getName() {return name;}
 
     CommDomainType(String name) {

@@ -53,6 +53,8 @@ public class SafeStyledDocument extends SafeDocument implements StyledDocument {
 
     /**
      * Execute code on the event dispatch thread and return a Style.
+     * @param r the runable to execute
+     * @return the style produced by running <CODE>r</CODE>
      */
     protected Style doitStyle(RunnableWithStyle r) {
 	try {

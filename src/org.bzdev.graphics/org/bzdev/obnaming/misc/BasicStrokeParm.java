@@ -378,6 +378,7 @@ public class BasicStrokeParm {
      * @param dashPattern the dash pattern
      * @param dashIncrement the length corresponding to a character in
      *        a dash pattern
+     * @return an array representing a dash pattern
      * @exception IllegalArgumentException the dashInrement argument was
      *        not positive or the dashPattern argument was illegal
      */

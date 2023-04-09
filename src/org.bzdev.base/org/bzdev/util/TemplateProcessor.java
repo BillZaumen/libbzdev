@@ -55,7 +55,7 @@ import java.net.URL;
  *               iterations is 1, but that can be changed by using the
  *               method
  *               {@link TemplateProcessor.KeyMap#put(String,Object,Object,Object)}.
- *       <UL>
+ *       </UL>
  *       Directives with a '+' or '-' can be used to create and conditional
  *       statements without having to explicitly add new directives whose
  *       only use is to indicate status.

@@ -53,6 +53,7 @@ public class ParmParser {
      *            key can be found
      * @exception ClassCastException if the object found for the given
      *            key is not a string
+     * @return the error message
      */
     protected String errorMsg(String key, Object... args)
 	throws
@@ -169,7 +170,7 @@ public class ParmParser {
      * a non-null value, the same method is called on that non-null value.
      * A typical code fragment is the following:
      * <blockquote>
-     * <code><pre>
+     * <pre><code>
      *         public void clear(int key) {
      *           factory.timelineMap.remove(key);
      *           ParmParser altParser = getAltParmParser();
@@ -177,7 +178,7 @@ public class ParmParser {
      *              altParser.clear(key);
      *           }
      *        }
-     * </pre></code>
+     * </CODE></PRE>
      * </blockquote>
      * Since all subclasses do the same thing, and because each
      * parm parser has its own alternate parm parser, the result
@@ -928,7 +929,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, NamedObjectOps value)
@@ -953,7 +954,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, Enum<?>value)
@@ -978,7 +979,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, String value)
@@ -1003,7 +1004,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, int value)
@@ -1028,7 +1029,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, IntegerRandomVariable value)
@@ -1053,7 +1054,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, IntegerRandomVariableRV value)
@@ -1079,7 +1080,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, long value)
@@ -1104,7 +1105,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, LongRandomVariable value)
@@ -1129,7 +1130,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, LongRandomVariableRV value)
@@ -1154,7 +1155,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, double value)
@@ -1179,7 +1180,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, DoubleRandomVariable value)
@@ -1205,7 +1206,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, DoubleRandomVariableRV value)
@@ -1230,7 +1231,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, boolean value)
@@ -1255,7 +1256,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, BooleanRandomVariable value)
@@ -1280,7 +1281,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(NamedObjectOps key, BooleanRandomVariableRV value)
@@ -1305,7 +1306,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, NamedObjectOps value)
@@ -1330,7 +1331,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, Enum<?>value)
@@ -1355,7 +1356,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, String value)
@@ -1380,7 +1381,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, int value)
@@ -1405,7 +1406,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, IntegerRandomVariable value)
@@ -1430,7 +1431,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, IntegerRandomVariableRV value)
@@ -1456,7 +1457,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, long value)
@@ -1481,7 +1482,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, LongRandomVariable value)
@@ -1506,7 +1507,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, LongRandomVariableRV value)
@@ -1531,7 +1532,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, double value)
@@ -1556,7 +1557,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, DoubleRandomVariable value)
@@ -1582,7 +1583,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, DoubleRandomVariableRV value)
@@ -1607,7 +1608,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, boolean value)
@@ -1632,7 +1633,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, BooleanRandomVariable value)
@@ -1657,7 +1658,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Enum<?> key, BooleanRandomVariableRV value)
@@ -1682,7 +1683,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, NamedObjectOps value)
@@ -1707,7 +1708,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, Enum<?>value)
@@ -1732,7 +1733,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, String value)
@@ -1757,7 +1758,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, int value)
@@ -1782,7 +1783,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, IntegerRandomVariable value)
@@ -1807,7 +1808,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, IntegerRandomVariableRV value)
@@ -1833,7 +1834,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, long value)
@@ -1858,7 +1859,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, LongRandomVariable value)
@@ -1883,7 +1884,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, LongRandomVariableRV value)
@@ -1908,7 +1909,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, double value)
@@ -1933,7 +1934,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, DoubleRandomVariable value)
@@ -1959,7 +1960,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, DoubleRandomVariableRV value)
@@ -1984,7 +1985,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, boolean value)
@@ -2009,7 +2010,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, BooleanRandomVariable value)
@@ -2034,7 +2035,7 @@ public class ParmParser {
      *            the use of this method
      * @exception IllegalStateException the factory is not in
      *            a state for which this value may be parsed and entered
-     * @exception KeyOutOfBoundsException the key is not in a legal
+     * @exception IndexOutOfBoundsException the key is not in a legal
      *            range
      */
     public void parse(Object[] key, BooleanRandomVariableRV value)
@@ -2556,4 +2557,4 @@ public class ParmParser {
 //  LocalWords:  assocaiated subclasses subparameter altParser
 //  LocalWords:  superclasses IllegalArgumentException boolean
 //  LocalWords:  UnsupportedOperationException IllegalStateException
-//  LocalWords:  IndexOutOfBoundsException KeyOutOfBoundsException
+//  LocalWords:  IndexOutOfBoundsException

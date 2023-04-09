@@ -1157,6 +1157,7 @@ public class DMethodProcessor extends AbstractProcessor {
 	if (baseReturnType.equals("void")) {
 	    keyMap.put("returnExpr", "return");
 	} else {
+	    keyMap.put("returnsNonVoid", new KeyMap());
 	    keyMap.put("resultEqual", baseReturnType + " result = ");
 	    keyMap.put("returnExpr", "return result");
 	}
@@ -1329,6 +1330,9 @@ public class DMethodProcessor extends AbstractProcessor {
 	}
 	String baseReturnType = hmap.get(helper).baseReturnType;
 	keyMap.put("baseReturnType", baseReturnType);
+	if (!baseReturnType.equals("void")) {
+	    keyMap.put("returnsNonVoid", new KeyMap());
+	}
 
 	int[] bOrder = hmap.get(helper).baseOrder;
 	int[] order = helperOrder(bOrder);

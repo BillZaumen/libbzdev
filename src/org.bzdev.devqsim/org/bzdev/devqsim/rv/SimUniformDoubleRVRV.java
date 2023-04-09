@@ -3,11 +3,11 @@ import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.UniformDoubleRV;
 import org.bzdev.math.rv.UniformDoubleRVRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of double-valued random variables, each with a uniform
  * distribution.
- * @see org.bzdev.math.rv.UniformDoubleRV;
+ * @see org.bzdev.math.rv.UniformDoubleRV
  */
 public class SimUniformDoubleRVRV
     extends SimDoubleRVRV<UniformDoubleRV,UniformDoubleRVRV>

@@ -33,7 +33,7 @@ abstract public class BooleanRandomVariable extends RandomVariable<Boolean>
 	return StreamSupport.stream(spliterator(size), false);
     }
 
-    /*
+    /**
      * Get a fixed-length parallel stream of boolean values.
      * @param size the number of random values to provide
      * @return the stream
@@ -42,7 +42,7 @@ abstract public class BooleanRandomVariable extends RandomVariable<Boolean>
 	return StreamSupport.stream(spliterator(size), true);
     }
 
-    /*
+    /**
      * Get an infinite stream of boolean values.
      * @return the stream
      */
@@ -50,7 +50,7 @@ abstract public class BooleanRandomVariable extends RandomVariable<Boolean>
 	return StreamSupport.stream(spliterator(), false);
     }
 
-    /*
+    /**
      * Get an infinite parallel stream of boolean values.
      * @return the stream
      */

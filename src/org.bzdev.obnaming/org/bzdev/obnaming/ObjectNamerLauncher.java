@@ -147,6 +147,7 @@ public abstract class ObjectNamerLauncher
 
     /**
      * Constructor given an expression parser.
+     * @param ep the expression parser
      * @exception IllegalStateException an object namer launcher is
      *            currently active in this thread
      */
@@ -177,6 +178,7 @@ public abstract class ObjectNamerLauncher
      * initializer with an initilizer provided as an argument
      * @param initializer1 the first initializer
      * @param initializers the remaining initializers
+     * @return the merger of the two initializers
      */
     protected static JSObject combine(JSObject initializer1,
 				      JSObject... initializers)
@@ -279,12 +281,13 @@ public abstract class ObjectNamerLauncher
      *        convert class names to classes
      * @param is the input stream
      * @param tabspacing the tab spacing (0 implies no tab processing)
+     * @return the object loaded from the input stream
      * @exception ClassNotFoundException a class needed to initialize
      *            this object could not be found
      * @exception IOException an IO error occurred
      * @exception IllegalAccessException if a Constructor object is
-     * enforcing Java language access control and the underlying
-     * constructor is inaccessible.
+     *            enforcing Java language access control and the underlying
+     *            constructor is inaccessible.
      */
     protected static JSObject loadFromStream(Class<?> lclass, InputStream is,
 					     int tabspacing)
@@ -675,6 +678,7 @@ public abstract class ObjectNamerLauncher
      * Process a JSON or YAML string.
      * @param s the string to process
      * @param ymode true if YAML syntax is being parse; false for JSON
+     * @exception Exception an error occurred
      */
     public static void process(String s, boolean ymode) throws Exception {
 	process(null, s, ymode);
@@ -684,6 +688,7 @@ public abstract class ObjectNamerLauncher
      * Process a JSON or YAML file.
      * @param r a reader for the text stored in the file
      * @param ymode true if YAML syntax is being parse; false for JSON
+     * @exception Exception an error occurred
      */
     public static void process(Reader r, boolean ymode) throws Exception {
 	process(null, r, ymode);
@@ -697,7 +702,7 @@ public abstract class ObjectNamerLauncher
      *        string
      * @param s the string to process
      * @param ymode true if YAML syntax is being parse; false for JSON
-     * @exception an error occurred
+     * @exception Exception an error occurred
      */
     public static void process(String filename, String s, boolean ymode)
 	throws Exception
@@ -712,7 +717,7 @@ public abstract class ObjectNamerLauncher
      * @param filename the input file name; null if not known
      * @param r a reader for the text stored in the file
      * @param ymode true if YAML syntax is being parse; false for JSON
-     * @exception an error occurred
+     * @exception Exception an error occurred
      */
     public static void process(String filename, Reader r, boolean ymode)
 	throws Exception
@@ -991,6 +996,7 @@ public abstract class ObjectNamerLauncher
      * final component in the path is "api" and that directory will
      * contain a file named either element-list or package-list.
      * @param apis a list of the URLS for javadoc directories
+     * @exception IOException an IO error occured
      */
     public static void createAPIMap(List<URL> apis) throws IOException {
 	ObjectNamerLauncher launcher = self.get();
@@ -1505,26 +1511,30 @@ public abstract class ObjectNamerLauncher
 
 
     /**
-     * Create a new instance of an object namer launcher.
+     * Create a new instance of an object-namer launcher.
      * There may be only one launcher active per thread. A launcher
      * becomes active when its constructor is called and is active
      * until its {@link #close()} method is called.
      * @param name the name of launcher.
+     * @return a new object-namer launcher
      * @exception IllegalAccessException if a Constructor object is
-     * enforcing Java language access control and the underlying
-     * constructor is inaccessible.
+     *            enforcing Java language access control and the
+     *            underlying constructor is inaccessible.
      * @exception IllegalArgumentException if the number of actual and
-     * formal parameters differ; if an unwrapping conversion for
-     * primitive arguments fails; or if, after possible unwrapping, a
-     * parameter value cannot be converted to the corresponding formal
-     * parameter type by a method invocation conversion; if a
-     * constructor pertains to an enum type.
+     *            formal parameters differ; if an unwrapping
+     *            conversion for primitive arguments fails; or if,
+     *            after possible unwrapping, a parameter value cannot
+     *            be converted to the corresponding formal parameter
+     *            type by a method invocation conversion; if a
+     *            constructor pertains to an enum type.
      * @exception InstantiationException if the class that declares
-     * the underlying constructor represents an abstract class.
+     *            the underlying constructor represents an abstract class
      * @exception InvocationTargetException if an underlying
-     * constructor throws an exception.
-     * @throwable ExceptionInInitializerError if the initialization
-     * provoked by this method fails.
+     *            constructor throws an exception
+     * @exception NoSuchMethodException if there is an attempt to use
+     *            a method that does not exist
+     * @throws ExceptionInInitializerError if the initialization
+     *            provoked by this method fails
      */
     public static synchronized ObjectNamerLauncher newInstance(String name)
 	throws InstantiationException, IllegalAccessException,
@@ -1553,24 +1563,29 @@ public abstract class ObjectNamerLauncher
      * until its {@link #close()} method is called.
      * @param name the name of launcher.
      * @param dnames the names of providers for additional data
+     * @return a new object-namer launcher
      * @exception IOException an IO error occurred
-     * @exception IllegalAccessException if a Constructor object is
-     * enforcing Java language access control and the underlying
-     * constructor is inaccessible.
+     * @exception IllegalAccessException if a constructor object is
+     *            enforcing Java language access control and the
+     *            underlying constructor is inaccessible.
      * @exception IllegalArgumentException if the number of actual and
-     * formal parameters differ; if an unwrapping conversion for
-     * primitive arguments fails; or if, after possible unwrapping, a
-     * parameter value cannot be converted to the corresponding formal
-     * parameter type by a method invocation conversion; if a
-     * constructor pertains to an enum type.
-     * @exception ClassNotFouncException if the class for an object-namer
-     * launcher could not be found
+     *            formal parameters differ; if an unwrapping
+     *            conversion for primitive arguments fails; or if,
+     *            after possible unwrapping, a parameter value cannot
+     *            be converted to the corresponding formal parameter
+     *            type by a method invocation conversion; if a
+     *            constructor pertains to an enum type.
+     * @exception ClassNotFoundException if the class for an object-namer
+     *            launcher could not be found
      * @exception InstantiationException if the class that declares
-     * the underlying constructor represents an abstract class.
+     *            the underlying constructor represents an abstract
+     *            class.
      * @exception InvocationTargetException if the underlying
-     * constructor throws an exception.
-     * @throwable ExceptionInInitializerError if the initialization
-     * provoked by this method fails.
+     *            constructor throws an exception.
+     * @exception ExceptionInInitializerError if the initialization
+     *            provoked by this method fails.
+     * @exception NoSuchMethodException if there is an attempt to use
+     *            a method that does not exist
      */
     public static synchronized ObjectNamerLauncher
 	newInstance(String name, String... dnames)
@@ -1755,6 +1770,8 @@ public abstract class ObjectNamerLauncher
      * classes used to define functions.
      * @param fname the name of the function
      * @return the method
+     * @exception NoSuchMethodException if there is an attempt to use
+     *            a method that does not exist
      */
     public static Method findRVFMethod (String fname)
 	throws IllegalStateException, NoSuchMethodException,
@@ -1788,7 +1805,7 @@ public abstract class ObjectNamerLauncher
 //  LocalWords:  lclass tabspacing vname noLauncher href HREF enum
 //  LocalWords:  createAPIMap hideString IllegalArgumentException JDK
 //  LocalWords:  InstantiationException InvocationTargetException api
-//  LocalWords:  ExceptionInInitializerError ClassNotFouncException
+//  LocalWords:  ExceptionInInitializerError
 //  LocalWords:  fname javadoc apis dnames launcherList yrunner msg
 //  LocalWords:  launcherDataList launcherExists setObject ArrayList
 //  LocalWords:  pushLevel popLevel incrList setKey StringBuilder

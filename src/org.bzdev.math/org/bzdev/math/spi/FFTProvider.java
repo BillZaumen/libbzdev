@@ -11,9 +11,9 @@ import org.bzdev.math.FFT;
  * a class library's JAR file.
  * For a modular JAR file, module-info.java should contain the following
  * clauses in its module declaration:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     provides org.bzdev.math.spi.FFTProvider with ...;
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where "<CODE>...</CODE>" is a comma-separated list of the fully
  * qualified class names of the FFT providers supplied by this module.
  * <P>

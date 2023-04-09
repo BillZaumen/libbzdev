@@ -216,11 +216,12 @@ public class Polynomial extends RealValuedFunction {
      * The size of the array is guaranteed to be at least 1 larger
      * then the degree of this polynomial. Modifying this array may
      * change the polynomial.
-     * Coefficients are order so that, for a polynomial
+     * Coefficients are ordered so that, for a polynomial
      * p(x) = a<sub>0</sub> + a<sub>1</sub>x + ... + a<sub>n</sub>x<sup>n</sup>,
      * the coefficient for the x<sup>i</sup> term is stored in an
      * array at index i, thus making a<sub>0</sub> the first index in p's
      * coefficient array.
+     * @return the array
      */
     public double[] getCoefficientsArray() {return coefficients;}
 
@@ -458,7 +459,7 @@ public class Polynomial extends RealValuedFunction {
      * This polynomial is not modified.
      * <P>
      * Please see
-     * @link Polynomials#divide(double[],double[],double[],int,double[],int)}l
+     * {@link Polynomials#divide(double[],double[],double[],int,double[],int)}
      * for documentation regarding numerical accuracy.
      * @param p the polynomial by which this polynomial is divided
      * @param isQuotient true if the quotient polynomial is returned;

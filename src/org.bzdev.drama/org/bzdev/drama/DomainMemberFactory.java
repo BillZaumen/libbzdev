@@ -4,7 +4,6 @@ package org.bzdev.drama;
  * Factory for creating instances of the class DomainMember.
  * <P>
  * The parameters this factory supports are shown in the following table:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/drama/DomainMemberFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/drama/DomainMemberFactory.html">

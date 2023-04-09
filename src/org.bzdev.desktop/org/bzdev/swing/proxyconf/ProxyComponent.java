@@ -806,6 +806,7 @@ public class ProxyComponent extends JComponent {
      *        a ProxyInfo object defining how the proxies should be configured
      *        with null indicating the values stored as preferences under the
      *        node whose name is ProxyInfo.DEFAULT_PREF_NODE
+     * @return the dialog
      */
     static public ProxyDialog createDialog(Container immediate,
 					   String title,

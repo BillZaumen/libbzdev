@@ -379,6 +379,7 @@ public interface HeaderOps extends Map<String,List<String>> {
     /**
      * Create a new instance of this interface with a default
      * implementation.
+     * @return the new instance of {@link HeaderOps}
      */
     static HeaderOps newInstance() {
 	return new OurHeaderOpsMap();

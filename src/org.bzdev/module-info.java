@@ -3,8 +3,6 @@
  *<P>
  * This module provides all the BZDev class library modules needed at
  * runtime.
- *
- * @moduleGraph
  */
 module org.bzdev {
     requires transitive org.bzdev.base;

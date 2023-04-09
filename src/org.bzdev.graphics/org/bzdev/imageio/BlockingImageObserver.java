@@ -22,7 +22,7 @@ import java.io.IOException;
  * simpler API: the Java classes that take an image obsever as an
  * argument may return before the image is completely loaded.
  * An example of usage is the following:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    Image image = ...;
  *    BlockingImageObserver bio =
  *         new BlockingImageObserver(true, true, true, true);
@@ -32,7 +32,7 @@ import java.io.IOException;
  *    // call to getWidth()
  *    width = image.getWidth(bio);
  *    int height = image.getHeight(bio);
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * <P>
  * This class should not be used when blocking would noticeably impact
  * performance. That could be an issue if an image is downloaded over

@@ -26,7 +26,7 @@ import org.bzdev.util.ErrorMessage;
  * input and can be used as a D&amp;D target when the boolean field dndInput
  * has the value <code>true</code>.  The class definition of InputPane
  * could include the following inner class:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    class FilenameTransferHandler extends ExtObjTransferHandler {
  *      {@literal @}Override
  *      protected void clear(boolean all) {
@@ -68,16 +68,16 @@ import org.bzdev.util.ErrorMessage;
  *          return false;
  *      }
  *  }
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * This class uses methods of InputPane to store the objects transferred
  * via a D&amp;D operation and additionally overrides importData and
  * canImport to test the the target is the desired one: either an
  * InputPane or a component (e.g., an Icon) of an InputPane. The
  * constructor for InputPane includes the following statements:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *      fnt = new FilenameTransferHandler(currentDirectory);
  *      setTransferHandler(fnt);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * The behavior of this class can be modified by calling
  * {@link ExtObjTransferHandler#setMultiEntryMode(boolean)} or
@@ -197,6 +197,7 @@ abstract public class ExtObjTransferHandler extends TransferHandler {
      * Set multi-entry mode with the replacement option.
      * The behavior depends on the combination of arguments provided:
      * <TABLE BORDER="1">
+     * <caption>&nbsp;</caption>
      * <TR><TH>mode</TH><TH>cmode</TH><TH>Description</TH></TR>
      * <TR><TD>true</TD><TD>(ignored)</TD><TD>A drag &amp; drop operation may
      *  insert multiple values, with new entries added to the target</TD></TR>

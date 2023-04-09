@@ -19,38 +19,38 @@ import java.awt.font.*;
  * Parameter names will be compound names, typically using a period as a
  * separator. When this class is used, multiple parameters will be defined,
  * and the last component of the parameter name will be the following:
- * <ul>
- *    <li> "name" - the name of a font or font family.
- *    <li> "justification" - the font justification
+ * <UL>
+ *    <LI> "name" - the name of a font or font family.
+ *    <LI> "justification" - the font justification
  *          (<CODE>LEFT</CODE>, <CODE>RIGHT</CODE>, or
  *          <CODE>CENTER</CODE>).
- *    <li> "baselinePosition" - the position of the line used to
+ *    <LI> "baselinePosition" - the position of the line used to
  *          position a font up or down. Values may be
  *          <CODE>TOP</CODE>, <CODE>CENTER</CODE>, <CODE>BASE</CODE>,
  *          or <CODE>BOTTOM</CODE>.
- *    <li> "angle" - the angle in degrees of the
+ *    <LI> "angle" - the angle in degrees of the
  *         font from horizontal, measured counterclockwise in user space.
- *    <li> "size" - the size of the font (a positive integer)
- *    <li> "style" - the style of the font (<CODE>PLAIN</CODE>,
+ *    <LI> "size" - the size of the font (a positive integer)
+ *    <LI> "style" - the style of the font (<CODE>PLAIN</CODE>,
  *         <CODE>ITALIC</CODE>, <CODE>BOLD</CODE>, or
  *         <CODE>BOLD_ITALIC</CODE>).
- *    <li> "color.red" - the red intensity of the font color,
+ *    <LI> "color.red" - the red intensity of the font color,
  *          an integer in the range [0, 255].
- *    <li> "color.green" - the green intensity of the font
+ *    <LI> "color.green" - the green intensity of the font
  *          color, an integer in the range [0, 255].
- *    <li> "color.blue" - the blue intensity of the font color,
+ *    <LI> "color.blue" - the blue intensity of the font color,
  *          an integer in the range [0, 255].
- *    <li> "color.alpha" - the alpha intensity of the font
+ *    <LI> "color.alpha" - the alpha intensity of the font
  *          color,an integer in the range [0, 255] with 0 indicating
  *          transparent and 255 indicating opaque.
- * </ul>
+ * </UL>
  * The constants shown in upper case are enumeration constants for
  * the following enumeration classes:
- * <ul>
- *   <it> {@link org.bzdev.graphs.Graph.Just}
- *   <it> {@link org.bzdev.graphs.Graph.BLineP}
- *   <it> {@link org.bzdev.obnaming.misc.GraphFontParm.FontStyle}
- * </ul>
+ * <UL>
+ *   <LI> {@link org.bzdev.graphs.Graph.Just}
+ *   <LI> {@link org.bzdev.graphs.Graph.BLineP}
+ *   <LI> {@link org.bzdev.obnaming.misc.GraphFontParm.FontStyle}
+ * </UL>
  * @see org.bzdev.graphs.Graph.Just
  * @see org.bzdev.graphs.Graph.BLineP
  * @see org.bzdev.obnaming.misc.GraphFontParm.FontStyle
@@ -226,6 +226,8 @@ public class GraphFontParm {
      * @param baselinePosition TOP for text aligned at its top; CENTER
      *        for text aligned at its center; BASE for text aligned at
      *        its baseline, and BOTTOM for text aligned at its bottom.
+     * @param angle the font angle in degrees from hoizontal, measured
+     *        counterclockwise in user space
      */
     public GraphFontParm(String name,
 			  FontStyle style,

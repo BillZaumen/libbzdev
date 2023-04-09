@@ -15,14 +15,12 @@ import java.util.HashMap;
  * <P>
  * The parameters are defined fort this class are the same ones defined for
  * {@link TraceSetFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/TraceSetFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/TraceSetFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
  */
 @FactoryParmManager(value = "TraceSetParmManager",
 		    tipResourceBundle = "*.lpack.TraceSetTips",

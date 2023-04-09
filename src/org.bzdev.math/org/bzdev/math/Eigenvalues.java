@@ -54,9 +54,9 @@ package org.bzdev.math;
  * A = V*D*inverse(V) depends upon the condition number for V.
  * The condition number for V can be computed by using the method
  * {@link SVDecomp#cond()}:
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *    (new SVDecomp(V)).cond()
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * For the nonsymmetric case, the eigenvectors are normalized but
  * are not orthogonal in general.
  * <P>

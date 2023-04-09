@@ -2,7 +2,7 @@ package org.bzdev.devqsim.rv;
 import org.bzdev.devqsim.Simulation;
 import org.bzdev.math.rv.GaussianRV;
 
-/*
+/**
  * Named random variable using a random variable that generates a
  * sequence of double-precision numbers with a Gaussian distribution.
  * @see org.bzdev.math.rv.GaussianRV

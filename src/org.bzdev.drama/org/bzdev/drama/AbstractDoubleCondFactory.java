@@ -21,7 +21,6 @@ import java.util.HashMap;
  * <P>
  * The factory parameters this factory provides are the same as the parameters
  * provided by its subclass {@link DoubleConditionFactory}:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/drama/DoubleConditionFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/drama/DoubleConditionFactory.html">

@@ -10,10 +10,10 @@ import org.bzdev.graphs.Graph;
  * </blockquote>
  * and that file should be included in the jar file. If the jar file is
  * a modular jar file, the module-info.java file should contain clauses
- * <BLOCKQUOTE><CODE></PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *     uses org.bzdev.graphs.spi.SymbolProvider;
  *     provides org.bzdev.graphs.spi.SymbolProvider with ... ;
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * where "<CODE>...</CODE>" is a comma-separated list of the fully
  * qualified class names of all the symbol providers in this class.
  * @see org.bzdev.graphs.Graph.SymbolFactory

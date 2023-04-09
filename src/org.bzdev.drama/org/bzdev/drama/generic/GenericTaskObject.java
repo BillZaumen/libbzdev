@@ -93,6 +93,7 @@ abstract public class GenericTaskObject<
 
     /**
      * Schedule the default task for immediate execution.
+     * @exception InterruptedException execution was interrupted
      */
     protected void scheduleDefaultTask() 
 	throws InterruptedException, IllegalStateException
@@ -104,6 +105,7 @@ abstract public class GenericTaskObject<
      * Schedule the default task for future execution.
      * @param delay the amount of simulation time to wait before the
      *              task is run
+     * @exception InterruptedException execution was interrupted
      */
     protected void scheduleDefaultTask(long delay) 
 	throws InterruptedException, IllegalStateException

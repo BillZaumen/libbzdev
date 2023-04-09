@@ -332,6 +332,7 @@ public class FileHandler implements HttpHandler {
      * @param clasz the subclass of WebMap to use for locating resources
      * @param nowebxml true if a web.xml file should be ignored;
      *                 false otherwise
+     * @exception Exception an error occurred
      */
     public FileHandler(String protocol, Object root,
 		       Class<? extends WebMap> clasz,
@@ -352,6 +353,8 @@ public class FileHandler implements HttpHandler {
      *                   false if a directory resource should not be displayed
      * @param hideWebInf true if the WEB-INF directory should be hidden;
      *                   false if it should be visible
+     * @exception IOException an IO error occurred
+     * @exception SAXException a SAX exception occurred
      */
     public FileHandler(String protocol, Object root,
 		       Class<? extends WebMap> clasz,
@@ -401,7 +404,9 @@ public class FileHandler implements HttpHandler {
      *        which will be used to map paths to resources.
      * @param nowebxml true if a web.xml file should be ignored;
      *                 false otherwise
-     */
+     * @exception IOException an IO error occurred
+     * @exception SAXException a SAX exception occurred
+   */
     public FileHandler(String protocol, Object root, String className,
 		       boolean nowebxml)
 	throws IOException, SAXException
@@ -422,6 +427,8 @@ public class FileHandler implements HttpHandler {
      *                   false if a directory resource should not be displayed
      * @param hideWebInf true if the WEB-INF directory should be hidden;
      *                   false if it should be visible
+     * @exception IOException an IO error occurred
+     * @exception SAXException a SAX exception occurred
      */
     public FileHandler(String protocol, Object root, String className,
 		       boolean nowebxml, boolean displayDir,
@@ -472,6 +479,7 @@ public class FileHandler implements HttpHandler {
      *                   false if a directory resource should not be displayed
      * @param hideWebInf true if the WEB-INF directory should be hidden;
      *                   false if it should be visible
+     * @exception Exception an error occurred
      */
     public FileHandler(String protocol, WebMap  webmap,
 		       boolean nowebxml, boolean displayDir,
@@ -540,7 +548,7 @@ public class FileHandler implements HttpHandler {
      * The stacktrace will be printed if {@link handle(HttpExchange)}
      * throws an exception and the first argument is not null.
      * @param tracer the Appendable for tracing requests and responses
-     * @parm stacktrace true for a stack trace; false otherwise
+     * @param stacktrace true for a stack trace; false otherwise
      */
     public void setTracer(Appendable tracer, boolean stacktrace) {
 	this.tracer = tracer;
@@ -555,8 +563,9 @@ public class FileHandler implements HttpHandler {
      * {@link HttpExchange#sendResponseHeaders(int,long)}.
      * @param exchange the Http exchange
      * @param code the status code
-     * @length the length of the response; 0 if the length is not known and
-     *         -1 if there is no response
+     * @param length the length of the response; 0 if the length is not
+     *        known and  -1 if there is no response
+     * @exception IOException an IO error occurred
      */
     public static void sendResponseHeaders(HttpExchange exchange,
 					   int code,

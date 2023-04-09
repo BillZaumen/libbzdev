@@ -6,7 +6,7 @@ import org.bzdev.math.rv.PoissonDoubleRVRV;
 /**
  * Named random variable using a random variable that generates a
  * sequence of double-valued random variables with a Poisson distribution.
- * @see org.bzdev.math.rv.PoissonDoubleRV;
+ * @see org.bzdev.math.rv.PoissonDoubleRV
  */
 public class SimPoissonDoubleRVRV
     extends SimDoubleRVRV<PoissonDoubleRV,PoissonDoubleRVRV>

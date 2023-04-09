@@ -22,9 +22,9 @@ import java.util.Set;
  * system property org.bzdev.math.fft.provider to the name of the
  * provider. If this is not set, the default name is bzdevFFT and
  * is equivalent to
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *    java -Dorg.bzdev.math.fft=bzdevFFT ...
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * The method {@link FFT#getServiceName(int,boolean,FFT.LMode)} can
  * be used to select a service provider. Alternatively, the method
@@ -216,6 +216,7 @@ public abstract class FFT {
      * subject to an optional in-place constraint
      * @param inplace true if an FFT must be able to use the same
      *        vectors for input and ouput; false otherwise.
+     * @return the array length limit
      */
     public static int getMaxLength(boolean inplace) {
 	int length = 0;
@@ -301,6 +302,9 @@ public abstract class FFT {
 	 *        is an upper bound on the array lengths;
 	 *        {@link FFT.LMode#EXACT_LENGTH} if the length argument
 	 *        represents a specific length
+	 * @return true on success; false if there is no FFT service
+	 *         that matches the specified parameters
+	 * @exception IllegalArgumentException an argument was illegal
 	 */
 	public synchronized boolean setParameters(int length,
 						  boolean inplace,
@@ -423,6 +427,7 @@ public abstract class FFT {
 	 * @param len the array size for the transform that will be
 	 *        created
 	 * @see #getLength(int)
+	 * @return the new FFT
 	 */
 	public FFT newInstance(int len) {
 	    return newInstance(len, Mode.SYMMETRIC);
@@ -436,6 +441,7 @@ public abstract class FFT {
 	 *        created
 	 * @param m the normalization mode ({@link Mode#NORMAL},
 	 *        {@link Mode#SYMMETRIC}, or {@link Mode#REVERSED})
+	 * @return the new FFT
 	 */
 	public FFT newInstance(int len,  Mode m) {
 	    if (len < 0 || ((length > 0) && (len > length))) {
@@ -648,6 +654,7 @@ public abstract class FFT {
      * provider with the default mode ({@link FFT.Mode#SYMMETRIC}).
      * The length must be one that the FFT provider supports.
      * @param n the length of the input and output arrays
+     * @return a new FFT
      * @see FFT.Mode
      * @see #getLength(int)
      */
@@ -662,6 +669,7 @@ public abstract class FFT {
      * @param n the length of the input and output arrays
      * @param m the mode ({@link Mode#NORMAL}, {@link Mode#SYMMETRIC},
      *        or {@link Mode#REVERSED})
+     * @return the new FFT
      * @see FFT.Mode
      * @see #getLength(int)
      */
@@ -675,6 +683,7 @@ public abstract class FFT {
      * that the FFT provider supports.
      * @param name the name of the FFT provider
      * @param n the length of the input and output arrays
+     * @return the new FFT
      * @see FFT.Mode
      * @see #getLength(String,int)
      */
@@ -691,6 +700,7 @@ public abstract class FFT {
      * @param n the length of the input and output arrays
      * @param m the mode ({@link Mode#NORMAL}, {@link Mode#SYMMETRIC},
      *        or {@link Mode#REVERSED})
+     * @return the new FFT
      * @see FFT.Mode
      * @see #getLength(String,int)
      */
@@ -729,6 +739,7 @@ public abstract class FFT {
      * @param fft an existing FFT instance
      * @param m the mode ({@link Mode#NORMAL}, {@link Mode#SYMMETRIC},
      *        or {@link Mode#REVERSED})
+     * @return the new FFT
      * @see FFT.Mode
      */
     public static FFT newInstance(FFT fft, Mode m) {

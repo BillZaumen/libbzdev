@@ -84,6 +84,7 @@ public abstract class BasicStatsMV {
      * number of variables.
      * @param values a vector of values (the first n entries will
      * be used) 
+     * @return this object
      * @exception IllegalArgumentException the argument array was too short
      */
     public BasicStatsMV add(double[] values)
@@ -386,13 +387,13 @@ public abstract class BasicStatsMV {
 	 * <P>
 	 * If rv is a random variable that returns a stream of double values,
 	 * the following example shows a typical use of this method:
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 * BasicStatsMV stats = rvs.parallelStream(1000000)
 	 *   .mapToObj(Double::valueOf)
 	 *   .reduce(BasicStats.Sample.identity(10),
 	 *	    BasicStats::add,
 	 *	    BasicStats::addAll);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * The method mapToObj is needed because the reduce method is
 	 * a method of {@link Stream} but not {@link DoubleStream}.
 	 * When used with a parallel stream, the mapToObj method;'s argument
@@ -508,13 +509,13 @@ public abstract class BasicStatsMV {
 	 * <P>
 	 * If rv is a random variable that returns a stream of double values,
 	 * the following example shows a typical use of this method:
-	 * <BLOCKQUOTE><CODE><PRE>
+	 * <BLOCKQUOTE><PRE><CODE>
 	 * BasicStatsMV stats = rvs.parallelStream(1000000)
 	 *   .mapToObj(Double::valueOf)
 	 *   .reduce(BasicStats.Sample.identity(10),
 	 *	    BasicStats::add,
 	 *	    BasicStats::addAll);
-	 * </PRE></CODE></BLOCKQUOTE>
+	 * </CODE></PRE></BLOCKQUOTE>
 	 * The method mapToObj is needed because the reduce method is
 	 * a method of {@link Stream} but not {@link DoubleStream}.
 	 * When used with a parallel stream, the mapToObj method;'s argument

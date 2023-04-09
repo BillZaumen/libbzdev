@@ -94,6 +94,8 @@ public class ImageScaler {
      *        0 for the image width and -1 if the width is not constrained
      * @param maxScaledHeight the maximum height of a scaled image in pixels;
      *        0 for the image height and -1 if the height is not constrained
+     * @param image the image to scale
+     * @return a scaled image
      * @exception IllegalArgumentException  generally an illegal input or
      *            output file name
      * @exception IOException read or write operations failed
@@ -173,6 +175,7 @@ public class ImageScaler {
      * @param maxScaledHeight the maximum height of a scaled image in pixels;
      *        0 for the image height and -1 if the height is not constrained
      * @param inputFileName the name of the input file.
+     * @return a scaled image
      * @exception IllegalArgumentException  generally an illegal input or
      *            output file name
      * @exception IOException read or write operations failed
@@ -207,6 +210,7 @@ public class ImageScaler {
      * @param maxScaledHeight the maximum height of a scaled image in pixels;
      *        0 for the image height and -1 if the height is not constrained
      * @param url the URL of the input image
+     * @return a scaled image
      * @exception IllegalArgumentException  generally an illegal input or
      *            output file name
      * @exception IOException read or write operations failed

@@ -19,11 +19,11 @@ all:
 	mkdir -p classes
 	javac  -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ScriptingTest --sandbox
-	$(HAS_JS) && $(JAVA) ScriptingTest  test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  test1.js || echo -n
 	$(JAVA) ScriptingTest  test1.esp
-	$(HAS_JS) && $(JAVA) ScriptingTest  --sandbox test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  --sandbox test1.js || echo -n
 	$(JAVA) ScriptingTest  --sandbox test1.esp
-	$(HAS_JS) && $(JAVA) ScriptingTest  --scriptSandbox test1.js
+	$(HAS_JS) && $(JAVA) ScriptingTest  --scriptSandbox test1.js || echo -n
 	$(JAVA) ScriptingTest  --scriptSandbox test1.esp
 	if $(HAS_JS) ; then \
 	$(JAVA) ScriptingTest test2.js ; echo Exit Status = $$? ; fi
@@ -37,11 +37,11 @@ all:
 	$(JAVA) ScriptingTest --scriptSandbox test2.js ; \
 	echo Exit Status = $$? ; fi
 	$(JAVA) ScriptingTest --scriptSandbox test2.esp ; echo Exit Status = $$?
-	$(HAS_JS) && $(JAVA) ScriptingTest2 test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 test3.js || echo -n
 	$(JAVA) ScriptingTest2 test3.esp
-	$(HAS_JS) && $(JAVA) ScriptingTest2 --sandbox test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 --sandbox test3.js || echo -n
 	$(JAVA) ScriptingTest2 --sandbox test3.esp
-	$(HAS_JS) && $(JAVA) ScriptingTest2 --scriptSandbox test3.js
+	$(HAS_JS) && $(JAVA) ScriptingTest2 --scriptSandbox test3.js || echo -n
 	$(JAVA) ScriptingTest2 --scriptSandbox test3.esp
 	@echo ---- private function test with parent ---
 	$(JAVA) ScriptingTest3
@@ -49,16 +49,16 @@ all:
 	$(JAVA_SKIPPED) PermissionTest
 	@echo --- Security Test using permissions ---
 	( cd classes; jar cf ../sectest.jar *.class )
-	$(HAS_JS) && $(JAVA1) SecTest
+	$(HAS_JS) && $(JAVA1) SecTest || echo -n
 	$(JAVA1) ThreadTest
 	@echo --- Listener Adapter Test ---
-	$(HAS_JS) && $(JAVA) ScriptingTest4 test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 test4.js || echo -n
 	$(JAVA) ScriptingTest4 test4.esp
 	@echo --- Listener Adapter in sandbox ---
-	$(HAS_JS) && $(JAVA) ScriptingTest4 --sandbox test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 --sandbox test4.js || echo -n
 	$(JAVA) ScriptingTest4 --sandbox test4.esp
 	@echo --- Listener Adapter in scripting sandbox ---
-	$(HAS_JS) && $(JAVA) ScriptingTest4 --scriptSandbox test4.js
+	$(HAS_JS) && $(JAVA) ScriptingTest4 --scriptSandbox test4.js || echo -n
 	$(JAVA) ScriptingTest4 --scriptSandbox test4.esp
 	echo ---- Now try code that will fail in a sandbox ---
 	if $(HAS_JS) ; then \
@@ -77,8 +77,8 @@ all:
 	rm test5.out
 	@echo --- ESP test using javax.script API ---
 	$(JAVA) EPTest
-	@$(HAS_JS) && echo --- import test for ECMAScript
-	$(HAS_JS) && $(JAVA) ImportTest itest.js
+	@$(HAS_JS) && echo --- import test for ECMAScript || echo -n
+	$(HAS_JS) && $(JAVA) ImportTest itest.js || echo -n
 	@echo --- import test for ESP
 	$(JAVA) ImportTest itest.esp
 

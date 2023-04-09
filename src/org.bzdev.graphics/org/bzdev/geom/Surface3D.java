@@ -907,6 +907,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    return boundaryTags.toArray();
 	}
 
+	/**
+	 * Get the colors for each segment along the boundary.
+	 * When using a path iterator for the boundary, counting the
+	 * lineTo and moveTo operations will generate the index for
+	 * the corresponding segment.
+	 * @return the colors in the same order as the boundary's path segments;
+	 *         null if the surface is not well formed
+	 */
 	public Object[] getColors() {
 	    if (boundaryColors == null) return null;
 	    return boundaryColors.toArray();
@@ -1375,7 +1383,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    }
 	}
 
-	/*
+	/**
 	 * Constructor for an oriented surface.
 	 * A surface is oriented if it has two sides. By convention,
 	 * for each of the patches and triangles that constitute a
@@ -1390,7 +1398,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    computeBoundary(it, null);
 	}
 
-	/*
+	/**
 	 * Constructor specifying if the surface is oriented.
 	 * A surface is oriented if it has two sides. By convention,
 	 * for each of the patches and triangles that constitute a
@@ -1408,7 +1416,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    computeBoundary(it, null);
 	}
 
-	/*
+	/**
 	 * Constructor for an oriented surface with an Appendable
 	 * for recording messages describing conditions that imply
 	 * that a surface is not well formed.
@@ -1428,7 +1436,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    computeBoundary(it, out);
 	}
 
-	/*
+	/**
 	 * Constructor specifying if the surface is oriented, and
 	 *  with an Appendable for recording messages
 	 * describing conditions that imply that a surface is not
@@ -5514,6 +5522,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	ccoords[11] = pcoords[i++];
     }
 
+    /**
+     * Consistency test for the corners of a patch.
+     * @param ucoords0 the coordinates for the U0 edge of the patch
+     * @param ucoords1 the coordinates for the U1 edge of the patch
+     * @param vcoords0 the coordinates for the V0 edge of the patch
+     * @param vcoords1 the coordinates for the V1 edge of the patch
+     * @return true on success; false on failure
+     */
     public static boolean checkPatchCorners(double[] ucoords0,
 					    double[] ucoords1,
 					    double[] vcoords0,
@@ -5526,6 +5542,16 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	} catch (IOException e) {return true;}
     }
 
+    /**
+     * Consistency test for the corners of a patch, with error messages.
+     * @param ucoords0 the coordinates for the U0 edge of the patch
+     * @param ucoords1 the coordinates for the U1 edge of the patch
+     * @param vcoords0 the coordinates for the V0 edge of the patch
+     * @param vcoords1 the coordinates for the V1 edge of the patch
+     * @param out an {@link Appendable} to record error messages
+     * @return true on success; false on failure
+     * @throws IOException an IO error occurred
+     */
     public static boolean checkPatchCorners(double[] ucoords0,
 					    double[] ucoords1,
 					    double[] vcoords0,
@@ -6538,9 +6564,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Add a cubic B&eacute;zier patch to this surface.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6590,9 +6616,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * orientation of the patch.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6648,9 +6674,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * a color.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6701,9 +6727,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * color and reversing the orientation of the patch.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6759,9 +6785,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Add a cubic B&eacute;zier patch to this surface, specifying a tag.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * For an oriented surface, the orientation of the patch is
      * determined by the right-hand rule when traversing the edges of
@@ -6812,9 +6838,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * and reversing the orientation of the patch.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * Before the orientation of the patch is reversed,
      * its orientation is determined by the right-hand
@@ -6872,9 +6898,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * a color and a tag.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * The orientation of the patch is determined by the right-hand
      * rule when traversing the edges of the patch so that the (u,v)
@@ -6925,9 +6951,9 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * color and a tag, and reversing the patch's orientation.
      * The control points P<sub>i,j</sub>, with i and j in the range
      * [0,3], determine a cubic B&eacute;zier patch.  The equation
-     * <blockquote><pre><big>
+     * <blockquote><pre><span style="font-size:150%">
      * P = &sum;<sub>i,j</sub> P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v)
-     * </big></pre></blockquote>
+     * </span></pre></blockquote>
      * where B<sub>i,3</sub> are Bernstein polynomials of degree 3.
      * The orientation of the patch is determined by the right-hand
      * rule when traversing the edges of the patch so that the (u,v)
@@ -7048,7 +7074,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7139,7 +7165,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7237,7 +7263,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7343,7 +7369,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * operation, is used as the start of the next.
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7433,7 +7459,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7531,7 +7557,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7637,7 +7663,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * operation, is used as the start of the next.
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by lastX,
      * lastY, lastZ, and the coords array, and read in the order
@@ -7737,7 +7763,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -7836,7 +7862,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      <P>
      * Given the following diagram:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * the control points P0, P1, P2, and P3, specified by the pcoords
      * array, and read in the order specified by the 'reverse'
@@ -8053,7 +8079,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8113,7 +8139,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8175,7 +8201,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8237,7 +8263,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8300,7 +8326,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, starting with the edge (0,0)--&gt;(1,0) and
@@ -8345,6 +8371,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * </UL>
      * @param controlPoints the control points for a B&eacute;zier
      *        triangle
+     * @param tag an object tagging this triangle
      */
     public void addCubicTriangle(double[] controlPoints, Object tag) {
 	addCubicTriangle(controlPoints, null, tag);
@@ -8361,7 +8388,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points, labeled
      * by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle before the triangle's
      * orientation is reversed is determined by applying the
@@ -8425,7 +8452,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * The control points, labeled by their three indices, are located
      * as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle is determined by applying the
      * right-hand rule, when traversing the vertices whose (u,v)
@@ -8484,7 +8511,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * Before the orientation is reversed, the control points,
      * labeled by their three indices, are located as follows:
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/barycentric.png" class="imgBackground">
+     * <IMG SRC="doc-files/barycentric.png" class="imgBackground" alt="Diagram">
      * <P>
      * The orientation of the triangle, again before the orientation
      * is reversed, is determined by applying the right-hand rule,
@@ -8548,7 +8575,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8595,7 +8622,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8644,7 +8671,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8691,7 +8718,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8741,7 +8768,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8789,7 +8816,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8838,7 +8865,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8886,7 +8913,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8934,7 +8961,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -8974,7 +9001,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is based
      * on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9019,7 +9046,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9063,7 +9090,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9110,7 +9137,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9155,7 +9182,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9202,7 +9229,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * with the representation used in the org.bzdev.p3d package (which
      * is based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -9258,7 +9285,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      * representation used in the org.bzdev.p3d package (which is
      * based on the ordering required in STL files):
      * <P style="text-align:center">
-     * <IMG SRC="doc-files/planar.png" class="imgBackground">
+     * <IMG SRC="doc-files/planar.png" class="imgBackground" alt="Diagram">
      * <P>
      * Points on the triangle can be expressed in barycentric coordinates
      * u, v, and w. These have a constraint u + v + w = 1.  By convention,
@@ -10970,6 +10997,18 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	}
     }
 
+    /**
+     * Convert a cubic vertex to a cubic patch
+     * @param coords an array holding the 5 control points representing
+     *        a cubic vertex in the order used by
+     *        {@link #addCubicVertex(double[])}
+     * @param offset the offset into coords where the control points start
+     * @param pcoords an array that will hold the 16 control points
+     *        representing a cubic patch in the order used by
+     *        {@link #addCubicPatch(double[])}
+     * @param poffset the offset into pocoords where the control points
+     *        start
+     */
     public static synchronized void
 	cubicVertexToPatch(double[] coords, int offset,
 			   double[] pcoords, int poffset)
@@ -10978,7 +11017,10 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	//  CUBIC_PATCH.
 	int diff = poffset - offset;
 
-	if (coords.length - 48 < offset) {
+	if (coords.length - 15 < offset) {
+	    throw new IllegalArgumentException(errorMsg("argarray"));
+	}
+	if (pcoords.length - 48 < poffset) {
 	    throw new IllegalArgumentException(errorMsg("argarray"));
 	}
 	if (coords == pcoords && ((diff > 0 && diff < 15)
@@ -11096,6 +11138,12 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
     // this beyond 2.
     static final int AREA_SPLIT = 2;
 
+    /**
+     * Compute the area of this surface, perhaps in parallel
+     * @param parallel true if the implementation should take advantage
+     *        of a multiprocessor; false otherwise
+     * @return the area
+     */
     public double area(boolean parallel) {
 	if (parallel && Runtime.getRuntime().availableProcessors() > 2) {
 	    final SurfaceIteratorSplitter splitter =
@@ -11325,6 +11373,16 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	return volume(parallel);
     }
 
+    /**
+     * Compute the volume enclosed by this surface, optionally in parallel.
+     * The surface must be a closed manifold.
+     * @param parallel true if the computation should be performed in
+     *        parallel; false otherwise
+     * @return the volume enclosed by this surface
+     * @exception IllegalStateException the surface is not a closed
+     *            manifold, is not an oriented manifold, or is not
+     *            well formed
+     */
     public double volume(boolean parallel) {
 	int maxProc = Runtime.getRuntime().availableProcessors();
 	if (parallel && maxProc > 2) {

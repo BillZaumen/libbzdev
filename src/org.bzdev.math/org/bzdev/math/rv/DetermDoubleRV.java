@@ -46,6 +46,15 @@ public class DetermDoubleRV extends DoubleRandomVariable {
 	return repeat;
     }
 
+    /**
+     * Set the minimum value for this random variable.
+     * @param min the minimum value
+     * @param closed true if the minimum value may be generated;
+     *        false otherwise
+     * @exception UnsupportedOperationException - if this operation is not
+     *            supported
+     * @exception  IllegalArgumentException - if an argument is out of range
+     */
     public void setMinimum(double min, boolean closed) 
 	throws UnsupportedOperationException, IllegalArgumentException
     {
@@ -54,6 +63,15 @@ public class DetermDoubleRV extends DoubleRandomVariable {
 	super.setMinimum(min,closed);
     }
 
+    /**
+     * Set the maximum value for this random variable.
+     * @param max the maximum value
+     * @param closed true if the maximum value may be generated;
+     *        false otherwise
+     * @exception UnsupportedOperationException - if this operation is not
+     *            supported
+     * @exception  IllegalArgumentException - if an argument is out of range
+     */
     public void setMaximum(double max, boolean closed) 
 	throws UnsupportedOperationException, IllegalArgumentException
     {

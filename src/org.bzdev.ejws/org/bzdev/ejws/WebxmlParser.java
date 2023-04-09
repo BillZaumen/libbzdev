@@ -169,6 +169,7 @@ public class WebxmlParser {
      * @param urlAsString the URL for the file to parse
      * @param map a WebMap used to store the configuration specified by
      *        the web.xml file being parsed
+     * @exception MalformedURLException the URL was malformed
      * @exception SAXException a parser error occurred
      * @exception IOException an IO error occurred
      */

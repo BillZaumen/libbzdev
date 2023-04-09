@@ -28,7 +28,7 @@ import org.bzdev.util.ErrorMessage;
  * supports reordering and displays icon images obtained from a URL or
  * file name (the class OurImageIcon is a subclass of ImageIcon that
  * provides an icon and some additional data):
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  DefaultListModel&lt;OurImageIcon&gt; listModel =
  *      new DefaultListModel&lt;OurImageIcon&gt;();
  *  JList&lt;OurImageIcon&gt; list = new JList&lt;OurImageIcon&gt;(listModel);
@@ -68,7 +68,7 @@ import org.bzdev.util.ErrorMessage;
  *  rlist.setFixedCellWidth(iconWidth + w);
  *  rlist.setLayoutOrientation(JList.VERTICAL);
  *  rlist.setVisibleRowCount(5);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  */
 abstract public class ExtObjListTransferHandler extends TransferHandler {
     private int[] indices  = null;
@@ -138,6 +138,7 @@ abstract public class ExtObjListTransferHandler extends TransferHandler {
      * Set multi-selection mode and replacement option.
      * The behavior depends on the combination of arguments provided:
      * <TABLE BORDER="1">
+     * <caption> &nbsp;</caption>
      * <TR><TH>mode</TH><TH>cmode</TH><TH>Description</TH></TR>
      * <TR><TD>true</TD><TD>(ignored)</TD><TD>A drag &amp; drop operation may
      *  insert multiple values, with new entries added to the target</TD></TR>

@@ -36,18 +36,21 @@ public @interface NamedObject {
 	 * The value is an array of strings, each providing the
 	 * type of a constructor's arguments. The order is the same
 	 * as the order of the constructor's arguments.
+	 * @return the types
 	 */
 	String[] value() default {};
 	/**
 	 * Exceptions a constructor may throw.
 	 * The value is an array of strings, each containing the class
 	 * name of an exception.
+	 * @return the exceptions
 	 */
 	String[] exceptions() default{};
     };
 
     /**
      * The named-object class' helper class.
+     * @return the helper class
      */
     String helperClass();
 
@@ -59,6 +62,7 @@ public @interface NamedObject {
     /**
      * The superclass of the named-object helper class.
      * This must be a Java class name.
+     * @return the superclass of the helper class
      */
     String helperSuperclass() default "";
 
@@ -67,6 +71,7 @@ public @interface NamedObject {
      * These must be actual types, not parameters.  The value must
      * include the delimiting '&lt;' and '&gt;' characters and the types
      * must be separated by commas.
+     * @return the type parameters for the helper superclass
      */
     String helperSuperclassTypeParms() default "";
 
@@ -78,6 +83,7 @@ public @interface NamedObject {
      * that might be thrown. The default provides a constructor with zero
      * arguments, and such a constructor, if desired, should be provided
      * if this argument is used.
+     * @return description of superclass constructors
      */
     NamedObject.ConstrTypes[] helperSuperclassConstrTypes() default {
 	@NamedObject.ConstrTypes()
@@ -85,6 +91,7 @@ public @interface NamedObject {
 
     /**
      * The name of the object-namer class.
+     * @return the name of the object-namer class
      */
     String namerHelperClass();
 
@@ -92,6 +99,7 @@ public @interface NamedObject {
      * The namer class.
      * The named object will have a protected method named getObjectNamer()
      * that returns an instance of this class.
+     * @return the namer class
      */
     String namerClass();
 }

@@ -507,6 +507,7 @@ public class BezierCap implements Shape3D {
      * curves in this case).
      * @param boundary the boundary
      * @param center the center point
+     * @return the vector
      */
     public static double[] findVector(Path3D boundary, final Point3D center) {
 	if (boundary == null) {
@@ -683,6 +684,9 @@ public class BezierCap implements Shape3D {
      * At both of these end points, the second derivative vanishes.
      * @param boundary the boundary
      * @param center the center point
+     * @param vector a vector assumed to be perpendicular to the plane
+     *        containing the boundary (or an approximation to such a plane,
+     *        particularly if one does not exist)
      * @param height the height above the boundary for the central point
      *        of this shape.
      * @param cmode true if the spokes should be circular; false if they
@@ -702,6 +706,9 @@ public class BezierCap implements Shape3D {
      * At both of these end points, the second derivative vanishes.
      * @param pit the path iterator for the boundary
      * @param center the center point
+     * @param vector a vector assumed to be perpendicular to the plane
+     *        containing the boundary (or an approximation to such a plane,
+     *        particularly if one does not exist)
      * @param height the height above the boundary for the central point
      *        of this shape.
      * @param cmode true if the spokes should be circular; false if they
@@ -824,6 +831,7 @@ public class BezierCap implements Shape3D {
 
     /**
      * Set the default color for this shape.
+     * @param c the color
      */
     public void setColor(Color c) {
 	defaultColor = c;
@@ -856,6 +864,7 @@ public class BezierCap implements Shape3D {
      * for which an explicit color has been specified.
      * When a color for a specific index has been provided, that color is
      * returned; otherwise the default color (if any) is returned.
+     * @param i the index of a B&eacute;zier triangle.
      * @return the color
      */
     public Color getColor(int i) {
@@ -915,6 +924,7 @@ public class BezierCap implements Shape3D {
 
     /**
      * Print this object's control points.
+     * @exception IOException an IO error occurred
      */
     public void print() throws IOException {
 	print(System.out);
@@ -923,6 +933,7 @@ public class BezierCap implements Shape3D {
     /**
      * Print this object's control points, specifying an output.
      * @param out the output
+     * @exception IOException an IO error occurred
      */
     public void print(Appendable out) throws IOException {
 	print("", out);
@@ -933,6 +944,7 @@ public class BezierCap implements Shape3D {
      * Each line will start with the prefix (typically some number
      * of spaces).
      * @param prefix the prefix
+     * @exception IOException an IO error occurred
      */
     public void print(String prefix) throws IOException {
 	print(prefix, System.out);
@@ -944,6 +956,7 @@ public class BezierCap implements Shape3D {
      * of spaces).
      * @param prefix the prefix
      * @param out the output
+     * @exception IOException an IO error occurred
      */
     public void print(String prefix, Appendable out) throws IOException {
 	out.append(String.format("%snumber of cubic triangles: %d\n", prefix,

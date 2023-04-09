@@ -44,7 +44,8 @@ public class DetermIntegerRV extends IntegerRandomVariable {
 	return repeat;
     }
 
-    public void setMinimum(int min, boolean closed) 
+    @Override
+    public void setMinimum(Integer min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (min > minvalue): (min >= minvalue)) 
@@ -52,7 +53,8 @@ public class DetermIntegerRV extends IntegerRandomVariable {
 	super.setMinimum(min, closed);
     }
 
-    public void setMaximum(int max, boolean closed) 
+    @Override
+    public void setMaximum(Integer max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (max < maxvalue):(max <= maxvalue))

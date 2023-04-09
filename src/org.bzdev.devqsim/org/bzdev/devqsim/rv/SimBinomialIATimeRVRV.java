@@ -7,7 +7,7 @@ import org.bzdev.math.rv.BinomialIATimeRVRV;
  * Named random variable using a random variable that generates a
  * sequence of long-integer valued random variable with a binomial
  * distribution.
- * @see org.bzdev.math.rv.BinomialIATimeRV;
+ * @see org.bzdev.math.rv.BinomialIATimeRV
  */
 public class SimBinomialIATimeRVRV
     extends SimInterarrivalTimeRVRV<BinomialIATimeRV,BinomialIATimeRVRV>

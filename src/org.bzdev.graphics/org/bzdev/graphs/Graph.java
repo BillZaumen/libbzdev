@@ -50,7 +50,7 @@ import org.bzdev.util.SafeFormatter;
  * <p>
  * A graph is assumed to be drawn on a rectangle with a height and
  * width specified in user space.
- * <quote><code><pre>
+ * <blockquote><pre><code>
  *                            width       
  *        _|____________________________________________|_
  *         |                                            |
@@ -68,7 +68,7 @@ import org.bzdev.util.SafeFormatter;
  *         |  lower |                          | upper  |
  *          x-offset                            x-offset
  *     
- * </pre></code></quote>
+ * </CODE></PRE></blockquote>
  * A portion of this rectangle&mdash;the inner rectangle in the
  * figure above&mdash;is area in which objects in the graph are
  * usually drawn. The axes, however, will typically be outside
@@ -101,7 +101,7 @@ import org.bzdev.util.SafeFormatter;
  * graph-coordinate space. The other objects are instances of Drawable
  * and Graphic described below The drawing methods are
  * <ul>
- *  <li> <A name="drawImg"></A>drawImage.  There are several variants,
+ *  <li> <A ID="drawImg"></A>drawImage.  There are several variants,
  *       some of which allow the image to be rotated, scaled, or
  *       flipped.  Arguments common to all are a graphics context, an
  *       image, and the x and y coordinate in graph-coordinate
@@ -203,16 +203,16 @@ import org.bzdev.util.SafeFormatter;
  * Typically one will first create a graph. One can specify the image
  * dimensions explicitly or initialize the graph with an instance of
  * {@link org.bzdev.gio.OutputStreamGraphics}.  For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *   Graph graph = new Graph(800, 600);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * or
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *   OutputStream os = new FileOutputStream("output.png");
  *   OutputStreamGraphics =
  *      OutputStreamGraphics.newInstance(800, 600, "png");
  *   Graph graph = new Graph(osg);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * The documentation for {@link org.bzdev.gio.PrinterGraphics} shows
  * how to set up a graph so that the image will go directly to a printer.
  * <P>
@@ -228,10 +228,10 @@ import org.bzdev.util.SafeFormatter;
  * For example, if the X values on a graph vary from 0.0 to 1000.0 and
  * the Y values vary from 0.0 to 100.0, the following statements could
  * be used to configure the graph:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     graph.setOffsets(75, 50, 75, 50);
  *     graph.setRanges(0.0, 1000.0, 0.0, 100.0);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * An alternate method
  * {@link Graph#setRanges(double,double,double,double,double,double)}
  * is useful when the Graph class is used to create a 'canvas' on
@@ -243,7 +243,7 @@ import org.bzdev.util.SafeFormatter;
  * not be used directly in most cases as the graphics context has
  * user-space coordinates.  Instead, the graphics context will be
  * passed to one of the graph's "draw" methods. For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     Graphics2D g2d = graph.createGraphics();
  *     double x1 = 10.0;
  *     double y1 = 1.0;
@@ -253,7 +253,7 @@ import org.bzdev.util.SafeFormatter;
  *     g2d.setColor(Color.BLUE);
  *     g2d.setStroke(new BasicStroke(1.5F));
  *     graph.draw(g2d, line);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * will draw a blue line whose end points in graph coordinate space
  * are (10.0, 1.0) and (900.0, 90.0) and whose width is 1.5 pts
  * (in user-space units).
@@ -262,13 +262,13 @@ import org.bzdev.util.SafeFormatter;
  * class {@link org.bzdev.graphs.Graph.SymbolFactory}, configure it,
  * and then create a symbol. A 'draw' method will then draw the symbol.
  * For example,
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     Graph.SymbolFactory sf = new Graph.SymbolFactory();
  *     sf.setColor(Color.BLACK);
  *     Graph.Symbol circ = sf.newSymbol("SolidCircle");
  *     graph.draw(circ, 200.0, 30.0);
  *     graph.drawEY(circ, 400.0, 40.0, 25.0);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * will draw a symbol (a solid, black circle) at the point (200.0, 30.0)
  * in graph coordinate space. It will also draw the same symbol at
  * (400.0, 40.0) in graph coordinate space, but with error bars in the
@@ -277,28 +277,28 @@ import org.bzdev.util.SafeFormatter;
  * The easiest way to add axes to a graph is to use one of the subclasses
  * of {@link org.bzdev.graphs.AxisBuilder} to create an axis. One can then
  * call a "draw" method to add the axis to the graph. For example
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     AxisBuilder.Linear ab =
  *        new AxisBuilder.Linear(graph, 0.0, 0.0, 1000.0, true, "X Axis");
  *     ab.setMaximumExponent(3);
  *     ab.addTickSpec(0, 0, true, "%4.0f");
  *     ab.addTickSpec(2, 1, false, null);
  *     graph.draw(ab.createAxis());
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * will draw an X axis. How the axis is configured is described in the
  * documentation for each of subclasses of {@link org.bzdev.graphs.AxisBuilder}.
  * <P>
  * To draw or output an image, call a 'write' method:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *     graph.write();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * when the graph's constructor used an instance of
  * {@link org.bzdev.gio.OutputStreamGraphics} or other classes that implement
  * the {@link org.bzdev.gio.OSGraphicsOps} interface. Otherwise use
  * a 'write' method with multiple arguments:
- <blockquote><code><pre>
+ <blockquote><pre><code>
  *     graph.write("png", "output.png");
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * @see org.bzdev.graphs.Graph.Axis
  * @see org.bzdev.graphs.Graph.TickSpec
  * @see org.bzdev.gio.OutputStreamGraphics
@@ -3061,6 +3061,7 @@ import org.bzdev.util.SafeFormatter;
      /**
       * Returns a shape in an image's or graphic context's user space
       * given a shape in graph coordinate space.
+      * @param s the original shape
       * @return the new shape
       */
      public Shape coordTransform(Shape s) {
@@ -3095,6 +3096,7 @@ import org.bzdev.util.SafeFormatter;
       * are instances of {@link java.awt.Rectangle}. This method will
       * convert a rectangular shape into a Rectangle, providing the
       * smallest {@link java.awt.Rectangle} that contains the shape.
+      * @param s the original shape
       * @return the new shape
       */
      public Shape coordTransformForClip(Shape s) {
@@ -3128,6 +3130,7 @@ import org.bzdev.util.SafeFormatter;
      /**
       * Returns a shape in graph coordinate space given a shape in
       * user space.
+      * @param s the original shape
       * @return the new shape
       */
      public Shape invCoordTransform(Shape s) {
@@ -4198,7 +4201,7 @@ import org.bzdev.util.SafeFormatter;
 	     return;
 	 }
 
-	 protected double axisScale = 1.0;
+	 private double axisScale = 1.0;
 	 /**
 	  * Set the axis scale.
 	  * The axis value that {@link Graph.Axis#axisValue(long)} returns
@@ -4211,8 +4214,8 @@ import org.bzdev.util.SafeFormatter;
 	  * in meters, setting this factor to 10<sup>3</sup> will allow
 	  * the axis to label tick marks in units of kilometers.
 	  * @param scaleFactor the scaleFactor
-	  * @exception the scale factor is not a positive double-precision
-	  *            number
+	  * @exception IllegalArgumentException if the scale factor is
+	  *            not a positive double-precision number
 	  */
 	 public void setAxisScale(double scaleFactor)
 	     throws IllegalArgumentException
@@ -5417,6 +5420,7 @@ import org.bzdev.util.SafeFormatter;
       * @param gcs true if the bounding box's coordinates are in
       *        graph coordinate space; false if the bounding box's
       *        units are in user space
+      * @return the bounding box
       */
      public Rectangle2D boundingBox(boolean gcs) {
 	 if (gcs) {
@@ -5440,7 +5444,7 @@ import org.bzdev.util.SafeFormatter;
      /**
       * Determine if a shape might be inside the portion of graph
       * coordinate space that can be displayed.
-      *  When this method returns true, a shape may be, but not
+      * When this method returns true, a shape may be, but not
       * necessarily is, within the visible area for a graph.
       * <P>
       * The main use for this class occurs when a large number of
@@ -5453,6 +5457,8 @@ import org.bzdev.util.SafeFormatter;
       * @param gcs true if the control points provided by a shape's
       *        path iterator are points in graph coordinate space;
       *        false if they are points in user space
+      * @return true if a shape might be visible; false if it is
+      *         definitely not visible
       */
      public boolean maybeVisible(Shape s, boolean gcs) {
 	 if (gcs) {
@@ -5925,6 +5931,7 @@ import org.bzdev.util.SafeFormatter;
 
      /**
       * Draw a symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       */
@@ -5936,6 +5943,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with symmetric error bars in the X direction.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param error distance in graph coordinate space from
@@ -5951,6 +5959,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with asymmetric error bars in the X direction.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param elow distance in graph coordinate space from
@@ -5970,6 +5979,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with symmetric error bars in the Y direction.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param error distance in graph coordinate space from
@@ -5985,6 +5995,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with asymmetric error bars in the Y direction.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param elow distance in graph coordinate space from
@@ -6004,6 +6015,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with symmetric error bars in the X and Y direction.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param errorX distance in the X direction in graph coordinate
@@ -6021,6 +6033,7 @@ import org.bzdev.util.SafeFormatter;
       * Draw a symbol with asymmetric error bars in the X and Y directions.
       * An error bar will not be displayed if it does not extend
       * past the symbol.
+      * @param symbol the symbol
       * @param x the x coordinate in graph coordinate space
       * @param y the y coordinate in graph coordinate space
       * @param elowX distance in graph coordinate space from

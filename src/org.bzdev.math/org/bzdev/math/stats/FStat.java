@@ -115,7 +115,7 @@ public abstract class FStat extends Statistic {
      * E<sub>i</sub>, and the standard deviation is the standard deviation
      * for X<sub>i</sub>. The &Chi;<sup>2</sup> distribution assumes that
      * these ratios have a normal distribution with unit variances and a
-     * mean of 0.  For a noncentral &Chi;<sup>2</sub> distribution, the
+     * mean of 0.  For a noncentral &Chi;<sup>2</sup> distribution, the
      * ratios are assumed to have a non-zero mean. The noncentrality
      * parameter &lambda; is defined by
      * &lambda; = &sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub>, where

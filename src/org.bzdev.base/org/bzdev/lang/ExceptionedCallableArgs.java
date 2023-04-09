@@ -13,7 +13,7 @@ public interface ExceptionedCallableArgs<T> {
      * The method to call.
      * @param args additional arguments supplied by the caller when
      *        this method is called
-     * @exception an exception was thrown
+     * @exception Exception an exception was thrown
      */
     @SuppressWarnings("unchecked")
     void call(T... args) throws Exception;

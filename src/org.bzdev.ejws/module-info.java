@@ -9,9 +9,6 @@
  * <P><B>
  * Please see <A HREF="org/bzdev/ejws/doc-files/description.html">the EJWS package description</A>
  * for a detailed description of this package.</B>
-
- *
- * @moduleGraph
  */
 module org.bzdev.ejws {
     exports org.bzdev.ejws;

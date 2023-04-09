@@ -232,7 +232,7 @@ public class Colors {
     /**
      * Get a Collection containing the names of CSS colors,
      * excluding "transparent".
-     * @return nameOrder true if the set is ordered by name, false
+     * @param nameOrder true if the set is ordered by name, false
      *         if it is ordered by value
      * @return a set containing those CSS colors that have names
      */
@@ -670,6 +670,7 @@ public class Colors {
      * @param r the red component
      * @param g the green component
      * @param b the blue component
+     * @return the color for the given values
      */
     public static Color getColorBysRGB(double r, double g, double b) {
 	return new Color((float)r, (float)g, (float)b);
@@ -686,6 +687,7 @@ public class Colors {
      * @param g the green component
      * @param b the blue component
      * @param a the alpha component
+     * @return the color for the given values
      */
     public static Color getColorBysRGB(double r, double g, double b, double a) {
 	return new Color((float)r, (float)g, (float)b, (float) a);
@@ -696,6 +698,7 @@ public class Colors {
      * Get a color given the wavelength of light.
      * @param cm the color model
      * @param wavelength the wavelength in meters
+     * @return the color for the given values
      */
     public static Color getColorByWavelength(ColorModel cm,
 					     double wavelength) {
@@ -712,6 +715,7 @@ public class Colors {
      * @param cm the color model
      * @param wavelength the wavelength in meters
      * @param intensity an intensity scaling factor in the range [0.0, 1.0]
+     * @return the color for the given values
      */
     public static Color getColorByWavelength(ColorModel cm,
 					     double wavelength,
@@ -735,6 +739,7 @@ public class Colors {
      * @param wavelength the wavelength in meters
      * @param intensity an intensity scaling factor in the range [0.0, 1.0]
      * @param alpha the alpha component of the color (range: [0.0, 1.0])
+     * @return the color for the given values
      */
     public static Color getColorByWavelength(ColorModel cm,
 					     double wavelength,
@@ -959,6 +964,7 @@ public class Colors {
      *        of electromagnetic radiation as a function of wavelength
      * @param intensity an intensity scaling factor in the range [0, 1.0]
      * @param alpha the alpha component of the color (range: [0.0, 1.0])
+     * @return the color for the given values
      */
     public static Color getColorBySpectrum(ColorModel cm,
 					   final RealValuedFunctOps spectrum,

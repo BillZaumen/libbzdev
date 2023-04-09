@@ -9,8 +9,6 @@
  * components, a bridge between documents and writers, a class
  * to map the names of keyboard keys to the corresponding Java
  * constants.
- *
- * @moduleGraph
  */
 module org.bzdev.desktop {
     exports org.bzdev.swing;

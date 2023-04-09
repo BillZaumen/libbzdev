@@ -504,6 +504,7 @@ public class FlatteningPathIterator2D implements PathIterator {
 
     /**
      * Get the flatness parameter.
+     * @return the flatness parameter
      */
     public double getFlatness() {return flatness;}
 

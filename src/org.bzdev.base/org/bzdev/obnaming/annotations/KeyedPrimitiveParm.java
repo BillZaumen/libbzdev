@@ -67,6 +67,7 @@ import java.lang.annotation.*;
 public @interface KeyedPrimitiveParm {
     /**
      * The name of the parameter.
+     * @return the parameter name
      */
     String value();
     /**
@@ -112,6 +113,7 @@ public @interface KeyedPrimitiveParm {
      *       be explicitly coded to call the random variable's next()
      *       method to do this - this behavior does not occur automatically).
      * </UL>
+     * @return true or false as described above
      */
     boolean rvmode() default false;
     /**
@@ -119,11 +121,13 @@ public @interface KeyedPrimitiveParm {
      * there is none.
      * It is ignored for types that are not numbers or random variables
      * that generate numbers.
+     * @return the upper bound; null if there is none
      */
     String upperBound() default "null";
     /**
      * A boolean that is true if the upper bound is included
      * in the map's value's range; false if it is not.
+     * @return true if the upper bound is in the range; false otherwise
      */
     boolean upperBoundClosed() default true;
     /**
@@ -131,6 +135,7 @@ public @interface KeyedPrimitiveParm {
      * there is none.
      * It is ignored for types that are not numbers or random variables
      * that generate numbers.
+     * @return the lower bound; null if there is none
      */
     String lowerBound() default "null";
     /**
@@ -139,6 +144,8 @@ public @interface KeyedPrimitiveParm {
      * <P>
      * It is ignored for types that are not numbers or random variables
      * that generate numbers.
+     * @return true if the lower bound is included in the map's
+     *          value's range; false if it is not.
      */
     boolean lowerBoundClosed() default true;
 }

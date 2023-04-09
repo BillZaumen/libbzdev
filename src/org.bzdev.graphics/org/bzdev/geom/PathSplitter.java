@@ -873,7 +873,7 @@ public class PathSplitter {
 	}
     }
 
-    /*
+    /**
      * Split a B&eacute;zier curve of degree n at a point t&isin;[0,1].
      * After the split, the first curve's initial point will be (x, y)
      * and its remaining control points will be in the array <CODE>first</CODE>.

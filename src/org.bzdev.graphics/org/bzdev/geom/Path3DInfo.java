@@ -189,6 +189,7 @@ public class Path3DInfo {
      * @param x the cubic spline for the X coordinates
      * @param y the cubic spline for the Y coordinates
      * @param z the cubic spline for the Z coordinates
+     * @return the path iterator
      */
     public static PathIterator3D getPathIterator(AffineTransform3D af,
 						 CubicSpline x,
@@ -2253,6 +2254,7 @@ public class Path3DInfo {
 
     /**
      * Get the type of a path-iterator item, formatted as a string
+     * @param type the path-iterator type as an integer
      * @return a string describing the type
      */
     public static String getTypeString(int type) {
@@ -2901,7 +2903,6 @@ public class Path3DInfo {
      * Entry i contains the x and y coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
-     * <P>
      * @param s the shape or path
      */
     public static void printSegments(Path3D s) {
@@ -3014,7 +3015,7 @@ public class Path3DInfo {
      * @return the patch component going through (x, y, z), with its
      *         segments shifted cyclically so that the returned path
      *         starts at the point (x, y, z).
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public static Path3D shiftClosedPath(Path3D path,
 					 double x, double y, double z)
@@ -3237,6 +3238,7 @@ public class Path3DInfo {
      * the tangent function should be a differentiable function as well,
      * which implies that successive straight-line segments should
      * have the same tangent vectors.
+     * @param path the path
      * @param tangent the tangent vector; null if not wanted
      * @param normal the normal vector; null if not wanted
      * @param binormal the binormal vector; null if not wanted

@@ -4,14 +4,12 @@ package org.bzdev.devqsim;
  * Factory for creating instances of PriorityTaskQueue.
  * <P>
  * The parameters are defined as follows:
- * <P>
  * <IFRAME SRC="{@docRoot}/factories-api/org/bzdev/devqsim/PriorityTQFactory.html" style="width:95%;height:500px;border: 3px solid steelblue">
  * Please see
  *  <A HREF="{@docRoot}/factories-api/org/bzdev/devqsim/PriorityTQFactory.html">
  *    the parameter documentation</A> for a table of the parameters supported
  * by this factory.
  * </IFRAME>
- * <P>
  * @see org.bzdev.devqsim.TaskQueue
  * @see org.bzdev.devqsim.TaskQueue.ReleasePolicy
  * @see org.bzdev.devqsim.QueueDeletePolicy

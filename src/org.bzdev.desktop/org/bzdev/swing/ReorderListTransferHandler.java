@@ -21,7 +21,7 @@ import org.bzdev.util.ErrorMessage;
  * <code>OurType</code> has a <code>toString()</code> method that will
  * produce a string whose length is the largest string length that should
  * appear in a JList for <code>OurType</code>.  The code is straightforward:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  DefaultListModel&lt;OurType&gt; listModel = new DefaultListModel&lt;OurType&gt;();
  *  JList&lt;OurType&gt; list = new JList&lt;OurType&gt;(listModel);
  *  JScrollPane scrollPane = new JScrollPane(list);
@@ -30,7 +30,7 @@ import org.bzdev.util.ErrorMessage;
  *  list.setTranferHandler(th);
  *  list.setDragEnabled(true);
  *  list.setDropMode(DropMode.INSERT);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * It is basically the default sequence of operations for enabling drag and
  * drop for a JList.
  */

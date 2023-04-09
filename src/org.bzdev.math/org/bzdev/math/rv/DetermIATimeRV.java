@@ -20,18 +20,32 @@ public class DetermIATimeRV extends InterarrivalTimeRV {
     private boolean repeat = false;
     int index = 0;
 
+    /**
+     * Get the values for this random variable.
+     * @return the values in the order in which they are generated,
+     *         excluding a final value for the non-repeating case
+     */
     public long[] getValues() {
 	return values.clone();
     }
 
+    /**
+     * Get the final value for this random variable.
+     * @return the final value; 0 if this random variable repeats
+     */
     public long getFinalValue() {
 	return finalValue;
     }
 
+    /**
+     * Determine if this random variable repeats its sequence.
+     * @return true if it is repeating; false otherwise
+     */
     public boolean isRepeating() {return repeat;}
 
 
-    public void setMinimum(long min, boolean closed) 
+    @Override
+    public void setMinimum(Long min, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (min > minvalue): (min >= minvalue)) 
@@ -40,7 +54,8 @@ public class DetermIATimeRV extends InterarrivalTimeRV {
 	super.setMinimum(min,closed);
     }
 
-    public void setMaximum(long max, boolean closed) 
+    @Override
+    public void setMaximum(Long max, boolean closed)
 	throws UnsupportedOperationException, IllegalArgumentException
     {
 	if (closed? (max < maxvalue):(max <= maxvalue))
@@ -112,6 +127,7 @@ public class DetermIATimeRV extends InterarrivalTimeRV {
 	this.finalValue = finalValue;
     }
 
+    @Override
     public Long next() {
 	if (!repeat && index == values.length) return finalValue;
 	try {
@@ -121,6 +137,7 @@ public class DetermIATimeRV extends InterarrivalTimeRV {
 	}
     }
 
+    @Override
     public String toString() {
 	return "DetermDetermIATime(" + values 
 	    + (repeat? "": "," + finalValue) + ")";

@@ -159,6 +159,8 @@ public class ErrorMessage {
      * Set the message operations object.
      * This class is used by {@link org.bzdev.swing.SwingErrorMessage}
      * to override the default behavior of this class.
+     * @param newops a replacement for the object that handles error
+     *        messages.
      */
     protected static void setOps(ErrorMsgOps newops) {
 	ops = newops;
@@ -174,6 +176,10 @@ public class ErrorMessage {
     }
     */
 
+    /**
+     * A field indicating if a separator is needed.
+     * This should be treated as a read-only value.
+     */
     protected static boolean needSeparator = false;
     /**
      * Add separator if needed.
@@ -182,6 +188,9 @@ public class ErrorMessage {
 	ops.addSeparatorIfNeeded();
     }
 
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     */
     protected static void addSeparatorIfNeededAux() {
 	if (needSeparator) {
 	    addSeparator();
@@ -195,6 +204,9 @@ public class ErrorMessage {
     public static void addSeparator() {
 	ops.addSeparator();
     }
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     */
     protected static void addSeparatorAux() {
 	try {
 	    err.append("________________________________________________\n\n");
@@ -212,6 +224,11 @@ public class ErrorMessage {
     public static void setStackTrace(boolean value) {
 	ops.setStackTrace(value);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param value an argument
+     */
     protected static void setStackTraceAux(boolean value) {
 	recordStackTrace = value;
     }
@@ -224,10 +241,19 @@ public class ErrorMessage {
     public static boolean stackTraceEnabled() {
 	return ops.stackTraceEnabled();
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @return status
+     */
     protected static boolean stackTraceEnabledAux() {
 	return recordStackTrace;
     }
 
+    /**
+     * The {@link Appendable} to which error messages will be written.
+     * The default is {@link System#err}.
+     */
     protected static Appendable err = System.err;
 
     /**
@@ -244,6 +270,11 @@ public class ErrorMessage {
     public static void setAppendable(Appendable out) {
 	ops.setAppendable(out);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param out an argument
+     */
     protected static void setAppendableAux(Appendable out) {
 	if (out == null) out = System.err;
 	err = out;
@@ -258,6 +289,13 @@ public class ErrorMessage {
     public static void display(String fn, int lineno, String msg) {
 	ops.display(fn, lineno, msg);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param fn an argument
+     * @param lineno an argument
+     * @param msg an argumnt
+     */
     protected static void displayAux(String fn, int lineno, String msg) {
 	if (msg == null) return;
 	String newmsg = (fn == null)? 
@@ -295,6 +333,12 @@ public class ErrorMessage {
     {
 	ops.display(prefix, t);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param prefix an argument
+     * @param t an argument
+     */
     protected static void displayAux(String prefix, Throwable t) 
     {
 	try {
@@ -329,6 +373,11 @@ public class ErrorMessage {
     public static void display(Throwable t) {
 	ops.display(t);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param t an argument
+     */
     protected static void displayAux(Throwable t) {
 	if (t == null) return;
 	String msg = t.getMessage();
@@ -364,6 +413,11 @@ public class ErrorMessage {
     public static void display(String msg) {
 	ops.display(msg);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param msg an argument
+     */
     protected static void displayAux(String msg) {
 	if (msg == null) return;
 	try {
@@ -384,6 +438,12 @@ public class ErrorMessage {
     public static void format(String format, Object... args) {
 	ops.format(format, args);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param format an argument
+     * @param args arguments
+     */
     protected static void formatAux(String format, Object... args) {
 	displayAux(String.format(format, args));
     }
@@ -399,6 +459,13 @@ public class ErrorMessage {
     public static void format(Locale locale, String format, Object... args) {
 	ops.format(locale, format, args);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param locale an argument
+     * @param format an argument
+     * @param args arguments
+     */
     protected static void formatAux(Locale locale, String format,
 				  Object... args)
     {
@@ -422,6 +489,13 @@ public class ErrorMessage {
     {
 	ops.displayFormat(title, format, args);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param title an argument
+     * @param format an argument
+     * @param args arguments
+     */
     protected static void displayFormatAux(String title, String format,
 					   Object... args)
     {
@@ -443,6 +517,15 @@ public class ErrorMessage {
     {
 	ops.displayFormat(title, locale, format, args);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param title an argument
+     * @param locale an argument
+     * @param format an argument
+     * @param args arguments
+
+     */
     protected static void displayFormatAux(String title, Locale locale,
 					   String format,
 					   Object... args)
@@ -461,6 +544,12 @@ public class ErrorMessage {
     public static void display(String title, String msg) {
 	ops.display(title, msg);
     }
+
+    /**
+     * Implemtation method for an instance of ErrorMsgOps.
+     * @param title an argument
+     * @param msg an argument
+     */
     protected static void displayAux(String title, String msg) {
 	try {
 	    err.append(msg);
@@ -493,10 +582,10 @@ public class ErrorMessage {
      * @param s the string
      * @param index the offset from the start of the string (the offset
      *        for the 1st character is 0)
-     * @retun an array whose first element is the line number, whose
-     *        second element is the column number, and whose third
-     *        element is the offset for the end of the line, excluding any
-     *        trailing white space
+     * @return an array whose first element is the line number, whose
+     *         second element is the column number, and whose third
+     *         element is the offset for the end of the line, excluding any
+     *         trailing white space
      */
     public static int[] getLineAndColumn(String s, int index) {
 	int line = 1;
@@ -645,7 +734,7 @@ public class ErrorMessage {
      * @param e the exception that generated an error
      * @param verbose true if a long format should be used
      * @param useLocation true if the location should appended
-
+     * @return a string spaning multiple lines
      */
     public static String getMultilineString(String prefix,
 					    String fn, String input, int index,
@@ -719,7 +808,6 @@ public class ErrorMessage {
      * @param verbose true if a long format should be used
      * @param showLocation true if line number and column numbers should be
      *        shown; false otherwise
-     * @exception IOException an IO error occurred
      */
     public static void display(String fn, String input, int index,
 			       Exception e, boolean verbose,
@@ -744,7 +832,6 @@ public class ErrorMessage {
      * @param verbose true if a long format should be used
      * @param showLocation true if line number and column numbers should be
      *        shown; false otherwise
-     * @exception IOException an IO error occurred
      */
     protected static void displayAux(String fn, String input, int index,
 				     Exception e, boolean verbose,

@@ -21,14 +21,14 @@ package org.bzdev.devqsim;
  * Subclasses that are not abstract classes must implement the method
  * {@link ServerQueueFactory#getQueueServerClass() getQueueServerClass}.
  * For example,
- * <BLOCKQUOTE><CODE><PRE>
+ * <BLOCKQUOTE><PRE><CODE>
  *   public class FooLifoSQFactory extends LifoServerQueueFactory&lt;Foo&gt; {
  *       Class&lt;Foo&gt; getQueueServerClass() {returns Foo.class;}
  *       public FooPrioritySQFactory(Simulation sim) {
  *         super(sim);
  *       }
  *   }
- * </PRE></CODE></BLOCKQUOTE>
+ * </CODE></PRE></BLOCKQUOTE>
  * would create a factory for priority server queues whose servers' class is Foo * @see org.bzdev.devqsim.TaskQueue
  * @see org.bzdev.devqsim.TaskQueue.ReleasePolicy
  * @see org.bzdev.devqsim.QueueDeletePolicy

@@ -145,6 +145,7 @@ public class Animation2D extends Simulation
 
     /**
      * Get the number of simulation ticks per frame.
+     * @return the number of ticks per frame
      */
     public long getTicksPerFrame() {return ticksPerFrame;}
     
@@ -375,6 +376,7 @@ public class Animation2D extends Simulation
      * @param filenamePrefix the initial part of an image file name
      * @param imageType the type of the images making up a sequence of
      *        frames ("png", "jpeg", etc.)
+     * @exception IOException an IO error occurred
      */
     public void initFrames(int maxFrames,
 			   String filenamePrefix, String imageType)
@@ -400,6 +402,7 @@ public class Animation2D extends Simulation
      *        frames
      * @param da a directory accessor for the directory that will
      *        contain the sequence of images
+     * @exception IOException an IO error occurred
      */
     public void initFrames(int maxFrames,
 			   String filenamePrefix, String imageType,
@@ -422,6 +425,7 @@ public class Animation2D extends Simulation
      *        sequence of frames
      * @param isw an image sequence writer that will store the images
      *        produced by the animation
+     * @exception IOException an IO error occurred
      */
     public void initFrames(int maxFrames,
 			   String imageFormat,
@@ -449,6 +453,7 @@ public class Animation2D extends Simulation
      * @param maxFrames the maximum number of frames in the sequence.
      * @param isw an image sequence writer that will store the images
      *        produced by the animation
+     * @exception IOException an IO error occurred
      */
     public void initFrames(int maxFrames, ISWriterOps isw)
 	throws IOException, IllegalArgumentException
@@ -476,6 +481,7 @@ public class Animation2D extends Simulation
      *        produced by the animation
      * @param da a directory accessor providing a directory in which
      *        image files will appear
+     * @exception IOException an IO error occurred
      */
     private void initFrames(int maxFrames,
 			    String filenamePrefix, String imageType,
@@ -1540,7 +1546,7 @@ public class Animation2D extends Simulation
      * @param level3 the level for additional update messages
      * @param level4 the level for calls to the PlacedAnimationObject2D
      *        method setPosition not shown by update messages
-     * @exception IllegalArgumentException
+     * @exception IllegalArgumentException an argument was illegal
      */
     public static void setTraceLevels(int level1, int level2,
 				      int level3, int level4)
@@ -1581,6 +1587,7 @@ public class Animation2D extends Simulation
      * </ul> the path parameter, velocity, acceleration,
      * This is provided to allow the caller to choose appropriate
      * values for a given application.
+     * @param <T> the type of an enumeration naming trace levels
      * @param level1 the level for non-update messages; null if level 1
      *        messages should not be displayed
      * @param level2 the level for update messages; null if level 2

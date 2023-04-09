@@ -3,11 +3,12 @@
 <HEAD>
   <title>The org.bzdev.drama Package</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
 </HEAD>
 <BODY>
     <div style="margin-left: 2em">
-<H2>The org.bzdev.drama package</H2>
+<H1>The org.bzdev.drama package</H1>
 
 Please see
 <UL>
@@ -15,7 +16,7 @@ Please see
   <LI><A HREF="#examples">the examples</A> for coding examples.
 </UL>
 
-<H3><A NAME="intro"></A>Introduction</H3>
+<H2><A ID="intro"></A>Introduction</H2>
 
 This package provides a simulation flavor that essentially
 instantiates the {@link org.bzdev.drama.generic} package but with no extra
@@ -24,7 +25,7 @@ hierarchy used in the generic simulation package, as the following UML
 diagram shows (the classes in org.bzdev.drama.generic are shown in
 blue):
 <P style="text-align:center">
-<img src="drama.png" class="imgBackground">
+<img src="drama.png" class="imgBackground" alt="Diagram">
 <P>
 The classes {@link DramaSimObject}
 and {@link AbstractTaskObject} are
@@ -39,7 +40,7 @@ Similarly {@link org.bzdev.obnaming.NamedObjectFactory named-object factories}
 are subclasses of the corresponding factories defined in
 org.bzdev.drama.generic.  These are shown in the following diagram:
 <P style="text-align:center">
-<img src="dfactories.png" class="imgBackground">
+<img src="dfactories.png" class="imgBackground" alt="Diagram">
 <P>
 All the named-object factories that are direct subclasses of the
 factory classes in {@link org.bzdev.drama.generic} are abstract
@@ -80,10 +81,10 @@ class is supported by several other classes:
     actors will have the same domains, In some cases, its use improves
     performance.
 </UL>
-<H3><A NAME="examples"></A>Examples</H3>
+<H2><A ID="examples"></A>Examples</H2>
 As a coding example, a trivial simulation using this package might
 create a subclass of {@link org.bzdev.drama.Actor} as follows:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import org.bzdev.devqsim.*;
 import org.bzdev.drama.*;
 import org.bzdev.lang.*;
@@ -114,14 +115,14 @@ public class TestActor extends Actor {
                            source.getName());
     }
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 This actor has a method that causes it to send a message to another
 actor. Because a delay was not specified, the delay will be determined
 by looking at the actor's communication domains.  Dynamic methods are
 used to handle messages that have been received.
 <P>
 The example also creates a communication domain:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import org.bzdev.drama.*:
 public class TestDomain extends Domain {
     public TestDomain(DramaSimulation sim, String name, int priority) {
@@ -129,11 +130,11 @@ public class TestDomain extends Domain {
         configureAsCommunicationDOmain("network");
     }
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 
 A subclass of MsgForwardingInfo is also created. This determines
 the delays when messages are routed though communication domains:
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import org.bzdev.drama.*:
 public class TestMsgForwardingInfo extends MsgForwardingInfo {
     DramaSimulation sim;
@@ -151,14 +152,14 @@ public class TestMsgForwardingInfo extends MsgForwardingInfo {
     ...
 
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
 <P>
 Finally a main program creates a simulation, a domain, provides the
 domain with a MsgForwardingInfo object so it can determine the appropriate
 delays, creates two actors, and places them in the domain.
 One actor's sendHello method is used to generate a message
 and the simulation is then run.
-<BLOCKQUOTE><CODE><PRE>
+<BLOCKQUOTE><PRE><CODE>
 import org.bzdev.drama.*;
 public class Test {
     public static void main(String argv[]) throws Exception {
@@ -177,7 +178,7 @@ public class Test {
         sim.run();
     }
 }
-</PRE></CODE></BLOCKQUOTE>
+</CODE></PRE></BLOCKQUOTE>
     </div>
 </BODY>
 </HTML>

@@ -58,7 +58,7 @@ import java.security.*;
  * by 3D printers.
  * <P>
  * As an example of its use, the statements
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * Model3D m3d = new Model3D();
  * m3d.setStackTraceMode(true);
  * m3d.addTriangle(...);
@@ -67,7 +67,7 @@ import java.security.*;
  * if (m3d.notPrintable(System.out)) System.exit(1);
  * m3d.writeSTL("model test", "model.stl");
  * System.exit(0);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * will create a model, test it to verify that it is printable on a 3D
  * printer, and if it is printable, create an STL file.  The call to
  * setStackTraceMode will configure the model so that each triangle
@@ -86,20 +86,20 @@ import java.security.*;
  * The simplest way to create an image showing the model is to
  * use the method
  * {@link Model3D#createImageSequence(OutputStream,String,int,int)}:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  *  Model3D m3d = new Model3D();
  *  ...
  *  m3d.addTriangle(...);
  *  ...
  *  m3d.createImageSequence(new FileOutputStream("model.isq"), "png", 8, 4);
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * The file model.isq is a ZIP file with a manifest describing various
  * image parameters, and a with a sequence of image files showing the model
  * in various orientations.
  * <P>
  * The following code creates an image, using the* low-level API:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * int WIDTH = 800;
  * int HEIGHT = 800;
  * ...
@@ -119,11 +119,11 @@ import java.security.*;
  * m3d.setImageParameters(image);
  * m3d.render(image);
  * image.write("png", "modeltest.png");
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * <P>
  * To create an animation showing the model from different orientations
  * use the following code:
- * <blockquote><code><pre>
+ * <blockquote><pre><code>
  * Model3D m3d = new Model3D();
  * ...
  * m3d.addTriangle(...);
@@ -141,7 +141,7 @@ import java.security.*;
  * a2d.initFrames(maxFrames, "tmp/img-", "png")
  * a2d.scheduleFrames(0, maxframes);
  * a2d.run();
- * </pre></code></blockquote>
+ * </CODE></PRE></blockquote>
  * The documentation for {@link Model3DViewFactory} describes how to
  * configure this factory.
  * <P>
@@ -1458,7 +1458,9 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     /**
      * The implementation of ImageData used by Model3D.
      * There are some fields and/or methods that are not visible
-     * outside the org.bzdev.p3d package.
+     * outside the org.bzdev.p3d package.  The documentation is
+     * overly terse because this class is not intended for general
+     * use. See {@link ImageData} instead.
      */
     public static class ImageDataImpl  implements ImageData {
 	// nothing to do, really, but the interface requires this method.
@@ -1480,6 +1482,9 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	}
 
 
+	/**
+	 * reset the render list.
+	 */
 	public void reset() {
 	    renderList.reset();
 	    rlistInvalid = true;
@@ -1488,56 +1493,74 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	int widthInt;
 	int heightInt;
 
+	@Override
 	public int getWidth() {return widthInt;}
+
+	@Override
 	public int getHeight() {return heightInt;}
 
 	float width;
 	float height;
+
+	@Override
 	public float getFloatWidth() {return width;}
+
+	@Override
 	public float getFloatHeight() {return height;}
 
 	float xorigin;
 	float yorigin;
 	double scaleFactor = 1.0;
 
+	@Override
 	public double getScaleFactor() {
 	    return scaleFactor;
 	}
 
+	@Override
 	public float getXOrigin() {
 	    return xorigin;
 	}
 
+	@Override
 	public float getYOrigin() {
 	    return yorigin;
 	}
 
+	@Override
 	public void setScaleFactor(double scaleFactor) {
 	    rlistInvalid = true;
 	    this.scaleFactor = scaleFactor;
 	}
 
+	@Override
 	public void setOrigin(int x, int y) {
 	    setOrigin((float)x, (float)y);
 	}
+
+	@Override
 	public void setOrigin(double x, double y) {
 	    setOrigin((float)x, (float)y);
 	}
 
+	@Override
 	public void setOrigin(float x, float y) {
 	    rlistInvalid = true;
 	    xorigin = x;
 	    yorigin = y;
 	}
 
+	@Override
 	public void setOrigin(int offset) {
 	    setOrigin((float)offset);
 	}
 
+	@Override
 	public void setOrigin(double offset) {
 	    setOrigin((float)offset);
 	}
 
+	@Override
 	public void setOrigin(float offset) {
 	    rlistInvalid = true;
 	    if (offset >= 0.0) {
@@ -1549,10 +1572,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    }
 	}
 
+	@Override
 	public void setOriginByFraction(double offset) {
 	    setOriginByFraction((float)offset);
 	}
 
+	@Override
 	public void setOriginByFraction (float offset) {
 	    rlistInvalid = true;
 	    if (offset >= 1.0 || offset <= -1.0) {
@@ -1572,6 +1597,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    }
 	}
 
+	@Override
 	public void setOrigin() {
 	    rlistInvalid = true;
 	    float width = getFloatWidth();
@@ -1587,18 +1613,22 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	double eulerPsi = 0.0;
 	double[][] matrix = new double[3][3]; // coord rotation for rendering
 
+	@Override
 	public double getPhi() {
 	    return eulerPhi;
 	}
 
+	@Override
 	public double getTheta() {
 	    return eulerTheta;
 	}
 
+	@Override
 	public double getPsi() {
 	    return eulerPsi;
 	}
 
+	@Override
 	public void setCoordRotation(double phi, double theta, double psi) {
 	    rlistInvalid = true;
 
@@ -1681,26 +1711,32 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	double yoriginAR;
 	double zoriginAR;
 
+	@Override
 	public double getRotationXOrigin() {
 	    return xoriginBR;
 	}
 
+	@Override
 	public double getRotationYOrigin() {
 	    return yoriginBR;
 	}
 
+	@Override
 	public double getRotationZOrigin() {
 	    return zoriginBR;
 	}
 
+	@Override
 	public boolean moveOriginAfterRotation() {
 	    return rotMoveOrigin;
 	}
 
+	@Override
 	public void setRotationOrigin(double x, double y, double z) {
 	    setRotationOrigin(x, y, z, false);
 	}
 
+	@Override
 	public void setRotationOrigin(double x, double y, double z,
 				      boolean move)
 	{
@@ -1735,14 +1771,17 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	double xtranslation;
 	double ytranslation;
 
+	@Override
 	public double getXTranslation() {
 	    return xtranslation;
 	}
 
+	@Override
 	public double getYTranslation() {
 	    return ytranslation;
 	}
     
+	@Override
 	public void setTranslation(double x, double y) {
 	    rlistInvalid = true;
 	    xtranslation = x;
@@ -1758,11 +1797,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	// multiple polygons.
 	double delta = 0.0;
 
+	@Override
 	public double getDelta() {
 	    return delta;
 	}
 
-
+	@Override
 	public void setDelta(double delta) {
 	    rlistInvalid = true;
 	    this.delta = delta;
@@ -1772,13 +1812,17 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	double lsphi;
 	double lstheta;
 
+	@Override
 	public double getLightSourcePhi() {
 	    return lsphi;
 	}
+
+	@Override
 	public double getLightSourceTheta() {
 	    return lstheta;
 	}
 
+	@Override
 	public void setLightSource(double phi, double theta) {
 	    rlistInvalid = true;
 	    double sin_psi;
@@ -1835,40 +1879,55 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	double  colorFactor = 0.0;
 	double normalFactor = 0.0;
 
+	@Override
 	public Color getBacksideColor() {
 	    return backsideColor;
 	}
+
+	/**
+	 * Get the default color for a triangle.
+	 * @return the color
+	 */
 	public Color getTriangleColor() {
 	    return triangleColor;
 	}
+
+	@Override
 	public Color getEdgeColor() {
 	    return edgeColor;
 	}
+
+	@Override
 	public double getColorFactor() {
 	    return colorFactor;
 	}
 
+	@Override
 	public void setColorFactor(double factor)
 	{
 	    rlistInvalid = true;
 	    colorFactor = factor;
 	}
 
+	@Override
 	public double getNormalFactor() {
 	    return normalFactor;
 	}
 
+	@Override
 	public void setNormalFactor(double factor) {
 	    rlistInvalid = true;
 	    if (factor < 0.0) factor = 0.0;
 	    normalFactor = factor;
 	}
 
+	@Override
 	public void setBacksideColor(Color c) {
 	    rlistInvalid = true;
 	    backsideColor = c;
 	}
 
+	@Override
 	public void setEdgeColor(Color c) {
 	    rlistInvalid = true;
 	    edgeColor = c;
@@ -1876,12 +1935,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
 	Color segmentColor = Color.blue;
 
+	@Override
 	public Color getDefaultSegmentColor() {
 	    return segmentColor;
 	}
 
-
-
+	@Override
 	public void setDefaultSegmentColor(Color c) {
 	    rlistInvalid = true;
 	    segmentColor = c;
@@ -1889,11 +1948,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
 	Color backsideSegmentColor = null;
     
+	@Override
 	public Color getDefaultBacksideSegmentColor() {
 	    return backsideSegmentColor;
 	}
 
 
+	@Override
 	public void setDefaultBacksideSegmentColor(Color c) {
 	    rlistInvalid = true;
 	    backsideSegmentColor = c;
@@ -1906,6 +1967,11 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    matrix[2][2] = 1.0;
 	}
 
+	/**
+	 * Constructor.
+	 * @param width the image width
+	 * @param height the image height
+	 */
 	public ImageDataImpl(int width, int height) {
 	    this.width = (float) width; this.height = (float)height;
 	    this.widthInt = width;
@@ -2245,14 +2311,30 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    return lsTheta;
 	}
 
+	/**
+	 * Get the color factor.
+	 * When not zero, the color factor causes triangles with lower
+	 * Z values (after all transformations and coordinate-system rotations)
+	 * to appear darker. When 1, a triangle with the lowest Z value will
+	 * appear as black and the one with the highest Z value will have its
+	 * specified color.
+	 * @return the color factor
+	 */
 	public double getColorFactor() {
 	    return colorFactor;
 	}
 
+	/**
+	 * Get the normal factor.
+	 * When not zero, for each triangle, the color factor will be
+	 * scaled by exp(-(1-n<sub>z)</sub>/f), where f is the normal
+	 * factor and n<sub>z</sub> is the Z component of a triangle's
+	 * normal vector (normalized so its length is 1).
+	 * @return the normal factor
+	 */
 	public double getNormalFactor() {
 	    return normalFactor;
 	}
-
     }
 
     boolean stackTraceMode = false;
@@ -2359,6 +2441,9 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * much larger than 1 are an indication that tessellation in not likely
      * to be affected by roundoff errors (assuming {@link #setULPFactor(double)}
      * has been called with a non-zero argument).
+     * @return the minimum ratio of the separation between adjacent
+     *         coordinate values to the ULP value for those
+     *         coordinates, treated as single-precision values
      */
     public double findMinULPRatio() {
 	double min = Double.POSITIVE_INFINITY;
@@ -2405,7 +2490,6 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * When stack-trace mode is on (true), triangles without an
      * explicit tag are tagged with a stack trace taken at the point
      * when the triangle was created.  The default value is false.
-     * <P>
      * @param mode true to turn on stack-trace mode; false to turn it off
      */
     public void setStackTraceMode(boolean mode) {
@@ -6434,6 +6518,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
     /**
      * Add a line segment.
      * @param segment the line segment to add.
+     * @return the line segment that was added
      */
     public LineSegment addLineSegment(LineSegment segment) {
 	Object tag = segment.getTag();
@@ -6453,6 +6538,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param x2 the x coordinate of point 2
      * @param y2 the y coordinate of point 2
      * @param z2 the z coordinate of point 2
+     * @return the line segment that was added
      */
     public LineSegment addLineSegment(double x1, double y1, double z1,
 				      double x2, double y2, double z2)
@@ -6471,6 +6557,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param y2 the y coordinate of point 2
      * @param z2 the z coordinate of point 2
      * @param color the line segment's color; null if no color is specified
+     * @return the line segment that was added
      */
     public LineSegment addLineSegment(double x1, double y1, double z1,
 				      double x2, double y2, double z2,
@@ -6492,6 +6579,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param z2 the z coordinate of point 2
      * @param color the line segment's color; null if no color is specified
      * @param tag a tag for the line segment; null if none is specified
+     * @return the line segment that was added
      */
     public LineSegment addLineSegment(double x1, double y1, double z1,
 				      double x2, double y2, double z2,
@@ -7024,6 +7112,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * The image data (idata) will be modified so that all the objects are
      * within the border of the image.
      * @param idata image data to read and modify
+     * @return the image parameters
      */
     public ImageParams setImageParameters(Model3D.ImageData idata) {
 	return setImageParameters(idata, -1.0, 1.0, 0.0, 0.0);
@@ -7037,6 +7126,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param idata image data to read and modify
      * @param border the minimum distance in user space from the edges of
      *        an image to the object(s) being displayed; -1 for a default
+     * @return the image parameters
      */
     public ImageParams setImageParameters(Model3D.ImageData idata,
 						double border)
@@ -7057,6 +7147,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param border the minimum distance in user space from the edges of
      *        an image to the object(s) being displayed; -1 for a default
      * @param magnification  The magnification of the image.
+     * @return the image parameters
      */
     public ImageParams
 	setImageParameters(Model3D.ImageData idata,
@@ -7087,6 +7178,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param yfract the fraction of the image width, excluding the borders,
      *        by which an image was shifted along the y axis, with values
      *        in the range [0.0, 1.0]
+     * @return the image parameters
      */
     public ImageParams
 	setImageParameters(Model3D.ImageData idata,
@@ -7121,6 +7213,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param yfract the fraction of the image width, excluding the borders,
      *        by which an image was shifted along the y axis, with values
      *        in the range [0.0, 1.0]
+     * @return the image parameters
      */
     public ImageParams
 	setImageParameters(Model3D.ImageData id, double border,
@@ -7155,6 +7248,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *        by which an image was shifted along the y axis, with values
      *        in the range [0.0, 1.0]
      * @param changeScale true if the scale should be changed; false if not
+     * @return the image parameters
      */
     public ImageParams
 	setImageParameters(Model3D.ImageData id, double border,
@@ -8371,7 +8465,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * the STL-base processing is ignored, and the coordinates provided
      * by the model (some of these coordinates may be negative or zero)
      * are used instead.
-     * @value true if an STL base is used; false otherwise
+     * @param value true if an STL base is used; false otherwise
      */
     public void setSTLBase(boolean value) {
 	useSTLBase = value;
@@ -8968,6 +9062,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param imageType the image type
      * @param nphi the number of steps for the Eulerian angle &phi;
      * @param ntheta the number of steps for the Eulerian angle $theta;
+     * @throws IOException if an IO error occurred
      */
     public void createImageSequence(OutputStream os, String imageType,
 				    int nphi, int ntheta)
@@ -9011,6 +9106,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *        parameter should be ignored
      * @param colorFactor the color factor; 0.0 if this parameter should
      *        be ignored
+     * @throws IOException if an IO error occurred
      * @see Model3D.Image#setDelta(double)
      * @see Model3D.Image#setColorFactor(double)
      */
@@ -9067,6 +9163,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param normalFactor the normal factor; 0.0 if there is none
      * @param showEdges true if edges of triangles and patches should be shown;
      *        false otherwise
+     * @throws IOException if an IO error occurred
      * @see Model3D.Image#setDelta(double)
      * @see Model3D.Image#setColorFactor(double)
      * @see Model3D.Image#setNormalFactor(double)
@@ -9164,23 +9261,24 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * set automatically.
      * For example, in a test case that purposely generated an error and
      * where {@link #notPrintable(Appendable)} printed
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      * 3D model's surface is not embedded in a three-dimensional space:
      * Planar Triangle (-6.70000,2.30000,4.70000)-(-6.70000,6.70000,4.70000)-(-1.10000,1.90526,4.70000)
      * Planar Triangle (-3.00000,3.00000,8.00000)-(3.00000,3.00000,4.00000)-(-3.00000,3.00000,4.00000)
 
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * The code
-     * <BLOCKQUOTE><CODE><PRE>
+     * <BLOCKQUOTE><PRE><CODE>
      * Graph graph = new Graph(700, 700);
      * m3d.createCrossSection(graph, -3.0, 3.0, 4.7,
      *                        new double[] {0.0, 1.0, 0.0});
      * graph.write("png", "fakelock.png");
-     * </PRE></CODE></BLOCKQUOTE>
+     * </CODE></PRE></BLOCKQUOTE>
      * produced the following image (truncated and rotated for display
      * purposes:
      * <P style="text-align: center">
-     * <img src="doc-files/fakelock.png"  class="imgBackground">
+     * <img src="doc-files/fakelock.png"  class="imgBackground"
+     *   alt="3D model that looks like a lock">
      * <P>
      * thus providing a visual representation of the error.
      * @param graph the graph

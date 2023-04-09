@@ -43,7 +43,6 @@ import java.security.PrivilegedAction;
  * <p>
  * The class is a wrapper for an existing TransferHandler, with a
  * default behavior if the wrapped TransferHandler is null.
- * <p>
  */
 public class DebugTransferHandler extends TransferHandler {
 

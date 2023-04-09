@@ -86,8 +86,7 @@ public class FileNameCellEditor extends AbstractCellEditor
     JDialog dialog;
     boolean existing = false;
 
-
-    protected static final String EDIT = "edit";
+    private static final String EDIT = "edit";
 
     /**
      * Sets the current file filter.  The file filter is used by the
@@ -110,6 +109,7 @@ public class FileNameCellEditor extends AbstractCellEditor
      * Adds a filter to the list of user choosable file filters.
      *  For information on setting the file selection mode, see 
      *  {@link #setFileSelectionMode(int)}.
+     * @param filter the file filter to add
      */
     public void addChoosableFileFilter(FileFilter filter) {
 	fileChooser.addChoosableFileFilter(filter);
@@ -186,6 +186,7 @@ public class FileNameCellEditor extends AbstractCellEditor
     /**
      * Gets the string that goes in the dialog's title bar.
      * @see #setDialogTitle
+     * @return the title
      */
     public String getDialogTitle() {
 	return fileChooser.getDialogTitle();
