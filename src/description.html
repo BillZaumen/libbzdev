@@ -3,7 +3,7 @@
 <HEAD>
   <title>The BZDev Class Library</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" type="text/css" href="../stylesheet.css"
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
 </HEAD>
 <BODY>
 <H2>The BZDev Class Library</H2>
@@ -485,7 +485,12 @@ one of two files from the <CODE>libbzdev</CODE> api directory:
 Javadoc for versions 11 and 17 use different style sheets and
 the selectors for Javadoc 17 are different than those used for
 Javadoc 11, regardless of the release for which the documentation
-is being generated.
+is being generated.  When javadoc is run, the option
+<CODE>--main-stylesheet</CODE> will replace the default style sheet
+with a user specified on.  In the  API directory, the file name
+for this style sheet may match the one specified on the command line,
+but the default seems to be <CODE>stylesheet.css</CODE>.
+
 
 <H2><A ID="libraries"></A>Libraries</H2>
 
