@@ -35,6 +35,9 @@ JAVAC = javac --release $(JAVA_VERSION)
 JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected -package \
 	-Xdoclint:all,-missing,-html
 
+JAVADOC_VERSION = $(shell javadoc --version | sed -e 's/javadoc //' \
+		| sed -e 's/[.].*//')
+
 all: jars
 
 include VersionVars.mk
@@ -1397,34 +1400,19 @@ JDOC_JFILES = $(BASE_JFILE) $(OBNAMING_JFILES) $(DESKTOP_JFILES) \
 # ended in 'lpack' to surpress some compiler warnings about empty packages
 # (the lpack directories ideally contain only 'properties' files).
 #
-JDOC_EXCLUDE_OBNAMING1 = org.bzdev.providers.obnaming
-JDOC_EXCLUDE_OBNAMING2 = org.bzdev.providers.obnaming.lpack
-JDOC_EXCLUDE_OBNAMING = $(JDOC_EXCLUDE_OBNAMING1):$(JDOC_EXCLUDE_OBNAMING2)
-JDOC_EXCLUDE1 = org.bzdev.protocols.resource:org.bzdev.protocols.sresource
-JDOC_EXCLUDE2 = org.bzdev.graphs.symbols:org.bzdev.obnaming.lpack
-JDOC_EXCLUDE3 = org.bzdev.anim2d.lpack:org.bzdev.geom.lpack
-JDOC_EXCLUDE4 = org.bzdev.obnaming.misc.lpack:org.bzdev.p3d.lpack
-JDOC_EXCLUDE5 = org.bzdev.drama.lpack:org.bzdev.drama.generic.lpack
-JDOC_EXCLUDE6 = org.bzdev.devqsim.lpack:org.bzdev.providers.math
-JDOC_EXCLUDE7 = org.bzdev.providers.math.lpack:$(JDOC_EXCLUDE_OBNAMING)
-JDOC_EXCLUDE8 = org.bzdev.providers.anim2d:org.bzdev.providers.anim2d.lpack
-JDOC_EXCLUDE9 = org.bzdev.providers.anim2d:org.bzdev.providers.anim2d.lpack
-JDOC_EXCLUDE10 = org.bzdev.providers.anim2d:org.bzdev.providers.anim2d.lpack
-JDOC_EXCLUDE11 = org.bzdev.providers.devqsim:org.bzdev.providers.devqsim.lpack
-JDOC_EXCLUDE12 = org.bzdev.providers.drama:org.bzdev.providers.drama.lpack
-JDOC_EXCLUDE13 = org.bzdev.providers.esp:org.bzdev.providers.esp.lpack
-JDOC_EXCLUDE14 = org.bzdev.providers.p3d:org.bzdev.providers.p2d.lpack
-JDOC_EXCLUDE15 = org.bzdev.providers.swing:org.bzdev.providers.swing.lpack
-JDOC_EXCLUDE16 = org.bzdev.providers.graphics:org.bzdev.providers.graphics.lpack
-JDOC_EXCLUDE345 = $(JDOC_EXCLUDE3):$(JDOC_EXCLUDE4):$(JDOC_EXCLUDE5)
-JDOC_EXCLUDE6TO9 = \
-	$(JDOC_EXCLUDE6):$(JDOC_EXCLUDE7):$(JDOC_EXCLUDE8):$(JDOC_EXCLUDE9)
-JDOC_EXCLUDE1013 = \
-	$(JDOC_EXCLUDE10):$(JDOC_EXCLUDE11):$(JDOC_EXCLUDE12):$(JDOC_EXCLUDE13)
-JDOC_EXCLUDE1416 = $(JDOC_EXCLUDE14):$(JDOC_EXCLUDE15):$(JDOC_EXCLUDE16)
-JDOC_EXCLUDE_F = $(JDOC_EXCLUDE1):$(JDOC_EXCLUDE2):$(JDOC_EXCLUDE345)
-JDOC_EXCLUDE_R = $(JDOC_EXCLUDE6TO9):$(JDOC_EXCLUDE1013):$(JDOC_EXCLUDE1416)
-JDOC_EXCLUDE = $(JDOC_EXCLUDE_F):$(JDOC_EXCLUDE_R)
+
+EXCLUDE_CMD1 = `for i in src/org.*; \
+	do (cd $$i ; find org -type d ); done \
+	| grep lpack | grep -v providers | sed -e 's/\//./g'`
+
+EXCLUDE_CMD2 = `for i in src/org.*; \
+	do (cd $$i ; find org -type d ); done \
+	| grep providers/ | sed -e 's/\//./g'`
+
+JDOC_EXCLUDE_A = $(shell echo $(EXCLUDE_CMD1) | sed -e 's/ /:/g' )
+JDOC_EXCLUDE_B = $(shell echo $(EXCLUDE_CMD2) | sed -e 's/ /:/g' )
+JDOC_EXCLUDE = $(JDOC_EXCLUDE_A):$(JDOC_EXCLUDE_B)
+
 
 RUNLSNOF = java -p BUILD -m org.bzdev.lsnof
 
@@ -1462,7 +1450,7 @@ saved:
 
 $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		src/overview.html src/description.html \
-		stylesheet.css description.css \
+		stylesheet$(JAVADOC_VERSION).css description.css \
 		src/FactoryOverview.html
 	rm -rf $(JROOT_JAVADOCS)
 	mkdir -p $(JROOT_JAVADOCS)
@@ -1470,7 +1458,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 	cp $(MATH_DIR)/$(BZDEV)/providers/math/fft/DefaultFFT.txt \
 		$(MATH_DIR)/$(BZDEV)/math/doc-files/DefaultFFT.txt
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
-		|| echo --main-stylesheet stylesheet.css`; \
+		|| echo --main-stylesheet stylesheet$(JAVADOC_VERSION).css`; \
 	$(JAVADOC) -d $(JROOT_JAVADOCS) \
 		--module-path BUILD:$(SERVLETS_BUILD_PATH1) \
 		$$styleoption \
@@ -1485,7 +1473,12 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		| grep -E -v -e '^Copying file'
 	mkdir -p $(JROOT_JAVADOCS)/doc-files
 	cp description.css $(JROOT_JAVADOCS)/description.css
-	cp src/description.html $(JROOT_JAVADOCS)/doc-files/description.html
+	cp stylesheet11.css $(JROOT_JAVADOCS)
+	cp stylesheet17.css $(JROOT_JAVADOCS)
+	dstylesheet=`[ -z "$(DARKMODE)" ] && echo stylesheet.css \
+		|| echo stylesheet$(JAVADOC_VERSION).css` ; \
+	sed -e s/stylesheet.css/$$dstylesheet/  src/description.html \
+		> $(JROOT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link \
@@ -1497,7 +1490,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	rm -rf $(JROOT_ALT_JAVADOCS)
 	mkdir -p $(JROOT_ALT_JAVADOCS)
 	styleoption=`[ -z "$(DARKMODE)" ] && echo \
-		|| echo --main-stylesheet stylesheet.css`; \
+		|| echo --main-stylesheet stylesheet$(JAVADOC_VERSION).css`; \
 	$(JAVADOC) -d $(JROOT_ALT_JAVADOCS) \
 		--module-path BUILD$(SERVLETS_BUILD_PATH) \
 		$$styleoption \
@@ -1510,9 +1503,10 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 		-overview src/overview.html \
 		--module $(JDOC_MODULES) \
 		-exclude $(JDOC_EXCLUDE) 2>&1 | grep -v javax\\.servlet\\.http
-	@echo '(18 warnings expected due to javax.servlet.http [not shown])'
 	mkdir -p $(JROOT_ALT_JAVADOCS)/doc-files
 	cp description.css $(JROOT_ALT_JAVADOCS)/description.css
+	cp stylesheet11.css $(JROOT_JAVADOCS)
+	cp stylesheet17.css $(JROOT_JAVADOCS)
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done

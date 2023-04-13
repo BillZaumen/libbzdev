@@ -470,6 +470,23 @@ whose source attribute is
 The javadoc program will replace <CODE>{@docRoot}</CODE> with the API
 directory (APIDIR in this example).
 
+<H3>Dark mode</H3>
+<P>
+A reverse-video mode is available for the API documentation.  To
+duplicate it, go to a javadoc-generated API directory and replace
+the stylesheet (the default is <CODE>stylesheet.css</CODE>) with
+one of two files from the <CODE>libbzdev</CODE> api directory:
+<UL>
+  <LI><CODE>stylesheet11.css</CODE> if the API documentation was
+    generated using the Java 11 version of javadoc.
+  <LI><CODE>stylesheet17.css</CODE> if the API documentation was
+    generated using the Java 17 version of javadoc.
+</UL>
+Javadoc for versions 11 and 17 use different style sheets and
+the selectors for Javadoc 17 are different than those used for
+Javadoc 11, regardless of the release for which the documentation
+is being generated.
+
 <H2><A ID="libraries"></A>Libraries</H2>
 
 The JAR files for the libbzdev modules should be available in a single
