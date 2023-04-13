@@ -1,3 +1,4 @@
+/* Reset header sizes so that h1 is not too large for a description */
 h1 {
     font-size:1.6em;
 }
