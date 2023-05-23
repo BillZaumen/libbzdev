@@ -331,6 +331,10 @@ public class FileHandler implements HttpHandler {
      * @param alias the alias string; null to remove it
      * @throws IllegalArgumentException if the first argument contains
      *        a "/"
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
      */
     public void setLoginAlias(String alias)
 	throws IllegalArgumentException
@@ -358,6 +362,10 @@ public class FileHandler implements HttpHandler {
      *        the page that should be visited after a successful login.
      * @throws IllegalArgumentException if the first argument contains
      *        a "/" or the second argument starts with a "/"
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
      */
     public void setLoginAlias(String alias, String target)
 	throws IllegalArgumentException
@@ -400,6 +408,10 @@ public class FileHandler implements HttpHandler {
      *        absolute
      * @throws MalformedURLException if the second argument could not be
      *         converted to a URL.
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
      */
     public void setLoginAlias(String alias, URI target)
 	throws IllegalArgumentException, MalformedURLException
@@ -448,6 +460,8 @@ public class FileHandler implements HttpHandler {
      *        absolute
      * @throws MalformedURLException if the second argument could not be
      *         converted to a URL.
+     * @see EjwsSecureBasicAuth
+     * @see EjwsBasicAuthenticator
      */
     public void setLogoutAlias(String alias, URI target)
 	throws IllegalArgumentException, MalformedURLException
