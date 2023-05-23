@@ -9,6 +9,8 @@ public class Test {
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,
 		true, true, true);
+	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
+	handler.setLoginAlias("login.html");
 	ews.setTracer("/", System.out);
 	ews.start();
     }

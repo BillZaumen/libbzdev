@@ -101,12 +101,6 @@ public class FileHandler implements HttpHandler {
 		    }
 		    if (mimePattern.length < 2 || mimePattern[0] == null
 			|| mimePattern[1] == null) {
-			/*
-			  System.out.println("mimePattern.length = "
-			  + mimePattern.length
-			  + ", mimePattern[0] = "
-			  + mimePattern[0]);
-			*/
 			throw new IllegalArgumentException
 			    (errorMsg("badMIMEPattern"));
 		    }
@@ -322,6 +316,168 @@ public class FileHandler implements HttpHandler {
 	}
     }
 
+    private String loginAlias = null;
+    private String loginTarget = null;
+    private URL loginURL = null;
+
+    /**
+     * Set the login-alias string.
+     * This string is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, that URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/"
+     */
+    public void setLoginAlias(String alias)
+	throws IllegalArgumentException
+    {
+	if (alias == null) {
+	    loginAlias = null;
+	    loginTarget = null;
+	    loginURL = null;
+	} else {
+	    setLoginAlias(alias, "");
+	}
+    }
+
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a relative path.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the second argument starts with a "/"
+     */
+    public void setLoginAlias(String alias, String target)
+	throws IllegalArgumentException
+    {
+	if (alias != null) {
+	    if (alias.contains("/")) {
+		throw new IllegalArgumentException(errorMsg("aliasSlash"));
+	    } else if (alias.equals(logoutAlias)) {
+		throw new IllegalStateException(errorMsg("aliasConflict"));
+	    }
+	}
+	if (target == null) {
+	    target = "";
+	} else {
+	    target = target.trim();
+	    if (target.length() > 0 && target.charAt(0) == '/') {
+		throw new IllegalArgumentException(errorMsg("targetSlash"));
+	    }
+	}
+	loginAlias = alias;
+	loginTarget = target;
+	loginURL = null;
+    }
+
+
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a URL.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @throws MalformedURLException if the second argument could not be
+     *         converted to a URL.
+     */
+    public void setLoginAlias(String alias, URI target)
+	throws IllegalArgumentException, MalformedURLException
+    {
+	if (alias != null) {
+	    if (alias.contains("/")) {
+		throw new IllegalArgumentException(errorMsg("aliasSlash"));
+	    } else if (alias.equals(logoutAlias)) {
+		throw new IllegalStateException(errorMsg("aliasConflict"));
+	    }
+	}
+	loginAlias = alias;
+	loginTarget = null;
+	loginURL = target.toURL();
+    }
+
+
+
+    /**
+     * Get the login-alias string.
+     * @return the string; null if none has been set
+     */
+    public String getLoginAlias() {
+	return loginAlias;
+    }
+
+
+    private String logoutAlias = null;
+    private URL logoutURL = null;
+
+
+    /**
+     * Set the logout-alias string with a location to visit when the logout is
+     * successful, with the location represented as a URL.
+     * The logout alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the logout-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the logout URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful logout.
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @throws MalformedURLException if the second argument could not be
+     *         converted to a URL.
+     */
+    public void setLogoutAlias(String alias, URI target)
+	throws IllegalArgumentException, MalformedURLException
+    {
+	if (alias == null && target == null) {
+	    logoutAlias = null;
+	    logoutURL = null;
+	    return;
+	}
+	if (alias.contains("/")) {
+	    throw new IllegalArgumentException(errorMsg("aliasSlash"));
+	} else if (alias.equals(loginAlias)) {
+	    throw new IllegalStateException(errorMsg("aliasConflict"));
+	}
+	logoutAlias = alias;
+	logoutURL = target.toURL();
+    }
+
+
+
+    /**
+     * Get the logout-alias string.
+     * @return the string; null if none has been set
+     */
+    public String getLogoutAlias() {
+	return logoutAlias;
+    }
+
+
+
     String protocol = "http";
 
     /**
@@ -341,6 +497,7 @@ public class FileHandler implements HttpHandler {
     {
 	this(protocol, root, clasz, nowebxml, false, true);
     }
+
     /**
      * Constructor specifying a WebMap's class.
      * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
@@ -543,9 +700,9 @@ public class FileHandler implements HttpHandler {
     }
 
     /**
-     * Set an Appendable for tracing with a stacktrace.
+     * Set an Appendable for tracing with a stack trace.
      * This method should be used only for debugging.
-     * The stacktrace will be printed if {@link handle(HttpExchange)}
+     * The stack trace will be printed if {@link handle(HttpExchange)}
      * throws an exception and the first argument is not null.
      * @param tracer the Appendable for tracing requests and responses
      * @param stacktrace true for a stack trace; false otherwise
@@ -726,6 +883,48 @@ public class FileHandler implements HttpHandler {
 		    // System.out.println("query null or allowed");
 		    String base = /*"/"*/t.getHttpContext().getPath();
 		    String base1 = (base.endsWith("/"))? base: (base + "/");
+
+		    if (loginAlias != null && path.equals(base1 + loginAlias)) {
+			String location = (loginTarget != null)?
+			    uri.resolve(base1 + loginTarget).toString():
+			    loginURL.toExternalForm();
+			// System.out.println("location = " + location);
+			if (method == HttpMethod.PUT
+			    || method == HttpMethod.POST) {
+			    // Delete any pending data.
+			    is = t.getRequestBody();
+			    is.transferTo(OutputStream.nullOutputStream());
+			    is.close();
+			}
+			Headers hdrs = t.getResponseHeaders();
+			hdrs.set("Location", location);
+			String proto = protocol.toUpperCase();
+			int code = ((proto.startsWith("HTTP") &&
+				     proto.endsWith("/1.0")))?
+			    302: 307;
+			sendResponseHeaders(t, code, -1);
+			return;
+		    } else if (logoutAlias != null
+			       && path.equals(base1 + logoutAlias)) {
+			String location = logoutURL.toExternalForm();
+			System.out.println("location = " + location);
+			if (method == HttpMethod.PUT
+			    || method == HttpMethod.POST) {
+			    // Delete any pending data.
+			    is = t.getRequestBody();
+			    is.transferTo(OutputStream.nullOutputStream());
+			    is.close();
+			}
+			Headers hdrs = t.getResponseHeaders();
+			hdrs.set("Location", location);
+			String proto = protocol.toUpperCase();
+			int code = ((proto.startsWith("HTTP") &&
+				     proto.endsWith("/1.0")))?
+			    302: 307;
+			sendResponseHeaders(t, code, -1);
+			return;
+		    }
+
 		    // System.out.println("base = \"" + base + "\"");
 		    // System.out.println("path = \"" + path + "\"");
 		    WebMap.Info info = null;
@@ -1048,5 +1247,10 @@ public class FileHandler implements HttpHandler {
 //  LocalWords:  itemElements http WebMap's HTTPS clasz nowebxml xml
 //  LocalWords:  displayDir hideWebInf toURI getCanonicalPath getName
 //  LocalWords:  InputStream getWebxml className webmap pendingCount
-//  LocalWords:  getRequestMethod uri toString getPath getLength
-//  LocalWords:  printStackTrace
+//  LocalWords:  getRequestMethod uri toString getPath getLength clen
+//  LocalWords:  printStackTrace mimeAcceptor authenticators boolean
+//  LocalWords:  IllegalArgumentException IOException SAXException
+//  LocalWords:  Appendable setTracer stacktrace HttpExchange firefox
+//  LocalWords:  sendResponseHeaders jsessionid readReqBody logoutURI
+//  LocalWords:  getAttribute SecureBasicAuthLogout welcomeTest html
+//  LocalWords:  copyOut favicon webpage acceptor getFirst

@@ -184,5 +184,37 @@ atest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest
 
+atest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest2
+
+atest3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest3 publicKey.pem
+
+atest4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest4 publicKey.pem
+
+atest5:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest5
+
+
+atest4-noauth:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest4 publicKey.pem --noauth
+
+
 clean:
 	rm -rf classes

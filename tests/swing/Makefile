@@ -9,6 +9,7 @@ JAVAM = java -p ../../BUILD  \
 
 ARG1 =
 ARG2 =
+HOST = localhost
 
 JFILES = $(shell ls *.java | grep -v DebugTransferTest.java)
 
@@ -46,6 +47,7 @@ compile:
 
 
 PROG = AuthPaneTest
+
 
 scpolicy.policy:
 	echo \
@@ -758,5 +760,71 @@ ops:
 		SwingOpsTest.java
 	$(JAVA) SwingOpsTest
 
+authtest1:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/thelio-ks.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest http://localhost:8080/resources/glass.png
+
+authtest1a:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/thelio-ks.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest http://localhost:8080/resources/glass.png \
+			http://localhost:8080/resources/x.png
+
+authtest2s:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/keystore.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/cacerts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://localhost:8080/resources/glass.png
+
+authtest2:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/thelio-ks.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://localhost:8080/resources/glass.png
+authtest2a:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/thelio-ks.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -DHOST=$(HOST) \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://$(HOST):8080/resources/glass.png \
+			https://$(HOST):8080/resources/x.png
+
+authtest2t:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.keyStore=../ejws/thelio-ks.jks \
+             -Dssl.keyStorePassword=changeit \
+	     -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://wtz-thelio:8080/resources/glass.png
+
+privateKey.pem.gpg: privateKey.pem
+	gpg -e privateKey.pem
+
+
 clean:
-	rm -rf classes toc.xml scpolicy.policy manual.jar
+	rm -rf classes toc.xml scpolicy.policy manual.jar privateKey.pem.gpg

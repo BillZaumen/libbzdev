@@ -44,7 +44,7 @@ public class EjwsPrincipal extends HttpPrincipal {
     }
 
     /**
-     * Constructor based on another principal.
+     * Constructor based on another principal, but specifying roles.
      * @param p the original principal
      * @param roles the roles for this principal
      */
@@ -54,7 +54,7 @@ public class EjwsPrincipal extends HttpPrincipal {
 
 
     /**
-     * Constructor specifying roles.
+     * Constructor specifying a realm and roles.
      * @param username the user name
      * @param realm the HTTP realm
      * @param roles the roles for this user

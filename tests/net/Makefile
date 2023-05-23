@@ -4,9 +4,10 @@ all: compile
 	$(JAVA) Test
 	@echo ---- ICalBuilder Test ------
 	@$(JAVA) ICalBuilderTest
-	@echo ---- FormDataIterator Test
+	@echo ---- FormDataIterator Test ----
 	$(JAVA) FormDataTest
-
+	@echo ----- PEM Test -----
+	R(JAVA) PemTest
 
 compile:
 	(cd ../.. ; make jars)
@@ -36,5 +37,31 @@ cwtest1: compile
 run-cwtest:
 	sudo $(JAVA) CWTest
 
+pem-test: compile
+	$(JAVA) PemTest
+
+secbasic: compile ecstore.pfx public.pem public.der
+	@echo ---- SecureBasicUtilities Test ----
+	@$(JAVA) SecureBasicTest
+
+# The following rules were added to check openssl compatibility
+
+eckey.pem:
+	openssl ecparam -name prime256v1 -genkey -noout -out eckey.pem
+
+ecstore.pfx: eckey.pem
+	openssl req -new -x509 -key eckey.pem -out eccert.pem -days 360
+	openssl pkcs12 -export -inkey eckey.pem -in eccert.pem \
+	    -name key -out ecstore.pfx
+
+public.pem: eckey.pem
+	openssl ec -in eckey.pem -pubout -out public.pem -outform PEM
+
+public.der: eckey.pem
+	openssl ec -in eckey.pem -pubout -out public.der -outform DER
+
+#
+
 clean:
-	rm -rf classes testcal.ics
+	rm -rf classes testcal.ics eckey.pem public.pem public.der \
+		ecstore.pfx eccert.pem

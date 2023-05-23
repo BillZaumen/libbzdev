@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertStore;
@@ -409,6 +410,61 @@ public class EmbeddedWebServer {
 
     HttpsConfigurator httpsConfigurator = null;
 
+    KeyStore ksForCerts = null;
+
+    private Certificate[] getCertificatesAux()
+	throws KeyStoreException
+    {
+	Iterator<String> aliases = ksForCerts.aliases().asIterator();
+	ArrayList<Certificate> alist = new ArrayList<>();
+	while (aliases.hasNext()) {
+	    String alias = aliases.next();
+	    try {
+		if (ksForCerts.isKeyEntry(alias)) {
+		    Certificate cert = ksForCerts.getCertificate(alias);
+		    if (cert != null) {
+			alist.add(cert);
+		    }
+		}
+	    } catch (Exception e) {}
+	}
+	Certificate[] certificates = new Certificate[alist.size()];
+	alist.toArray(certificates);
+	return certificates;
+    }
+
+    /**
+     * Get Certificates.
+     * This will return null for an HTTP server and an array of
+     * certificates for HTTPS.  The certificates returned will be
+     * those with private keys and any such key is assumed to be
+     * possibly used as a server certificate.
+     * @param aliases the names of the aliases; no arguments for all
+     *        certificates
+     * @return an array containing certificates; null if not applicable
+
+     */
+    public Certificate[] getCertificates(String... aliases) {
+	if (ksForCerts == null) return null;
+	if (aliases.length == 0) {
+	    try {
+		return getCertificatesAux();
+	    } catch (Exception e) {
+		return null;
+	    }
+	} else {
+	    Certificate[] certificates = new Certificate[aliases.length];
+	    for (int i = 0; i < aliases.length; i++) {
+		try {
+		    certificates[i] = ksForCerts.getCertificate(aliases[i]);
+		} catch (Exception e) {
+		    certificates[i] = null;
+		}
+	    }
+	    return certificates;
+	}
+    }
+
     private void setupServer(SSLSetup s /*
                              InputStream ksis, char[] ksp,w char[] kepw,
 			     InputStream tsis, char[] tspw,
@@ -435,6 +491,7 @@ public class EmbeddedWebServer {
 		    ("org/bzdev/ejws/defaultCerts");
 	    }
 	    ks.load(s.ksis, s.kspw);
+	    ksForCerts = ks;
 	    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 	    kmf.init(ks, s.kepw);
 	    TrustManagerFactory tmf = null;
@@ -942,6 +999,24 @@ public class EmbeddedWebServer {
 	    p = "/";
 	}
 	return prefixMap.containsKey(p);
+    }
+
+    /**
+     * Get an HtppHandler if it is an instance of {@link FileHandler}.
+     * A leading and/or trailing '/' will be added to the prefix if
+     * missing.
+     * <P>
+     * This method is provided for convenience.
+     * @param p the prefix (null implies the root prefix)
+     * @return the handler
+     */
+    public FileHandler getFileHandler(String p) {
+	HttpHandler handler = getHttpHandler(p);
+	if (handler != null && handler instanceof FileHandler) {
+	    return (FileHandler) handler;
+	} else {
+	    return null;
+	}
     }
 
     /**
