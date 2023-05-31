@@ -291,6 +291,61 @@ public class AuthPaneTest {
 		frame.setVisible(true);
 	    });
 	if (url1 != null) {
+	    System.out.println("connect to logout");
+	    if (urlString1.startsWith("http://" + HOST + ":8080/")
+		|| urlString1.startsWith("https://" + HOST + ":8080/")) {
+		int last = urlString1.lastIndexOf('/');
+		URL url0 = new URL(urlString1.startsWith("https")?
+				   "https://" + HOST + ":8080/logout.html":
+				   "http://" + HOST + ":8080/logout.html");
+		URLConnection urlc = url0.openConnection();
+		urlc.connect();
+		System.out.println("... reading (content length = "
+				   + urlc.getContentLength() + ")");
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
+		System.out.println("... get input stream");
+		InputStream is = (status == 200)? urlc.getInputStream():
+		    ((HttpURLConnection) urlc).getErrorStream();
+		int cnt  = 0;
+		while (is.read() != -1) {
+		    cnt++;
+		}
+		is.close();
+		System.out.println("... read " + cnt + " bytes");
+		System.out.println("... reading complete");
+	    }
+	}
+	if (url1 != null) {
+	    System.out.println("connect to login");
+	    if (urlString1.startsWith("http://" + HOST + ":8080/")
+		|| urlString1.startsWith("https://" + HOST + ":8080/")) {
+		int last = urlString1.lastIndexOf('/');
+		URL url0 = new URL(urlString1.startsWith("https")?
+				   "https://" + HOST + ":8080/login.html":
+				   "http://" + HOST + ":8080/login.html");
+		URLConnection urlc = url0.openConnection();
+		urlc.connect();
+		System.out.println("... reading (content length = "
+				   + urlc.getContentLength() + ")");
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
+		System.out.println("... get input stream");
+		InputStream is = (status == 200)? urlc.getInputStream():
+		    ((HttpURLConnection) urlc).getErrorStream();
+		int cnt  = 0;
+		while (is.read() != -1) {
+		    cnt++;
+		}
+		is.close();
+		System.out.println("... read " + cnt + " bytes");
+		System.out.println("... reading complete");
+	    }
+	}
+
+	if (url1 != null) {
 	    Thread.sleep(25000L);
 	    System.out.println("connect to root");
 	    if (urlString1.startsWith("http://" + HOST + ":8080/")
@@ -319,11 +374,51 @@ public class AuthPaneTest {
 				   "http://" + HOST + ":8080/logout.html");
 		URLConnection urlc = url0.openConnection();
 		urlc.connect();
-		System.out.println("... reading");
-		InputStream is = urlc.getInputStream();
-		is.transferTo(OutputStream.nullOutputStream());
+		System.out.println("... reading (content length = "
+				   + urlc.getContentLength() + ")");
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
+		System.out.println("... get input stream");
+		InputStream is = (status == 200)? urlc.getInputStream():
+		    ((HttpURLConnection) urlc).getErrorStream();
+		int cnt  = 0;
+		while (is.read() != -1) {
+		    cnt++;
+		}
 		is.close();
+		System.out.println("... read " + cnt + " bytes");
 		System.out.println("... reading complete");
+	    }
+	}
+	if (url1 != null) {
+	    Thread.sleep(1000L);
+	    System.out.println("connect to root again");
+	    if (urlString1.startsWith("http://" + HOST + ":8080/")
+		|| urlString1.startsWith("https://" + HOST + ":8080/")) {
+		int last = urlString1.lastIndexOf('/');
+		URL url0 = new URL(urlString1.startsWith("https")?
+				   "https://" + HOST + ":8080/":
+				   "http://" + HOST + ":8080/");
+		URLConnection urlc = url0.openConnection();
+		urlc.connect();
+		System.out.println("... reading (content length = "
+				   + urlc.getContentLength() + ")");
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
+		System.out.println("... get input stream");
+		InputStream is = (status == 200)? urlc.getInputStream():
+		    ((HttpURLConnection) urlc).getErrorStream();
+		if (is != null) {
+		    int cnt  = 0;
+		    while (is.read() != -1) {
+			cnt++;
+		    }
+		    is.close();
+		    System.out.println("... read " + cnt + " bytes");
+		    System.out.println("... reading complete");
+		}
 	    }
 	}
 

@@ -7,6 +7,7 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.Certificate;
+import java.util.Iterator;
 
 public class ATest4 {
     public static void main(String argv[]) throws Exception {
@@ -17,6 +18,19 @@ public class ATest4 {
 	System.out.println(publicKeyPem);
 
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
+	System.out.println("server address:" + saddr.getAddress());
+	System.out.println("all addresses: ");
+	Iterator<NetworkInterface> it1 =
+	    NetworkInterface.getNetworkInterfaces().asIterator();
+	while (it1.hasNext()) {
+	    Iterator<InetAddress> it2 =
+		it1.next().getInetAddresses().asIterator();
+	    while (it2.hasNext()) {
+		System.out.println("... " + it2.next());
+	    }
+	}
+
+
 	EmbeddedWebServer ews = new
 	    EmbeddedWebServer(saddr.getAddress(),
 			      8080, 48, 10,
@@ -26,7 +40,7 @@ public class ATest4 {
 					  ("thelio-ts.jks")));
 
 	EjwsSecureBasicAuth auth = null;
-	if (argv.length == 1 || !argv[1].equals("--noauth")) {
+	if (!argv[argv.length-1].equals("--noauth")) {
 	    Certificate[] certs = ews.getCertificates();
 	    System.out.println("Number of certificates = " + certs.length);
 	    auth = new EjwsSecureBasicAuth(realm, certs);
@@ -40,13 +54,22 @@ public class ATest4 {
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
 
+	ews.add("/open/", DirWebMap.class, new File("../../BUILD/api/"), null,
+		true, true, true);
+
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
-	handler.setLoginAlias("login.html");
-	handler.setLogoutAlias("logout.html",
-			       new URI("https://www.google.com"));
+	handler.setLoginAlias("login.html", "", true);
+	URI logoutURI = (argv.length == 1)?
+	    new URI("https://www.google.com"): new URI(argv[1]);
+
+	handler.setLogoutAlias("logout.html", logoutURI);
 
 	auth.setLoginFunction((p, t) -> {
 		System.out.println("login: " + p.getUsername());
+	    });
+
+	auth.setAuthorizedFunction((p, t) -> {
+		System.out.println("logged in: " + p.getUsername());
 	    });
 
 	auth.setLogoutFunction((p, t) -> {

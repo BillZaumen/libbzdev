@@ -11,8 +11,7 @@ public class ATest3 {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	EjwsSecureBasicAuth auth =
-	    new EjwsSecureBasicAuth(realm, null);
+	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm);
 	System.out.println("auth mode = " + auth.getMode());
 	String publicKeyPem = Files.readString(Paths.get(argv[0]));
 	System.out.println(publicKeyPem);

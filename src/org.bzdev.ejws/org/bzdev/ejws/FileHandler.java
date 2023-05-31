@@ -18,7 +18,8 @@ import org.bzdev.net.HttpMethod;
 import org.bzdev.net.ServerCookie;
 import org.bzdev.net.HeaderOps;
 import org.bzdev.util.ErrorMessage;
-
+import org.bzdev.util.TemplateProcessor;
+import org.bzdev.util.TemplateProcessor.KeyMap;
 
 //@exbundle org.bzdev.ejws.lpack.EmbeddedWebServer
 
@@ -319,6 +320,19 @@ public class FileHandler implements HttpHandler {
     private String loginAlias = null;
     private String loginTarget = null;
     private URL loginURL = null;
+    private boolean loginRequired = false;
+
+    /**
+     * Determine if a login is required.
+     * When a login is required, {@link EjwsSecureBasicAuth}
+     * will reject an authorization request unless the user has first
+     * been authorized when visiting the page denoted by the login alias.
+     * @return true if a login is required; false otherwise
+     */
+    public boolean isLoginRequired() {
+	return loginRequired;
+    }
+
 
     /**
      * Set the login-alias string.
@@ -370,6 +384,40 @@ public class FileHandler implements HttpHandler {
     public void setLoginAlias(String alias, String target)
 	throws IllegalArgumentException
     {
+	setLoginAlias(alias, target, false);
+    }
+
+    /**
+     * Set the login-alias string with a location to visit when the
+     * login is successful, with the location represented as a
+     * relative path, and with a flag indicating if a login is
+     * required.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * <P>
+     * When a login is required, an authenticaor that supports this
+     * behavior will reject all authorization requests from a user
+     * until the user is authorized by visiting the login-alias page.
+     * A logout will restore this behavior.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @param required true if a login is required; false (the default)
+     *        otherwise
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the second argument starts with a "/"
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public void setLoginAlias(String alias, String target, boolean required)
+	throws IllegalArgumentException
+    {
 	if (alias != null) {
 	    if (alias.contains("/")) {
 		throw new IllegalArgumentException(errorMsg("aliasSlash"));
@@ -388,8 +436,8 @@ public class FileHandler implements HttpHandler {
 	loginAlias = alias;
 	loginTarget = target;
 	loginURL = null;
+	loginRequired = required;
     }
-
 
     /**
      * Set the login-alias string with a location to visit when the login is
@@ -407,13 +455,48 @@ public class FileHandler implements HttpHandler {
      *        a "/" or the URI provided by the second argument is not
      *        absolute
      * @throws MalformedURLException if the second argument could not be
-     *         converted to a URL.
+     *         converted to a URL
      * @see EjwsSecureBasicAuth#setLoginFunction
      * @see EjwsSecureBasicAuth#setLogoutFunction
      * @see EjwsBasicAuthenticator#setLoginFunction
      * @see EjwsBasicAuthenticator#setLogoutFunction
      */
     public void setLoginAlias(String alias, URI target)
+	throws IllegalArgumentException, MalformedURLException
+    {
+	setLoginAlias(alias, target, false);
+    }
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a URL, and with a flag
+     * indicating if a login is required.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * <P>
+     * When a login is required, an authenticaor that supports this
+     * behavior will reject all authorization requests from a user
+     * until the user is authorized by visiting the login-alias page.
+     * A logout will restore this behavior.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @param required true if a login is required; false (the default)
+     *        otherwise
+     * @throws MalformedURLException if the second argument could not be
+     *         converted to a URL
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public void setLoginAlias(String alias, URI target, boolean required)
 	throws IllegalArgumentException, MalformedURLException
     {
 	if (alias != null) {
@@ -426,6 +509,7 @@ public class FileHandler implements HttpHandler {
 	loginAlias = alias;
 	loginTarget = null;
 	loginURL = target.toURL();
+	loginRequired = required;
     }
 
 
@@ -440,8 +524,20 @@ public class FileHandler implements HttpHandler {
 
 
     private String logoutAlias = null;
-    private URL logoutURL = null;
+    private URI logoutURI = null;
+    private InetAddress logoutAddr = null;
+    private int logoutPort = -1;
+    private String logoutPath = null;
+    private EmbeddedWebServer ews = null;
 
+    /**
+     * Set the embedded web server that uses this file handler.
+     * @param ews the embedded web server for this file handler; null
+     *        if there is none
+     */
+    protected void setEWS(EmbeddedWebServer ews) {
+	this.ews = ews;
+    }
 
     /**
      * Set the logout-alias string with a location to visit when the logout is
@@ -452,23 +548,33 @@ public class FileHandler implements HttpHandler {
      * the logout-alias, that URL will be redirected to a location
      * specified by the target.  In addition, the logout URL may be
      * treated specially by authenticators.
+     * <P>
+     * The URI provided by the second argument must not be one that
+     * will be authenticated by this handler's context's authenticator.
+     * The test for this is more precise when the web server is created
+     * by an instance of {@link EmbeddedWebServer} because
+     * {@link EmbeddedWebServer} allows one to find all the context paths.
+     * Otherwise a simple test using this handler's context path is used:
+     * For the current server, if the URI's path starts with the context
+     * path, the logout URI is rejected.
      * @param alias the alias string; null to remove it
-     * @param target the relative path from this handler's context to
-     *        the page that should be visited after a successful logout.
+     * @param target the URI for the page that should be visited after
+     *        a successful logout.
      * @throws IllegalArgumentException if the first argument contains
      *        a "/" or the URI provided by the second argument is not
      *        absolute
-     * @throws MalformedURLException if the second argument could not be
-     *         converted to a URL.
+     * @throws UnknownHostException if the host component of a URI
+     *         passed as this method's second argument is not recognized
+     *         by a name server
      * @see EjwsSecureBasicAuth
      * @see EjwsBasicAuthenticator
      */
     public void setLogoutAlias(String alias, URI target)
-	throws IllegalArgumentException, MalformedURLException
+	throws IllegalArgumentException, UnknownHostException
     {
 	if (alias == null && target == null) {
 	    logoutAlias = null;
-	    logoutURL = null;
+	    logoutURI = null;
 	    return;
 	}
 	if (alias.contains("/")) {
@@ -477,10 +583,12 @@ public class FileHandler implements HttpHandler {
 	    throw new IllegalStateException(errorMsg("aliasConflict"));
 	}
 	logoutAlias = alias;
-	logoutURL = target.toURL();
+	logoutURI = target;
+	String host = target.getHost();
+	logoutAddr = (host == null)? null: InetAddress.getByName(host);
+	int port = target.getPort();
+	logoutPath = target.getPath();
     }
-
-
 
     /**
      * Get the logout-alias string.
@@ -490,6 +598,14 @@ public class FileHandler implements HttpHandler {
 	return logoutAlias;
     }
 
+    /**
+     * Get the logout URI.
+     * The URI is the one to which a user will be redirected.
+     * @return the logout URI
+     */
+    public URI getLogoutURI() {
+	return  logoutURI;
+    }
 
 
     String protocol = "http";
@@ -861,6 +977,7 @@ public class FileHandler implements HttpHandler {
 			if (clen != len) {
 			    throw new IOException(errorMsg("clen", len, clen));
 			}
+			os.flush();
 		    } finally {
 			if (is != null) is.close();
 		    }
@@ -920,8 +1037,29 @@ public class FileHandler implements HttpHandler {
 			return;
 		    } else if (logoutAlias != null
 			       && path.equals(base1 + logoutAlias)) {
-			String location = logoutURL.toExternalForm();
-			System.out.println("location = " + location);
+			// Do a check that a logout won't land you on
+			// a page using the same authenticator that you
+			// are trying to log out of.
+			boolean ok = (ews == null);
+			if (!ok) {
+			    if (logoutPort > 0 && logoutAddr != null) {
+				ok = !ews.isServerAddressAndPort(logoutAddr,
+								 logoutPort)
+				    || !logoutPath.startsWith(base1);
+			    } else {
+				ok = !logoutPath.startsWith(base1);
+			    }
+			}
+			if (!ok) {
+			    for (String p: ews.getPrefixes()) {
+				if ((p.length() > base1.length())
+				    && p.startsWith(base1)
+				    && logoutPath.startsWith(p)) {
+				    ok = true;
+				    break;
+				}
+			    }
+			}
 			if (method == HttpMethod.PUT
 			    || method == HttpMethod.POST) {
 			    // Delete any pending data.
@@ -929,13 +1067,37 @@ public class FileHandler implements HttpHandler {
 			    is.transferTo(OutputStream.nullOutputStream());
 			    is.close();
 			}
-			Headers hdrs = t.getResponseHeaders();
-			hdrs.set("Location", location);
-			String proto = protocol.toUpperCase();
-			int code = ((proto.startsWith("HTTP") &&
-				     proto.endsWith("/1.0")))?
-			    302: 307;
-			sendResponseHeaders(t, code, -1);
+			String location = logoutURI.toASCIIString();
+			if (ok) {
+			    // System.out.println("location = " + location);
+			    Headers hdrs = t.getResponseHeaders();
+			    hdrs.set("Location", location);
+			    String proto = protocol.toUpperCase();
+			    int code = ((proto.startsWith("HTTP") &&
+					 proto.endsWith("/1.0")))?
+				302: 307;
+			    sendResponseHeaders(t, code, -1);
+			} else {
+			    KeyMap kmap = new KeyMap();
+			    kmap.put("statusCode", "500");
+			    kmap.put("requestURL", uri.toString());
+			    kmap.put("location", location);
+			    TemplateProcessor tp = new TemplateProcessor(kmap);
+			    ByteArrayOutputStream bos =
+				new ByteArrayOutputStream();
+			    try {
+				InputStream tis = getClass()
+				    .getResourceAsStream("error3.tpl");
+				Reader r = new InputStreamReader(tis, "UTF-8");
+				tp.processTemplate(r, "UTF-8", bos);
+				sendResponseHeaders(t, 500, bos.size());
+				OutputStream os = t.getResponseBody();
+				bos.writeTo(os);
+				os.flush();
+			    } catch (Exception e) {
+				ErrorMessage.display(e);
+			    }
+			}
 			return;
 		    }
 
@@ -1225,6 +1387,7 @@ public class FileHandler implements HttpHandler {
 			if (clen != len) {
 			    throw new IOException(errorMsg("clen", len, clen));
 			}
+			os.flush();
 		    }
 		} finally {
 		    if (is != null) is.close();

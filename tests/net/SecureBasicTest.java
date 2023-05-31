@@ -47,7 +47,7 @@ public class SecureBasicTest {
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
-	if (ops.isLogout(passwordStr)) throw new Exception();
+	// if (ops.isLogout(passwordStr)) throw new Exception();
 	if (ops.decodeUserName(null, passwordStr) != null) {
 	    throw new Exception();
 	}
@@ -57,7 +57,7 @@ public class SecureBasicTest {
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
-	if (ops.isLogout(pwBytes)) throw new Exception();
+	// if (ops.isLogout(pwBytes)) throw new Exception();
 	if (ops.decodeUserName(null, pwBytes) != null) throw new Exception();
 
 
@@ -68,7 +68,7 @@ public class SecureBasicTest {
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
-	if (ops.isLogout(passwordStr)) throw new Exception();
+	// if (ops.isLogout(passwordStr)) throw new Exception();
 
 	password = passwordStr.toCharArray();
 	sigarray = ops.decodePassword(password);

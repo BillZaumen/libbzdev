@@ -113,16 +113,36 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     }
 
 
-    static class Entry {
+    /**
+     * User entry.
+     * This object contains a user's password and roles, and
+     * (if applicable) the user's public key in PEM format.
+     * The PEM file must also contain a header specifying a
+     * digital-ignature algorithm.
+     * @see org.bzdev.net.SecureBasicUtilities
+     */
+   public static class Entry {
 	String pw;
 	Set<String> roles;
 	SecureBasicUtilities keyops;
 	
+	/**
+	 * Constructor.
+	 * @param pw a password for a user
+	 * @param roles a set of roles that a user may have
+	 */
 	Entry(String pw, Set<String>roles) {
 	    this.pw = pw; this.roles = roles;
 	    this.keyops = new SecureBasicUtilities();
 	}
 
+	/**
+	 * Constructor with a PEM-encoded public-key.
+	 * @param pem the PEM encoded public key or a certificate
+	 *        containing that public key.
+	 * @param pw a password for a user
+	 * @param roles a set of roles that a user may have
+	 */
 	Entry(String pem, String pw, Set<String>roles) {
 	    this.pw = pw; this.roles = roles;
 	    try {
@@ -136,9 +156,20 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    }
 	}
 	
-    }
+       /**
+	 * Get the password stored in this entry.
+	 * @return the password
+	 */
+	public String getPassword() {return pw;}
 
-    Map<String,Entry>map = new ConcurrentHashMap<String,Entry>();
+	/**
+	 * Get the roles stroed in this entry
+	 * @return a set of roles; null if not applicable
+	 */
+	public Set<String> getRoles(){return roles;}
+   }
+
+    Map<String,Entry>map = null;
 
     Certificate[] certificates;
     SecureBasicUtilities.Mode mode;
@@ -150,6 +181,8 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     public SecureBasicUtilities.Mode getMode() {
 	return mode;
     }
+
+    private String unencodedRealm ;
 
     // allow a small but ample time window for clocks to be
     // out of sync, plus propagation delay.
@@ -210,15 +243,34 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	this.passwordTimeout = passwordTimeout;
     }
 
-
     /**
      * Constructor for {@link SecureBasicUtilities.Mode#DIGEST} mode.
      * @param realm the HTTP realm
      */
     public EjwsSecureBasicAuth(String realm) {
+	this(realm, new ConcurrentHashMap<String,Entry>());
+    }
+
+    /**
+     * Constructor for {@link SecureBasicUtilities.Mode#DIGEST} mode,
+     * specifying a map.
+     * <P>
+     * A user-supplied map can be implemented so as to allow one to obtain
+     * passwords and roles from a database or some other form of persistent
+     * storage. If entries can be added while a server using this
+     * authenticator is running, the map should have a thread-safe
+     * implementation.
+     * @param realm the HTTP realm
+     * @param map a map associating user names with entries containing
+     *        a password, roles, and optionally a public key and related
+     *        data
+     */
+    public EjwsSecureBasicAuth(String realm, Map<String,Entry> map) {
 	super(SecureBasicUtilities
 	      .encodeRealm(realm, SecureBasicUtilities.Mode.DIGEST));
+	unencodedRealm = realm;
 	mode = SecureBasicUtilities.Mode.DIGEST;
+	this.map = map;
     }
 
     private static SecureBasicUtilities.Mode getMode(Certificate cert) {
@@ -251,7 +303,33 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * @param realm the HTTP realm
      */
     public EjwsSecureBasicAuth(String realm, Certificate[] certs) {
+	this(realm, certs, new ConcurrentHashMap<String,Entry>());
+    }
+
+    /**
+     * Constructor for {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT}
+     * mode and
+     * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT} mode given
+     * multiple certificates, specifying a map.
+     * <P>
+     * A user-supplied map can be implemented so as to allow one to obtain
+     * passwords and roles from a database or some other form of persistent
+     * storage. If entries can be added while a server using this
+     * authenticator is running, the map should have a thread-safe
+     * implementation.
+     * @param certs the server certificates.
+     * @param realm the HTTP realm
+     * @param map a map associating user names with entries containing
+     *        a password, roles, and optionally a public key and related
+     *        data
+     */
+    public EjwsSecureBasicAuth(String realm,
+			       Certificate[] certs,
+			       Map<String,Entry> map)
+    {
 	super(SecureBasicUtilities.encodeRealm(realm, getMode(certs)));
+	unencodedRealm = realm;
+	this.map = map;
 	if (certs != null) {
 	    int cnt = 0;
 	    for (int i = 0; i < certs.length; i++) {
@@ -280,8 +358,13 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * Add a user name and password for this authenticator's HTTP realm.
      * @param username the user name
      * @param password the password
-     */
-    public void add(String username, String password) {
+     * @throws UnsupportedOperationException if the map does not allow
+     *         entries to be added (the default map does not throw this
+     *         exception)
+    */
+    public void add(String username, String password)
+	throws UnsupportedOperationException
+    {
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
@@ -294,8 +377,13 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * @param username the user name
      * @param password the user's password
      * @param roles the user's roles
+     * @throws UnsupportedOperationException if the map does not allow
+     *         entries to be added (the default map does not throw this
+     *         exception)
      */
-    public void add(String username, String password, Set<String> roles ) {
+    public void add(String username, String password, Set<String> roles )
+	throws UnsupportedOperationException
+    {
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
@@ -309,8 +397,12 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * @param pem A PEM file providing the signature algorithm and
      *            the user's certificate or public key
      * @param password the user's password
+     * @throws UnsupportedOperationException if the map does not allow
+     *         entries to be added (the default map does not throw this
+     *         exception)
      */
     public void add(String username, String pem, String password)
+	throws UnsupportedOperationException
     {
 	add(username, pem, password, null);
     }
@@ -324,9 +416,13 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      *            the user's certificate or public key
      * @param password the user's password
      * @param roles the user's roles
+     * @throws UnsupportedOperationException if the map does not allow
+     *         entries to be added (the default map does not throw this
+     *         exception)
      */
     public void add(String username, String pem, String password,
 		    Set<String> roles )
+	throws UnsupportedOperationException
     {
 	if (mode == SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
@@ -336,14 +432,18 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 
     private String loginPath = null;
     private boolean loginPathUsed = true;
-    BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
-
-
+    private boolean loginRequired = false;
+    private BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
+    private ThreadLocal<Boolean> foundLoginTL = new ThreadLocal<>();
+    private ThreadLocal<Integer> flCode = new ThreadLocal<>();
 
     private String logoutPath = null;
     private boolean logoutPathUsed = true;
-    BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
+    private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
+    private ThreadLocal<Boolean> foundLogoutTL = new ThreadLocal<>();
+    private ThreadLocal<String> usernameTL = new ThreadLocal<>();
 
+    private BiConsumer authFunction = null;
 
     /**
      * Set the login function.
@@ -354,7 +454,9 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * <P>
      * The function will be called when the request URI matches a
      * designated login URI, with the current {@link EjwsPrincipal} and
-     * {@link HttpExchange} as its arguments
+     * {@link HttpExchange} as its arguments.
+     * In any transaction, at most one of the login, logout, and
+     * authorized functions will be called.
      * @param function the function; null to disable
      * @see FileHandler#setLoginAlias(String)
      * @see FileHandler#setLoginAlias(String,String)
@@ -367,6 +469,21 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     }
 
     /**
+     * Set the authorized function.
+     * This function will be called when a request is authorized.
+     * Its arguments are a principal and the Http exchange. THe
+     * later can be used to set cookies or perform other operations.
+     * In any transaction, at most one of the login, logout, and
+     * authorized functions will be called.
+     * @param function the 'authorized' function.
+     */
+    public void setAuthorizedFunction
+	(BiConsumer<EjwsPrincipal,HttpExchange> function)
+    {
+	authFunction = function;
+    }
+
+    /**
      * Set the logout function.
      * This function will be called using the current HttpExchange
      * when a logout is (a) successful and (b) the function is not null.
@@ -375,7 +492,10 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * <P>
      * The function will be called when the request URI matches a
      * designated logout URI, with the current {@link EjwsPrincipal} and
-     * {@link HttpExchange} as its arguments
+     * {@link HttpExchange} as its arguments.  The {@link HttpExchange}
+     * will be null if the login session has timed out.
+     * In any transaction, at most one of the login, logout, and
+     * authorized functions will be called.
      * @param function the function; null to disable
      * @see FileHandler#setLogoutAlias(String,URI)
      */
@@ -415,6 +535,8 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 		    String root = t.getHttpContext().getPath();
 		    if (!root.endsWith("/")) root = root + "/";
 		    loginPath = root + alias;
+		    loginRequired = fileHandler.isLoginRequired();
+
 		} else {
 		    loginPathUsed = false;
 		}
@@ -426,6 +548,10 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	if (loginPathUsed
 	    && t.getRequestURI().getPath().equals(loginPath)) {
 	    foundLogin = true;
+	}
+	if (loginRequired) {
+	    foundLoginTL.set(foundLogin);
+	    flCode.set(0);
 	}
 
 	if (logoutPathUsed && logoutPath == null) {
@@ -450,6 +576,9 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    foundLogout = true;
 	}
 
+	if (loginRequired) {
+	    foundLogoutTL.set(foundLogout);
+	}
 
 	if (tracer != null) {
 	    String s = t.getRequestHeaders().getFirst("Authorization");
@@ -490,6 +619,8 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 		}
 		PWInfoKey key = new PWInfoKey(un, iaddr);
 		pwmap.remove(key);
+	    } else if (!foundLogin && !foundLogout && authFunction != null) {
+		authFunction.accept((EjwsPrincipal)p, t);
 	    }
 	    return new Authenticator.Success(p);
 	} else {
@@ -507,6 +638,28 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 		try {
 		    tracer.append("(" + ct + ") authentication failed\n");
 		} catch (IOException e) {}
+	    }
+	    if (loginRequired) {
+		int code = flCode.get();
+		if (code != 0) {
+		    if (code == 307) {
+			String proto = t.getProtocol().toUpperCase();
+			code = ((proto.startsWith("HTTP") &&
+				 proto.endsWith("/1.0")))?
+			    302: 307;
+			t.getResponseHeaders().set("Location",
+						   fileHandler.getLogoutURI()
+						   .toASCIIString());
+			String un = usernameTL.get();
+			EjwsPrincipal p = new EjwsPrincipal(un,
+							    unencodedRealm,
+							    map.get(un).roles);
+			if (logoutFunction != null) {
+			    logoutFunction.accept(p, null);
+			}
+		    }
+		    return new Authenticator.Failure(code);
+		}
 	    }
 	    return result;
 	}
@@ -555,6 +708,29 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 
     private Map<PWInfoKey,PWInfo> pwmap = new ConcurrentHashMap<>();
 
+    private long TOFFSET = 30;
+
+    /**
+     *
+     */
+    public void prune() {
+	long now = Instant.now().getEpochSecond();
+	Iterator<Map.Entry<PWInfoKey,PWInfo>> it = pwmap.entrySet().iterator();
+	while (it.hasNext()) {
+	    Map.Entry<PWInfoKey,PWInfo> info = it.next();
+	    if (info.getValue().expires < now - TOFFSET) {
+		String un = info.getKey().username;
+		it.remove();
+		EjwsPrincipal p = new EjwsPrincipal(un, unencodedRealm,
+						    map.get(un).roles);
+		if (logoutFunction != null) {
+		    logoutFunction.accept(p, null);
+		}
+	    }
+	}
+    }
+
+
     /**
      * Check credentials.
      * This method is called for each incoming request to verify
@@ -571,8 +747,10 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	username = SecureBasicUtilities.decodeUserName(username, password);
 	InetAddress iaddr = addr.get();
 	PWInfoKey key = new PWInfoKey(username, iaddr);
+	/*
 	System.out.println("username = " + username + ", iaddr = "
 			   + iaddr.toString());
+	*/
 	PWInfo pwinfo = pwmap.get(key);
 	if (pwinfo != null) {
 	    /*
@@ -601,8 +779,21 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 					  + "extended timeout expired\n");
 			} catch (IOException e){}
 		    }
+		    if (loginRequired) {
+			// the login timed out, so send the user
+			// to the login page.
+			flCode.set(307);
+			usernameTL.set(username);
+		    }
 		    return false;
 		}
+	    }
+	} else if (loginRequired) {
+	    boolean foundLogin = foundLoginTL.get();
+	    boolean foundLogout = foundLogoutTL.get();
+	    if (!foundLogin && !foundLogout) {
+		flCode.set(403);
+		return false;
 	    }
 	}
 	Entry entry = map.get(username);

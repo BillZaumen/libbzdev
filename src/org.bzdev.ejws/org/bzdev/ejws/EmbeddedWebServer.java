@@ -637,6 +637,7 @@ public class EmbeddedWebServer {
 	this.backlog = backlog;
 	this.nthreads = nthreads;
 	this.useHTTPS = (sslSetup != null);
+	createAddressList();
 	try {
 	    setupServer(sslSetup);
 	} catch (Exception e) {
@@ -644,6 +645,64 @@ public class EmbeddedWebServer {
 	    throw new UnexpectedExceptionError(e);
 	}
     }
+
+    private List<InetAddress> addressList = null;
+
+    private void createAddressList() {
+	if (addr == null || addr.isAnyLocalAddress()) {
+	    LinkedList<InetAddress> list = new LinkedList<>();
+	    try {
+		Iterator<NetworkInterface> it1 =
+		    NetworkInterface.getNetworkInterfaces().asIterator();
+		while (it1.hasNext()) {
+		    Iterator<InetAddress> it2 =
+			it1.next().getInetAddresses().asIterator();
+		    while (it2.hasNext()) {
+			list.add(it2.next());
+		    }
+		}
+	    } catch (Exception e) {
+		try {
+		    err.append("cannot create network address list\n");
+		} catch (Exception ee) {}
+	    }
+	    addressList = list;
+	} else {
+	    addressList = List.of(addr);
+	}
+    }
+
+    /**
+     * Get a list of the Internet addresses that this embedded web server
+     * uses.
+     * <P>
+     * The list can have more than one entry when the server is
+     * configured using a wildcard address.
+     * @return a list of addresses
+     */
+    public List<InetAddress> getAddresses() {
+	return Collections.unmodifiableList(addressList);
+    }
+
+    /**
+     * Determine if an address and port is one associated with this
+     * server.
+     * @param addr the internet address
+     * @param port the port
+     * @return true if the arguments provide an address and port that this
+     *         server uses; false otherwise
+     */
+    public boolean isServerAddressAndPort(InetAddress addr, int port) {
+	if (port == this.port) {
+	    for (InetAddress a: getAddresses()) {
+		if (a.equals(addr)) {
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
 
     // HashSet<String> prefixSet = new HashSet<String>();
 
@@ -811,10 +870,11 @@ public class EmbeddedWebServer {
 	} else {
 	    p = "/";
 	}
-	add(p, new FileHandler((useHTTPS?"https":"http"),
-			       arg, className, nowebxml, displayDir,
-			       hideWebInf),
-	    authenticator);
+	FileHandler fh = new FileHandler((useHTTPS?"https":"http"),
+					 arg, className, nowebxml, displayDir,
+					 hideWebInf);
+	add(p, fh, authenticator);
+
     }
 
     /**
@@ -868,9 +928,10 @@ public class EmbeddedWebServer {
 	} else {
 	    p = "/";
 	}
-	add(p, new FileHandler((useHTTPS?"https":"http"),
-			       arg, clazz, nowebxml, displayDir, hideWebInf),
-	    authenticator);
+	FileHandler fh = new
+	    FileHandler((useHTTPS?"https":"http"),
+			arg, clazz, nowebxml, displayDir, hideWebInf);
+	add(p, fh, authenticator);
     }
 
     /**
@@ -938,6 +999,9 @@ public class EmbeddedWebServer {
     private void doAdd(String p, PrefixData pd)
     {
 	HttpContext context = server.createContext(p, pd.handler);
+	if (pd.handler instanceof FileHandler) {
+	    ((FileHandler)(pd.handler)).setEWS(this);
+	}
 	context.getFilters().add(new TraceFilter());
 	pd.context = context;
 	if (pd.authenticator != null) {
@@ -966,6 +1030,10 @@ public class EmbeddedWebServer {
 	    p = "/";
 	}
 	if (prefixMap.containsKey(p)) {
+	    HttpHandler handler = getHttpHandler(p);
+	    if (handler instanceof FileHandler) {
+		((FileHandler) handler).setEWS(null);
+	    }
 	    WebMap wm = getWebMap(p);
 	    server.removeContext(p);
 	    // prefixSet.remove(p);

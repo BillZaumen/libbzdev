@@ -24,6 +24,10 @@ public class ATest {
 		System.out.println("login: " + p.getUsername());
 	    });
 
+	auth.setAuthorizedFunction((p, t) -> {
+		System.out.println("logged in as " + p.getUsername());
+	    });
+
 	auth.setLogoutFunction((p, t) -> {
 		System.out.println("logout: " + p.getUsername());
 	    });

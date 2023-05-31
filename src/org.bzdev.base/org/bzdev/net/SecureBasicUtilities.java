@@ -835,6 +835,7 @@ public class SecureBasicUtilities {
     }
 
 
+    /*
     public static boolean isLogout(String password) {
 	if (password != null && password.charAt(0) == ':') {
 	    int index = password.indexOf(':', 1);
@@ -914,6 +915,7 @@ public class SecureBasicUtilities {
 	}
 	return false;
     }
+    */
 
 
     /**

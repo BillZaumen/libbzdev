@@ -215,6 +215,18 @@ atest4-noauth:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest4 publicKey.pem --noauth
 
+atest4-open:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest4 publicKey.pem /open/index.html
+
+atest4-badlogout:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest4 publicKey.pem /index.html
+
 
 clean:
 	rm -rf classes
