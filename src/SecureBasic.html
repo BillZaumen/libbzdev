@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+<HEAD>
+  <title>Secure Basic Authentication</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+</HEAD>
+<BODY>
+  <H1>Secure Basic Authentication</H1>
+  <P> 
+    <STRONG>Basic Access Authentication</STRONG> and a more secure
+    variant named <STRONG>Digest Access Authentication</STRONG>, are
+    described in RFC 2617, which discusses the security issues with
+    both, including MITM (Man In The Middle) attacks.
+  <P>
+    Secure Basic authentication combines the simplicity of Basic
+    authentication with the security provided by public-key
+    cryptography.  Simplicity is achieved by eliminating the need for
+    a server to explicitly send a challenge as is done by SSH or FIDO
+    when public-key authentication is used.  Instead the public key of
+    a server's certificate is used: SSL ensures that whatever provided
+    the certificate sent to a client also has the corresponding
+    private key.  Secure Basic authentication signs this public key,
+    along with some additional information, and sends that as a
+    password.  As a result, any password sent to a fake web site will
+    be useless because legitimate websites' certificates will have
+    different public keys.
+  <P>
+    Essentially, secure basic authentication uses public key cryptography
+    to generate a one-time password that is actually a digital signature
+    with some additional information.  Once validated, this  one-time
+    password can be used as long as (a) a timeout has not expired and (b)
+    the user's IP address has not changed: the server caches this
+    one-time password and for new authorization requests, that request's
+    password is simply compared to the cached value.  If not in the cache,
+    it is validated again.
+  <P>
+    When setting up an account at a server, a user will provide a
+    "stored password" and a file containing a PEM-encoded public key
+    with a header describing the signature algorithm to use. Unlike
+    FIDO, the same public key and password can be used on multiple
+    servers.
+
+  <P>
+    The password used in Secure Basic authentication contains several
+    fields:
+    <UL>
+      <LI> a 4-octet field containing a timestamp consisting of a
+	32-bit two's complement integer, stored in little-endian byte
+	order, providing the time the password was created. The time
+	is given by the number of seconds since 1970-01-01T00:00:00Z.
+	The wide availability of NTP (Network Time Protocol) servers
+	makes is easy to keep clocks synchronized to within a small
+	margin of error. Furthermore many systems come with NTP software
+	preinstalled.
+      <LI> a 4-octet field containing a 32-bit CRC of the first four
+	octets and a UTF-8 encoded shared password in that order, stored in
+	little-endian byte order. For a denial of service attack with
+	random passwords, the CRC will reduce the number of digital
+	signatures that have to verified by a server by a factor of
+	approximately 4 billion.
+      <LI> a digital signature of
+	<UL>
+	  <LI> the first 8 octets,
+	  <LI> the DER encoding of the certificate's public key,
+	  <LI> the UTF-8 encoded shared password used in the CRC,
+	</UL>
+	created using the user's private key and signature algorithm.
+    </UL>
+    This sequence of octets is then base-64 encoded using the URL-safe
+    encoding described in RFC 4648 to create the password that will be
+    sent to the server.
+  <P>
+    The server stores the user's public key, signature algorithm, and
+    stored password. To check that a password is valid, the server
+    <UL>
+      <LI> decodes the password using a base-64 decoder for the
+	URL-safe encoding,
+      <LI> checks the timestamp stored in the first four octets
+	(octets 1 to 4),
+      <LI> uses the first 4 octets and the stored password in that
+	order to compute a 32-bit CRC and compares that to the one
+	corresponding to the value stored in octets 5 to 8,
+      <LI> uses the public key and signature algorithm to verify that
+	the signature stored in the remaining octets (starting with
+	octet 9) is valid for a document consisting of
+	<UL>
+	  <LI> octets 1 to 8,
+	  <LI> the server's SSL certificate's public key represented
+	    by its DER encoding,
+	  <LI> the UTF-8 encoded stored password.
+	</UL>
+    </UL>
+    If these tests do not fail, authorization succeeds and the
+    password can be stored in a table of verified passwords with a key
+    given by the user's name and Internet address. This table also
+    includes an expiration time for the user and address specified by
+    the key, which is updated each time the key provided the
+    expiration time has not been reached.  If the expiration time has
+    been passed, the authentication fails and the user must generate a
+    new password.
+  <P>
+    The shared password is useful when certificates use subject
+    alternative names, effectively allowing multiple entities to
+    share a single certificate, and where one may want to be logged
+    into one entity but not another.
+  <P>
+    Typically a client will reuse a password that it has previously
+    generated until that password fails.  It that is done, the client
+    should check that the corresponding certificate has not been
+    changed: otherwise a MITM attack is possible, although that would
+    require compromising the network infrastructure (routers, DNS servers,
+    etc.)
+
+    <H2>Alternative password format</H2>
+
+    A special encoding is used to allow a user name and password to
+    be entered into a browser's password text field, leaving the user
+    name blank: if a password starts with a colon (':') and is followed
+    by some text that is terminated by a colon, the text between those
+    two colons is treated as the user name, and the text after the
+    second colon then contains the password represented by its
+    base-64 URL-safe encoding.
+
+    A program, <STRONG>sbl</STRONG>, will generate passwords in this
+    format and copy them to the clipboard so that they can be pasted
+    into a dialog box provided by a browser that does not support
+    secure basic authentication without the need to copy and paste a
+    user name and password separately.
+
+    <H2>Realms</H2>
+  <P>
+    Secure basic authentication uses a stylized encoding for realms: if
+    a realm sent by a server to a client starts with
+    <UL>
+      <LI><STRONG>[D]</STRONG>, a form of digest authentication is used:
+	the password is the URL-safe base64 encoding of the first 8
+	octets as described above, followed by a SHA-256
+	message digest of those 8 octets and the UTF-8 encoded
+	password in that order. This option is provided primarily for
+	testing.
+      <LI><STRONG>[S]</STRONG>, the digital signature described above
+	does not include the public key from the server certificate.
+	This option is provided for testing or if for some
+	reason SSL cannot be used and security is not a major concern.
+      <LI><STRONG>[SC]</STRONG>, the digital signature is computed as
+	described above.
+    </UL>
+    Otherwise basic authentication is assumed.  The class
+    org.bzdev.swing.AuthenticationPane replaces "[D]", "[S]", and
+    "[SC]" with sequences of one or more emoji when creating a prompt
+    to display.  The emoji are used as icons.
+
+    <H2>Timestamps and timeouts</H2>
+  <P>
+    A server should support the following limits and timeouts
+    <UL>
+      <LI><STRONG>lowerTimeDiffLimit</STRONG>. This value must be
+	negative. It is added to the current time to get a lower bound
+	on the timestamp encoded in the first 4 octets of a password.
+	It is negative to account for clocks being slightly out of
+	synchronization. The value is in units of seconds.
+      <LI><STRONG>upperTimeDiffLimit</STRONG>. This value must not be
+	negative. It is added to the current time to get an upper bound
+	on the timestamp encoded in the first 4 octets of a password.
+	Its value should be large enough to allow for delay and
+	processing time in addition to errors in clock synchronization.
+	The value is in units of seconds.
+      <LI><STRONG>passwordTimeout</STRONG>. Once a password has been
+	authenticated, the password will typically be kept in a table
+	that maps a given user name and Internet address to a password
+	and expiration time.  The expiration time will be the sum of
+	the current time and the value of
+	<STRONG>passwordTimeout</STRONG>, both in units of seconds.
+	If a new authorization request arrives before the expiration
+	time for the same user and Internet address, the corresponding
+	expiration time is reset to the sum of the new current time
+	and the value of
+	<STRONG>passwordTimeout</STRONG>.
+    </UL>
+  <P>
+    The use of timestamps prevents old passwords from being reused,
+    even though, with SSL, it would be very difficult to obtain one.
+
+    <H2>Key pairs</H2>
+
+    Key pairs and signature algorithms are those that Java supports.
+    The default uses elliptic key cryptography.  The elliptic curve
+    is <STRONG>secp256r1</STRONG> (openssl prefers the name
+    <STRONG>prime256v1</STRONG>, which keytool does not accept). The
+    default signature algorithm is <STRONG>SHA256withECDSA</STRONG>.
+
+    <H2>Ease of implementation</H2>
+
+    Secure basic authentication is easy to implement, primarily
+    because basic-authentication code is reused.  The following
+    classes were added to the BZDev class library to support
+    secure basic authentication:
+    <UL>
+      <LI><STRONG>org.bzdev.net.PemDecoder</STRONG>: 227 lines of
+	code.  This is a general-purpose class for decoding PEM files.
+	It uses a utility class (org.bzdev.net.HeaderOps) that
+	contains 371 lines of code).
+      <LI><STRONG>org.bzdev.net.PemEncoder</STRONG>: 79 lines of code.
+	This is a general-purpose class for encoding PEM files.
+      <LI><STRONG>org.bzdev.net.SecureBasicUtilities</STRONG>: 622
+	lines of code. This class contains the code for creating and
+	verifying passwords, and for some other useful operations. It
+	contains methods used by both a client and a server and can
+	generate key pairs. It also contains methods that allow
+	passwords to be represented in a series of format: strings,
+	arrays of char, and arrays of bytes, so there is some
+	duplication.
+      <LI><STRONG>org.bzdev.ejws.EjwsSecureBasicAuth</STRONG>: 300
+	more lines of code than needed for
+	org.bzdev.ejws.EjwsBasicAuthenticator, which provides an
+	implementation of basic authentication.  The class
+	EjwsSecureBasicAuth contains server-specific code for the web
+	server provided by the org.bzdev.ejws package.  If a private
+	key is GPG encrypted, this class will use GPG to decrypt the
+	private key (the advantage is that GPG agent will then prompt
+	for the appropriate password, etc., needed to decrypt the
+	key).
+      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 424
+	lines of code.  This contains the code needed to create a
+	dialog box to get a user name and password. It works with
+	secure basic authentication, digest authentication, and basic
+	authentication.
+    </UL>
+    The number of lines of code were estimated using a program that
+    ignores comments and blank lines, but counts everything else including
+    Java import statements and lines that contain as little as a single
+    brace. As a result the number of lines of code listed for each case
+    is an overestimate of the number of executable statements.
+
+    <H2>Implementation limitations</H2>
+  <P>
+    The current implementation has two limitations, mostly because
+    of the current Java APIs:
+    <UL>
+      <LI> The client will open a separate SSL connection to the
+        server to get the certificate because the Java APIs do not
+        provide a convenient way of getting the certificate for the
+        connection an authenticator is using.
+      <LI> When a password is cached an SSL connection's certificate is
+	not checked to verify that it is the one used to generate the
+	password. While it is a trivial change, it would require modifying
+	classes that are part of JRE.
+    </UL>
+</BODY>
+</HTML>
+
+<!--  LocalWords:  MITM SSL PEM endian NTP CRC UTF DER sbl SHA secp
+ -->
+<!--  LocalWords:  lowerTimeDiffLimit upperTimeDiffLimit openssl GPG
+ -->
+<!--  LocalWords:  passwordTimeout keytool withECDSA BZDev decrypt
+ -->
+<!--  LocalWords:  EjwsSecureBasicAuth
+ -->

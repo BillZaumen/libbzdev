@@ -41,7 +41,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
 
 /**
  * Operations for basic authentication with digital signatures and
- * time stamps.
+ * timestamps.
  * <P>
  * This is a support class for an authentications scheme dubbed Secure
  * Basic Authentication.  As a protocol, secure basic authentication
@@ -49,7 +49,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * The differences are in how passwords are created and compared, and
  * in how realms are named.  Generally, a secure-basic-authentication
  * password is a URL-safe, base 64 encoding of a sequence of
- * bytes. The first four bytes is a time stamp of a 32 bit two's
+ * bytes. The first four bytes is a timestamp of a 32-bit two's
  * complement integer, stored in little-endian byte order, providing
  * the time at which the password was created as the number of seconds
  * since 1970-01-01T00:00:00Z. The next four bytes is a 32-bit CRC of
@@ -129,7 +129,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
  * using the PEM-encoded public key for a client as an argument.  It
  * will decode the password provided by the user by calling
  * {@link SecureBasicUtilities#decodePassword(String)}, and then
- * {@link SecureBasicUtilities#getTimeDiff(byte[])} to check a time stamp.
+ * {@link SecureBasicUtilities#getTimeDiff(byte[])} to check a timestamp.
  * Then it will call
  * {@link SecureBasicUtilities#checkPassword(byte[],Certificate,String)}
  * with the decoded password as its first argument, the server's certificate
@@ -198,7 +198,7 @@ public class SecureBasicUtilities {
     public static enum Mode {
 	/**
 	 * The generated password contains a SHA-256 digest of a four
-	 * byte time stamp (seconds from 1970-01-01T00:00:00Z in
+	 * byte timestamp (seconds from 1970-01-01T00:00:00Z in
 	 * little-endian order) and a user-supplied password using
 	 * UTF-8 encoding. The digest is encoded using the URL-safe
 	 * base 64 encoding.
@@ -206,7 +206,7 @@ public class SecureBasicUtilities {
 	DIGEST,
 	/**
 	 * The generated password contains a digital signature of a
-	 * four byte time stamp (seconds from 1970-01-01T00:00:00Z in
+	 * four byte timestamp (seconds from 1970-01-01T00:00:00Z in
 	 * little-endian order) and a user-supplied password using
 	 * UTF-8 encoding.  The signature is encoded using the
 	 * URL-safe base 64 encoding.
@@ -215,7 +215,7 @@ public class SecureBasicUtilities {
 
 	/**
 	 * The generated password contains a digital signature of a
-	 * four byte time stamp (seconds from 1970-01-01T00:00:00Z in
+	 * four byte timestamp (seconds from 1970-01-01T00:00:00Z in
 	 * little-endian order), the DER encoding of the public key
 	 * provided by a server in an SSL/TLS certificate, and finally
 	 * a user-supplied password using UTF-8 encoding.  The
@@ -1004,14 +1004,14 @@ public class SecureBasicUtilities {
 
     /**
      * Given a decoded password, find the time difference
-     * between the current time and the password's time stamp.
+     * between the current time and the password's timestamp.
      * A small negative value can occur when clocks are not
      * synchronized.  When the exact time is used, the value
      * should be non-negative as the password will be checked
      * after it is created.
      * @param sigarray the decoded password
      * @return the difference between the current time and the
-     *         password's time stamp in units of seconds
+     *         password's timestamp in units of seconds
      * @see #decodePassword(String)
      */
     public static int getTimeDiff(byte[] sigarray) {

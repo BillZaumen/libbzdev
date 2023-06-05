@@ -184,6 +184,8 @@ public class DarkmodeMonitor {
 			  UIManager.get("TextPane.foreground"));
 	    UIManager.put("FormattedTextField.caretForeground",
 			  UIManager.get("TextPane.foreground"));
+	    UIManager.put("PasswordField.caretForeground",
+			  UIManager.get("TextPane.foreground"));
 	    DarkmodeMonitor.addPropertyChangeListener(evnt -> {
 		    UIManager.put("TextField.caretForeground",
 				  UIManager.get("TextField.foreground"));
@@ -194,6 +196,8 @@ public class DarkmodeMonitor {
 		    UIManager.put("TextPane.caretForeground",
 				  UIManager.get("TextPane.foreground"));
 		    UIManager.put("FormattedTextField.caretForeground",
+				  UIManager.get("TextPane.foreground"));
+		    UIManager.put("PasswordField.caretForeground",
 				  UIManager.get("TextPane.foreground"));
 
 		});

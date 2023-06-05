@@ -7,6 +7,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,12 +18,15 @@ import java.util.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.border.Border;
 import javax.swing.filechooser.*;
 import javax.swing.table.*;
 
+import org.bzdev.io.AppendableWriter;
 import org.bzdev.lang.Callable;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.util.CopyUtilities;
@@ -31,7 +35,7 @@ import org.bzdev.swing.TextCellEditor;
 //@exbundle org.bzdev.swing.lpack.Swing
 
 /**
-74 * Property-editor class.
+ * Property-editor class.
  * This class supports configuration files that are represented
  * as Java property files using the syntax described in the
  * documentation for {@link java.util.Properties#load(Reader)}.
@@ -353,32 +357,144 @@ public abstract class ConfigPropertyEditor {
 	return new String(data, UTF8);
     }
 
-    private static String decrypt(String value) {
-	if (value == null) return EMPTY_STRING;
+    private static class  StringBuilderHolder {
+	StringBuilder sb = new StringBuilder();
+    }
+
+    private static String decrypt(String value, char[] password) {
+	if (value == null || password == null) return EMPTY_STRING;
 	byte[] data = Base64.getDecoder().decode(value);
-	ProcessBuilder pb = new ProcessBuilder("gpg", "-d");
-	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	ByteArrayInputStream is = new ByteArrayInputStream(data);
+
 	try {
-	    StringBuilder sb = new StringBuilder();
+	    File tmpf = File.createTempFile("configPropEditor", "gpg");
+	    tmpf.deleteOnExit();
+	    FileOutputStream fos = new FileOutputStream(tmpf);
+	    is.transferTo(fos);
+	    is.close();
+	    fos.close();
+
+	    // Need to use --batch, etc. because when this runs in
+	    // a dialog box, we don't have access to a terminal and
+	    // GPG agent won't ask for a passphrase.
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--pinentry-mode",
+						   "loopback",
+						   "--passphrase-fd", "0",
+						   "--batch", "-d",
+						   tmpf.getCanonicalPath());
+	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    StringBuilderHolder sbh = new StringBuilderHolder();
 	    Process p = pb.start();
-	    Thread thread = new Thread(()->{
+	    Thread thread1 = new Thread(()->{
 		    try {
-			CopyUtilities.copyStream(p.getInputStream(), sb, UTF8);
-			p.waitFor();
+			OutputStream os = p.getOutputStream();
+			OutputStreamWriter w = new OutputStreamWriter(os);
+			w.write(password, 0, password.length);
+			w.write('\n');
+			w.flush();
+			w.close();
+			os.close();
 		    } catch(Exception e) {
+			System.err.println(e.getMessage());
 		    }
 	    });
-	    thread.start();
-	    OutputStream os = p.getOutputStream();
-	    os.write(data);
-	    os.flush();
-	    os.close();
-	    thread.join();
+	    Thread thread2 = new Thread(()->{
+		    try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			InputStream is1 = p.getInputStream();
+			is1.transferTo(os);
+			sbh.sb.append(os.toString(UTF8));
+		    } catch(Exception e) {
+			System.err.println(e.getMessage());
+		    } finally {
+			tmpf.delete();
+		    }
+	    });
+	    thread2.start();
+	    thread1.start();
+	    thread1.join();
+	    thread2.join();
+	    StringBuilder sb = sbh.sb;
+	    // thread.join();
+	    p.waitFor();
 	    if (p.exitValue() != 0) {
 		System.err.println(errorMsg("gpgFailed", p.exitValue()));
 		return EMPTY_STRING;
 	    }
 	    return sb.toString();
+	} catch (Exception e) {
+	    System.err.println(errorMsg("decryption", e.getMessage()));
+	    return null;
+	}
+    }
+
+    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+
+
+    private static char[] decryptToCharArray(String value, char[] password) {
+	if (value == null || password == null) return EMPTY_CHAR_ARRAY;
+	byte[] data = Base64.getDecoder().decode(value);
+	ByteArrayInputStream is = new ByteArrayInputStream(data);
+
+	try {
+	    File tmpf = File.createTempFile("configPropEditor", "gpg");
+	    tmpf.deleteOnExit();
+	    FileOutputStream fos = new FileOutputStream(tmpf);
+	    is.transferTo(fos);
+	    is.close();
+	    fos.close();
+
+	    // Need to use --batch, etc. because when this runs in
+	    // a dialog box, we don't have access to a terminal and
+	    // GPG agent won't ask for a passphrase.
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--pinentry-mode",
+						   "loopback",
+						   "--passphrase-fd", "0",
+						   "--batch", "-d",
+						   tmpf.getCanonicalPath());
+	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    ByteArrayOutputStream baos = new
+		ByteArrayOutputStream(data.length);
+	    Process p = pb.start();
+	    Thread thread1 = new Thread(()->{
+		    try {
+			OutputStream os = p.getOutputStream();
+			OutputStreamWriter w = new OutputStreamWriter(os);
+			w.write(password, 0, password.length);
+			w.write('\n');
+			w.flush();
+			w.close();
+			os.close();
+		    } catch(Exception e) {
+			System.err.println(e.getMessage());
+		    }
+	    });
+	    Thread thread2 = new Thread(()->{
+		    try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			InputStream is1 = p.getInputStream();
+			is1.transferTo(baos);
+		    } catch(Exception e) {
+			System.err.println(e.getMessage());
+		    } finally {
+			tmpf.delete();
+		    }
+	    });
+	    thread2.start();
+	    thread1.start();
+	    thread1.join();
+	    thread2.join();
+	    // StringBuilder sb = sbh.sb;
+	    // thread.join();
+	    p.waitFor();
+	    if (p.exitValue() != 0) {
+		System.err.println(errorMsg("gpgFailed", p.exitValue()));
+		return EMPTY_CHAR_ARRAY;
+	    }
+	    return (UTF8.decode(ByteBuffer.wrap(baos.toByteArray())))
+		.array();
 	} catch (Exception e) {
 	    System.err.println(errorMsg("decryption", e.getMessage()));
 	    return null;
@@ -999,8 +1115,8 @@ public abstract class ConfigPropertyEditor {
      * This will be called before the editor's top-level window is
      * created.
      * <P>
-     * Calling this method will result in the user being prompted
-     * to save changes if values are edited.
+     * Calling this method directly will not result in the user being
+     * prompted to save changes if values are edited.
      * @param f the file to open; null if no file should be loaded.
      * @exception IOException an IO exception occurred
      */
@@ -1257,6 +1373,82 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
+    private char[] password = null;
+
+    /**
+     * Request a GPG passphrase.
+     * This method will open a dialog box to request a GPG pasphrase
+     * for decryption.
+     * @param owner a component over which a dialog box should be displayed
+     */
+    public void requestPassphrase(Component owner) {
+	if (password == null) {
+	    if (!SwingUtilities.isEventDispatchThread()) {
+		try {
+		    SwingUtilities.invokeAndWait(() -> {
+			    requestPassphrase(owner);
+			});
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException e) {
+		}
+		return;
+	    }
+	    JPasswordField pwf = new JPasswordField(16);
+	    pwf.addFocusListener(new FocusAdapter() {
+		    boolean retry = true;
+		    public void focusLost(FocusEvent e) {
+			Component other = e.getOppositeComponent();
+			Window w1 = SwingUtilities.getWindowAncestor
+			    (pwf);
+			Window w2 = (other == null)? null:
+			    SwingUtilities.getWindowAncestor(other);
+			if (retry && e.getCause()
+			    == FocusEvent.Cause.UNKNOWN
+			    && w1 == w2) {
+			    SwingUtilities.invokeLater(() -> {
+				    pwf.requestFocusInWindow();
+				});
+			} else {
+			    retry = false;
+			}
+		    }
+		});
+	    pwf.addAncestorListener(new AncestorListener() {
+		    public void ancestorAdded(AncestorEvent ev) {
+			SwingUtilities.invokeLater(() -> {
+				pwf.requestFocusInWindow();
+			    });
+		    }
+		    public void ancestorRemoved(AncestorEvent ev) {
+		    }
+		    public void ancestorMoved(AncestorEvent ev) {
+		    }
+		});
+
+	    int status = JOptionPane
+		.showConfirmDialog(pwowner, pwf, localeString("enterPW"),
+				   JOptionPane.OK_CANCEL_OPTION);
+	    if (status == JOptionPane.OK_OPTION) {
+		password = pwf.getPassword();
+	    }
+	}
+    }
+
+    /**
+     * Remove the current GPG passphrase.
+     * As a general rule, this method should be called as soon as
+     * a passphrase is no longer needed, or will not be needed for
+     * some time.
+     */
+    public void clearPassphrase() {
+	if (password != null) {
+	    for (int i = 0; i < password.length; i++) {
+		password[i] = (char)0;
+	    }
+	}
+	password = null;
+    }
+
     private class OurCellEditor2 extends TextCellEditor<String> {
 	HashSet<String> keys = null;
 	public OurCellEditor2(HashSet<String>keys) {
@@ -1309,7 +1501,8 @@ public abstract class ConfigPropertyEditor {
 		// value = decode(oldvalue);
 	    } else if (key.startsWith("ebase64.")) {
 		tag = 2;
-		value = decrypt(oldvalue);
+		requestPassphrase(pwowner);
+		value = decrypt(oldvalue, password);
 	    }
 
 	    TaggedTextField tf = (TaggedTextField)
@@ -1649,7 +1842,7 @@ public abstract class ConfigPropertyEditor {
     protected void monitorProperty(String property)
 	throws IllegalArgumentException
     {
-	if (property.startsWith("EB64KEY_START")) {
+	if (property.startsWith(EB64KEY_START)) {
 	    throw new IllegalArgumentException(errorMsg("monitorEB64"));
 	}
 	monitoredKeys.add(property);
@@ -1672,6 +1865,28 @@ public abstract class ConfigPropertyEditor {
     }
 
     Map<String,Set<String>> cpcMap = new HashMap<>();
+
+    // Need a comparator that ignores an initial "base64." or "ebase64."
+    private static final Comparator<String> keyComparator =
+	new Comparator<>()
+	{
+	    public int compare(String s1, String s2) {
+		String s1a =
+		s1.startsWith(B64KEY_START)? s1.substring(B64KEY_START_LEN):
+		s1.startsWith(EB64KEY_START)? s1.substring(EB64KEY_START_LEN):
+		s1;
+		String s2a =
+		s2.startsWith(B64KEY_START)? s2.substring(B64KEY_START_LEN):
+		s2.startsWith(EB64KEY_START)? s2.substring(EB64KEY_START_LEN):
+		s2;
+		if (s1a.equals(s2a)) {
+		    return s1.compareTo(s2);
+		} else {
+		    return s1a.compareTo(s2a);
+		}
+	    }
+	};
+
 
     /**
      * Indicate that if one property's value changes, various other properties
@@ -1697,7 +1912,7 @@ public abstract class ConfigPropertyEditor {
 	    if (s.equals(p) || s == null) continue;
 	    properties[i++] = s;
 	}
-	Arrays.sort(properties);
+	Arrays.sort(properties, keyComparator);
 	rcount = 0;
 	String last = null;
 	for (String s: properties) {
@@ -1720,6 +1935,49 @@ public abstract class ConfigPropertyEditor {
 	cpcMap.put(p, Set.of(properties));
     }
 
+    /**
+     * Test if a key exists.
+     * @param key the key
+     * @areturn true if the key exists; false otherwise
+     */
+    public boolean hasKey(String key) {
+	if (properties == null) {
+	    return false;
+	}
+	return (properties.get(key) != null);
+    }
+
+    /**
+     * Set a key.
+     * The first argument is used when a key starts with "ebase64." as
+     * that indicates that GPG encryption will be used, in which case
+     * dialog boxes will be used to get the names of recipients.
+     * If a key already exists, its value will be overwritten.
+     * @param owner a compoent over which a dialog box may appear; null
+     *        if a dialog box's location is not constrained
+     * @param key the key
+     * @param value the value for the key
+     */
+    public void set(Component owner, String key, String value) {
+	if (key == null) return;
+	key = key.trim();
+	if (key.length() == 0) return;
+	if (value == null) return;
+	if (properties == null) {
+	    properties = new Properties();
+	}
+	if (key.startsWith(EB64KEY_START)) {
+	    String[] recipients = getRecipients(owner);
+	    if (recipients == null || recipients.length == 0) return;
+	    properties.setProperty(key, encrypt(value, recipients));
+	} else if (key.startsWith(B64KEY_START)) {
+	    properties.setProperty(key, encode(value));
+	} else {
+	    properties.setProperty(key, value);
+	}
+    }
+
+    Component pwowner = null;
 
     private void doEdit(Component owner,  Mode mode, Callable continuation,
 			CloseMode quitCloseMode)
@@ -1729,7 +1987,7 @@ public abstract class ConfigPropertyEditor {
 	 final CallableContainer continuationContainer =
 	    new CallableContainer(continuation);
 	//System.out.println("mode = " + mode);
-	Window window = (mode == Mode.JFRAME)?
+	 Window window = (mode == Mode.JFRAME)?
 	    new JFrame(configTitle()):
 	    new JDialog(((owner == null)? null:
 			 SwingUtilities.getWindowAncestor(owner)),
@@ -1737,6 +1995,8 @@ public abstract class ConfigPropertyEditor {
 			((mode == Mode.MODAL)?
 			 Dialog.ModalityType.APPLICATION_MODAL:
 			 Dialog.ModalityType.MODELESS));
+
+	 pwowner = window;
 
 	Set<String> names = new HashSet<>(64);
 	if (properties == null) {
@@ -1794,7 +2054,7 @@ public abstract class ConfigPropertyEditor {
 	for (int i = 0; i < adjustedSpacersLength; i++) {
 	    keys[keys1.length+i] = "";
 	}
-	Arrays.sort(keys);
+	Arrays.sort(keys, keyComparator);
 	int kind = 0;
 	int sind = 0;
 	int mkind = 0;
@@ -1843,6 +2103,7 @@ public abstract class ConfigPropertyEditor {
 		if (key.startsWith("base64.")) {
 		    value = decode(value);
 		}
+
 	    }
 	    Vector<Object>row = new Vector<>(2);
 	    /*
@@ -2129,6 +2390,7 @@ public abstract class ConfigPropertyEditor {
 		    }
 		    window.setVisible(false);
 		    window.dispose();
+		    pwowner = null;
 		    CloseMode qcm = quitCloseMode;
 		    if (qcm == CloseMode.BOTH) {
 			qcm = (e.getSource() == quitMenuItem)?
@@ -2429,7 +2691,7 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Get the decoded properties.
-     * Base-64 encryption will be removed for unencrypted properties
+     * Base-64 encoding will be removed for unencrypted properties
      * and all string substitution will be performed before the
      * results are returned. For keys starting with the component
      * "base64", the first token and its following delimiter
@@ -2455,7 +2717,14 @@ public abstract class ConfigPropertyEditor {
      * longer needed.  You can overwrite a character array, but you
      * cannot overwrite a string, which will persist until reclaimed
      * by the garbage collector.
+     * <P>
+     * NOTE:  For encrypted values the method
+     * {@link #requestPassphrase()} or {@link #requestPassphrase(Component)}
+     * should be called before a call to {@link Properties#get(Object)}
+     * if the dialog box is to be placed over a specific component.
      * @return the properties
+     * @see #requestPassphrase(Component)
+     * @see #clearPassword()
      */
     public Properties getDecodedProperties() {
 	Properties results = new Properties() {
@@ -2464,46 +2733,8 @@ public abstract class ConfigPropertyEditor {
 			String key = (String) k;
 			if (key.startsWith("ebase64.")) {
 			    String encrypted = getProperty(key);
-			    byte[] data = Base64.getDecoder().decode(encrypted);
-			    ByteArrayInputStream is =
-				new ByteArrayInputStream(data);
-			    ProcessBuilder pb = new ProcessBuilder("gpg", "-d");
-			    try {
-				Process process = pb.start();
-				Thread ot = new Thread(() -> {
-					try {
-					    OutputStream os =
-						process.getOutputStream();
-					    is.transferTo(os);
-					    // don't have to close a
-					    // ByteArrayInputStream
-					    os.close();
-					} catch (IOException eio) {
-					    System.err
-						.println(eio.getMessage());
-					}
-				});
-				ot.start();
-				CharArrayWriter w = new
-				    CharArrayWriter(encrypted.length()) {
-					public char[] toCharArray() {
-					    char[] result = super.toCharArray();
-					    if (result != this.buf) {
-						// want to keep sensitive info
-						// for as little as possible
-						Arrays.fill(buf, '\0');
-					    }
-					    return result;
-					}
-				    };
-				Reader r = new InputStreamReader
-				    (process.getInputStream(), UTF8);
-				r.transferTo(w);
-				return w.toCharArray();
-			    } catch (IOException e) {
-				throw new IllegalStateException
-				    (e.getMessage(), e);
-			    }
+			    requestPassphrase(null);
+			    return decryptToCharArray(encrypted, password);
 			} else {
 			    return super.get(k);
 			}

@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.awt.*;
 import java.awt.event.*;
@@ -61,6 +64,84 @@ public class AuthenticationPane extends JComponent {
 	pemFile = pemfile;
     }
 
+    private static char[] password = null;
+
+    /**
+     * Request a GPG passphrase.
+     * This method will open a dialog box to request a GPG pasphrase
+     * for decryption.
+     * @param owner a component over which a dialog box should be displayed
+     */
+    public static void requestPassphrase(Component owner) {
+	if (password == null) {
+	    if (!SwingUtilities.isEventDispatchThread()) {
+		try {
+		    SwingUtilities.invokeAndWait(() -> {
+			    requestPassphrase(owner);
+			});
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException e) {
+		}
+		return;
+	    }
+	    JPasswordField pwf = new JPasswordField(16);
+	    pwf.addFocusListener(new FocusAdapter() {
+		    boolean retry = true;
+		    public void focusLost(FocusEvent e) {
+			Component other = e.getOppositeComponent();
+			Window w1 = SwingUtilities.getWindowAncestor
+			    (pwf);
+			Window w2 = (other == null)? null:
+			    SwingUtilities.getWindowAncestor(other);
+			if (retry && e.getCause()
+			    == FocusEvent.Cause.UNKNOWN
+			    && w1 == w2) {
+			    SwingUtilities.invokeLater(() -> {
+				    pwf.requestFocusInWindow();
+				});
+			} else {
+			    retry = false;
+			}
+		    }
+		});
+	    pwf.addAncestorListener(new AncestorListener() {
+		    public void ancestorAdded(AncestorEvent ev) {
+			SwingUtilities.invokeLater(() -> {
+				pwf.requestFocusInWindow();
+			    });
+		    }
+		    public void ancestorRemoved(AncestorEvent ev) {
+		    }
+		    public void ancestorMoved(AncestorEvent ev) {
+		    }
+		});
+
+	    System.out.println("got here 2");
+	    int status = JOptionPane
+		.showConfirmDialog(owner, pwf, localeString("enterPW"),
+				   JOptionPane.OK_CANCEL_OPTION);
+	    System.out.println("JOptionPane status = " + status);
+	    if (status == JOptionPane.OK_OPTION) {
+		password = pwf.getPassword();
+	    }
+	}
+    }
+
+    /**
+     * Remove the current GPG passphrase.
+     * As a general rule, this method should be called as soon as
+     * a passphrase is no longer needed, or will not be needed for
+     * some time.
+     */
+    public static void clearPassphrase() {
+	if (password != null) {
+	    for (int i = 0; i < password.length; i++) {
+		password[i] = (char)0;
+	    }
+	}
+	password = null;
+    }
+
     private static synchronized SecureBasicUtilities getOps()
 	throws IOException, GeneralSecurityException
     {
@@ -69,11 +150,23 @@ public class AuthenticationPane extends JComponent {
 	    String name = pemFile.getName();
 	    if (name.endsWith(".gpg")) {
 		ProcessBuilder pb = new
-		    ProcessBuilder("gpg", "-d",
+		    ProcessBuilder("gpg",
+				   "--pinentry-mode", "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d",
 				   pemFile.getCanonicalPath());
-		pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+		// pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 		try {
 		    Process p = pb.start();
+		    System.out.println("got here");
+		    requestPassphrase(null);
+		    if (password == null) return null;
+		    OutputStream os = p.getOutputStream();
+		    OutputStreamWriter w = new OutputStreamWriter(os, utf8);
+		    w.write(password, 0, password.length);
+		    w.flush();
+		    w.close();
+		    os.close();
 		    InputStream is = p.getInputStream();
 		    ops = new SecureBasicUtilities(is);
 		    is.close();

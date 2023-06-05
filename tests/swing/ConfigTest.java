@@ -81,6 +81,13 @@ public class ConfigTest {
 	    editor.loadFile(f);
 	}
 
+	if (editor.hasKey("zzz")) {
+	    System.out.println("key zzz exists");
+	}
+	editor.set(null, "zzz", "programatically added property");
+	editor.set(null, "base64.zzz1", "programatically added property");
+	editor.set(null, "ebase64.zzz2", "programatically added property");
+
 	System.out.println("opening dialog");
 	editor.setSaveQuestion(true);
 	JMenuItem helpMI = new JMenuItem("Show Help");
@@ -108,6 +115,7 @@ public class ConfigTest {
 	    }
 	}
 	System.out.println("-----------------");
+	editor.clearPassphrase();
 	System.exit(0);
     }
 }

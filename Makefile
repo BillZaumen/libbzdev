@@ -32,7 +32,7 @@ JROOT := $(shell while [ ! -d src -a `pwd` != / ] ; do cd .. ; done ; pwd)
 
 JAVA_VERSION = 11
 JAVAC = javac --release $(JAVA_VERSION)
-JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected -package \
+JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected  \
 	-Xdoclint:all,-missing,-html
 
 JAVADOC_VERSION = $(shell javadoc --version | sed -e 's/javadoc //' \
@@ -1451,7 +1451,7 @@ saved:
 $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		src/overview.html src/description.html \
 		stylesheet$(JAVADOC_VERSION).css description.css \
-		src/FactoryOverview.html
+		src/FactoryOverview.html src/SecureBasic.html
 	rm -rf $(JROOT_JAVADOCS)
 	mkdir -p $(JROOT_JAVADOCS)
 	mkdir -p $(MATH_DIR)/$(BZDEV)/math/doc-files
@@ -1479,6 +1479,8 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		|| echo stylesheet$(JAVADOC_VERSION).css` ; \
 	sed -e s/stylesheet.css/$$dstylesheet/  src/description.html \
 		> $(JROOT_JAVADOCS)/doc-files/description.html
+	sed -e s/stylesheet.css/$$dstylesheet/  src/SecureBasic.html \
+		> $(JROOT_JAVADOCS)/doc-files/SecureBasic.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link \
@@ -1508,6 +1510,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	cp stylesheet11.css $(JROOT_JAVADOCS)
 	cp stylesheet17.css $(JROOT_JAVADOCS)
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
+	cp src/SecureBasic.html $(JROOT_ALT_JAVADOCS)/doc-files/SecureBasic.html
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link-offline \
