@@ -1,3 +1,4 @@
+
 package org.bzdev.swing;
 
 import java.awt.*;
@@ -367,12 +368,14 @@ public abstract class ConfigPropertyEditor {
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
 
 	try {
+	    /*
 	    File tmpf = File.createTempFile("configPropEditor", "gpg");
 	    tmpf.deleteOnExit();
 	    FileOutputStream fos = new FileOutputStream(tmpf);
 	    is.transferTo(fos);
 	    is.close();
 	    fos.close();
+	    */
 
 	    // Need to use --batch, etc. because when this runs in
 	    // a dialog box, we don't have access to a terminal and
@@ -381,8 +384,8 @@ public abstract class ConfigPropertyEditor {
 						   "--pinentry-mode",
 						   "loopback",
 						   "--passphrase-fd", "0",
-						   "--batch", "-d",
-						   tmpf.getCanonicalPath());
+						   "--batch", "-d"/*,
+						    tmpf.getCanonicalPath()*/);
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    StringBuilderHolder sbh = new StringBuilderHolder();
 	    Process p = pb.start();
@@ -391,8 +394,9 @@ public abstract class ConfigPropertyEditor {
 			OutputStream os = p.getOutputStream();
 			OutputStreamWriter w = new OutputStreamWriter(os);
 			w.write(password, 0, password.length);
-			w.write('\n');
+			w.write(System.getProperty("line.separator"));
 			w.flush();
+			is.transferTo(os);
 			w.close();
 			os.close();
 		    } catch(Exception e) {
@@ -407,9 +411,9 @@ public abstract class ConfigPropertyEditor {
 			sbh.sb.append(os.toString(UTF8));
 		    } catch(Exception e) {
 			System.err.println(e.getMessage());
-		    } finally {
+		    } /*finally {
 			tmpf.delete();
-		    }
+			}*/
 	    });
 	    thread2.start();
 	    thread1.start();
@@ -438,13 +442,14 @@ public abstract class ConfigPropertyEditor {
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
 
 	try {
+	    /*
 	    File tmpf = File.createTempFile("configPropEditor", "gpg");
 	    tmpf.deleteOnExit();
 	    FileOutputStream fos = new FileOutputStream(tmpf);
 	    is.transferTo(fos);
 	    is.close();
 	    fos.close();
-
+	    */
 	    // Need to use --batch, etc. because when this runs in
 	    // a dialog box, we don't have access to a terminal and
 	    // GPG agent won't ask for a passphrase.
@@ -452,8 +457,8 @@ public abstract class ConfigPropertyEditor {
 						   "--pinentry-mode",
 						   "loopback",
 						   "--passphrase-fd", "0",
-						   "--batch", "-d",
-						   tmpf.getCanonicalPath());
+						   "--batch", "-d"/*,
+						   tmpf.getCanonicalPath()*/);
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    ByteArrayOutputStream baos = new
 		ByteArrayOutputStream(data.length);
@@ -463,8 +468,9 @@ public abstract class ConfigPropertyEditor {
 			OutputStream os = p.getOutputStream();
 			OutputStreamWriter w = new OutputStreamWriter(os);
 			w.write(password, 0, password.length);
-			w.write('\n');
+			w.write(System.getProperty("line.separator"));
 			w.flush();
+			is.transferTo(os);
 			w.close();
 			os.close();
 		    } catch(Exception e) {
@@ -478,9 +484,9 @@ public abstract class ConfigPropertyEditor {
 			is1.transferTo(baos);
 		    } catch(Exception e) {
 			System.err.println(e.getMessage());
-		    } finally {
+		    } /*finally {
 			tmpf.delete();
-		    }
+			}*/
 	    });
 	    thread2.start();
 	    thread1.start();
@@ -1425,11 +1431,33 @@ public abstract class ConfigPropertyEditor {
 		    }
 		});
 
-	    int status = JOptionPane
-		.showConfirmDialog(pwowner, pwf, localeString("enterPW"),
-				   JOptionPane.OK_CANCEL_OPTION);
-	    if (status == JOptionPane.OK_OPTION) {
-		password = pwf.getPassword();
+	    for (;;) {
+		int status = JOptionPane
+		    .showConfirmDialog(pwowner, pwf, localeString("enterPW"),
+				       JOptionPane.OK_CANCEL_OPTION);
+		if (status == JOptionPane.OK_OPTION) {
+		    char[] pw = pwf.getPassword();
+		    if (pw == null) continue;
+		    boolean ok = true;
+		    for (int i = 0; i < pw.length; i++) {
+			if (pw[i] == '\n') {
+			    ok = false;
+			    break;
+			}
+			if (pw[i] == '\r') {
+			    ok = false;
+			    break;
+			}
+		    }
+		    if (!ok) {
+			pwf.setText("");
+			continue;
+		    }
+		    password = pw;
+		    break;
+		} else {
+		    break;
+		}
 	    }
 	}
     }

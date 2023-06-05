@@ -116,13 +116,33 @@ public class AuthenticationPane extends JComponent {
 		    }
 		});
 
-	    System.out.println("got here 2");
-	    int status = JOptionPane
-		.showConfirmDialog(owner, pwf, localeString("enterPW"),
-				   JOptionPane.OK_CANCEL_OPTION);
-	    System.out.println("JOptionPane status = " + status);
-	    if (status == JOptionPane.OK_OPTION) {
-		password = pwf.getPassword();
+	    for (;;) {
+		int status = JOptionPane
+		    .showConfirmDialog(owner, pwf, localeString("enterPW"),
+				       JOptionPane.OK_CANCEL_OPTION);
+		if (status == JOptionPane.OK_OPTION) {
+		    char[] pw = pwf.getPassword();
+		    if (pw == null) continue;
+		    boolean ok = true;
+		    for (int i = 0; i < pw.length; i++) {
+			if (pw[i] == '\n') {
+			    ok = false;
+			    break;
+			}
+			if (pw[i] == '\r') {
+			    ok = false;
+			    break;
+			}
+		    }
+		    if (!ok) {
+			pwf.setText("");
+			continue;
+		    }
+		    password = pw;
+		    break;
+		} else {
+		    break;
+		}
 	    }
 	}
     }
@@ -158,12 +178,12 @@ public class AuthenticationPane extends JComponent {
 		// pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 		try {
 		    Process p = pb.start();
-		    System.out.println("got here");
 		    requestPassphrase(null);
 		    if (password == null) return null;
 		    OutputStream os = p.getOutputStream();
 		    OutputStreamWriter w = new OutputStreamWriter(os, utf8);
 		    w.write(password, 0, password.length);
+		    w.write(System.getProperty("line.separator"));
 		    w.flush();
 		    w.close();
 		    os.close();

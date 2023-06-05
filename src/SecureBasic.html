@@ -209,10 +209,10 @@
 	contains methods used by both a client and a server and can
 	generate key pairs. It also contains methods that allow
 	passwords to be represented in a series of format: strings,
-	arrays of char, and arrays of bytes, so there is some
-	duplication.
-      <LI><STRONG>org.bzdev.ejws.EjwsSecureBasicAuth</STRONG>: 300
-	more lines of code than needed for
+	arrays of char, and arrays of bytes, so there is more code
+	than would be needed by a single application.
+      <LI><STRONG>org.bzdev.ejws.EjwsSecureBasicAuth</STRONG>: 484
+	lines of code, compared to 184 lines of code for
 	org.bzdev.ejws.EjwsBasicAuthenticator, which provides an
 	implementation of basic authentication.  The class
 	EjwsSecureBasicAuth contains server-specific code for the web
@@ -221,7 +221,7 @@
 	private key (the advantage is that GPG agent will then prompt
 	for the appropriate password, etc., needed to decrypt the
 	key).
-      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 424
+      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 520
 	lines of code.  This contains the code needed to create a
 	dialog box to get a user name and password. It works with
 	secure basic authentication, digest authentication, and basic
