@@ -1402,11 +1402,11 @@ JDOC_JFILES = $(BASE_JFILE) $(OBNAMING_JFILES) $(DESKTOP_JFILES) \
 #
 
 EXCLUDE_CMD1 = `for i in src/org.*; \
-	do (cd $$i ; find org -type d ); done \
+	do (cd $$i ; [ -d org ] && find org -type d ); done \
 	| grep lpack | grep -v providers | sed -e 's/\//./g'`
 
 EXCLUDE_CMD2 = `for i in src/org.*; \
-	do (cd $$i ; find org -type d ); done \
+	do (cd $$i ; [ -d org ] && find org -type d ); done \
 	| grep providers/ | sed -e 's/\//./g'`
 
 JDOC_EXCLUDE_A = $(shell echo $(EXCLUDE_CMD1) | sed -e 's/ /:/g' )

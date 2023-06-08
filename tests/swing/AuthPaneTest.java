@@ -224,9 +224,11 @@ public class AuthPaneTest {
 	if (!pkfile.exists()) pkfile = new File("privateKey.pem");
 
 	AuthenticationPane.setPrivateKey(pkfile);
+	Authenticator auth =
+	    AuthenticationPane.getAuthenticator(null, true, false);
+	// AuthenticationPane.setPrivateKey(auth,pkfile);
 
-	Authenticator
-	    .setDefault(AuthenticationPane.getAuthenticator(null, true, false));
+	Authenticator.setDefault(auth);
 
 	if (url1 != null) {
 	    System.out.println("connect to login alias");

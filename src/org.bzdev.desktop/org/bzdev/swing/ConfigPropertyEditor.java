@@ -1,4 +1,3 @@
-
 package org.bzdev.swing;
 
 import java.awt.*;
@@ -362,7 +361,7 @@ public abstract class ConfigPropertyEditor {
 	StringBuilder sb = new StringBuilder();
     }
 
-    private static String decrypt(String value, char[] password) {
+    private String decrypt(String value) {
 	if (value == null || password == null) return EMPTY_STRING;
 	byte[] data = Base64.getDecoder().decode(value);
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
@@ -424,7 +423,18 @@ public abstract class ConfigPropertyEditor {
 	    p.waitFor();
 	    if (p.exitValue() != 0) {
 		System.err.println(errorMsg("gpgFailed", p.exitValue()));
-		return EMPTY_STRING;
+		int status = JOptionPane
+		    .showConfirmDialog(pwowner,
+				       localeString("pwTryAgain"),
+				       localeString("gpgFailedTitle"),
+				       JOptionPane.YES_NO_OPTION);
+		if (status == JOptionPane.OK_OPTION) {
+		    password = null;
+		    requestPassphrase(pwowner);
+		    return decrypt(value);
+		} else {
+		    return EMPTY_STRING;
+		}
 	    }
 	    return sb.toString();
 	} catch (Exception e) {
@@ -436,7 +446,7 @@ public abstract class ConfigPropertyEditor {
     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
 
-    private static char[] decryptToCharArray(String value, char[] password) {
+    private char[] decryptToCharArray(String value) {
 	if (value == null || password == null) return EMPTY_CHAR_ARRAY;
 	byte[] data = Base64.getDecoder().decode(value);
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
@@ -882,6 +892,22 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
+    /**
+     * Save the configuration in a file.
+     * @param f the file
+     * @throws IOException if an IO error occurred
+     */
+    public void save(File f) throws IOException {
+	FileOutputStream os = new FileOutputStream(f);
+	Writer w = new OutputStreamWriter(os, UTF8);
+	w = new CRLFWriter(w);
+	if (properties == null) {
+	    properties = new Properties();
+	}
+	properties.store(w, "(!M.T " + mediaType() + ")");
+    }
+
+
     private void save(File f, InputTablePane table) throws IOException {
 	FileOutputStream os = new FileOutputStream(f);
 	Writer w = new OutputStreamWriter(os, UTF8);
@@ -969,6 +995,14 @@ public abstract class ConfigPropertyEditor {
     /**
      * Add a reserved-key entry where the key can be changed to use
      * various suffixes.
+     * This will cause a spacer (a string of '-' characters where a
+     * key is expected) to be added after the entry, unless the prefix
+     * was already entered as a key by a call to
+     * {@link #addReservedKeys(String...)} with that key given as
+     * the concatination of the prefix, a period, and the first suffix.
+     * In this case, the call to {@link #addReservedKeys(String...)}
+     * must immediately preceed the call to this method or a sequence
+     * of calls to this method.
      * @param prefix the start of a key
      * @param suffixes the possibile suffixes following the prefix
      *        and separated from the prefix by a period.
@@ -982,10 +1016,25 @@ public abstract class ConfigPropertyEditor {
 	    // table.
 	    throw new IllegalStateException(errorMsg("indexWrap"));
 	}
-	final int ourind = reserved.size() + ind;
 	String ourkey = prefix + ((suffixes.length == 0)? "":
 				  "." + suffixes[0]);
-	reserved.add(ourkey);
+	boolean isNew = !reserved.contains(ourkey);
+
+	int ourindx;
+	if (isNew) {
+	    ourindx = reserved.size() + ind;
+	    reserved.add(ourkey);
+	} else {
+	    int index = 0;
+	    for (String k: reserved) {
+		if (k.equals(ourkey)) {
+		    break;
+		}
+		index++;
+	    }
+	    ourindx = index + ind - 1;
+	}
+	final int ourind = ourindx;
 	if (suffixes.length > 1) {
 	    String[] strings = new String[suffixes.length-1];
 	    System.arraycopy(suffixes, 1, strings, 0, strings.length);
@@ -1019,7 +1068,7 @@ public abstract class ConfigPropertyEditor {
 				  (new JComboBox<String>(vector)));
 		});
 	}
-	sl.add(reserved.size() + (ind++));
+	if (isNew) sl.add(reserved.size() + (ind++));
     }
 
     private int KLEN = 0;
@@ -1530,7 +1579,7 @@ public abstract class ConfigPropertyEditor {
 	    } else if (key.startsWith("ebase64.")) {
 		tag = 2;
 		requestPassphrase(pwowner);
-		value = decrypt(oldvalue, password);
+		value = decrypt(oldvalue);
 	    }
 
 	    TaggedTextField tf = (TaggedTextField)
@@ -1863,9 +1912,11 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Monitor a property.
+     * Registered listeners will be called when the property changes value.
      * @param property the property to monitor
      * @exception IllegalArgumentException the property's name starts
      *            with "ebase64.", indicating an encrypted value
+     * @see #addConfigPropertyListener(ConfigPropertyListener)
      */
     protected void monitorProperty(String property)
 	throws IllegalArgumentException
@@ -1966,7 +2017,7 @@ public abstract class ConfigPropertyEditor {
     /**
      * Test if a key exists.
      * @param key the key
-     * @areturn true if the key exists; false otherwise
+     * @return true if the key exists; false otherwise
      */
     public boolean hasKey(String key) {
 	if (properties == null) {
@@ -2747,12 +2798,12 @@ public abstract class ConfigPropertyEditor {
      * by the garbage collector.
      * <P>
      * NOTE:  For encrypted values the method
-     * {@link #requestPassphrase()} or {@link #requestPassphrase(Component)}
+     * {@link #requestPassphrase(Component)}
      * should be called before a call to {@link Properties#get(Object)}
      * if the dialog box is to be placed over a specific component.
      * @return the properties
      * @see #requestPassphrase(Component)
-     * @see #clearPassword()
+     * @see #clearPassphrase()
      */
     public Properties getDecodedProperties() {
 	Properties results = new Properties() {
@@ -2762,7 +2813,7 @@ public abstract class ConfigPropertyEditor {
 			if (key.startsWith("ebase64.")) {
 			    String encrypted = getProperty(key);
 			    requestPassphrase(null);
-			    return decryptToCharArray(encrypted, password);
+			    return decryptToCharArray(encrypted);
 			} else {
 			    return super.get(k);
 			}

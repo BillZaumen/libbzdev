@@ -19,12 +19,12 @@
     a server to explicitly send a challenge as is done by SSH or FIDO
     when public-key authentication is used.  Instead the public key of
     a server's certificate is used: SSL ensures that whatever provided
-    the certificate sent to a client also has the corresponding
-    private key.  Secure Basic authentication signs this public key,
-    along with some additional information, and sends that as a
-    password.  As a result, any password sent to a fake web site will
-    be useless because legitimate websites' certificates will have
-    different public keys.
+    the certificate sent to a client when setting up an SSL connection
+    also has the corresponding private key.  Secure Basic
+    authentication signs this public key, along with some additional
+    information, and sends that as a password.  As a result, any
+    password sent to a fake web site will be useless because
+    legitimate websites' certificates will have different public keys.
   <P>
     Essentially, secure basic authentication uses public key cryptography
     to generate a one-time password that is actually a digital signature
@@ -54,7 +54,7 @@
 	margin of error. Furthermore many systems come with NTP software
 	preinstalled.
       <LI> a 4-octet field containing a 32-bit CRC of the first four
-	octets and a UTF-8 encoded shared password in that order, stored in
+	octets and a UTF-8 encoded stored password in that order, stored in
 	little-endian byte order. For a denial of service attack with
 	random passwords, the CRC will reduce the number of digital
 	signatures that have to verified by a server by a factor of
@@ -63,7 +63,7 @@
 	<UL>
 	  <LI> the first 8 octets,
 	  <LI> the DER encoding of the certificate's public key,
-	  <LI> the UTF-8 encoded shared password used in the CRC,
+	  <LI> the UTF-8 encoded stored password used in the CRC,
 	</UL>
 	created using the user's private key and signature algorithm.
     </UL>
@@ -100,14 +100,14 @@
     been passed, the authentication fails and the user must generate a
     new password.
   <P>
-    The shared password is useful when certificates use subject
+    The stored password is useful when certificates use subject
     alternative names, effectively allowing multiple entities to
     share a single certificate, and where one may want to be logged
     into one entity but not another.
   <P>
     Typically a client will reuse a password that it has previously
     generated until that password fails.  It that is done, the client
-    should check that the corresponding certificate has not been
+    should also  check that the corresponding certificate has not been
     changed: otherwise a MITM attack is possible, although that would
     require compromising the network infrastructure (routers, DNS servers,
     etc.)
@@ -221,7 +221,7 @@
 	private key (the advantage is that GPG agent will then prompt
 	for the appropriate password, etc., needed to decrypt the
 	key).
-      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 520
+      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 558
 	lines of code.  This contains the code needed to create a
 	dialog box to get a user name and password. It works with
 	secure basic authentication, digest authentication, and basic

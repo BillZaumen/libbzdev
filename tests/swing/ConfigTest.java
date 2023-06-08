@@ -13,9 +13,10 @@ public class ConfigTest {
 	 */
 	public ConfigEditor() {
 	    super();
-	    addReservedKeys("key1", "key2", "key3");
+	    addReservedKeys("key1", "key2", "config.url", "input.url");
+	    addAltReservedKeys("config", "url", "file");
 	    addAltReservedKeys("input", "url", "file");
-	    addReservedKeys("base64.key4", "base64.key5");
+	    addReservedKeys("key3", "base64.key4", "base64.key5");
 	    addReservedKeys("ebase64.password");
 	    addReservedKeys("output.file");
 

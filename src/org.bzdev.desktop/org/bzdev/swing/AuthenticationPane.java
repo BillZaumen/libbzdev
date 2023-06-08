@@ -48,13 +48,13 @@ public class AuthenticationPane extends JComponent {
 	    .toString();
     }
 
-    private static SecureBasicUtilities dops = new SecureBasicUtilities();;
+    private static SecureBasicUtilities dops = new SecureBasicUtilities();
     private static SecureBasicUtilities ops = null;
     private static File pemFile = null;
     private static final Charset utf8 = Charset.forName("UTF-8");
 
     /**
-     * Set the private key for secure basic authentication.
+     * Set the default private key for secure basic authentication.
      * The file's extension should be ".pem" or ".pem.gpg" when
      * the file is GPG encrypted.
      * @param pemfile a file, possibly encrypted, in PEM format containing
@@ -62,6 +62,26 @@ public class AuthenticationPane extends JComponent {
      */
     public static void setPrivateKey(File pemfile) {
 	pemFile = pemfile;
+    }
+
+    static ConcurrentHashMap<Authenticator,File> pemMap =
+	new ConcurrentHashMap<>();
+
+    /**
+     * Set the private key for secure basic authentication for a
+     * specific authenticator.
+     * @param authenticator the authenticator
+     * @param pemfile a file, possibly encrypted, in PEM format containing
+     *        the private key; null to remove the authenticator-specific key
+     */
+    public static void setPrivateKey(Authenticator authenticator,
+				     File pemfile)
+    {
+	if (pemfile == null) {
+	    pemMap.remove(authenticator);
+	} else {
+	    pemMap.put(authenticator, pemfile);
+	}
     }
 
     private static char[] password = null;
@@ -162,41 +182,41 @@ public class AuthenticationPane extends JComponent {
 	password = null;
     }
 
-    private static synchronized SecureBasicUtilities getOps()
+    private static synchronized SecureBasicUtilities getOps(Component comp,
+							    File pemFile)
 	throws IOException, GeneralSecurityException
     {
 	if (pemFile == null) return null;
-	if (ops == null) {
-	    String name = pemFile.getName();
-	    if (name.endsWith(".gpg")) {
-		ProcessBuilder pb = new
-		    ProcessBuilder("gpg",
-				   "--pinentry-mode", "loopback",
-				   "--passphrase-fd", "0",
-				   "--batch", "-d",
-				   pemFile.getCanonicalPath());
-		// pb.redirectError(ProcessBuilder.Redirect.DISCARD);
-		try {
-		    Process p = pb.start();
-		    requestPassphrase(null);
-		    if (password == null) return null;
-		    OutputStream os = p.getOutputStream();
-		    OutputStreamWriter w = new OutputStreamWriter(os, utf8);
-		    w.write(password, 0, password.length);
-		    w.write(System.getProperty("line.separator"));
-		    w.flush();
-		    w.close();
-		    os.close();
-		    InputStream is = p.getInputStream();
-		    ops = new SecureBasicUtilities(is);
-		    is.close();
-		} catch (Exception e) {
-		    System.err.println(errorMsg("decryption", name));
-		    return null;
-		}
-	    } else {
-		ops = new SecureBasicUtilities(new FileInputStream(pemFile));
+	String name = pemFile.getName();
+	SecureBasicUtilities ops = null;
+	if (name.endsWith(".gpg")) {
+	    ProcessBuilder pb = new
+		ProcessBuilder("gpg",
+			       "--pinentry-mode", "loopback",
+			       "--passphrase-fd", "0",
+			       "--batch", "-d",
+			       pemFile.getCanonicalPath());
+	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    try {
+		Process p = pb.start();
+		requestPassphrase(comp);
+		if (password == null) return null;
+		OutputStream os = p.getOutputStream();
+		OutputStreamWriter w = new OutputStreamWriter(os, utf8);
+		w.write(password, 0, password.length);
+		w.write(System.getProperty("line.separator"));
+		w.flush();
+		w.close();
+		os.close();
+		InputStream is = p.getInputStream();
+		ops = new SecureBasicUtilities(is);
+		is.close();
+	    } catch (Exception e) {
+		System.err.println(errorMsg("decryption", name));
+		return null;
 	    }
+	} else {
+	    ops = new SecureBasicUtilities(new FileInputStream(pemFile));
 	}
 	return ops;
     }
@@ -326,6 +346,10 @@ public class AuthenticationPane extends JComponent {
 
     static long tdLimit = 60000L;
 
+    private static class AuthHolder {
+	Authenticator authenticator = null;
+    }
+
     /**
      * Get an authenticator for network authentication requests,
      * optionally placing the authenticator in a map.
@@ -359,9 +383,12 @@ public class AuthenticationPane extends JComponent {
     {
 	final ConcurrentHashMap<URL,URLData> urlmap =
 	    withMap? new ConcurrentHashMap<URL,URLData>(): null;
+	final AuthHolder authHolder = new AuthHolder();
 	Authenticator authenticator = new Authenticator() {
 		Component component = comp;
 
+		SecureBasicUtilities ops = null;
+		File pemF = null;
 
 		java.util.List<URLTimestamp> ulist = Collections
 		    .synchronizedList(new LinkedList<URLTimestamp>());
@@ -529,6 +556,9 @@ public class AuthenticationPane extends JComponent {
 				     JOptionPane.QUESTION_MESSAGE) == 0) {
 				    char[] pw = apane.getPassword();
 				    String uname = apane.getUser();
+				    File pf = pemMap
+					.get(authHolder.authenticator);
+				    if (pf == null) pf = pemFile;
 				    try {
 					Certificate cert = null;
 					switch (mode) {
@@ -543,7 +573,15 @@ public class AuthenticationPane extends JComponent {
 					    pw = dops.createPassword(null, pw);
 					    break;
 					case SIGNATURE_WITHOUT_CERT:
-					    ops = getOps();
+					    if (pf == null) {
+						throw new
+						    IllegalStateException
+						    (errorMsg("noPrivateKey"));
+					    }
+					    if (ops == null
+						|| !pf.equals(pemF)) {
+						ops = getOps(component, pf);
+					    }
 					    if (udata != null) {
 						udata.userName = uname;
 						udata.password = pw;
@@ -554,7 +592,16 @@ public class AuthenticationPane extends JComponent {
 					    pw = ops.createPassword(null, pw);
 					    break;
 					case SIGNATURE_WITH_CERT:
-					    ops = getOps();
+					    if (pf == null) {
+						throw new
+						    IllegalStateException
+						    (errorMsg("noPrivateKey"));
+					    }
+					    if (ops == null
+						|| !pf.equals(pemF)) {
+						ops = getOps(component, pf);
+						pemF = pf;
+					    }
 					    cert = getCertificate();
 					    if (udata != null) {
 						udata.userName = uname;
@@ -612,6 +659,7 @@ public class AuthenticationPane extends JComponent {
 		    return resultHolder.result;
 		}
 	    };
+	authHolder.authenticator = authenticator;
 	if (withMap) map.put(authenticator, urlmap);
 	return authenticator;
     }
