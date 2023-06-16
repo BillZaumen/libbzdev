@@ -20,15 +20,15 @@
       </magic>
       <glob pattern="*.isq"/>
   </mime-type>
-  <mime-type type="application/vnd.bzdev.sblauncher-config">
+  <mime-type type="application/vnd.bzdev.sblauncher">
     <comment>Secure Basic Launcher configuration</comment>
     <magic priority="80">
       <match type="string" offset="0"
-             value="#(!M.T application/vnd.bzdev.sblauncher-config)"/>
+             value="#(!M.T application/vnd.bzdev.sblauncher)"/>
       <!-- match when a byte order mark is present -->
       <match type="big32" value="0xefbbbf3c" offset="0">
         <match type="string" offset="4"
-               value="#(!M.T application/vnd.bzdev.sblauncher-config)"/>
+               value="#(!M.T application/vnd.bzdev.sblauncher)"/>
       </match>
     </magic>
     <glob pattern="*.sbl"/>

@@ -535,6 +535,7 @@ public class SBL {
 
 	while (indx < argv.length) {
 	    if (argv[indx].equals("--")) {
+		indx++;
 		break;
 	    } else if (argv[indx].equals("-n")) {
 		indx++;

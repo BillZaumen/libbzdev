@@ -358,7 +358,7 @@ ecircErr:
 sbl:
 	(cd ../.. ; make )
 	chmod u+x sblrun
-	./sblrun
+	./sblrun --
 	chmod u-x sblrun
 
 sbl-list:

@@ -51,10 +51,10 @@ include MajorMinor.mk
 DARKMODE =
 
 MIMETYPES_DIR = mimetypes
+APPS_DIR = apps
 # System directories
 #
 SYS_APPDIR = /usr/share/applications
-SYS_APP_POPICON_DIR = $(SYS_POPICON_DIR)/scalable/$(APPS_DIR)
 SYS_APP_ICON_DIR = $(SYS_ICON_DIR)/scalable/$(APPS_DIR)
 SYS_JARDIRECTORY=/usr/share/bzdev
 SYS_DOCDIR = /usr/share/doc/libbzdev-java
@@ -67,6 +67,7 @@ SYS_MANDIR = /usr/share/man
 SYS_MIMEDIR = /usr/share/mime
 SYS_ICON_DIR = /usr/share/icons/hicolor
 SYS_POPICON_DIR = /usr/share/icons/Pop
+SYS_APP_POPICON_DIR = $(SYS_POPICON_DIR)/scalable/$(APPS_DIR)
 SYS_MIME_ICON_DIR = $(SYS_ICON_DIR)/scalable/$(MIMETYPES_DIR)
 SYS_MIME_POPICON_DIR = $(SYS_POPICON_DIR)/scalable/$(MIMETYPES_DIR)
 SYS_CONFIGDIR = /etc/bzdev
@@ -96,7 +97,10 @@ JARDIR=$(shell echo $(SYS_JARDIRECTORY) | sed  s/\\//\\\\\\\\\\//g)
 #
 IMAGE_SEQUENCE_ICON = image-vnd.bzdev.image-sequence+zip
 
-SBL_CONF_ICON = application-vnd.bzdev.sblauncher-config
+SBL_TARGETICON = SBLauncher.svg
+SBL_TARGETICON_PNG = SBLauncher.png
+
+SBL_CONF_ICON = application-vnd.bzdev.sblauncher
 
 # Target for the standard Java-library directory
 LIBJARDIR = $(DESTDIR)$(SYS_LIBJARDIR)
@@ -1774,11 +1778,16 @@ install-javadocs: javadocs
 install-misc:
 	install -d $(MIMEDIR)
 	install -d $(MIMEDIR)/packages
+	install -d $(APP_ICON_DIR)
 	install -m 0644 -T MediaTypes/libbzdev.xml \
 		$(MIMEDIR)/packages/libbzdev.xml
 	install -d $(MIME_ICON_DIR)
 	install -m 0644 -T MediaTypes/ImageSeq.svg \
 		$(MIME_ICON_DIR)/$(IMAGE_SEQUENCE_ICON).svg
+	install -m 0644 -T MediaTypes/sblconf.svg \
+		$(MIME_ICON_DIR)/$(SBL_CONF_ICON).svg
+	install -m 0644 -T MediaTypes/sblauncher.svg \
+		$(APP_ICON_DIR)/$(SBL_TARGETICON)
 	for i in $(ICON_WIDTHS) ; do \
 	  install -d $(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
 	  inkscape -w $$i -y 0.0 --export-filename=tmp.png \
@@ -1788,6 +1797,11 @@ install-misc:
 	  inkscape -w $$i -y 0.0 --export-filename=tmp.png \
 		MediaTypes/sblconf.svg ; \
 	  install -m 0644 -T tmp.png $$dir/$(SBL_CONF_ICON).png; \
+	  install -d $(ICON_DIR)/$${i}x$${i}/$(APPS_DIR) ; \
+	  inkscape -w $$i -y 0.0 --export-filename=tmp.png \
+		MediaTypes/sblauncher.svg ; \
+	  install -m 0644 -T tmp.png \
+		$(ICON_DIR)/$${i}x$${i}/$(APPS_DIR)/$(SBL_TARGETICON_PNG) ; \
 	  rm tmp.png ; \
 	done
 	for i in $(ICON_WIDTHS2x) ; do \
@@ -1800,6 +1814,11 @@ install-misc:
 	  inkscape -w $$ii -y 0.0 --export-filename=tmp.png \
 		MediaTypes/sblconf.svg ; \
 	  install -m 0644 -T tmp.png $$dir/$(SBL_CONF_ICON).png; \
+	  install -d $(ICON_DIR)/$${i}x$${i}@2x/$(APPS_DIR) ; \
+	  inkscape -w $$ii -y 0.0 --export-filename=tmp.png \
+		MediaTypes/sblauncher.svg ; \
+	  install -m 0644 -T tmp.png \
+		$(ICON_DIR)/$${i}x$${i}@2x/$(APPS_DIR)/$(SBL_TARGETICON_PNG) ; \
 	  rm tmp.png ; \
 	done
 
@@ -1810,13 +1829,15 @@ uninstall-misc:
 		echo ... rm $(IMAGE_SEQUENCE_ICON).svg FAILED
 	@rm -f $(MIME_ICON_DIR)/$(SBL_CONF_ICON).svg || \
 		echo ... rm $(SBL_CONF_ICON).svg FAILED
+	@rm -f $(APP_ICON_DIR)/$(SBL_TARGETICON) || \
+		echo ... rm $(SBL_TARGETICON) FAILED
 	@(for i in $(ICON_WIDTHS) ; do \
 	   dir=$(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
-	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
+	   rm -f $$dir/$(IMAGE_SEQUENCE_ICON).png; \
 	  done) || echo ... rm $(IMAGE_SEQUENCE_ICON).png FAILED AT LEAST ONCE
 	@(for i in $(ICON_WIDTHS2x) ; do \
 	   dir=$(ICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
-	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
+	   rm -f $$dir/$(IMAGE_SEQUENCE_ICON).png; \
 	  done) || echo ... rm $(IMAGE_SEQUENCE_ICON).png FAILED AT LEAST ONCE
 	@(for i in $(ICON_WIDTHS) ; do \
 	   dir=$(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
@@ -1826,6 +1847,14 @@ uninstall-misc:
 	   dir=$(ICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
 	   rm -f $$dir/$(SBL_CONF_ICON).png; \
 	  done) || echo ... rm $(SBL_CONF_ICON).png FAILED AT LEAST ONCE
+	@(for i in $(ICON_WIDTHS) ; do \
+	   dir=$(ICON_DIR)/$${i}x$${i}/$(APPS_DIR) ; \
+	   rm -f $$dir/$(SBL_TARGETICON_PNG) ; \
+	   done) || echo ... rm $(SBL_TARGETICON_PNG) FAILED AT LEAST ONCE
+	@(for i in $(ICON_WIDTHS) ; do \
+	   dir=$(ICON_DIR)/$${i}x$${i}@2x/$(APPS_DIR) ; \
+	   rm -f $$dir/$(SBL_TARGETICON_PNG) ; \
+	   done) || echo ... rm $(SBL_TARGETICON_PNG) FAILED AT LEAST ONCE
 
 install-pop:
 	install -d $(MIME_POPICON_DIR)
@@ -1862,13 +1891,16 @@ uninstall-pop:
 		echo ... rm $(IMAGE_SEQUENCE_ICON).svg FAILED
 	@rm -f $(MIME_POPICON_DIR)/$(SBL_CONF_ICON).svg || \
 		echo ... rm $(SBL_CONF_ICON).svg FAILED
+
+
+old-uninstall-pop-tail:
 	@(for i in $(POPICON_WIDTHS) ; do \
 	   dir=$(POPICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
-	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
+	   rm -f $$dir/$(IMAGE_SEQUENCE_ICON).png; \
 	  done) || echo ... rm $(IMAGE_SEQUENCE_ICON).png FAILED AT LEAST ONCE
 	@(for i in $(POPICON_WIDTHS2x) ; do \
 	   dir=$(POPICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
-	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
+	   rm -f $$dir/$(IMAGE_SEQUENCE_ICON).png; \
 	  done) || echo ... rm $(IMAGE_SEQUENCE_ICON).png FAILED AT LEAST ONCE
 
 uninstall-links:
