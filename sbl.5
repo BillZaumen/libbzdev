@@ -1,0 +1,93 @@
+.TH SBL "5" "Nov 2014" "sbl VERSION" "File Formats and Conventions"
+.SH NAME
+sbl \- sbl input file
+.SH DESCRIPTION
+.PP
+.B SBL
+(Secure Basic Launcher) configuration files are stylized Java property
+files using the UTF-8 character set.  While the file name extension is
+.BR sbl ,
+the file type can be determined by their first line:
+.br
+.sp
+#(!m.T\ application/vnd.bzdev.sblauncher)
+.br
+.sp
+which encodes the file's media type (MIME type).  The remainder of the
+file contains a key given as a qualified name, followed by an "=", and
+finally followed by a value.  If the key starts with "base64", the
+value is URL-safe base-64 encoded with no line breaks.  Similarly
+if the key starts with "ebase64", the value is encrypted with GPG
+and then encoded using the URL-safe base-64 encoding.
+.PP
+There are several reserved keys (property names):
+.TP
+.B title
+A user-specified title to display for this file
+.TP
+.B base64.keypair.publicKey
+The public key.
+.TP
+.B ebase64.keypair.privateKey
+The GPG-encrypted private key
+.TP
+.B trustStore.file
+The file name for an additional trust store to use in addition to
+the default.  A trust store contains self-signed certificates that
+are deemed to be trusted for signing other certificates.
+.TP
+.B ebase64.trustStore.password
+The password for the trust store file.
+.TP
+.B trust.selfsigned
+The value is
+.B true
+if a server's certificate can be self-signed;
+.B false
+otherwise.
+.TP
+.B trust.allow.loopback
+The value is
+.B true
+if the server can be found on the loopback interface;
+.B false
+otherwise.
+.PP
+The remaining keys are partially user-specified.  For each name
+.I NAME
+that user chooses, the corresponding keys are
+.TP
+.B \fINAME\fB.description
+The value is a textual description for this entry.
+.TP
+.B \fINAME\fB.mode
+The value is the type of the passphrase generate 
+.BR\fI(\fBDIGEST , PASSWORD , PASSWORD_WITHOUT_CERT , PASSWORD_WITH_CERT ).
+.TP
+.B \fINAME\fB.password
+The value is the user-supplied password.
+.TP
+.B \fINAME\fB.uri
+The value is the URI used to find a web site.
+.TP
+.B \fINAME\fB.user
+The value is the user's login name for this web site.
+.SH SUBSTITUTION
+.PP
+For keys that do not start with
+.B base64
+or
+.BR ebase64 ,
+when a value contains
+.BI $( KEY )
+that expression will be replaced with the value corresponding
+to
+.IR KEY .
+
+
+.SH SEE ALSO
+.PP
+.BR sbl (1)
+
+\"  LocalWords:  SBL sbl UTF br sp ebase GPG TP trustStore selfsigned
+\"  LocalWords:  loopback fINAME fB fI fBDIGEST uri

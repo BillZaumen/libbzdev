@@ -1,0 +1,151 @@
+.TH SBL "1" "June 2023" "libbzdev-util VERSION" "User Commands"
+.SH NAME
+sbl \- create passphrases for use with secure basic authentication
+.SH SYNOPSIS
+.B sbl
+.br
+.B sbl\ \fICFILE
+.br
+.B sbl \fB[\fIOPTION\fB]...\fR \fICFILE
+.SH DESCRIPTION
+.PP
+The program
+.B sbl
+(Secure Basic Launcher) provides a simple graphical user interface
+for web sites that use Secure Basic authentication. Secure Basic
+authentication differs from Basic authentication in that the
+password is replaced with a passphrase that is a digital signature.
+Once verified, this passphrase can be used like a traditional
+password.  It is intended to be secure when used with TLS/SSL,
+in which case the passphrase consists of a time stamp, a 32-bit
+CRC of the time stamp and a traditional password, and a digital
+signature of the time stamp, the CRC, the SSL certificate's
+public key, and the password.  Once verified, this signature is
+teated as a basic-authentication password, accepted provided the
+sender's IP address has not changed.
+.PP
+Configurations are stored in files typically withh the
+file-nameextension
+.BR sbl .
+Each file will typically include sites that are related in
+some way (the grouping is choosen by each user).
+
+.PP
+While there are
+some command-line options for specific tasks, typically
+.B sbl
+will be used to open a browser window with a specified web page,
+and simultaneously copy a secure basic authentication passphrase to
+the system clipboard, which can then be pasted into a dialog box
+or text field provided by a browser.
+.PP
+When
+.B sbl
+is run with no arguments, or one argument (an
+.B sbl
+configuration file
+.IR CFILE )
+with no options except
+.BR \-\-,
+it will provide a window with a series of buttons or controls for
+specific operations.  These are
+.TP
+.B Load
+A new configuration file will be loaded. A "file chooser" dialog box
+will allow a configuration file to be selected.
+.TP
+.B Select\ Site
+This will allow one to select a web page to visit, based on an
+identifier providing a short name for the page.
+.TP
+.B Open\ Browser
+This will open a window using the user's default browser. It will also
+generate a passphrase to copy into a 'password' dialog box or a text
+field in an HTML form.
+.TP
+.B Generate\ Passphrase
+This will generate a new passphrase for the selected site.
+.TP
+.B Add\ Entry
+This will add a new entry the configuration file's tables.
+.TP
+.B Edit\ Entries
+This will allow the user to edit the configuration file.
+.TP
+.B Copy\ User\ Name
+This will copy the user name for the selected site to the
+system clipboard.
+.TP
+.B Copy\ Public\ Key
+This will copy the public key for the selected site to the
+system clipboard.
+.TP
+.B Copy\ Password
+This will copy the user's password for the selected site to the
+clipboard.  For secure basic authentication, a traditional password
+is used for two purposes: (1) to quickly reject bad authentication
+requests, and (2) so that passwords can differ when two web sites
+share the same certificate (web sites that are part of a larger
+organization sometimes share certificates).
+
+.SH OPTIONS
+The options are
+.TP
+.B \-\-
+Terminate options. 
+.TP
+.BI \-n\   NAME
+The argument
+.I NAME
+is the identifier displayed when the
+.B Select\ Site
+box is used to choose a particular web page.  This identifier is
+used as a key to select particular options.
+.TP
+.B \-\-print\ \fIPOPTION
+The argument
+.I POPTION
+can be
+.B user
+(to print the user name to use when logging into the web site),
+.B uri
+(to print the URI for the web page),
+.B description
+(to print the description of the web page),
+.B password
+(to print the user-supplied password),
+.B mode
+(to print the type of authentication used),
+.B publicKey
+(to print the public key for this configuration file),
+.B list
+(to print a list of the identifiers used to select a web page.)
+.PP
+For the
+.B \-\-print
+option, except when its argument
+.I POPTION
+is
+.BR list ,
+a
+.B \-n
+option will also be needed.
+.SH FILES
+.I ~/.config/sbl
+This directory contains configuration files. Each will have
+its own key pair, and will otherwise list web sites, user names,
+and their corresponding passwords.
+
+.SH SEE ALSO
+.BR sbl (5)
+
+\"  LocalWords:  fIOPTION fICLASSNAME fR subclasses CLASSNAME javadoc
+\"  LocalWords:  NamedObjectFactory codebase classname superclass TP
+\"  LocalWords:  getTemplateKeyMap BZDev URLPATH dryrun JOPTION TQ br
+\"  LocalWords:  stackTrace baseURL subdirectories DIRNAME api html
+\"  LocalWords:  toplevel factoryDoc charset CHARSET UTF templateURL
+\"  LocalWords:  templateResource templateFile definingClass bzdev fI
+\"  LocalWords:  definingClassHTML RESOURCENAME listCodeBase rdanim
+\"  LocalWords:  subdirectory roadanim scrunner fRor Solaris config
+\"  LocalWords:  conf SBL libbzdev util sbl fICFILE fB CFILE POPTION
+\"  LocalWords:  fIPOPTION uri publicKey

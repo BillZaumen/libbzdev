@@ -299,6 +299,11 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * mode and
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT} mode given
      * multiple certificates.
+     * <P>
+     * If the second argument is null or does not contain any certficates,
+     * the mode is {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT};
+     * otherwise the mode is
+     * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT}
      * @param certs the server certificates.
      * @param realm the HTTP realm
      */
@@ -311,6 +316,11 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * mode and
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT} mode given
      * multiple certificates, specifying a map.
+     * <P>
+     * If the second argument is null or does not contain any certficates,
+     * the mode is {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT};
+     * otherwise the mode is
+     * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT}
      * <P>
      * A user-supplied map can be implemented so as to allow one to obtain
      * passwords and roles from a database or some other form of persistent
@@ -744,7 +754,6 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	// message digest.
 	long now = Instant.now().getEpochSecond();
 	// System.out.println("checking " + username + ", " + password);
-	username = SecureBasicUtilities.decodeUserName(username, password);
 	InetAddress iaddr = addr.get();
 	PWInfoKey key = new PWInfoKey(username, iaddr);
 	/*

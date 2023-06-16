@@ -60,6 +60,20 @@ public.pem: eckey.pem
 public.der: eckey.pem
 	openssl ec -in eckey.pem -pubout -out public.der -outform DER
 
+
+sslutil0: compile
+	$(JAVA) SSLUtilTest
+
+sslutil1: compile
+	$(JAVA) SSLUtilTest -
+
+sslutil2: compile
+	$(JAVA) SSLUtilTest tstore
+
+sslutil121: compile
+	$(JAVA) SSLUtilTest - tstore -
+
+
 #
 
 clean:

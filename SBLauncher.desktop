@@ -1,0 +1,20 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=SBLauncher
+GenericName=SBLauncher
+Comment=Creates a Secure Basic passhrase, optionally opening a broswer window
+Exec=qrl -- %U
+TryExec=qrl
+MimeType=application/vnd.bzdev.sblauncher;
+Terminal=false
+Type=Application
+Icon=/usr/share/icons/hicolor/scalable/apps/SBLauncher.svg
+Categories=Utility;
+StartupNotify=false
+
+
+
+
+
+
+

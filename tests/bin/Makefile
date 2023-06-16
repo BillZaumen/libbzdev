@@ -7,7 +7,7 @@ all:
 	( cd ../.. ; make )
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
 		--supportsLanguage ECMAScript && echo ECMAScript supported \
-		|| ECMAScript not supported
+		|| echo ECMAScript not supported
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
 		--supportsLanguage ESP && echo ESP supported
 	java -Dscrunner.usrconf=test.conf -p ../../BUILD -m org.bzdev.scrunner \
@@ -354,6 +354,58 @@ ecircErr:
 	chmod u-x ecirc2
 	chmod u-x ecirc4
 	chmod u-x run
+
+sbl:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun
+	chmod u-x sblrun
+
+sbl-list:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --print list sblconf/test.sbl
+	chmod u-x sblrun
+
+sbl-user:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	for i in `./sblrun --print list sblconf/test.sbl` ; \
+	do ./sblrun --print user -n $$i sblconf/test.sbl ; done
+	chmod u-x sblrun
+
+sbl-uri:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	for i in `./sblrun --print list sblconf/test.sbl` ; \
+	do ./sblrun --print uri -n $$i sblconf/test.sbl ; done
+	chmod u-x sblrun
+sbl-description:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	for i in `./sblrun --print list sblconf/test.sbl` ; \
+	do ./sblrun --print description -n $$i sblconf/test.sbl ; done
+	chmod u-x sblrun
+
+sbl-password:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	for i in `./sblrun --print list sblconf/test.sbl` ; \
+	do ./sblrun --print password -n $$i sblconf/test.sbl ; done
+	chmod u-x sblrun
+
+sbl-mode:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	for i in `./sblrun --print list sblconf/test.sbl` ; \
+	do ./sblrun --print mode -n $$i sblconf/test.sbl ; done
+	chmod u-x sblrun
+
+sbl-publickey:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --print publicKey sblconf/test.sbl
+	chmod u-x sblrun
 
 clean:
 	rm -fr junk raf tmp.png

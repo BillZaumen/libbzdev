@@ -128,41 +128,16 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 
     Map<String,Entry>map = null;
 
-    boolean implicitUsername = true;
-
     /**
      * Constructor.
-     * This constructor configures the authenticator to accept
-     * implicit user names. for an implicit user name, the convention
-     * is that, when the user name is missing, the password is scanned
-     * for the first ':', the text before this colon is treated as the
-     * user name, and the text after this colon is treated as a
-     * password.  This is done to support a secure basic
-     * authentication option, and is generally safe as hardly anyone
-     * would accept an empty string as a user name.  In the unusual case
-     * where empty user names are acceptable, one can use the constructor
-     * {@link #EjwsBasicAuthenticator(String,boolean)} with its second
-     * argument set to <CODE>false</CODE>.
      * @param realm the HTTP realm
      */
     public EjwsBasicAuthenticator(String realm) {
-	this(realm, true);
+	this(realm, new ConcurrentHashMap<String,Entry>());
     }
 
     /**
      * Constructor providing a map.
-     * This constructor configures the authenticator to accept
-     * implicit user names. for an implicit user name, the convention
-     * is that, when the user name is missing, the password is scanned
-     * for the first ':', the text before this colon is treated as the
-     * user name, and the text after this colon is treated as a
-     * password.  This is done to support a secure basic
-     * authentication option, and is generally safe as hardly anyone
-     * would accept an empty string as a user name.  In the unusual case
-     * where empty user names are acceptable, one can use the constructor
-     * {@link #EjwsBasicAuthenticator(String,boolean)} with its second
-     * argument set to <CODE>false</CODE>.
-     * <P>
      * A user-supplied map can be implemented so as to allow one to obtain
      * passwords and roles from a database or some other form of persistent
      * storage. If entries can be added while a server using this
@@ -171,60 +146,9 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      * @param realm the HTTP realm
      * @param map a map associating a user name with a table entry.
      */
-    public EjwsBasicAuthenticator(String realm, Map<String,Entry>map) {
-	this(realm, true, map);
-    }
-
-
-    /**
-     * Constructor specifiying whether or no implicit user names are allowed.
-     * When the <CODE>implicitUsername</CODE> argument has the value
-     * <CODE>true</CODE>, a null or empty user name may be replaced by a
-     * value encoded in the password.  The convention is that, when the
-     * user name is missing, the password is scanned for the first ':',
-     * the text before this colon is treated as the user name, and the text
-     * after this colon is treated as a password.  This is done to
-     * support a secure basic authentication option, and is generally safe
-     * as hardly anyone would accept an empty string as a user name. In the
-     * unusual case where an empty user name is actually used, the second
-     * argument can simply be set to <CODE>false</CODE>.
-     * @param realm the HTTP realm
-     * @param implicitUsername true if an implicit user name can be used;
-     *        false otherwise
-     */
-    public EjwsBasicAuthenticator(String realm, boolean implicitUsername) {
-	this(realm, implicitUsername, new ConcurrentHashMap<String,Entry>());
-    }
-
-    /**
-     * Constructor specifiying whether or no implicit user names are allowed
-     * and providing a map.
-     * When the <CODE>implicitUsername</CODE> argument has the value
-     * <CODE>true</CODE>, a null or empty user name may be replaced by a
-     * value encoded in the password.  The convention is that, when the
-     * user name is missing, the password is scanned for the first ':',
-     * the text before this colon is treated as the user name, and the text
-     * after this colon is treated as a password.  This is done to
-     * support a secure basic authentication option, and is generally safe
-     * as hardly anyone would accept an empty string as a user name. In the
-     * unusual case where an empty user name is actually used, the second
-     * argument can simply be set to <CODE>false</CODE>.
-     * <P>
-     * A user-supplied map can be implemented so as to allow one to obtain
-     * passwords and roles from a database or some other form of persistent
-     * storage. If entries can be added while a server using this
-     * authenticator is running, the map should have a thread-safe
-     * implementation.
-     * @param realm the HTTP realm
-     * @param implicitUsername true if an implicit user name can be used;
-     *        false otherwise
-     * @param map a map associating a user name with a table entry.
-     */
-    public EjwsBasicAuthenticator(String realm, boolean implicitUsername,
-				  Map<String,Entry> map)
+    public EjwsBasicAuthenticator(String realm, Map<String,Entry> map)
     {
 	super(realm);
-	this.implicitUsername = implicitUsername;
 	this.map = map;
     }
 
@@ -385,21 +309,6 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      */
     @Override
     public boolean checkCredentials(String username, String password) {
-	if (implicitUsername) {
-	    if (username == null || username.trim().length() == 0) {
-		// special case to be compatible with a Secure Basic
-		// Authentication convention used for backwards compatibility
-		// with browsers that do not support SecureBasicAuthentication.
-		if (password != null) {
-		    int index = password.indexOf(':');
-		    if (index >= 0) {
-			username = password.substring(0, index);
-			password = password.substring(index+1);
-		    }
-		}
-	    }
-	}
-
 	Entry entry = map.get(username);
 	if (entry == null) {
 	    if (tracer != null) {

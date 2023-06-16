@@ -227,6 +227,10 @@ atest4-badlogout:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest4 publicKey.pem /index.html
 
-
+atest6:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest6 ../bin/sblconf/test.sbl foo
 clean:
 	rm -rf classes

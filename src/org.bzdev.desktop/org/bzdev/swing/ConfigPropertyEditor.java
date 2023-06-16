@@ -16,6 +16,7 @@ import java.text.Format;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.regex.*;
+import java.util.function.Function;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -542,26 +543,73 @@ public abstract class ConfigPropertyEditor {
 			data2 = Base64.getEncoder().encode(data2);
 			sb.append(new String(data2, UTF8));
 		    } catch (Exception e) {
-			e.printStackTrace();
+			try {
+			    p.waitFor();
+			} catch (Exception ee) {
+			    e.printStackTrace();
+			}
 		    }
 	    });
 	    thread.start();
-	    OutputStream os = p.getOutputStream();
-	    OutputStreamWriter w = new OutputStreamWriter(os, UTF8);
-	    w.write(value);
-	    w.flush();
-	    w.close();
-	    thread.join();
-	    if (p.exitValue() != 0) {
-		System.err.println(errorMsg("gpgFailed", p.exitValue()));
+	    try {
+		OutputStream os = p.getOutputStream();
+		OutputStreamWriter w = new OutputStreamWriter(os, UTF8);
+		w.write(value);
+		w.flush();
+		w.close();
+		thread.join();
+		if (p.exitValue() != 0) {
+		    System.err.println(errorMsg("gpgFailed", p.exitValue()));
+		    return null;
+		} else {
+		    return sb.toString();
+		}
+	    } catch (Exception e) {
+		thread.join();
+		if (p.exitValue() != 0) {
+		    System.err.println(errorMsg("gpgFailed", p.exitValue()));
+		} else {
+		    e.printStackTrace();
+		}
 		return null;
-	    } else {
-		return sb.toString();
 	    }
 	} catch (Exception e) {
-	    e.printStackTrace();
 	    return null;
 	}
+    }
+
+    // List of recipients used when we always want the same ones.
+    String[] recipientsList = null;
+
+    /**
+     * Set the list of recipients to use when values are encrypted.
+     * The list will be built interactively.
+     * A recipient is a string acceptable to the '-r' argument for GPG.
+     * @param c the component on which to center dialog boxes
+     */
+    public void setRecipients(Component c) {
+	recipientsList = getRecipients(c);
+    }
+
+    /**
+     * Set the list of recipients to use when values are encrypted, given
+     * an explicit list.
+     * A recipient is a string acceptable to the '-r' argument for GPG.
+     * @param list the recipient list; null to remove the recipients list
+     */
+    public void setRecipients(String[] list) {
+	recipientsList =  list.clone();
+    }
+
+    /**
+     * Clear the recipients list.
+     * After this is called, and until either
+     * {@link #setRecipients(Component)} or {@link #setRecipients(String[])}
+     * is called, the user will be asked for recipients each time a value
+     * is encrypted.
+     */
+    public void clearRecipients() {
+	recipientsList = null;
     }
 
     static String[] getRecipients(Component frame) {
@@ -1433,18 +1481,44 @@ public abstract class ConfigPropertyEditor {
     /**
      * Request a GPG passphrase.
      * This method will open a dialog box to request a GPG pasphrase
-     * for decryption.
+     * for decryption. However, if the argument is null, this method
+     * is not called from the event dispatch thread, and a system
+     * console exists, the system console will be used to obtain the
+     * password (unless the password exists).
+     * <P>
+     * To use a dialog box when 'owner' is null and a console exists,
+     * use
+     * <BLOCKQUOTE><PRE><CODE>
+     * ConfigPropertyEditor cpe = ...;
+     * ...
+     * SwingUtilities.invokeAndWait(() -&gt; {
+     *     cpe.requestPassphrase(null);
+     * });
+     * </BLOCKQUOTE></CODE></PRE>
+     * <P>
+     * NOTE: tests indicate that in Java, a system console exists only when
+     * both standard input and standard output are connected to a terminal.
      * @param owner a component over which a dialog box should be displayed
      */
     public void requestPassphrase(Component owner) {
 	if (password == null) {
 	    if (!SwingUtilities.isEventDispatchThread()) {
-		try {
-		    SwingUtilities.invokeAndWait(() -> {
-			    requestPassphrase(owner);
-			});
-		} catch (InterruptedException e) {
-		} catch (InvocationTargetException e) {
+		Console console = System.console();
+		if (console != null) {
+		    password = console
+			.readPassword(localeString("enterPW2") + ":");
+		    if (password == null || password.length == 0) {
+			password = null;
+		    }
+		    return;
+		} else {
+		    try {
+			SwingUtilities.invokeAndWait(() -> {
+				requestPassphrase(owner);
+			    });
+		    } catch (InterruptedException e) {
+		    } catch (InvocationTargetException e) {
+		    }
 		}
 		return;
 	    }
@@ -1482,7 +1556,7 @@ public abstract class ConfigPropertyEditor {
 
 	    for (;;) {
 		int status = JOptionPane
-		    .showConfirmDialog(pwowner, pwf, localeString("enterPW"),
+		    .showConfirmDialog(owner, pwf, localeString("enterPW"),
 				       JOptionPane.OK_CANCEL_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
 		    char[] pw = pwf.getPassword();
@@ -1600,7 +1674,8 @@ public abstract class ConfigPropertyEditor {
 	    case 1:
 		return value;
 	    case 2:
-		String[] recipients = getRecipients(tf.table);
+		String[] recipients = (recipientsList != null)? recipientsList:
+		    getRecipients(tf.table);
 		if (recipients == null  || recipients.length == 0) {
 		    return tf.oldvalue;
 		}
@@ -1745,14 +1820,16 @@ public abstract class ConfigPropertyEditor {
 	    if (isBordered) {
 		if (isSelected) {
 		    if (selectedBorder == null) {
-			selectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-									 table.getSelectionBackground());
+			selectedBorder = BorderFactory
+			    .createMatteBorder(2,5,2,5,
+					       table.getSelectionBackground());
 		    }
 		    setBorder(selectedBorder);
 		} else {
 		    if (unselectedBorder == null) {
-			unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-									   table.getBackground());
+			unselectedBorder = BorderFactory
+			    .createMatteBorder(2,5,2,5,
+					       table.getBackground());
 		    }
 		    setBorder(unselectedBorder);
 		}
@@ -1760,6 +1837,97 @@ public abstract class ConfigPropertyEditor {
 	    return this;
 	}
     }
+
+    /**
+     * Table-Cell renderer that describes its contents rather than
+     * displays its contents.
+     * An instance of this renderer can be used with
+     * {@link #addRE(String,TableCellRenderer,TableCellEditor)} for
+     * cases where the contents of a cell should not be displayed and
+     * one wants adescription of its contents instead.
+     * <P>
+     * A function maps the value to the string describing it.  If the
+     * value is a string, the string is trimmed and if the resulting
+     * length is value, the valuse is handled as if it were null. Any
+     * text that is displayed by this renderer will be bracked by square
+     * brackets.
+     * <P>
+     * This renderer will use colors that are the same as those used for
+     * indicating encrypted text.
+     */
+    public static class DescribingRenderer extends JLabel
+                           implements TableCellRenderer
+    {
+
+	Border unselectedBorder = null;
+	Border selectedBorder = null;
+	boolean isBordered = true;
+	Function<Object,String> textFunction = null;
+
+	/**
+	 * Constructor.
+	 * @param textFunction a function that maps the value of a cell to
+	 *        a string that should be displayed when the contents are
+	 *        not empty
+	 * @param isBordered true if this cell renderer should use a border;
+	 *                   false otherwise
+	 * @throws IllegalArgumentException if the first argument is null
+	 */
+	public DescribingRenderer(Function<Object,String> textFunction,
+				  boolean isBordered) {
+	    super();
+	    if (textFunction == null) {
+		String msg = errorMsg("textFunctionNeeded");
+		throw new IllegalArgumentException(msg);
+	    }
+	    this.isBordered = isBordered;
+	    setOpaque(true); //MUST do this for background to show up.
+	    this.textFunction = textFunction;
+	}
+
+	@Override
+	public Component
+	    getTableCellRendererComponent(JTable table, Object value,
+					  boolean isSelected, boolean hasFocus,
+					  int row, int column) {
+	    if (value instanceof String) {
+		String s = (String) value;
+		if (s.trim().length() == 0) value = null;
+	    }
+	    boolean darkmode = DarkmodeMonitor.getDarkmode();
+	    setBackground(null);
+
+	    if (value == null) {
+		setText("");
+	    } else {
+		setText("[" + textFunction.apply(value) + "]");
+	    }
+	    if (darkmode) {
+		setForeground(Color.YELLOW.darker());
+	    } else {
+		setForeground(Color.YELLOW.brighter());
+	    }
+	    if (isBordered) {
+		if (isSelected) {
+		    if (selectedBorder == null) {
+			selectedBorder = BorderFactory
+			    .createMatteBorder(2,5,2,5,
+					       table.getSelectionBackground());
+		    }
+		    setBorder(selectedBorder);
+		} else {
+		    if (unselectedBorder == null) {
+			unselectedBorder = BorderFactory
+			    .createMatteBorder(2,5,2,5,
+					       table.getBackground());
+		    }
+		    setBorder(unselectedBorder);
+		}
+	    }
+	    return this;
+	}
+    }
+
 
     private static Ebase64TableCellRenderer encryptedTCR = null;
 
@@ -2036,44 +2204,104 @@ public abstract class ConfigPropertyEditor {
      *        if a dialog box's location is not constrained
      * @param key the key
      * @param value the value for the key
+     * @return true if successful; false otherwise (e.g., GPG failed
+     *         to encrypt, the key was missing, or the value was null)
      */
-    public void set(Component owner, String key, String value) {
-	if (key == null) return;
+    public boolean set(Component owner, String key, String value) {
+	if (key == null) return false;
 	key = key.trim();
-	if (key.length() == 0) return;
-	if (value == null) return;
+	if (key.length() == 0) return false;
+	if (value == null) return false;
 	if (properties == null) {
 	    properties = new Properties();
 	}
 	if (key.startsWith(EB64KEY_START)) {
-	    String[] recipients = getRecipients(owner);
-	    if (recipients == null || recipients.length == 0) return;
-	    properties.setProperty(key, encrypt(value, recipients));
+	    String[] recipients = (recipientsList != null)? recipientsList:
+		getRecipients(owner);
+
+	    if (recipients == null || recipients.length == 0) return false;
+	    String evalue = encrypt(value, recipients);
+	    if (evalue == null) return false;
+	    properties.setProperty(key, evalue);
 	} else if (key.startsWith(B64KEY_START)) {
 	    properties.setProperty(key, encode(value));
 	} else {
 	    properties.setProperty(key, value);
 	}
+	return true;
     }
 
     Component pwowner = null;
 
-    private void doEdit(Component owner,  Mode mode, Callable continuation,
-			CloseMode quitCloseMode)
+    /**
+     * Prevent editing of specific rows and columns.
+     * The default implementation returns <CODE>false</CODE> for any
+     * pair of arguments. If the value returned is dependent on a
+     * cell's row and column instead of its contents, the behavior
+     * of this class may be erratic unless those cells cannot be moved.
+     * <P>
+     * This method can not override the prohibition on editing reserved
+     * keys or spacers.
+     * @param row the table row
+     * @param col the table column
+     * @return true if editing is explicitly prohibited for the given
+     *         row and column; false otherwise
+     */
+    protected boolean prohibitEditing(int row, int col) {
+	return false;
+    }
+
+    private void doEdit(final Component owner,  final Mode mode,
+			final Callable continuation,
+			final CloseMode quitCloseMode)
      {
 	 selectedIndex = -1;
 	 needSave = false;
 	 final CallableContainer continuationContainer =
 	    new CallableContainer(continuation);
 	//System.out.println("mode = " + mode);
+	 Window window;
+	 switch (mode) {
+	 case JFRAME:
+	     window = new JFrame(configTitle());
+	     break;
+	 default:
+	     if (owner == null) {
+		 window = new JDialog(null, configTitle(),
+				      ((mode == Mode.MODAL)?
+				       Dialog.ModalityType.APPLICATION_MODAL:
+				       Dialog.ModalityType.MODELESS));
+	     } else if (owner instanceof Dialog) {
+		 window = new JDialog((Dialog)owner, configTitle(),
+				      mode == Mode.MODAL);
+	     } else if (owner instanceof Frame) {
+		 window = new JDialog((Frame)owner, configTitle(),
+				      mode == Mode.MODAL);
+	     } else if (owner instanceof Window) {
+		 window = new JDialog((Window)owner, configTitle(),
+				      ((mode == Mode.MODAL)?
+				       Dialog.ModalityType.APPLICATION_MODAL:
+				       Dialog.ModalityType.MODELESS));
+	     } else {
+		 window = new JDialog(SwingUtilities.getWindowAncestor(owner),
+				      configTitle(),
+				      ((mode == Mode.MODAL)?
+				       Dialog.ModalityType.APPLICATION_MODAL:
+				       Dialog.ModalityType.MODELESS));
+	     }
+	     break;
+	 }
+	 /*
 	 Window window = (mode == Mode.JFRAME)?
 	    new JFrame(configTitle()):
 	    new JDialog(((owner == null)? null:
+			 (owner instanceof Window)? (Window)owner:
 			 SwingUtilities.getWindowAncestor(owner)),
 			configTitle(),
 			((mode == Mode.MODAL)?
 			 Dialog.ModalityType.APPLICATION_MODAL:
 			 Dialog.ModalityType.MODELESS));
+	 */
 
 	 pwowner = window;
 
@@ -2244,7 +2472,8 @@ public abstract class ConfigPropertyEditor {
 			    if (key.trim().charAt(0) == '-') return true;
 			}
 		    }
-		    return false;
+		    return ConfigPropertyEditor.this
+			.prohibitEditing(row, col);
 		}
 		@Override
 		protected int minimumSelectableRow(int col, boolean all) {
@@ -2571,6 +2800,35 @@ public abstract class ConfigPropertyEditor {
 			    tmlAddedContainer.tmlAdded = false;
 			}
 			save(properties, /*table*/ipane);
+			Set<String> loop = checkLoops(ipane);
+			if (loop.size() > 0) {
+			    StringBuffer sb = new StringBuffer();
+			    String msg = errorMsg("propertiesLoop");
+			    sb.append(msg + ": ");
+			    boolean first = true;
+			    for (String key: loop) {
+				if (first == false) {
+				    sb.append("\u27F6");
+				} else {
+				    first = false;
+				}
+				sb.append(key);
+			    }
+			    JOptionPane.showMessageDialog(owner,
+							  sb.toString(),
+							  errorTitle(),
+							  JOptionPane
+							  .ERROR_MESSAGE);
+			    // Restart the editor because there were
+			    // loops and these have to be fixed. to have
+			    // a consistent state.
+			    window.dispose();
+			    SwingUtilities.invokeLater(() -> {
+				    doEdit(owner, mode, continuation,
+					   quitCloseMode);
+				});
+			    return;
+			}
 			if (continuationContainer.callable!= null) {
 			    Callable callable = continuationContainer.callable;
 			    continuationContainer.callable = null;
@@ -2600,6 +2858,35 @@ public abstract class ConfigPropertyEditor {
 				tmlAddedContainer.tmlAdded = false;
 			    }
 			    save(properties, /*table*/ipane);
+			    Set<String> loop = checkLoops(ipane);
+			    if (loop.size() > 0) {
+				StringBuffer sb = new StringBuffer();
+				String msg = errorMsg("propertiesLoop");
+				sb.append(msg + ": ");
+				boolean first = true;
+				for (String key: loop) {
+				    if (first == false) {
+					sb.append("\u27F6");
+				    } else {
+					first = false;
+				    }
+				    sb.append(key);
+				}
+				JOptionPane.showMessageDialog(owner,
+							      sb.toString(),
+							      errorTitle(),
+							      JOptionPane
+							      .ERROR_MESSAGE);
+				// Restart the editor because there were
+				// loops and these have to be fixed. to have
+				// a consistent state.
+				window.dispose();
+				SwingUtilities.invokeLater(() -> {
+					doEdit(owner, mode, continuation,
+					       quitCloseMode);
+				    });
+				return;
+			    }
 			    if (continuationContainer.callable != null) {
 				Callable callable =
 				    continuationContainer.callable;
@@ -2613,11 +2900,44 @@ public abstract class ConfigPropertyEditor {
 			    }
 			}
 		    });
+	    } else {
+		if (continuationContainer.callable != null) {
+		    Callable callable =
+			continuationContainer.callable;
+		    continuationContainer.callable = null;
+		    callable.call();
+		}
 	    }
 	}
 	
 	window.add(panel, BorderLayout.CENTER);
 	window.pack();
+	// It seems that we have to position the window explicitly,
+	// at least in some cases.
+	if (window.getOwner() != null) {
+	    Rectangle r1 = window.getBounds();
+	    Rectangle r2 = window.getOwner().getBounds();
+	    Rectangle r3 = window.getOwner().getGraphicsConfiguration()
+		.getBounds();
+	    int x = r2.x  + r2.width/2 - r1.width/2;
+	    int y = r2.y + r2.height/2 - r1.height/2;
+	    int x3L = r3.x;
+	    int y3L = r3.y;
+	    int x3U = x3L + r3.width;
+	    int y3U = x3L + r3.height;
+	    if (x3L > x) {
+		x = x3L;
+	    } else if (x3U < x + r1.width) {
+		x = x3U - r1.width;
+	    }
+	    if (y3L > y) {
+		y = y3L;
+	    } else if (y3U < y + r1.height) {
+		y = y3U - r1.height;
+	    }
+	    Point p = new Point(x, y);
+	    window.setLocation(p);
+	}
 	window.setVisible(true);
 	if (mode == Mode.MODAL) {
 	    ipane.stopCellEditing();
@@ -2626,7 +2946,31 @@ public abstract class ConfigPropertyEditor {
 		tmlAddedContainer.tmlAdded = false;
 	    }
 	    save(properties, /*table*/ipane);
-	    if (continuationContainer.callable != null) {
+	    Set<String> loop = checkLoops(ipane);
+	    if (loop.size() > 0) {
+		StringBuffer sb = new StringBuffer();
+		String msg = errorMsg("propertiesLoop");
+		sb.append(msg + ": ");
+		boolean first = true;
+		for (String key: loop) {
+		    if (first == false) {
+			sb.append("\u27F6");
+		    } else {
+			first = false;
+		    }
+		    sb.append(key);
+		}
+		JOptionPane.showMessageDialog(owner,
+					      sb.toString(),
+					      errorTitle(),
+					      JOptionPane
+					      .ERROR_MESSAGE);
+		// Restart the editor because there were
+		// loops and these have to be fixed. to have
+		// a consistent state.
+		window.dispose();
+		doEdit(owner, mode, continuation, quitCloseMode);
+	    } else if (continuationContainer.callable != null) {
 		continuationContainer.callable.call();
 	    }
 	}
@@ -2784,7 +3128,8 @@ public abstract class ConfigPropertyEditor {
      * has been customized: for keys starting with "ebase64.", the
      * method {@link Properties#getProperty(String)} will return the
      * encrypted value, whereas the method
-     * {@link Properties#get(Object)} will return an {@link Object}
+     * {@link Hashtable#get(Object) get(Object)} will return
+     * an {@link Object}
      * that is actually an array of characters and that contains the
      * decrypted data. For these keys, a new array will be returned
      * each time {@link Properties#get(Object)} is called. This is

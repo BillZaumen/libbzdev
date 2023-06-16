@@ -1,5 +1,5 @@
 /**
- * Module providing classes for the scrunner application.
+ * Module providing classes for the yrunner application.
  */
 module org.bzdev.yrunner {
     exports org.bzdev.bin.yrunner;

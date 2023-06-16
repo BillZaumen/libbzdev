@@ -53,6 +53,9 @@ DARKMODE =
 MIMETYPES_DIR = mimetypes
 # System directories
 #
+SYS_APPDIR = /usr/share/applications
+SYS_APP_POPICON_DIR = $(SYS_POPICON_DIR)/scalable/$(APPS_DIR)
+SYS_APP_ICON_DIR = $(SYS_ICON_DIR)/scalable/$(APPS_DIR)
 SYS_JARDIRECTORY=/usr/share/bzdev
 SYS_DOCDIR = /usr/share/doc/libbzdev-java
 SYS_LIBJARDIR = /usr/share/java
@@ -93,6 +96,8 @@ JARDIR=$(shell echo $(SYS_JARDIRECTORY) | sed  s/\\//\\\\\\\\\\//g)
 #
 IMAGE_SEQUENCE_ICON = image-vnd.bzdev.image-sequence+zip
 
+SBL_CONF_ICON = application-vnd.bzdev.sblauncher-config
+
 # Target for the standard Java-library directory
 LIBJARDIR = $(DESTDIR)$(SYS_LIBJARDIR)
 
@@ -107,8 +112,11 @@ EXAMPLES = $(DESTDIR)$(SYS_EXAMPLES)
 BINDIR = $(DESTDIR)$(SYS_BINDIR)
 MANDIR = $(DESTDIR)$(SYS_MANDIR)
 MIMEDIR = $(DESTDIR)$(SYS_MIMEDIR)
+APPDIR = $(DESTDIR)$(SYS_APPDIR)
 MIME_ICON_DIR = $(DESTDIR)$(SYS_MIME_ICON_DIR)
 MIME_POPICON_DIR = $(DESTDIR)$(SYS_MIME_POPICON_DIR)
+APP_ICON_DIR = $(DESTDIR)$(SYS_APP_ICON_DIR)
+APP_POPICON_DIR = $(DESTDIR)$(SYS_APP_POPICON_DIR)
 ICON_DIR = $(DESTDIR)$(SYS_ICON_DIR)
 POPICON_DIR = $(DESTDIR)$(SYS_POPICON_DIR)
 CONFIGDIR = $(DESTDIR)$(SYS_CONFIGDIR)
@@ -138,6 +146,7 @@ P3D_DIR = ./src/org.bzdev.p3d
 LSNOF_DIR = ./src/org.bzdev.lsnof
 SCRUNNER_DIR  = ./src/org.bzdev.scrunner
 YRUNNER_DIR = ./src/org.bzdev.yrunner
+SBL_DIR = ./src/org.bzdev.sbl
 
 SHORT_MODULE_NAMES = base servlets esp dmethods math obnaming parmproc \
 	graphics desktop devqsim drama anim2d p3d ejws
@@ -161,6 +170,7 @@ P3D_MODINFO = $(P3D_DIR)/module-info.java
 LSNOF_MODINFO = $(LSNOF_DIR)/module-info.java
 SCRUNNER_MODINFO = $(SCRUNNER_DIR)/module-info.java
 YRUNNER_MODINFO = $(YRUNNER_DIR)/module-info.java
+SBL_MODINFO = $(SBL_DIR)/module-info.java
 
 # Names of services. There will be corrsponding entries in
 # .../META-INF/services and/or a series of provides SERVICE with ...
@@ -556,6 +566,16 @@ YRUNNER_RESOURCES1 = \
 	$(wildcard $(YRUNNER_DIR)/$(BZDEV)/bin/yrunner/lpack/*.properties)
 YRUNNER_RESOURCES = $(subst ./src/,,$(YRUNNER_RESOURCES1))
 
+# Variable used to build the org.bzdev.sbl module's jar file
+#
+SBL_JFILES = $(wildcard $(SBL_DIR)/$(BZDEV)/bin/sbl/*.java)
+SBL_JFILES2 =$(SBL_DIR)/$(BZDEV)/bin/sbl/lpack/DefaultClass.java
+
+SBL_RESOURCES1 = \
+	$(wildcard $(SBL_DIR)/$(BZDEV)/bin/sbl/lpack/*.properties)
+SBL_RESOURCES = $(subst ./src/,,$(SBL_RESOURCES1))
+
+
 
 all: jars $(BLDPOLICY)
 
@@ -588,7 +608,7 @@ APP_BUILD_PATH = $(subst START:,,$(APP_BUILD_PATH1))
 # ordered so that each JAR file is built before it will be used.
 #
 jars: $(JARS) BUILD/libbzdev.jar BUILD/lsnof.jar BUILD/scrunner.jar \
-	BUILD/yrunner.jar
+	BUILD/yrunner.jar  BUILD/sbl.jar
 
 #
 # RULES FOR EACH JAR FILE WE NEED TO CREATE
@@ -856,6 +876,32 @@ BUILD/yrunner.jar: $(YRUNNER_JFILES) $(YRUNNER_RESOURCES1) \
 		--manifest=$(YRUNNER_DIR)/manifest.mf \
 		--main-class=org.bzdev.bin.yrunner.YRunnerCmd \
 		-C mods/org.bzdev.yrunner .
+
+# The application jar file for the yrunner program, provided as modular
+# jar file (module org.bzdev.yrunner).
+#
+BUILD/sbl.jar: $(SBL_JFILES) $(SBL_RESOURCES1) \
+		$(SBL_MODINFO) $(SBL_DIR)/manifest.mf \
+		MediaTypes/sblauncher.svg MediaTypes/sblconf.svg
+	mkdir -p mods/org.bzdev.sbl
+	mkdir -p BUILD
+	$(JAVAC) -d mods/org.bzdev.sbl -p $(APP_BUILD_PATH) \
+		$(SBL_DIR)/module-info.java $(SBL_JFILES) \
+		$(SBL_JFILES2)
+	for i in $(SBL_RESOURCES) ; do mkdir -p mods/`dirname $$i` ; \
+		cp src/$$i mods/$$i ; done
+	for i in $(ICON_WIDTHS) ; do \
+		inkscape -w $$i \
+		--export-filename=mods/org.bzdev.sbl/org/bzdev/bin/sbl/sblauncher$${i}.png \
+		MediaTypes/sblauncher.svg ; \
+		inkscape -w $$i \
+		--export-filename=mods/org.bzdev.sbl/org/bzdev/bin/sbl/sblconf$${i}.png \
+		MediaTypes/sblconf.svg ; \
+		done
+	jar --create --file BUILD/sbl.jar \
+		--manifest=$(SBL_DIR)/manifest.mf \
+		--main-class=org.bzdev.bin.sbl.SBL \
+		-C mods/org.bzdev.sbl .
 
 
 clean:
@@ -1604,16 +1650,19 @@ install-$(MODULE_NAME):  BUILD/libbzdev-$(MODULE_NAME).jar
 		$(LIBJARDIR)/libbzdev-$(MODULE_NAME)-$(VERSION).jar ;
 
 install-utils: BUILD/lsnof.jar BUILD/scrunner.jar BUILD/ejwsCerts.jks \
-		BUILD/yrunner.jar
+		BUILD/yrunner.jar BUILD/sbl.jar
 	sed s/BZDEVDIR/$(JARDIR)/ scrunner.sh > scrunner.tmp
 	sed s/BZDEVDIR/$(JARDIR)/ yrunner.sh > yrunner.tmp
 	sed s/BZDEVDIR/$(JARDIR)/ lsnof.sh > lsnof.tmp
+	sed s/BZDEVDIR/$(JARDIR)/ sbl.sh > sbl.tmp
 	sed s/VERSION/$(UVERSION)/ scrunner.conf.5 | \
 		gzip -9 -n > scrunner.conf.5.gz
 	sed s/VERSION/$(UVERSION)/ scrunner.1 | gzip -9 -n > scrunner.1.gz
 	sed s/VERSION/$(UVERSION)/ lsnof.1 | gzip -9 -n > lsnof.1.gz
 	sed s/VERSION/$(UVERSION)/ yrunner.1 | gzip -9 -n > yrunner.1.gz
 	sed s/VERSION/$(UVERSION)/ yrunner.5 | gzip -9 -n > yrunner.5.gz
+	sed s/VERSION/$(UVERSION)/ sbl.1 | gzip -9 -n > sbl.1.gz
+	sed s/VERSION/$(UVERSION)/ sbl.5 | gzip -9 -n > sbl.5.gz
 	sed s/LOCATION/$(LIBJARDIR_SED)/ libbzdev.policy \
 	    | sed s/SCRLOCATION/$(JARDIR)/ > tmppolicy
 	install -d $(JARDIRECTORY)
@@ -1622,11 +1671,14 @@ install-utils: BUILD/lsnof.jar BUILD/scrunner.jar BUILD/ejwsCerts.jks \
 	install -d $(MANDIR)/man1
 	install -d $(MANDIR)/man5
 	install -d $(CONFIGDIR)
+	install -d $(APPDIR)
 	install -m 0644 -T BUILD/lsnof.jar $(JARDIRECTORY)/lsnof.jar
 	install -m 0644 -T BUILD/scrunner.jar $(JARDIRECTORY)/scrunner.jar
 	install -m 0644 -T BUILD/yrunner.jar $(JARDIRECTORY)/yrunner.jar
+	install -m 0644 -T BUILD/sbl.jar $(JARDIRECTORY)/sbl.jar
 	install -m 0755 -T scrunner.tmp $(BINDIR)/scrunner
 	install -m 0755 -T lsnof.tmp $(BINDIR)/lsnof
+	install -m 0755 -T sbl.tmp $(BINDIR)/sbl
 	install -m 0755 -T yrunner.tmp $(BINDIR)/yrunner
 	install -m 0644 -T tmppolicy $(JARDIRECTORY)/libbzdev.policy
 	install -m 0644  scrunner.conf $(CONFIGDIR)
@@ -1635,8 +1687,12 @@ install-utils: BUILD/lsnof.jar BUILD/scrunner.jar BUILD/ejwsCerts.jks \
 	install -m 0644 yrunner.1.gz $(MANDIR)/man1
 	install -m 0644 scrunner.conf.5.gz $(MANDIR)/man5
 	install -m 0644 yrunner.5.gz $(MANDIR)/man5
+	install -m 0644 sbl.1.gz $(MANDIR)/man1
+	install -m 0644 sbl.5.gz $(MANDIR)/man5
+	install -m 0644 SBLauncher.desktop $(APPDIR)/SBLauncher.desktop
 	rm scrunner.tmp lsnof.tmp yrunner.tmp scrunner.conf.5.gz tmppolicy \
-		lsnof.1.gz scrunner.1.gz yrunner.1.gz yrunner.5.gz
+		lsnof.1.gz scrunner.1.gz yrunner.1.gz yrunner.5.gz \
+		sbl.tmp sbl.1.gz sbl.5.gz
 	install -m 0644 -T BUILD/ejwsCerts.jks \
 		$(JARDIRECTORY)/ejwsCerts.jks
 
@@ -1729,6 +1785,9 @@ install-misc:
 		MediaTypes/ImageSeq.svg ; \
 	  dir=$(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
 	  install -m 0644 -T tmp.png $$dir/$(IMAGE_SEQUENCE_ICON).png; \
+	  inkscape -w $$i -y 0.0 --export-filename=tmp.png \
+		MediaTypes/sblconf.svg ; \
+	  install -m 0644 -T tmp.png $$dir/$(SBL_CONF_ICON).png; \
 	  rm tmp.png ; \
 	done
 	for i in $(ICON_WIDTHS2x) ; do \
@@ -1738,6 +1797,9 @@ install-misc:
 		MediaTypes/ImageSeq.svg ; \
 	  dir=$(ICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
 	  install -m 0644 -T tmp.png $$dir/$(IMAGE_SEQUENCE_ICON).png;\
+	  inkscape -w $$ii -y 0.0 --export-filename=tmp.png \
+		MediaTypes/sblconf.svg ; \
+	  install -m 0644 -T tmp.png $$dir/$(SBL_CONF_ICON).png; \
 	  rm tmp.png ; \
 	done
 
@@ -1746,6 +1808,8 @@ uninstall-misc:
 		|| echo ... rm libbzdev.xml FAILED
 	@rm -f $(MIME_ICON_DIR)/$(IMAGE_SEQUENCE_ICON).svg || \
 		echo ... rm $(IMAGE_SEQUENCE_ICON).svg FAILED
+	@rm -f $(MIME_ICON_DIR)/$(SBL_CONF_ICON).svg || \
+		echo ... rm $(SBL_CONF_ICON).svg FAILED
 	@(for i in $(ICON_WIDTHS) ; do \
 	   dir=$(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
 	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
@@ -1754,11 +1818,21 @@ uninstall-misc:
 	   dir=$(ICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
 	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
 	  done) || echo ... rm $(IMAGE_SEQUENCE_ICON).png FAILED AT LEAST ONCE
+	@(for i in $(ICON_WIDTHS) ; do \
+	   dir=$(ICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
+	   rm -f $$dir/$(SBL_CONF_ICON).png; \
+	  done) || echo ... rm $(SBL_CONF_ICON).png FAILED AT LEAST ONCE
+	@(for i in $(ICON_WIDTHS2x) ; do \
+	   dir=$(ICON_DIR)/$${i}x$${i}@2x/$(MIMETYPES_DIR) ; \
+	   rm -f $$dir/$(SBL_CONF_ICON).png; \
+	  done) || echo ... rm $(SBL_CONF_ICON).png FAILED AT LEAST ONCE
 
 install-pop:
 	install -d $(MIME_POPICON_DIR)
 	install -m 0644 -T MediaTypes/ImageSeq.svg \
 		$(MIME_POPICON_DIR)/$(IMAGE_SEQUENCE_ICON).svg
+	install -m 0644 -T MediaTypes/sblconf.svg \
+		$(MIME_POPICON_DIR)/$(SBL_CONF_ICON).svg
 
 # We are removing this from install-pop due to a package problem
 # that suddenly arose. /usr/share/icons/Pop/NxN, etc. now seem to
@@ -1786,6 +1860,8 @@ old-install-pop-tail:
 uninstall-pop:
 	@rm -f $(MIME_POPICON_DIR)/$(IMAGE_SEQUENCE_ICON).svg || \
 		echo ... rm $(IMAGE_SEQUENCE_ICON).svg FAILED
+	@rm -f $(MIME_POPICON_DIR)/$(SBL_CONF_ICON).svg || \
+		echo ... rm $(SBL_CONF_ICON).svg FAILED
 	@(for i in $(POPICON_WIDTHS) ; do \
 	   dir=$(POPICON_DIR)/$${i}x$${i}/$(MIMETYPES_DIR) ; \
 	   rm -f $$dir/$(IMAGE_SEQENCE_ICON).png; \
@@ -1816,6 +1892,7 @@ uninstall-utils:
 	@rm $(BINDIR)/lsnof || echo ... rm lsnof FAILED
 	@rm $(BINDIR)/scrunner || echo ... rm scrunner FAILED
 	@rm $(BINDIR)/yrunner || echo ... rm yrunner FAILED
+	@rm $(BINDIR)/sbl || echo ... rm sbl FAILED
 	@rm $(MANDIR)/man1/scrunner.1.gz || echo  ... rm scrunner.1.gz FAILED
 	@rm $(MANDIR)/man1/lsnof.1.gz || echo ... rm lsnof.1.gz FAILED
 	@rm $(MANDIR)/man1/yrunner.1.gz || echo ... rm yrunner.1.gz FAILED
@@ -1852,6 +1929,9 @@ shortcuts:
 	@ln -s -T ../../../src/org.bzdev.yrunner/org/bzdev/bin/yrunner \
 		org/bzdev/bin/yrunner \
 		2> /dev/null || echo ... yrunner exists
+	@ln -s -T ../../../src/org.bzdev.sbl/org/bzdev/bin/sbl \
+		org/bzdev/bin/sbl \
+		2> /dev/null || echo ... sbl exists
 	@for i in `cd src/org.bzdev.anim2d/org/bzdev; ls -d *` ; \
 	    do if [ "$$i" = "providers" ] ; \
 	    then ln -s -T \

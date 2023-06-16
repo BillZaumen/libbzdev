@@ -700,7 +700,7 @@ public class SecureBasicUtilities {
 	*/
     }
 
-    /**
+    /*
      * Get the user name, possibly encoded in the password.
      * Normally the user name provided as an argument is returned.
      * If that user name is either null, an empty string, or a
@@ -715,7 +715,6 @@ public class SecureBasicUtilities {
      * @param userName the user name
      * @param password the password
      * @return the user name
-     */
     public static String decodeUserName(String userName, String password) {
 	if (userName == null || userName.trim().length() == 0) {
 	    if (password != null && password.charAt(0) == ':') {
@@ -732,8 +731,9 @@ public class SecureBasicUtilities {
 	    return userName;
 	}
     }
+    */
 
-    /**
+    /*
      * Get the user name, possibly encoded in the password, with the
      * password represented as an array of characters.
      * Normally the user name provided as an argument is returned.
@@ -749,8 +749,7 @@ public class SecureBasicUtilities {
      * @param userName the user name
      * @param password the password
      * @return the user name
-     */
-    public static String decodeUserName(String userName, char[] password) {
+      public static String decodeUserName(String userName, char[] password) {
 	if (userName == null || userName.trim().length() == 0) {
 	    if (password != null && password[0] == ':') {
 		int index = 1;
@@ -770,8 +769,8 @@ public class SecureBasicUtilities {
 	    return userName;
 	}
     }
-
-    /**
+    */
+    /*
      * Get the user name, possibly encoded in the password, with the
      * password represented as an array of bytes.
      * Normally the user name provided as an argument is returned.
@@ -787,7 +786,6 @@ public class SecureBasicUtilities {
      * @param userName the user name
      * @param password the password
      * @return the user name
-     */
     public static String decodeUserName(String userName, byte[] password) {
 	if (userName == null || userName.trim().length() == 0) {
 	    if (password != null && password[0] == (byte)':') {
@@ -808,25 +806,24 @@ public class SecureBasicUtilities {
 	    return userName;
 	}
     }
+     */
 
     /**
      * Decode an encoded password represented as a string.
      * This method removes base 64, URL encoding.
-     * A special case occurs when a password starts with a
-     * colon (":"): the text between and including the initial
-     * colon and the next colon is treated as a user name and
-     * is ignored along with the second colon.
      * @param password the encoded password
      * @return the bytes that were base 64, URL encoded
      */
     public static byte[] decodePassword(String password) {
 	Base64.Decoder decoder = Base64.getUrlDecoder();
+	/*
 	if (password != null && password.charAt(0) == ':') {
 	    int index = password.indexOf(':', 1);
 	    if (index > 0) {
 		password = password.substring(index+1);
 	    }
 	}
+	*/
 	try {
 	    return decoder.decode(password.getBytes(utf8));
 	} catch (Exception e) {
@@ -930,6 +927,7 @@ public class SecureBasicUtilities {
 	    return new byte[0];
 	}
 	Base64.Decoder decoder = Base64.getUrlDecoder();
+	/*
 	if (password[0] == (byte)':') {
 	    int index = 1;
 	    while (index < password.length) {
@@ -950,6 +948,7 @@ public class SecureBasicUtilities {
 		return new byte[0];
 	    }
 	}
+	*/
 	try {
 	    return decoder.decode(password);
 	} catch (Exception e) {
@@ -966,6 +965,7 @@ public class SecureBasicUtilities {
      */
     public static byte[] decodePassword(char[] password) {
 	Base64.Decoder decoder = Base64.getUrlDecoder();
+	/*
 	if (password[0] == ':') {
 	    int index = 1;
 	    while (index < password.length) {
@@ -986,6 +986,7 @@ public class SecureBasicUtilities {
 		return new byte[0];
 	    }
 	}
+	*/
 	byte[] encoded = new byte[password.length];
 	for (int i = 0; i < password.length; i++) {
 	    encoded[i] = (byte) password[i];

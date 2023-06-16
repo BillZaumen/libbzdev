@@ -83,14 +83,19 @@ public class SSLUtilities {
 		    // merge results from "stdTM" and "ourTM".
 		    X509Certificate[] certs1 =
 			stdTM.getAcceptedIssuers();
-		    X509Certificate[] certs2 =
-			ourTM.getAcceptedIssuers();
+		    X509Certificate[] certs2 = null;
+		    if (ourTM != null) {
+			certs2 = ourTM.getAcceptedIssuers();
+		    }
 		    Set<X509Certificate> set = new HashSet<X509Certificate>();
 		    for (X509Certificate cert: certs1) {
 			set.add(cert);
 		    }
-		    for (X509Certificate cert: certs2) {
-			set.add(cert);
+
+		    if (certs2 != null) {
+			for (X509Certificate cert: certs2) {
+			    set.add(cert);
+			}
 		    }
 		    X509Certificate[] certs = new X509Certificate[set.size()];
 		    int i = 0;
@@ -159,14 +164,14 @@ public class SSLUtilities {
 	SSLContext.setDefault(sslContext);
     }
 
+    private static HostnameVerifier defaultHNV =
+	    HttpsURLConnection.getDefaultHostnameVerifier();
+
     /**
      * Install a custom host-name verifier that will additionally accept
      * the loopback interface's host name.
      */
     public static void allowLoopbackHostname() {
-
-	HostnameVerifier defaultHNV =
-	    HttpsURLConnection.getDefaultHostnameVerifier();
 	
 	HostnameVerifier ourHNV = new HostnameVerifier() {
 		String loopback = InetAddress.getLoopbackAddress()
@@ -180,6 +185,15 @@ public class SSLUtilities {
 		}
 	    };
 	HttpsURLConnection.setDefaultHostnameVerifier(ourHNV);
+    }
+
+    /**
+     * Remove the custom host name verifier set by calling
+     * {@link #allowLoopbackHostname()} and restore the system default that
+     * was in effect when this class was initialized.
+     */
+    public static void disallowLoopbackHostname() {
+	HttpsURLConnection.setDefaultHostnameVerifier(defaultHNV);
     }
 }
 
