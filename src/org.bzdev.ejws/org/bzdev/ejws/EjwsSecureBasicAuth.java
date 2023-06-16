@@ -189,7 +189,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     private int lowerTimeDiffLimit = -10;
     private int upperTimeDiffLimit = 150; 
     // How long to use a verified password
-    private int passwordTimeout = 1200;
+    private int passphraseTimeout = 1200;
 
     /**
      * Set time-offset limits.
@@ -213,7 +213,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      *        in seconds (the default is -10 seconds).
      * @param upperTimeDiffLimit the upper limit for the time difference
      *        in seconds (the default is 150 seconds)
-     * @param passwordTimeout the time interval in seconds for which a
+     * @param passphraseTimeout the time interval in seconds for which a
      *        password is valid (the default is 1200)
      * @throws IllegalArgumentException if the first argument is larger
      *         than zero, if the second argument is less than zero,
@@ -221,7 +221,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      */
     public void setTimeLimits(int lowerTimeDiffLimit,
 			      int upperTimeDiffLimit,
-			      int passwordTimeout)
+			      int passphraseTimeout)
 	throws IllegalArgumentException
     {
 	if (lowerTimeDiffLimit > 0) {
@@ -232,15 +232,15 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    String msg = errorMsg("negativeUpperTDL", upperTimeDiffLimit);
 	    throw new IllegalArgumentException(msg);
 	}
-	if (passwordTimeout < upperTimeDiffLimit) {
+	if (passphraseTimeout < upperTimeDiffLimit) {
 	    int uTDL = upperTimeDiffLimit;
 	    String msg =
-		errorMsg("passwordTimeout", passwordTimeout, uTDL);
+		errorMsg("passphraseTimeout", passphraseTimeout, uTDL);
 	    throw new IllegalArgumentException(msg);
 	}
 	this.lowerTimeDiffLimit = lowerTimeDiffLimit;
 	this.upperTimeDiffLimit = upperTimeDiffLimit;
-	this.passwordTimeout = passwordTimeout;
+	this.passphraseTimeout = passphraseTimeout;
     }
 
     /**
@@ -768,7 +768,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    */
 	    if ((pwinfo.expires - now) >= 0) {
 		if (pwinfo.password.equals(password)) {
-		    pwinfo.expires = passwordTimeout + now;
+		    pwinfo.expires = passphraseTimeout + now;
 		    if (tracer != null) {
 			String ct = "" + Thread.currentThread().getId();
 			try {
@@ -825,7 +825,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    if (certificates == null) {
 		if (ops.checkPassword(sigarray, null, entry.pw)) {
  		    pwmap.put(key,
-			      new PWInfo(now+passwordTimeout,
+			      new PWInfo(now+passphraseTimeout,
 					 password));
 		    if (tracer != null) {
 			String ct = "" + Thread.currentThread().getId();
@@ -842,7 +842,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 					  certificates[i],
 					  entry.pw)) {
 			pwmap.put(key,
-				  new PWInfo(now+passwordTimeout,
+				  new PWInfo(now+passphraseTimeout,
 					     password));
 			if (tracer != null) {
 			    String ct = "" + Thread.currentThread().getId();
@@ -870,7 +870,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 //  LocalWords:  groupname secp sigalg withECDSA dname CN keypass pfx
 //  LocalWords:  storepass keystore ecstore ecparam noout eckey pem
 //  LocalWords:  req eccert pkcs inkey Appendable lowerTimeDiffLimit
-//  LocalWords:  upperTimeDiffLimit passwordTimeout positiveLowerTDL
+//  LocalWords:  upperTimeDiffLimit passphraseTimeout positiveLowerTDL
 //  LocalWords:  IllegalArgumentException negativeUpperTDL hdr addr
 //  LocalWords:  authenticator's Authenticator HttpExchange getClass
 //  LocalWords:  instanceof InetAddress iaddr pwinfo

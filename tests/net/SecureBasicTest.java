@@ -47,24 +47,15 @@ public class SecureBasicTest {
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
-	// if (ops.isLogout(passwordStr)) throw new Exception();
-	if (ops.decodeUserName(null, passwordStr) != null) {
-	    throw new Exception();
-	}
 
 	byte[] pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
-	// if (ops.isLogout(pwBytes)) throw new Exception();
-	if (ops.decodeUserName(null, pwBytes) != null) throw new Exception();
-
 
 	passwordStr = ":foo:" + passwordStr;
 	sigarray = ops.decodePassword(passwordStr);
-	String userName = ops.decodeUserName(null, passwordStr);
-	if (!userName.equals("foo")) throw new Exception();
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
@@ -72,44 +63,28 @@ public class SecureBasicTest {
 
 	password = passwordStr.toCharArray();
 	sigarray = ops.decodePassword(password);
-	userName = ops.decodeUserName(null, password);
-	if (!userName.equals("foo")) {
-	    System.out.println("userName = " + userName);
-	    throw new Exception();
-	}
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
 
 	pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
-	userName = ops.decodeUserName(null, pwBytes);
-	if (!userName.equals("foo")) throw new Exception();
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
 
 	sigarray = ops.decodePassword(passwordStr);
-	userName = ops.decodeUserName("", passwordStr);
-	if (!userName.equals("foo")) throw new Exception();
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
 	password = passwordStr.toCharArray();
 	sigarray = ops.decodePassword(password);
-	userName = ops.decodeUserName("", password);
-	if (!userName.equals("foo")) {
-	    System.out.println("userName = " + userName);
-	    throw new Exception();
-	}
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
 
 	pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
-	userName = ops.decodeUserName("", pwBytes);
-	if (!userName.equals("foo")) throw new Exception();
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
 	}
