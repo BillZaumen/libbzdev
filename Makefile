@@ -1528,7 +1528,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 	dstylesheet=`[ -z "$(DARKMODE)" ] && echo stylesheet.css \
 		|| echo stylesheet$(JAVADOC_VERSION).css` ; \
 	sed -e s/stylesheet.css/$$dstylesheet/  src/description.html \
-		> $(JROOT_JAVADOCS)/doc-files/description.html
+		> $(JROOT_JAVADOCS)/doc-files/description.html ; \
 	sed -e s/stylesheet.css/$$dstylesheet/  src/SecureBasic.html \
 		> $(JROOT_JAVADOCS)/doc-files/SecureBasic.html
 	for i in $(MOD_IMAGES) ; \
