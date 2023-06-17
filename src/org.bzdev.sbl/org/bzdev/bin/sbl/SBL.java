@@ -568,6 +568,7 @@ public class SBL {
 		}
 	    } else if (argv[indx].startsWith("-")) {
 		System.err.println("sbl: " + errorMsg("badOption", argv[indx]));
+		System.exit(1);
 	    } else {
 		break;
 	    }
