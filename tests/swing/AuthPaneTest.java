@@ -225,7 +225,7 @@ public class AuthPaneTest {
 
 	AuthenticationPane.setPrivateKey(pkfile);
 	Authenticator auth =
-	    AuthenticationPane.getAuthenticator(null, true, false);
+	    AuthenticationPane.getAuthenticator(null, true);
 	// AuthenticationPane.setPrivateKey(auth,pkfile);
 
 	Authenticator.setDefault(auth);
@@ -254,7 +254,6 @@ public class AuthPaneTest {
 		    is.close();
 		    System.out.println("... reading complete");
 		} else {
-		    System.exit(1);
 		}
 	    }
 	}
@@ -348,6 +347,7 @@ public class AuthPaneTest {
 	}
 
 	if (url1 != null) {
+	    System.out.println("*** sleeping 25 seconds");
 	    Thread.sleep(25000L);
 	    System.out.println("connect to root");
 	    if (urlString1.startsWith("http://" + HOST + ":8080/")
@@ -358,6 +358,9 @@ public class AuthPaneTest {
 				   "http://" + HOST + ":8080/");
 		URLConnection urlc = url0.openConnection();
 		urlc.connect();
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
 		System.out.println("... reading");
 		InputStream is = urlc.getInputStream();
 		is.transferTo(OutputStream.nullOutputStream());
@@ -366,6 +369,29 @@ public class AuthPaneTest {
 	    }
 	}
 	if (url1 != null) {
+	    System.out.println("*** sleeping 50 seconds");
+	    Thread.sleep(50000L);
+	    System.out.println("connect to root");
+	    if (urlString1.startsWith("http://" + HOST + ":8080/")
+		|| urlString1.startsWith("https://" + HOST + ":8080/")) {
+		int last = urlString1.lastIndexOf('/');
+		URL url0 = new URL(urlString1.startsWith("https")?
+				   "https://" + HOST + ":8080/":
+				   "http://" + HOST + ":8080/");
+		URLConnection urlc = url0.openConnection();
+		urlc.connect();
+		int status = (urlc instanceof HttpURLConnection)?
+		    ((HttpURLConnection) urlc).getResponseCode(): -1;
+		System.out.println("... status = " + status);
+		System.out.println("... reading");
+		InputStream is = urlc.getInputStream();
+		is.transferTo(OutputStream.nullOutputStream());
+		is.close();
+		System.out.println("... reading complete");
+	    }
+	}
+	if (url1 != null) {
+	    System.out.println("*** sleeping 50 seconds");
 	    Thread.sleep(50000L);
 	    System.out.println("connect to logout");
 	    if (urlString1.startsWith("http://" + HOST + ":8080/")
@@ -394,6 +420,7 @@ public class AuthPaneTest {
 	    }
 	}
 	if (url1 != null) {
+	    System.out.println("*** sleeping 1 seconds");
 	    Thread.sleep(1000L);
 	    System.out.println("connect to root again");
 	    if (urlString1.startsWith("http://" + HOST + ":8080/")
@@ -420,6 +447,8 @@ public class AuthPaneTest {
 		    is.close();
 		    System.out.println("... read " + cnt + " bytes");
 		    System.out.println("... reading complete");
+		} else {
+		    System.out.println("... no input stream");
 		}
 	    }
 	}

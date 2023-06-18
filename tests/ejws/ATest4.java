@@ -58,23 +58,25 @@ public class ATest4 {
 		true, true, true);
 
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
-	handler.setLoginAlias("login.html", "", true);
-	URI logoutURI = (argv.length == 1)?
-	    new URI("https://www.google.com"): new URI(argv[1]);
+	if (!argv[argv.length-1].equals("--nologin")) {
+	    handler.setLoginAlias("login.html", "", true);
+	    URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
+		new URI("https://www.google.com"): new URI(argv[1]);
 
-	handler.setLogoutAlias("logout.html", logoutURI);
+	    handler.setLogoutAlias("logout.html", logoutURI);
 
-	auth.setLoginFunction((p, t) -> {
-		System.out.println("login: " + p.getUsername());
-	    });
+	    auth.setLoginFunction((p, t) -> {
+		    System.out.println("login: " + p.getUsername());
+		});
 
-	auth.setAuthorizedFunction((p, t) -> {
-		System.out.println("logged in: " + p.getUsername());
-	    });
+	    auth.setAuthorizedFunction((p, t) -> {
+		    System.out.println("logged in: " + p.getUsername());
+		});
 
-	auth.setLogoutFunction((p, t) -> {
-		System.out.println("logout: " + p.getUsername());
-	    });
+	    auth.setLogoutFunction((p, t) -> {
+		    System.out.println("logout: " + p.getUsername());
+		});
+	}
 
 	// CloseWaitService cws = new CloseWaitService(120, 30, saddr);
 	// cws.start();

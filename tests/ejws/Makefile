@@ -202,6 +202,13 @@ atest4:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest4 publicKey.pem
 
+atest4-nologin:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest4 publicKey.pem --nologin
+
+
 atest5:
 	(cd ../.. ; make jars)
 	mkdir -p classes

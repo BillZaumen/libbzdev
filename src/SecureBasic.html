@@ -148,7 +148,18 @@
     org.bzdev.swing.AuthenticationPane replaces "[D]", "[S]", and
     "[SC]" with sequences of one or more emoji when creating a prompt
     to display.  The emoji are used as icons.
-
+  <P>
+    The realm is not used when a passphrase is generated for pragmatic
+    reasons: programs such as <STRONG>sbl</STRONG> that generate
+    passphrases may not be able to determine what the realm is
+    (<STRONG>sbl</STRONG> opens an SSL/TLS connection to a server but
+    does not use HTTP or HTTPS, and consequently cannot determine the
+    realm. While the realm could be specified explicitly in
+    an <STRONG>sbl</STRONG>'s input file, the realm can be changed by
+    a server at any time, and it is not desirable to burden the user
+    with having to figure out when this has happened (when
+    authenticating, firefox, for example, does not tell users what the
+    realm is).
     <H2>Timestamps and timeouts</H2>
   <P>
     A server should support the following limits and timeouts
@@ -219,7 +230,7 @@
 	private key (the advantage is that GPG agent will then prompt
 	for the appropriate password, etc., needed to decrypt the
 	key).
-      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 558
+      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 555
 	lines of code.  This contains the code needed to create a
 	dialog box to get a user name and password. It works with
 	secure basic authentication, digest authentication, and basic
@@ -374,5 +385,5 @@ ccR8O2EQZnVa2RKF9NRhQ5QgDa1EJpJlB+VPL7W+
  -->
 <!--  LocalWords:  EjwsSecureBasicAuth DNS APIs authenticator JRE TLS
  -->
-<!--  LocalWords:  revalidated
+<!--  LocalWords:  revalidated firefox
  -->
