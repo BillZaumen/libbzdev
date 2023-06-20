@@ -60,8 +60,12 @@ identifier providing a short name for the page.
 .TP
 .B Open\ Browser
 This will open a window using the user's default browser. It will also
-generate a passphrase to copy into a 'password' dialog box or a text
-field in an HTML form.
+generate a passphrase, and will copy both the user name and the
+corresponding passphrase to the system clipboard so both can be
+pasted into the appropriate text fields displayed by a browser. Pasting
+is hanlded specially: each time the copy is pasted the value provided
+alternates between the user name and the passphrase, starting with the
+user name.
 .TP
 .B Generate\ Passphrase
 This will generate a new passphrase for the selected site.

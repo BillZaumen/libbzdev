@@ -46,7 +46,7 @@ public class ATest6 {
 		    protected String configTitle() {return "";}
 		    @Override
 		    protected String mediaType() {
-			return "application/vnd.bzdev.sbl";
+			return "application/vnd.bzdev.sblauncher";
 		    }
 		    @Override
 		    protected String extensionFilterTitle() {

@@ -2,7 +2,11 @@ package org.bzdev.bin.sbl;
 import java.awt.*;
 import java.awt.image.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -47,6 +51,10 @@ public class SBL {
 
     private static String localeString(String key) {
 	return errorMsg(key);
+    }
+
+    private static int vk(String key) {
+	return org.bzdev.swing.keys.VirtualKeys.lookup(localeString(key));
     }
 
     private static Charset utf8 = Charset.forName("UTF-8");
@@ -508,6 +516,68 @@ public class SBL {
 	}
     }
 
+    // This is a bit of a hack.  We want to be able to paste two
+    // fields, a user name and a passphrase.  We'd expect a browser
+    // to give the user textfield the keyboard focus before the password
+    // textfield, so we alternate between the two for each successive
+    // paste, starting with the user name.  This saves the user from
+    // having to go back and forth between two windows or having to paste
+    // in an unnatural order.
+    private static class StringSelection2
+	implements Transferable, ClipboardOwner
+    {
+
+	long startTime = System.currentTimeMillis();
+	boolean start = false;
+
+	int i = 0;
+	StringSelection[] selections =  new StringSelection[2];
+	public StringSelection2(StringSelection ss1, StringSelection ss2) {
+	    selections[0] = ss1;
+	    selections[1] = ss2;
+	}
+
+	public Object getTransferData(DataFlavor flavor)
+	    throws UnsupportedFlavorException, IOException
+	{
+	    try {
+		return selections[i].getTransferData(flavor);
+	    } finally {
+		// getTransferData can be called before the user
+		// pastes the results.  When this occurs, the call
+		// should be almost immediately after this instance
+		// was initialized.  A 200 ms window should be more
+		// than long enough, and users cannot push a button
+		// and start the place operation within this short
+		// time interval.
+		if (!start && (System.currentTimeMillis() - startTime) > 200) {
+		    start = true;
+		}
+		if (start) {
+		    i++;
+		    i = i % 2;
+		}
+	    }
+	}
+	public DataFlavor[] getTransferDataFlavors() {
+	    return selections[i].getTransferDataFlavors();
+	}
+	public boolean isDataFlavorSupported(DataFlavor flavor) {
+	    return selections[i].isDataFlavorSupported(flavor);
+	}
+
+	public void lostOwnership(Clipboard clipboard,
+				 Transferable contents)
+	{
+	    // A check of the openjdk source code indicates that
+	    // for string selections, this method doesn't do anything.
+	    // The call is made just in case something changes later.
+	    selections[i].lostOwnership(clipboard, contents);
+	}
+    }
+
+
+
     public static void main(String argv[]) throws Exception {
 	configDir.mkdirs();
 	System.setProperty("user.dir", configDir.getCanonicalPath());
@@ -658,6 +728,9 @@ public class SBL {
 		    new JComboBox<>(new Vector<String>());
 		selectSiteCB.addItem(localeString("selectSiteCB"));
 		selectSiteCB.setSelectedIndex(0);
+		JMenuItem findMenuItem = new JMenuItem(localeString("Find"));
+		JMenuItem browserMenuItem =
+		    new JMenuItem(localeString("Browser"));
 		JButton visitSiteButton = new
 		    JButton(localeString("visitSiteButton"));
 		JButton generateButton =
@@ -679,6 +752,8 @@ public class SBL {
 		    editEntriesButton.setEnabled(false);
 		    selectSiteCB.setEnabled(false);
 		    visitSiteButton.setEnabled(false);
+		    findMenuItem.setEnabled(false);
+		    browserMenuItem.setEnabled(false);
 		    generateButton.setEnabled(false);
 		    copyUserButton.setEnabled(false);
 		    copyPubKeyButton.setEnabled(false);
@@ -690,6 +765,8 @@ public class SBL {
 			    editEntriesButton.setEnabled(true);
 			    selectSiteCB.setEnabled(false);
 			    visitSiteButton.setEnabled(false);
+			    findMenuItem.setEnabled(false);
+			    browserMenuItem.setEnabled(false);
 			    generateButton.setEnabled(false);
 			    copyUserButton.setEnabled(false);
 			    copyPubKeyButton.setEnabled(true);
@@ -699,6 +776,8 @@ public class SBL {
 			    editEntriesButton.setEnabled(false);
 			    selectSiteCB.setEnabled(false);
 			    visitSiteButton.setEnabled(false);
+			    findMenuItem.setEnabled(false);
+			    browserMenuItem.setEnabled(false);
 			    generateButton.setEnabled(false);
 			    copyUserButton.setEnabled(false);
 			    copyPubKeyButton.setEnabled(false);
@@ -722,6 +801,8 @@ public class SBL {
 			editEntriesButton.setEnabled(true);
 			selectSiteCB.setEnabled(true);
 			visitSiteButton.setEnabled(false);
+			findMenuItem.setEnabled(true);
+			browserMenuItem.setEnabled(false);
 			generateButton.setEnabled(false);
 			addEntryButton.setEnabled(false);
 			copyUserButton.setEnabled(false);
@@ -730,55 +811,63 @@ public class SBL {
 		    }
 		}
 
-		loadButton.addActionListener((e) -> {
-			configFile = getFile(frame);
-			if (configFile == null) {
-			    // Keep the current configuration
-			    return;
-			}
-			if (!configFile.exists()) {
-			    if (init()) {
-				addEntryButton.setEnabled(true);
-				editEntriesButton.setEnabled(true);
-				selectSiteCB.setEnabled(false);
-				visitSiteButton.setEnabled(false);
-				generateButton.setEnabled(false);
-				copyUserButton.setEnabled(false);
-				copyPubKeyButton.setEnabled(true);
-				copyPWButton.setEnabled(false);
-			    } else {
-				addEntryButton.setEnabled(false);
-				editEntriesButton.setEnabled(false);
-				selectSiteCB.setEnabled(false);
-				visitSiteButton.setEnabled(false);
-				generateButton.setEnabled(false);
-				copyUserButton.setEnabled(false);
-				copyPubKeyButton.setEnabled(false);
-				copyPWButton.setEnabled(false);
-			    }
-			}
-			try {
-			    cpe.loadFile(configFile);
-			    configTrust(frame);
-			    fixupEntries(selectSiteCB);
+		ActionListener loadAL = (e) -> {
+		    configFile = getFile(frame);
+		    if (configFile == null) {
+			// Keep the current configuration
+			return;
+		    }
+		    if (!configFile.exists()) {
+			if (init()) {
 			    addEntryButton.setEnabled(true);
 			    editEntriesButton.setEnabled(true);
-			    selectSiteCB.setEnabled(entries.size() > 0);
+			    selectSiteCB.setEnabled(false);
 			    visitSiteButton.setEnabled(false);
+			    findMenuItem.setEnabled(false);
+			    browserMenuItem.setEnabled(false);
 			    generateButton.setEnabled(false);
 			    copyUserButton.setEnabled(false);
 			    copyPubKeyButton.setEnabled(true);
 			    copyPWButton.setEnabled(false);
-			    String txt =
-				cpe.getEncodedProperties().getProperty("title");
-			    titleLabel.setText(localeString("loaded") + ": "
-					       + txt);
-			    descrLabel.setText(" ");
-
-			} catch (IOException eio) {
-			    System.err.println(eio.getMessage());
+			} else {
+			    addEntryButton.setEnabled(false);
+			    editEntriesButton.setEnabled(false);
+			    selectSiteCB.setEnabled(false);
+			    visitSiteButton.setEnabled(false);
+			    findMenuItem.setEnabled(false);
+			    browserMenuItem.setEnabled(false);
+			    generateButton.setEnabled(false);
+			    copyUserButton.setEnabled(false);
+			    copyPubKeyButton.setEnabled(false);
+			    copyPWButton.setEnabled(false);
 			}
-		    });
+		    }
+		    try {
+			cpe.loadFile(configFile);
+			configTrust(frame);
+			fixupEntries(selectSiteCB);
+			addEntryButton.setEnabled(true);
+			editEntriesButton.setEnabled(true);
+			selectSiteCB.setEnabled(entries.size() > 0);
+			visitSiteButton.setEnabled(false);
+			findMenuItem.setEnabled(entries.size() > 0);
+			browserMenuItem.setEnabled(false);
+			generateButton.setEnabled(false);
+			copyUserButton.setEnabled(false);
+			copyPubKeyButton.setEnabled(true);
+			copyPWButton.setEnabled(false);
+			String txt =
+			    cpe.getEncodedProperties().getProperty("title");
+			titleLabel.setText(localeString("loaded") + ": "
+					   + txt);
+			descrLabel.setText(" ");
+
+		    } catch (IOException eio) {
+			System.err.println(eio.getMessage());
+		    }
+		};
+
+		loadButton.addActionListener(loadAL);
 
 		addEntryButton.addActionListener((e) -> {
 			String name;
@@ -825,6 +914,8 @@ public class SBL {
 				fixupEntries(selectSiteCB);
 				selectSiteCB.setEnabled(entries.size() > 0);
 				visitSiteButton.setEnabled(false);
+				findMenuItem.setEnabled(entries.size() > 0);
+				browserMenuItem.setEnabled(false);
 				generateButton.setEnabled(false);
 				copyUserButton.setEnabled(false);
 				copyPubKeyButton.setEnabled(false);
@@ -843,6 +934,8 @@ public class SBL {
 			    fixupEntries(selectSiteCB);
 			    selectSiteCB.setEnabled(entries.size() > 0);
 			    visitSiteButton.setEnabled(false);
+			    findMenuItem.setEnabled(entries.size() > 0);
+			    browserMenuItem.setEnabled(false);
 			    generateButton.setEnabled(false);
 			    copyUserButton.setEnabled(false);
 			    copyPubKeyButton.setEnabled(false);
@@ -861,6 +954,7 @@ public class SBL {
 			int index = selectSiteCB.getSelectedIndex();
 			if (index < 1) {
 			    visitSiteButton.setEnabled(false);
+			    browserMenuItem.setEnabled(false);
 			    generateButton.setEnabled(false);
 			    copyUserButton.setEnabled(false);
 			    copyPubKeyButton.setEnabled(true);
@@ -868,6 +962,7 @@ public class SBL {
 			    descrLabel.setText(" ");
 			} else {
 			    visitSiteButton.setEnabled(true);
+			    browserMenuItem.setEnabled(true);
 			    generateButton.setEnabled(true);
 			    copyUserButton.setEnabled(true);
 			    copyPubKeyButton.setEnabled(true);
@@ -911,7 +1006,7 @@ public class SBL {
 			cb.setContents(selection, selection);
 		    });
 
-		visitSiteButton.addActionListener((e) -> {
+		ActionListener visitAL = (e) -> {
 			String name = getName(selectSiteCB);
 			if (name == null) return;
 			Properties props = cpe.getEncodedProperties();
@@ -922,8 +1017,12 @@ public class SBL {
 			Clipboard cb = panel.getToolkit()
 			    .getSystemClipboard();
 			String password = new String(getSecurePW(panel, name));
-			StringSelection selection =
+			StringSelection selection1 =
+			    new StringSelection(user);
+			StringSelection selection2 =
 			    new StringSelection(password);
+			StringSelection2 selection = new
+			    StringSelection2(selection1, selection2);
 			cb.setContents(selection, selection);
 			try {
 			    uri = new URI(uriString);
@@ -936,10 +1035,12 @@ public class SBL {
 			    }
 			} catch (Exception ex) {
 			    System.err.println("sbl: " + ex.getMessage());
-			    selection = new StringSelection("");
-			    cb.setContents(selection, selection);
+			    StringSelection s = new StringSelection("");
+			    cb.setContents(s, s);
 			}
-		    });
+		};
+
+		visitSiteButton.addActionListener(visitAL);
 
 		generateButton.addActionListener((e) -> {
 			String name = getName(selectSiteCB);
@@ -957,6 +1058,42 @@ public class SBL {
 		frame = new JFrame((configFile == null)?
 				   errorMsg("title0"):
 				   errorMsg("title", configFile.getName()));
+
+		JMenuBar menubar = new JMenuBar();
+		JMenu fileMenu = new JMenu(localeString("File"));
+		JMenuItem menuItem = new JMenuItem(localeString("Close"));
+		fileMenu.setMnemonic(vk("VK_FILE"));
+		menuItem.setAccelerator(KeyStroke.getKeyStroke
+					(KeyEvent.VK_W,
+					 InputEvent.CTRL_DOWN_MASK));
+		menuItem.addActionListener((ae) -> {
+			System.exit(0);
+		    });
+		fileMenu.add(menuItem);
+		menuItem = new JMenuItem(localeString("Open"));
+		menuItem.setAccelerator(KeyStroke.getKeyStroke
+					(KeyEvent.VK_O,
+					 InputEvent.CTRL_DOWN_MASK));
+		menuItem.addActionListener(loadAL);
+		fileMenu.add(menuItem);
+		menuItem = findMenuItem;
+		menuItem.setAccelerator(KeyStroke.getKeyStroke
+					(KeyEvent.VK_F,
+					 InputEvent.CTRL_DOWN_MASK));
+		menuItem.addActionListener((ae) -> {
+			selectSiteCB.requestFocusInWindow();
+			selectSiteCB.showPopup();
+		    });
+		fileMenu.add(menuItem);
+		menuItem = browserMenuItem;
+		menuItem.setAccelerator(KeyStroke.getKeyStroke
+					(KeyEvent.VK_B,
+					 InputEvent.CTRL_DOWN_MASK));
+		menuItem.addActionListener(visitAL);
+		fileMenu.add(menuItem);
+
+		menubar.add(fileMenu);
+		frame.setJMenuBar(menubar);
 
 		frame.setIconImages(getIconList());
 		panel.add(loadButton);

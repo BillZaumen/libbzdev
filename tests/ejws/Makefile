@@ -239,5 +239,13 @@ atest6:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest6 ../bin/sblconf/test.sbl foo
+
+atest7:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest7 /usr/share/doc/libbzdev-doc/api/ \
+		~/.config/sbl/example.sbl testUser
+
 clean:
 	rm -rf classes
