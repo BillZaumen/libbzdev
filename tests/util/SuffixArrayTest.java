@@ -193,10 +193,240 @@ public class SuffixArrayTest {
 	return suffixArray;
     }
 
+    private  static class Info  {
+	int index;
+	int current;
+	int next;
+    }
+
+    // A time test indicated that the naive algorithm is a better
+    // choice for short sequences: when the sequences are long
+    // enough for this to be a better choice compared to  the
+    // naive algorithm, SA-IS is faster than either.
+
+    public static int[] makeSuffixArray2(final int[] sequence) {
+	int len = sequence.length;
+	Info[] info = new Info[len];
+	int lenm1 = len-1;
+	for (int i = 0; i < lenm1; i++) {
+	    Info inf = new Info();
+	    inf.index = i;
+	    inf.next = sequence[i+1];
+	    info[i] = inf;
+	}
+	info[lenm1] = new Info();
+	info[lenm1].index = lenm1;
+	info[lenm1].next = -1;
+
+	Comparator<Info> ic0 = new Comparator<>() {
+		public int compare(Info info1, Info info2) {
+		    int index1 = info1.index;
+		    int index2 = info2.index;
+		    if (sequence[index1] < sequence[index2]) {
+			return -1;
+		    } else if (sequence[index1] > sequence[index2]) {
+			return 1;
+		    } else {
+			if (info1.next < info2.next) {
+			    return -1;
+			} else if (info1.next > info2.next) {
+			    return 1;
+			} else {
+			    return 0;
+			}
+		    }
+		}
+	    };
+
+	Arrays.sort(info, ic0);
+
+	if (len > 2) {
+	    Comparator<Info> ic = new Comparator<>() {
+		    public int compare(Info info1, Info info2) {
+			if (info1.current < info2.current) {
+			    return -1;
+			} else if (info1.current > info2.current) {
+			    return 1;
+			} else {
+			    if (info1.next < info2.next) {
+				return -1;
+			    } else if (info1.next > info2.next) {
+				return 1;
+			    } else {
+				return 0;
+			    }
+			}
+		    }
+		};
+
+	    int inverse[] = new int[len];
+	    {
+		int current = 0;
+		int prev = sequence[info[0].index];
+		info[0].current = current;
+		inverse[info[0].index] = 0;
+		for (int i = 1; i < len; i++) {
+		    if (sequence[info[i].index] == prev
+			&& info[i].next == info[i-1].next) {
+			info[i].current = current;
+		    } else {
+			prev = sequence[info[i].index];
+			current++;
+			info[i].current = current;
+		    }
+		    inverse[info[i].index]  = i;
+		}
+		for (int i = 0; i < len; i++) {
+		    int nextIndex = info[i].index + 2;
+		    info[i].next = (nextIndex < len) ?
+			info[inverse[nextIndex]].current:
+			-1;
+		}
+		Arrays.sort(info, ic);
+	    }
+	    for (int ind = 4; ind < len; ind <<= 1) {
+		int current = 0;
+		int prev = info[0].current;
+		info[0].current = current;
+		inverse[info[0].index] = 0;
+		for (int i = 1; i < len; i++) {
+		    if (info[i].current == prev
+			&& info[i].next == info[i-1].next) {
+			info[i].current = current;
+		    } else {
+			prev = info[i].current;
+			current++;
+			info[i].current = current;
+		    }
+		    inverse[info[i].index]  = i;
+		}
+		for (int i = 0; i < len; i++) {
+		    int nextIndex = info[i].index + ind;
+		    info[i].next = (nextIndex < len) ?
+			info[inverse[nextIndex]].current:
+			-1;
+		}
+		Arrays.sort(info, ic);
+	    }
+	}
+
+	int slenp1 = len + 1;
+	int[] suffixArray = new int[slenp1];
+	suffixArray[0] = len;
+	for (int i = 1; i < slenp1; i++) {
+	    suffixArray[i] = info[i-1].index;
+	}
+	return suffixArray;
+    }
+
+    // test against another implementation found on an internet site
+    // ... just so we can do an independent check.
+    public static class Suffix implements Comparable<Suffix>
+    {
+        int index;
+        int rank;
+        int next;
+
+        public Suffix(int ind, int r, int nr)
+        {
+            index = ind;
+            rank = r;
+            next = nr;
+        }
+
+        public int compareTo(Suffix s)
+        {
+            if (rank != s.rank) return Integer.compare(rank, s.rank);
+            return Integer.compare(next, s.next);
+        }
+    }
+    public static int[] makeSuffixArray3(int[] s)
+    {
+        int n = s.length;
+        Suffix[] su = new Suffix[n];
+
+        // Store suffixes and their indexes in
+        // an array of classes. The class is needed
+        // to sort the suffixes alphabetically and
+        // maintain their old indexes while sorting
+        for (int i = 0; i < n; i++)
+        {
+            su[i] = new Suffix(i, s[i], 0);
+        }
+        for (int i = 0; i < n; i++)
+            su[i].next = (i + 1 < n ? su[i + 1].rank : -1);
+
+        // Sort the suffixes using the comparison function
+        // defined above.
+        Arrays.sort(su);
+
+        // At this point, all suffixes are sorted
+        // according to first 2 characters.
+        // Let us sort suffixes according to first 4
+        // characters, then first 8 and so on
+        int[] ind = new int[n];
+
+
+        // This array is needed to get the index in suffixes[]
+        // from original index. This mapping is needed to get
+        // next suffix.
+        for (int length = 4; length < 2 * n; length <<= 1)
+        {
+            // Assigning rank and index values to first suffix
+            int rank = 0, prev = su[0].rank;
+            su[0].rank = rank;
+            ind[su[0].index] = 0;
+            for (int i = 1; i < n; i++)
+            {
+                // If first rank and next ranks are same as
+                // that of previous suffix in array,
+                // assign the same new rank to this suffix
+                if (su[i].rank == prev &&
+                    su[i].next == su[i - 1].next)
+                {
+                    prev = su[i].rank;
+                    su[i].rank = rank;
+                }
+                else
+                {
+                    // Otherwise increment rank and assign
+                    prev = su[i].rank;
+                    su[i].rank = ++rank;
+                }
+                ind[su[i].index] = i;
+            }
+
+            // Assign next rank to every suffix
+            for (int i = 0; i < n; i++)
+            {
+                int nextP = su[i].index + length / 2;
+                su[i].next = nextP < n ?
+                   su[ind[nextP]].rank : -1;
+            }
+
+            // Sort the suffixes according
+            // to first k characters
+            Arrays.sort(su);
+        }
+
+        // Store indexes of all sorted
+        // suffixes in the suffix array
+        int[] suf = new int[n+1];
+
+	suf[0] = n;
+        for (int i = 0; i < n; i++)
+            suf[i+1] = su[i].index;
+
+        // Return the suffix array
+        return suf;
+    }
+
     public static void main(String argv[]) throws Exception {
 
 	int[] sequence = {'c', 'a', 'b', 'b', 'a', 'g', 'e'};
 	int[] array = makeSuffixArray(sequence);
+	int[] array2 = makeSuffixArray2(sequence);
+	int[] array3 = makeSuffixArray3(sequence);
 	System.out.println("suffixes:");
 	for (int i = 0; i < array.length; i++) {
 	    System.out.print("    ");
@@ -212,9 +442,20 @@ public class SuffixArrayTest {
 	}
 	for (int i = 0; i < expecting.length; i++) {
 	    if (expecting[i] != array[i]) {
-		System.out.format("length value %d at index %d, "
+		System.out.format("array: value %d at index %d, "
 				  + "expecting %d\n",
 				  array[i], i, expecting[i]);
+	    }
+	    if (expecting[i] != array2[i]) {
+		System.out.format("array2: value %d at index %d, "
+				  + "expecting %d\n",
+				  array2[i], i, expecting[i]);
+		throw new Exception("wrong value");
+	    }
+	    if (expecting[i] != array3[i]) {
+		System.out.format("array3: value %d at index %d, "
+				  + "expecting %d\n",
+				  array3[i], i, expecting[i]);
 		throw new Exception("wrong value");
 	    }
 	}
@@ -273,6 +514,8 @@ public class SuffixArrayTest {
 		sequence[i] = rv.next();
 	    }
 	    expecting = makeSuffixArray(sequence);
+	    array2 = makeSuffixArray2(sequence);
+	    array3 = makeSuffixArray3(sequence);
 	    suffixArray = new SuffixArray.Integer(sequence, 256);
 	    array = suffixArray.getArray();
 	    if (array.length != expecting.length) {
@@ -281,9 +524,21 @@ public class SuffixArrayTest {
 	    }
 	    for (int i = 0; i < expecting.length; i++) {
 		if (expecting[i] != array[i]) {
-		    System.out.format("length value %d at index %d, "
+		    System.out.format("array: value %d at index %d, "
 				      + "expecting %d\n",
 				      array[i], i, expecting[i]);
+		    throw new Exception("wrong value");
+		}
+		if (expecting[i] != array3[i]) {
+		    System.out.format("array3: value %d at index %d, "
+				      + "expecting %d\n",
+				      array3[i], i, expecting[i]);
+		    throw new Exception("wrong value");
+		}
+		if (expecting[i] != array2[i]) {
+		    System.out.format("array2: value %d at index %d, "
+				      + "expecting %d\n",
+				      array2[i], i, expecting[i]);
 		    throw new Exception("wrong value");
 		}
 	    }
@@ -811,6 +1066,16 @@ public class SuffixArrayTest {
 	int if2 = ifsa.findSubsequence(ifsubsequence, true);
 	System.out.format("ifsa test: first index = %d, last index = %d\n",
 			  if1, if2);
+	int if1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
+	int if2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
+	int if1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, if1a, if2a+1,
+					false);
+	int if2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, if1a, if2a+1,
+					true);
+	if (if1 != if1b) throw new Exception();
+	if (if2 != if2b) throw new Exception();
+
+
 	System.out.format("ifsequence: first index = %d, last index = %d\n",
 			  ifA[if1], ifA[if2]);
 	System.out.format("ifsa: any index = %d\n",
@@ -867,6 +1132,14 @@ public class SuffixArrayTest {
 			  sfA[sf1], sfA[sf2]);
 	System.out.format("sfsa: any index = %d\n",
 			  sfsa.findSubsequence(sfsubsequence));
+	int sf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
+	int sf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
+	int sf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, sf1a, sf2a+1,
+					false);
+	int sf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, sf1a, sf2a+1,
+					true);
+	if (sf1 != sf1b) throw new Exception();
+	if (sf2 != sf2b) throw new Exception();
 
 
 	range = sfsa.findRange(sfsubsequence);
@@ -923,6 +1196,16 @@ public class SuffixArrayTest {
 	System.out.format("cfsa: any index = %d\n",
 			  cfsa.findSubsequence(cfsubsequence));
 
+	int cf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
+	int cf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
+	int cf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, cf1a, cf2a+1,
+					false);
+	int cf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, cf1a, cf2a+1,
+					true);
+	if (cf1 != cf1b) throw new Exception();
+	if (cf2 != cf2b) throw new Exception();
+
+
 	range = cfsa.findRange(cfsubsequence);
 
 	System.out.println("range.size() = " + range.size());
@@ -976,6 +1259,17 @@ public class SuffixArrayTest {
 			  bfA[bf1], bfA[bf2]);
 	System.out.format("bfsa: any index = %d\n",
 			  bfsa.findSubsequence(bfsubsequence));
+
+	int bf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
+	int bf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
+	int bf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, bf1a, bf2a+1,
+					false);
+	int bf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, bf1a, bf2a+1,
+					true);
+	if (bf1 != bf1b) throw new Exception();
+	if (bf2 != bf2b) throw new Exception();
+
+
 	range = bfsa.findRange(bfsubsequence);
 
 	System.out.println("range.size() = " + range.size());
@@ -1088,6 +1382,17 @@ public class SuffixArrayTest {
 			  ofA[of1], ofA[of2]);
 	System.out.format("ofsa: any index = %d\n",
 			  ofsa.findSubsequence(ofsubsequence));
+
+	int of1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
+	int of2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
+	int of1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, of1a, of2a+1,
+					false);
+	int of2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, of1a, of2a+1,
+					true);
+	if (of1 != of1b) throw new Exception();
+	if (of2 != of2b) throw new Exception();
+
+
 	range = ofsa.findRange(ofsubsequence);
 
 	System.out.println("range.size() = " + range.size());
@@ -1441,7 +1746,7 @@ public class SuffixArrayTest {
 		    for (int i = 0; i < n; i++) {
 			sequence[i] = rv.next();
 		    }
-		    long t1 = System.nanoTime();
+		    long t1 = System.nanoTime()			;
 		    int[] na = makeSuffixArray(sequence);
 		    long t2 = System.nanoTime();
 		    suffixArray = new SuffixArray.Integer(sequence, n);

@@ -1501,7 +1501,8 @@ saved:
 $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		src/overview.html src/description.html \
 		stylesheet$(JAVADOC_VERSION).css description.css \
-		src/FactoryOverview.html src/SecureBasic.html
+		src/FactoryOverview.html src/SecureBasic.html \
+		src/sbl-example.png
 	rm -rf $(JROOT_JAVADOCS)
 	mkdir -p $(JROOT_JAVADOCS)
 	mkdir -p $(MATH_DIR)/$(BZDEV)/math/doc-files
@@ -1531,6 +1532,7 @@ $(JROOT_JAVADOCS)/index.html: $(JARS) $(DIAGRAMS) $(BLDPOLICY) $(DESCR_HTML) \
 		> $(JROOT_JAVADOCS)/doc-files/description.html ; \
 	sed -e s/stylesheet.css/$$dstylesheet/  src/SecureBasic.html \
 		> $(JROOT_JAVADOCS)/doc-files/SecureBasic.html
+	cp src/sbl-example.png $(JROOT_JAVADOCS)/doc-files/
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link \
@@ -1561,6 +1563,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	cp stylesheet17.css $(JROOT_JAVADOCS)
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	cp src/SecureBasic.html $(JROOT_ALT_JAVADOCS)/doc-files/SecureBasic.html
+	cp src/sbl-example.png $(JROOT_JAVADOCS)/doc-files/
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link-offline \

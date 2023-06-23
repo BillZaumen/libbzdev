@@ -121,16 +121,27 @@ import org.bzdev.lang.UnexpectedExceptionError;
  *       some search algorithms use this transform.
  *  <LI> findInstance.  This method (there are two variants) will find an
  *       offset into the sequence array where the offset matches the specified
- *       subsequence.
+ *       subsequence.  This is a convenience method that uses
+ *       findSubsequence to look up an index in the suffix array, but returns
+ *       the corresponding index into the sequence instead.
  *  <LI> findRange.  This method (there are two variants) will find a
  *       a range of offsets into the sequence array where each offset
  *       matches the specified subsequence.
- *  <LI> findSubsequence. This method (there are two variants) allows
- *       instances of a subsequence to be found efficiently. If n is the
- *       length of the sequence and m is the length of a subsequence, the
- *       time complexity in practice is O(m log n) if the LCP-LR auxiliary
- *       data structure is not used and is O(m + log n) if the LCP-LR
- *       auxiliary data structure is used.
+ *  <LI> findSubsequence. This method (there are three variants) allows
+ *       instances of a subsequence to be found efficiently. For the
+ *       case without a boolean argument, where an arbitrary instance
+ *       of the subsequence is returned, the time complexity depends
+ *       on whether or not LCP arrays are used: if n is the length of
+ *       the sequence and m is the length of a subsequence, the time
+ *       complexity is O(m log n) if the LCP-LR auxiliary data
+ *       structure is not used and is O(m + log n) if the LCP-LR
+ *       auxiliary data structure is used.  One variant allows one to
+ *       search just a portion of a suffix array. For example, when
+ *       searching for a number of different HTML tags, one can first
+ *       search for '&lt;' to find the indicies in the suffix array for
+ *       all suffixes that start with '&lt;' and then search that subrange
+ *       for the remainder of the tag, which can improve performance as
+ *       the subsequent binary searches will be faster.
  *  <LI> inverseBWT. This method (which is a static method) computes the
  *       inverse Burrows-Wheeler transform.
  * </UL>
@@ -943,7 +954,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(int[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -1137,7 +1149,33 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    int val1 = sequence[o1 + i];
-		    int val2 = sarray[i];
+		    int val2 = sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    int[] sarray;
+	    OffsetFindComparator(int offset, int[] sarray, int start, int end) {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength ) return -1;
+		    int val1 = sequence[o1 + i + offset];
+		    int val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -1159,6 +1197,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -1188,6 +1229,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, or the second and third
+	 * arguments are equal, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -1214,6 +1259,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(int[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -1235,7 +1281,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(int[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    if (LCP_L != null && LCP_R != null) {
@@ -1259,6 +1306,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(int[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -1282,16 +1330,62 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
+	    if (start == end) return 0;
 	    if (start >= end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(sarray, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1, c, false);
 	    if (i1 < 0) return -1;
 	    int i2 = PrimArrays.binarySearch(array, i1, last, -1, c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param sarray the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, int[] sarray, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, sarray, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence.
@@ -1830,7 +1924,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(short[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -2024,7 +2119,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    short val1 = sequence[o1 + i];
-		    short val2 = sarray[i];
+		    short val2 = sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    short[] sarray;
+	    OffsetFindComparator(int offset, short[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    short val1 = sequence[o1 + i + offset];
+		    short val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -2046,6 +2169,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -2075,6 +2201,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, or the second and third
+	 * arguments are equal, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -2101,6 +2231,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(short[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -2123,7 +2254,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(short[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    if (LCP_L != null && LCP_R != null) {
@@ -2147,6 +2279,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(short[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -2170,10 +2303,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -2181,7 +2316,51 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, short[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence.
@@ -2710,7 +2889,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(short[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -2906,7 +3086,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    int val1 =  0xFFFF & sequence[o1 + i];
-		    int val2 = 0xFFFF & sarray[i];
+		    int val2 = 0xFFFF & sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    short[] sarray;
+	    OffsetFindComparator(int offset, short[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    int val1 =  0xFFFF & sequence[o1 + i + offset];
+		    int val2 = 0xFFFF & sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -2928,6 +3136,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -2957,6 +3168,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -2983,6 +3198,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(short[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -3005,7 +3221,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(short[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    if (LCP_L != null && LCP_R != null) {
@@ -3029,6 +3246,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(short[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -3052,10 +3270,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -3063,6 +3283,49 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, short[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
 
 	/**
@@ -3592,7 +3855,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(char[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -3797,7 +4061,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    char val1 = sequence[o1 + i];
-		    char val2 = sarray[i];
+		    char val2 = sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    char[] sarray;
+	    OffsetFindComparator(int offset, char[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    char val1 = sequence[o1 + i + offset];
+		    char val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -3820,6 +4112,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -3846,6 +4141,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -3875,6 +4173,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -3901,6 +4203,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(java.lang.String subsequence) {
+	    if (subsequence.length() == 0) return 0;
 	    return findSubsequence(subsequence.toCharArray());
 	}
 
@@ -3915,6 +4218,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(char[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -3937,7 +4241,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(char[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    if (LCP_L != null && LCP_R != null) {
@@ -3962,6 +4267,7 @@ public abstract class SuffixArray {
 	 */
 	public int findSubsequence(java.lang.String subsequence,
 				   boolean keyflag) {
+	    if (subsequence.length() == 0) return 0;
 	    return findSubsequence(subsequence.toCharArray(), keyflag);
 	}
 
@@ -3977,6 +4283,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(char[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -4000,10 +4307,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
+	    if (start == end) return 0;
 	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -4011,7 +4320,51 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, char[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence, with the subsequence
@@ -4048,8 +4401,7 @@ public abstract class SuffixArray {
 	 *         suffix array
 	 * @see #getSequence()
 	 */
-	public Range findRange(char[] sarray, int start,
-				   int end)
+	public Range findRange(char[] sarray, int start, int end)
 	{
 	    if (start >= end) return new OurRange(0, 0, 0);
 	    int first = 1;
@@ -4558,7 +4910,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(byte[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -4751,7 +5104,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    int val1 = sequence[o1 + i];
-		    int val2 = sarray[i];
+		    int val2 = sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    byte[] sarray;
+	    OffsetFindComparator(int offset, byte[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    int val1 = sequence[o1 + i + offset];
+		    int val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -4773,6 +5154,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -4802,6 +5186,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -4828,6 +5216,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(byte[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -4850,7 +5239,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(byte[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 
@@ -4875,6 +5265,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(byte[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -4898,10 +5289,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -4909,7 +5302,51 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, byte[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence.
@@ -5444,7 +5881,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(byte[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -5638,7 +6076,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    int val1 = 0xFF & sequence[o1 + i];
-		    int val2 = 0xFF & sarray[i];
+		    int val2 = 0xFF & sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    byte[] sarray;
+	    OffsetFindComparator(int offset, byte[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    int val1 = 0xFF & sequence[o1 + i + offset];
+		    int val2 = 0xFF & sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -5660,6 +6126,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -5689,6 +6158,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -5715,6 +6188,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(byte[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -5737,7 +6211,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(byte[] sarray, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 
@@ -5762,6 +6237,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(byte[] subsequence, boolean keyflag) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -5785,10 +6261,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -5796,7 +6274,51 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, byte[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence.
@@ -6348,6 +6870,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -6375,6 +6900,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(java.lang.String subsequence) {
+	    if (subsequence.length() == 0) return 0;
 	    try {
 		return findSubsequence(subsequence.getBytes(UTF8));
 	    } catch (UnsupportedEncodingException e) {
@@ -6396,6 +6922,7 @@ public abstract class SuffixArray {
 	 */
 	public int findSubsequence(java.lang.String subsequence,
 				   boolean keyflag) {
+	    if (subsequence.length() == 0) return 0;
 	    try {
 		return findSubsequence(subsequence.getBytes(UTF8), keyflag);
 	    } catch (UnsupportedEncodingException e) {
@@ -6481,7 +7008,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(char[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -6678,7 +7206,35 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    char val1 = sequence[o1 + i];
-		    char val2 = sarray[i];
+		    char val2 = sarray[i + start];
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    char[] sarray;
+	    OffsetFindComparator(int offset, char[] sarray,
+				 int start, int end)
+	    {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    char val1 = sequence[o1 + i + offset];
+		    char val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
 		}
@@ -6700,6 +7256,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -6729,6 +7288,10 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -6757,6 +7320,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(java.lang.String subsequence) {
+	    if (subsequence.length() == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length());
 	}
 
@@ -6778,7 +7342,8 @@ public abstract class SuffixArray {
 	public int findSubsequence(java.lang.String subsequence, int start,
 				   int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    CharSequence cseq = subsequence.subSequence(start, end);
@@ -6828,6 +7393,7 @@ public abstract class SuffixArray {
 	public int findSubsequence(java.lang.String subsequence,
 				   boolean keyflag)
 	{
+	    if (subsequence.length() == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length(),
 				   keyflag);
 	}
@@ -6852,7 +7418,8 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    CharSequence cseq = subsequence.subSequence(start, end);
@@ -6871,6 +7438,7 @@ public abstract class SuffixArray {
 		}
 	    }
 	    FindComparator c = new FindComparator(sarray, 0, slen);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -6878,7 +7446,68 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset,
+				   java.lang.String subsequence,
+				   int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    CharSequence cseq = subsequence.subSequence(start, end);
+	    int slen = cseq.length();
+	    char[] sarray = new char[slen];
+	    for (int i = 0; i < slen; i++) {
+		sarray[i] = cseq.charAt(i);
+	    }
+	    if (map != null) {
+		for (int i = 0; i < sarray.length; i++) {
+		    Character ch = map.get(sarray[i]);
+		    if (ch == null) {
+			return -1;
+		    }
+		    sarray[i] = ch;
+		}
+	    }
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, sarray, 0, slen);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
 
 	/**
 	 * Find all instances of a subsequence.
@@ -7493,7 +8122,8 @@ public abstract class SuffixArray {
 
 	private int findSubsequenceLCPLR(T[] sarray, int start, int end)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int low = 1;
 	    int high = array.length-1;
 	    int s = start;
@@ -7688,7 +8318,38 @@ public abstract class SuffixArray {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
 		    java.lang.Integer val1 = map.get(sequence[o1 + i]);
-		    java.lang.Integer val2 = map.get(sarray[i]);
+		    java.lang.Integer val2 = map.get(sarray[i + start]);
+		    if (val1 == null || val2 == null) {
+			java.lang.String
+			    msg = errorMsg("compareToNull");
+			throw new IllegalArgumentException(msg);
+		    }
+		    if (val1 < val2) return -1;
+		    if (val1 > val2) return 1;
+		}
+		return 0;
+	    }
+	}
+
+	class OffsetFindComparator implements IntComparator {
+	    int offset;
+	    int start;
+	    int end;
+	    int limit;
+
+	    T[] sarray;
+	    OffsetFindComparator(int offset, T[] sarray, int start, int end) {
+		this.offset = offset;
+		this.sarray = sarray;
+		this.start = start;
+		this.limit = end - start;
+	    }
+
+	    public int compare(int o1, int o2) {
+		for (int i = 0; i < limit; i++) {
+		    if (o1 + i + offset >= sequenceLength) return -1;
+		    java.lang.Integer val1 = map.get(sequence[o1 + i + offset]);
+		    java.lang.Integer val2 = map.get(sarray[i + start]);
 		    if (val1 == null || val2 == null) {
 			java.lang.String
 			    msg = errorMsg("compareToNull");
@@ -7715,6 +8376,9 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, the value returned is the
+	 * length of the sequence.
 	 * @param subsequence the subsequence.
 	 * @return the index into the sequence; -1 if the subsequence
 	 *         cannot be found
@@ -7744,6 +8408,11 @@ public abstract class SuffixArray {
 	 * at the first step at which the suffixes actually differ:
 	 * the difference in running time in practice is data-set
 	 * dependent.
+	 * <P>
+	 * If the argument has a length of 0, or the second and third
+	 * arguments are equal, the value returned is the
+	 * length of the sequence. This is also true if the second and
+	 * third arguments are equal.
 	 * @param subsequence  array containing the subsequence.
 	 * @param start the starting index in the subsequence array (inclusive)
 	 * @param end the ending index in the subsequence array (exclusive)
@@ -7770,6 +8439,7 @@ public abstract class SuffixArray {
 	 * @see SuffixArray#getArray()
 	 */
 	public int findSubsequence(T[] subsequence) {
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length);
 	}
 
@@ -7793,7 +8463,8 @@ public abstract class SuffixArray {
 				   int end)
 	{
 
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    if (LCP_L != null && LCP_R != null) {
@@ -7819,6 +8490,7 @@ public abstract class SuffixArray {
 	public int findSubsequence(T[] subsequence,
 				   boolean keyflag)
 	{
+	    if (subsequence.length == 0) return 0;
 	    return findSubsequence(subsequence, 0, subsequence.length, keyflag);
 	}
 
@@ -7843,10 +8515,12 @@ public abstract class SuffixArray {
 				   int end,
 				   boolean keyflag)
 	{
-	    if (start >= end) return -1;
+	    if (start == end) return 0;
+	    if (start > end) return -1;
 	    int first = 1;
 	    int last = array.length;
 	    FindComparator c = new FindComparator(subsequence, start, end);
+	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
 						     c, false);
 	    if (i1 < 0) return -1;
@@ -7854,6 +8528,49 @@ public abstract class SuffixArray {
 					     c, true);
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
+	    */
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
+	/**
+	 * Find a subsequence given a starting index and ending index for
+	 * the subsequence, restricting the search to a range in this
+	 * suffix array.
+	 * This method finds the index into a suffix array corresponding to
+	 * a subsequence. The subsequence consists of the elements of
+	 * the array sarray with a starting index named start and and
+	 * ending index named end. When the range provided by the fifth and
+	 * sixth arguments is such that all suffixes in this range start with
+	 * the same N symbols, the offset can be set to N so that these
+	 * symbols are ignored in comparisions, in which case the third
+	 * argument should also be set so that the subsequence does not
+	 * contain these N symbols at its start.
+	 * @param offset an offset to add to the index into a sequence
+	 *       provided by the suffix array when comparing values
+	 * @param subsequence the subsequence array
+	 * @param start the starting index in the subsequence array (inclusive)
+	 * @param end the ending index in the subsequence array (exclusive)
+	 * @param first the starting index in the suffix array (inclusive)
+	 * @param last the ending index int he suffix array (exclusive)
+	 * @param keyflag true if the highest index should be returned; false
+	 *        if the lowest index should be returned.
+	 * @return the index into the suffix array; -1 if the subsequence
+	 *         cannot be found
+	 * @see SuffixArray#getArray()
+	 */
+	public int findSubsequence(int offset, T[] subsequence, int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start >= end) return -1;
+	    OffsetFindComparator c =
+		new OffsetFindComparator(offset, subsequence, start, end);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
 	}
 
 	/**
