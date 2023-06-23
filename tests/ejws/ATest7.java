@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import org.bzdev.swing.ConfigPropertyEditor;
 
+// use to test SBL
 public class ATest7 {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
