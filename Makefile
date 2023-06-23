@@ -1563,7 +1563,7 @@ $(JROOT_ALT_JAVADOCS)/index.html: $(JROOT_JAVADOCS)/index.html
 	cp stylesheet17.css $(JROOT_JAVADOCS)
 	cp src/description.html $(JROOT_ALT_JAVADOCS)/doc-files/description.html
 	cp src/SecureBasic.html $(JROOT_ALT_JAVADOCS)/doc-files/SecureBasic.html
-	cp src/sbl-example.png $(JROOT_JAVADOCS)/doc-files/
+	cp src/sbl-example.png $(JROOT_ALT_JAVADOCS)/doc-files/
 	for i in $(MOD_IMAGES) ; \
 	    do cp src/doc-files/$$i $(JROOT_ALT_JAVADOCS)/doc-files ; done
 	$(RUNLSNOF) $(DARKMODE) --link-offline \
