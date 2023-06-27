@@ -202,13 +202,13 @@ public abstract class SuffixArray {
      * The Longest Common Prefix (LCP) length array. Subclasses may
      * read this field but should not set it or alter it.
      */
-    private int[] lcpArray;
+    protected int[] lcpArray;
 
     /**
      * The inverse of the suffix array.
-     * Subclasses may read this
+     * Subclasses may read this.
      */
-    private int[] rank;
+    protected int[] rank;
 
     /**
      * Test if the inverse array is currently cached.
@@ -332,16 +332,15 @@ public abstract class SuffixArray {
      * mapping will be used later, one should call {@link #useInverse()}
      * before this method is called to avoid creating the inverse mapping
      * multiple times.
-     * @return the LCP array.
      */
     public synchronized int[] getLCP() {
 	if (lcpArray == null) {
-	    boolean clearRank = (rank == null);
+	    // boolean clearRank = (rank == null);
 	    int[] ourRank = getInverse();
 	    int[] ourlcpArray = new int[array.length];
 	    ourlcpArray[0] = -1; // signal that no valid entry exists.
 	    fillLCPArray(ourlcpArray, ourRank);
-	    if (clearRank) rank = null;
+	    // if (clearRank) rank = null;
 	    return ourlcpArray;
 	} else {
 	    return lcpArray;
@@ -396,11 +395,18 @@ public abstract class SuffixArray {
      * memory will be required.
      * <P>
      * Calling this method will result in the LCP-LR table being cached.
-     * To clear the cached table, call {@link #clearCachedLCPLR()}
+     * To clear the cached table, call {@link #clearCachedLCPLR()}.
      */
     public synchronized void useLCPLR() {
 	if (LCP_L != null && LCP_R != null) return;
-	int[] lcp = getLCP();
+	boolean clearLCP = (lcpArray == null);
+	int [] lcp = null;
+	try {
+	    lcp = getLCP();
+	} finally {
+	    if (clearLCP) lcpArray = null;
+	}
+	if (lcp.length < 3) return;
 	LCP_L = new int[lcp.length];
 	LCP_R = new int [lcp.length];
 	Arrays.fill(LCP_L, lcp.length);
@@ -436,8 +442,31 @@ public abstract class SuffixArray {
     private int lengthFromLCPLR(int low, int high) {
 	if (low == 0) return 0;
 	if (low == high) return array[0] - array[low];
-	return lengthFromLCPLR(low, high, 1, LCP_L.length-1, true,
-			   array[0]);
+	int maxlen = array[0] - Math.min(array[low], array[high]);
+	// Bracket to reduce the size of the binary search,
+	// in particular, the use of recursion.
+	int rlow = 1;
+	int rhigh = LCP_L.length-1;
+	int mid = (rlow + rhigh) >>> 1;
+	while (rlow < low) {
+	    if (mid >= low) {
+		break;
+	    } else {
+		rlow = mid;
+	    }
+	    mid = (rlow + rhigh) >>> 1;
+	}
+	mid = (rlow + rhigh) >>> 1;
+	while (rhigh > high) {
+	    if (mid <= high) {
+		break;
+	    } else {
+		rhigh = mid;
+	    }
+	    mid = (rlow + rhigh) >>> 1;
+	}
+	return lengthFromLCPLR(low, high, rlow, rhigh, true,
+			       /*array[0]*/ maxlen);
     }
 
 
@@ -460,7 +489,7 @@ public abstract class SuffixArray {
 	int mid = (high + low) >>> 1;
 	int r1 = lengthFromLCPLR(min, max, low, mid, false, maxlen);
 	int r2 = lengthFromLCPLR(min, max, mid, high, true, maxlen);
-	return maxlen = Math.min(r1, r2);
+	return /*maxlen = */ Math.min(r1, r2);
     }
 
     /**
@@ -1133,6 +1162,239 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(int[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		sarray[s3] < sequence[indl]) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int key = sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start+offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -1332,9 +1594,6 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(sarray, start, end);
 	    /*
 	    int i1 = PrimArrays.binarySearch(array, first, last, -1, c, false);
 	    if (i1 < 0) return -1;
@@ -1342,8 +1601,16 @@ public abstract class SuffixArray {
 	    if (i2 < 0) return -1;
 	    return keyflag? i2: i1;
 	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null)  {
+		return findSubsequenceLCPLR2(sarray, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(sarray, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -1380,7 +1647,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(sarray, start, end):
 		new OffsetFindComparator(offset, sarray, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -2103,6 +2371,239 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(short[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		sarray[s3] < sequence[indl]) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int key = sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = lowOffset < highOffset? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start + offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -2305,20 +2806,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -2355,7 +2852,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -3070,6 +3568,240 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(short[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && (0xFFFF & sarray[s2])
+		> (0xFFFF & sequence[indh])) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		(0xFFFF & sarray[s3]) < (0xFFFF & sequence[indl])) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1:
+		    (0xFFFF & sequence[ind]);
+		int key = 0xFFFF & sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = 0xFFFF & sequence[ind];
+				key = 0xFFFF & sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = 0xFFFF & sequence[ind];
+				key = 0xFFFF & sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start + offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = 0xFFFF & sequence[ind++];
+			test = (val < (0xFFFF & sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = 0xFFFF & sequence[ind++];
+			test = (val < (0xFFFF & sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -3272,20 +4004,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -3322,7 +4050,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -4038,6 +4767,239 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(char[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		sarray[s3] < sequence[indl]) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int key = sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start + offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	/**
 	 * Get the sequence associated with this suffix array.
 	 * The sequence is an array that must not be modified.
@@ -4309,20 +5271,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -4359,7 +5317,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -5088,6 +6047,239 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(byte[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		sarray[s3] < sequence[indl]) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int key = sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(0, sarray, start, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -5291,20 +6483,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -5341,7 +6529,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -6060,6 +7249,240 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(byte[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && ((0xFF & sarray[s2]) >
+			     (0xFF & sequence[indh]))) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		((0xFF & sarray[s3]) < (0xFF & sequence[indl]))) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: 0xFF & sequence[ind];
+		int key = 0xFF & sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = 0xFF & sequence[ind];
+				key = 0xFF & sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = 0xFF & sequence[ind];
+				key = 0xFF & sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start + offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = 0xFF & sequence[ind++];
+			test = (val < (0xFF & sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = 0xFF & sequence[ind++];
+			test = (val < (0xFF & sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -6263,20 +7686,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -6313,7 +7732,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
@@ -7190,6 +8610,238 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(char[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (sarray[s] == sequence[indl])
+		   && (sarray[s] == sequence[indh])) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (sarray[s2] == sequence[indh])) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
+	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& sequence[indh] == sarray[s2]) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (sarray[s3] == sequence[indl])) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		sarray[s3] < sequence[indl]) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& sarray[s3] == sequence[indl]) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int key = sarray[s];
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = sequence[ind];
+				key = sarray[s];
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start + offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = sequence[ind++];
+			test = (val < sarray[i])? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = sequence[ind++];
+		    if (val != sarray[i]) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -7420,8 +9072,6 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
 	    CharSequence cseq = subsequence.subSequence(start, end);
 	    int slen = cseq.length();
 	    char[] sarray = new char[slen];
@@ -7437,18 +9087,16 @@ public abstract class SuffixArray {
 		    sarray[i] = ch;
 		}
 	    }
-	    FindComparator c = new FindComparator(sarray, 0, slen);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(sarray, 0, slen, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(sarray, 0, slen);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -7502,8 +9150,27 @@ public abstract class SuffixArray {
 		    sarray[i] = ch;
 		}
 	    }
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(sarray, 0, slen):
 		new OffsetFindComparator(offset, sarray, 0, slen);
+	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
+	    return (i < 0)? -1: i;
+	}
+
+
+	private int findSubsequence(int offset,
+				   char[] subsequence,
+				   int start,
+				   int end,
+				   int first,
+				   int last,
+				   boolean keyflag)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
+		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;
 	}
@@ -8302,6 +9969,239 @@ public abstract class SuffixArray {
 	    return -1;
 	}
 
+	// Modified findSubsequenceLCPLR so we get the low or high endpoints.
+	private int findSubsequenceLCPLR2(T[] sarray, int start, int end,
+					  boolean max)
+	{
+	    if (start == end) return 0;
+	    if (start > end) return -1;
+	    int low = 1;
+	    int high = array.length-1;
+	    int s = start;
+	    int indl = array[low];
+	    int indh = array[high];
+	    while (s < end-1
+		   && indl < sequenceLength && indh < sequenceLength
+		   && (iget(sarray[s]) == iget(sequence[indl]))
+		   && (iget(sarray[s]) == iget(sequence[indh]))) {
+		s++; indl++; indh++;
+	    }
+	    int s2 = s;
+	    int s3 = s;
+	    while (indh < sequenceLength  && s2 < end-1 &&
+		   (iget(sarray[s2]) == iget(sequence[indh]))) {
+		s2++; indh++;
+	    }
+	    if (indh == sequenceLength) return -1;
+	    if (s2 < end && iget(sarray[s2]) > iget(sequence[indh])) return -1;
+	    if (s2 == end-1 && iget(sarray[s2]) == iget(sequence[indh])) {
+		if (max || low == high) {
+		    return high;
+		} else {
+		    if (lcpArray[high] < (end - start)) {
+			return high;
+		    }
+		}
+	    }
+	    if (s2 < end-1 && indh == sequenceLength - 1
+		&& iget(sequence[indh]) == iget(sarray[s2])) {
+		return -1;
+	    }
+	    while (indl < sequenceLength  && s3 < end-1 &&
+		   (iget(sarray[s3]) == iget(sequence[indl]))) {
+		s3++; indl++;
+	    }
+	    if (s3 < end && indl < sequenceLength &&
+		iget(sarray[s3]) < iget(sequence[indl])) {
+		return -1;
+	    }
+	    if (s3 == end-1 && indl != sequenceLength
+		&& iget(sarray[s3]) == iget(sequence[indl])) {
+		if (max == false) {
+		    return low;
+		} else {
+		    if (lcpArray[low+1] < (end - start)) {
+			return low;
+		    }
+		}
+	    }
+	    boolean right = (s2 <= s3);
+	    if (right) {
+		s = s3;
+	    } else {
+		s = s2;
+	    }
+	    int k = s - start;
+	    int lowOffset = s2 - start;
+	    int highOffset = s3 - start;
+	    int test = -2;	// Signal that test was not done.
+	    boolean match = false;
+	    int middle = -1;
+	    while ((high - low) > 1) {
+		middle = (low + high) >>> 1;
+		int ind = array[middle] + k;
+		int val = (ind >= sequenceLength)? -1: iget(sequence[ind]);
+		int key = iget(sarray[s]);
+		if (right) {
+		    if (k < LCP_L[middle]) {
+			low = middle;
+			lowOffset = k;
+		    } else if (k > LCP_L[middle]) {
+			high = middle;
+			highOffset = k;
+			right = true;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			    right = false;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind >= sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = iget(sequence[ind]);
+				key = iget(sarray[s]);
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+				right = false;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				java.lang.String msg =
+				    errorMsg("processingError");
+				throw new IllegalStateException(msg);
+			    }
+			}
+		    }
+		} else {
+		    if (k < LCP_R[middle]) {
+			high = middle;
+			highOffset = k;
+		    } else if (k > LCP_R[middle]) {
+			low = middle;
+			lowOffset = k;
+			right = false;
+		    } else {
+			test = ((val == key)? 0: ((val < key)? -1: 1));
+			if (test < 0) {
+			    low = middle;
+			    lowOffset = k;
+			    right = true;
+			} else if (test > 0) {
+			    high = middle;
+			    highOffset = k;
+			} else {
+			    while (test == 0 && s < end-1) {
+				k++; ind++; s++;
+				if (ind == sequenceLength) {
+				    test = -1;
+				    break;
+				}
+				val = iget(sequence[ind]);
+				key = iget(sarray[s]);
+				test = ((val == key)? 0: ((val < key)? -1: 1));
+			    }
+			    if (test < 0) {
+				low = middle;
+				lowOffset = k;
+				right = true;
+			    } else if (test > 0) {
+				high = middle;
+				highOffset = k;
+			    } else if (s == end-1) {
+				// return middle;
+				match = true;
+				break;
+			    } else {
+				throw new IllegalStateException
+				    ("search failed but test was zero");
+			    }
+			}
+		    }
+		}
+	    }
+	    if (match) {
+		if (max) {
+		    if (lcpArray[middle+1] < (end - start)) {
+			return middle;
+		    }
+		    low = middle;
+		} else {
+		    if (lcpArray[middle] < (end - start)) {
+			return middle;
+		    }
+		    high = middle;
+		}
+		int offset = (lowOffset < highOffset)? lowOffset: highOffset;
+		return findSubsequence(offset, sarray, start+offset, end,
+				       low, high, max);
+	    }
+	    if (test == -2) {
+		test = 0;
+		if (right) {
+		    int ind = array[low];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = iget(sequence[ind++]);
+			test = (val < iget(sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return low;
+		} else {
+		    int ind = array[high];
+		    for (int i = start; i < end; i++) {
+			if (ind >= sequenceLength) {
+			    test = -1;
+			    break;
+			}
+			int val = iget(sequence[ind++]);
+			test = (val < iget(sarray[i]))? -1: 1;
+			if (test != 0) break;
+		    }
+		    if (test == 0) return high;
+		}
+	    }
+
+	    if (test < 0) {
+		// test high
+		int ind = array[high];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = iget(sequence[ind++]);
+		    if (val != iget(sarray[i])) return -1;
+		}
+		return high;
+	    } else if (test > 0) {
+		// test low
+		int ind = array[low];
+		for (int i = start; i < end; i++) {
+		    if (ind >= sequenceLength) return -1;
+		    int val = iget(sequence[ind++]);
+		    if (val != iget(sarray[i])) return -1;
+		}
+		return low;
+	    }
+	    return -1;
+	}
+
 	class FindComparator implements IntComparator {
 	    int start;
 	    int end;
@@ -8517,20 +10417,16 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start > end) return -1;
-	    int first = 1;
-	    int last = array.length;
-	    FindComparator c = new FindComparator(subsequence, start, end);
-	    /*
-	    int i1 = PrimArrays.binarySearch(array, first, last, -1,
-						     c, false);
-	    if (i1 < 0) return -1;
-	    int i2 = PrimArrays.binarySearch(array, i1, last, -1,
-					     c, true);
-	    if (i2 < 0) return -1;
-	    return keyflag? i2: i1;
-	    */
-	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
-	    return (i < 0)? -1: i;
+	    if (LCP_L != null && LCP_R != null && lcpArray != null) {
+		return findSubsequenceLCPLR2(subsequence, start, end, keyflag);
+	    } else {
+		int first = 1;
+		int last = array.length;
+		FindComparator c = new FindComparator(subsequence, start, end);
+		int i = PrimArrays.binarySearch(array, first, last,
+						-1, c, keyflag);
+		return (i < 0)? -1: i;
+	    }
 	}
 
 	/**
@@ -8567,7 +10463,8 @@ public abstract class SuffixArray {
 	{
 	    if (start == end) return 0;
 	    if (start >= end) return -1;
-	    OffsetFindComparator c =
+	    IntComparator c = (offset == 0)?
+		new FindComparator(subsequence, start, end):
 		new OffsetFindComparator(offset, subsequence, start, end);
 	    int i = PrimArrays.binarySearch(array, first, last, -1, c, keyflag);
 	    return (i < 0)? -1: i;

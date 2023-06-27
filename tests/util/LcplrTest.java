@@ -22,6 +22,30 @@ public class LcplrTest {
 	System.out.println(name + ":");
 	SuffixArray.Integer sai = new SuffixArray.Integer(sequence, 128);
 	int[] array = sai.getArray();
+	SuffixArray.Integer sai2 = new SuffixArray.Integer(sequence, 128);
+	SuffixArray.Integer sai3 = new SuffixArray.Integer(sequence, 128);
+	sai2.useLCP();
+	sai3.useLCP();
+	sai3.useLCPLR();
+
+	for (int i = 1; i < array.length; i++) {
+	    for (int j = i+1; j < array.length; j++) {
+		int len1 = sai.lcpLength(i, j);
+		int len2 = sai2.lcpLength(i, j);
+		int len3 = sai3.lcpLength(i, j);
+		if (len1 != len2) {
+		    System.out.format("at [%d, %d], len1 = %d, len2 = %d\n",
+				      i, j, len1, len2);
+		    throw new Exception();
+		}
+		if (len1 != len3) {
+		    System.out.format("at [%d, %d], len1 = %d, len3 = %d\n",
+				      i, j, len1, len3);
+		    throw new Exception();
+		}
+	    }
+	}
+
 	if (printArray) {
 	    System.out.println();
 	    System.out.println("suffix array:");
@@ -345,6 +369,31 @@ public class LcplrTest {
 
 	    for (int j = 0; j < len; j++) {
 		isequence[j] = srv.next();
+	    }
+
+	    SuffixArray.Integer sai1 = new SuffixArray.Integer(isequence, 6);
+	    SuffixArray.Integer sai2 = new SuffixArray.Integer(isequence, 6);
+	    SuffixArray.Integer sai3 = new SuffixArray.Integer(isequence, 6);
+	    sai2.useLCP();
+	    sai3.useLCP();
+	    sai3.useLCPLR();
+	    int[] array1 = sai1.getArray();
+	    for (int k = 1; k < array1.length; k++) {
+		for (int j = k+1; j < array1.length; j++) {
+		    int len1 = sai1.lcpLength(k, j);
+		    int len2 = sai2.lcpLength(k, j);
+		    int len3 = sai3.lcpLength(k, j);
+		    if (len1 != len2) {
+			System.out.format("at [%d, %d], len1 = %d, len2 = %d\n",
+					  k, j, len1, len2);
+			throw new Exception();
+		    }
+		    if (len1 != len3) {
+			System.out.format("at [%d, %d], len1 = %d, len3 = %d\n",
+					  k, j, len1, len3);
+			throw new Exception();
+		    }
+		}
 	    }
 
 	    int start = StaticRandom.nextInt(len - 1);

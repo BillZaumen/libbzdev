@@ -1074,6 +1074,50 @@ public class SuffixArrayTest {
 					true);
 	if (if1 != if1b) throw new Exception();
 	if (if2 != if2b) throw new Exception();
+	int ifsubsequenceL[] = {1};
+	int ifsubsequenceU[] = {9};
+	int ifsubsequenceM[] = {7, 5, 2};
+	int ifsubsequence0[] = {3, 4};
+	int ifsubsequence8[] = {8};
+	int t1a = ifsa.findSubsequence(ifsubsequenceL, false);
+	int t1b = ifsa.findSubsequence(ifsubsequenceL, true);
+	int t2a = ifsa.findSubsequence(ifsubsequenceU, false);
+	int t2b = ifsa.findSubsequence(ifsubsequenceU, true);
+	int t3a = ifsa.findSubsequence(ifsubsequenceM, false);
+	int t3b = ifsa.findSubsequence(ifsubsequenceM, true);
+	int t4a = ifsa.findSubsequence(ifsubsequence0, false);
+	int t4b = ifsa.findSubsequence(ifsubsequence0, true);
+	int t5a = ifsa.findSubsequence(ifsubsequence8, false);
+	int t5b = ifsa.findSubsequence(ifsubsequence8, true);
+
+	ifsa.useLCP();
+	ifsa.useLCPLR();
+	int v1 = ifsa.findSubsequence(ifsubsequence, false);
+	int v2 = ifsa.findSubsequence(ifsubsequence, true);
+	if (if1 != v1 || if2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	int tt1a = ifsa.findSubsequence(ifsubsequenceL, false);
+	int tt1b = ifsa.findSubsequence(ifsubsequenceL, true);
+	int tt2a = ifsa.findSubsequence(ifsubsequenceU, false);
+	int tt2b = ifsa.findSubsequence(ifsubsequenceU, true);
+	int tt3a = ifsa.findSubsequence(ifsubsequenceM, false);
+	int tt3b = ifsa.findSubsequence(ifsubsequenceM, true);
+	int tt4a = ifsa.findSubsequence(ifsubsequence0, false);
+	int tt4b = ifsa.findSubsequence(ifsubsequence0, true);
+	int tt5a = ifsa.findSubsequence(ifsubsequence8, false);
+	int tt5b = ifsa.findSubsequence(ifsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
 
 
 	System.out.format("ifsequence: first index = %d, last index = %d\n",
@@ -1126,23 +1170,186 @@ public class SuffixArrayTest {
 
 	int sf1 = sfsa.findSubsequence(sfsubsequence, false);
 	int sf2 = sfsa.findSubsequence(sfsubsequence, true);
+
+	short sfsubsequenceL[] = {1};
+	short sfsubsequenceU[] = {9};
+	short sfsubsequenceM[] = {7, 5, 2};
+	short sfsubsequence0[] = {3, 4};
+	short sfsubsequence8[] = {8};
+	t1a = sfsa.findSubsequence(sfsubsequenceL, false);
+	t1b = sfsa.findSubsequence(sfsubsequenceL, true);
+	t2a = sfsa.findSubsequence(sfsubsequenceU, false);
+	t2b = sfsa.findSubsequence(sfsubsequenceU, true);
+	t3a = sfsa.findSubsequence(sfsubsequenceM, false);
+	t3b = sfsa.findSubsequence(sfsubsequenceM, true);
+	t4a = sfsa.findSubsequence(sfsubsequence0, false);
+	t4b = sfsa.findSubsequence(sfsubsequence0, true);
+	t5a = sfsa.findSubsequence(sfsubsequence8, false);
+	t5b = sfsa.findSubsequence(sfsubsequence8, true);
+
+	sfsa.useLCP();
+	sfsa.useLCPLR();
+	v1 = sfsa.findSubsequence(sfsubsequence, false);
+	v2 = sfsa.findSubsequence(sfsubsequence, true);
+	if (sf1 != v1 || sf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = sfsa.findSubsequence(sfsubsequenceL, false);
+	tt1b = sfsa.findSubsequence(sfsubsequenceL, true);
+	tt2a = sfsa.findSubsequence(sfsubsequenceU, false);
+	tt2b = sfsa.findSubsequence(sfsubsequenceU, true);
+	tt3a = sfsa.findSubsequence(sfsubsequenceM, false);
+	tt3b = sfsa.findSubsequence(sfsubsequenceM, true);
+	tt4a = sfsa.findSubsequence(sfsubsequence0, false);
+	tt4b = sfsa.findSubsequence(sfsubsequence0, true);
+	tt5a = sfsa.findSubsequence(sfsubsequence8, false);
+	tt5b = sfsa.findSubsequence(sfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
+
 	System.out.format("sfsa test: first index = %d, last index = %d\n",
 			  sf1, sf2);
 	System.out.format("sfsequence: first index = %d, last index = %d\n",
 			  sfA[sf1], sfA[sf2]);
 	System.out.format("sfsa: any index = %d\n",
 			  sfsa.findSubsequence(sfsubsequence));
-	int sf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
-	int sf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
-	int sf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, sf1a, sf2a+1,
+	int sf1a = sfsa.findSubsequence(sfsubsequence, 0, 1, false);
+	int sf2a = sfsa.findSubsequence(sfsubsequence, 0, 1, true);
+	int sf1b = sfsa.findSubsequence(1, sfsubsequence, 1, 2, sf1a, sf2a+1,
 					false);
-	int sf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, sf1a, sf2a+1,
+	int sf2b = sfsa.findSubsequence(1, sfsubsequence, 1, 2, sf1a, sf2a+1,
 					true);
 	if (sf1 != sf1b) throw new Exception();
 	if (sf2 != sf2b) throw new Exception();
 
 
 	range = sfsa.findRange(sfsubsequence);
+
+	System.out.println("range.size() = " + range.size());
+	System.out.println("range.subsequenceLength() = "
+			   + range.subsequenceLength());
+
+
+	for (int ind2: range) {
+	    System.out.println("using iterator, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind2: range.toArray()) {
+	    System.out.println("using array, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind2: range.toArray(new int[range.size()])) {
+	    System.out.println("using our array, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind3 = 0; ind3 < range.size(); ind3++) {
+	    System.out.println("using index, subsequence starting at "
+			       + range.subsequenceIndex(ind3));
+	}
+
+	short usfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
+	short usfsubsequence[] = {2, 8};
+	for (int i = 0; i < usfsequence.length; i++) {
+	    usfsequence[i] += (short)40000;
+	}
+	for (int i = 0; i < usfsubsequence.length; i++) {
+	    usfsubsequence[i] += (short)40000;
+	}
+
+	SuffixArray.UnsignedShort usfsa =
+	    new SuffixArray.UnsignedShort(usfsequence, 40011);
+	int[] usfA = usfsa.getArray();
+	System.out.println("usfA.length = " + usfA.length
+			   + ", usfsequence.length = " + usfsequence.length);
+	System.out.println("usfA:");
+	for (int index: usfA) {
+	    if (index == usfsequence.length) {
+		System.out.println("    " + index);
+	    } else {
+		System.out.println("    " + index
+				   + " --> " + usfsequence[index]);
+	    }
+	}
+
+	int usf1 = usfsa.findSubsequence(usfsubsequence, false);
+	int usf2 = usfsa.findSubsequence(usfsubsequence, true);
+
+	short usfsubsequenceL[] = {(short)40001};
+	short usfsubsequenceU[] = {(short)40009};
+	short usfsubsequenceM[] = {(short)40007, (short)40005, (short)40002};
+	short usfsubsequence0[] = {(short)40003, (short)40004};
+	short usfsubsequence8[] = {(short)40008};
+	t1a = usfsa.findSubsequence(usfsubsequenceL, false);
+	t1b = usfsa.findSubsequence(usfsubsequenceL, true);
+	t2a = usfsa.findSubsequence(usfsubsequenceU, false);
+	t2b = usfsa.findSubsequence(usfsubsequenceU, true);
+	t3a = usfsa.findSubsequence(usfsubsequenceM, false);
+	t3b = usfsa.findSubsequence(usfsubsequenceM, true);
+	t4a = usfsa.findSubsequence(usfsubsequence0, false);
+	t4b = usfsa.findSubsequence(usfsubsequence0, true);
+	t5a = usfsa.findSubsequence(usfsubsequence8, false);
+	t5b = usfsa.findSubsequence(usfsubsequence8, true);
+
+	usfsa.useLCP();
+	usfsa.useLCPLR();
+	v1 = usfsa.findSubsequence(usfsubsequence, false);
+	v2 = usfsa.findSubsequence(usfsubsequence, true);
+	if (usf1 != v1 || usf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = usfsa.findSubsequence(usfsubsequenceL, false);
+	tt1b = usfsa.findSubsequence(usfsubsequenceL, true);
+	tt2a = usfsa.findSubsequence(usfsubsequenceU, false);
+	tt2b = usfsa.findSubsequence(usfsubsequenceU, true);
+	tt3a = usfsa.findSubsequence(usfsubsequenceM, false);
+	tt3b = usfsa.findSubsequence(usfsubsequenceM, true);
+	tt4a = usfsa.findSubsequence(usfsubsequence0, false);
+	tt4b = usfsa.findSubsequence(usfsubsequence0, true);
+	tt5a = usfsa.findSubsequence(usfsubsequence8, false);
+	tt5b = usfsa.findSubsequence(usfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
+
+	System.out.format("usfsa test: first index = %d, last index = %d\n",
+			  usf1, usf2);
+	System.out.format("usfsequence: first index = %d, last index = %d\n",
+			  usfA[usf1], usfA[usf2]);
+	System.out.format("usfsa: any index = %d\n",
+			  usfsa.findSubsequence(usfsubsequence));
+	int usf1a = usfsa.findSubsequence(usfsubsequence, 0, 1, false);
+	int usf2a = usfsa.findSubsequence(usfsubsequence, 0, 1, true);
+	int usf1b = usfsa.findSubsequence(1, usfsubsequence, 1, 2,
+					  usf1a, usf2a+1,
+					  false);
+	int usf2b = usfsa.findSubsequence(1, usfsubsequence, 1,
+					  2, usf1a, usf2a+1,
+					  true);
+	if (usf1 != usf1b) throw new Exception();
+	if (usf2 != usf2b) throw new Exception();
+
+
+	range = usfsa.findRange(usfsubsequence);
 
 	System.out.println("range.size() = " + range.size());
 	System.out.println("range.subsequenceLength() = "
@@ -1196,14 +1403,59 @@ public class SuffixArrayTest {
 	System.out.format("cfsa: any index = %d\n",
 			  cfsa.findSubsequence(cfsubsequence));
 
-	int cf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
-	int cf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
-	int cf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, cf1a, cf2a+1,
+	int cf1a = cfsa.findSubsequence(cfsubsequence, 0, 1, false);
+	int cf2a = cfsa.findSubsequence(cfsubsequence, 0, 1, true);
+	int cf1b = cfsa.findSubsequence(1, cfsubsequence, 1, 2, cf1a, cf2a+1,
 					false);
-	int cf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, cf1a, cf2a+1,
+	int cf2b = cfsa.findSubsequence(1, cfsubsequence, 1, 2, cf1a, cf2a+1,
 					true);
 	if (cf1 != cf1b) throw new Exception();
 	if (cf2 != cf2b) throw new Exception();
+
+	char cfsubsequenceL[] = {1};
+	char cfsubsequenceU[] = {9};
+	char cfsubsequenceM[] = {7, 5, 2};
+	char cfsubsequence0[] = {3, 4};
+	char cfsubsequence8[] = {8};
+	t1a = cfsa.findSubsequence(cfsubsequenceL, false);
+	t1b = cfsa.findSubsequence(cfsubsequenceL, true);
+	t2a = cfsa.findSubsequence(cfsubsequenceU, false);
+	t2b = cfsa.findSubsequence(cfsubsequenceU, true);
+	t3a = cfsa.findSubsequence(cfsubsequenceM, false);
+	t3b = cfsa.findSubsequence(cfsubsequenceM, true);
+	t4a = cfsa.findSubsequence(cfsubsequence0, false);
+	t4b = cfsa.findSubsequence(cfsubsequence0, true);
+	t5a = cfsa.findSubsequence(cfsubsequence8, false);
+	t5b = cfsa.findSubsequence(cfsubsequence8, true);
+
+	cfsa.useLCP();
+	cfsa.useLCPLR();
+	v1 = cfsa.findSubsequence(cfsubsequence, false);
+	v2 = cfsa.findSubsequence(cfsubsequence, true);
+	if (cf1 != v1 || cf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = cfsa.findSubsequence(cfsubsequenceL, false);
+	tt1b = cfsa.findSubsequence(cfsubsequenceL, true);
+	tt2a = cfsa.findSubsequence(cfsubsequenceU, false);
+	tt2b = cfsa.findSubsequence(cfsubsequenceU, true);
+	tt3a = cfsa.findSubsequence(cfsubsequenceM, false);
+	tt3b = cfsa.findSubsequence(cfsubsequenceM, true);
+	tt4a = cfsa.findSubsequence(cfsubsequence0, false);
+	tt4b = cfsa.findSubsequence(cfsubsequence0, true);
+	tt5a = cfsa.findSubsequence(cfsubsequence8, false);
+	tt5b = cfsa.findSubsequence(cfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
 
 
 	range = cfsa.findRange(cfsubsequence);
@@ -1234,10 +1486,10 @@ public class SuffixArrayTest {
 	}
 
 
-	short bfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
-	short bfsubsequence[] = {2, 8};
+	byte bfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
+	byte bfsubsequence[] = {2, 8};
 
-	SuffixArray.Short bfsa = new SuffixArray.Short(bfsequence, 11);
+	SuffixArray.Byte bfsa = new SuffixArray.Byte(bfsequence, 11);
 	int[] bfA = bfsa.getArray();
 	System.out.println("bfA.length = " + bfA.length
 			   + ", bfsequence.length = " + bfsequence.length);
@@ -1260,15 +1512,59 @@ public class SuffixArrayTest {
 	System.out.format("bfsa: any index = %d\n",
 			  bfsa.findSubsequence(bfsubsequence));
 
-	int bf1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
-	int bf2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
-	int bf1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, bf1a, bf2a+1,
+	int bf1a = bfsa.findSubsequence(bfsubsequence, 0, 1, false);
+	int bf2a = bfsa.findSubsequence(bfsubsequence, 0, 1, true);
+	int bf1b = bfsa.findSubsequence(1, bfsubsequence, 1, 2, bf1a, bf2a+1,
 					false);
-	int bf2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, bf1a, bf2a+1,
+	int bf2b = bfsa.findSubsequence(1, bfsubsequence, 1, 2, bf1a, bf2a+1,
 					true);
 	if (bf1 != bf1b) throw new Exception();
 	if (bf2 != bf2b) throw new Exception();
 
+	byte bfsubsequenceL[] = {1};
+        byte bfsubsequenceU[] = {9};
+	byte bfsubsequenceM[] = {7, 5, 2};
+	byte bfsubsequence0[] = {3, 4};
+	byte bfsubsequence8[] = {8};
+	t1a = bfsa.findSubsequence(bfsubsequenceL, false);
+	t1b = bfsa.findSubsequence(bfsubsequenceL, true);
+	t2a = bfsa.findSubsequence(bfsubsequenceU, false);
+	t2b = bfsa.findSubsequence(bfsubsequenceU, true);
+	t3a = bfsa.findSubsequence(bfsubsequenceM, false);
+	t3b = bfsa.findSubsequence(bfsubsequenceM, true);
+	t4a = bfsa.findSubsequence(bfsubsequence0, false);
+	t4b = bfsa.findSubsequence(bfsubsequence0, true);
+	t5a = bfsa.findSubsequence(bfsubsequence8, false);
+	t5b = bfsa.findSubsequence(bfsubsequence8, true);
+
+	bfsa.useLCP();
+	bfsa.useLCPLR();
+	v1 = bfsa.findSubsequence(bfsubsequence, false);
+	v2 = bfsa.findSubsequence(bfsubsequence, true);
+	if (bf1 != v1 || bf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = bfsa.findSubsequence(bfsubsequenceL, false);
+	tt1b = bfsa.findSubsequence(bfsubsequenceL, true);
+	tt2a = bfsa.findSubsequence(bfsubsequenceU, false);
+	tt2b = bfsa.findSubsequence(bfsubsequenceU, true);
+	tt3a = bfsa.findSubsequence(bfsubsequenceM, false);
+	tt3b = bfsa.findSubsequence(bfsubsequenceM, true);
+	tt4a = bfsa.findSubsequence(bfsubsequence0, false);
+	tt4b = bfsa.findSubsequence(bfsubsequence0, true);
+	tt5a = bfsa.findSubsequence(bfsubsequence8, false);
+	tt5b = bfsa.findSubsequence(bfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
 
 	range = bfsa.findRange(bfsubsequence);
 
@@ -1297,6 +1593,127 @@ public class SuffixArrayTest {
 			       + range.subsequenceIndex(ind3));
 	}
 
+	byte ubfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
+	byte ubfsubsequence[] = {2, 8};
+
+	for (int i = 0; i < ubfsequence.length; i++) {
+	    ubfsequence[i] = (byte)(ubfsequence[i] | 0x40);
+	}
+	for (int i = 0; i < ubfsubsequence.length; i++) {
+	    ubfsubsequence[i] = (byte)(ubfsubsequence[i] | 0x40);
+	}
+
+	SuffixArray.UnsignedByte ubfsa = new
+	    SuffixArray.UnsignedByte(ubfsequence, 0x40 | 11);
+	int[] ubfA = ubfsa.getArray();
+	System.out.println("ubfA.length = " + ubfA.length
+			   + ", ubfsequence.length = " + ubfsequence.length);
+	System.out.println("ubfA:");
+	for (int index: ubfA) {
+	    if (index == ubfsequence.length) {
+		System.out.println("    " + index);
+	    } else {
+		System.out.println("    " + index
+				   + " --> " + ubfsequence[index]);
+	    }
+	}
+
+	int ubf1 = ubfsa.findSubsequence(ubfsubsequence, false);
+	int ubf2 = ubfsa.findSubsequence(ubfsubsequence, true);
+	System.out.format("ubfsa test: first index = %d, last index = %d\n",
+			  ubf1, ubf2);
+	System.out.format("ubfsequence: first index = %d, last index = %d\n",
+			  ubfA[ubf1], ubfA[ubf2]);
+	System.out.format("ubfsa: any index = %d\n",
+			  ubfsa.findSubsequence(ubfsubsequence));
+
+	int ubf1a = ubfsa.findSubsequence(ubfsubsequence, 0, 1, false);
+	int ubf2a = ubfsa.findSubsequence(ubfsubsequence, 0, 1, true);
+	int ubf1b = ubfsa.findSubsequence(1, ubfsubsequence, 1, 2, ubf1a,
+					  ubf2a+1,
+					  false);
+	int ubf2b = ubfsa.findSubsequence(1, ubfsubsequence, 1, 2, ubf1a,
+					  ubf2a+1,
+					  true);
+	if (ubf1 != ubf1b) throw new Exception();
+	if (ubf2 != ubf2b) throw new Exception();
+
+	byte ubfsubsequenceL[] = {(byte) (0x40 | 1)};
+        byte ubfsubsequenceU[] = {(byte) (0x40 | 9)};
+	byte ubfsubsequenceM[] = {(byte) (0x40 | 7),
+	    (0x4F | 5), (0x40 | 2)};
+	byte ubfsubsequence0[] = {(0x40 | 3), (0x40 |4)};
+	byte ubfsubsequence8[] = {(0x40 | 8)};
+	t1a = ubfsa.findSubsequence(ubfsubsequenceL, false);
+	t1b = ubfsa.findSubsequence(ubfsubsequenceL, true);
+	t2a = ubfsa.findSubsequence(ubfsubsequenceU, false);
+	t2b = ubfsa.findSubsequence(ubfsubsequenceU, true);
+	t3a = ubfsa.findSubsequence(ubfsubsequenceM, false);
+	t3b = ubfsa.findSubsequence(ubfsubsequenceM, true);
+	t4a = ubfsa.findSubsequence(ubfsubsequence0, false);
+	t4b = ubfsa.findSubsequence(ubfsubsequence0, true);
+	t5a = ubfsa.findSubsequence(ubfsubsequence8, false);
+	t5b = ubfsa.findSubsequence(ubfsubsequence8, true);
+
+	ubfsa.useLCP();
+	ubfsa.useLCPLR();
+	v1 = ubfsa.findSubsequence(ubfsubsequence, false);
+	v2 = ubfsa.findSubsequence(ubfsubsequence, true);
+	if (ubf1 != v1 || ubf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = ubfsa.findSubsequence(ubfsubsequenceL, false);
+	tt1b = ubfsa.findSubsequence(ubfsubsequenceL, true);
+	tt2a = ubfsa.findSubsequence(ubfsubsequenceU, false);
+	tt2b = ubfsa.findSubsequence(ubfsubsequenceU, true);
+	tt3a = ubfsa.findSubsequence(ubfsubsequenceM, false);
+	tt3b = ubfsa.findSubsequence(ubfsubsequenceM, true);
+	tt4a = ubfsa.findSubsequence(ubfsubsequence0, false);
+	tt4b = ubfsa.findSubsequence(ubfsubsequence0, true);
+	tt5a = ubfsa.findSubsequence(ubfsubsequence8, false);
+	tt5b = ubfsa.findSubsequence(ubfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
+
+
+
+	range = ubfsa.findRange(ubfsubsequence);
+
+	System.out.println("range.size() = " + range.size());
+	System.out.println("range.subsequenceLength() = "
+			   + range.subsequenceLength());
+
+
+	for (int ind2: range) {
+	    System.out.println("using iterator, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind2: range.toArray()) {
+	    System.out.println("using array, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind2: range.toArray(new int[range.size()])) {
+	    System.out.println("using our array, subsequence starting at "
+			       + ind2);
+	}
+
+	for (int ind3 = 0; ind3 < range.size(); ind3++) {
+	    System.out.println("using index, subsequence starting at "
+			       + range.subsequenceIndex(ind3));
+	}
+
+
 	// String case
 	// char Sfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
 	String Sfsequence = "128475228:289";
@@ -1324,6 +1741,65 @@ public class SuffixArrayTest {
 			  SfA[Sf1], SfA[Sf2]);
 	System.out.format("Sfsa: any index = %d\n",
 			  Sfsa.findSubsequence(Sfsubsequence));
+
+	int Sf1a = Sfsa.findSubsequence(Sfsubsequence, 0, 1, false);
+	int Sf2a = Sfsa.findSubsequence(Sfsubsequence, 0, 1, true);
+	int Sf1b = Sfsa.findSubsequence(1, Sfsubsequence, 1, 2, Sf1a, Sf2a+1,
+					false);
+	int Sf2b = Sfsa.findSubsequence(1, Sfsubsequence, 1, 2, Sf1a, Sf2a+1,
+					true);
+	if (Sf1 != Sf1b) throw new Exception();
+	if (Sf2 != Sf2b) throw new Exception();
+
+	String SfsubsequenceL = "1";
+
+	String SfsubsequenceU = "9";
+	String SfsubsequenceM = "752";
+	String Sfsubsequence0 = "34";
+	String Sfsubsequence8 = "8";
+	t1a = Sfsa.findSubsequence(SfsubsequenceL, false);
+	t1b = Sfsa.findSubsequence(SfsubsequenceL, true);
+	t2a = Sfsa.findSubsequence(SfsubsequenceU, false);
+	t2b = Sfsa.findSubsequence(SfsubsequenceU, true);
+	t3a = Sfsa.findSubsequence(SfsubsequenceM, false);
+	t3b = Sfsa.findSubsequence(SfsubsequenceM, true);
+	t4a = Sfsa.findSubsequence(Sfsubsequence0, false);
+	t4b = Sfsa.findSubsequence(Sfsubsequence0, true);
+	t5a = Sfsa.findSubsequence(Sfsubsequence8, false);
+	t5b = Sfsa.findSubsequence(Sfsubsequence8, true);
+
+	Sfsa.useLCP();
+	Sfsa.useLCPLR();
+	v1 = Sfsa.findSubsequence(Sfsubsequence, false);
+	v2 = Sfsa.findSubsequence(Sfsubsequence, true);
+	if (Sf1 != v1 || Sf2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = Sfsa.findSubsequence(SfsubsequenceL, false);
+	tt1b = Sfsa.findSubsequence(SfsubsequenceL, true);
+	tt2a = Sfsa.findSubsequence(SfsubsequenceU, false);
+	tt2b = Sfsa.findSubsequence(SfsubsequenceU, true);
+	tt3a = Sfsa.findSubsequence(SfsubsequenceM, false);
+	tt3b = Sfsa.findSubsequence(SfsubsequenceM, true);
+	tt4a = Sfsa.findSubsequence(Sfsubsequence0, false);
+	tt4b = Sfsa.findSubsequence(Sfsubsequence0, true);
+	tt5a = Sfsa.findSubsequence(Sfsubsequence8, false);
+	tt5b = Sfsa.findSubsequence(Sfsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
+
+
+
+
 	range = Sfsa.findRange(Sfsubsequence);
 
 	System.out.println("range.size() = " + range.size());
@@ -1383,14 +1859,59 @@ public class SuffixArrayTest {
 	System.out.format("ofsa: any index = %d\n",
 			  ofsa.findSubsequence(ofsubsequence));
 
-	int of1a = ifsa.findSubsequence(ifsubsequence, 0, 1, false);
-	int of2a = ifsa.findSubsequence(ifsubsequence, 0, 1, true);
-	int of1b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, of1a, of2a+1,
+	int of1a = ofsa.findSubsequence(ofsubsequence, 0, 1, false);
+	int of2a = ofsa.findSubsequence(ofsubsequence, 0, 1, true);
+	int of1b = ofsa.findSubsequence(1, ofsubsequence, 1, 2, of1a, of2a+1,
 					false);
-	int of2b = ifsa.findSubsequence(1, ifsubsequence, 1, 2, of1a, of2a+1,
+	int of2b = ofsa.findSubsequence(1, ofsubsequence, 1, 2, of1a, of2a+1,
 					true);
 	if (of1 != of1b) throw new Exception();
 	if (of2 != of2b) throw new Exception();
+
+	Object ofsubsequenceL[] = {1};
+	Object ofsubsequenceU[] = {9};
+	Object ofsubsequenceM[] = {7, 5, 2};
+	Object ofsubsequence0[] = {3, 4};
+	Object ofsubsequence8[] = {8};
+	t1a = ofsa.findSubsequence(ofsubsequenceL, false);
+	t1b = ofsa.findSubsequence(ofsubsequenceL, true);
+	t2a = ofsa.findSubsequence(ofsubsequenceU, false);
+	t2b = ofsa.findSubsequence(ofsubsequenceU, true);
+	t3a = ofsa.findSubsequence(ofsubsequenceM, false);
+	t3b = ofsa.findSubsequence(ofsubsequenceM, true);
+	t4a = ofsa.findSubsequence(ofsubsequence0, false);
+	t4b = ofsa.findSubsequence(ofsubsequence0, true);
+	t5a = ofsa.findSubsequence(ofsubsequence8, false);
+	t5b = ofsa.findSubsequence(ofsubsequence8, true);
+
+	ofsa.useLCP();
+	ofsa.useLCPLR();
+	v1 = ofsa.findSubsequence(ofsubsequence, false);
+	v2 = ofsa.findSubsequence(ofsubsequence, true);
+	if (of1 != v1 || of2 != v2) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+	tt1a = ofsa.findSubsequence(ofsubsequenceL, false);
+	tt1b = ofsa.findSubsequence(ofsubsequenceL, true);
+	tt2a = ofsa.findSubsequence(ofsubsequenceU, false);
+	tt2b = ofsa.findSubsequence(ofsubsequenceU, true);
+	tt3a = ofsa.findSubsequence(ofsubsequenceM, false);
+	tt3b = ofsa.findSubsequence(ofsubsequenceM, true);
+	tt4a = ofsa.findSubsequence(ofsubsequence0, false);
+	tt4b = ofsa.findSubsequence(ofsubsequence0, true);
+	tt5a = ofsa.findSubsequence(ofsubsequence8, false);
+	tt5b = ofsa.findSubsequence(ofsubsequence8, true);
+	if (t1a != tt1a) throw new Exception();
+	if (t1b != tt1b) throw new Exception();
+	if (t2a != tt2a) throw new Exception();
+	if (t2b != tt2b) throw new Exception();
+	if (t3a != tt3a) throw new Exception();
+	if (t3b != tt3b) throw new Exception();
+	if (t4a != tt4a) throw new Exception();
+	if (t4b != tt4b) throw new Exception();
+	if (t5a != tt5a) throw new Exception();
+	if (t5b != tt5b) throw new Exception();
 
 
 	range = ofsa.findRange(ofsubsequence);
@@ -1595,6 +2116,18 @@ public class SuffixArrayTest {
 			int iiupper = iisa.findSubsequence(rsubsequence, true);
 			int iilower = iisa.findSubsequence(rsubsequence,
 							   false);
+			if (iilower != -1) {
+			    for (int i = iilower; i <= iiupper; i++) {
+				int start = iisa.getArray()[i];
+				for (int j = 0; j < rsubsequence.length; j++) {
+				    if (rsubsequence[j] !=
+					rsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
 			int ourcount = 1 + iiupper - iilower;
 			if (iilower == -1 && iiupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1606,6 +2139,25 @@ public class SuffixArrayTest {
 			    System.out.println("ii: range error");
 			    System.exit(1);
 			}
+
+			try {
+			    iisa.useLCP();
+			    iisa.useLCPLR();
+			} catch (Exception e) {
+			    System.out.println("sequence: ");
+			    for (int i = 0; i < rsequence.length; i++) {
+				System.out.println("    " + rsequence[i]);
+			    }
+			    throw e;
+			}
+			int iiupper2 = iisa.findSubsequence(rsubsequence, true);
+			int iilower2 = iisa.findSubsequence(rsubsequence,
+							   false);
+
+			if (iiupper2 != iiupper || iilower2 != iilower) {
+			    throw new Exception();
+			}
+
 			// short case
 			short[] srsequence = new short[tlen];
 			short[] srsubsequence = new short[len];
@@ -1620,6 +2172,21 @@ public class SuffixArrayTest {
 			int siupper = sisa.findSubsequence(srsubsequence, true);
 			int silower = sisa.findSubsequence(srsubsequence,
 							   false);
+			if (silower != iilower || siupper != iiupper) {
+			    throw new Exception();
+			}
+			if (silower != -1) {
+			    for (int i = silower; i <= siupper; i++) {
+				int start = sisa.getArray()[i];
+				for (int j = 0; j < srsubsequence.length; j++) {
+				    if (srsubsequence[j] !=
+					srsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
 			ourcount = 1 + siupper - silower;
 			if (silower == -1 && siupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1631,6 +2198,70 @@ public class SuffixArrayTest {
 			    System.out.println("si: range error");
 			    System.exit(1);
 			}
+			for (int i = 0; i < srsequence.length; i++) {
+			    srsequence[i] = (short)( 0xF000 | srsequence[i]);
+			}
+			for (int i = 0; i < srsubsequence.length; i++) {
+			    srsubsequence[i] = (short)
+				(0xF000 | srsubsequence[i]);
+			}
+			sisa.useLCP();
+			sisa.useLCPLR();
+			int siupper2 = sisa.findSubsequence(srsubsequence,
+							    true);
+			int silower2 = sisa.findSubsequence(srsubsequence,
+							   false);
+			if (siupper2 != siupper || silower2 != silower) {
+			    throw new Exception();
+			}
+
+
+			SuffixArray.UnsignedShort usisa =
+			    new SuffixArray.UnsignedShort(srsequence,
+							  0xF000 | 10);
+			int usiupper = usisa.findSubsequence(srsubsequence,
+							    true);
+			int usilower = usisa.findSubsequence(srsubsequence,
+							    false);
+
+			if (usilower != -1) {
+			    for (int i = usilower; i <= usiupper; i++) {
+				int start = usisa.getArray()[i];
+				for (int j = 0; j < srsubsequence.length; j++) {
+				    if (srsubsequence[j] !=
+					srsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
+			if (usilower != iilower || usiupper != iiupper) {
+			    throw new Exception();
+			}
+
+			ourcount = 1 + usiupper - usilower;
+			if (usilower == -1 && usiupper == -1) ourcount = 0;
+			if (ourcount != rcount) {
+			    System.out.format("usi: ourcount %d != rcount %d\n",
+					      ourcount, rcount);
+			    System.exit(1);
+			}
+			if (ourcount != usisa.findRange(srsubsequence).size()) {
+			    System.out.println("si: range error");
+			    System.exit(1);
+			}
+
+			usisa.useLCP();
+			usisa.useLCPLR();
+			int usiupper2 = usisa.findSubsequence(srsubsequence,
+							      true);
+			int usilower2 = usisa.findSubsequence(srsubsequence,
+							      false);
+			if (usiupper2 != usiupper || usilower2 != usilower) {
+			    throw new Exception();
+			}
+
 			// byte case
 			byte[] brsequence = new byte[tlen];
 			byte[] brsubsequence = new byte[len];
@@ -1645,6 +2276,22 @@ public class SuffixArrayTest {
 			int biupper = bisa.findSubsequence(brsubsequence, true);
 			int bilower = bisa.findSubsequence(brsubsequence,
 							   false);
+			if (bilower != -1) {
+			    for (int i = bilower; i <= biupper; i++) {
+				int start = bisa.getArray()[i];
+				for (int j = 0; j < brsubsequence.length; j++) {
+				    if (brsubsequence[j] !=
+					brsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
+			if (bilower != iilower || biupper != iiupper) {
+			    throw new Exception();
+			}
+
 			ourcount = 1 + biupper - bilower;
 			if (bilower == -1 && biupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1656,6 +2303,63 @@ public class SuffixArrayTest {
 			    System.out.println("si: range error");
 			    System.exit(1);
 			}
+
+			bisa.useLCP();
+			bisa.useLCPLR();
+			int biupper2 = bisa.findSubsequence(brsubsequence,
+							    true);
+			int bilower2 = bisa.findSubsequence(brsubsequence,
+							   false);
+			if (biupper2 != biupper || bilower2 != bilower) {
+			    throw new Exception();
+			}
+
+			// unsigned byte case
+			SuffixArray.UnsignedByte ubisa =
+			    new SuffixArray.UnsignedByte(brsequence, 0x40 | 10);
+			int ubiupper = ubisa.findSubsequence(brsubsequence,
+							     true);
+			int ubilower = ubisa.findSubsequence(brsubsequence,
+							     false);
+			if (ubilower != -1) {
+			    for (int i = ubilower; i <= ubiupper; i++) {
+				int start = ubisa.getArray()[i];
+				for (int j = 0; j < brsubsequence.length; j++) {
+				    if (brsubsequence[j] !=
+					brsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
+			if (ubilower != iilower || ubiupper != iiupper) {
+			    throw new Exception();
+			}
+
+			ourcount = 1 + biupper - bilower;
+			if (ubilower == -1 && ubiupper == -1) ourcount = 0;
+			if (ourcount != rcount) {
+			    System.out.format("bi: ourcount %d != rcount %d\n",
+					      ourcount, rcount);
+			    System.exit(1);
+			}
+			if (ourcount != ubisa.findRange(brsubsequence).size()) {
+			    System.out.println("si: range error");
+			    System.exit(1);
+			}
+
+			ubisa.useLCP();
+			ubisa.useLCPLR();
+			int ubiupper2 = ubisa.findSubsequence(brsubsequence,
+							      true);
+			int ubilower2 = ubisa.findSubsequence(brsubsequence,
+							      false);
+			if (ubiupper2 != ubiupper || ubilower2 != ubilower) {
+			    throw new Exception();
+			}
+
+
 			// char case
 			char[] crsequence = new char[tlen];
 			char[] crsubsequence = new char[len];
@@ -1670,6 +2374,22 @@ public class SuffixArrayTest {
 			int ciupper = cisa.findSubsequence(crsubsequence, true);
 			int cilower = cisa.findSubsequence(crsubsequence,
 							   false);
+			if (cilower != -1) {
+			    for (int i = cilower; i <= ciupper; i++) {
+				int start = cisa.getArray()[i];
+				for (int j = 0; j < crsubsequence.length; j++) {
+				    if (crsubsequence[j] !=
+					crsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
+			if (cilower != iilower || ciupper != iiupper) {
+			    throw new Exception();
+			}
+
 			ourcount = 1 + ciupper - cilower;
 			if (cilower == -1 && ciupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1681,6 +2401,17 @@ public class SuffixArrayTest {
 			    System.out.println("si: range error");
 			    System.exit(1);
 			}
+
+			cisa.useLCP();
+			cisa.useLCPLR();
+			int ciupper2 = cisa.findSubsequence(crsubsequence,
+							    true);
+			int cilower2 = cisa.findSubsequence(crsubsequence,
+							   false);
+			if (ciupper2 != ciupper || cilower2 != cilower) {
+			    throw new Exception();
+			}
+
 			// string case
 			String Srsequence = new String(crsequence);
 			String Srsubsequence = new String(crsubsequence);
@@ -1689,6 +2420,22 @@ public class SuffixArrayTest {
 			int Siupper = Sisa.findSubsequence(Srsubsequence, true);
 			int Silower = Sisa.findSubsequence(Srsubsequence,
 							   false);
+			if (Silower != -1) {
+			    for (int i = Silower; i <= Siupper; i++) {
+				int start = Sisa.getArray()[i];
+				for (int j = 0; j < crsubsequence.length; j++) {
+				    if (crsubsequence[j] !=
+					crsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+			if (Silower != iilower || Siupper != iiupper) {
+			    throw new Exception();
+			}
+
+
 			ourcount = 1 + Siupper - Silower;
 			if (Silower == -1 && Siupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1700,6 +2447,18 @@ public class SuffixArrayTest {
 			    System.out.println("si: range error");
 			    System.exit(1);
 			}
+
+			Sisa.useLCP();
+			Sisa.useLCPLR();
+			int Siupper2 = Sisa.findSubsequence(Srsubsequence,
+							    true);
+			int Silower2 = Sisa.findSubsequence(Srsubsequence,
+							   false);
+			if (Siupper2 != Siupper || Silower2 != Silower) {
+			    throw new Exception();
+			}
+
+
 			// array case
 			Integer[] Irsequence = new Integer[tlen];
 			Integer[] Irsubsequence = new Integer[len];
@@ -1718,6 +2477,23 @@ public class SuffixArrayTest {
 			int Iiupper = Iisa.findSubsequence(Irsubsequence, true);
 			int Iilower = Iisa.findSubsequence(Irsubsequence,
 							   false);
+
+			if (Iilower != -1) {
+			    for (int i = Iilower; i <= Iiupper; i++) {
+				int start = Iisa.getArray()[i];
+				for (int j = 0; j < crsubsequence.length; j++) {
+				    if (rsubsequence[j] !=
+					rsequence[start + j]) {
+					throw new Exception();
+				    }
+				}
+			    }
+			}
+
+			if (Iilower != iilower || Iiupper != iiupper) {
+			    throw new Exception();
+			}
+
 			ourcount = 1 + Iiupper - Iilower;
 			if (Iilower == -1 && Iiupper == -1) ourcount = 0;
 			if (ourcount != rcount) {
@@ -1728,6 +2504,16 @@ public class SuffixArrayTest {
 			if (ourcount != Iisa.findRange(Irsubsequence).size()) {
 			    System.out.println("Ii: range error");
 			    System.exit(1);
+			}
+
+			Iisa.useLCP();
+			Iisa.useLCPLR();
+			int Iiupper2 = Iisa.findSubsequence(Irsubsequence,
+							    true);
+			int Iilower2 = Iisa.findSubsequence(Irsubsequence,
+							   false);
+			if (Iiupper2 != Iiupper || Iilower2 != Iilower) {
+			    throw new Exception();
 			}
 		    }
 		}
