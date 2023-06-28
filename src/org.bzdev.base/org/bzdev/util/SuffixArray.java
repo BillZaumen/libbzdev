@@ -396,6 +396,10 @@ public abstract class SuffixArray {
      * <P>
      * Calling this method will result in the LCP-LR table being cached.
      * To clear the cached table, call {@link #clearCachedLCPLR()}.
+     * In addition, this method uses an LCP array.  The method
+     * {@link #useLCP()} should be called before a call to this method
+     * if the LCP array will be used later: otherwise the LCP array will
+     * be recomputed.
      */
     public synchronized void useLCPLR() {
 	if (LCP_L != null && LCP_R != null) return;
@@ -444,7 +448,8 @@ public abstract class SuffixArray {
 	if (low == high) return array[0] - array[low];
 	int maxlen = array[0] - Math.min(array[low], array[high]);
 	// Bracket to reduce the size of the binary search,
-	// in particular, the use of recursion.
+	// in particular, the use of recursion, which is more
+	// computationally expensive than a simple 'while' loop.
 	int rlow = 1;
 	int rhigh = LCP_L.length-1;
 	int mid = (rlow + rhigh) >>> 1;
@@ -465,11 +470,16 @@ public abstract class SuffixArray {
 	    }
 	    mid = (rlow + rhigh) >>> 1;
 	}
-	return lengthFromLCPLR(low, high, rlow, rhigh, true,
-			       /*array[0]*/ maxlen);
+	return lengthFromLCPLR(low, high, rlow, rhigh, true, maxlen);
     }
 
 
+    // This uses the same binary search used in constructing the LCP-LR
+    // tables, and finds all intervals in the range [min,max]. The left
+    // or right table will contain the length of the longest common prefix
+    // for those endpoints, and which one to use depends on the value of
+    // 'right'. Since each index in [min,max] will be in one of these
+    // intervals, we just need to find the minimum value out of those.
     private int lengthFromLCPLR(int min, int max,  int low, int high,
 				boolean right, int maxlen)
     {
@@ -521,7 +531,10 @@ public abstract class SuffixArray {
      * <UL>
      *  <LI> if this suffix array has an LCP-LR table, an algorithm
      *       whose running time is comparable to that for a binary
-     *       search is used.
+     *       search is used.  When the LCP length is small, a direct
+     *       comparison is faster.  The LCP-LR table provides more
+     *       predictable performance, particularly in cases where
+     *       long substrings are repeated.
      *  <LI> if there is an LCP table, but no LCP-LR table, the
      *       minimum LCP value between two offsets into the suffix array
      *       will be computed, but if the difference between the offsets
