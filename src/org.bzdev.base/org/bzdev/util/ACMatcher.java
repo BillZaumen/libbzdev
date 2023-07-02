@@ -3,6 +3,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+//@exbundle org.bzdev.util.lpack.Util
 
 // From https://www.geeksforgeeks.org/aho-corasick-algorithm-pattern-searching/
 // Java program for implementation of
@@ -31,6 +32,13 @@ import java.util.stream.StreamSupport;
  * package is case sensitive.
  */
 public class ACMatcher  {
+
+    static String
+	errorMsg(String key, Object... args)
+    {
+	return UtilErrorMsg.errorMsg(key, args);
+    }
+
 
     /**
      * Match result holder.
@@ -299,7 +307,7 @@ public class ACMatcher  {
 	    return new Iterator<MatchResult>() {
 		public boolean hasNext() {return false;}
 		public MatchResult next() throws NoSuchElementException {
-		    throw new NoSuchElementException();
+		    throw new NoSuchElementException(errorMsg("noNextElem"));
 		}
 	    };
 	}
@@ -344,7 +352,9 @@ public class ACMatcher  {
 	    public MatchResult next() throws NoSuchElementException {
 		update();
 		MatchResult mr = queue.poll();
-		if (mr == null) throw new NoSuchElementException();
+		if (mr == null) {
+		    throw new NoSuchElementException(errorMsg("noNextElem"));
+		}
 		return mr;
 	    }
 	};
