@@ -1151,6 +1151,18 @@ public class SuffixArrayTest {
 			       + range.subsequenceIndex(ind3));
 	}
 
+	range.stream().forEach((ind4) -> {
+		System.out.println("from stream, subsequence starting at "
+				   + ind4);
+	    });
+
+	int[] suffArray = ifsa.getArray();
+	for (int ind5 = range.start(); ind5 < range.end(); ind5++) {
+	    System.out.println("directly, subsequence starting at "
+			       + suffArray[ind5]);
+	}
+	suffArray = null;
+
 	short sfsequence[] = {1, 2, 8, 4, 7, 5, 2, 2, 8, 10, 2, 8, 9};
 	short sfsubsequence[] = {2, 8};
 

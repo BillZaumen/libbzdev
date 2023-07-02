@@ -365,10 +365,11 @@ public class SBL {
 			       keypair[1])) {
 		    break;
 		}
+		String s1 = errorMsg("encryptFailed");
+		String s2 = errorMsg("encryptFailedTitle");
+
 		int status = JOptionPane
-		    .showConfirmDialog(frame,
-				       errorMsg("encryptFailed"),
-				       errorMsg("encryptFailedTitle"),
+		    .showConfirmDialog(frame, s1, s2,
 				       JOptionPane.YES_NO_OPTION);
 		if (status != JOptionPane.OK_OPTION) {
 		    return false;
@@ -1055,9 +1056,11 @@ public class SBL {
 			
 		    });
 
-		frame = new JFrame((configFile == null)?
-				   errorMsg("title0"):
-				   errorMsg("title", configFile.getName()));
+		if (configFile == null) {
+		    frame = new JFrame(errorMsg("title0"));
+		} else {
+		    frame = new JFrame(errorMsg("title", configFile.getName()));
+		}
 
 		JMenuBar menubar = new JMenuBar();
 		JMenu fileMenu = new JMenu(localeString("File"));

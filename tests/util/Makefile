@@ -112,6 +112,9 @@ all: compile
 	@./scrun checkPrintWriter.esp > testPW.html
 	chmod u-x scrun
 
+actest: compile
+	@$(JAVA) ACTest
+
 
 test7-sc:
 	chmod u+x scrun

@@ -5,9 +5,14 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.bzdev.lang.UnexpectedExceptionError;
+
 
 //@exbundle org.bzdev.util.lpack.Util
 
@@ -658,6 +663,8 @@ public abstract class SuffixArray {
 
 	/**
 	 * Return the next element in the iteration.
+	 * This element is an index into the sequence, not the
+	 * suffix array.
 	 * @return the next element in the iteration
 	 */
 	@Override
@@ -803,7 +810,21 @@ public abstract class SuffixArray {
 	int size();
 
 	/**
-	 * Get the index into a sequence for a subsequence.
+	 * Get the starting index into the corresponding suffix array
+	 * (inclusive).
+	 * @return the starting index
+	 */
+	int start();
+
+	/**
+	 * Get the ending index into the corresponding suffix array
+	 * (exclusive).
+	 * @return the ending index
+	 */
+	int end();
+
+	/**
+	 * Get an index into a sequence for a subsequence.
 	 * The subsequences associated with a range are indexed
 	 * starting at 0.  Each has a corresponding index into the
 	 * full sequence.
@@ -893,6 +914,8 @@ public abstract class SuffixArray {
 	 */
 	void toArray(int[] a, int offset) throws IllegalArgumentException;
 
+	IntStream stream();
+
     }
 
     /**
@@ -915,6 +938,16 @@ public abstract class SuffixArray {
 	@Override
 	public int size() {
 	    return length;
+	}
+
+	@Override
+	public int start() {
+	    return start;
+	}
+
+	@Override
+	public int end() {
+	    return end;
 	}
 
 	@Override
@@ -974,6 +1007,14 @@ public abstract class SuffixArray {
 	    for (int i = 0; i < length; i++) {
 		a[offset+i] = array[start+i];
 	    }
+	}
+
+	@Override
+	public IntStream stream() {
+	    return StreamSupport.intStream(Arrays.spliterator(array,
+							      start,
+							      end),
+					   false);
 	}
     }
 
@@ -8433,6 +8474,11 @@ public abstract class SuffixArray {
 	int sequenceLength;
 	HashMap<Character,Character> map = null;
 
+
+	private final char charAt(int index) {
+	    return (sequence == null)? string.charAt(index): sequence[index];
+	}
+
 	/**
 	 * Get the sequence associated with this suffix array.
 	 * @return the sequence that this suffix array describes
@@ -8450,33 +8496,33 @@ public abstract class SuffixArray {
 	    int indh = array[high];
 	    while (s < end-1
 		   && indl < sequenceLength && indh < sequenceLength
-		   && (sarray[s] == sequence[indl])
-		   && (sarray[s] == sequence[indh])) {
+		   && (sarray[s] == charAt(indl))
+		   && (sarray[s] == charAt(indh))) {
 		s++; indl++; indh++;
 	    }
 	    int s2 = s;
 	    int s3 = s;
 	    while (indh < sequenceLength  && s2 < end-1 &&
-		   (sarray[s2] == sequence[indh])) {
+		   (sarray[s2] == charAt(indh))) {
 		s2++; indh++;
 	    }
 	    if (indh == sequenceLength) return -1;
-	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
-	    if (s2 == end-1 && sarray[s2] == sequence[indh]) return high;
+	    if (s2 < end && sarray[s2] > charAt(indh)) return -1;
+	    if (s2 == end-1 && sarray[s2] == charAt(indh)) return high;
 	    if (s2 < end-1 && indh == sequenceLength - 1
-		&& sequence[indh] == sarray[s2]) {
+		&& charAt(indh) == sarray[s2]) {
 		return -1;
 	    }
 	    while (indl < sequenceLength  && s3 < end-1 &&
-		   (sarray[s3] == sequence[indl])) {
+		   (sarray[s3] == charAt(indl))) {
 		s3++; indl++;
 	    }
 	    if (s3 < end && indl < sequenceLength &&
-		sarray[s3] < sequence[indl]) {
+		sarray[s3] < charAt(indl)) {
 		return -1;
 	    }
 	    if (s3 == end-1 && indl != sequenceLength
-		&& sarray[s3] == sequence[indl]) {
+		&& sarray[s3] == charAt(indl)) {
 		return low;
 	    }
 	    boolean right = (s2 <= s3);
@@ -8490,7 +8536,7 @@ public abstract class SuffixArray {
 	    while ((high - low) > 1) {
 		int middle = (low + high) >>> 1;
 		int ind = array[middle] + k;
-		char val = (ind >= sequenceLength)? 0xffff: sequence[ind];
+		char val = (ind >= sequenceLength)? 0xffff: charAt(ind);
 		char key = sarray[s];
 		if (right) {
 		    if (k < LCP_L[middle]) {
@@ -8513,7 +8559,7 @@ public abstract class SuffixArray {
 				    test = -1;
 				    break;
 				}
-				val = sequence[ind];
+				val = charAt(ind);
 				key = sarray[s];
 				test = ((val == key)? 0:
 					((val < key || val == 0xffff)? -1: 1));
@@ -8553,7 +8599,7 @@ public abstract class SuffixArray {
 				    test = -1;
 				    break;
 				}
-				val = sequence[ind];
+				val = charAt(ind);
 				key = sarray[s];
 				test = ((val == key)? 0:
 					((val < key || val == 0xffff)? -1: 1));
@@ -8582,7 +8628,7 @@ public abstract class SuffixArray {
 			    test = -1;
 			    break;
 			}
-			char val = sequence[ind++];
+			char val = charAt(ind++);
 			test = (val < sarray[i] || val == 0xffff)? -1: 1;
 			if (test != 0) break;
 		    }
@@ -8594,7 +8640,7 @@ public abstract class SuffixArray {
 			    test = -1;
 			    break;
 			}
-			char val = sequence[ind++];
+			char val = charAt(ind++);
 			test = (val < sarray[i] || val == 0xffff)? -1: 1;
 			if (test != 0) break;
 		    }
@@ -8606,7 +8652,7 @@ public abstract class SuffixArray {
 		int ind = array[high];
 		for (int i = start; i < end; i++) {
 		    if (ind >= sequenceLength) return -1;
-		    char val = sequence[ind++];
+		    char val = charAt(ind++);
 		    if (val != sarray[i]) return -1;
 		}
 		return high;
@@ -8615,7 +8661,7 @@ public abstract class SuffixArray {
 		int ind = array[low];
 		for (int i = start; i < end; i++) {
 		    if (ind >= sequenceLength) return -1;
-		    char val = sequence[ind++];
+		    char val = charAt(ind++);
 		    if (val != sarray[i]) return -1;
 		}
 		return low;
@@ -8636,19 +8682,19 @@ public abstract class SuffixArray {
 	    int indh = array[high];
 	    while (s < end-1
 		   && indl < sequenceLength && indh < sequenceLength
-		   && (sarray[s] == sequence[indl])
-		   && (sarray[s] == sequence[indh])) {
+		   && (sarray[s] == charAt(indl))
+		   && (sarray[s] == charAt(indh))) {
 		s++; indl++; indh++;
 	    }
 	    int s2 = s;
 	    int s3 = s;
 	    while (indh < sequenceLength  && s2 < end-1 &&
-		   (sarray[s2] == sequence[indh])) {
+		   (sarray[s2] == charAt(indh))) {
 		s2++; indh++;
 	    }
 	    if (indh == sequenceLength) return -1;
-	    if (s2 < end && sarray[s2] > sequence[indh]) return -1;
-	    if (s2 == end-1 && sarray[s2] == sequence[indh]) {
+	    if (s2 < end && sarray[s2] > charAt(indh)) return -1;
+	    if (s2 == end-1 && sarray[s2] == charAt(indh)) {
 		if (max || low == high) {
 		    return high;
 		} else {
@@ -8658,19 +8704,19 @@ public abstract class SuffixArray {
 		}
 	    }
 	    if (s2 < end-1 && indh == sequenceLength - 1
-		&& sequence[indh] == sarray[s2]) {
+		&& charAt(indh) == sarray[s2]) {
 		return -1;
 	    }
 	    while (indl < sequenceLength  && s3 < end-1 &&
-		   (sarray[s3] == sequence[indl])) {
+		   (sarray[s3] == charAt(indl))) {
 		s3++; indl++;
 	    }
 	    if (s3 < end && indl < sequenceLength &&
-		sarray[s3] < sequence[indl]) {
+		sarray[s3] < charAt(indl)) {
 		return -1;
 	    }
 	    if (s3 == end-1 && indl != sequenceLength
-		&& sarray[s3] == sequence[indl]) {
+		&& sarray[s3] == charAt(indl)) {
 		if (max == false) {
 		    return low;
 		} else {
@@ -8694,7 +8740,7 @@ public abstract class SuffixArray {
 	    while ((high - low) > 1) {
 		middle = (low + high) >>> 1;
 		int ind = array[middle] + k;
-		int val = (ind >= sequenceLength)? -1: sequence[ind];
+		int val = (ind >= sequenceLength)? -1: charAt(ind);
 		int key = sarray[s];
 		if (right) {
 		    if (k < LCP_L[middle]) {
@@ -8720,7 +8766,7 @@ public abstract class SuffixArray {
 				    test = -1;
 				    break;
 				}
-				val = sequence[ind];
+				val = charAt(ind);
 				key = sarray[s];
 				test = ((val == key)? 0: ((val < key)? -1: 1));
 			    }
@@ -8766,7 +8812,7 @@ public abstract class SuffixArray {
 				    test = -1;
 				    break;
 				}
-				val = sequence[ind];
+				val = charAt(ind);
 				key = sarray[s];
 				test = ((val == key)? 0: ((val < key)? -1: 1));
 			    }
@@ -8814,7 +8860,7 @@ public abstract class SuffixArray {
 			    test = -1;
 			    break;
 			}
-			int val = sequence[ind++];
+			int val = charAt(ind++);
 			test = (val < sarray[i])? -1: 1;
 			if (test != 0) break;
 		    }
@@ -8826,7 +8872,7 @@ public abstract class SuffixArray {
 			    test = -1;
 			    break;
 			}
-			int val = sequence[ind++];
+			int val = charAt(ind++);
 			test = (val < sarray[i])? -1: 1;
 			if (test != 0) break;
 		    }
@@ -8839,7 +8885,7 @@ public abstract class SuffixArray {
 		int ind = array[high];
 		for (int i = start; i < end; i++) {
 		    if (ind >= sequenceLength) return -1;
-		    int val = sequence[ind++];
+		    int val = charAt(ind++);
 		    if (val != sarray[i]) return -1;
 		}
 		return high;
@@ -8848,7 +8894,7 @@ public abstract class SuffixArray {
 		int ind = array[low];
 		for (int i = start; i < end; i++) {
 		    if (ind >= sequenceLength) return -1;
-		    int val = sequence[ind++];
+		    int val = charAt(ind++);
 		    if (val != sarray[i]) return -1;
 		}
 		return low;
@@ -8870,7 +8916,7 @@ public abstract class SuffixArray {
 	    public int compare(int o1, int o2) {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i >= sequenceLength) return -1;
-		    char val1 = sequence[o1 + i];
+		    char val1 = charAt(o1 + i);
 		    char val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
@@ -8898,7 +8944,7 @@ public abstract class SuffixArray {
 	    public int compare(int o1, int o2) {
 		for (int i = 0; i < limit; i++) {
 		    if (o1 + i + offset >= sequenceLength) return -1;
-		    char val1 = sequence[o1 + i + offset];
+		    char val1 = charAt(o1 + i + offset);
 		    char val2 = sarray[i + start];
 		    if (val1 < val2) return -1;
 		    if (val1 > val2) return 1;
@@ -9037,12 +9083,22 @@ public abstract class SuffixArray {
 
 	/**
 	 * Get the char array representing this object's sequence.
-	 * The  array that must not be modified.
+	 * The array that is returned must not be modified.
+	 * <P>
+	 * If an explicit alphabet is not used or the if last argument
+	 * of the three-argument constructor has a value of
+	 * <CODE>false</CODE>, calling this argument will allocate an
+	 * array that will improve performance slightly .
 	 * @return the array of characters for the string used to
 	 *         create this suffix array
 	 *
 	 */
-	public char[] getSequenceArray() {return sequence;}
+	public char[] getSequenceArray() {
+	    if (sequence == null) {
+		sequence = string.toCharArray();
+	    }
+	    return sequence;
+	}
 
 	/**
 	 * Find a subsequence.
@@ -9264,9 +9320,9 @@ public abstract class SuffixArray {
 		    int index = array[i];
 		    if (index == 0) {
 			result = i-1;
-			bwt[i-1] = sequence[sequenceLength-1];
+			bwt[i-1] = charAt(sequenceLength-1);
 		    } else {
-			bwt[i-1] = sequence[index-1];
+			bwt[i-1] = charAt(index-1);
 		    }
 		}
 	    } else {
@@ -9276,7 +9332,7 @@ public abstract class SuffixArray {
 			result = i;
 			bwt[i] = (char)0xffff;
 		    } else {
-			bwt[i] = sequence[index-1];
+			bwt[i] = charAt(index-1);
 		    }
 		}
 	    }
@@ -9367,7 +9423,7 @@ public abstract class SuffixArray {
 		}
 		int j = array[rank[i]+1];
 		while (i+k < n && j+k < n &&
-		       sequence[i+k] == sequence[j+k]) {
+		       charAt(i+k) == charAt(j+k)) {
 		    k++;
 		}
 		ourlcpArray[rank[i]+1] = k;
@@ -9379,7 +9435,7 @@ public abstract class SuffixArray {
 	protected int commonPrefixLength(int index1, int index2) {
 	    int sum = 0;
 	    while (index1 < sequenceLength && index2 < sequenceLength
-		   && sequence[index1++] == sequence[index2++]) {
+		   && charAt(index1++) == charAt(index2++)) {
 		sum++;
 	    }
 	    return sum;
@@ -9393,9 +9449,9 @@ public abstract class SuffixArray {
 			int xlimit = limit;
 			if (limit > olimit) xlimit = olimit;
 			for (int i = 0; i < xlimit; i++) {
-			    if (sequence[index1+i] < sequence[index2+i])
+			    if (charAt(index1+i) < charAt(index2+i))
 				return -1;
-			    if (sequence[index1+i] > sequence[index2+i])
+			    if (charAt(index1+i) > charAt(index2+i))
 				return 1;
 			}
 			if (limit < olimit) return -1;
@@ -9419,8 +9475,8 @@ public abstract class SuffixArray {
 		    int xlimit = limit;
 		    if (limit > olimit) xlimit = olimit;
 		    for (int i = 0; i < xlimit; i++) {
-			if (sequence[index1+i] < sequence[index2+i]) return -1;
-			if (sequence[index1+i] > sequence[index2+i]) return 1;
+			if (charAt(index1+i) < charAt(index2+i)) return -1;
+			if (charAt(index1+i) > charAt(index2+i)) return 1;
 		    }
 		    if (limit < olimit) return -1;
 		    if (limit > olimit) return 1;
@@ -9433,7 +9489,7 @@ public abstract class SuffixArray {
 	    Arrays.fill(guessed, -1);
 	    for (int i = 0; i < sequenceLength; i++) {
 		if (i == 0 || !inS[i] || inS[i-1]) continue;
-		int element = sequence[i];
+		int element = charAt(i);
 		guessed[tails[element]] = i;
 		tails[element] -= 1;
 	    }
@@ -9451,7 +9507,7 @@ public abstract class SuffixArray {
 		int j = guessed[i]-1;
 		if (j < 0) continue;
 		if (inS[j]) continue;
-		int element = sequence[j];
+		int element = charAt(j);
 		guessed[heads[element]] = j;
 		heads[element]++;
 	    }
@@ -9466,7 +9522,7 @@ public abstract class SuffixArray {
 		int j = guessed[i] -1;
 		if (j < 0) continue;
 		if (!inS[j]) continue;
-		int element = sequence[j];
+		int element = charAt(j);
 		guessed[tails[element]] = j;
 		tails[element]--;
 	    }
@@ -9511,7 +9567,7 @@ public abstract class SuffixArray {
 		    lmsNames[element] = current;
 		    continue;
 		}
-		if (sequence[index1] != sequence[index2]) {
+		if (charAt(index1) != charAt(index2)) {
 		    current++;
 		    last = element;
 		    lmsNames[element] = current;
@@ -9531,7 +9587,7 @@ public abstract class SuffixArray {
 			current++;
 			break;
 		    }
-		    if (sequence[index1] != sequence[index2]) {
+		    if (charAt(index1) != charAt(index2)) {
 			current++;
 			break;
 		    }
@@ -9590,7 +9646,7 @@ public abstract class SuffixArray {
 	    Arrays.fill(array, -1);
 	    for (int i = summarySuffixes.length-1; i > 1; i--) {
 		int sIndex = summaryOffsets[summarySuffixes[i]];
-		int bIndex = sequence[sIndex];
+		int bIndex = charAt(sIndex);
 
 		array[tails[bIndex]] = sIndex;
 		tails[bIndex]--;
@@ -9603,21 +9659,29 @@ public abstract class SuffixArray {
 	/**
 	 * Constructor given an alphabet.
 	 * <P>
-	 * When an alphabet is used, it will be mapped to a sequence
-	 * of integers, starting at 0, and in the order implied by the
-	 * set's iterator.  To force the use of a particular order,
-	 * use {@link java.util.LinkedHashSet} or
-	 * {@link java.util.TreeSet}.
+	 * The alphabet will be mapped to a sequence of integers,
+	 * starting at 0, and in the order implied by the set's
+	 * iterator.  To force the use of a particular order, use
+	 * {@link java.util.LinkedHashSet} or {@link java.util.TreeSet}.
+	 * <P>
+	 * Note: using this constructor will result in allocation a character
+	 * array whose size is equal to the length of the string provided
+	 * by the first argument.  If the string contains characters not
+	 * in the alphabet, the alphabet will be automatically extended.
 	 * @param string a string representing a sequence of characters.
 	 * @param alphabet the characters that are used in the string
 	 * @exception IllegalArgumentException a character in the string
 	 *            was not in the alphabet
+	 * @exception NullPointerException the second argument was null
 	 */
 	public String(java.lang.String string,
 		       Set<java.lang.Character> alphabet)
 	    throws IllegalArgumentException
 	{
 	    int n = alphabet.size();
+	    if (alphabet == null) {
+		throw new NullPointerException(errorMsg("noAlphabet"));
+	    }
 	    map = new HashMap<Character,Character>(n);
 	    char index = (char)0;
 	    for (Character ch: alphabet) {
@@ -9629,7 +9693,8 @@ public abstract class SuffixArray {
 	/**
 	 * Constructor given an alphabet size.
 	 * The maximum reasonable value of n should be no higher than the
-	 * length of the sequence and frequently much lower.
+	 * length of the sequence and frequently much lower. The value
+	 * of each character in the string must be in the range [0, n).
 	 * @param string a string representing a sequence of characters.
 	 * @param n the size of an alphabet encoded as values in [0,n)
 	 *        where n is positive and no larger than 0xFFFF
@@ -9661,6 +9726,13 @@ public abstract class SuffixArray {
 	 * each additional Unicode character that is used. The integer
 	 * codes for these additional characters will be set by their
 	 * order of occurrence in the string.
+	 * <P>
+	 * Note: when the third argument has the value <CODE>true</CODE>,
+	 * a char array whose dimensions are the same as that for the
+	 * string passed as the first argument will be allocated. When
+	 * the third argument has the value <CODE>false</CODE>, the
+	 * value of each character in the string passed as the first
+	 * argument must be in the range [0, n).
 	 * @param string a string representing a sequence of characters.
 	 * @param n the estimated size of an alphabet encoded as values in [0,n)
 	 *        where n is positive and no larger than 0xFFFF
@@ -9673,8 +9745,8 @@ public abstract class SuffixArray {
 	    if (n <= 0 || n > 0xFFFF) {
 		throw new IllegalArgumentException(errorMsg("argsOutOfRange"));
 	    }
-	    sequence = string.toCharArray();
 	    if (extend) {
+		sequence = string.toCharArray();
 		int m = string.length();
 		if (m == 0) m = 1;
 		int est = Math.abs(Math.round((float)MathOps.log2(n, 0.1)))
@@ -9699,11 +9771,13 @@ public abstract class SuffixArray {
 	    throws IllegalArgumentException
 	{
 	    this.string = string;
-	    sequence = string.toCharArray();
-	    sequenceLength = sequence.length;
+	    // sequenceLength = sequence.length;
+	    sequenceLength = string.length();
 	    if (map != null) {
+		// sequence = string.toCharArray();
+		sequence = new char[sequenceLength];
 		for (int i = 0; i < sequenceLength; i++) {
-		    Character ch = map.get(sequence[i]);
+		    Character ch = map.get(string.charAt(i));
 		    if (ch == null) {
 			throw new IllegalArgumentException
 			    (errorMsg("notInAlphabet", i));
@@ -9732,16 +9806,16 @@ public abstract class SuffixArray {
 	    inS[sequenceLength] = true;
 	    if (sequenceLength > 0) {
 		for (int i = sequenceLength-2; i > -1; i--) {
-		    if (sequence[i] == sequence[i+1] && inS[i+1]) {
+		    if (charAt(i) == charAt(i+1) && inS[i+1]) {
 			inS[i] = true;
-		    } else if (sequence[i] < sequence[i+1]) {
+		    } else if (charAt(i) < charAt(i+1)) {
 			inS[i] = true;
 		    }
 		}
 	    }
 	    int[] bucketSizes = new int[n];
 	    for (int i = 0; i < sequenceLength; i++) {
-		int element = sequence[i];
+		int element = charAt(i);
 		if (element < 0 || element >= n) {
 		    throw new
 			IllegalArgumentException(errorMsg("notInAlphabet", i));
