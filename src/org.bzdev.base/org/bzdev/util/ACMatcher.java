@@ -197,6 +197,40 @@ public class ACMatcher  {
  
     int[] kmap;
 
+    private static String[] getStringArray(String first, String[] rest) {
+	String strings[] = new String[1 + rest.length];
+	strings[0] = first;
+	System.arraycopy(rest, 0, strings, 1, rest.length);
+	return strings;
+    }
+
+    /**
+     * Constructor using a variable number of arguments.
+     * @param first the first search string
+     * @param rest the remaining search strings
+     */
+    public ACMatcher(String first, String... rest) {
+	this(getStringArray(first, rest));
+    }
+
+    /**
+     * Get the number of patterns for this matcher.
+     * @return the number of patterns
+     */
+    public int size() {
+	return patterns.length;
+    }
+
+    /**
+     * Get the patterns (search strings) for this matcher.
+     * @return the patterns
+     */
+    public String[] getPatterns() {
+	String[] array = new String[patterns.length];
+	System.arraycopy(patterns, 0, array, 0, patterns.length);
+	return array;
+    }
+
     /**
      * Constructor.
      * @param strings the strings to match
@@ -285,7 +319,7 @@ public class ACMatcher  {
     }
 
     /**
-     * Get a stream of matches for the given text
+     * Get a stream of matches for the given text.
      * @param text the text to scan
      * @return the stream
      */

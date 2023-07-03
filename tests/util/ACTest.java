@@ -6,8 +6,14 @@ public class ACTest {
 
     static void test(String[] patterns, String text) throws Exception {
 	ACMatcher matcher = new ACMatcher(patterns);
-	int count[] = new int[patterns.length];
-	int last[] = new int[patterns.length];
+	test(matcher, text);
+    }
+
+    static void test(ACMatcher matcher, String text) throws Exception {
+	int plen = matcher.size();
+	int count[] = new int[plen];
+	int last[] = new int[plen];
+	String[] patterns = matcher.getPatterns();
 	Arrays.fill(last, -1);
 	for (ACMatcher.MatchResult mr: matcher.iterableOver(text)) {
 	    int index = mr.getIndex();
@@ -53,7 +59,32 @@ public class ACTest {
 	test(patterns, "xxx");
 	test(patterns, "xxxx");
 
+	ACMatcher matcher = new ACMatcher("foo");
+	test(patterns, "");
+	test(patterns, "fo");
+	test(patterns, "foo");
+	test(patterns, "foob");
+	test(patterns, "fobo");
+	test(patterns, "xfoo");
+	test(patterns, "xfo");
+	test(patterns, "x");
+	test(patterns, "xxx");
+	test(patterns, "xxxx");
+
+
 	patterns = new String[] {"foo", "fo"};
+	test(patterns, "");
+	test(patterns, "fo");
+	test(patterns, "foo");
+	test(patterns, "foob");
+	test(patterns, "fobo");
+	test(patterns, "xfoo");
+	test(patterns, "xfo");
+	test(patterns, "x");
+	test(patterns, "xxx");
+	test(patterns, "xxxx");
+
+	matcher = new ACMatcher("foo", "fo");
 	test(patterns, "");
 	test(patterns, "fo");
 	test(patterns, "foo");
@@ -102,6 +133,7 @@ public class ACTest {
 	test(patterns, "xxxx");
 	
 
+
 	patterns = new String[] {
 	    "foo",
 	    "oo",
@@ -114,6 +146,14 @@ public class ACTest {
 
 	test(patterns, text);
 	
+	matcher = new ACMatcher("foo",
+				"oo",
+				"oba",
+				"bar",
+				"ar",
+				"fo");
+	test(patterns, text);
+
 	text = "foofofoo";
 	test(patterns, text);
 
@@ -167,7 +207,7 @@ public class ACTest {
 	test(patterns, text);
 
 	long t0 = System.nanoTime();
-	ACMatcher matcher = new ACMatcher(patterns);
+	matcher = new ACMatcher(patterns);
 	matcher.stream(text).forEach((mr) -> {
 	    });
 
