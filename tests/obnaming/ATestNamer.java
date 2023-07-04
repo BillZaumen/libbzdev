@@ -10,7 +10,7 @@ import javax.script.*;
 	     objectHelperClass = "OHelper")
 public class ATestNamer extends NHelper implements ObjectNamerOps<ATestObject> {
 
-    static String lang = "ECMAScript";
+    static String lang = "ESP";
     public static void setLanguage(String l) {
 	lang = l;
     }

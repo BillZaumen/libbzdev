@@ -12,7 +12,7 @@ JAVA2 = java -Djava.security.policy=test.policy \
 	-p ../../BUILD -cp classes:ltest.jar \
 	--add-modules org.bzdev.base
 
-JAVAC = javac -p ../../BUILD --add-modules org.bzdev \
+JAVAC = javac -p ../../BUILD --add-modules org.bzdev  \
 		--processor-path ../../BUILD/libbzdev.jar \
 		-classpath classes
 

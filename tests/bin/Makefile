@@ -50,7 +50,7 @@ all:
 	|| echo ... Failure Expected
 	@echo ---- list some factories ----
 	chmod u+x ./run1
-	 ./run1 --list --codebase ../../BUILD/scrunner.jar
+	 ./run1 --list --codebase ../../BUILD/scrunner.jar --stackTrace
 	@echo --- test command-line options
 	chmod u+x ./run
 	./run -vS:foo abc -vS:bar:def

@@ -297,7 +297,7 @@ class $(helperClass)
      *         the class clazz passed as the method's argument; an
      *         empty (and unmodifiable) collection if no objects can be found
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation", "removal"})
      public Collection<$(objectClass)> getObjects(String className) {
 	try {
 	    ClassLoader scl = AccessController.doPrivileged
@@ -346,6 +346,7 @@ class $(helperClass)
      * @exception IllegalArgumentException the scriptObject is
      *            ill formed
      */
+    @SuppressWarnings({"deprecation", "removal"})
     public void configureFactory(NamedObjectFactory factory,
 				 Object scriptObject)
 	throws UnsupportedOperationException, IllegalArgumentException
@@ -401,6 +402,7 @@ class $(helperClass)
       $(endNCF2)
     }
 
+    @SuppressWarnings({"deprecation", "removal"})
     public void createFactories(String pkg, Object scriptObject)
 	throws UnsupportedOperationException, IllegalArgumentException
     {

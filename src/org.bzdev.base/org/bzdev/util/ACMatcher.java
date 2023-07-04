@@ -2,6 +2,7 @@ package org.bzdev.util;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.function.Function;
 
 //@exbundle org.bzdev.util.lpack.Util
 
@@ -220,6 +221,63 @@ public class ACMatcher  {
     public int size() {
 	return patterns.length;
     }
+
+    private static <T> String[]
+	createPatterns(Function<T,String> f, T[] specs)
+    {
+	String[] patterns = new String[specs.length];
+	for (int i = 0; i < specs.length; i++) {
+	    patterns[i] = f.apply(specs[i]);
+	}
+	return patterns;
+    }
+
+
+    /**
+     * Constructor using an array of pattern specifications.
+     * A function maps each pattern specification to the corresponding
+     * pattern. This can be used to associate each pattern with a
+     * enumeration, which can make the use of a <CODE>switch</CODE>
+     * statement more reliable when new cases are added.  For
+     * example,
+     * <BLOCKQUOTE><PRE><CODE>
+     * static enum SpecType {
+     *      TYPE1,
+     *      TYPE2,
+     *      ...
+     * }
+     * static class Spec {
+     *   SpecType type
+     *   String pattern;
+     *   public Spec(specType type, string pattern) {
+     *       this.type = type;
+     *       tyis.pattern = pattern;
+     * }
+     * ...
+     *   Spec specs[] = {
+     *       new Spec(SpecType.TYPE1, "foo"),
+     *       new Spec(SpecType.TYPE2, "bar"),
+     *       ...
+     *   };
+     *   ACMatcher matcher = new
+     *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
+     *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
+     *       int index = mr.getIndex();
+     *       switch (spec[index].type) {
+     *       case TYPE1:
+     *          ...
+     *       }
+     *   }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param f a function that maps a pattern specification to a pattern
+     * @param specs an array containing pattern specifications
+     * @param <T> the type of the objects used as a pattern specifications
+     */
+
+    public <T> ACMatcher(Function<T,String> f, T[] specs) {
+	this(createPatterns(f, specs));
+    }
+
 
     /**
      * Get the patterns (search strings) for this matcher.

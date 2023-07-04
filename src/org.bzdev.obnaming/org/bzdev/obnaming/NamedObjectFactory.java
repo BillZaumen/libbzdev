@@ -4,6 +4,8 @@ import org.bzdev.util.*;
 import org.bzdev.math.rv.*;
 import org.bzdev.util.SafeFormatter;
 import org.bzdev.net.WebEncoder;
+import org.bzdev.util.ACMatcher;
+import org.bzdev.util.ACMatcher.MatchResult;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -1465,6 +1467,80 @@ abstract public class NamedObjectFactory<
 
     private String setupDocLinks(String docParmName, String type, String doc) {
 	if (doc.length() == 0) return doc;
+	ACMatcher matcher = new ACMatcher("<code>",   // case 0
+					  "</code>",  // case 1
+					  "<jdoc>",   // case 2
+					  "</jdoc>"); // case 3
+	int cdepth = 0;
+	int adepth = 0;
+	ArrayList<Integer> alist = new ArrayList(1 + doc.length()/6);
+	String lcdoc = doc.toLowerCase(Locale.ENGLISH);
+	for (MatchResult mr: matcher.iterableOver(lcdoc)) {
+	    alist.add(mr.getStart());
+	    switch(mr.getIndex()) {
+	    case 0:
+		cdepth++;
+		if (adepth > 0) {
+		    String cname = getClass().getName();
+		    String dpn = docParmName;
+		    throw new IllegalArgumentException
+			(errorMsg("nesting", "code", dpn, cname , type));
+		}
+		break;
+	    case 1:
+		cdepth--;
+		if (cdepth < 0) {
+		    String cname = getClass().getName();
+		    String dpn = docParmName;
+		    throw new IllegalArgumentException
+			(errorMsg("unbalancedHTML", "code", dpn, cname , type));
+		}
+		if (adepth > 0) {
+		    String cname = getClass().getName();
+		    String dpn = docParmName;
+		    throw new IllegalArgumentException
+			(errorMsg("overlapping", dpn, cname , type));
+		}
+		break;
+	    case 2:
+		if (adepth > 0) {
+		    String cname = getClass().getName();
+		    String dpn = docParmName;
+		    throw new IllegalArgumentException
+			(errorMsg("nesting", "jdoc", dpn, cname , type));
+		}
+		adepth++;
+		break;
+	    case 3:
+		adepth--;
+		if (adepth < 0) {
+		    String cname = getClass().getName();
+		    String dpn = docParmName;
+		    throw new IllegalArgumentException
+			(errorMsg("unbalancedHTML", "jdoc", dpn, cname , type));
+		}
+		break;
+	    }
+	}
+	if (cdepth != 0) {
+	    String cname = getClass().getName();
+	    String dpn = docParmName;
+	    throw new IllegalArgumentException
+		(errorMsg("unbalancedHTML", "code", dpn, cname , type));
+	}
+	if (adepth != 0) {
+	    String cname = getClass().getName();
+	    String dpn = docParmName;
+	    throw new IllegalArgumentException
+		(errorMsg("unbalancedHTML", "jdoc", dpn, cname , type));
+	}
+	int alistLen = alist.size();
+	int[] codeTags = new int[alistLen];
+	for (int i = 0; i < alistLen; i++) {
+	    codeTags[i] = alist.get(i);
+	}
+	char[] sequence = lcdoc.toCharArray();
+	/*
 	SuffixArray.String sa =
 	    new SuffixArray.String(doc.toLowerCase(Locale.ENGLISH), 128, true);
 	int[] codeStarts = sa.findRange("<code>").toArray();
@@ -1501,12 +1577,16 @@ abstract public class NamedObjectFactory<
 		    (errorMsg("unbalancedHTML", "jdoc", dpn , cname, type));
 	    }
 	}
+	*/
 	StringBuilder sb = new StringBuilder(2*doc.length());
 	sb.append(doc);
+
+	/*
 	int[] codeTags = ArrayMerger.concat(codeStarts, codeEnds,
 					    jdocStarts, jdocEnds);
 	Arrays.sort(codeTags);
 	char[] sequence = sa.getSequenceArray();
+	*/
 	for (int i = codeTags.length-2; i > -1; i--) {
 	    int tag = codeTags[i];
 	    int ntag = codeTags[i+1];

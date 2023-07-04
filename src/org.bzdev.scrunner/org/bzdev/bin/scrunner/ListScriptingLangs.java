@@ -35,7 +35,7 @@ public class ListScriptingLangs {
 		    System.out.println("[Scripting language " + ln
 				       + " not supported]");
 		    */
-		    System.out.println(localeString("noSupported", ln));
+		    System.out.println(localeString("notSupported", ln));
 		    /*
 		    if (argv.length == 1) {
 			System.exit(1);

@@ -17,9 +17,11 @@ public class LTest {
 
 	// ScriptingContext.grantPermissionFor(ATestNamer.class);
 
+	/*
 	try {
 	    System.setSecurityManager(new SecurityManager());
 	} catch (UnsupportedOperationException eu) {}
+	*/
 
 	ATestNamer anamer = new ATestNamer();
 	NamedObjectFactory f = new LTestFactory(anamer);

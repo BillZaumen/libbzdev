@@ -59,17 +59,18 @@ public class ACTest {
 	test(patterns, "xxx");
 	test(patterns, "xxxx");
 
+
 	ACMatcher matcher = new ACMatcher("foo");
-	test(patterns, "");
-	test(patterns, "fo");
-	test(patterns, "foo");
-	test(patterns, "foob");
-	test(patterns, "fobo");
-	test(patterns, "xfoo");
-	test(patterns, "xfo");
-	test(patterns, "x");
-	test(patterns, "xxx");
-	test(patterns, "xxxx");
+	test(matcher, "");
+	test(matcher, "fo");
+	test(matcher, "foo");
+	test(matcher, "foob");
+	test(matcher, "fobo");
+	test(matcher, "xfoo");
+	test(matcher, "xfo");
+	test(matcher, "x");
+	test(matcher, "xxx");
+	test(matcher, "xxxx");
 
 
 	patterns = new String[] {"foo", "fo"};
@@ -85,16 +86,29 @@ public class ACTest {
 	test(patterns, "xxxx");
 
 	matcher = new ACMatcher("foo", "fo");
-	test(patterns, "");
-	test(patterns, "fo");
-	test(patterns, "foo");
-	test(patterns, "foob");
-	test(patterns, "fobo");
-	test(patterns, "xfoo");
-	test(patterns, "xfo");
-	test(patterns, "x");
-	test(patterns, "xxx");
-	test(patterns, "xxxx");
+	test(matcher, "");
+	test(matcher, "fo");
+	test(matcher, "foo");
+	test(matcher, "foob");
+	test(matcher, "fobo");
+	test(matcher, "xfoo");
+	test(matcher, "xfo");
+	test(matcher, "x");
+	test(matcher, "xxx");
+	test(matcher, "xxxx");
+
+	matcher = new ACMatcher((s) -> {return s;}, patterns);
+	test(matcher, "");
+	test(matcher, "fo");
+	test(matcher, "foo");
+	test(matcher, "foob");
+	test(matcher, "fobo");
+	test(matcher, "xfoo");
+	test(matcher, "xfo");
+	test(matcher, "x");
+	test(matcher, "xxx");
+	test(matcher, "xxxx");
+
 
 	patterns = new String[] {"foo", "o"};
 	test(patterns, "");

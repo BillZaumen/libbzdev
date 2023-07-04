@@ -8,11 +8,17 @@ import javax.script.*;
 @ObjectNamer(helperClass = "NHelper",
 	     helperSuperclass = "org.bzdev.scripting.ScriptingContext",
 	     objectClass = "ATestObject",
-	     objectHelperClass = "OHelper")
+	     objectHelperClass = "OHelper",
+	     helperSuperclassConstrTypes = {
+		 @ObjectNamer.ConstrTypes(
+			  value = {"org.bzdev.scripting.ScriptingContext"},
+			  exceptions = {"SecurityException"})
+	     })
 public class ATestNamer extends NHelper implements ObjectNamerOps<ATestObject> {
 
+    /*
     final ScriptEngineManager manager = new ScriptEngineManager();
-    final ScriptEngine engine = manager.getEngineByName("javascript");
+    final ScriptEngine engine = manager.getEngineByName("ESP");
     final ScriptEngineFactory factory = engine.getFactory();
     final String languageName = factory.getLanguageName();
     final Bindings defaultBindings =
@@ -28,5 +34,9 @@ public class ATestNamer extends NHelper implements ObjectNamerOps<ATestObject> {
 
     protected  String doGetScriptLanguage() {
 	return languageName;
+    }
+    */
+    public ATestNamer() {
+	super((ATestNamer) null);
     }
 }

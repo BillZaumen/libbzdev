@@ -12,7 +12,7 @@ public class Test {
     }
 
     public static void main(String argv[]) throws Exception {
-	String lang = System.getProperty("script.language", "ECMAScript");
+	String lang = System.getProperty("script.language", "ESP");
 	ATestNamer.setLanguage(lang);
 	TestNamer namer = new TestNamer();
 	TestNamer altNamer = new TestNamer();
