@@ -1,4 +1,5 @@
 package org.bzdev.util;
+import org.bzdev.lang.MathOps;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -6,13 +7,6 @@ import java.util.function.Function;
 
 //@exbundle org.bzdev.util.lpack.Util
 
-// From https://www.geeksforgeeks.org/aho-corasick-algorithm-pattern-searching/
-// Java program for implementation of
-// Aho Corasick algorithm for String
-// matching
-// This code is contributed by Princi Singh
-
- 
 /**
  * This class provides an implementation of the Aho Corasick string-matching
  * algorithm.
@@ -29,8 +23,22 @@ import java.util.function.Function;
  * an Aho Corasick algorithm implementation</A>.  The modifications included
  * using a {@link BitSet} instead of an integer (which restricted the number
  * of patterns to less than 32), a dynamically configured alphabet, and
- * methods to support iterators and streams.  The implementation in this
- * package is case sensitive.
+ * methods to provide iterators and streams.  The implementation in this
+ * package is case sensitive.  Finally, the sequence being searched can
+ * be represented as either a string or an array of characters, and the
+ * search can be restricted to a subsequence of either.
+ * <P>
+ * The patterns to search for are passed to a constructor. The methods
+ * used to search are named
+ * <UL>
+ *   <LI><STRONG>iterator</STRONG>. This provides an {@link Iterator}.
+ *   <LI><STRONG>iterableOver</STRONG>. This provides an {@link Iterable}
+ *     for use in a 'for' loop.
+ *   <LI><STRONG>stream</STRONG>. This provides a {@link Stream}.
+ * <UL>
+ * These are overloaded so that the text being searched can be either a
+ * string or a character array, and so that all the text can be searched
+ * or just a subsequence of the text.
  */
 public class ACMatcher  {
 
@@ -50,7 +58,7 @@ public class ACMatcher  {
 	private int end;
 
 	/**
-	 * Get the index into the of strings array passsed to the constutctor
+	 * Get the index into the of strings array passed to the constructor
 	 * of {@link ACMatcher} for this match.
 	 * @return the index
 	 */
@@ -251,7 +259,7 @@ public class ACMatcher  {
      *   String pattern;
      *   public Spec(specType type, string pattern) {
      *       this.type = type;
-     *       tyis.pattern = pattern;
+     *       this.pattern = pattern;
      * }
      * ...
      *   Spec specs[] = {
@@ -305,7 +313,10 @@ public class ACMatcher  {
 		continue;
 	    }
 	    MAXS += s.length();
-	    alen += (int)Math.round(Math.log(s.length()));
+	    // Increase alen by a value proportional to the logarithm
+	    // of the length of each pattern.  The value of alen is used
+	    // as an estimate of an appropriate initial's hash-table size.
+	    alen += 4 * (int)Math.round(MathOps.log2(s.length(), 1.0));
 	    kmap[k] = kk;
 	    k++; kk++;
 	}
@@ -353,8 +364,8 @@ public class ACMatcher  {
 
 
     /**
-     * Get an {@link Iterable} that can search the given text for
-     * the patterns used to configure this matcher.
+     * Get an {@link Iterable} that searches the given text, provided
+     * as a string, for the patterns used to configure this matcher.
      * <P>
      * This is a convenience method, added to allow an instance of
      * this class to be used in a 'for' loop:
@@ -366,6 +377,7 @@ public class ACMatcher  {
      *    ...
      * }
      * </CODE></PRE></BLOCKQUOTE>
+     * @param text the text to search
      * @return the iterable
      */
     public Iterable<MatchResult> iterableOver(String text) {
@@ -377,7 +389,93 @@ public class ACMatcher  {
     }
 
     /**
-     * Get a stream of matches for the given text.
+     * Get an {@link Iterable} that starch's a portion of the given
+     * text, provided as a string, for the patterns used to configure
+     * this matcher.
+     * <P>
+     * This is a convenience method, added to allow an instance of
+     * this class to be used in a 'for' loop:
+     * <BLOCKQUOTE><PRE><CODE>
+     * String patterns[] = {...};
+     * ACMatcher matcher = new ACMatcher(patterns);
+     * String text = "...";
+     * int start = ...;
+     * int end = ...;
+     * for (ACMatcher.MatchResult mr: matcher.iterableOver(text, start, end)) {
+     *    ...
+     * }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param text the text to search
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return the iterable
+     */
+    public Iterable<MatchResult> iterableOver(String text, int start, int end) {
+	return new Iterable<MatchResult>() {
+	    public Iterator<MatchResult> iterator() {
+		return ACMatcher.this.iterator(text, start, end);
+	    }
+	};
+    }
+
+    /**
+     * Get an {@link Iterable} that searcher the given text, provided
+     * as a character array, for the patterns used to configure this
+     * matcher.
+     * <P>
+     * This is a convenience method, added to allow an instance of
+     * this class to be used in a 'for' loop:
+     * <BLOCKQUOTE><PRE><CODE>
+     * String patterns[] = {...};
+     * ACMatcher matcher = new ACMatcher(patterns);
+     * String text = "...";
+     * for (ACMatcher.MatchResult mr: matcher.iterableOver(text)) {
+     *    ...
+     * }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param text the text to search
+     * @return the iterable
+     */
+    public Iterable<MatchResult> iterableOver(char[] text) {
+	return new Iterable<MatchResult>() {
+	    public Iterator<MatchResult> iterator() {
+		return ACMatcher.this.iterator(text);
+	    }
+	};
+    }
+
+    /**
+     * Get an {@link Iterable} that searcher's a portion of the given
+     * text, provided as a character array, for the patterns used to
+     * configure this matcher.
+     * <P>
+     * This is a convenience method, added to allow an instance of
+     * this class to be used in a 'for' loop:
+     * <BLOCKQUOTE><PRE><CODE>
+     * String patterns[] = {...};
+     * ACMatcher matcher = new ACMatcher(patterns);
+     * String text = "...";
+     * int start = ...;
+     * int end = ...;
+     * for (ACMatcher.MatchResult mr: matcher.iterableOver(text, start, end)) {
+     *    ...
+     * }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param text the text to search
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return the iterable
+     */
+    public Iterable<MatchResult> iterableOver(char[] text, int start, int end) {
+	return new Iterable<MatchResult>() {
+	    public Iterator<MatchResult> iterator() {
+		return ACMatcher.this.iterator(text, start, end);
+	    }
+	};
+    }
+
+    /**
+     * Get a stream of matches for the given text, provided as a string.
      * @param text the text to scan
      * @return the stream
      */
@@ -387,13 +485,64 @@ public class ACMatcher  {
     }
 
     /**
-     * Get an iterator that will scan some given text and match that
-     * text against the patterns used to configure this matcher.
+     * Get a stream of matches for a portion of the given text,
+     * provided as a string.
      * @param text the text to scan
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return the stream
+     */
+    public Stream<MatchResult> stream(String text, int start, int end) {
+	return StreamSupport
+	    .stream(iterableOver(text, start, end).spliterator(), false);
+    }
+
+    /**
+     * Get a stream of matches for the given text, provided as a character
+     * array.
+     * @param text the text to scan
+     * @return the stream
+     */
+    public Stream<MatchResult> stream(char[] text) {
+	return StreamSupport
+	    .stream(iterableOver(text).spliterator(), false);
+    }
+
+    /**
+     * Get a stream of matches for a portion the given text, provided
+     * as a character array.
+     * @param text the text to scan
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return the stream
+     */
+    public Stream<MatchResult> stream(char[] text, int start, int end) {
+	return StreamSupport
+	    .stream(iterableOver(text, start, end).spliterator(), false);
+    }
+
+    /**
+     * Get an iterator that will scan a given string and match that
+     * string against the patterns used to configure this matcher.
+     * @param text the string to scan
      * @return an iterator that will enumerate the matches
      * @see ACMatcher.MatchResult
      */
     public Iterator<MatchResult> iterator(String text) {
+	return iterator(text, 0, text.length());
+    }
+    /**
+     * Get an iterator that will scan a portion of a given string and
+     * match that string against the patterns used to configure this
+     * matcher.
+     * @param text the string to scan
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return an iterator that will enumerate the matches
+     * @see ACMatcher.MatchResult
+     */
+    public Iterator<MatchResult> iterator(String text, int start, int end) {
+
 	final int k = (patterns == null)? 0: patterns.length;
 	if (k == 0) {
 	    return new Iterator<MatchResult>() {
@@ -405,8 +554,8 @@ public class ACMatcher  {
 	}
 	return new Iterator<MatchResult>() {
 	    int currentState = 0;
-	    int index = -1;
-	    int lenm1 = text.length() - 1;
+	    int index = start - 1;
+	    int lenm1 = end - 1;
 	    boolean done = false;
 	    Queue<MatchResult> queue = new LinkedList<MatchResult>();
 
@@ -451,5 +600,91 @@ public class ACMatcher  {
 	    }
 	};
     }
+
+    /**
+     * Get an iterator that will scan a given character array and match that
+     * sequence against the patterns used to configure this matcher.
+     * @param text the character array to scan
+     * @return an iterator that will enumerate the matches
+     * @see ACMatcher.MatchResult
+     */
+    public Iterator<MatchResult> iterator(char[] text) {
+	return iterator(text, 0, text.length);
+    }
+    /**
+     * Get an iterator that will scan a portion of a given character
+     * array and match that sequence against the patterns used to
+     * configure this matcher.
+     * @param text the character array to scan
+     * @param start the starting index (inclusive) for the text being scanned
+     * @param end the ending index (exclusive) for the text being scanned
+     * @return an iterator that will enumerate the matches
+     * @see ACMatcher.MatchResult
+     */
+    public Iterator<MatchResult> iterator(char[] text, int start, int end) {
+	final int k = (patterns == null)? 0: patterns.length;
+	if (k == 0) {
+	    return new Iterator<MatchResult>() {
+		public boolean hasNext() {return false;}
+		public MatchResult next() throws NoSuchElementException {
+		    throw new NoSuchElementException(errorMsg("noNextElem"));
+		}
+	    };
+	}
+	return new Iterator<MatchResult>() {
+	    int currentState = 0;
+	    int index = start - 1;
+	    int lenm1 = end - 1;
+	    boolean done = false;
+	    Queue<MatchResult> queue = new LinkedList<MatchResult>();
+
+	    private void update() {
+		if (queue.isEmpty()) {
+		    while (index < lenm1) {
+			index++;
+			currentState = findNextState(currentState,
+						     text[index]);
+			if (!out[currentState].isEmpty()) {
+			    for (int j = 0; j < k; j++) {
+				if (out[currentState].get(j)) {
+				    int end = index + 1;
+				    int start = end - patterns[j].length();
+				    MatchResult mr = new MatchResult(kmap[j],
+								     start,
+								     end);
+				    queue.offer(mr);
+				}
+			    }
+			    break;
+			}
+		    }
+		    done = queue.isEmpty();
+		}
+	    }
+
+	    @Override
+	    public boolean hasNext() {
+		update();
+		return !done;
+	    }
+
+	    @Override
+	    public MatchResult next() throws NoSuchElementException {
+		update();
+		MatchResult mr = queue.poll();
+		if (mr == null) {
+		    throw new NoSuchElementException(errorMsg("noNextElem"));
+		}
+		return mr;
+	    }
+	};
+    }
+
 }
 
+
+//  LocalWords:  exbundle Aho Corasick substrings ACMatcher substring
+//  LocalWords:  SuffixArray Princi HREF BitSet subsequence Iterable
+//  LocalWords:  iterableOver GOTO TRIE matcher BLOCKQUOTE PRE enum
+//  LocalWords:  SpecType specType MatchResult mr interatorOver alen
+//  LocalWords:  getIndex iterable noNextElem

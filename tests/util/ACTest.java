@@ -30,6 +30,8 @@ public class ACTest {
 		throw new Exception();
 	    }
 	}
+
+
 	SuffixArray.String sa = new SuffixArray.String(text,127);
 	for (int i = 0; i < patterns.length; i++) {
 	    String pattern = patterns[i];
@@ -40,6 +42,100 @@ public class ACTest {
 		throw new Exception();
 	    }
 	}
+
+	// Redo tests, searching  a char array instead of the string
+
+	Arrays.fill(count, 0);
+	Arrays.fill(last, -1);
+
+	for (ACMatcher.MatchResult mr: matcher
+		 .iterableOver(text.toCharArray())) {
+	    int index = mr.getIndex();
+	    int start  = mr.getStart();
+	    int end = mr.getEnd();
+	    String match = text.substring(start, end);
+	    if (!match.equals(patterns[index])) {
+		throw new Exception();
+	    }
+	    count[index]++;
+	    if (start != last[index]) {
+		last[index] = start;
+	    } else {
+		throw new Exception();
+	    }
+	}
+	for (int i = 0; i < patterns.length; i++) {
+	    String pattern = patterns[i];
+	    SuffixArray.Range range = sa.findRange(pattern);
+	    if (range.size() != count[i]) {
+		System.out.println("range.size() == " + range.size()
+				   + ", count[ " + i + "] = " + count[i]);
+		throw new Exception();
+	    }
+	}
+	String text2 = "xxx" + text + "xxx";
+
+	Arrays.fill(count, 0);
+	Arrays.fill(last, -1);
+
+	for (ACMatcher.MatchResult mr:
+		 matcher.iterableOver(text2, 3, 3 + text.length())) {
+	    int index = mr.getIndex();
+	    int start  = mr.getStart();
+	    int end = mr.getEnd();
+	    String match = text2.substring(start, end);
+	    if (!match.equals(patterns[index])) {
+		throw new Exception();
+	    }
+	    count[index]++;
+	    if (start != last[index]) {
+		last[index] = start;
+	    } else {
+		throw new Exception();
+	    }
+	}
+
+	for (int i = 0; i < patterns.length; i++) {
+	    String pattern = patterns[i];
+	    SuffixArray.Range range = sa.findRange(pattern);
+	    if (range.size() != count[i]) {
+		System.out.println("range.size() == " + range.size()
+				   + ", count[ " + i + "] = " + count[i]);
+		throw new Exception();
+	    }
+	}
+
+	Arrays.fill(count, 0);
+	Arrays.fill(last, -1);
+
+	for (ACMatcher.MatchResult mr:
+		 matcher.iterableOver(text2.toCharArray(),
+				      3, 3 + text.length())) {
+	    int index = mr.getIndex();
+	    int start  = mr.getStart();
+	    int end = mr.getEnd();
+	    String match = text2.substring(start, end);
+	    if (!match.equals(patterns[index])) {
+		throw new Exception();
+	    }
+	    count[index]++;
+	    if (start != last[index]) {
+		last[index] = start;
+	    } else {
+		throw new Exception();
+	    }
+	}
+
+	for (int i = 0; i < patterns.length; i++) {
+	    String pattern = patterns[i];
+	    SuffixArray.Range range = sa.findRange(pattern);
+	    if (range.size() != count[i]) {
+		System.out.println("range.size() == " + range.size()
+				   + ", count[ " + i + "] = " + count[i]);
+		throw new Exception();
+	    }
+	}
+
     }
 
     
@@ -173,6 +269,12 @@ public class ACTest {
 
 	test(patterns, "xxxxxxxxxxxx");
 
+
+	text = "ofofofofof";
+	matcher = new  ACMatcher("of", "ofof", "ofofof");
+	test(matcher, text);
+
+
 	IntegerRandomVariable txtrv = new UniformIntegerRV((int)'a', (int)'e');
 	IntegerRandomVariable plenrv = new UniformIntegerRV(1, 64);
 	StringBuilder sb = new StringBuilder();
@@ -220,20 +322,26 @@ public class ACTest {
 	System.out.println("... starting test");
 	test(patterns, text);
 
+	System.out.println("... starting timing test");
+	System.gc();
 	long t0 = System.nanoTime();
 	matcher = new ACMatcher(patterns);
+	int count[] = {0};
 	matcher.stream(text).forEach((mr) -> {
+		count[0]++;
 	    });
 
 	long t1 = System.nanoTime();
-	SuffixArray.String sa = new SuffixArray.String(text, 4);
-	int count = 0;
-	for (int i = 0; i < patterns.length; i++) {
-	    count += sa.findRange(patterns[i]).size();
-	}
+	count[0] = 0;
+	System.gc();
 	long t2 = System.nanoTime();
+	SuffixArray.String sa = new SuffixArray.String(text, 4);
+	for (int i = 0; i < patterns.length; i++) {
+	    count[0] += sa.findRange(patterns[i]).size();
+	}
+	long t3 = System.nanoTime();
 	System.out.println ("Aho Corasick: " + (t1 - t0) + " ns");
-	System.out.println ("Suffix Array: " + (t2 - t1) + " ns");
+	System.out.println ("Suffix Array: " + (t3 - t2) + " ns");
     }
 }
 
