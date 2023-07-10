@@ -19,9 +19,16 @@
     a server to explicitly send a challenge as is done by SSH or FIDO
     when public-key authentication is used.  Instead, a passphrase is
     computed, using a combination of time stamps and public key
-    encryption, and verified by the server.  Secure basic
-    authentication assumes that SSL/TLS will be used for connections
-    between a client and server. As a result,
+    encryption, and verified by the server.  The effect is similar to
+    the use of client certificates, but does not require a certificate
+    authority or some other third party, nor a procedure for obtaining
+    and configuring certificates that most users find too daunting to
+    consider (a program named <STRONG>sbl</STRONG> described below
+    will set up a key pair painlessly and provides buttons to copy
+    data needed by a server to the system clipboard).
+  <P>
+    Secure basic authentication assumes that SSL/TLS will be used for
+    connections between a client and server. As a result,
     <UL>
       <LI> when a connection is first established, a client will receive
 	a certificate from the server. This certificate is valid for at
@@ -68,7 +75,7 @@
       <LI> a digital signature of
 	<UL>
 	  <LI> the first 8 octets of the passphrase,
-	  <LI> the DER encoding of the certificate's public key,
+	  <LI> the DER encoding of the server's certificate's public key,
 	  <LI> the UTF-8 encoded password used in the CRC,
 	</UL>
 	created using the user's private key and signature algorithm.
@@ -395,5 +402,5 @@ ccR8O2EQZnVa2RKF9NRhQ5QgDa1EJpJlB+VPL7W+
  -->
 <!--  LocalWords:  EjwsSecureBasicAuth DNS APIs authenticator JRE TLS
  -->
-<!--  LocalWords:  revalidated firefox
+<!--  LocalWords:  revalidated firefox HTTPS
  -->

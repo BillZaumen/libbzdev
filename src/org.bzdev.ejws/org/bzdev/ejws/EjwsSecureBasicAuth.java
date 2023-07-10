@@ -115,10 +115,8 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 
     /**
      * User entry.
-     * This object contains a user's password and roles, and
-     * (if applicable) the user's public key in PEM format.
-     * The PEM file must also contain a header specifying a
-     * digital-ignature algorithm.
+     * This object contains a user's password, roles, and public-key
+     * operations.
      * @see org.bzdev.net.SecureBasicUtilities
      */
    public static class Entry {
@@ -131,7 +129,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	 * @param pw a password for a user
 	 * @param roles a set of roles that a user may have
 	 */
-	Entry(String pw, Set<String>roles) {
+	public Entry(String pw, Set<String>roles) {
 	    this.pw = pw; this.roles = roles;
 	    this.keyops = new SecureBasicUtilities();
 	}
@@ -143,7 +141,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	 * @param pw a password for a user
 	 * @param roles a set of roles that a user may have
 	 */
-	Entry(String pem, String pw, Set<String>roles) {
+	public Entry(String pem, String pw, Set<String>roles) {
 	    this.pw = pw; this.roles = roles;
 	    try {
 		this.keyops = new SecureBasicUtilities(pem);
@@ -163,10 +161,20 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	public String getPassword() {return pw;}
 
 	/**
-	 * Get the roles stroed in this entry
+	 * Get the roles stored in this entry.
 	 * @return a set of roles; null if not applicable
 	 */
 	public Set<String> getRoles(){return roles;}
+
+       /**
+	* Get an instance of an object that provides secure basic
+	* authentication operations. This object is created by
+	* this class's constructors.
+	* @return the object
+	*/
+       public SecureBasicUtilities getSecureBasicUtilities() {
+	   return  keyops;
+       }
    }
 
     Map<String,Entry>map = null;
@@ -300,7 +308,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT} mode given
      * multiple certificates.
      * <P>
-     * If the second argument is null or does not contain any certficates,
+     * If the second argument is null or does not contain any certificates,
      * the mode is {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT};
      * otherwise the mode is
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT}
@@ -317,7 +325,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT} mode given
      * multiple certificates, specifying a map.
      * <P>
-     * If the second argument is null or does not contain any certficates,
+     * If the second argument is null or does not contain any certificates,
      * the mode is {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT};
      * otherwise the mode is
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT}
@@ -481,7 +489,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     /**
      * Set the authorized function.
      * This function will be called when a request is authorized.
-     * Its arguments are a principal and the Http exchange. THe
+     * Its arguments are a principal and the HTTP exchange. The
      * later can be used to set cookies or perform other operations.
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
@@ -721,7 +729,9 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     private long TOFFSET = 30;
 
     /**
-     *
+     * Remove cached passwords whose timeout has expired.
+     * The method can be called periodically to eliminate passwords
+     * when a user has not explicitly logged out.
      */
     public void prune() {
 	long now = Instant.now().getEpochSecond();
@@ -873,4 +883,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 //  LocalWords:  upperTimeDiffLimit passphraseTimeout positiveLowerTDL
 //  LocalWords:  IllegalArgumentException negativeUpperTDL hdr addr
 //  LocalWords:  authenticator's Authenticator HttpExchange getClass
-//  LocalWords:  instanceof InetAddress iaddr pwinfo
+//  LocalWords:  instanceof InetAddress iaddr pwinfo pw authenticator
+//  LocalWords:  UnsupportedOperationException wrongMode URI
+//  LocalWords:  EjwsPrincipal FileHandler setLoginAlias toString
+//  LocalWords:  setLogoutAlias

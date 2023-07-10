@@ -35,7 +35,7 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	public String getPassword() {return pw;}
 
 	/**
-	 * Get the roles stroed in this entry
+	 * Get the roles stored in this entry
 	 * @return a set of roles; null if not applicable
 	 */
 	public Set<String> getRoles(){return roles;}
@@ -92,7 +92,7 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
     /**
      * Set the authorized function.
      * This function will be called when a request is authorized.
-     * Its arguments are a principal and the Http exchange. THe
+     * Its arguments are a principal and the HTTP exchange. The
      * later can be used to set cookies or perform other operations.
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
@@ -325,4 +325,7 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 }
 
 //  LocalWords:  BasicAuthenticator username Appendable getFirst UTF
-//  LocalWords:  authenticator's getRequestHeaders hdr keySet
+//  LocalWords:  authenticator's getRequestHeaders hdr keySet pw URI
+//  LocalWords:  HttpExchange EjwsPrincipal FileHandler setLoginAlias
+//  LocalWords:  setLogoutAlias authenticator
+//  LocalWords:  UnsupportedOperationException
