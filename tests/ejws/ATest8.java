@@ -12,7 +12,7 @@ import java.util.Properties;
 import org.bzdev.swing.ConfigPropertyEditor;
 
 // use to test SBL
-public class ATest7 {
+public class ATest8 {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
@@ -70,6 +70,26 @@ public class ATest7 {
 	    ews.add("/", DirWebMap.class, dir, auth, true, true, true);
 	WebMap webmap = ews.getWebMap("/");
 	webmap.addWelcome("/index.html");
+
+	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
+	handler.setLoginAlias("login.html", "", true);
+	URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
+	    new URI("https://www.google.com"): new URI(argv[1]);
+
+	handler.setLogoutAlias("logout.html", logoutURI);
+
+	auth.setLoginFunction((p, t) -> {
+		System.out.println("login: " + p.getUsername());
+	    });
+
+	auth.setAuthorizedFunction((p, t) -> {
+		System.out.println("logged in: " + p.getUsername());
+	    });
+
+	auth.setLogoutFunction((p, t) -> {
+		System.out.println("logout: " + p.getUsername());
+	    });
+
 
 	// CloseWaitService cws = new CloseWaitService(120, 30, saddr);
 	// cws.start();

@@ -825,8 +825,29 @@ authtest2t:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
 	java -Dssl.trustStore=../ejws/thelio-ts.jks \
              -Dssl.trustStorePassword=changeit \
+	     -DHOST=$(HOST) \
 	     -classpath ../../BUILD/libbzdev.jar:classes \
-	     AuthPaneTest https://wtz-thelio:8080/resources/glass.png
+	     AuthPaneTest https://$(HOST):8080/resources/glass.png
+
+authtest2t:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -DHOST=$(HOST) \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://$(HOST):8080/resources/glass.png
+
+authtest3:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
+	java -Dssl.trustStore=../ejws/thelio-ts.jks \
+             -Dssl.trustStorePassword=changeit \
+	     -DsblFile=$$HOME/.config/sbl/example.sbl \
+	     -DHOST=$(HOST) \
+	     -classpath ../../BUILD/libbzdev.jar:classes \
+	     AuthPaneTest https://$(HOST):8080/resources/glass.png
+
 
 privateKey.pem.gpg: privateKey.pem
 	gpg -e privateKey.pem

@@ -220,13 +220,43 @@ public class AuthPaneTest {
 
 	// Se we'll handle authentication before the frame is constructed.
 
-	File pkfile = new File("privateKey.pem.gpg");
+	File pkfile = new File(System.getProperty("sblFile",
+						  "privateKey.pem.gpg"));
 	if (!pkfile.exists()) pkfile = new File("privateKey.pem");
+
+	System.out.println("pkfile = " + pkfile);
+
+	try {
+	    AuthenticationPane.setPrivateKey(new File("junk.pem"));
+	    System.out.println("exception missing");
+	    System.exit(1);
+	} catch (Exception e) {}
+
+	try {
+	    AuthenticationPane.setPrivateKey(new File("AuthPaneTest.java"));
+	    System.out.println("exception missing");
+	    System.exit(1);
+	} catch (Exception e) {}
+
 
 	AuthenticationPane.setPrivateKey(pkfile);
 	Authenticator auth =
 	    AuthenticationPane.getAuthenticator(null, true);
 	// AuthenticationPane.setPrivateKey(auth,pkfile);
+
+	try {
+	    AuthenticationPane.setPrivateKey(auth, new File("junk.pem"));
+	    System.out.println("exception missing");
+	    System.exit(1);
+	} catch (Exception e) {}
+
+	try {
+	    AuthenticationPane.setPrivateKey(auth,
+					     new File("AuthPaneTest.java"));
+	    System.out.println("exception missing");
+	    System.exit(1);
+	} catch (Exception e) {}
+
 
 	Authenticator.setDefault(auth);
 

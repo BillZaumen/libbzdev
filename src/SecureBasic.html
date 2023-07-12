@@ -247,11 +247,13 @@
 	private key (the advantage is that GPG agent will then prompt
 	for the appropriate password, etc., needed to decrypt the
 	key).
-      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 555
+      <LI><STRONG>org.bzdev.swing.AuthenticationPane</STRONG>: 674
 	lines of code.  This contains the code needed to create a
 	dialog box to get a user name and password. It works with
 	secure basic authentication, digest authentication, and basic
-	authentication.
+	authentication. It will create an instance of
+	<STRONG>java.net.Authenticator</STRONG> for use with the Java
+	networking APIs.
     </UL>
     The number of lines of code were estimated using a program that
     ignores comments and blank lines, but counts everything else including

@@ -1,5 +1,7 @@
 package org.bzdev.swing;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
@@ -55,13 +57,31 @@ public class AuthenticationPane extends JComponent {
 
     /**
      * Set the default private key for secure basic authentication.
-     * The file's extension should be ".pem" or ".pem.gpg" when
-     * the file is GPG encrypted.
+     * The file's extension should be ".pem", ".pem.gpg" when
+     * the file is GPG encrypted, or ".sbl" if the file was created with
+     * the program <STRONG>sbl</STRONG>.
      * @param pemfile a file, possibly encrypted, in PEM format containing
-     *        the private key
+     *        the private key; null to remove the default private key
+     * @throws IllegalArgumentException if the argument is not an
+     *         ordinary file, is not readable, or has the wrong extension
      */
-    public static void setPrivateKey(File pemfile) {
-	pemFile = pemfile;
+    public static void setPrivateKey(File pemfile)
+	throws IllegalArgumentException
+    {
+	if (pemfile == null) {
+	    pemFile = null;
+	    return;
+	}
+	String name = pemfile.getName().toLowerCase();
+	boolean allowedSuffix = name.endsWith(".pem")
+	    || name.endsWith(".pem.gpg") || name.endsWith(".sbl");
+	if (allowedSuffix &&  pemfile.isFile() && pemfile.canRead()) {
+	    pemFile = pemfile;
+	} else {
+	    name = pemfile.toString();
+	    String msg = errorMsg("notPrivateKeyFile", name);
+	    throw new IllegalArgumentException(msg);
+	}
     }
 
     static ConcurrentHashMap<Authenticator,File> pemMap =
@@ -70,19 +90,40 @@ public class AuthenticationPane extends JComponent {
     /**
      * Set the private key for secure basic authentication for a
      * specific authenticator.
-     * This method should be used when there are multiple authenticators,
-     * some with an authenticator-specific private key.
+     * This method should be used when there are multiple
+     * authenticators, some with an authenticator-specific private
+     * key. The file-name extensions should be either
+     * <UL>
+     *   <LI><STRONG>.pem</STRONG> if the file is a PEM file.
+     *   <LI><STRONG>.pem.gpg</STRONG> if the file is a GPG-encrypted
+     *   PEM file.
+     *   <LI><STRONG>.sbl</STRONG> if the file is a saved <STRONG>sbl</STRONG>
+     *     configuration.
+     * </UL>
      * @param authenticator the authenticator
-     * @param pemfile a file, possibly encrypted, in PEM format containing
-     *        the private key; null to remove the authenticator-specific key
-     */
+     * @param pemfile a file, possibly encrypted, in PEM format
+     *        containing the private key, or a file created with the
+     *        program <STRONG>sbl</STRONG>; null to remove the
+     *        authenticator-specific key
+     * @throws IllegalArgumentException if the second argument is not an
+     *         ordinary file, is not readable, or has the wrong extension
+   */
     public static void setPrivateKey(Authenticator authenticator,
 				     File pemfile)
     {
 	if (pemfile == null) {
 	    pemMap.remove(authenticator);
 	} else {
-	    pemMap.put(authenticator, pemfile);
+	    String name = pemfile.getName().toLowerCase();
+	    boolean allowedSuffix = name.endsWith(".pem")
+		|| name.endsWith(".pem.gpg") || name.endsWith(".sbl");
+	    if (allowedSuffix &&  pemfile.isFile() && pemfile.canRead()) {
+		pemMap.put(authenticator, pemfile);
+	    } else {
+		name = pemfile.toString();
+		String msg = errorMsg("notPrivateKeyFile", name);
+		throw new IllegalArgumentException(msg);
+	    }
 	}
     }
 
@@ -185,14 +226,37 @@ public class AuthenticationPane extends JComponent {
 	password = null;
     }
 
+    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+
+    private static synchronized SecureBasicUtilities tryAgain(Component comp,
+							      File pemFile)
+	throws IOException, GeneralSecurityException
+    {
+	int status = JOptionPane
+	    .showConfirmDialog(comp,
+			       localeString("pwTryAgain"),
+			       localeString("gpgFailedTitle"),
+			       JOptionPane.YES_NO_OPTION);
+	if (status == JOptionPane.OK_OPTION) {
+	    password = null;
+	    return getOps(comp, pemFile);
+	} else {
+	    return null;
+	}
+    }
+
     private static synchronized SecureBasicUtilities getOps(Component comp,
 							    File pemFile)
 	throws IOException, GeneralSecurityException
     {
 	if (pemFile == null) return null;
 	String name = pemFile.getName();
+	if (!(pemFile.isFile() && pemFile.canRead())) {
+	    throw new IOException(errorMsg("notPrivateKeyFile", name));
+	}
+	String nameLC = name.toLowerCase();
 	SecureBasicUtilities ops = null;
-	if (name.endsWith(".gpg")) {
+	if (nameLC.endsWith(".gpg")) {
 	    ProcessBuilder pb = new
 		ProcessBuilder("gpg",
 			       "--pinentry-mode", "loopback",
@@ -201,19 +265,101 @@ public class AuthenticationPane extends JComponent {
 			       pemFile.getCanonicalPath());
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    try {
-		Process p = pb.start();
 		requestPassphrase(comp);
 		if (password == null) return null;
-		OutputStream os = p.getOutputStream();
-		OutputStreamWriter w = new OutputStreamWriter(os, utf8);
-		w.write(password, 0, password.length);
-		w.write(System.getProperty("line.separator"));
-		w.flush();
-		w.close();
-		os.close();
-		InputStream is = p.getInputStream();
-		ops = new SecureBasicUtilities(is);
-		is.close();
+		Process p = pb.start();
+		SecureBasicUtilities[] results =
+		    new SecureBasicUtilities[1];
+		Thread thread = new Thread(() -> {
+			try {
+			    OutputStream os = p.getOutputStream();
+			    OutputStreamWriter w =
+				new OutputStreamWriter(os, utf8);
+			    w.write(password, 0, password.length);
+			    w.write(System.getProperty("line.separator"));
+			    w.flush();
+			    w.close();
+			    os.close();
+			    InputStream is = p.getInputStream();
+			    results[0] = new SecureBasicUtilities(is);
+			    is.close();
+			} catch(Exception e) {
+			    System.err.println(e.getMessage());
+			}
+		});
+		thread.start();
+		thread.join();
+		p.waitFor();
+		if (p.exitValue() != 0) {
+		    System.err.println(errorMsg("gpgFailed", p.exitValue()));
+		    return tryAgain(comp, pemFile);
+		}
+		ops = results[0];
+	    } catch (Exception e) {
+		System.err.println(errorMsg("decryption", name));
+		return null;
+	    }
+	} else if (nameLC.endsWith(".sbl")) {
+	    // in case the program sbl was used to create the key pair.
+	    Properties props = new Properties();
+	    props.load(new FileInputStream(pemFile));
+	    requestPassphrase(comp);
+	    if (password == null) return null;
+	    String eb64key = props.getProperty("ebase64.keypair.privateKey");
+	    byte[] data = Base64.getDecoder().decode(eb64key);
+	    ByteArrayInputStream is = new ByteArrayInputStream(data);
+	    try {
+		// Need to use --batch, etc. because when this runs in
+		// a dialog box, we don't have access to a terminal and
+		// GPG agent won't ask for a passphrase.
+		ProcessBuilder pb = new ProcessBuilder("gpg",
+						       "--pinentry-mode",
+						       "loopback",
+						       "--passphrase-fd", "0",
+						       "--batch", "-d");
+		// pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+		ByteArrayOutputStream baos = new
+		    ByteArrayOutputStream(data.length);
+		requestPassphrase(comp);
+		if (password == null) return null;
+		Process p = pb.start();
+		Thread thread1 = new Thread(()->{
+			try {
+			    OutputStream os = p.getOutputStream();
+			    OutputStreamWriter w = new OutputStreamWriter(os);
+			    w.write(password, 0, password.length);
+			    w.write(System.getProperty("line.separator"));
+			    w.flush();
+			    is.transferTo(os);
+			    w.close();
+			    os.close();
+			} catch(Exception e) {
+			    System.err.println(e.getMessage());
+			}
+		});
+		SecureBasicUtilities[] results =
+		    new SecureBasicUtilities[1];
+		Thread thread2 = new Thread(()->{
+			try {
+			    ByteArrayOutputStream os =
+				new ByteArrayOutputStream();
+			    InputStream is1 = p.getInputStream();
+			    results[0] = new SecureBasicUtilities(is1);
+			    is1.transferTo(baos);
+			} catch(Exception e) {
+			    System.err.println(e.getMessage());
+			}
+		});
+		thread2.start();
+		thread1.start();
+		thread1.join();
+		thread2.join();
+		p.waitFor();
+		if (p.exitValue() != 0) {
+		    System.err.println(errorMsg("gpgFailed", p.exitValue()));
+		    return tryAgain(comp, pemFile);
+		}
+		ops = results[0];
 	    } catch (Exception e) {
 		System.err.println(errorMsg("decryption", name));
 		return null;

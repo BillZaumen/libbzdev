@@ -247,5 +247,12 @@ atest7:
 	$(JAVA) ATest7 /usr/share/doc/libbzdev-doc/api/ \
 		~/.config/sbl/example.sbl testUser
 
+atest8:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest8 /usr/share/doc/libbzdev-doc/api/ \
+		~/.config/sbl/example.sbl testUser
+
 clean:
 	rm -rf classes
