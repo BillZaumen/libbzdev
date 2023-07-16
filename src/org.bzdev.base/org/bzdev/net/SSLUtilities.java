@@ -1,22 +1,170 @@
 package org.bzdev.net;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.cert.*;
+import java.util.Base64;
+import java.util.Properties;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import javax.net.ssl.*;
+
+//@exbundle org.bzdev.net.lpack.Net
 
 /**
  * Methods for configuring SSL/TLS.
  * These methods 
  */
 public class SSLUtilities {
+
+    private static String
+	errorMsg(java.lang.String key, java.lang.Object... args)
+    {
+	return NetErrorMsg.errorMsg(key, args);
+    }
+
+    private static String localeString(String key) {
+	return NetErrorMsg.errorMsg(key);
+    }
+
+    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
+
+    private static char[] decryptToCharArray(String value, char[] gpgpw)
+	throws GeneralSecurityException
+    {
+	if (value == null || gpgpw == null) return EMPTY_CHAR_ARRAY;
+	byte[] data = Base64.getDecoder().decode(value);
+	ByteArrayInputStream is = new ByteArrayInputStream(data);
+
+	try {
+	    // Need to use --batch, etc. because when this runs in
+	    // a dialog box, we don't have access to a terminal and
+	    // GPG agent won't ask for a passphrase.
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--pinentry-mode",
+						   "loopback",
+						   "--passphrase-fd", "0",
+						   "--batch", "-d"/*,
+						   tmpf.getCanonicalPath()*/);
+	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    ByteArrayOutputStream baos = new
+		ByteArrayOutputStream(data.length);
+	    Process p = pb.start();
+	    Thread thread1 = new Thread(()->{
+		    try {
+			OutputStream os = p.getOutputStream();
+			OutputStreamWriter w = new OutputStreamWriter(os);
+			w.write(gpgpw, 0, gpgpw.length);
+			w.write(System.getProperty("line.separator"));
+			w.flush();
+			is.transferTo(os);
+			w.close();
+			os.close();
+		    } catch(Exception e) {
+			System.err.println(e.getMessage());
+		    }
+	    });
+	    Thread thread2 = new Thread(()->{
+		    try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			InputStream is1 = p.getInputStream();
+			is1.transferTo(baos);
+		    } catch(Exception e) {
+			System.err.println(e.getMessage());
+		    }
+	    });
+	    thread2.start();
+	    thread1.start();
+	    thread1.join();
+	    thread2.join();
+	    p.waitFor();
+	    if (p.exitValue() != 0) {
+		String msg = errorMsg("gpgFailed", p.exitValue());
+		throw new GeneralSecurityException(msg);
+	    }
+	    return (Charset.forName("utf-8")
+		    .decode(ByteBuffer.wrap(baos.toByteArray())))
+		.array();
+	} catch (Exception e) {
+	    String msg = errorMsg("decryption", e.getMessage());
+	    throw new GeneralSecurityException(msg, e);
+	}
+    }
+
+    private static Supplier<char[]> defaultPassphraseSupplier = () -> {
+	Console console = System.console();
+	if (console != null) {
+	    char[] password = console
+		.readPassword(localeString("enterPW2") + ":");
+	    if (password == null || password.length == 0) {
+		password = null;
+	    }
+	    return password;
+	} else {
+	    return null;
+	}
+    };
+
+    /**
+     * Configure SSL using data stored in an SBL file.
+     * SBL files can be created and edited using the program
+     * <STRONG>sbl</STRONG>, which is normally installed with this
+     * class library.
+     * @param type the type for an {@link SSLContext} (e.g., SSL or TLS)
+     * @param sblFile a file in SBL format
+     * @param passphraseSupplier a {@link Supplier} that will provide a
+     *        GPG pass phrase; null for a default
+     * @see org.bzdev.swing.ConfigPropertyEditor#gpgPassphraseSupplier
+     */
+    public static void
+	configureUsingSBL(String type,
+			  File sblFile,
+			  Supplier<char[]> passphraseSupplier)
+	throws IOException, GeneralSecurityException, CertificateException
+    {
+	Properties props = new Properties();
+	props.load(new FileInputStream(sblFile));
+	String fn = props.getProperty("trustStore.file");
+	File trustKeyStore = (fn == null)? null: new File(fn);
+	String s = props.getProperty("trust.selfsigned", "false");
+	boolean allowSelfSigned = s.trim().toLowerCase().equals("true");
+	s = props.getProperty("trust.allow.loopback");
+	boolean allowLoopback = s.trim().toLowerCase().equals("true");
+
+	if (trustKeyStore != null) {
+	    if (passphraseSupplier == null) {
+		passphraseSupplier = defaultPassphraseSupplier;
+	    }
+	    char[] gpgpw = passphraseSupplier.get();
+	    String epw = props.getProperty("ebase64.trustStore.password");
+	    if (epw == null) {
+		throw new GeneralSecurityException(errorMsg("epwExpected"));
+	    }
+
+	    installTrustManager(type, trustKeyStore,
+				decryptToCharArray(epw, gpgpw),
+				allowSelfSigned? (cert) -> {return true;}:
+				null);
+	}
+	if (allowLoopback) {
+	    allowLoopbackHostname();
+	}
+    }
+
 
     /**
      * Configure SSL so that it will use a custom trust store in addition

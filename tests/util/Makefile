@@ -333,6 +333,16 @@ blockTest:
 	./scrun checkPrintWriter.esp > testPW.html
 	@chmod u-x scrun
 
+configProp: compile ../swing/config.foo
+	$(JAVA) ConfigPropTest
+
+
+../swing/config.foo:
+	@echo Save a configuration in the file config.foo
+	@echo (this is run in ../swing).  You will need a
+	@echo GPG key.
+	(cd ../swing; make config)
+
 clean:
 	rm -rf classes
 	(cd rv ; make clean)

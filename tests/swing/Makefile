@@ -848,7 +848,6 @@ authtest3:
 	     -classpath ../../BUILD/libbzdev.jar:classes \
 	     AuthPaneTest https://$(HOST):8080/resources/glass.png
 
-
 privateKey.pem.gpg: privateKey.pem
 	gpg -e privateKey.pem
 

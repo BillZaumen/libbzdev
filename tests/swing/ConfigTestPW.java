@@ -1,3 +1,4 @@
+import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
 import org.bzdev.swing.*;
 
@@ -52,13 +53,31 @@ public class ConfigTestPW {
 
 	ConfigEditor editor = new ConfigEditor();
 
+	System.out.println("... requestPassphrase(null)");
 	editor.requestPassphrase(null);
 	editor.clearPassphrase();
+	System.out.println("... requestPassphrase(null) "
+			   + "on event dispatch thread");
 	SwingUtilities.invokeAndWait(() -> {
 	    editor.requestPassphrase(null);
 	    });
 	editor.clearPassphrase();
-	System.out.println("printing to stdout");
+	System.out.println("... requestPassphrase(null, true)");
+	editor.requestPassphrase(null, true);
+	editor.clearPassphrase();
+	System.out.println("... requestGPGPassphrase (null, false)");
+	char[] pw = ConfigPropertyEditor.requestGPGPassphrase(null, false);
+	System.out.println(new String(pw));
+	System.out.println("... requestGPGPassphrase (null, true)");
+	pw = ConfigPropertyEditor.requestGPGPassphrase(null, true);
+	System.out.println(new String(pw));
+	System.out.println("(test) printing to stdout");
+	Supplier<char[]> supplier = ConfigPropertyEditor
+	    .gpgPassphraseSupplier(null, false);
+	System.out.println(supplier.get());
+	supplier = ConfigPropertyEditor
+	    .gpgPassphraseSupplier(null, true);
+	System.out.println(supplier.get());
 	System.exit(0);
     }
 }

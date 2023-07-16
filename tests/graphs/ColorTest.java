@@ -186,6 +186,10 @@ public class ColorTest {
 	    throw new Exception("chsl != c");
 	}
 
+	if (!Colors.getCSSName(c).equals("tomato")) {
+	    throw new Exception("tomato expected");
+	}
+
 	comp = Colors.getComponentsByCSS(hsla);
 	if (comp[0] != 255 || comp[1] != 99 || comp[2] != 71
 	    || comp[3] != 128) {

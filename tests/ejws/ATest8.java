@@ -9,7 +9,8 @@ import java.nio.file.Paths;
 import java.security.cert.Certificate;
 import java.util.Iterator;
 import java.util.Properties;
-import org.bzdev.swing.ConfigPropertyEditor;
+// import org.bzdev.swing.ConfigPropertyEditor;
+import org.bzdev.util.ConfigPropUtilities;
 
 // use to test SBL
 public class ATest8 {
@@ -41,6 +42,7 @@ public class ATest8 {
 	    auth.setTimeLimits(-60 , 120, 3600);
 	    System.out.println("auth mode = " + auth.getMode());
 
+	    /*
 	    ConfigPropertyEditor cpe = new ConfigPropertyEditor() {
 		    @Override
 		    protected String errorTitle()
@@ -64,6 +66,16 @@ public class ATest8 {
 	    String user = props.getProperty(key + ".user");
 	    String password = props.getProperty(key + ".password");
 	    String publicKeyPem = props.getProperty("keypair.publicKey");
+	    */
+	    Properties props = ConfigPropUtilities
+		.newInstance(sblFile, "application/vnd.bzdev.sblauncher");
+	    String user = ConfigPropUtilities
+		.getProperty(props, key + ".user");
+	    String password = ConfigPropUtilities
+		.getProperty(props, key + ".password");
+	    String publicKeyPem = ConfigPropUtilities
+		.getProperty(props, "base64.keypair.publicKey");
+
 	    auth.add(user, publicKeyPem, password);
 	    // auth.setTracer(System.out);
 

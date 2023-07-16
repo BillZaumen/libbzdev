@@ -200,18 +200,23 @@ public class AuthPaneTest {
 	    throw new Exception("ops");
 	}
 
-	// sslSetup();
-	SSLUtilities
-	    .installTrustManager("TLS",
-				 new File(System.getProperty
-					  ("ssl.trustStore")),
-				 System
-				 .getProperty
-				 ("ssl.trustStorePassword")
-				 .toCharArray(),
-				 (cert) -> {return true;});
+	String fn = System.getProperty("sblFile");
+	if (fn != null || fn.length() > 0) {
+	    SSLUtilities.configureUsingSBL("TLS", new File(fn), null);
+	} else {
+	    // sslSetup();
+	    SSLUtilities
+		.installTrustManager("TLS",
+				     new File(System.getProperty
+					      ("ssl.trustStore")),
+				     System
+				     .getProperty
+				     ("ssl.trustStorePassword")
+				     .toCharArray(),
+				     (cert) -> {return true;});
 
-	SSLUtilities.allowLoopbackHostname();
+	    SSLUtilities.allowLoopbackHostname();
+	}
 
 	String urlString1 = argv.length > 0 ? argv[0]: null;
 	String urlString2 = argv.length > 1? argv[1]: null;

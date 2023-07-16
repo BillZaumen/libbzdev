@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.*;
 import java.util.regex.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -40,6 +41,10 @@ import org.bzdev.swing.TextCellEditor;
  * This class supports configuration files that are represented
  * as Java property files using the syntax described in the
  * documentation for {@link java.util.Properties#load(Reader)}.
+ * A seperate class, {@link org.bzdev.util.ConfigPropUtilities},
+ * can be used to read files produced by property editors when
+ * editing is not needed.
+ * <P>
  * The editor displays a window (whether a frame or dialog) containing
  * a menubar, some buttons, and a table with two columns: one labeled
  * <STRONG>Property</STRONG> and one labeled <STRONG>Value</STRONG>.
@@ -952,7 +957,7 @@ public abstract class ConfigPropertyEditor {
 	if (properties == null) {
 	    properties = new Properties();
 	}
-	properties.store(w, "(!M.T " + mediaType() + ")");
+	properties.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
     }
 
 
@@ -982,7 +987,7 @@ public abstract class ConfigPropertyEditor {
 	    if (value.length() == 0) continue;
 	    props.setProperty(key, value);
 	}
-	props.store(w, "(!M.T " + mediaType() + ")");
+	props.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
 	w.flush();
 	w.close();
     }
@@ -1232,7 +1237,7 @@ public abstract class ConfigPropertyEditor {
 	file = f;
 	Reader r = new InputStreamReader(new FileInputStream(file),
 					 UTF8);
-	String comment = "#(!M.T " + mediaType() + ")\r\n";
+	String comment = "#(!M.T " + mediaType().toLowerCase() + ")\r\n";
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
 	int n = r.read(cbuf2);
@@ -1240,8 +1245,16 @@ public abstract class ConfigPropertyEditor {
 	    throw new IOException(errorMsg("wrongMediaType", f.toString()));
 	}
 	for  (int i = 0; i < n; i++) {
-	    if (cbuf1[i] != cbuf2[i]) {
-		throw new IOException(errorMsg("wrongMediaType", f.toString()));
+	    if (i < 7) {
+		if (cbuf1[i] != cbuf2[i]) {
+		    throw new IOException(errorMsg("wrongMediaType",
+						   f.toString()));
+		}
+	    } else {
+		if (cbuf1[i] != Character.toLowerCase(cbuf2[i])) {
+		    throw new IOException(errorMsg("wrongMediaType",
+						   f.toString()));
+		}
 	    }
 	}
 	if (properties == null) {
@@ -1479,12 +1492,13 @@ public abstract class ConfigPropertyEditor {
     private char[] password = null;
 
     /**
-     * Request a GPG passphrase.
-     * This method will open a dialog box to request a GPG pasphrase
-     * for decryption. However, if the argument is null, this method
-     * is not called from the event dispatch thread, and a system
-     * console exists, the system console will be used to obtain the
-     * password (unless the password exists).
+     * Request a GPG passphrase when one has not already been provided.
+     * This method will typically open a dialog box to request a GPG
+     * passphrase for decryption if the passphrase is not already
+     * known. However, if the argument is null, this method is not
+     * called from the event dispatch thread, and a system console
+     * exists, the system console will be used to obtain the
+     * passphrase.
      * <P>
      * To use a dialog box when 'owner' is null and a console exists,
      * use
@@ -1502,87 +1516,183 @@ public abstract class ConfigPropertyEditor {
      */
     public void requestPassphrase(Component owner) {
 	if (password == null) {
-	    if (!SwingUtilities.isEventDispatchThread()) {
-		Console console = System.console();
-		if (console != null) {
-		    password = console
-			.readPassword(localeString("enterPW2") + ":");
-		    if (password == null || password.length == 0) {
-			password = null;
-		    }
-		    return;
-		} else {
-		    try {
-			SwingUtilities.invokeAndWait(() -> {
-				requestPassphrase(owner);
-			    });
-		    } catch (InterruptedException e) {
-		    } catch (InvocationTargetException e) {
-		    }
-		}
-		return;
+	    password = requestGPGPassphrase(owner, false);
+	}
+    }
+
+    /**
+     * Request a GPG passphrase when one has not already been provided,
+     * optionally supressing any use of the system console..
+     * This method will typically open a dialog box to request a GPG
+     * passphrase for decryption if the passphrase is not already
+     * known. However, if the first argument is null, this method is not
+     * called from the event dispatch thread, and a system console
+     * exists, the system console will be used to obtain the
+     * passphrase unless the second argument true.
+     * <P>
+     * To use a dialog box when 'owner' is null and a console exists,
+     * use
+     * <BLOCKQUOTE><PRE><CODE>
+     * ConfigPropertyEditor cpe = ...;
+     * ...
+     * SwingUtilities.invokeAndWait(() -&gt; {
+     *     cpe.requestPassphrase(null);
+     * });
+     * </BLOCKQUOTE></CODE></PRE>
+     * <P>
+     * NOTE: tests indicate that in Java, a system console exists only when
+     * both standard input and standard output are connected to a terminal.
+     * @param owner a component over which a dialog box should be displayed
+     * @param ignoreConsole true if a console should always be ignored; false
+     *        otherwise
+     */
+    public void requestPassphrase(Component owner, boolean ignoreConsole) {
+	if (password == null) {
+	    password = requestGPGPassphrase(owner, ignoreConsole);
+	}
+    }
+
+    /**
+     * Create a supplier that can be used to ask for a GPG passphrase.
+     * The supplier will call
+     * {@link #requestGPGPassphrase(Component,boolean)},
+     * which will typically open a dialog box to request a GPG
+     * passphrase. However, if the first argument is null, this method
+     * is not called from the event dispatch thread, and a system
+     * console exists, the system console will be used to obtain the
+     * passphrase (unless the second argument is true, in which case
+     * the current thread will block until a passphrase is provided
+     * via a dialog box or the dialog box is canceled).
+     * @param owner a component over which a dialog box should be displayed
+     * @param ignoreConsole true if a console should always be ignored; false
+     *        otherwise
+     * @return the supplier
+     * @see org.bzdev.net.SSLUtilities#configureUsingSBL
+     */
+    public static Supplier<char[]>
+	gpgPassphraseSupplier(final Component owner,
+			      final boolean ignoreConsole)
+    {
+	return new Supplier<char[]>() {
+	    public char[] get() {
+		return requestGPGPassphrase(owner, ignoreConsole);
 	    }
-	    JPasswordField pwf = new JPasswordField(16);
-	    pwf.addFocusListener(new FocusAdapter() {
-		    boolean retry = true;
-		    public void focusLost(FocusEvent e) {
-			Component other = e.getOppositeComponent();
-			Window w1 = SwingUtilities.getWindowAncestor
-			    (pwf);
-			Window w2 = (other == null)? null:
-			    SwingUtilities.getWindowAncestor(other);
-			if (retry && e.getCause()
-			    == FocusEvent.Cause.UNKNOWN
-			    && w1 == w2) {
-			    SwingUtilities.invokeLater(() -> {
-				    pwf.requestFocusInWindow();
-				});
-			} else {
-			    retry = false;
-			}
-		    }
-		});
-	    pwf.addAncestorListener(new AncestorListener() {
-		    public void ancestorAdded(AncestorEvent ev) {
+	};
+    }
+
+    /**
+     * Request a GPG passphrase.
+     * This method will typically open a dialog box to request a GPG
+     * pasphrase. However, if the first argument is null,
+     * this method is not called from the event
+     * dispatch thread, and a system console exists, the system console
+     * will be used to obtain the passphrase (unless the second
+     * argument is true, in which case the current thread will block until
+     * a password is provided or the dialog box is canceled).
+     * <P>
+     * To use a dialog box when 'owner' is null, the call is not from
+     * the event dispatch thread,  and a console exists,
+     * use
+     * <BLOCKQUOTE><PRE><CODE>
+     * SwingUtilities.invokeAndWait(() -&gt; {
+     *     char[] passphrase = ConfigPropertyEditor
+     *         .requestGPGPassphrase(null, true);
+     * });
+     * </BLOCKQUOTE></CODE></PRE>
+     * <P>
+     * NOTE: tests indicate that in Java, a system console exists only when
+     * both standard input and standard output are connected to a terminal.
+     * @param owner a component over which a dialog box should be displayed
+     * @param ignoreConsole true if a console should always be ignored; false
+     *        otherwise
+     */
+    public static char[] requestGPGPassphrase(Component owner,
+					      boolean ignoreConsole)
+    {
+	char[] passphrase = null;
+	if (!SwingUtilities.isEventDispatchThread()) {
+	    Console console = System.console();
+	    if (owner == null && console != null && ignoreConsole == false) {
+		passphrase = console
+		    .readPassword(localeString("enterPW2") + ":");
+		if (passphrase == null || passphrase.length == 0) {
+		    passphrase = null;
+		}
+	    } else {
+		char[][] array = new char[1][];
+		try {
+		    SwingUtilities.invokeAndWait(() -> {
+			    array[0] = requestGPGPassphrase(owner, false);
+			});
+		} catch (InterruptedException e) {
+		} catch (InvocationTargetException e) {
+		}
+		passphrase = array[0];
+		array[0] = null;
+	    }
+	    return passphrase;
+	}
+	JPasswordField pwf = new JPasswordField(16);
+	pwf.addFocusListener(new FocusAdapter() {
+		boolean retry = true;
+		public void focusLost(FocusEvent e) {
+		    Component other = e.getOppositeComponent();
+		    Window w1 = SwingUtilities.getWindowAncestor
+			(pwf);
+		    Window w2 = (other == null)? null:
+			SwingUtilities.getWindowAncestor(other);
+		    if (retry && e.getCause()
+			== FocusEvent.Cause.UNKNOWN
+			&& w1 == w2) {
 			SwingUtilities.invokeLater(() -> {
 				pwf.requestFocusInWindow();
 			    });
+		    } else {
+			retry = false;
 		    }
-		    public void ancestorRemoved(AncestorEvent ev) {
-		    }
-		    public void ancestorMoved(AncestorEvent ev) {
-		    }
-		});
-
-	    for (;;) {
-		int status = JOptionPane
-		    .showConfirmDialog(owner, pwf, localeString("enterPW"),
-				       JOptionPane.OK_CANCEL_OPTION);
-		if (status == JOptionPane.OK_OPTION) {
-		    char[] pw = pwf.getPassword();
-		    if (pw == null) continue;
-		    boolean ok = true;
-		    for (int i = 0; i < pw.length; i++) {
-			if (pw[i] == '\n') {
-			    ok = false;
-			    break;
-			}
-			if (pw[i] == '\r') {
-			    ok = false;
-			    break;
-			}
-		    }
-		    if (!ok) {
-			pwf.setText("");
-			continue;
-		    }
-		    password = pw;
-		    break;
-		} else {
-		    break;
 		}
+	    });
+	pwf.addAncestorListener(new AncestorListener() {
+		public void ancestorAdded(AncestorEvent ev) {
+		    SwingUtilities.invokeLater(() -> {
+			    pwf.requestFocusInWindow();
+			});
+		}
+		public void ancestorRemoved(AncestorEvent ev) {
+		}
+		public void ancestorMoved(AncestorEvent ev) {
+		}
+	    });
+
+	for (;;) {
+	    int status = JOptionPane
+		.showConfirmDialog(owner, pwf, localeString("enterPW"),
+				   JOptionPane.OK_CANCEL_OPTION);
+	    if (status == JOptionPane.OK_OPTION) {
+		char[] pw = pwf.getPassword();
+		if (pw == null) continue;
+		boolean ok = true;
+		for (int i = 0; i < pw.length; i++) {
+		    if (pw[i] == '\n') {
+			ok = false;
+			break;
+		    }
+		    if (pw[i] == '\r') {
+			ok = false;
+			break;
+		    }
+		}
+		if (!ok) {
+		    pwf.setText("");
+		    continue;
+		}
+		passphrase = pw;
+		break;
+	    } else {
+		break;
 	    }
 	}
+	return passphrase;
     }
 
     /**

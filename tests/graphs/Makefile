@@ -101,8 +101,6 @@ colors:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ColorTest
 
-
-
 clean:
 	rm -rf testGraph.ps testGraph.png testGraph2.png \
 		abtest*.png abclocktest*.png abclocktest4.ps\
