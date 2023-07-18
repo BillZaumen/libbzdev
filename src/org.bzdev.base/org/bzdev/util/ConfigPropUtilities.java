@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
  * The values for keys that start with
  * <UL>
  *   <LI></STRONG>ebase64.</STRONG> are encrypted using GPG and then
- *       encoded as printable ascii characters using the basic Base64
+ *       encoded as printable ASCII characters using the basic Base64
  *       encoding using the alphabet specified in Table 1 of RFC 4648.
- *   <LI></STRONG>base64.</STRONG> are encoded as printable ascii
+ *   <LI></STRONG>base64.</STRONG> are encoded as printable ASCII
  *       characters using the basic Base64 encoding using the
  *       alphabet specified in Table 1 of RFC 4648.
  * </UL>
@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  * "<STRONG>base64.</STRONG>" or "<STRONG>ebase64.</STRONG>".
  * <P>
  * The motivation is that sometimes values are repeated and it is
- * both tedius and error-prone to replace each instance when there is
+ * both tedious and error-prone to replace each instance when there is
  * a change.  For example
  * <BLOCKQUOTE><PRE><CODE>
  * foregroundColor = white
@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * </CODE></PRE></BLOCKQUOTE>
  * allows one to switch from "dark mode" by simply changing two values.
  * <P>
- * Subsitition loops are not supported:
+ * Substitution loops are not supported:
  * <BLOCKQUOTE><PRE><CODE>
  * foregroundColor = $(backgroundColor)
  * backgroundColor = $(foregroundColor)
@@ -218,13 +218,13 @@ public class ConfigPropUtilities {
 	for  (int i = 0; i < n; i++) {
 	    if (i < 7) {
 		if (cbuf1[i] != cbuf2[i]) {
-		    throw new IOException(errorMsg("wrongMediaType",
-						   f.toString()));
+		    throw new
+			IOException(errorMsg("wrongMediaType", f.toString()));
 		}
 	    } else {
 		if (cbuf1[i] != Character.toLowerCase(cbuf2[i])) {
-		    throw new IOException(errorMsg("wrongMediaType",
-						   f.toString()));
+		    throw new
+			IOException(errorMsg("wrongMediaType", f.toString()));
 		}
 	    }
 	}
@@ -300,7 +300,7 @@ public class ConfigPropUtilities {
      * @param props the instance of {@link Properties} storing key-value
      *        pairs.
      * @param key the key
-     * @return the value for the given key
+     * @return the value for the given key; null if the key does not exist
      */
     public static String getProperty(Properties props, String key)
 	throws IllegalStateException
@@ -309,7 +309,7 @@ public class ConfigPropUtilities {
 	    throw new IllegalStateException(errorMsg("needPassphrase", key));
 	} else if (key.startsWith(B64KEY_START)) {
 	    String value = props.getProperty(key);
-	    if (value == null) return "";
+	    if (value == null) return null;
 	    byte[] data = Base64.getDecoder().decode(value);
 	    ByteArrayInputStream is = new ByteArrayInputStream(data);
 	    StringBuilder sb = new StringBuilder();
@@ -319,7 +319,7 @@ public class ConfigPropUtilities {
 	    return sb.toString();
 	} else {
 	    String value = props.getProperty(key);
-	    if (value == null) return "";
+	    if (value == null) return null;
 	    Matcher matcher = pattern.matcher(value);
 	    int index = 0;
 	    StringBuilder sb = null;
@@ -345,3 +345,11 @@ public class ConfigPropUtilities {
 	}
     }
 }
+
+//  LocalWords:  exbundle GPG BLOCKQUOTE PRE foregroundColor rbg UTF
+//  LocalWords:  backgroundColor headingColor textColor errorColor fd
+//  LocalWords:  ConfigPropUtilities gpg pinentry loopback tmpf pb zA
+//  LocalWords:  getCanonicalPath redirectError gpgFailed utf enterPW
+//  LocalWords:  MEDIATYPE mediaType noFileSpecified wrongMediaType
+//  LocalWords:  ebase decrypted GeneralSecurityException
+//  LocalWords:  needPassphrase

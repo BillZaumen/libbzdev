@@ -202,6 +202,7 @@ public class AuthPaneTest {
 
 	String fn = System.getProperty("sblFile");
 	if (fn != null || fn.length() > 0) {
+	    System.out.println("configuring from " + fn);
 	    SSLUtilities.configureUsingSBL("TLS", new File(fn), null);
 	} else {
 	    // sslSetup();

@@ -111,6 +111,7 @@ all: compile
 	chmod u+x scrun
 	@./scrun checkPrintWriter.esp > testPW.html
 	chmod u-x scrun
+	@echo --- run configProp test interactively '(make configProp)' ---
 
 actest: compile
 	@$(JAVA) ACTest

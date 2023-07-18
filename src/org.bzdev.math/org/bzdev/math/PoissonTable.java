@@ -27,6 +27,29 @@ public final class PoissonTable {
     int n;
 
     /**
+     * Compares this object against the argument.
+     * Two instances of PoissonTable are considered to be equal
+     * if the value of lambda used to configure them are the same.
+     * @param o the argument
+     * @return true if the objects are equal; false otherwise
+     */
+    public boolean equals(Object o) {
+	if (o instanceof PoissonTable) {
+	    return lambda.equals(((PoissonTable)o).lambda);
+	} else {
+	    return false;
+	}
+    }
+
+    /**
+     * Get the hash code for this object.
+     * @return the hash code
+     */
+    public int hashCode() {
+	return lambda.hashCode();
+    }
+
+    /**
      * The maximum value of &lambda; for an instance of
      * {@link PoissonTable}.
      */
@@ -125,7 +148,7 @@ public final class PoissonTable {
 
     private static WeakHashMap<Double,WeakReference<PoissonTable>> map =
 	new WeakHashMap<>(1024, 2.0F);
-    private static HashSet<Double> set = new HashSet<Double>(256);
+    private static HashSet<PoissonTable> set = new HashSet<>(256);
 
     /**
      * Get an instance of {@link PoissonTable}.
@@ -189,13 +212,13 @@ public final class PoissonTable {
 	PoissonTable table;
 	synchronized(set) {
 	    table = createTable(lambda);
-	    set.add(table.lambda);
+	    set.add(table);
 	}
 	return table;
     }
 
     /**
-     * Arragne so that an added {@link PoissonTable} can be
+     * Arrange so that an added {@link PoissonTable} can be
      * garbage collected.
      * @param lambda the &lambda; parameter for the distribution
      * @return the table
@@ -205,7 +228,7 @@ public final class PoissonTable {
 	synchronized(set) {
 	    table = getTable(lambda);
 	    if (table != null) {
-		set.remove(table.lambda);
+		set.remove(table);
 	    }
 	}
 	return table;

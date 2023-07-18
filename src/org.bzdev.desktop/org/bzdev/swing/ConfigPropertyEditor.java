@@ -41,7 +41,7 @@ import org.bzdev.swing.TextCellEditor;
  * This class supports configuration files that are represented
  * as Java property files using the syntax described in the
  * documentation for {@link java.util.Properties#load(Reader)}.
- * A seperate class, {@link org.bzdev.util.ConfigPropUtilities},
+ * A separate class, {@link org.bzdev.util.ConfigPropUtilities},
  * can be used to read files produced by property editors when
  * editing is not needed.
  * <P>
@@ -1052,12 +1052,12 @@ public abstract class ConfigPropertyEditor {
      * key is expected) to be added after the entry, unless the prefix
      * was already entered as a key by a call to
      * {@link #addReservedKeys(String...)} with that key given as
-     * the concatination of the prefix, a period, and the first suffix.
+     * the concatenation of the prefix, a period, and the first suffix.
      * In this case, the call to {@link #addReservedKeys(String...)}
-     * must immediately preceed the call to this method or a sequence
+     * must immediately precede the call to this method or a sequence
      * of calls to this method.
      * @param prefix the start of a key
-     * @param suffixes the possibile suffixes following the prefix
+     * @param suffixes the possible suffixes following the prefix
      *        and separated from the prefix by a period.
      * @exception IllegalArgumentException a key is already in use
      */
@@ -1065,7 +1065,7 @@ public abstract class ConfigPropertyEditor {
 	throws IllegalArgumentException
     {
 	if (ind < 0) {
-	    // should never happen - just catches a ridicularly large
+	    // should never happen - just catches a ridiculously large
 	    // table.
 	    throw new IllegalStateException(errorMsg("indexWrap"));
 	}
@@ -1247,13 +1247,13 @@ public abstract class ConfigPropertyEditor {
 	for  (int i = 0; i < n; i++) {
 	    if (i < 7) {
 		if (cbuf1[i] != cbuf2[i]) {
-		    throw new IOException(errorMsg("wrongMediaType",
-						   f.toString()));
+		    throw new
+			IOException(errorMsg("wrongMediaType", f.toString()));
 		}
 	    } else {
 		if (cbuf1[i] != Character.toLowerCase(cbuf2[i])) {
-		    throw new IOException(errorMsg("wrongMediaType",
-						   f.toString()));
+		    throw new
+			IOException(errorMsg("wrongMediaType", f.toString()));
 		}
 	    }
 	}
@@ -1522,7 +1522,7 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Request a GPG passphrase when one has not already been provided,
-     * optionally supressing any use of the system console..
+     * optionally suppressing any use of the system console..
      * This method will typically open a dialog box to request a GPG
      * passphrase for decryption if the passphrase is not already
      * known. However, if the first argument is null, this method is not
@@ -1583,7 +1583,7 @@ public abstract class ConfigPropertyEditor {
     /**
      * Request a GPG passphrase.
      * This method will typically open a dialog box to request a GPG
-     * pasphrase. However, if the first argument is null,
+     * passphrase. However, if the first argument is null,
      * this method is not called from the event
      * dispatch thread, and a system console exists, the system console
      * will be used to obtain the passphrase (unless the second
@@ -1954,12 +1954,12 @@ public abstract class ConfigPropertyEditor {
      * An instance of this renderer can be used with
      * {@link #addRE(String,TableCellRenderer,TableCellEditor)} for
      * cases where the contents of a cell should not be displayed and
-     * one wants adescription of its contents instead.
+     * one wants a description of its contents instead.
      * <P>
      * A function maps the value to the string describing it.  If the
      * value is a string, the string is trimmed and if the resulting
-     * length is value, the valuse is handled as if it were null. Any
-     * text that is displayed by this renderer will be bracked by square
+     * length is 0, the value is handled as if it were null. Any
+     * text that is displayed by this renderer will be bracketed by square
      * brackets.
      * <P>
      * This renderer will use colors that are the same as those used for
@@ -2207,7 +2207,7 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Get the value for a monitored property.
-     * @param property a propertyy that is being monitored
+     * @param property a property that is being monitored
      * @return the value for the specified property
      * @exception IllegalArgumentException the key was not monitored
      */
@@ -2249,7 +2249,7 @@ public abstract class ConfigPropertyEditor {
      * Indicate that if one property's value changes, various other properties
      * should have their values set to null.
      * <P>
-     * THis is useful in cases such as one property providing a file format
+     * This is useful in cases such as one property providing a file format
      * and a second providing a file name that is required to have a particular
      * extension.
      * @param p a property
@@ -2310,7 +2310,7 @@ public abstract class ConfigPropertyEditor {
      * that indicates that GPG encryption will be used, in which case
      * dialog boxes will be used to get the names of recipients.
      * If a key already exists, its value will be overwritten.
-     * @param owner a compoent over which a dialog box may appear; null
+     * @param owner a component over which a dialog box may appear; null
      *        if a dialog box's location is not constrained
      * @param key the key
      * @param value the value for the key
@@ -3106,7 +3106,7 @@ public abstract class ConfigPropertyEditor {
      *        closing.
      * @param quitCloseMode {@link CloseMode#QUIT} if the process should
      *        exit when the editor closes; {@link CloseMode#CLOSE} if
-     *        the process should continue after the editor clsoes, or
+     *        the process should continue after the editor closes, or
      *        {@link CloseMode#BOTH} if both a Quit and a Close menu
      *        item should appear in the File menu.
      */
@@ -3345,7 +3345,26 @@ public abstract class ConfigPropertyEditor {
 //  LocalWords:  config getDecodedProperties addMoreKeys IOException
 //  LocalWords:  noFileSpecified wrongMediaType unencrypted emdash pb
 //  LocalWords:  getProperty rawkey ProcessBuilder ot OutputStream os
-//  LocalWords:  getOutputStream transferTo eio getMessage buf sb
-//  LocalWords:  CharArrayWriter toCharArray InputStreamReader
-//  LocalWords:  getInputStream StringBuilder setProperty toString
-//  LocalWords:  println errorMsg
+//  LocalWords:  getOutputStream transferTo eio getMessage buf sb AWT
+//  LocalWords:  CharArrayWriter toCharArray InputStreamReader addRE
+//  LocalWords:  getInputStream StringBuilder setProperty toString fd
+//  LocalWords:  println renderers TableCellRenderer tmpf tf
+//  LocalWords:  TableCellEditor renderer freezeRows createTempFile
+//  LocalWords:  setInitialExtraRows configPropEditor deleteOnExit bg
+//  LocalWords:  FileOutputStream fos pinentry loopback redirectError
+//  LocalWords:  getCanonicalPath pwTryAgain gpgFailedTitle sbh fg VK
+//  LocalWords:  setRecipients indexWrap addReservedKeys altKeys cpe
+//  LocalWords:  IllegalArgumentException getBackground getForeground
+//  LocalWords:  getCaretColor getText stopCellEditing SwingUtilities
+//  LocalWords:  requestPassphrase ignoreConsole requestGPGPassphrase
+//  LocalWords:  boolean configureUsingSBL enterPW HelpMenuItem CTRL
+//  LocalWords:  helpMenuItem menuItem isBordered encryptedTCR qcl
+//  LocalWords:  textFunction textFunctionNeeded monitorProperty
+//  LocalWords:  ConfigPropertyListener addConfigPropertyListener
+//  LocalWords:  monitorEB notMonitoredKey comparator instanceof
+//  LocalWords:  getWindowAncestor extraInitialRows tableExtensible
+//  LocalWords:  adjustedSpacersLength lastKey tmlAdded qctitle
+//  LocalWords:  saveQuestionQuit saveQuestionClose localeString
+//  LocalWords:  JMenuItem KeyEvent InputEvent addActionListener
+//  LocalWords:  fileMenu CloseMode selectedIndex Hashtable
+//  LocalWords:  clearPassphrase

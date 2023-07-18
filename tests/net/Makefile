@@ -7,7 +7,7 @@ all: compile
 	@echo ---- FormDataIterator Test ----
 	$(JAVA) FormDataTest
 	@echo ----- PEM Test -----
-	R(JAVA) PemTest
+	$(JAVA) PemTest
 
 compile:
 	(cd ../.. ; make jars)

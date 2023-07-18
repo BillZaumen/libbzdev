@@ -22,12 +22,17 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.net.ssl.*;
+import org.bzdev.util.ConfigPropUtilities;
 
 //@exbundle org.bzdev.net.lpack.Net
 
 /**
- * Methods for configuring SSL/TLS.
- * These methods 
+ * Class for configuring SSL/TLS.
+ * This class consists of static methods. It will let one
+ * add an additional trust store (useful for testing or servers
+ * that are running locally), allow the loopback interface to be
+ * used in an SSL connection, and configure when
+ * self-signed certificates are accepted.
  */
 public class SSLUtilities {
 
@@ -41,6 +46,7 @@ public class SSLUtilities {
 	return NetErrorMsg.errorMsg(key);
     }
 
+    /*
     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
     private static char[] decryptToCharArray(String value, char[] gpgpw)
@@ -58,8 +64,7 @@ public class SSLUtilities {
 						   "--pinentry-mode",
 						   "loopback",
 						   "--passphrase-fd", "0",
-						   "--batch", "-d"/*,
-						   tmpf.getCanonicalPath()*/);
+						   "--batch", "-d");
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    ByteArrayOutputStream baos = new
 		ByteArrayOutputStream(data.length);
@@ -118,6 +123,7 @@ public class SSLUtilities {
 	    return null;
 	}
     };
+    */
 
     /**
      * Configure SSL using data stored in an SBL file.
@@ -136,27 +142,47 @@ public class SSLUtilities {
 			  Supplier<char[]> passphraseSupplier)
 	throws IOException, GeneralSecurityException, CertificateException
     {
+	/*
 	Properties props = new Properties();
 	props.load(new FileInputStream(sblFile));
-	String fn = props.getProperty("trustStore.file");
+	*/
+	Properties props = ConfigPropUtilities
+	    .newInstance(sblFile, "application/vnd.bzdev.sblauncher");
+	// String fn = props.getProperty("trustStore.file");
+	String fn = ConfigPropUtilities.getProperty(props, "trustStore.file");
 	File trustKeyStore = (fn == null)? null: new File(fn);
-	String s = props.getProperty("trust.selfsigned", "false");
+	// String s = props.getProperty("trust.selfsigned", "false");
+	String s = ConfigPropUtilities.getProperty(props, "trust.selfsigned");
+	if (s == null) s = "false";
 	boolean allowSelfSigned = s.trim().toLowerCase().equals("true");
-	s = props.getProperty("trust.allow.loopback");
+	s = ConfigPropUtilities.getProperty(props, "trust.allow.loopback");
+	if (s == null) s = "false";
 	boolean allowLoopback = s.trim().toLowerCase().equals("true");
 
 	if (trustKeyStore != null) {
+	    /*
 	    if (passphraseSupplier == null) {
 		passphraseSupplier = defaultPassphraseSupplier;
 	    }
 	    char[] gpgpw = passphraseSupplier.get();
-	    String epw = props.getProperty("ebase64.trustStore.password");
-	    if (epw == null) {
+	    */
+	    char[] gpgpw = ConfigPropUtilities
+		.getGPGPassphrase(passphraseSupplier);
+
+	    // String epw = props.getProperty("ebase64.trustStore.password");
+	    char[] trustpw = ConfigPropUtilities
+		.getDecryptedProperty(props, "ebase64.trustStore.password",
+				      gpgpw);
+
+	    for (int i = 0; i < gpgpw.length; i++) {
+		gpgpw[i] = '\0';
+	    }
+	    if (trustpw == null) {
 		throw new GeneralSecurityException(errorMsg("epwExpected"));
 	    }
 
-	    installTrustManager(type, trustKeyStore,
-				decryptToCharArray(epw, gpgpw),
+	    installTrustManager(type, trustKeyStore, trustpw,
+				/* decryptToCharArray(epw, gpgpw),*/
 				allowSelfSigned? (cert) -> {return true;}:
 				null);
 	}
@@ -345,5 +371,16 @@ public class SSLUtilities {
     }
 }
 
-//  LocalWords:  SSL TLS acceptSelfSigned SSLContext trustKeyStore
-//  LocalWords:  getInstance auth stdTM ourTM verifier loopback
+//  LocalWords:  SSL TLS acceptSelfSigned SSLContext trustKeyStore pb
+//  LocalWords:  getInstance auth stdTM ourTM verifier loopback gpgpw
+//  LocalWords:  exbundle decryptToCharArray GeneralSecurityException
+//  LocalWords:  ByteArrayInputStream GPG ProcessBuilder gpg pinentry
+//  LocalWords:  fd redirectError ByteArrayOutputStream baos os msg
+//  LocalWords:  OutputStream getOutputStream OutputStreamWriter utf
+//  LocalWords:  transferTo getMessage InputStream getInputStream SBL
+//  LocalWords:  waitFor exitValue gpgFailed Charset forName
+//  LocalWords:  defaultPassphraseSupplier readPassword localeString
+//  LocalWords:  enterPW sbl sblFile passphraseSupplier fn trustStore
+//  LocalWords:  gpgPassphraseSupplier FileInputStream getProperty
+//  LocalWords:  trustStroe selfsigned epw epwExpected
+//  LocalWords:  allowLoopbackHostname

@@ -35,6 +35,12 @@ import org.bzdev.util.SafeFormatter;
  * <code>Authenticator.setDefault(AuthenticationPane.getAuthenticator(component));</code>
  * where <code>component</code> is a component on which to center a dialog
  * that is created when interaction with the user is necessary.
+ * <P>
+ * If the server does not have a certificate signed by a certificate
+ * authority, SSL will have to be configured to handle this case.
+ * The class {@link org.bzdev.net.SSLUtilities} has methods that can
+ * handle this situation.  The class
+ * {@link org.bzdev.util.ConfigPropUtilities} may also be useful.
  */
 public class AuthenticationPane extends JComponent {
 
@@ -852,5 +858,7 @@ public class AuthenticationPane extends JComponent {
 //  LocalWords:  getAuthenticator withMap udata ctxt reqURL userName
 //  LocalWords:  PasswordAuthentication https getMessage resultHolder
 //  LocalWords:  auth getPassword authenticators enterPW pinentry len
-//  LocalWords:  loopback redirectError getPath charAt endsWith
+//  LocalWords:  loopback redirectError getPath charAt endsWith sbl
 //  LocalWords:  substring MalformedURLException containsKey
+//  LocalWords:  IllegalArgumentException notPrivateKeyFile gpgFailed
+//  LocalWords:  pwTryAgain gpgFailedTitle noPrivateKey
