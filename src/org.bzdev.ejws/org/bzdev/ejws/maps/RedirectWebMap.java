@@ -135,11 +135,17 @@ public class RedirectWebMap extends WebMap {
 					  WebMap.RequestInfo requestInfo)
     {
 	/*
-	  System.out.println("getInfoFrom Path called with path " + path
-	  + ", querty " + query);
+	System.out.println("getInfoFrom Path called with path " + path
+			   + ", query " + query);
 	*/
 	if (path.startsWith("/")) {
 	    path = path.substring(1);
+	}
+	if (path.length() == 0 && query == null) {
+	    // we aren't providing a subpath and/or a query, so we
+	    // should get those from the URL used to configure this
+	    // web masp.
+	    query = base.getRawQuery();
 	}
 	URL url;
 	try {

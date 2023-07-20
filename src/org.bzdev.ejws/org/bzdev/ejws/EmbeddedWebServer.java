@@ -579,9 +579,6 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for a wildcard IP address with a default number of threads.
-     * When useHTTPS is true, the server will use a default certificate
-     * appropriate only for testing.  Other constructors allow a certificate
-     * to be provided explicitly.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -597,9 +594,6 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for a wildcard IP address.
-     * When useHTTPS is true, the server will use a default certificate
-     * appropriate only for testing.  Other constructors allow a certificate
-     * to be provided explicitly.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -617,9 +611,6 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor.
-     * When useHTTPS is true, the server will use a default certificate
-     * appropriate only for testing.  Other constructors allow a certificate
-     * to be provided explicitly.
      * @param addr the Internet address for this server; null for the
      *        wildcard address
      * @param port the TCP port number for a server; 0 for a system-allocated

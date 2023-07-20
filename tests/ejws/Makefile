@@ -215,6 +215,12 @@ atest5:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest5
 
+atest5a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest5a
+
 
 atest4-noauth:
 	(cd ../.. ; make jars)
