@@ -654,6 +654,8 @@ public class BasicSplinePath2D extends SplinePath2D {
      * Entry i contains the x and y coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      */
     public void printTable() {
 	printTable(System.out);
@@ -664,6 +666,8 @@ public class BasicSplinePath2D extends SplinePath2D {
      * Entry i contains the x and y coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      * @param appendable an Appendable on which to print
      */
     public void printTable(Appendable appendable) {
@@ -671,11 +675,13 @@ public class BasicSplinePath2D extends SplinePath2D {
     }
 
     /**
-     * Print information about the segments that make up the path
+     * Print information about the segments that make up the path,
      * adding a prefix.
      * Entry i contains the x and y coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      * @param prefix a prefix to print at the start of each line
      *        (null implies an empty string)
      * @param appendable the appendable for output

@@ -478,6 +478,8 @@ public class BasicSplinePath3D extends SplinePath3D {
      * Entry i contains the X, Y, and Z coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      */
     public void printTable() {
 	printTable(System.out);
@@ -488,6 +490,8 @@ public class BasicSplinePath3D extends SplinePath3D {
      * Entry i contains the X, Y, and Z coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      * @param appendable an Appendable on which to print
      */
     public void printTable(Appendable appendable) {
@@ -500,6 +504,8 @@ public class BasicSplinePath3D extends SplinePath3D {
      * Entry i contains the X, Y, and Z coordinate when the parameter is
      * equal to i, followed by control points, the last of which is
      * the coordinate when the parameter is i+1.
+     * Each segment represents a line or curve whose intermediate
+     * points, if any, are control points.
      * @param prefix a prefix to print at the start of each line
      *        (null implies an empty string)
      * @param appendable the appendable for output
