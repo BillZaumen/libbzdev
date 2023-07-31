@@ -17,11 +17,19 @@ public class ConfigPropTest {
 	System.out.println(ConfigPropUtilities
 			   .getProperty(props, "base64.zzz1"));
 			   
-	System.out.println(ConfigPropUtilities
+	System.out.println("key1 = " + ConfigPropUtilities
 			   .getProperty(props, "key1"));
-	System.out.println(ConfigPropUtilities
+	System.out.println("key2 = " + ConfigPropUtilities
 			   .getProperty(props, "key2"));
-	System.out.println(ConfigPropUtilities
+	System.out.println("key3 = " + ConfigPropUtilities
 			   .getProperty(props, "key3"));
+	System.out.println("key4 = " + ConfigPropUtilities
+			   .getProperty(props, "key4"));
+	System.out.println("key5 = " + ConfigPropUtilities
+			   .getProperty(props, "key5"));
+	System.out.println("key6 = " + ConfigPropUtilities
+			   .getProperty(props, "key6"));
+	System.out.println("key7 = " + ConfigPropUtilities
+			   .getProperty(props, "key7"));
     }
 }

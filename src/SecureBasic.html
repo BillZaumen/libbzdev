@@ -25,7 +25,10 @@
     and configuring certificates that most users find too daunting to
     consider (a program named <STRONG>sbl</STRONG> described below
     will set up a key pair painlessly and provides buttons to copy
-    data needed by a server to the system clipboard).
+    data needed by a server to the system clipboard).  In addition,
+    client certificates are used when an SSL connection is established,
+    which is problematic for a web site that uses a single TCP socket
+    when only part of the web site should be authenticated.
   <P>
     Secure basic authentication assumes that SSL/TLS will be used for
     connections between a client and server. As a result,

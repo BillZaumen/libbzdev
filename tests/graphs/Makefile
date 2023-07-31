@@ -25,6 +25,7 @@ all:
 	$(JAVA) BBTest
 	$(JAVA) GridTest
 	$(JAVA) PolarTest
+	$(JAVA) RadialTest
 
 text:
 	(cd ../.. ; make jars)
@@ -100,6 +101,13 @@ colors:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ColorTest
+
+radial:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) RadialTest
+
 
 clean:
 	rm -rf testGraph.ps testGraph.png testGraph2.png \

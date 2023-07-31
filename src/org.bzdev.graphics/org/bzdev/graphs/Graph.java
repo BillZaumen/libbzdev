@@ -256,7 +256,16 @@ import org.bzdev.util.SafeFormatter;
  * </CODE></PRE></blockquote>
  * will draw a blue line whose end points in graph coordinate space
  * are (10.0, 1.0) and (900.0, 90.0) and whose width is 1.5 pts
- * (in user-space units).
+ * (in user-space units).  If {@link Graphics2D#setPaint(Paint)} is used,
+ * The paint is specified in user space.  The method
+ * {@link Graph#createGraphicsGCS()} will create a graphics context that
+ * uses graph coordinate space and the method
+ * {@link Graphics2D#setPaint(Paint)} will specify a paint using graph
+ * coordinate space, but in this case the graphics context must be used
+ * directly to draw or fill shapes: the <STRONG>draw</STRONG> and
+ * <STRONG>fill</STRONG> methods provided by {@link Graph} specify the
+ * shape to be drawn in graph coordinate space using a graphics context
+ * that draws in user apsce.
  * <P>
  * To draw a symbol on the graph, one can create an instance of the
  * class {@link org.bzdev.graphs.Graph.SymbolFactory}, configure it,

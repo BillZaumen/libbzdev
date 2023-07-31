@@ -21,12 +21,13 @@ all:
 	@$(JAVA) CPointTest
 	@echo --------- BuilderTest --------------
 	@$(JAVA) BuilderTest
-	@echo -------- BuilderTestOps ------------
 	@$(JAVA) BuilderTestOps
 	@echo --------- BuilderTest2 -------------
 	@$(JAVA) BuilderTest2
 	@echo --------- BuilderTest3 -------------
 	@$(JAVA) BuilderTest3
+	@echo ------- BuilderTest4 ----------
+	@$(JAVA) BuilderTest4
 	@echo --------- scripting path-builder tests
 	@$(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
@@ -187,6 +188,15 @@ affine:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@echo ------- AffineTest ----------
 	$(JAVA) AffineTest
+
+
+btest4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest4 ----------
+	$(JAVA) BuilderTest4
+
 
 
 bvtest:

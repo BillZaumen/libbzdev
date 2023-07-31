@@ -171,17 +171,31 @@ public class ConfigPropUtilities {
 	}
     };
 
-
     /**
      * Create a new instance of {@link Properties}, loading its keys and
      * values from a file.
      * @param f the file from which to load properties
      */
     public static Properties newInstance(File f) throws IOException {
+	if (f == null) {
+	    throw new IOException("noFileSpecified");
+	}
+	try (InputStream is = new FileInputStream(f)) {
+	    return newInstance(is);
+	}
+    }
+
+
+    /**
+     * Create a new instance of {@link Properties}, loading its keys and
+     * values from an input stream.
+     * The stream is not automatically closed.
+     * @param f the file from which to load properties
+     */
+    public static Properties newInstance(InputStream is) throws IOException {
 	Properties props = new Properties();
-	InputStream is = new FileInputStream(f);
 	props.load(is);
-	is.close();
+	// is.close();
 	return props;
     }
 
@@ -206,31 +220,56 @@ public class ConfigPropUtilities {
 	if (f == null) {
 	    throw new IOException("noFileSpecified");
 	}
-	Reader r = new InputStreamReader(new FileInputStream(f),
-					 UTF8);
+	try (InputStream is = new FileInputStream(f)) {
+	    return newInstance(is, mediaType);
+	}
+    }
+    /**
+     * Create a new instance of {@link Properties}, loading its keys and
+     * values from an input sream, and checking the stream's media type.
+     * <P>
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.
+     * The stream is not automatically closed.
+     * @param is the input stream from which to load properties
+     * @param mediaType the expected media type for the file
+     */
+    public static Properties newInstance(InputStream is,
+					 String mediaType)
+	throws IOException
+    {
+	if (is == null) {
+	    throw new IOException("noInputStreamSpecified");
+	}
+	Reader r = new InputStreamReader(is, UTF8);
 	String comment = "#(!M.T " + mediaType.trim().toLowerCase() + ")\r\n";
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
 	int n = r.read(cbuf2);
 	if (n != cbuf2.length) {
-	    throw new IOException(errorMsg("wrongMediaType", f.toString()));
+	    throw new IOException(errorMsg("wrongMediaType"));
 	}
 	for  (int i = 0; i < n; i++) {
 	    if (i < 7) {
 		if (cbuf1[i] != cbuf2[i]) {
 		    throw new
-			IOException(errorMsg("wrongMediaType", f.toString()));
+			IOException(errorMsg("wrongMediaType"));
 		}
 	    } else {
 		if (cbuf1[i] != Character.toLowerCase(cbuf2[i])) {
 		    throw new
-			IOException(errorMsg("wrongMediaType", f.toString()));
+			IOException(errorMsg("wrongMediaType"));
 		}
 	    }
 	}
 	Properties properties = new Properties();
 	properties.load(r);
-	r.close();
+	// r.close();
 	return properties;
     }
 
@@ -280,7 +319,7 @@ public class ConfigPropUtilities {
     private static final Pattern keyPattern =
 	Pattern.compile("[a-zA-Z][a-zA-Z0-9_]*([.][a-zA-Z][a-zA-Z0-9_]*)*");
     static final Pattern pattern =
-	Pattern.compile(Pattern.quote("$(")
+	Pattern.compile(Pattern.quote("$$") + "|" + Pattern.quote("$(")
 			+ "([a-zA-Z][a-zA-Z0-9_]*([.][a-zA-Z][a-zA-Z0-9_]*)*)"
 			+ Pattern.quote(")"));
 
@@ -319,7 +358,10 @@ public class ConfigPropUtilities {
 	    return sb.toString();
 	} else {
 	    String value = props.getProperty(key);
-	    if (value == null) return null;
+	    if (value == null) {
+		value = getProperty(props, "base64." + key);
+		return value;
+	    }
 	    Matcher matcher = pattern.matcher(value);
 	    int index = 0;
 	    StringBuilder sb = null;
@@ -327,11 +369,15 @@ public class ConfigPropUtilities {
 		if (sb == null) sb = new StringBuilder();
 		int start = matcher.start();
 		int end = matcher.end();
-		String pkey = value.substring(start+2, end-1);
-		sb.append(value.substring(index, start));
-		String pval = getProperty(props, pkey);
-		if (pval != null) {
-		    sb.append(pval);
+		if (value.charAt(start+1) == '$') {
+		    sb.append("$");
+		} else {
+		    String pkey = value.substring(start+2, end-1);
+		    sb.append(value.substring(index, start));
+		    String pval = getProperty(props, pkey);
+		    if (pval != null) {
+			sb.append(pval);
+		    }
 		}
 		index = end;
 	    }

@@ -435,12 +435,15 @@ public abstract class RootFinder<P> {
 	 * Create a new instance of RootFinder.Brent using
 	 * a {@link RealValuedFunction} or {@link RealValuedFunctOps}
 	 * to provide the root finder's function, plus a second function
-	 * to provide error values.
+	 * to provide error values (this function will be used to
+	 * implement the method {@link RootFinder#ferror(double)}).
 	 * <P>
 	 * A {@link RealValuedFunction}'s
 	 * {@link RealValuedFunction#derivAt(double)} and
 	 * {@link RealValuedFunction#secondDerivAt(double)} do not have
 	 * to be implemented as these are not used.
+	 * The function provided as the second argument will be used to
+	 * implement the method {@link RootFinder#ferror(double)}.
 	 * @param f a function
 	 * @param ef a function providing the error for f(x)
 	 * @return a new root finder
@@ -737,9 +740,9 @@ public abstract class RootFinder<P> {
 	 * {@link RootFinder.Brent}.  As the iteration continues, the
 	 * interval will become smaller.
 	 * @param y the desired value of f(x, p)
-	 * @param initialArgs a single mandatory argument providing a guess
-	 *        and optionally two optional giving a range over which
-	 *        a solution is bracketed
+	 * @param initialArgs a single mandatory argument providing a
+	 *        guess and optionally two additional arguments giving
+	 *        a range over which a solution is bracketed
 	 * @exception RootFinder.ConvergenceException the method failed
 	 * @exception MathException an error occurred calling the function f or
 	 *            one of its derivatives.
@@ -1059,7 +1062,8 @@ public abstract class RootFinder<P> {
 	 * The {@link RealValuedFunction}'s
 	 * {@link RealValuedFunction#secondDerivAt(double)}
 	 * method does not have to be implemented as this method is
-	 * not used.
+	 * not used. The function ef will be used to implement the
+	 * method {@link RootFinder#ferror(double)}.
 	 * @param f a function
 	 * @param ef a function providing the error for the value f(x)
 	 * @return a new root finder
@@ -1113,7 +1117,9 @@ public abstract class RootFinder<P> {
 	 * an instance of  {@link DoubleUnaryOperator}
 	 *  or {@link RealValuedFunctOps}
 	 *  to provide the root finder's function
-	 * and its first derivative, plus an error function.
+	 * and its first derivative.
+	 * The function provided as the second argument will be used to
+	 * implement the method {@link RootFinder#ferror(double)}.
 	 * @param f the function for the root finder
 	 * @param df the derivative of f
 	 * @param ef a function providing the error in the computation of f
@@ -1428,8 +1434,9 @@ public abstract class RootFinder<P> {
 	/**
 	 * Create a new instance of RootFinder.Halley using
 	 * a {@link RealValuedFunction} to provide the root finder's function
-	 * and that function's first and second derivative, and a function
-	 * to provide the error.
+	 * and that function's first and second derivative.
+	 * The function provided as the second argument will be used to
+	 * implement the method {@link RootFinder#ferror(double)}.
 	 * @param f a function
 	 * @param ef a function providing the error in the value f(x)
 	 * @return a new root finder

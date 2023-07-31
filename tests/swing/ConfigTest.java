@@ -19,12 +19,14 @@ public class ConfigTest {
 	    addReservedKeys("key3", "base64.key4", "base64.key5");
 	    addReservedKeys("ebase64.password");
 	    addReservedKeys("output.file");
+	    addReservedKeys("key6", "key7");
 
 	    setupCompleted();
 	    setDefaultProperty("key1", "foo");
 	    setDefaultProperty("key2", "$(key1), $(key3)");
 	    setDefaultProperty("key3", "bar");
-
+	    setDefaultProperty("key6", "$$(hello)");
+	    setDefaultProperty("key7", "$$$$$(key1)");
 	    monitorProperty("input.file");
 	    monitorProperty("output.file");
 	}

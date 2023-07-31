@@ -118,9 +118,9 @@ import org.bzdev.swing.TextCellEditor;
  *   $(<I>KEY</I>)
  * </CODE></PRE></BLOCkQUOTE>
  * will be replaced with the value of the key. The order of the keys
- * does not matter, but references must not be circular.  There is not
- * an escape syntax that would allow string "$(" to be part of a value.
- * Instead, one should use base-64 encoding, in which case variable
+ * does not matter, but references must not be circular.  The sequence
+ * <CODE>$$</CODE> will be replaced with <CODE>$</CODE>. It may be
+ * more convenient to  use base-64 encoding, in which case variable
  * substitution will not occur. Leading and trailing whitespace is
  * preserved for keys whose first token is "base64" or "ebase64", but
  * not otherwise. With any "base64" or "ebase64" token and its
@@ -744,7 +744,7 @@ public abstract class ConfigPropertyEditor {
     }
 
     static final Pattern pattern =
-	Pattern.compile(Pattern.quote("$(")
+	Pattern.compile(Pattern.quote("$$") + "|" + Pattern.quote("$(")
 			+ "([a-zA-Z][a-zA-Z0-9_]*([.][a-zA-Z][a-zA-Z0-9_]*)*)"
 			+ Pattern.quote(")"));
 
@@ -786,12 +786,14 @@ public abstract class ConfigPropertyEditor {
 	    while (matcher.find(index)) {
 		int start = matcher.start();
 		int end = matcher.end();
-		String pkey = value.substring(start+2, end-1);
-		String pval = props.getProperty(pkey);
-		if (pval != null) {
-		    Set<String> outmapLinks = outmap.get(pkey);
-		    inmapLinks.add(pkey);
-		    outmapLinks.add(key);
+		if (value.charAt(start+1) != '$') {
+		    String pkey = value.substring(start+2, end-1);
+		    String pval = props.getProperty(pkey);
+		    if (pval != null) {
+			Set<String> outmapLinks = outmap.get(pkey);
+			inmapLinks.add(pkey);
+			outmapLinks.add(key);
+		    }
 		}
 		index = end;
 	    }
@@ -862,12 +864,14 @@ public abstract class ConfigPropertyEditor {
 	    while (matcher.find(index)) {
 		int start = matcher.start();
 		int end = matcher.end();
-		String pkey = value.substring(start+2, end-1);
-		String pval = props.getProperty(pkey);
-		if (pval != null) {
-		    Set<String> outmapLinks = outmap.get(pkey);
-		    inmapLinks.add(pkey);
-		    outmapLinks.add(key);
+		if (value.charAt(start+1) != '$') {
+		    String pkey = value.substring(start+2, end-1);
+		    String pval = props.getProperty(pkey);
+		    if (pval != null) {
+			Set<String> outmapLinks = outmap.get(pkey);
+			inmapLinks.add(pkey);
+			outmapLinks.add(key);
+		    }
 		}
 		index = end;
 	    }
@@ -3167,12 +3171,14 @@ public abstract class ConfigPropertyEditor {
 	    while (matcher.find(index)) {
 		int start = matcher.start();
 		int end = matcher.end();
-		String pkey = value.substring(start+2, end-1);
-		String pval = dbProperties.getProperty(pkey);
-		if (pval != null) {
-		    Set<String> outmapLinks = outmap.get(pkey);
-		    inmapLinks.add(pkey);
-		    outmapLinks.add(key);
+		if (value.charAt(start+1) != '$') {
+		    String pkey = value.substring(start+2, end-1);
+		    String pval = dbProperties.getProperty(pkey);
+		    if (pval != null) {
+			Set<String> outmapLinks = outmap.get(pkey);
+			inmapLinks.add(pkey);
+			outmapLinks.add(key);
+		    }
 		}
 		index = end;
 	    }
@@ -3306,12 +3312,16 @@ public abstract class ConfigPropertyEditor {
 		while (matcher.find(index)) {
 		    int start = matcher.start();
 		    int end = matcher.end();
-		    String pkey =value.substring(start+2, end-1);
 		    sb.append(value.substring(index, start));
-		    String pval = results.getProperty(pkey);
-		    if (pval == null) pval = System.getProperty(pkey);
-		    if (pval != null) {
-			sb.append(pval);
+		    if (value.charAt(start+1) != '$') {
+			String pkey = value.substring(start+2, end-1);
+			String pval = results.getProperty(pkey);
+			if (pval == null) pval = System.getProperty(pkey);
+			if (pval != null) {
+			    sb.append(pval);
+			}
+		    } else {
+			sb.append("$");
 		    }
 		    index = end;
 		}
