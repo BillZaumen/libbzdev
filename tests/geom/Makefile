@@ -197,6 +197,11 @@ btest4:
 	@echo ------- BuilderTest4 ----------
 	$(JAVA) BuilderTest4
 
+btest3d:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) BasicPath3DTest
 
 
 bvtest:

@@ -695,6 +695,12 @@ public class BasicSplinePath2D extends SplinePath2D {
 	    out = new PrintWriter(w);
 	}
 	if (entries == null) refresh();
+	double x0 = 0.0;
+	double y0 = 0.0;
+	if (entries.length > 0) {
+	    x0 = entries[0].x;
+	    y0 = entries[0].y;
+	}
 	for (int i = 0; i < entries.length; i++) {
 	    out.println(prefix + "Entry " + i + ":");
 	    int m = 0;
@@ -711,6 +717,10 @@ public class BasicSplinePath2D extends SplinePath2D {
 		out.println(prefix + "    mode: SEG_QUADTO");
 		m = 4;
 		break;
+	    case PathIterator.SEG_CLOSE:
+		out.println(prefix + "    mode: SEG_LINETO");
+		m = 0;
+		break;
 	    default:
 		System.out.println(prefix +"   [unknown mode]");
 	    }
@@ -719,6 +729,10 @@ public class BasicSplinePath2D extends SplinePath2D {
 	    for (int j = 0; j < m; j++) {
 		out.println(prefix + "    coords[" + j + "]: "
 			    + entries[i].coords[j]);
+	    }
+	    if (entries[i].type == PathIterator.SEG_CLOSE) {
+		out.println(prefix + "    coords[2]: " + x0);
+		out.println(prefix + "    coords[3]: " + y0);
 	    }
 	}
 	out.flush();
@@ -2716,6 +2730,9 @@ public class BasicSplinePath2D extends SplinePath2D {
 	// local variable - same name as the instance variable
 	// the instance variable is set at the end.
 	boolean cyclic = false;
+	// incr is true if we have a SEG_CLOSE that adds a segment that
+	// doesn't have a length of zero.
+	boolean incr = false;
 	// ArrayList<Entry> entries = new ArrayList<Entry>();
 	cumulativeLength = null;
 	sublengths = null;
@@ -2725,12 +2742,11 @@ public class BasicSplinePath2D extends SplinePath2D {
 	if (mode != PathIterator.SEG_MOVETO) {
 	    throw new IllegalStateException(errorMsg("piSEGMOVETO"));
 	}
-	/*
 	double x = coords[0];
 	double y = coords[1];
 	double x0 = x;
 	double y0 = y;
-	*/
+	int mtcount = 0; // count number of extra initial SEG_MOVETO entries
 	pit.next();
 	while (!pit.isDone()) {
 	    /*
@@ -2751,6 +2767,12 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    entries.add(entry);
 		}
 		*/
+		float fmaxX = (float)Math.max(Math.abs(x), Math.abs(x0));
+		float fmaxY = (float)Math.max(Math.abs(y), Math.abs(y0));
+		if ((Math.abs(x - x0) > Math.ulp(fmaxX)) ||
+		    ( Math.abs(y - y0) > Math.ulp(fmaxY))) {
+		    incr = true;
+		}
 		break;
 	    case PathIterator.SEG_CUBICTO:
 		if (cyclic) {
@@ -2762,6 +2784,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		y = entry.coords[5];
 		entries.add(entry);
 		*/
+		x = coords[4];
+		y = coords[5];
 		break;
 	    case PathIterator.SEG_LINETO:
 		if (cyclic) {
@@ -2773,6 +2797,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		y = entry.coords[1];
 		entries.add(entry);
 		*/
+		x = coords[0];
+		y = coords[1];
 		break;
 	    case PathIterator.SEG_MOVETO:
 		if (mode == PathIterator.SEG_MOVETO) {
@@ -2784,6 +2810,9 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    x0 = x;
 		    y0 = y;
 		    */
+		    x0 = coords[0];
+		    y0 = coords[1];
+		    mtcount++;
 		} else {
 		    throw new IllegalStateException
 			("only initial SEG_MOVETO allowed");
@@ -2799,6 +2828,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		y = entry.coords[3];
 		entries.add(entry);
 		*/
+		x = coords[2];
+		y = coords[3];
 		break;
 	    }
 	    mode = /*entry.mode*/ type;
@@ -2809,14 +2840,30 @@ public class BasicSplinePath2D extends SplinePath2D {
 	// lengthCount = 0;
 	totalLength = 0.0;
 	this.cyclic = cyclic;
-	entries = new Path2DInfo.Entry[elist.size() - (cyclic? 2: 1)];
-	int i = -1;
+	entries =
+	    new Path2DInfo.Entry[elist.size() - ((cyclic && !incr)? 2: 1)
+				 - mtcount];
+	int i = -1 - mtcount;
 	for (Path2DInfo.Entry entry: elist) {
 	    if (i < 0 || i >= entries.length) {
 		i++;
 		continue;
 	    }
 	    entries[i++] = entry;
+	}
+	if (incr) {
+	    // fix up.
+	    Path2DInfo.Entry ent = entries[entries.length-1];
+	    double crds[] = {x0, y0};
+	    double xx = x - x0;
+	    double yy = y - y0;
+	    double len = Math.sqrt(xx*xx + yy*yy);
+	    Path2DInfo.SegmentData sd  = new Path2DInfo.SegmentData
+		(PathIterator.SEG_LINETO, x, y, crds,
+		 entries[entries.length-2].getData());
+	    entries[entries.length-1] =
+		new Path2DInfo.Entry(ent.getIndex(), PathIterator.SEG_LINETO,
+				     x, y, x0, y0, len, crds, sd);
 	}
     }
 

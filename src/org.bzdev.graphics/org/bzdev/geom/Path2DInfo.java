@@ -1929,13 +1929,13 @@ public class Path2DInfo {
 	    this.x0 = x0;
 	    this.y0 = y0;
 
-	    c2 = coords[2];
-	    c3 = coords[3];
 	    c0x0 = c0 - x0;
 	    c1y0 = c1 - y0;
 	    if (st == PathIterator.SEG_LINETO || st == PathIterator.SEG_CLOSE) {
 		return;
 	    }
+	    c2 = coords[2];
+	    c3 = coords[3];
 	    c2c0 = c2 - c0;
 	    c3c1 = c3 - c1;
 	    if (st == PathIterator.SEG_CUBICTO) {

@@ -2948,6 +2948,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 	// local variable - same name as the instance variable
 	// the instance variable is set at the end.
 	boolean cyclic = false;
+	boolean incr = false;
 	// ArrayList<Path3DInfo.Entry> entries = new ArrayList<>();
 	cumulativeLength = null;
 	sublengths = null;
@@ -2957,14 +2958,13 @@ public class BasicSplinePath3D extends SplinePath3D {
 	if (mode != PathIterator3D.SEG_MOVETO) {
 	    throw new IllegalStateException(errorMsg("piSEGMOVETO"));
 	}
-	/*
 	double x = coords[0];
 	double y = coords[1];
 	double z = coords[2];
 	double x0 = x;
 	double y0 = y;
 	double z0 = z;
-	*/
+	int mtcount = 0; // count number of extra initial SEG_MOVETO entries
 	pit.next();
 	while (!pit.isDone()) {
 	    /*
@@ -2987,6 +2987,14 @@ public class BasicSplinePath3D extends SplinePath3D {
 		    entries.add(entry);
 		}
 		*/
+		float fmaxX = (float)Math.max(Math.abs(x), Math.abs(x0));
+		float fmaxY = (float)Math.max(Math.abs(y), Math.abs(y0));
+		float fmaxZ = (float)Math.max(Math.abs(z), Math.abs(z0));
+		if (Math.abs(x - x0) > Math.ulp(fmaxX)
+		    || Math.abs(y - y0) > Math.ulp(fmaxY)
+		    || Math.abs(z - z0) > Math.ulp(fmaxZ)) {
+		    incr = true;
+		}
 		break;
 	    case PathIterator3D.SEG_CUBICTO:
 		if (cyclic) {
@@ -2999,6 +3007,9 @@ public class BasicSplinePath3D extends SplinePath3D {
 		z = entry.coords[8];
 		entries.add(entry);
 		*/
+		x = coords[6];
+		y = coords[7];
+		z = coords[8];
 		break;
 	    case PathIterator3D.SEG_LINETO:
 		if (cyclic) {
@@ -3011,6 +3022,9 @@ public class BasicSplinePath3D extends SplinePath3D {
 		z = entry.coords[2];
 		entries.add(entry);
 		*/
+		x = coords[0];
+		y = coords[1];
+		z = coords[2];
 		break;
 	    case PathIterator3D.SEG_MOVETO:
 		if (mode == PathIterator3D.SEG_MOVETO) {
@@ -3024,6 +3038,10 @@ public class BasicSplinePath3D extends SplinePath3D {
 		    y0 = y;
 		    z0 = z;
 		    */
+		    x0 = coords[0];
+		    y0 = coords[1];
+		    z0 = coords[2];
+		    mtcount++;
 		} else {
 		    throw new IllegalStateException
 			("only initial SEG_MOVETO allowed");
@@ -3033,32 +3051,50 @@ public class BasicSplinePath3D extends SplinePath3D {
 		if (cyclic) {
 		    throw new IllegalStateException
 			(errorMsg("segsAfterClose"));
-		}
-		/*
+		}	/*
 		x = entry.coords[3];
 		y = entry.coords[4];
 		z = entry.coords[5];
 		entries.add(entry);
 		*/
+		x = coords[3];
+		y = coords[4];
+		z = coords[5];
 		break;
 	    }
 	    mode = /* entry.mode*/ type;
 	    pit.next();
-	} 
+	}
 	// this.entries = new Entry[entries.size()];
 	// this.entries = entries.toArray(this.entries);
 	// lengthCount = 0;
 	totalLength = 0.0;
 	this.cyclic = cyclic;
 	entries =
-	    new Path3DInfo.Entry[elist.size() - (cyclic? 2: 1)];
-	int i = -1;
+	    new Path3DInfo.Entry[elist.size() - ((cyclic && !incr)? 2: 1)
+				 - mtcount];
+	int i = -1 - mtcount;
 	for (Path3DInfo.Entry entry: elist) {
 	    if (i < 0 || i >= entries.length) {
 		i++;
 		continue;
 	    }
 	    entries[i++] = entry;
+	}
+	if (incr) {
+	    // fix up.
+	    Path3DInfo.Entry ent = entries[entries.length-1];
+	    double crds[] = {x0, y0, z0};
+	    double xx = x - x0;
+	    double yy = y - y0;
+	    double zz = z - z0;
+	    double len = Math.sqrt(xx*xx + yy*yy + zz*zz);
+	    Path3DInfo.SegmentData sd  = new Path3DInfo.SegmentData
+		(PathIterator3D.SEG_LINETO, x, y, z, crds,
+		 entries[entries.length-2].getData());
+	    entries[entries.length-1] =
+		new Path3DInfo.Entry(ent.getIndex(), PathIterator3D.SEG_LINETO,
+				     x, y, z, x0, y0, z0, len, crds, sd);
 	}
     }
  }

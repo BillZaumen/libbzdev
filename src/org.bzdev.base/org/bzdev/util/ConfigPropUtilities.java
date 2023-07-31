@@ -190,7 +190,7 @@ public class ConfigPropUtilities {
      * Create a new instance of {@link Properties}, loading its keys and
      * values from an input stream.
      * The stream is not automatically closed.
-     * @param f the file from which to load properties
+     * @param is the input stream from which to load properties
      */
     public static Properties newInstance(InputStream is) throws IOException {
 	Properties props = new Properties();

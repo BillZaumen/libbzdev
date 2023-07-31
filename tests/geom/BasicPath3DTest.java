@@ -632,6 +632,28 @@ public class BasicPath3DTest {
 	    System.out.println("... [Exception expected]\n");
 	}
 
+	BasicSplinePath3D bpath = new BasicSplinePath3D();
+	// bpath.moveTo(-1.0, -1.0, -1.0);
+	bpath.moveTo(0.0, 0.0, 0.0);
+	bpath.lineTo(1.0, 0.0, 0.0);
+	bpath.lineTo(1.0, 1.0, 0.0);
+	bpath.lineTo(1.0, 1.0, 1.0);
+	bpath.lineTo(1.0, 0.0, 1.0);
+	bpath.lineTo(0.0, 0.0, 1.0);
+	bpath.closePath();
+	bpath.printTable();
+	System.out.println("max parameter = " + bpath.getMaxParameter());
+	System.out.println("path length = " + bpath.getPathLength());
+	System.out.println("max parameter = " + bpath.getMaxParameter());
+	System.out.println("max parameter = " + bpath.getMaxParameter());
+	System.out.println("path length [0, 5] = "
+			   + bpath.getPathLength(0.0, 5.0));
+	System.out.println("path length [0, 6] = "
+			   + bpath.getPathLength(0.0, 6.0));
+	System.out.println("path length [0, 7] = "
+			   + bpath.getPathLength(0.0, 7.0));
+	System.out.println("path length [0, 12] = "
+			   + bpath.getPathLength(0.0, 12.0));
 
 	if (errcount > 0) {
 	    System.out.println(" ... failed");

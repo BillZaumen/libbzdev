@@ -4,17 +4,20 @@ public class BuilderTest4 {
 
     public static void main(String argv[]) throws Exception {
 	BasicSplinePathBuilder spb = new BasicSplinePathBuilder();
-	SplinePathBuilder.CPoint[] cpoints1= new SplinePathBuilder.CPoint[5];
+	SplinePathBuilder.CPoint[] cpoints1= new SplinePathBuilder.CPoint[6];
 
+	// test spurious initial MOVE_TO
 	cpoints1[0] = new SplinePathBuilder.CPoint
-	    (SplinePathBuilder.CPointType.MOVE_TO, 0.0, 0.0);
+	    (SplinePathBuilder.CPointType.MOVE_TO, -1.0, -1.0);
 	cpoints1[1] = new SplinePathBuilder.CPoint
-	    (SplinePathBuilder.CPointType.SEG_END, 1.0, 0.0);
+	    (SplinePathBuilder.CPointType.MOVE_TO, 0.0, 0.0);
 	cpoints1[2] = new SplinePathBuilder.CPoint
-	    (SplinePathBuilder.CPointType.SEG_END, 1.0, 1.0);
+	    (SplinePathBuilder.CPointType.SEG_END, 1.0, 0.0);
 	cpoints1[3] = new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SEG_END, 1.0, 1.0);
+	cpoints1[4] = new SplinePathBuilder.CPoint
 	    (SplinePathBuilder.CPointType.SEG_END, 0.0, 1.0);
-	cpoints1[4] = new
+	cpoints1[5] = new
 	    SplinePathBuilder.CPoint(SplinePathBuilder.CPointType.CLOSE);
 	// apath.append(cpoints);
 	spb.initPath(cpoints1);
@@ -31,6 +34,8 @@ public class BuilderTest4 {
 			   + path.getPathLength(0.0, 5.0));
 	System.out.println("path length [0, 8] = "
 			   + path.getPathLength(0.0, 8.0));
+
+
 	System.exit(0);
     }
 }
