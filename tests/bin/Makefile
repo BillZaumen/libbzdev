@@ -361,6 +361,21 @@ sbl:
 	./sblrun --
 	chmod u-x sblrun
 
+sbl-test:
+
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun -- sblconf/test.sbl
+	chmod u-x sblrun
+
+sbl-test-f:
+
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun -f -- sblconf/test.sbl
+	chmod u-x sblrun
+
+
 sbl-list:
 	(cd ../.. ; make )
 	chmod u+x sblrun

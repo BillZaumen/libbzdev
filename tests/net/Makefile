@@ -73,6 +73,8 @@ sslutil2: compile
 sslutil121: compile
 	$(JAVA) SSLUtilTest - tstore -
 
+sslutil: compile
+	$(JAVA) SSLUtilTest2
 
 #
 

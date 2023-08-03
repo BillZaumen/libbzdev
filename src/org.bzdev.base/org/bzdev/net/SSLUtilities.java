@@ -294,7 +294,7 @@ public class SSLUtilities {
 			    ourTM.checkServerTrusted(chain, authType);
 			} catch (CertificateException ee) {
 			    if (acceptSelfSigned != null) {
-				if (chain.length > 0) throw ee;
+				if (chain.length > 1) throw ee;
 				X509Certificate cert = chain[0];
 				cert.checkValidity();
 				try {

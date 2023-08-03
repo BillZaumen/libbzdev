@@ -21,15 +21,24 @@ in which case the passphrase consists of a time stamp, a 32-bit
 CRC of the time stamp and a traditional password, and a digital
 signature of the time stamp, the CRC, the SSL certificate's
 public key, and the password.  Once verified, this signature is
-teated as a basic-authentication password, accepted provided the
+treated as a basic-authentication password, accepted provided the
 sender's IP address has not changed.
 .PP
-Configurations are stored in files typically withh the
-file-nameextension
+Configurations are stored in files typically with the
+file-name extension
 .BR sbl .
-Each file will typically include sites that are related in
-some way (the grouping is choosen by each user).
-
+Each file will typically include sites, or logins, that are related in
+some way (the grouping is chosen by each user). There is one
+special case: if a configuration file contains a single site or login,
+and the configuration file is provided on the command line, that site or
+login will be selected.  Web sites can provide an
+.B sbl
+configuration file and browsers can start
+.B sbl
+for the user.  The special case allows the user to skip the step of
+selecting a site, and can simply click the
+.B Open\ Browser
+button, and then paste the user name and password.
 .PP
 While there are
 some command-line options for specific tasks, typically
@@ -63,7 +72,7 @@ This will open a window using the user's default browser. It will also
 generate a passphrase, and will copy both the user name and the
 corresponding passphrase to the system clipboard so both can be
 pasted into the appropriate text fields displayed by a browser. Pasting
-is hanlded specially: each time the copy is pasted the value provided
+is handled specially: each time the copy is pasted the value provided
 alternates between the user name and the passphrase, starting with the
 user name.
 .TP
@@ -97,6 +106,13 @@ The options are
 .TP
 .B \-\-
 Terminate options. 
+.TP
+.B \-f
+Suppress a dialog box that asks permission to use a trust store,
+loopback host name, or a self-signed certificate. This dialog box
+mill otherwise appear if an
+.B sbl
+file is provided as a command-line argument.
 .TP
 .BI \-n\   NAME
 The argument
@@ -152,4 +168,4 @@ and their corresponding passwords.
 \"  LocalWords:  definingClassHTML RESOURCENAME listCodeBase rdanim
 \"  LocalWords:  subdirectory roadanim scrunner fRor Solaris config
 \"  LocalWords:  conf SBL libbzdev util sbl fICFILE fB CFILE POPTION
-\"  LocalWords:  fIPOPTION uri publicKey
+\"  LocalWords:  fIPOPTION uri publicKey TLS SSL CRC loopback

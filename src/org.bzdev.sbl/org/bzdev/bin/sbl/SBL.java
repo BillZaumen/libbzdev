@@ -478,15 +478,36 @@ public class SBL {
 	}
     }
 
+    // Will be set to true if loading from a file provided on the
+    // command line as sbl may have been started by a browser.
+    static boolean checkConfig = true;
+
     public static void configTrust(Component owner) {
 	Properties p = cpe.getDecodedProperties();
 	String tname = p.getProperty("trustStore.file");
+	if (tname != null) tname = tname.trim();
 	final boolean selfsigned =
 	    Boolean.valueOf(p.getProperty("trust.selfSigned"));
 	boolean loopback =
 	    Boolean.valueOf(p.getProperty("trust.allow.loopback"));
+	if (checkConfig && ((tname != null  && tname.length() > 0)
+			    || selfsigned || loopback)) {
+	    String msg = errorMsg("REQ", tname, selfsigned, loopback);
+	    JLabel label = new JLabel(msg);
+	    String title = errorMsg("REQTITLE");
+	    switch (JOptionPane
+		    .showConfirmDialog(owner, msg, title,
+				       JOptionPane.OK_CANCEL_OPTION,
+				       JOptionPane.QUESTION_MESSAGE)) {
+	    case JOptionPane.OK_OPTION:
+		break;
+	    case JOptionPane.CANCEL_OPTION:
+	    default:
+		return;
+	    }
+	}
 	try {
-	    if (tname != null && tname.trim().length() > 0) {
+	    if (tname != null && tname.length() > 0) {
 		cpe.requestPassphrase(owner);
 		Object obj = p.get("ebase64.trustStore.password");
 		char[] pw = null;
@@ -608,6 +629,8 @@ public class SBL {
 	    if (argv[indx].equals("--")) {
 		indx++;
 		break;
+	    } else if (argv[indx].equals("-f")) {
+		checkConfig = false;
 	    } else if (argv[indx].equals("-n")) {
 		indx++;
 		nm = argv[indx];
@@ -720,6 +743,7 @@ public class SBL {
 	}
 
 	SwingUtilities.invokeLater(() -> {
+		boolean loadedAtStart = false;
 		JPanel panel = new JPanel(new GridLayout(3, 3));
 		JLabel titleLabel = new JLabel(" ");
 		JLabel descrLabel = new JLabel(" ");
@@ -794,6 +818,7 @@ public class SBL {
 			    titleLabel.setText(localeString("loaded") + ": "
 					       + txt);
 			    descrLabel.setText(" ");
+			    loadedAtStart = true;
 			} catch (IOException eio) {
 			    System.err.println(eio.getMessage());
 			    System.exit(1);
@@ -845,6 +870,7 @@ public class SBL {
 		    }
 		    try {
 			cpe.loadFile(configFile);
+			checkConfig = false;
 			configTrust(frame);
 			fixupEntries(selectSiteCB);
 			addEntryButton.setEnabled(true);
@@ -975,6 +1001,15 @@ public class SBL {
 					       + ": " + key + "\u2014" + txt);
 			}
 		    });
+
+		if (loadedAtStart && entries.size() == 1) {
+		    // If the configuration file was loaded from a file
+		    // specified on the command line and there is only
+		    // a single item to select, select that one automatically.
+		    // The use case is a user who opens a file provided by
+		    // a browser and there is only a single entry.
+		    selectSiteCB.setSelectedIndex(1);
+		}
 
 		copyUserButton.addActionListener((e) -> {
 			String name = getName(selectSiteCB);

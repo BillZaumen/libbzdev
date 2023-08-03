@@ -86,11 +86,16 @@ when a value contains
 that expression will be replaced with the value corresponding
 to
 .IR KEY .
-
-
+The escape sequence
+.B $$
+is treated as a single
+.BR $ .
+Substitutions are not performed when an SBL file is being edited by
+the program
+.BR sbl .
 .SH SEE ALSO
 .PP
 .BR sbl (1)
 
 \"  LocalWords:  SBL sbl UTF br sp ebase GPG TP trustStore selfsigned
-\"  LocalWords:  loopback fINAME fB fI fBDIGEST uri
+\"  LocalWords:  loopback fINAME fB fI fBDIGEST uri fR
