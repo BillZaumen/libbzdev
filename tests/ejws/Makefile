@@ -268,7 +268,7 @@ atest8:
 		~/.config/sbl/example.sbl testUser
 
 cert:
-	rm thelio-ks.jks thelio-ts.jks
+	rm -f thelio-ks.jks thelio-ts.jks
 	keytool -genkey -keyalg EC -groupname secp256r1 \
 		-sigalg SHA256withECDSA -keystore thelio-ks.jks \
 		-keypass changeit -storepass changeit \
@@ -280,7 +280,7 @@ cert:
 
 # one day - we want the certificates to expire for testing purposes.
 cert2:
-	rm thelio-ks.jks thelio-ts.jks
+	rm -f thelio-ks2.jks thelio-ts2.jks
 	keytool -genkey -keyalg EC -groupname secp256r1 \
 		-sigalg SHA256withECDSA -keystore thelio-ks2.jks \
 		-keypass changeit -storepass changeit \
