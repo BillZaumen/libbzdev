@@ -18,6 +18,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSession;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -30,11 +31,14 @@ import java.util.TreeSet;
 import java.util.Properties;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bzdev.net.SecureBasicUtilities;
 import org.bzdev.swing.ConfigPropertyEditor;
 import org.bzdev.swing.DarkmodeMonitor;
 import org.bzdev.swing.FileNameCellEditor;
+import org.bzdev.swing.SimpleConsole;
+import org.bzdev.swing.SwingErrorMessage;
 import org.bzdev.util.SafeFormatter;
 
 //@exbundle org.bzdev.bin.sbl.lpack.SBL
@@ -411,9 +415,11 @@ public class SBL {
 		InputStream is = new ByteArrayInputStream(barray);
 		ops = new SecureBasicUtilities(is);
 	    } catch (IOException eio) {
-		System.err.println(eio.getMessage());
+		// System.err.println(eio.getMessage());
+		SwingErrorMessage.format("%s",eio.getMessage());
 	    } catch (GeneralSecurityException egs) {
-		System.err.println(egs.getMessage());
+		// System.err.println(egs.getMessage());
+		SwingErrorMessage.format("%s",egs.getMessage());
 	    }
 	}
 	Properties props = cpe.getEncodedProperties();
@@ -424,14 +430,16 @@ public class SBL {
 	try {
 	    mode = modes[Integer.valueOf(props.getProperty(name + ".mode"))];
 	} catch (Exception em) {
-	    System.err.println(em.getMessage());
+	    // System.err.println(em.getMessage());
+	    SwingErrorMessage.format("%s", em.getMessage());
 	    return null;
 	}
 	URI uri = null;
 	try {
 	    uri = new URI(uriString);
 	} catch (Exception e) {
-	    System.err.println(e.getMessage());
+	    // System.err.println(e.getMessage());
+	    SwingErrorMessage.format("%s", e.getMessage());
 	    return null;
 	}
 	String scheme = uri.getScheme().toLowerCase();
@@ -453,11 +461,18 @@ public class SBL {
 	        cert =  (chain == null || chain.length == 0)? null:
 		    chain[0];
 	    } catch (Exception e) {
-		System.err.println(e.getMessage());
+		// System.err.println(e.getMessage());
+		SwingErrorMessage.format("%s", e.getMessage());
+		Throwable ee = e.getCause();
+		if (ee != null) {
+		    // System.err.println(ee.getMessage());
+		    SwingErrorMessage.format("... %s", ee.getMessage());
+		}
 		cert = null;
 	    }
 	}
 	try {
+	    // System.out.println("mode = " + mode);
 	    switch(mode) {
 	    case DIGEST:
 		password = dops.createPassword(null, password);
@@ -466,14 +481,22 @@ public class SBL {
 		password = ops.createPassword(null, password);
 		break;
 	    case SIGNATURE_WITH_CERT:
+		if (cert == null) {
+		    // System.err.println("no certificate");
+		    SwingErrorMessage.format("%s", errorMsg("noCertificate"));
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		    return null;
+		}
 		password = ops.createPassword(cert, password);
 		break;
 	    case PASSWORD:
-		return null;
+		return password;
 	    }
 	    return password;
 	} catch (Exception e) {
-	    System.err.println(e.getMessage());
+	    // System.err.println(e.getMessage());
+	    SwingErrorMessage.format("%s", e.getMessage());
+	    SwingErrorMessage.displayConsoleIfNeeded();
 	    return null;
 	}
     }
@@ -482,12 +505,14 @@ public class SBL {
     // command line as sbl may have been started by a browser.
     static boolean checkConfig = true;
 
+    public static HashSet<X509Certificate> certSet = new HashSet<>();
+
     public static void configTrust(Component owner) {
 	Properties p = cpe.getDecodedProperties();
 	String tname = p.getProperty("trustStore.file");
 	if (tname != null) tname = tname.trim();
 	final boolean selfsigned =
-	    Boolean.valueOf(p.getProperty("trust.selfSigned"));
+	    Boolean.valueOf(p.getProperty("trust.selfsigned"));
 	boolean loopback =
 	    Boolean.valueOf(p.getProperty("trust.allow.loopback"));
 	if (checkConfig && ((tname != null  && tname.length() > 0)
@@ -507,6 +532,27 @@ public class SBL {
 	    }
 	}
 	try {
+	    Predicate<X509Certificate> selfSignedTest = (cert) -> {
+		if (selfsigned) {
+		    return true;
+		} else {
+		    if (certSet.contains(cert)) {
+			return true;
+		    } else {
+			switch(JOptionPane.showConfirmDialog
+			       (frame, errorMsg("acceptSelfSigned"),
+				errorMsg("acceptSelfSignedTitle"),
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE)) {
+			case JOptionPane.OK_OPTION:
+			    certSet.add(cert);
+			    return true;
+			default:
+			    return false;
+			}
+		    }
+		}
+	    };
 	    if (tname != null && tname.length() > 0) {
 		cpe.requestPassphrase(owner);
 		Object obj = p.get("ebase64.trustStore.password");
@@ -517,15 +563,21 @@ public class SBL {
 		}
 		SSLUtilities.installTrustManager("TLS",
 						 trustStore, pw,
+						 /*
 						 (cert) -> {
 						     return selfsigned;
-						 });
+						 }
+						 */
+						 selfSignedTest);
 	    } else {
 		SSLUtilities.installTrustManager("TLS",
 						 null, null,
+						 /*
 						 (cert) -> {
 						     return selfsigned;
-						 });
+						 }
+						 */
+						 selfSignedTest);
 	    }
 	    if (loopback) {
 		SSLUtilities.allowLoopbackHostname();
@@ -533,7 +585,9 @@ public class SBL {
 		SSLUtilities.disallowLoopbackHostname();
 	    }
 	} catch (Exception e) {
-	    System.err.println(e.getMessage());
+	    // System.err.println(e.getMessage());
+	    SwingErrorMessage.format("%s", e.getMessage());
+	    SwingErrorMessage.displayConsoleIfNeeded();
 	    return;
 	}
     }
@@ -756,6 +810,17 @@ public class SBL {
 		JMenuItem findMenuItem = new JMenuItem(localeString("Find"));
 		JMenuItem browserMenuItem =
 		    new JMenuItem(localeString("Browser"));
+		SimpleConsole console = new SimpleConsole();
+		console.addSeparator();
+		JMenuItem consoleMenuItem = console
+		    .createMenuItem(errorMsg("openConsole"), "console",
+				    800, 600);
+		SwingErrorMessage.setAppendable(console);
+		console.addCloseAccelerator(KeyEvent.VK_W,
+					    InputEvent.CTRL_DOWN_MASK,
+					    InputEvent.CTRL_DOWN_MASK
+					    | InputEvent.ALT_DOWN_MASK);
+
 		JButton visitSiteButton = new
 		    JButton(localeString("visitSiteButton"));
 		JButton generateButton =
@@ -820,7 +885,9 @@ public class SBL {
 			    descrLabel.setText(" ");
 			    loadedAtStart = true;
 			} catch (IOException eio) {
-			    System.err.println(eio.getMessage());
+			    // System.err.println(eio.getMessage());
+			    SwingErrorMessage.format("%s",  eio.getMessage());
+			    SwingErrorMessage.displayConsoleIfNeeded();
 			    System.exit(1);
 			}
 			addEntryButton.setEnabled(true);
@@ -890,7 +957,9 @@ public class SBL {
 			descrLabel.setText(" ");
 
 		    } catch (IOException eio) {
-			System.err.println(eio.getMessage());
+			// System.err.println(eio.getMessage());
+			SwingErrorMessage.format("%s", eio.getMessage());
+			SwingErrorMessage.displayConsoleIfNeeded();
 		    }
 		};
 
@@ -948,7 +1017,10 @@ public class SBL {
 				copyPubKeyButton.setEnabled(false);
 				copyPWButton.setEnabled(false);
 			    } catch (IOException eio) {
-				System.err.println(eio.getMessage());
+				// System.err.println(eio.getMessage());
+				SwingErrorMessage.format("%s",
+							 eio.getMessage());
+				SwingErrorMessage.displayConsoleIfNeeded();
 			    }
 			}
 		    });
@@ -973,7 +1045,9 @@ public class SBL {
 					       + txt);
 			    descrLabel.setText(" ");
 			} catch (IOException eio) {
-			    System.err.println(eio.getMessage());
+			    // System.err.println(eio.getMessage());
+			    SwingErrorMessage.format("%s", eio.getMessage());
+			    SwingErrorMessage.displayConsoleIfNeeded();
 			}
 		    });
 
@@ -1043,52 +1117,60 @@ public class SBL {
 		    });
 
 		ActionListener visitAL = (e) -> {
-			String name = getName(selectSiteCB);
-			if (name == null) return;
-			Properties props = cpe.getEncodedProperties();
-			String user = props.getProperty(name + ".user");
-			String uriString = props.getProperty(name + ".uri");
-			URI uri = null;
+		    console.addSeparatorIfNeeded();
+		    String name = getName(selectSiteCB);
+		    if (name == null) return;
+		    Properties props = cpe.getEncodedProperties();
+		    String user = props.getProperty(name + ".user");
+		    String uriString = props.getProperty(name + ".uri");
+		    URI uri = null;
 			
-			Clipboard cb = panel.getToolkit()
-			    .getSystemClipboard();
-			String password = new String(getSecurePW(panel, name));
-			StringSelection selection1 =
-			    new StringSelection(user);
-			StringSelection selection2 =
-			    new StringSelection(password);
-			StringSelection2 selection = new
-			    StringSelection2(selection1, selection2);
-			cb.setContents(selection, selection);
-			try {
-			    uri = new URI(uriString);
-			    if (Desktop.isDesktopSupported()) {
-				Desktop desktop = Desktop.getDesktop();
-				if (desktop.isSupported(Desktop.Action
-							.BROWSE)) {
-				    desktop.browse(uri);
-				}
+		    Clipboard cb = panel.getToolkit().getSystemClipboard();
+		    char[] passwd = getSecurePW(panel, name);
+		    if (passwd == null) return;
+		    String password = new String(passwd);
+		    StringSelection selection1 =
+		    new StringSelection(user);
+		    StringSelection selection2 = new StringSelection(password);
+		    StringSelection2 selection = new
+		    StringSelection2(selection1, selection2);
+		    cb.setContents(selection, selection);
+		    try {
+			uri = new URI(uriString);
+			if (Desktop.isDesktopSupported()) {
+			    Desktop desktop = Desktop.getDesktop();
+			    if (desktop.isSupported(Desktop.Action
+						    .BROWSE)) {
+				desktop.browse(uri);
 			    }
-			} catch (Exception ex) {
-			    System.err.println("sbl: " + ex.getMessage());
-			    StringSelection s = new StringSelection("");
-			    cb.setContents(s, s);
 			}
+		    } catch (Exception ex) {
+			// System.err.println("sbl: " + ex.getMessage());
+			SwingErrorMessage.format("%s", ex.getMessage());
+			SwingErrorMessage.displayConsoleIfNeeded();
+			StringSelection s = new StringSelection("");
+			cb.setContents(s, s);
+		    }
 		};
 
 		visitSiteButton.addActionListener(visitAL);
 
 		generateButton.addActionListener((e) -> {
+			console.addSeparatorIfNeeded();
 			String name = getName(selectSiteCB);
 			String user = cpe.getEncodedProperties()
 			    .getProperty(name + ".user");
 			if (name == null) return;
-			String value = new String(getSecurePW(panel, name));
+			char[] passwd = getSecurePW(panel, name);
+			if (passwd == null) {
+			    return;
+			}
+			String value = new String(passwd);
 			Clipboard cb = panel.getToolkit()
 			    .getSystemClipboard();
-			StringSelection selection = new StringSelection(value);
+			StringSelection selection =
+			    new StringSelection(value);
 			cb.setContents(selection, selection);
-			
 		    });
 
 		if (configFile == null) {
@@ -1096,6 +1178,7 @@ public class SBL {
 		} else {
 		    frame = new JFrame(errorMsg("title", configFile.getName()));
 		}
+		SwingErrorMessage.setComponent(frame);
 
 		JMenuBar menubar = new JMenuBar();
 		JMenu fileMenu = new JMenu(localeString("File"));
@@ -1126,9 +1209,16 @@ public class SBL {
 		menuItem = browserMenuItem;
 		menuItem.setAccelerator(KeyStroke.getKeyStroke
 					(KeyEvent.VK_B,
-					 InputEvent.CTRL_DOWN_MASK));
+					InputEvent.CTRL_DOWN_MASK));
 		menuItem.addActionListener(visitAL);
 		fileMenu.add(menuItem);
+
+		consoleMenuItem.setAccelerator(KeyStroke.getKeyStroke
+					(KeyEvent.VK_J,
+					 InputEvent.SHIFT_DOWN_MASK
+					 | InputEvent.CTRL_DOWN_MASK));
+		fileMenu.add(consoleMenuItem);
+
 
 		menubar.add(fileMenu);
 		frame.setJMenuBar(menubar);

@@ -95,6 +95,14 @@ public class ErrorMessage {
 		ErrorMessage.displayAux(fn, lineno, msg);
 	    }
 
+	    /**
+	     * Display a console if there is one, if it is an instance of
+	     * {@link org.bzdev.swing.SimpleConsole}, and if there is new text
+	     * to display. For a
+	     * {@link org.bzdev.swing.SimpleConsole SimpleConsole}
+	     * to be available, it must have been passed to
+	     * {@link #setAppendable(Appendable)}.
+	     */
 	    @Override
 	    public void displayConsoleIfNeeded() {
 		return;

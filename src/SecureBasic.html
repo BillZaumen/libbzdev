@@ -281,6 +281,32 @@
 	password. While it is a trivial change, it would require modifying
 	classes that are part of the JRE.
     </UL>
+    <H2>Server-centric logins</H2>
+  <P>
+    The program <STRONG>sbl</STRONG> uses GPG to encrypt the private
+    key corresponding to the public key used by a server for
+    authentication, and that private key can be encrypted so that more
+    than one user can decrypt it. For a small web site for which
+    several individuals need access to a role-specific management
+    account, one can simply provide an <STRONG>sbl</STRONG> file on
+    that web site, and a browser can then save that file or simply run
+    it, automatically starting <STRONG>sbl</STRONG>.  This can
+    simplify managing the web site as users don't have to set up an
+    account or remember a website-specific password (but will need to
+    install <STRONG>sbl</STRONG> and <STRONG>GPG</STRONG>).  GPG key
+    servers can eliminate the need for a user to explicitly provide a
+    GPG key.
+  <P>
+    This capability may be particularly useful for small websites that
+    support a relatively small number of users and that do not have a
+    full-time staff to manage them.  There's one security risk in
+    placing an <STRONG>sbl</STRONG> file on a publicly accessible
+    website: additional users can get access to an encrypted
+    private key, but the mitigating factor is that the key is encrypted
+    using GPG and without access to the GPG private key, breaking
+    GPG encryption is nearly impossible: it would require a brute-force
+    search of 2<SUP>128</SUP> keys.
+
     <H2>Example</H2>
 
   <P>
@@ -409,5 +435,5 @@ ccR8O2EQZnVa2RKF9NRhQ5QgDa1EJpJlB+VPL7W+
  -->
 <!--  LocalWords:  EjwsSecureBasicAuth DNS APIs authenticator JRE TLS
  -->
-<!--  LocalWords:  revalidated firefox HTTPS
+<!--  LocalWords:  revalidated firefox HTTPS TCP centric
  -->

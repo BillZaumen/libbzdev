@@ -351,7 +351,7 @@ public class SwingErrorMessage extends ErrorMessage {
 	}
     }
 
-    static Appendable err = System.err;
+    // static Appendable err = System.err;
 
     /*
      * Set the Appendable recording error messages.

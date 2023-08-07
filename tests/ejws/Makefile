@@ -91,6 +91,7 @@ test6a:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) Test6 false
 
+
 test7:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -246,6 +247,12 @@ atest6:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest6 ../bin/sblconf/test.sbl foo
 
+atest6a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ATest6a ../bin/sblconf/test.sbl foo
+
 atest7:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -259,6 +266,30 @@ atest8:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest8 /usr/share/doc/libbzdev-doc/api/ \
 		~/.config/sbl/example.sbl testUser
+
+cert:
+	rm thelio-ks.jks thelio-ts.jks
+	keytool -genkey -keyalg EC -groupname secp256r1 \
+		-sigalg SHA256withECDSA -keystore thelio-ks.jks \
+		-keypass changeit -storepass changeit \
+		-dname CN=wtz-thelio -alias thelio -validity 365
+	keytool -keystore thelio-ks.jks -alias thelio -exportcert \
+		-storepass changeit -rfc \
+	| keytool -importcert -alias thelio  -keystore thelio-ts.jks \
+		-keypass changeit -storepass changeit -noprompt
+
+# one day - we want the certificates to expire for testing purposes.
+cert2:
+	rm thelio-ks.jks thelio-ts.jks
+	keytool -genkey -keyalg EC -groupname secp256r1 \
+		-sigalg SHA256withECDSA -keystore thelio-ks2.jks \
+		-keypass changeit -storepass changeit \
+		-dname CN=wtz-thelio -alias thelio -validity 1
+	keytool -keystore thelio-ks2.jks -alias thelio -exportcert \
+		-storepass changeit -rfc \
+	| keytool -importcert -alias thelio  -keystore thelio-ts2.jks \
+		-keypass changeit -storepass changeit -noprompt
+
 
 clean:
 	rm -rf classes

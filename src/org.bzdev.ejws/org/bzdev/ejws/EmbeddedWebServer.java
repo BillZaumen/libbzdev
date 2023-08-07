@@ -60,7 +60,27 @@ import org.xml.sax.SAXException;
  *  <LI> An instance of {@link EmbeddedWebServer.SSLSetup}. When null, the
  *       server will use HTTP and when non-null, the server will run
  *       HTTPS. While there are defaults (suitable for testing), one
- *       can provide a number of SSL options explicitly.
+ *       can provide a number of SSL options explicitly. Typically, one
+ *       will need a keystore containing a certificate. To create one
+ *       using <STRONG>keytool</STRONG> run it with options similar to
+ *       the following:
+ *       <BLOCKQUOTE><PRE><CODE>
+ * keytool -genkey -keyalg EC -groupname secp256r1 \
+ *         -sigalg SHA256withECDSA -keystore ks.jks \
+ *         -keypass changeit -storepass changeit \
+ *         -dname CN=HOST -alias NAME -validity 365
+ *       </CODE></PRE></BLOCKQUOTE>
+ *       to import this certificate into a trust store, run a command
+ *       similar to the following:
+ *       <BLOCKQUOTE><PRE><CODE>
+ * keytool -keystore ks.jks -alias thelio -exportcert \
+ *         -storepass changeit -rfc \
+ *   | keytool -importcert -alias NAME  -keystore ts.jks \
+ *             -keypass changeit -storepass changeit -noprompt
+ *       </CODE></PRE></BLOCKQUOTE>
+ *       Generally for testing, one will need to provide both a
+ *       keystore and a trust store (which is not needed if the
+ *       certificate was signed by a certificate authority).
  * </UL>
  * <P>
  * After an EmbeddedWebServer is constructed, handlers for HTTP
@@ -286,6 +306,7 @@ public class EmbeddedWebServer {
      * {@link HttpsConfigurator} and this interface can be used to
      * implement its {@link HttpsConfigurator#configure(HttpsParameters)}
      * method.
+     * @see EmbeddedWebServer.SSLSetup
      */
     @FunctionalInterface
     public static interface Configurator {
@@ -309,8 +330,8 @@ public class EmbeddedWebServer {
      * truststore in a file named ejwsCerts.jks. On Linux systems, this
      * should be in the directory /usr/share/bzdev although its actual
      * location may be system dependent.  This truststore's password is
-     * "changeit". As it in a directory owned by root, and is intended
-     * only  for testing, this password should not be changed.
+     * "changeit". As it is in a directory owned by root, and is intended
+     * only for testing, this password should not be changed.
      * ejwsCerts.jks is needed because without explicitly providing a
      * keystore containing the server's certificate, a self-signed
      * certificate will be used (a common practice during testing).

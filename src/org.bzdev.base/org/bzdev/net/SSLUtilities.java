@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.net.ssl.*;
 import org.bzdev.util.ConfigPropUtilities;
+import org.bzdev.util.ErrorMessage;
 
 //@exbundle org.bzdev.net.lpack.Net
 
@@ -33,6 +34,12 @@ import org.bzdev.util.ConfigPropUtilities;
  * that are running locally), allow the loopback interface to be
  * used in an SSL connection, and configure when
  * self-signed certificates are accepted.
+ * <P>
+ * Error messages may appear on standard error, but how and where these
+ * messages are displayed can be changed by using methods provided by
+ * {@link org.bzdev.util.ErrorMessage} and
+ * {link org.bzdev.swing.SwingErrorMessage}.
+
  */
 public class SSLUtilities {
 
@@ -296,18 +303,26 @@ public class SSLUtilities {
 			    if (acceptSelfSigned != null) {
 				if (chain.length > 1) throw ee;
 				X509Certificate cert = chain[0];
-				cert.checkValidity();
 				try {
+				    cert.checkValidity();
 				    cert.verify(cert.getPublicKey());
 				} catch (GeneralSecurityException eee) {
+				    String m = eee.getMessage();
+				    String msg = errorMsg("certNotValid", m);
+				    ErrorMessage.format("%s", msg);
+				    // System.err.println(msg);
 				    throw new
-					CertificateException(ee.getMessage(),
-							     eee);
+					CertificateException(msg, eee);
 				}
 				if (!acceptSelfSigned.test(cert)) {
+				    String msg = errorMsg("selfSigned");
+				    ErrorMessage.format("%s", msg);
 				    throw ee;
 				}
 			    } else {
+				String m = ee.getMessage();
+				String msg = errorMsg("certNotValid", m);
+				ErrorMessage.format("%s", msg);
 				throw ee;
 			    }
 			}

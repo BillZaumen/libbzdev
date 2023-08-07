@@ -120,6 +120,56 @@ public class SimpleConsole extends JComponent implements Appendable {
     private JScrollPane cscrollPane;
 
     /**
+     * Get the text pane used for this console.
+     * This text pane is needed occassionally for purposes such as
+     * installing a key listener.
+     * @return the text pane
+     */
+    public SimpleJTextPane getConsole() {
+	return console;
+    }
+
+    /**
+     * Add a keyboard accelerator that will close a console window.
+     * This method will not have any effect if called before a console
+     * is associated with a window (e.g., by calling
+     * {@link #createMenuItem(String,String,int,int)}).
+     * <P>
+     * It should be used if an accelerator is desired when the window
+     * containing the console was created with
+     * {@link #createMenuItem(String,String,int,int)}. It should not
+     * be necessary if the window containing the {@link SimpleConsole}
+     * has a suitable menu item, with an accelerator, installed.
+     * @param keycode the keycode
+     * @param modifiers the modifiers
+     * @param mask the mask
+     * @see KeyEvent#getKeyCode()
+     * @see KeyEvent#getModifiersEx()
+     */
+    public void addCloseAccelerator(int keycode, int modifiers, int mask) {
+	final KeyAdapter ka = new KeyAdapter() {
+		public void keyPressed(KeyEvent ke) {
+		    int mods = ke.getModifiersEx();
+		    if (ke.getKeyCode() == keycode
+			&& ((mods & mask) == modifiers)) {
+			JFrame frame = getFrame();
+			if (frame != null) {
+			    frame.setVisible(false);
+			    frame.setFocusable(true);
+			}
+		    }
+		}
+	    };
+	JFrame frame = getFrame();
+	if (frame != null) {
+	    // Testi indicate that we need all of this.
+	    frame.setFocusable(true);
+	    console.addKeyListener(ka);
+	    frame.addKeyListener(ka);
+	}
+    }
+
+    /**
      * SimpleJTextPane runtime-exception class.
      * For an instance of this class to be constructed, a call
      * to SwingUtilities.invokeAndWait would have to be interrupted.
@@ -153,6 +203,11 @@ public class SimpleConsole extends JComponent implements Appendable {
 		    console.clear();
 		    needNL = false;
 		    needSeparator = false;
+		    JFrame frame = getFrame();
+		    if (frame != null) {
+			frame.setFocusable(true);
+			frame.requestFocusInWindow(FocusEvent.Cause.UNKNOWN);
+		    }
 		}
 	    });
 	JButton printButton = new JButton(localeString("print"));
@@ -174,6 +229,13 @@ public class SimpleConsole extends JComponent implements Appendable {
 			String msg = errorMsg("pfailed", pae.getMessage());
 			SwingErrorMessage.display(console, null, msg);
 			SwingErrorMessage.display(pae.getCause());
+		    } finally {
+			JFrame frame = getFrame();
+			if (frame != null) {
+			    frame.setFocusable(true);
+			    frame.requestFocusInWindow
+				(FocusEvent.Cause.UNKNOWN);
+			}
 		    }
 		}
 	    });
@@ -258,6 +320,12 @@ public class SimpleConsole extends JComponent implements Appendable {
 		    AccessController.doPrivileged(new PrivilegedAction<Void>() {
 			    public Void run() {
 				doit();
+				JFrame frame = getFrame();
+				if (frame != null) {
+				    frame.setFocusable(true);
+				    frame.requestFocusInWindow
+					(FocusEvent.Cause.UNKNOWN);
+				}
 				return (Void)null;
 			    }
 			});

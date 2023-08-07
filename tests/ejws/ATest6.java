@@ -61,7 +61,7 @@ public class ATest6 {
 	    String user = props.getProperty(key + ".user");
 	    String password = props.getProperty(key + ".password");
 	    String publicKeyPem = props.getProperty("keypair.publicKey");
-	    auth.add("foo", publicKeyPem, "foo");
+	    auth.add(user, publicKeyPem, password);
 	    auth.setTracer(System.out);
 
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
