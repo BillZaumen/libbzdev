@@ -150,12 +150,31 @@ is
 a
 .B \-n
 option will also be needed.
+.TP
+.BI \-r GPGKEY
+The argument
+.I GPGKEY
+is any valid GPG user ID that will name a key in the user's key ring,
+ane multiple
+.B \-r
+options are allowed. When at least one
+.B \-r
+option is present, private keys will be encrypted using all of these
+user IDs to determine which users can decrypt a private key.  If
+a configuration file is provided on the command line, the key pair
+for that file will be replaced and
+.B sbl
+will exit. If no configuration file is provided or a specified key
+file does not exist, then when a new
+configuration file is created, the private key will be encrypted so
+that the users specified by the
+.B \-r
+options can decrypt it.
 .SH FILES
 .I ~/.config/sbl
 This directory contains configuration files. Each will have
 its own key pair, and will otherwise list web sites, user names,
 and their corresponding passwords.
-
 .SH SEE ALSO
 .BR sbl (5)
 

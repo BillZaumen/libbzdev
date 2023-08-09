@@ -306,6 +306,11 @@
     using GPG and without access to the GPG private key, breaking
     GPG encryption is nearly impossible: it would require a brute-force
     search of 2<SUP>128</SUP> keys.
+  <P>
+    As a convenience, <STRONG>sbl</STRONG> allows GPG user ID's to be
+    listed with multiple -r options, followed by the configuration-file
+    name.  This will cause a new key pair to be generated with a new
+    set of users being able to access the private key.
 
     <H2>Example</H2>
 

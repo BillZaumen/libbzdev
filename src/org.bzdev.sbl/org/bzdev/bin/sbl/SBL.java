@@ -358,12 +358,19 @@ public class SBL {
 	}
     }
 
-    private static boolean init() {
+    private static boolean init(List<String> rlist) {
 	try {
 	    String[] keypair =
 		SecureBasicUtilities.createPEMPair(null,null);
 	    for (;;) {
-		cpe.setRecipients(frame);
+		if (rlist.size() == 0) {
+		    cpe.setRecipients(frame);
+		} else {
+		    cpe.setRecipients(rlist);
+		    // If we fail, ask explicitly.
+		    rlist.clear();
+		}
+
 		if (cpe.set(frame, "ebase64.keypair.privateKey", keypair[0])
 		    && cpe.set(frame, "base64.keypair.publicKey",
 			       keypair[1])) {
@@ -678,11 +685,15 @@ public class SBL {
 	boolean printPublicKey = false;
 	boolean printList = false;
 	String nm = null;
+	List<String> rlist = new LinkedList<String>();
 
 	while (indx < argv.length) {
 	    if (argv[indx].equals("--")) {
 		indx++;
 		break;
+	    } else if (argv[indx].equals("-r")) {
+		indx++;
+		rlist.add(argv[indx]);
 	    } else if (argv[indx].equals("-f")) {
 		checkConfig = false;
 	    } else if (argv[indx].equals("-n")) {
@@ -796,6 +807,25 @@ public class SBL {
 	    }
 	}
 
+	if (configFile != null && configFile.exists() && rlist.size() > 0) {
+	    // add a new keypair with a new list of recipients
+	    cpe.loadFile(configFile);
+	    String[] keypair =
+		SecureBasicUtilities.createPEMPair(null,null);
+	    cpe.setRecipients(rlist);
+	    if (cpe.set(null, "ebase64.keypair.privateKey", keypair[0])
+		&& cpe.set(null, "base64.keypair.publicKey",
+			   keypair[1])) {
+		cpe.save(configFile);
+		System.exit(0);
+	    } else {
+		System.err.println("sbl: "
+				   + errorMsg("encryptFailed"));
+		System.exit(1);
+	    }
+	}
+
+
 	SwingUtilities.invokeLater(() -> {
 		boolean loadedAtStart = false;
 		JPanel panel = new JPanel(new GridLayout(3, 3));
@@ -850,7 +880,7 @@ public class SBL {
 		    copyPWButton.setEnabled(false);
 		} else {
 		    if (!configFile.exists()) {
-			if (init()) {
+			if (init(rlist)) {
 			    addEntryButton.setEnabled(true);
 			    editEntriesButton.setEnabled(true);
 			    selectSiteCB.setEnabled(false);
@@ -911,7 +941,7 @@ public class SBL {
 			return;
 		    }
 		    if (!configFile.exists()) {
-			if (init()) {
+			if (init(rlist)) {
 			    addEntryButton.setEnabled(true);
 			    editEntriesButton.setEnabled(true);
 			    selectSiteCB.setEnabled(false);

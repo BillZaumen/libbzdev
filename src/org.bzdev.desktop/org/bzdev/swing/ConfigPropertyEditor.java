@@ -598,12 +598,23 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Set the list of recipients to use when values are encrypted, given
-     * an explicit list.
+     * an array of recipients.
      * A recipient is a string acceptable to the '-r' argument for GPG.
      * @param list the recipient list; null to remove the recipients list
      */
     public void setRecipients(String[] list) {
 	recipientsList =  list.clone();
+    }
+
+    /**
+     * Set the list of recipients to use when values are encrypted, given
+     * a list of recipients.
+     * A recipient is a string acceptable to the '-r' argument for GPG.
+     * @param list the recipient list; null to remove the recipients list
+     */
+    public void setRecipients(java.util.List<String> list) {
+	String[] array = new String[list.size()];
+	setRecipients(list.toArray(array));
     }
 
     /**
