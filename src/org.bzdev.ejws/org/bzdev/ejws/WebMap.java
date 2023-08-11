@@ -1350,23 +1350,32 @@ abstract public class WebMap {
      * is not dependent on server-specific conventions such as naming
      * a 'welcome' file index.html. The method
      * {@link #addWelcome(String)} adds possible welcome file locations.
+     * <P>
+     * Deprecated because this method is not needed.
      * @param base the path (which must end in "/").
      * @return an instance of Info containing an input stream for reading
      *         the "welcome" file; null if none exists.
      * @exception IOException an IO error occurred
+     * @Deprecated
      */
     public Info getWelcomeInfo(String base) throws IOException {
+	return getWelcomeInfo();
+	/*
 	if (base == null || base.length() == 0) {
 	    return getWelcomeInfo();
 	}
+
 	if (base.startsWith("/")) {
 	    base = base.substring(1);
+	}
+	if (!base.endsWith("/")) {
+	    base = base + "/";
 	}
 	for (String path: welcomeList) {
 	    if (path.startsWith("/")) {
 		path = path.substring(1);
 	    }
-	    path = base + path;
+	    // path = base + path;
 	    try {
 		Info info = getInfoFromPath(path);
 		if (info != null) {
@@ -1375,6 +1384,7 @@ abstract public class WebMap {
 	    } catch (EjwsException e) {}
 	}
 	return null;
+	*/
     }
 
 
@@ -2087,6 +2097,10 @@ abstract public class WebMap {
      * generally not use this method explicitly. Note that, when a
      * WEB-INF/web.xml file exists, a WebxmlParser will be created and
      * called by a FileHandler's constructor.
+     * <P>
+     * The paths are relative to the base URL for this web map and
+     * should not contain a "/" if the welcome page contains
+     * relative links.
      * @param path the path to add
      */
     public void addWelcome(String path) {

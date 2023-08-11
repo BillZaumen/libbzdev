@@ -1004,6 +1004,7 @@ public class FileHandler implements HttpHandler {
 		Headers headers = t.getResponseHeaders();
 		headers.set("Allow", sb.toString());
 		t.sendResponseHeaders(200, -1);
+		return;
 	    }
 	    try {
 		URI uri = t.getRequestURI();
@@ -1108,14 +1109,9 @@ public class FileHandler implements HttpHandler {
 			((path.length() == 0 || path.equals(base)
 			  || path.equals(base1))
 			 && query == null);
-		    // welcomeTest = welcomeTest && !nowebxml;
 		    welcomeTest = welcomeTest && map.welcomeInfoAvailable();
 		    if (welcomeTest) {
-			if (path.length() == 0 || path.equals("/")) {
-			    info = map.getWelcomeInfo();
-			} else {
-			    info = map.getWelcomeInfo(base1);
-			}
+			info = map.getWelcomeInfo();
 		    }
 		    // info will be non-null only if there is a 'welcome'
 		    // page; otherwise we have to request the info object.
