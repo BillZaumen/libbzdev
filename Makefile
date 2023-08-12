@@ -1774,7 +1774,7 @@ install-javadocs: javadocs
 		$(EXAMPLES)/epi
 	install -m 0644 $(JROOT_EXAMPLES)/epi/emodel/Adapter.java \
 		$(EXAMPLES)/epi/emodel
-	install -d $(EXAMPLES/sbl
+	install -d $(EXAMPLES)/sbl
 	install -m 0644 $(JROOT_EXAMPLES)/sbl/Makefile $(EXAMPLES)/sbl/Makefile
 	install -m 0644 $(JROOT_EXAMPLES)/sbl/Server.java \
 		$(EXAMPLES)/sbl/Server.java
