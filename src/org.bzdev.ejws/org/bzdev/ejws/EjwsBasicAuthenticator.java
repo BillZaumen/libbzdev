@@ -63,7 +63,7 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
     private boolean logoutPathUsed = true;
     private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
 
-    private BiConsumer authFunction = null;
+    private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
 
 
     /**

@@ -29,6 +29,8 @@ public class CopyUtilities {
     /**
      * Copy a resource to a file.
      * The resource is accessed via the system class loader.
+     * This can be problematic in Java modules unless the module is
+     * an open module.
      * @param resource the resource
      * @param outputFile the output file
      * @exception IOException an IO error occurred
@@ -43,6 +45,8 @@ public class CopyUtilities {
     /**
      * Copy a resource to an output stream.
      * The resource is accessed via the system class loader.
+     * This can be problematic with Java modules unless the module
+     * containing the resource is an open module.
      * @param resource the resource
      * @param target the output stream
      * @exception IOException an IO error occurred
@@ -75,6 +79,8 @@ public class CopyUtilities {
     /**
      * Copy a resource containing character data to an Appendable
      * The resource is accessed via the system class loader.
+     * This can be problematic with Java modules unless the module
+     * containing the resource is an open module.
      * @param resource the resource
      * @param a is the object used to store the copy
      * @param charset the character encoding used by the resource
@@ -102,6 +108,107 @@ public class CopyUtilities {
 	}
 	copyStream(is, a, charset);
     }
+
+
+    /**
+     * Copy a resource in the same package as the given class to a file.
+     * The resource is accessed via the system class loader.
+     * Typically, the first argument will be <CODE>this.getClass()</CODE>
+     * or just <CODE>getClass()</CODE>.  The first argument is needed
+     * in most cases due to the restrictions modules place on the visibility
+     * of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the resource
+     * @param outputFile the output file
+     * @exception IOException an IO error occurred
+     */
+    public static void copyResourceToFile(Class clasz,
+					  String resource,
+					  File outputFile)
+	throws IOException
+    {
+	OutputStream os = new FileOutputStream(outputFile);
+	copyResourceToStream(clasz, resource, os);
+    }
+
+    /**
+     * Copy a resource in the same package as the given class to an
+     * output stream.
+     * The resource is accessed via the system class loader.
+     * Typically, the first argument will be
+     * <CODE>this.getClass()</CODE> or just <CODE>getClass()</CODE>.
+     * The first argument is needed in most cases due to the
+     * restrictions modules place on the visibility of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the resource
+     * @param target the output stream
+     * @exception IOException an IO error occurred
+     */
+    public static void copyResourceToStream(Class clasz,
+					    String resource,
+					    OutputStream target)
+	throws IOException
+    {
+	if (clasz == null || resource == null || target == null) {
+	    throw new NullPointerException("nullArgument");
+	}
+	if (!resource.startsWith("/")) {
+	    resource = "/" + resource;
+	}
+	InputStream is = null;
+	try {
+	    is = clasz.getResourceAsStream(resource);
+	} catch (Exception  e) {}
+	if (is == null) {
+	    throw new IOException(errorMsg("noResource", resource));
+	}
+	byte[] buffer = new byte[4096];
+	int len;
+	while ((len = is.read(buffer)) != -1) {
+	    target.write(buffer, 0, len);
+	}
+	target.flush();
+    }
+
+
+    /**
+     * Copy a resource in the same package as the given class and
+     * containing character data to an Appendable.
+     * The resource is accessed via the system class loader.
+     * Typically, the first argument will be
+     * <CODE>this.getClass()</CODE> or just <CODE>getClass()</CODE>.
+     * The first argument is needed in most cases due to the
+     * restrictions modules place on the visibility of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the resource
+     * @param a is the object used to store the copy
+     * @param charset the character encoding used by the resource
+     * @exception IOException an IO error occurred
+     * @exception NullPointerException an argument was null
+     */
+    public static void copyResource(Class clasz,
+				    String resource,
+				    Appendable a,
+				    Charset charset)
+	throws IOException, NullPointerException
+    {
+	if (clasz == null || resource == null || a == null || charset == null) {
+	    throw new NullPointerException("nullArgument");
+	}
+	if (!resource.startsWith("/")) {
+	    resource = "/" + resource;
+	}
+	InputStream is = null;
+	try {
+	    is = clasz.getResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
+	copyStream(is, a, charset);
+    }
+
+
 
     /**
      * Copy a file to a file.

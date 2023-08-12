@@ -1351,13 +1351,13 @@ abstract public class WebMap {
      * a 'welcome' file index.html. The method
      * {@link #addWelcome(String)} adds possible welcome file locations.
      * <P>
-     * Deprecated because this method is not needed.
+     * @deprecated this method is not needed.
      * @param base the path (which must end in "/").
      * @return an instance of Info containing an input stream for reading
      *         the "welcome" file; null if none exists.
      * @exception IOException an IO error occurred
-     * @Deprecated
      */
+    @Deprecated
     public Info getWelcomeInfo(String base) throws IOException {
 	return getWelcomeInfo();
 	/*
@@ -2189,18 +2189,26 @@ abstract public class WebMap {
      * generally not use this method explicitly.  Note that, when a
      * WEB-INF/web.xml file exists, a WebxmlParser will be created and
      * called by a FileHandler's constructor.
+     * <P>
+     * The suffix should not start with a period&mdash;if it does, the
+     * period will be removed.
      * @param suffix the file name or path suffix
      * @param mtype the corresponding MIME type
      */
     public void addMapping(String suffix, String mtype) {
+	if (suffix.charAt(0) == '.') suffix = suffix.substring(1);
 	suffixToMimeType.put(suffix, mtype);
     }
 
     /**
      * Add a file-name/path suffix that indicates the use of gzip compression.
+     * <P>
+     * The suffix should not start with a period&mdash;if it does, the
+     * period will be removed.
      * @param suffix the suffix
      */
     public void addGzipSuffix(String suffix) {
+	if (suffix.charAt(0) == '.') suffix = suffix.substring(1);
 	if (!suffixForGZipDefault.contains(suffix)) {
 	    suffixForGZip.add(suffix);
 	}

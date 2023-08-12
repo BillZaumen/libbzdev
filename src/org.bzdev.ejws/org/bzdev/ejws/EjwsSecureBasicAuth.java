@@ -461,7 +461,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
     private ThreadLocal<Boolean> foundLogoutTL = new ThreadLocal<>();
     private ThreadLocal<String> usernameTL = new ThreadLocal<>();
 
-    private BiConsumer authFunction = null;
+    private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
 
     /**
      * Set the login function.

@@ -56,7 +56,7 @@ import java.net.URL;
  *               method
  *               {@link TemplateProcessor.KeyMap#put(String,Object,Object,Object)}.
  *       </UL>
- *       Directives with a '+' or '-' can be used to create and conditional
+ *       Directives with a '+' or '-' can be used to create conditional
  *       statements without having to explicitly add new directives whose
  *       only use is to indicate status.
  * </ul>
@@ -959,7 +959,6 @@ public class TemplateProcessor {
 	}
     }
 
-
     /**
      * Process a template given a reader, specifying the output as a file.
      * @param reader the Reader used to read a template
@@ -992,6 +991,8 @@ public class TemplateProcessor {
     /**
      * Process a template stored as a system resource, specifying the output
      * as a File.
+     * This can be problematic with Java modules unless the module
+     * containing the resource is an open module.
      * @param resource the name of the resource containing the template
      * @param encoding the character encoding for the resource
      * @param outputFile a file in which the output is stored
@@ -1002,8 +1003,19 @@ public class TemplateProcessor {
 				      File outputFile)
 	throws IOException
     {
-	InputStream is = 
-	    ClassLoader.getSystemResourceAsStream (resource);
+	InputStream is =  null;
+	try {
+	    is = ClassLoader.getSystemResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    if (!resource.startsWith("/")) {
+		resource = "/" + resource;
+	    }
+	    is = TemplateProcessor.class.getResourceAsStream(resource);
+	}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
 	InputStreamReader rd = new InputStreamReader(is, encoding);
 	OutputStream os = new FileOutputStream(outputFile);
 	OutputStreamWriter wr = new OutputStreamWriter(os, encoding);
@@ -1015,6 +1027,8 @@ public class TemplateProcessor {
 
     /**
      * Process a template stored as a system resource.
+     * This can be problematic with Java modules unless the module
+     * containing the resource is an open module.
      * @param resource the name of the resource containing the template
      * @param encoding the character encoding for the resource
      * @param writer the Writer used to output the replacement text
@@ -1025,9 +1039,19 @@ public class TemplateProcessor {
 				      Writer writer)
 	throws IOException
     {
-	InputStream is = ClassLoader.getSystemResourceAsStream(resource);
-	if (is == null) throw new IOException("could not load resource "
-					      + resource);
+	InputStream is = null;
+	try {
+	    is = ClassLoader.getSystemResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    if (!resource.startsWith("/")) {
+		resource = "/" + resource;
+	    }
+	    is = TemplateProcessor.class.getResourceAsStream(resource);
+	}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
 	InputStreamReader rd = new InputStreamReader(is, encoding);
 	processTemplate(rd,writer);
 	is.close();
@@ -1036,6 +1060,8 @@ public class TemplateProcessor {
     /**
      * Process a template stored as a system resource, specifying the output
      * as an output stream.
+     * This can be problematic with Java modules unless the module
+     * containing the resource is an open module.
      * @param resource the name of the resource containing the template
      * @param encoding the character encoding for the resource
      * @param os an output stream for the processed template
@@ -1045,14 +1071,132 @@ public class TemplateProcessor {
 				      OutputStream os) 
 	throws IOException
     {
-	InputStream is = 
-	    ClassLoader.getSystemResourceAsStream (resource);
-	if (is == null) throw new IOException("could not read " + resource);
+	InputStream is = null;
+	try {
+	    is = ClassLoader.getSystemResourceAsStream (resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    if (!resource.startsWith("/")) {
+		resource = "/" + resource;
+	    }
+	    is = TemplateProcessor.class.getResourceAsStream(resource);
+	}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
 	InputStreamReader rd = new InputStreamReader(is, encoding);
 	OutputStreamWriter wr = new OutputStreamWriter(os, encoding);
 	processTemplate(rd,wr);
 	is.close();
     }
+
+    /**
+     * Process a template stored as a system resource, specifying the output
+     * as a File and provided a class in the same package as the resource.
+     * Typically, the first argument will be <CODE>this.getClass()</CODE>
+     * or just <CODE>getClass()</CODE>.  The first argument is needed
+     * in most cases due to the restrictions modules place on the visibility
+     * of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the name of the resource containing the template
+     * @param encoding the character encoding for the resource
+     * @param outputFile a file in which the output is stored
+     * @exception IOException an IO error occurred during processing
+     */
+public void processSystemResource(Class clasz,
+				  String resource,
+				  String encoding,
+				  File outputFile)
+	throws IOException
+    {
+	if (!resource.startsWith("/")) {
+	    resource = "/" + resource;
+	}
+	InputStream is = null;
+	try {
+	    is = clasz.getResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
+	InputStreamReader rd = new InputStreamReader(is, encoding);
+	OutputStream os = new FileOutputStream(outputFile);
+	OutputStreamWriter wr = new OutputStreamWriter(os, encoding);
+	processTemplate(rd,wr);
+	is.close();
+	wr.close();
+    }
+
+    /**
+     * Process a template stored as a system resource and provided a
+     * class in the same package as the resource.
+     * Typically, the first argument will be <CODE>this.getClass()</CODE>
+     * or just <CODE>getClass()</CODE>.  The first argument is needed
+     * in most cases due to the restrictions modules place on the visibility
+     * of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the name of the resource containing the template
+     * @param encoding the character encoding for the resource
+     * @param writer the Writer used to output the replacement text
+     * @exception IOException an IO error occurred during processing
+     */
+    public void processSystemResource(Class clasz,
+				      String resource,
+				      String encoding,
+				      Writer writer)
+	throws IOException
+    {
+	if (!resource.startsWith("/")) {
+	    resource = "/" + resource;
+	}
+	InputStream is = null;
+	try {
+	    is = clasz.getResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
+	InputStreamReader rd = new InputStreamReader(is, encoding);
+	processTemplate(rd,writer);
+	is.close();
+    }
+
+    /**
+     * Process a template stored as a system resource, specifying the
+     * output as an output stream and provided a class in the same
+     * package as the resource.
+     * Typically, the first argument will be <CODE>this.getClass()</CODE>
+     * or just <CODE>getClass()</CODE>.  The first argument is needed
+     * in most cases due to the restrictions modules place on the visibility
+     * of resources.
+     * @param clasz a class in the same package as the resource
+     * @param resource the name of the resource containing the template
+     * @param encoding the character encoding for the resource
+     * @param os an output stream for the processed template
+     * @exception IOException an IO error occurred during processing
+     */
+    public void processSystemResource(Class clasz,
+				      String resource,
+				      String encoding,
+				      OutputStream os)
+	throws IOException
+    {
+	if (!resource.startsWith("/")) {
+	    resource = "/" + resource;
+	}
+	InputStream is = null;
+	try {
+	    is = clasz.getResourceAsStream(resource);
+	} catch (Exception e) {}
+	if (is == null) {
+	    throw new IOException(errorMsg("missingResource", resource));
+	}
+	InputStreamReader rd = new InputStreamReader(is, encoding);
+	OutputStreamWriter wr = new OutputStreamWriter(os, encoding);
+	processTemplate(rd,wr);
+	is.close();
+    }
+
 
     /**
      * Process a template located via a URL.

@@ -546,9 +546,10 @@ public class SBL {
 		    if (certSet.contains(cert)) {
 			return true;
 		    } else {
+			String msg = errorMsg("acceptSelfSigned");
+			String title = errorMsg("acceptSelfSignedTitle");
 			switch(JOptionPane.showConfirmDialog
-			       (frame, errorMsg("acceptSelfSigned"),
-				errorMsg("acceptSelfSignedTitle"),
+			       (frame, msg, title,
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE)) {
 			case JOptionPane.OK_OPTION:
@@ -819,8 +820,7 @@ public class SBL {
 		cpe.save(configFile);
 		System.exit(0);
 	    } else {
-		System.err.println("sbl: "
-				   + errorMsg("encryptFailed"));
+		System.err.println("sbl: " + errorMsg("encryptFailed"));
 		System.exit(1);
 	    }
 	}
@@ -842,9 +842,9 @@ public class SBL {
 		    new JMenuItem(localeString("Browser"));
 		SimpleConsole console = new SimpleConsole();
 		console.addSeparator();
+		String clbl = errorMsg("openConsole");
 		JMenuItem consoleMenuItem = console
-		    .createMenuItem(errorMsg("openConsole"), "console",
-				    800, 600);
+		    .createMenuItem(clbl, "console", 800, 600);
 		SwingErrorMessage.setAppendable(console);
 		console.addCloseAccelerator(KeyEvent.VK_W,
 					    InputEvent.CTRL_DOWN_MASK,
@@ -935,11 +935,12 @@ public class SBL {
 		}
 
 		ActionListener loadAL = (e) -> {
-		    configFile = getFile(frame);
-		    if (configFile == null) {
+		    File f = getFile(frame);
+		    if (f == null) {
 			// Keep the current configuration
 			return;
 		    }
+		    configFile = f;
 		    if (!configFile.exists()) {
 			if (init(rlist)) {
 			    addEntryButton.setEnabled(true);

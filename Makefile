@@ -238,6 +238,10 @@ BASE_RESOURCES1 = $(wildcard $(BASE_DIR)/$(BZDEV)/io/lpack/*.properties) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/scripting/lpack/*.properties) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/espdocs.tpl) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/*.properties) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoStart.xml) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfo.xml) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoEnd.xml)
+
 
 BASE_RESOURCES = $(subst ./src/,,$(BASE_RESOURCES1))
 
@@ -1747,7 +1751,7 @@ install-javadocs: javadocs
 	install -d $(EXAMPLES)
 	for i in blackhole dplot drama harmonic Legendre lgraph lingraph \
 	   lognormal lsqfit math multi p3d path pendulum plates \
-	   smartmeter stephan tandem zipviewer ; \
+	   smartmeter stephan  tandem zipviewer ; \
 	do  install -d $(EXAMPLES)/$$i ; \
 	    install -m 0644 $(JROOT_EXAMPLES)/$$i/*.java $(EXAMPLES)/$$i ; \
 	done
@@ -1770,6 +1774,10 @@ install-javadocs: javadocs
 		$(EXAMPLES)/epi
 	install -m 0644 $(JROOT_EXAMPLES)/epi/emodel/Adapter.java \
 		$(EXAMPLES)/epi/emodel
+	install -d $(EXAMPLES/sbl
+	install -m 0644 $(JROOT_EXAMPLES)/sbl/Makefile $(EXAMPLES)/sbl/Makefile
+	install -m 0644 $(JROOT_EXAMPLES)/sbl/Server.java \
+		$(EXAMPLES)/sbl/Server.java
 	install -m 0644 $(JROOT_EXAMPLES)/smartmeter/*.properties \
 		$(EXAMPLES)/smartmeter
 	install -d $(EXAMPLES)/smartmeter/META-INF
