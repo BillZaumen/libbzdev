@@ -239,7 +239,8 @@ BASE_RESOURCES1 = $(wildcard $(BASE_DIR)/$(BZDEV)/io/lpack/*.properties) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/espdocs.tpl) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/lpack/*.properties) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoStart.xml) \
-	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfo.xml) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoCPE.xml) \
+	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoZipDoc.xml) \
 	$(wildcard $(BASE_DIR)/$(BZDEV)/util/SharedMimeInfoEnd.xml)
 
 

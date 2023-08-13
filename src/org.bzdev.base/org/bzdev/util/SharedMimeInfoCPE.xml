@@ -1,5 +1,5 @@
-  <mime-type type="$(mediaType)">
-    <comment>Secure Basic Launcher configuration</comment>
+  <mime-type type="$(mediaType)">$(+comment:endComment)
+    <comment>$(comment)</comment>$(endComment)
     <magic priority="$(priority)">
       <match type="string" offset="0"
              value="#(!M.T $(mediaType))"/>

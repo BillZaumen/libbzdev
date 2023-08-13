@@ -111,6 +111,8 @@ all: compile
 	chmod u+x scrun
 	@./scrun checkPrintWriter.esp > testPW.html
 	chmod u-x scrun
+	@echo --- shared-mime-info test ---
+	@$(JAVA) SMITest
 	@echo --- run configProp test interactively '(make configProp)' ---
 
 actest: compile
@@ -334,9 +336,13 @@ blockTest:
 	./scrun checkPrintWriter.esp > testPW.html
 	@chmod u-x scrun
 
+smi: compile
+	@echo --- shared-mime-info test ---
+	@$(JAVA) SMITest
+
+
 configProp: compile ../swing/config.foo
 	$(JAVA) ConfigPropTest
-
 
 ../swing/config.foo:
 	@echo Save a configuration in the file config.foo

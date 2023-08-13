@@ -1,0 +1,20 @@
+  <mime-type type="$(mediaType)">$(+comment:endComment)
+    <comment>$(comment)</comment>$(endComment)
+    <sub-class-of type="application/zip"/>
+      <magic priority="$(priority)">
+        <match type="little16" offset="26" value="9">
+          <match type="little16" offset="28" value="38">
+            <match type="string" offset="30" value="META-INF/">
+              <match type="little16" offset="39" value="0xFACE">
+                <match type="little16" offset="41" value="34">
+                  <match type="string" offset="43"
+                         value="$(mediaType)">
+                  </match>
+                </match>
+              </match>
+            </match>
+          </match>
+        </match>
+      </magic>$(+suffix:endSuffix)
+      <glob pattern="*.$(suffix)"/>$(endSuffix)
+  </mime-type>
