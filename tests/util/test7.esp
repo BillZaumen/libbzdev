@@ -1,9 +1,9 @@
-import(org.bzdev.util.units.MKS);
-import (org.bzdev.anim2d, [
+import org.bzdev.util.units.MKS;
+import org.bzdev.anim2d, [
     Animation2D, KinematicOps2D,
     ConnectingLine2D, ConnectingLine2DFactory,
     AnimationLayer2D, AnimationLayer2DFactory,
-    AnimationPath2D, AnimationPath2DFactory]);
+    AnimationPath2D, AnimationPath2DFactory];
 import (org.bzdev.swing.AnimatedPanelGraphics);
 var frameWidth = 1046;
 var frameHeight = 722;

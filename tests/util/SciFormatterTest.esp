@@ -1,5 +1,5 @@
 import("org.bzdev.util.SciFormatter");
-import("org.bzdev.util.VarArgsFormatter");
+import org.bzdev.util.VarArgsFormatter;
 import("java.util.Locale");
 
 var err ?= global.getErrorWriter();

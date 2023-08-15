@@ -7882,6 +7882,11 @@ public class ExpressionParser implements ObjectParser<Object>
 	Token nonNullPrev = null;
 	Token ltPrevToken = null;
 
+	// Used to determine if we should internally add a
+	// missing parentheses for import statements.
+	boolean importParen = false;
+	boolean needCloseParen = false;
+
 	for (int i = 0; i < len; i++) {
 	    char ch = s.charAt(i);
 	    if (colonExpected) {
@@ -8049,6 +8054,35 @@ public class ExpressionParser implements ObjectParser<Object>
 		throw new ObjectParser.Exception(msg, filenameTL.get(), s, i);
 	    }
 	    ltPrevToken = null;
+
+	    if (importParen) {
+		i = skipWhitespace(s, i, len, false);
+		if (i == len) {
+		    i--;	// for i++ in 'for' loop
+		    continue;
+		}
+		ch = s.charAt(i);
+		if (ch == '"' || Character.isJavaIdentifierStart(ch)) {
+		    needCloseParen = true;
+		    ch = '(';
+		    i--;
+		}
+		importParen = false;
+	    } else if (needCloseParen) {
+		// the 'else' is needed so we don't run this
+		// when we just set ch to '(' and decremented i.
+		i = skipWhitespace(s, i, len, false);
+		if (i == len) {
+		    i--;	// for i++ in 'for' loop
+		    continue;
+		}
+		ch = s.charAt(i);
+		if (ch == ';') {
+		    needCloseParen = false;
+		    i--;
+		    ch = ')';
+		}
+	    }
 
 	    // Operator ptype = (prev == null)? null: prev.getType();
 	    switch(ch) {
@@ -9128,7 +9162,6 @@ public class ExpressionParser implements ObjectParser<Object>
 		} else {
 		    level += 1 + LEVEL_OFFSET;
 		}
-
 		next = new Token(Operator.OPAREN, "(", offset+i, level);
 		if (funct != null) {
 		    next.setFunct(funct);
@@ -10194,6 +10227,12 @@ public class ExpressionParser implements ObjectParser<Object>
 			tokens.add(next);
 			importStarted = true;
 			finishNeeded = true;
+			// Setting importParen to true results in code
+			// immediately before the 'switch' statement above
+			// being executed, and that code checks for the
+			// opening parenthesis.
+			importParen = true;
+
 		    } else if (variable.equals("import")) {
 			// imports not allowed / 'import' is a reserved word.
 			String msg;

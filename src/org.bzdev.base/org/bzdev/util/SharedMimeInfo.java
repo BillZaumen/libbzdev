@@ -26,7 +26,7 @@ import java.nio.charset.Charset;
  * a good example:
  * <BLOCKQUOTE><PRE></CODE>
  * #!/usr/bin/scrunner -sEUN:true
- * import (org.bzdev.util.SharedMimeInfo);
+ * import org.bzdev.util.SharedMimeInfo;
  *
  * new SharedMimeInfo(global.getWriter())
  *    .addConfigPropertyType(90, "application/foo", "foo",

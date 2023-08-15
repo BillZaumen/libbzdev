@@ -1148,6 +1148,11 @@ import-statement: &apos;import&apos; &apos;(&apos; package-name &apos;,&apos; cl
     | &apos;import&apos; &apos;(&apos; class-name &apos;)&apos;
     | &apos;import &apos;(&apos; &apos;[&apos; class-names &apos;]&apos; &apos;)&apos;
 
+    | &apos;import&apos; package-name &apos;,&apos; class-name
+    | &apos;import&apos; package-name &apos;,&apos; &apos;[&apos; class-names &apos;]&apos;
+    | &apos;import&apos; class-name
+    | &apos;import  &apos;[&apos; class-names &apos;]&apos;
+
 package-name: qualified-name
     | &apos;"&apos; &apos;"&apos;
     | &apos;null&apos;
@@ -1161,7 +1166,8 @@ import-class-name: class-name
     | &apos;"&apos; class-name &apos;"&apos;
     </PRE></BLOCKQUOTE>
   <P>
-    When there are multiple import statements in a row (that is,
+    Whether parentheses are used in an import statement is a matter of
+    style. When there are multiple import statements in a row (that is,
     without any intervening statement), all are imported at once - the
     classes will be added to lists of allowed values and allowed arguments,
     and those lists determine which methods are visible.  Public,
