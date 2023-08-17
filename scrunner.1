@@ -596,7 +596,9 @@ to the boolean
 which must have the values
 .B true
 or
-.BR false .
+.BR false ,
+or be a boolean-valued ESP expression that starts with an
+equal sign ("=").
 .TP
 .BI \-vI: VAR\ VALUE
 .TQ
@@ -605,11 +607,16 @@ Set the variable
 .I VAR
 to the number
 .IR VALUE ,
-which is treated as an integer.
+which is treated as an integer  or
+an integer-valued ESP expression if
 .I VALUE
-may be followed (with no intermediate spaces) by the letters 'h' (hecto), 'k'
-(kilo), 'M' (mega), or 'G' (giga), which multiply the value by 
-1000, 1,000,000, or 1,000,000,000 respectively.
+starts with an equal sign ("=").
+.I VALUE
+may be followed (with no intermediate spaces) by the letters 'h'
+(hecto), 'k' (kilo), 'M' (mega), or 'G' (giga), which multiply the
+value by 1000, 1,000,000, or 1,000,000,000 respectively. For the ESP
+expression case, the value multiplied is the value of the full
+expression, not an individual term.
 .TP
 .BI \-vL: VAR\ VALUE
 .TQ
@@ -618,13 +625,18 @@ Set the variable
 .I VAR
 to the number
 .IR VALUE ,
-which is treated as a long integer.
+which is treated as a long integer or
+a long-integer-valued ESP expression if
+.I VALUE
+starts with an equal sign ("=").
 .I VALUE
 may be followed (with no intermediate spaces) by the 
 letters 'h' (hecto) 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
 (peta), or 'E' (exa), which multiply
 .I VALUE
-by 100, 1000, 1,000,000, 1e9, 1e12, 1e15, 1e18 respectively.
+by 100, 1000, 1,000,000, 1e9, 1e12, 1e15, 1e18 respectively. For the
+ESP expression case, the value multiplied is the value of the full
+expression, not an individual term.
 .TP
 .BI \-vD: VAR\ VALUE
 .TQ
@@ -633,7 +645,10 @@ Set the variable
 .I VAR
 to the number
 .IR VALUE ,
-which is treated as a double-precision floating-point number.
+which is treated as a double-precision floating-point number or
+a double-precision-valued ESP expression if
+.I VALUE
+starts with an equal sign ("=").
 .I VALUE
 may be followed (with no intermediate spaces) by the
 letters 'y' (yocto), 'z' (zepto), 'a' (atto), 'f' (femto), 'p'
@@ -643,7 +658,9 @@ letters 'y' (yocto), 'z' (zepto), 'a' (atto), 'f' (femto), 'p'
 .I VALUE
 by 1.0e\-24, 1.0e\-21, 1.0e\-18, 1.0e\-15, 1.0e\-12, 1.0e\-9, 1.0e\-6,
 1.0e\-3, 1.0e\-3, 1.0e2, 1.0e3, 1.0e6, 1.0e9, 1.0e12, 1.0e15, 1.0e18,
-1.0e21 or 1.e24 respectively.
+1.0e21 or 1.e24 respectively. For the ESP expression case, the value
+multiplied is the value of the full expression, not an individual
+term.
 .TP
 .B \-\-versions
 Print the URL of each JAR file in
@@ -653,6 +670,32 @@ class path, including entries added via the
 option, followed by an indented line containing the specification version
 for the JAR file and then the implementation version.  If either is
 missing, a "\-" is printed in its place.
+.SH ESP expressions on the command line.
+.PP
+Arguments constrained to have integer, long-integer, double, or
+boolean values can be either literal values or can be ESP expressions
+that start with an equal sign. In addition to standard ESP operators,
+one may use a few predefined functions.  These correspond to the
+static methods defined
+for the classes java.lang.Math and org.bzdev.MathOps as long as
+the methods and their arguments are suitable primitive types,
+.BR int ,
+.BR long ,
+.BR double ,
+.BR boolean ,
+and
+.BR String ,
+and as long as the methods return specific primitive values
+.BR int ,
+.BR long ,
+.BR double ,
+and
+.BR boolean .
+.PP
+ESP is run in a mode in a restricted mode that prevents new classes
+from being imported.  Furthermore, variables cannot be set, and for
+each argument, a new instance of ESP is used, independent of the one
+used for the script.
 .SH EXECUTABLE SCRIPTS
 .PP
 The

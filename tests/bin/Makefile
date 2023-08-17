@@ -74,6 +74,21 @@ all:
 	./run -vL:foo:10 printfoo.esp
 	./run -vB:foo:true printfoo.esp
 	./run -vB:foo true printfoo.esp
+	./run -vD:foo =10+1 printfoo.esp
+	./run -vD:foo:=20+2 printfoo.esp
+	./run -vI:foo =10+1 printfoo.esp
+	./run -vI:foo:=10+1 printfoo.esp
+	./run -vL:foo =10+1 printfoo.esp
+	./run -vL:foo:=10+1 printfoo.esp
+	./run -vD:foo =10+1k printfoo.esp
+	./run -vD:foo:=20+2k printfoo.esp
+	./run -vI:foo =10+1k printfoo.esp
+	./run -vI:foo:=10+1k printfoo.esp
+	./run -vL:foo =10+1k printfoo.esp
+	./run -vL:foo:=10+1k printfoo.esp
+	./run -vB:foo:='(10 == 20)' printfoo.esp
+	./run -vB:foo '=(10 == 10)'  printfoo.esp
+	./run -vI:foo'="foo".length()' printfoo.esp
 	@echo ---- actually run programs ----
 	./run --listScriptingLanguages
 	./run --listScriptingLanguages ECMAScript
@@ -172,6 +187,25 @@ all:
 		--codebase .../lsnof.jar "test.esp"
 	@echo ----- yrunner tests -----
 	make ytest
+
+print:
+	chmod u+x ./run ./run1
+	./run -vD:foo =10+1 printfoo.esp
+	./run -vD:foo:=20+2 printfoo.esp
+	./run -vI:foo =10+1 printfoo.esp
+	./run -vI:foo:=10+1 printfoo.esp
+	./run -vL:foo =10+1 printfoo.esp
+	./run -vL:foo:=10+1 printfoo.esp
+	./run -vD:foo =10+1k printfoo.esp
+	./run -vD:foo:=20+2k printfoo.esp
+	./run -vI:foo =10+1k printfoo.esp
+	./run -vI:foo:=10+1k printfoo.esp
+	./run -vL:foo =10+1k printfoo.esp
+	./run -vL:foo:=10+1k printfoo.esp
+	./run -vB:foo:='(10 == 20)' printfoo.esp
+	./run -vB:foo '=(10 == 10)'  printfoo.esp
+	./run -vI:foo'="foo".length()' printfoo.esp
+	chmod u-x ./run ./run1
 
 rpath:
 	( cd ../.. ; make )
@@ -333,9 +367,11 @@ ecirc:
 	chmod u+x ecirc2
 	chmod u+x ecirc3
 	./ecirc2 --dryrun 10 20
-	./ecirc2 -vD:x:30 --dryrun -10 20
+	./ecirc2 -vD:x:=30/2 --dryrun -10 20
 	./ecirc2  10 20
 	./ecirc3  10 20
+	./ecirc2  --dryrun =10/5 =20/5
+	./ecirc2  =10/5 =20/5
 	chmod u-x ecirc3
 	chmod u-x ecirc2
 	chmod u-x ./run

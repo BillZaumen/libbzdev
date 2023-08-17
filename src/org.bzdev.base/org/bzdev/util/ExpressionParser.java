@@ -6478,13 +6478,14 @@ public class ExpressionParser implements ObjectParser<Object>
      * and whose argument have the type
      * <UL>
      *    <LI> int. An argument of this type must be a literal
-     *         because the type of each variable is double,  and all
-     *         functions return a double, and all expressions produce
-     *         values whose types are double.
+     *         or an expression guaranteed to return an int.
+     *    <LI> long. An argument of this type must be a literal
+     *         or an expression guaranteed to return a long.
+     *    <LI> boolean. An argument of this type must be a literal
+     *         (true or false) or an expression guaranteed to return
+     *         a boolean.
      *    <LI> String. An argument of this type must be a literal
-     *         because the type of each variable is double,  and all
-     *         functions return a double, and all expressions produce
-     *         values whose types are double.
+     *         or a function guaranteed to return a string.
      *    <LI> double. An argument of this type may be an expression,
      *         a literal, or a function call.
      * </UL>

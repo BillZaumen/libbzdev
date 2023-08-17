@@ -4,7 +4,9 @@ import org.bzdev.util.*;
 import org.bzdev.io.*;
 import org.bzdev.obnaming.NamedObjectFactory;
 // import org.bzdev.net.URLClassLoaderOps;
+import org.bzdev.lang.MathOps;
 import org.bzdev.net.URLPathParser;
+import org.bzdev.util.ExpressionParser;
 import org.bzdev.util.SafeFormatter;
 import org.bzdev.util.ObjectParser;
 
@@ -110,7 +112,20 @@ public class SCRunner {
 	if (isuffixMap.containsKey(last)) {
 	    long mult = isuffixMap.get(last);
 	    String istring = string.substring(0, len-1);
-	    int value = Integer.parseInt(istring);
+	    int value;
+	    if (istring.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    value = ((Number)ep.parse(istring))
+			.intValue();
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToInt", istring);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		value = Integer.parseInt(istring);
+	    }
 	    switch (last) {
 	    case 'h':
 	    case 'k':
@@ -127,7 +142,20 @@ public class SCRunner {
 		    (errorMsg("outOfRange", istring));
 	    }
 	} else {
-	    return Integer.parseInt(string);
+	    if (string.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    int value = ((Number)ep.parse(string))
+			.intValue();
+		    return value;
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToInt", string);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		return Integer.parseInt(string);
+	    }
 	}
     }
 
@@ -142,7 +170,20 @@ public class SCRunner {
 	if (isuffixMap.containsKey(last)) {
 	    long mult = isuffixMap.get(last);
 	    String istring = string.substring(0, len-1);
-	    long value = Long.parseLong(istring);
+	    long value;
+	    if (istring.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    value = ((Number)ep.parse(istring))
+			.longValue();
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToLong", istring);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		value = Long.parseLong(istring);
+	    }
 	    long result = value * mult;
 	    if ((result < 0 && value > 0) || (result > 0 && value < 0)) {
 		throw new NumberFormatException
@@ -151,7 +192,20 @@ public class SCRunner {
 	    }
 	    return value *  mult;
 	} else {
-	    return Long.parseLong(string);
+	    if (string.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    long value = ((Number)ep.parse(string))
+			.longValue();
+		    return value;
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToLong", string);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		return Long.parseLong(string);
+	    }
 	}
     }
 
@@ -159,6 +213,7 @@ public class SCRunner {
 	
 	if (string == null)
 	    throw new NullPointerException(errorMsg("missingNumber"));
+	string = string.trim();
 	int len = string.length();
 	if (len == 0)
 	    throw new NumberFormatException(errorMsg("emptyString"));
@@ -166,10 +221,36 @@ public class SCRunner {
 	if (isuffixMap.containsKey(last)) {
 	    double mult = dsuffixMap.get(last);
 	    String dstring = string.substring(0, len-1);
-	    double value = Double.parseDouble(dstring);
-	    return value *  mult;
+	    if (dstring.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    double value = ((Number)ep.parse(dstring))
+			.doubleValue();
+		    return value * mult;
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToNumber", dstring);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		double value = Double.parseDouble(dstring);
+		return value *  mult;
+	    }
 	} else {
-	    return Double.parseDouble(string);
+	    if (string.startsWith("=")) {
+		try {
+		    ExpressionParser ep = new
+			ExpressionParser(Math.class, MathOps.class);
+		    double value = ((Number)ep.parse(string))
+			.doubleValue();
+		    return value;
+		} catch (Exception e) {
+		    String msg = errorMsg("notEvalToNumber", string);
+		    throw new NumberFormatException(msg);
+		}
+	    } else {
+		return Double.parseDouble(string);
+	    }
 	}
     }
 
@@ -549,13 +630,24 @@ public class SCRunner {
 		} else if (argv[index].startsWith("-vB:")) {
 		    String varName = argv[index].substring(4);
 		    int ind = varName.indexOf(':');
+		    int eqind = varName.indexOf("=");
 		    String string;
-		    if (ind < 0) {
+		    if (ind < 0 && eqind < 0 ) {
 			index++;
 			string = argv[index];
 		    } else {
-			string = varName.substring(ind+1);
-			varName = varName.substring(0, ind);
+			if (eqind < 0) {
+			    string = varName.substring(ind+1);
+			    varName = varName.substring(0, ind);
+			} else {
+			    if (ind >= 0 && ind < eqind) {
+				string = varName.substring(ind+1);
+				varName = varName.substring(0, ind);
+			    } else {
+				string = varName.substring(eqind);
+				varName = varName.substring(0, eqind);
+			    }
+			}
 		    }
 		    try {
 			if (varName.equals("scripting")
@@ -569,7 +661,21 @@ public class SCRunner {
 				    (errorMsg("variableInUse", varName));
 				/*throw new Exception("variable name in use");*/
 			    }
-			boolean value = Boolean.parseBoolean(string);
+			boolean value;
+			if (string.startsWith("=")) {
+			    try {
+				ExpressionParser ep = new
+				    ExpressionParser(Math.class, MathOps.class);
+				value = ((Boolean)ep.parse(string))
+				    .booleanValue();
+			    } catch (Exception e) {
+				String msg =
+				    errorMsg("notEvalToNumber", string);
+				throw new NumberFormatException(msg);
+			    }
+			} else {
+			    value = Boolean.parseBoolean(string);
+			}
 			vmap.put(varName, value);
 		    } catch (Exception e) {
 			String msg = e.getMessage();
@@ -589,13 +695,24 @@ public class SCRunner {
 		} else if (argv[index].startsWith("-vL:")) {
 		    String varName = argv[index].substring(4);
 		    int ind = varName.indexOf(':');
+		    int eqind = varName.indexOf("=");
 		    String string;
-		    if (ind < 0) {
+		    if (ind < 0 && eqind < 0) {
 			index++;
 			string = argv[index];
 		    } else {
-			string = varName.substring(ind+1);
-			varName = varName.substring(0, ind);
+			if (eqind < 0) {
+			    string = varName.substring(ind+1);
+			    varName = varName.substring(0, ind);
+			} else {
+			    if (ind >= 0 && ind < eqind) {
+				string = varName.substring(ind+1);
+				varName = varName.substring(0, ind);
+			    } else {
+				string = varName.substring(eqind);
+				varName = varName.substring(0, eqind);
+			    }
+			}
 		    }
 		    try {
 			if (varName.equals("scripting")
@@ -629,13 +746,24 @@ public class SCRunner {
 		} else 	if (argv[index].startsWith("-vI:")) {
 		    String varName = argv[index].substring(4);
 		    int ind = varName.indexOf(':');
+		    int eqind = varName.indexOf("=");
 		    String string;
-		    if (ind < 0) {
+		    if (ind < 0 && eqind < 0) {
 			index++;
 			string = argv[index];
 		    } else {
-			string = varName.substring(ind+1);
-			varName = varName.substring(0, ind);
+			if (eqind < 0) {
+			    string = varName.substring(ind+1);
+			    varName = varName.substring(0, ind);
+			} else {
+			    if (ind >= 0 && ind < eqind) {
+				string = varName.substring(ind+1);
+				varName = varName.substring(0, ind);
+			    } else {
+				string = varName.substring(eqind);
+				varName = varName.substring(0, eqind);
+			    }
+			}
 		    }
 		    try {
 			if (varName.equals("scripting")
@@ -669,13 +797,24 @@ public class SCRunner {
 		} else 	if (argv[index].startsWith("-vD:")) {
 		    String varName = argv[index].substring(4);
 		    int ind = varName.indexOf(':');
+		    int eqind = varName.indexOf('=');
 		    String string;
-		    if (ind < 0) {
+		    if (ind < 0 && eqind < 0) {
 			index++;
 			string = argv[index];
 		    } else {
-			string = varName.substring(ind+1);
-			varName = varName.substring(0, ind);
+			if (eqind < 0) {
+			    string = varName.substring(ind+1);
+			    varName = varName.substring(0, ind);
+			} else {
+			    if (ind >= 0 && ind < eqind) {
+				string = varName.substring(ind+1);
+				varName = varName.substring(0, ind);
+			    } else {
+				string = varName.substring(eqind);
+				varName = varName.substring(0, eqind);
+			    }
+			}
 		    }
 		    try {
 			if (varName.equals("scripting")

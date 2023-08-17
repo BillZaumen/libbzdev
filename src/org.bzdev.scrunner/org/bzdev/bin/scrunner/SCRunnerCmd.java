@@ -614,6 +614,8 @@ public class SCRunnerCmd {
 	String typename = null;
 	arg = arg.substring(arg.indexOf(":")+1);
 	arg = arg.substring(arg.indexOf(":")+1);
+	arg = arg.trim();
+	if (arg.startsWith("=")) return;
 	try {
 	    switch(type) {
 	    case 'I':
@@ -1213,7 +1215,8 @@ public class SCRunnerCmd {
 		} else 	if (argv[index].startsWith("-vD:")) {
 		    String varName = argv[index].substring(4);
 		    int ind = varName.indexOf(':');
-		    if (ind < 0) {
+		    int eqind = varName.indexOf('=');
+		    if (ind < 0 && eqind == 0) {
 			index++;
 			if (index == argv.length) {
 			    System.err.println

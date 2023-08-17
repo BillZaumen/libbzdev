@@ -285,7 +285,29 @@ public class ExprScriptTest {
 	parser = new ExpressionParser(new Class<?>[0], new Class<?>[0],
 				      new Class<?>[0], new Class<?>[0],
 				      new Class<?>[0]);
-	Class<?> carray[] = {Math.class};
+	Class carray[] = {Math.class, MathOps.class};
+	parser = new ExpressionParser(null, null, carray, null, null);
+	parser = new ExpressionParser(Math.class, MathOps.class);
+
+	try {
+	    estr = "=20/2";
+	    Object obj = parser.parse(estr);
+	    System.out.println(obj + estr);
+	    estr = "=sqrt(2)";
+	    obj = parser.parse(estr);
+	    System.out.println(obj + estr);
+	    estr = "=20/3";
+	    obj = parser.parse(est
+	    System.out.println(obj + estr);
+	    estr = "=function(){var a = 20; var b = 30; (a+b)/(b-a)}()";
+	    obj = parser.parse(estr);
+	    System.out.println(obj + estr);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
+
 	// if (System.getSecurityManager() == null) System.exit(0);
 	/*
 	try {
