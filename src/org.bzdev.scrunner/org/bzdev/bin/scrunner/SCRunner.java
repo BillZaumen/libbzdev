@@ -9,6 +9,7 @@ import org.bzdev.net.URLPathParser;
 import org.bzdev.util.ExpressionParser;
 import org.bzdev.util.SafeFormatter;
 import org.bzdev.util.ObjectParser;
+import org.bzdev.math.Functions;
 
 import javax.script.*;
 import java.security.*;
@@ -101,6 +102,13 @@ public class SCRunner {
 	dsuffixMap.put('y', 1.0e-24);
     }
 
+    static Class[] functionClasses = {
+	Math.class,
+	MathOps.class,
+	Functions.class};
+    static Class[] fieldClasses = {Math.class};
+    private static ExpressionParser ep = null;
+
 
     static int parseInt(String string) throws NumberFormatException {
 	
@@ -110,22 +118,15 @@ public class SCRunner {
 	if (len == 0) throw new NumberFormatException(errorMsg("emptyString"));
 	char last = string.charAt(len-1);
 	if (isuffixMap.containsKey(last)) {
-	    long mult = isuffixMap.get(last);
-	    String istring = string.substring(0, len-1);
 	    int value;
-	    if (istring.startsWith("=")) {
-		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    value = ((Number)ep.parse(istring))
-			.intValue();
-		} catch (Exception e) {
-		    String msg = errorMsg("notEvalToInt", istring);
-		    throw new NumberFormatException(msg);
-		}
+	    if (string.startsWith("=")) {
+		String msg = errorMsg("siSuffix", string);
+		throw new NumberFormatException(msg);
 	    } else {
+		String istring = string.substring(0, len-1).trim();
 		value = Integer.parseInt(istring);
 	    }
+	    long mult = isuffixMap.get(last);
 	    switch (last) {
 	    case 'h':
 	    case 'k':
@@ -134,21 +135,25 @@ public class SCRunner {
 		int result = value * (int) mult;
 		if ((result < 0 && value > 0) || (result > 0 && value < 0)) {
 		    throw new NumberFormatException
-			(errorMsg("outOfRange", istring));
+			(errorMsg("outOfRange", string));
 		}
 		return result;
 	    default:
 		throw new NumberFormatException
-		    (errorMsg("outOfRange", istring));
+		    (errorMsg("outOfRange", string));
 	    }
 	} else {
 	    if (string.startsWith("=")) {
 		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    int value = ((Number)ep.parse(string))
+		    if (ep == null) {
+			ep = new ExpressionParser(null, null,
+						  functionClasses, null,
+						  fieldClasses);
+		    } else {
+			ep.clear();
+		    }
+		    return ((Number)ep.parse(string))
 			.intValue();
-		    return value;
 		} catch (Exception e) {
 		    String msg = errorMsg("notEvalToInt", string);
 		    throw new NumberFormatException(msg);
@@ -168,37 +173,34 @@ public class SCRunner {
 			  NumberFormatException(errorMsg("emptyString"));
 	char last = string.charAt(len-1);
 	if (isuffixMap.containsKey(last)) {
-	    long mult = isuffixMap.get(last);
-	    String istring = string.substring(0, len-1);
 	    long value;
-	    if (istring.startsWith("=")) {
-		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    value = ((Number)ep.parse(istring))
-			.longValue();
-		} catch (Exception e) {
-		    String msg = errorMsg("notEvalToLong", istring);
-		    throw new NumberFormatException(msg);
-		}
+	    if (string.startsWith("=")) {
+		String msg = errorMsg("siSuffix", string);
+		throw new NumberFormatException(msg);
 	    } else {
+		String istring = string.substring(0, len-1).trim();
 		value = Long.parseLong(istring);
 	    }
+	    long mult = isuffixMap.get(last);
 	    long result = value * mult;
 	    if ((result < 0 && value > 0) || (result > 0 && value < 0)) {
 		throw new NumberFormatException
-		    (errorMsg("outOfRange", istring));
+		    (errorMsg("outOfRange", string));
 		/* throw new NumberFormatException("out of range");*/
 	    }
-	    return value *  mult;
+	    return result;
 	} else {
 	    if (string.startsWith("=")) {
 		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    long value = ((Number)ep.parse(string))
+		    if (ep == null) {
+			ep = new ExpressionParser(null, null,
+						  functionClasses, null,
+						  fieldClasses);
+		    } else {
+			ep.clear();
+		    }
+		    return ((Number)ep.parse(string))
 			.longValue();
-		    return value;
 		} catch (Exception e) {
 		    String msg = errorMsg("notEvalToLong", string);
 		    throw new NumberFormatException(msg);
@@ -218,32 +220,28 @@ public class SCRunner {
 	if (len == 0)
 	    throw new NumberFormatException(errorMsg("emptyString"));
 	char last = string.charAt(len-1);
-	if (isuffixMap.containsKey(last)) {
-	    double mult = dsuffixMap.get(last);
-	    String dstring = string.substring(0, len-1);
-	    if (dstring.startsWith("=")) {
-		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    double value = ((Number)ep.parse(dstring))
-			.doubleValue();
-		    return value * mult;
-		} catch (Exception e) {
-		    String msg = errorMsg("notEvalToNumber", dstring);
-		    throw new NumberFormatException(msg);
-		}
+	if (dsuffixMap.containsKey(last)) {
+	    if (string.startsWith("=")) {
+		String msg = errorMsg("siSuffix", string);
+		throw new NumberFormatException(msg);
 	    } else {
+		double mult = dsuffixMap.get(last);
+		String dstring = string.substring(0, len-1).trim();
 		double value = Double.parseDouble(dstring);
 		return value *  mult;
 	    }
 	} else {
 	    if (string.startsWith("=")) {
 		try {
-		    ExpressionParser ep = new
-			ExpressionParser(Math.class, MathOps.class);
-		    double value = ((Number)ep.parse(string))
+		    if (ep == null) {
+			ep = new ExpressionParser(null, null,
+						  functionClasses, null,
+						  fieldClasses);
+		    } else {
+			ep.clear();
+		    }
+		    return ((Number)ep.parse(string))
 			.doubleValue();
-		    return value;
 		} catch (Exception e) {
 		    String msg = errorMsg("notEvalToNumber", string);
 		    throw new NumberFormatException(msg);

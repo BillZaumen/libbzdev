@@ -607,6 +607,39 @@ public class SCRunnerCmd {
 	}
     }
 
+    static Set<Character> isuffixSet  = new HashSet<Character>();
+    static Set<Character> dsuffixSet = new HashSet<Character>();
+    static {
+	// use standard metric-unit prefixes
+	isuffixSet.add('h');
+	isuffixSet.add('k');
+	isuffixSet.add('M');
+	isuffixSet.add('G');
+	isuffixSet.add('T');
+	isuffixSet.add('P');
+	isuffixSet.add('E');
+
+	dsuffixSet.add('h');
+	dsuffixSet.add('k');
+	dsuffixSet.add('M');
+	dsuffixSet.add('G');
+	dsuffixSet.add('T');
+	dsuffixSet.add('P');
+	dsuffixSet.add('E');
+	dsuffixSet.add('Z');
+	dsuffixSet.add('Y');
+	dsuffixSet.add('c');
+	dsuffixSet.add('m');
+	dsuffixSet.add('u');
+	dsuffixSet.add('n');
+	dsuffixSet.add('p');
+	dsuffixSet.add('f');
+	dsuffixSet.add('a');
+	dsuffixSet.add('z');
+	dsuffixSet.add('y');
+    }
+
+
     // for positional arguments with "-s"
     private static void checkArg(String script, String arg) {
 	if (script == null) script = "scrunner";
@@ -616,18 +649,28 @@ public class SCRunnerCmd {
 	arg = arg.substring(arg.indexOf(":")+1);
 	arg = arg.trim();
 	if (arg.startsWith("=")) return;
+	char last = arg.charAt(arg.length()-1);
 	try {
 	    switch(type) {
 	    case 'I':
 		typename = "integer";
+		if (isuffixSet.contains(last)) {
+		    arg = arg.substring(0, arg.length()-1);
+		}
 		Integer.parseInt(arg.trim());
 		break;
 	    case 'L':
 		typename = "long integer";
+		if (isuffixSet.contains(last)) {
+		    arg = arg.substring(0, arg.length()-1);
+		}
 		Long.parseLong(arg.trim());
 		break;
 	    case 'D':
 		typename = "double";
+		if (dsuffixSet.contains(last)) {
+		    arg = arg.substring(0, arg.length()-1);
+		}
 		Double.parseDouble(arg.trim());
 		break;
 	    case 'B':

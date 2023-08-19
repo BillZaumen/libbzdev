@@ -610,9 +610,9 @@ to the number
 which is treated as an integer  or
 an integer-valued ESP expression if
 .I VALUE
-starts with an equal sign ("=").
+starts with an equal sign ("="). When it does not start with an equal sign,
 .I VALUE
-may be followed (with no intermediate spaces) by the letters 'h'
+may be followed (as part of the same argument) by the letters 'h'
 (hecto), 'k' (kilo), 'M' (mega), or 'G' (giga), which multiply the
 value by 1000, 1,000,000, or 1,000,000,000 respectively. For the ESP
 expression case, the value multiplied is the value of the full
@@ -628,9 +628,9 @@ to the number
 which is treated as a long integer or
 a long-integer-valued ESP expression if
 .I VALUE
-starts with an equal sign ("=").
+starts with an equal sign ("="). When it does not start with an equal sign,
 .I VALUE
-may be followed (with no intermediate spaces) by the 
+may be followed (as part of the same argument) by the 
 letters 'h' (hecto) 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
 (peta), or 'E' (exa), which multiply
 .I VALUE
@@ -648,9 +648,9 @@ to the number
 which is treated as a double-precision floating-point number or
 a double-precision-valued ESP expression if
 .I VALUE
-starts with an equal sign ("=").
+starts with an equal sign ("="). When it does not start with an equal sign,
 .I VALUE
-may be followed (with no intermediate spaces) by the
+may be followed (as part of the same argument) by the
 letters 'y' (yocto), 'z' (zepto), 'a' (atto), 'f' (femto), 'p'
 (pica), 'n' (nano), 'u' (micro), 'm' (milli), 'c' (centi), 'h'
 (hecto), 'k' (kilo), 'M' (mega), 'G' (giga), 'T' (tera), 'P'
@@ -676,9 +676,12 @@ Arguments constrained to have integer, long-integer, double, or
 boolean values can be either literal values or can be ESP expressions
 that start with an equal sign. In addition to standard ESP operators,
 one may use a few predefined functions.  These correspond to the
-static methods defined
-for the classes java.lang.Math and org.bzdev.MathOps as long as
-the methods and their arguments are suitable primitive types,
+static methods defined for the classes
+.BR java.lang.Math ,
+.BR org.bzdev.lang.MathOps , and
+.B org.bzdev.math.Functions
+as long as the methods and their arguments are suitable primitive
+types,
 .BR int ,
 .BR long ,
 .BR double ,
@@ -691,6 +694,13 @@ and as long as the methods return specific primitive values
 .BR double ,
 and
 .BR boolean .
+The constants
+.B E
+.BR  \fR(\fBMath.E )
+and
+.B PI
+.BR \fR(\fBMath.PI )
+are also included.
 .PP
 ESP is run in a mode in a restricted mode that prevents new classes
 from being imported.  Furthermore, variables cannot be set, and for

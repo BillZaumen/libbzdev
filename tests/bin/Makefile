@@ -80,15 +80,22 @@ all:
 	./run -vI:foo:=10+1 printfoo.esp
 	./run -vL:foo =10+1 printfoo.esp
 	./run -vL:foo:=10+1 printfoo.esp
-	./run -vD:foo =10+1k printfoo.esp
-	./run -vD:foo:=20+2k printfoo.esp
-	./run -vI:foo =10+1k printfoo.esp
-	./run -vI:foo:=10+1k printfoo.esp
-	./run -vL:foo =10+1k printfoo.esp
-	./run -vL:foo:=10+1k printfoo.esp
+	./run -vD:foo:10.0k printfoo.esp
+	./run -vD:foo 10.0k printfoo.esp
+	./run -vI:foo:10k printfoo.esp
+	./run -vI:foo 10k printfoo.esp
+	./run -vL:foo:10k printfoo.esp
+	./run -vL:foo 10k printfoo.esp
+	./run -vD:foo:=10.0k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vD:foo =10.0k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vI:foo:=10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vI:foo =10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vL:foo:=10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vL:foo =10k printfoo.esp || echo ... EXCEPTION EXPECTED
 	./run -vB:foo:='(10 == 20)' printfoo.esp
 	./run -vB:foo '=(10 == 10)'  printfoo.esp
 	./run -vI:foo'="foo".length()' printfoo.esp
+	./run -vD:foo  =sin(PI/2)/2 printfoo.esp
 	@echo ---- actually run programs ----
 	./run --listScriptingLanguages
 	./run --listScriptingLanguages ECMAScript
@@ -196,15 +203,16 @@ print:
 	./run -vI:foo:=10+1 printfoo.esp
 	./run -vL:foo =10+1 printfoo.esp
 	./run -vL:foo:=10+1 printfoo.esp
-	./run -vD:foo =10+1k printfoo.esp
-	./run -vD:foo:=20+2k printfoo.esp
-	./run -vI:foo =10+1k printfoo.esp
-	./run -vI:foo:=10+1k printfoo.esp
-	./run -vL:foo =10+1k printfoo.esp
-	./run -vL:foo:=10+1k printfoo.esp
+	./run -vD:foo:=10.0k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vD:foo =10.0k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vI:foo:=10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vI:foo =10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vL:foo:=10k printfoo.esp || echo ... EXCEPTION EXPECTED
+	./run -vL:foo =10k printfoo.esp || echo ... EXCEPTION EXPECTED
 	./run -vB:foo:='(10 == 20)' printfoo.esp
 	./run -vB:foo '=(10 == 10)'  printfoo.esp
 	./run -vI:foo'="foo".length()' printfoo.esp
+	./run -vD:foo:'=Math.sin(PI/2)' printfoo.esp
 	chmod u-x ./run ./run1
 
 rpath:
@@ -372,6 +380,8 @@ ecirc:
 	./ecirc3  10 20
 	./ecirc2  --dryrun =10/5 =20/5
 	./ecirc2  =10/5 =20/5
+	./ecirc2  =10/5k =20/5 || echo ... EXCEPTION EXPECTED
+	./ecirc2  '=sin(PI/2)/2' '=sin(PI/2)/2'
 	chmod u-x ecirc3
 	chmod u-x ecirc2
 	chmod u-x ./run
