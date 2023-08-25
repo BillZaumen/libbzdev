@@ -405,6 +405,30 @@ public class FunctionsTest {
 	    }
 	}
 
+	double x = .3;
+	double y = .4;
+	double z = .5;
+	double p = .6;
+
+
+	// from https://calcresource.com/eval-elliptic-carlson.html
+	// ... to check against somone else's software.
+	double rf = 1.59129;
+	double rc = 1.65576;
+	double rd = 3.49443;
+	double rj = 3.11271;
+	if (Math.abs(rf - Functions.RF(x,y,z)) > 1.e-4)	{
+	    throw new Exception("RF error");
+	}
+	if (Math.abs(rc - Functions.RC(x,y)) > 1.e-4)	{
+	    throw new Exception("RC error");
+	}
+	if (Math.abs(rd - Functions.RD(x,y,z)) > 1.e-4)	{
+	    throw new Exception("RD error");
+	}
+	if (Math.abs(rj - Functions.RJ(x,y,z,p)) > 1.e-4)	{
+	    throw new Exception("RJ error");
+	}
     }
 
 

@@ -12,10 +12,12 @@ import org.bzdev.io.AppendableWriter;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.util.ArrayMerger;
 
+import org.bzdev.math.BezierPolynomial;
 import org.bzdev.math.CubicSpline;
 import org.bzdev.math.GLQuadrature;
 import org.bzdev.math.Adder;
 import org.bzdev.math.Adder.Kahan;
+import org.bzdev.math.Polynomials;
 import org.bzdev.math.VectorOps;
 
 //@exbundle org.bzdev.geom.lpack.Geom
@@ -30,6 +32,35 @@ import org.bzdev.math.VectorOps;
  * allow various paths to be constructed.
  */
 public class Path3DInfo {
+
+    static double quadLength(double u,
+			     double x0, double y0, double z0,
+			     double[] coords)
+	throws Exception
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[3])
+	    .deriv();
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[4])
+	    .deriv();
+
+	BezierPolynomial pz = new BezierPolynomial(z0, coords[2], coords[5])
+	    .deriv();
+
+	double[] array = Polynomials
+	    .fromBezier(Polynomials.multiply(px, px)
+			.add(Polynomials.multiply(py, py))
+			.add(Polynomials.multiply(pz, pz))
+			.getCoefficientsArray(),
+			0, 2);
+
+	double a = array[0];
+	double b = array[1];
+	double c = array[2];
+	return Path2DInfo.integrateRootP2(u, a, b, c);
+    }
+
+
 
     // just static
     private Path3DInfo() {}
@@ -2570,6 +2601,12 @@ public class Path3DInfo {
 		    return Math.sqrt(dx*dx + dy*dy + dz*dz);
 		}
 	    }
+	case PathIterator.SEG_QUADTO:
+	    try {
+		return quadLength(1.0, x0, y0, z0, coords);
+	    } catch (Exception e) {
+		// fall through so we just integrate numerically.
+	    }
 	default:
 	    {
 		double[] fcoords = new double[9];
@@ -2762,7 +2799,20 @@ public class Path3DInfo {
 		coords[2] = lastMoveToZ;
 	    }
 	    SegmentData data = new SegmentData(st, x0, y0, z0, coords, last);
-	    if (st != PathIterator3D.SEG_MOVETO) {
+	    boolean quadCaseWorked = false;
+
+	    if (st == PathIterator3D.SEG_QUADTO) {
+		try {
+		    length = quadLength(1.0, x0, y0, z0, coords);
+		    quadCaseWorked = true;
+		} catch (Exception e) {
+		    // nothing to do. Because quadCaseWorked is false,
+		    // we'll handle the SEG_QUADTO case numerically.
+		}
+	    }
+
+	    if (st != PathIterator3D.SEG_MOVETO
+		|| (st == PathIterator3D.SEG_QUADTO && !quadCaseWorked)) {
 		if (st == PathIterator3D.SEG_CLOSE
 		    || st == PathIterator3D.SEG_LINETO) {
 		    // special case - for straight lines, this is faster. The

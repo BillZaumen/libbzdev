@@ -1,4 +1,5 @@
 package org.bzdev.geom;
+import org.bzdev.lang.MathOps;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.io.AppendableWriter;
 import org.bzdev.math.Adder;
@@ -7,6 +8,8 @@ import org.bzdev.math.BezierPolynomial;
 import org.bzdev.math.CubicSpline;
 import org.bzdev.math.Functions;
 import org.bzdev.math.GLQuadrature;
+import org.bzdev.math.Polynomial;
+import org.bzdev.math.Polynomials;
 import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.math.RootFinder;
 import org.bzdev.math.VectorOps;
@@ -34,6 +37,63 @@ import java.io.Writer;
  * {@link PathSplitter} will allow various paths to be constructed.
  */
 public class Path2DInfo {
+
+
+    static double integrateRootP2(double x, double a, double b, double c)
+	throws Exception
+    {
+	// a + bx +cx^2 to fit CRC handbook integral tables
+	if (c == 0.0) {
+	    // CRC Standard Math Tables, page 291
+	    if (b == 0.0) {
+		if (a < 0.0) throw new Exception("cannot integrate");
+		return Math.sqrt(a)*x;
+	    }
+	    return (2.0/(3.0*b))
+		* (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
+	}
+	double q = 4*a*c - b*b;
+	if (q == 0.0) {
+	    // r = -b /(2*c);
+	    // polynomial = c*(x-r)^2 so integrate sqrt(c)*(x-r);
+	    double rootc = Math.sqrt(c);
+	    return rootc*x*x/2 + x*b/(2*rootc);
+	}
+	if (q < 0.0) throw new Exception("cannot integrate");
+	// CRC Standard Math Tables, page 297
+	double k = 4*c / q;
+	RealValuedFunctOps f = (u) -> {
+	    double u2 = u*u;
+	    double rootc = Math.sqrt(c);
+	    double expr = a + b*u + c*u2;
+	    double root = Math.sqrt(expr);
+	    return ((2*c*u + b)*root/(4*c)
+		    + Functions.asinh((2*c*u + b)/Math.sqrt(q))
+		    / (rootc * 2 * k));
+	};
+	return f.valueAt(x) - f.valueAt(0.0);
+    }
+
+    static double quadLength(double u, double x0, double y0, double[] coords)
+	throws Exception
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2])
+	    .deriv();
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3])
+	    .deriv();
+
+	double[] array = Polynomials
+	    .fromBezier(Polynomials.multiply(px, px)
+			.add(Polynomials.multiply(py, py))
+			.getCoefficientsArray(),
+			0, 2);
+
+	double a = array[0];
+	double b = array[1];
+	double c = array[2];
+	return integrateRootP2(u, a, b, c);
+    }
 
     // just static
     private Path2DInfo() {}
@@ -4015,6 +4075,12 @@ public class Path2DInfo {
 		    return Math.sqrt(dx*dx + dy*dy);
 		}
 	    }
+	case PathIterator.SEG_QUADTO:
+	    try {
+		return quadLength(1.0, x0, y0, coords);
+	    } catch (Exception e) {
+		// fall through so we just integrate numerically.
+	    }
 	default:
 	    {
 		double[] fcoords = new double[6];
@@ -4200,7 +4266,20 @@ public class Path2DInfo {
 		coords[1] = lastMoveToY;
 	    }
 	    SegmentData data = new SegmentData(st, x0, y0, coords, last);
-	    if (st != PathIterator.SEG_MOVETO) {
+	    boolean quadCaseWorked = false;
+
+	    if (st == PathIterator.SEG_QUADTO) {
+		try {
+		    length = quadLength(1.0, x0, y0, coords);
+		    quadCaseWorked = true;
+		} catch (Exception e) {
+		    // nothing to do. Because quadCaseWorked is false,
+		    // we'll handle the SEG_QUADTO case numerically.
+		}
+	    }
+
+	    if (st != PathIterator.SEG_MOVETO
+		|| (st == PathIterator.SEG_QUADTO && !quadCaseWorked)) {
 		if (st == PathIterator.SEG_CLOSE
 		    || st == PathIterator.SEG_LINETO) {
 		    // special case - for straight lines, this is faster. The

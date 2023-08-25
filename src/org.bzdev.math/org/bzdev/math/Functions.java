@@ -5109,7 +5109,7 @@ public class Functions {
     // (which has the correct equations).
 
     /**
-     * Carson symmetric form R<sub>F</sub> for elliptic integrals.
+     * Carlson symmetric form R<sub>F</sub> for elliptic integrals.
      * R<sub>F</sub>(x,y,z) is defined as
      * (1/2)<span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&infin;</span></sup></span><sub>t=0</sub>
      * (1/&radic;((t+x)(t+y)(t+z))) dt.
@@ -5130,6 +5130,11 @@ public class Functions {
     public static double RF(double x, double y, double z)
 	throws IllegalArgumentException
     {
+	// Based on Billie Carlson and Elaine Notis,
+	// Algorithm 577, ACM Transactions on Mathematical Software
+	// Volume 7, Number 3, pages 398--403, September 1981.
+	// https://people.math.sc.edu/Burkardt/f77_src/toms577/toms577.f
+	// for an on-line copy.
 	if (x < 0.0) {
 	    String msg = errorMsg("firstArgNeg", x);
 	    throw new IllegalArgumentException(msg);
@@ -5179,7 +5184,7 @@ public class Functions {
     }
 
     /**
-     * Carson symmetric form R<sub>C</sub> for elliptic integrals.
+     * Carlson symmetric form R<sub>C</sub> for elliptic integrals.
      * R<sub>C</sub>(x, y) = R<sub>F</sub>(x, y, y).
      * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
      * Wikipedia article</A>  and a
@@ -5205,7 +5210,7 @@ public class Functions {
 
 
     /**
-     * Carson symmetric form R<sub>D</sub> for elliptic integrals.
+     * Carlson symmetric form R<sub>D</sub> for elliptic integrals.
      * R<sub>D</sub>(x, y, z) = R<sub>J</sub>(x, y, z, z).
      * There is a <A HREF="https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals">
      * Wikipedia article</A> and a

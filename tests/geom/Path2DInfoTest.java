@@ -6,8 +6,155 @@ import java.awt.geom.*;
 import java.util.Arrays;
 import org.bzdev.util.PrimArrays;
 import org.bzdev.util.IntComparator;
+import org.bzdev.math.rv.UniformDoubleRV;
+import org.bzdev.lang.MathOps;
 
 public class Path2DInfoTest {
+
+    public static double integrateRootP2(double x, double a, double b, double c)
+	throws Exception
+    {
+	// a + bx +cx^2 to fit CRC handbook integral tables
+	if (c == 0.0) {
+	    // CRC Standard Math Tables, page 291
+	    if (b == 0.0) {
+		if (a < 0.0) throw new Exception("cannot integrate");
+		return Math.sqrt(a)*x;
+	    }
+	    return (2.0/(3.0*b))
+		* (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
+	}
+	double q = 4*a*c - b*b;
+	if (q == 0.0) {
+	    // r = -b /(2*c);
+	    // polynomial = c*(x-r)^2 so integrate sqrt(c)*(x-r);
+	    double rootc = Math.sqrt(c);
+	    return rootc*x*x/2 + x*b/(2*rootc);
+	}
+	if (q < 0.0) throw new Exception("cannot integrate");
+	// CRC Standard Math Tables, page 297
+	double k = 4*c / q;
+	RealValuedFunctOps f = (u) -> {
+	    double u2 = u*u;
+	    double rootc = Math.sqrt(c);
+	    double expr = a + b*u + c*u2;
+	    double root = Math.sqrt(expr);
+	    return ((2*c*u + b)*root/(4*c)
+		    + Functions.asinh((2*c*u + b)/Math.sqrt(q))
+		    / (rootc * 2 * k));
+	};
+	return f.valueAt(x) - f.valueAt(0.0);
+    }
+
+    public static double quadLength(double x0, double y0, double[] coords)
+	throws Exception
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2])
+	    .deriv();
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3])
+	    .deriv();
+
+	double[] array = Polynomials
+	    .fromBezier(Polynomials.multiply(px, px)
+			.add(Polynomials.multiply(py, py))
+			.getCoefficientsArray(),
+			0, 2);
+
+	double a = array[0];
+	double b = array[1];
+	double c = array[2];
+	return integrateRootP2(1.0, a, b, c);
+    }
+
+    static double a = 2.0;
+    static double b = 4.0;
+    static double c = 2.0;
+    public static void testQuadLength() throws Exception {
+
+	double v1 = integrateRootP2(1.0, a, b, c);
+	RealValuedFunctOps integrand = (uu) -> {
+	    return Math.sqrt(a + b * uu + c*uu*uu);
+	};
+	GLQuadrature glq = new GLQuadrature(10) {
+		protected double function(double t) {
+		    return integrand.valueAt(t);
+		}
+	    };
+	double v2 = glq.integrate(0, 1.0);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+
+	double uarray[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	for (double u: uarray) {
+	    v1 = integrateRootP2(u, a, b, c);
+	    v2 = glq.integrate(0.0, u);
+	    if (Math.abs(v1 - v2)
+		/ Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+		throw new Exception();
+	    }
+	}
+
+	UniformDoubleRV rv = new UniformDoubleRV(-100.0, true, 100.0, true);
+	for (int i = 0; i < 1000; i++) {
+	    a = rv.next();
+	    b = rv.next();
+	    c = rv.next();
+	    if (c <= 0.0) continue;
+	    if ((4*a*c-b*b) < 0.0) continue;
+	    for (double u: uarray) {
+		v1 = integrateRootP2(u, a, b, c);
+		v2 = glq.integrate(0.0, u);
+		if (Math.abs(v1 - v2)
+		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+	    }
+
+	    c = 0.0;
+	    if  (a < 0.0) continue;
+	    if (b < -a) continue;
+	    for (double u: uarray) {
+		v1 = integrateRootP2(u, a, b, c);
+		v2 = glq.integrate(0.0, u);
+		if (Math.abs(v1 - v2)
+		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+	    }
+	    b  = 0.0;
+	    for (double u: uarray) {
+		v1 = integrateRootP2(u, a, b, c);
+		v2 = glq.integrate(0.0, u);
+		if (Math.abs(v1 - v2)
+		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+	    }
+	}
+
+	double[] coords = new double[6];
+	for (int i = 0; i < 1000; i++) {
+	    double x0 = rv.next();
+	    double y0 = rv.next();
+	    for (int j = 0; j < 4; j++) {
+		coords[j] = rv.next();
+	    }
+	    double val1 = quadLength(x0, y0, coords);
+	    double val2 = Path2DInfo.segmentLength(PathIterator.SEG_QUADTO,
+						   x0, y0, coords);
+	    if (Math.abs(val1 - val2)/Math.max(val1, val2) > 1.e-6) {
+		System.out.println("failed: val1 = " + val1
+				   + ", val2 = " +val2);
+		System.exit(0);
+	    }
+	}
+    }
 
     static void centerOfMassTest() {
 
@@ -2279,6 +2426,9 @@ public class Path2DInfoTest {
 
     public static void main(String argv[]) throws Exception {
 
+	testQuadLength();
+
+
 	centerOfMassTest();
 
 	distTest();
@@ -2493,6 +2643,11 @@ public class Path2DInfoTest {
 			       + Path2DInfo.segmentLength(type,
 							  x0, y0,
 							  coords));
+	    if (type == PathIterator.SEG_QUADTO) {
+		double qlen = quadLength(x0, y0, coords);
+		System.out.println("     ... integrated segment length["
+				   + j +"] = " + qlen);
+	    }
 	    System.out.println("     ... segment length["
 			       + j
 			       +"] = " +
