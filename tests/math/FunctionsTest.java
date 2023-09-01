@@ -431,8 +431,80 @@ public class FunctionsTest {
 	}
     }
 
+    static void initialCarlsonTest() throws Exception {
+	// An attempt to integrate the square root of a quartic
+	// 9 + 6x + 6x^2 + 2x^3 + x^4 disagrees with GL quadrature.
+	// expected values calculated using
+	// https://calcresource.com/eval-elliptic-carlson.html
+	// as an independent source of values.
+
+
+	double[] args1 = {
+	    605.8143191089465 ,
+	    610.886115878671 ,
+	    624.742522339222
+	};
+	double v1 = Functions.RD(args1[0], args1[1], args1[2]);
+	double ev1 = 0.0000650673;
+
+	double[] args2 = {
+	    605.8143191089465 ,
+	    610.886115878671 ,
+	    624.742522339222
+	};
+	double v2 = Functions.RF(args2[0], args2[1], args2[2]);
+	double ev2 = 0.0403638;
+
+	double[] args3 = {
+	    605.8143191089465 ,
+	    610.886115878671 ,
+	    624.742522339222 ,
+	    613.8143191089465
+	};
+
+	double v3 = Functions.RJ(args3[0], args3[1], args3[2], args3[3]);
+	double ev3 = 0.000065761;
+
+	double[] args4 = {
+	    5.786029061433749E7 ,
+	    5.786003461433749E7
+	};
+	double v4 = Functions.RC(args4[0], args4[1]);
+	double ev4 = 0.000131465;
+
+	double[] args5 = {
+	    1418.521301712814 ,
+	    1341.765819933007
+	};
+	double v5 = Functions.RC(args5[0], args5[1]);
+	double ev5 = 0.0270461;
+
+	if (Math.abs (v1 - ev1) > 1.0e-6) {
+	    System.out.println("v1 = " + v1 + "ev1 = " + ev1);
+	    throw new Exception();
+	}
+	if (Math.abs (v2 - ev2) > 1.0e-6) {
+	    System.out.println("v2 = " + v2 + "ev2 = " + ev2);
+	    throw new Exception();
+	}
+	if (Math.abs (v3 - ev3) > 1.0e-8) {
+	    System.out.println("v3 = " + v3 + "ev3 = " + ev3);
+	    throw new Exception();
+	}
+	if (Math.abs (v4 - ev4) > 1.0e-10) {
+	    System.out.println("v4 = " + v4 + "ev4 = " + ev4);
+	    throw new Exception();
+	}
+	if (Math.abs (v5 - ev5) > 1.0e-7) {
+	    System.out.println("v5 = " + v5 + "ev5 = " + ev5);
+	    throw new Exception();
+	}
+    }
 
     public static void main(String argv[]) throws Exception {
+
+	initialCarlsonTest();
+
 	double delta = 0.00001;
 	double limit = 0.0001;
 	double n = 17;

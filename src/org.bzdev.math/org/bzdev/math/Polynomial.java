@@ -262,6 +262,43 @@ public class Polynomial extends RealValuedFunction {
     }
 
     /**
+     * Shift a polynomial P(x).
+     * This polynomial is modified.
+     * @param a the value by which to shift the argument of P(x)
+     * @return the polynomial P(x+a)
+     */
+    public Polynomial shift(double a) {
+	int n = degree+1;
+	for (int i = 0; i < n; i++) {
+	    double prod = coefficients[i];
+	    for (int j = i - 1; j >= 0; j--) {
+		prod *= a;
+		coefficients[j] += prod*Binomial.C(i,j);
+	    }
+	}
+	return this;
+    }
+
+    /**
+     * Get the amount by which to shift a polynomial to put it into its
+     * reduced form.
+     * <P>
+     * A typical useage is
+     * <BLOCKQUOTE><PRE><CODE>
+     *  Polynomial p = ...;
+     *  double s = p.getCoefficientsArray[p.getDegree()];
+     *  double shift = p.reducedFormShift();
+     *  p.shift(shift).multiplyBy(1/s);
+     * </CODE></PRE></BLOCKQUOTE>
+     * To undo the effects of the shift, use <CODE>p.shift(-shift)</CODE>.
+     * @return the shift
+     */
+    public double reducedFormShift() {
+	if (degree == 0) return 0;
+	return  -coefficients[degree-1] / (degree * coefficients[degree]);
+    }
+
+    /**
      * Integrate a polynomial.
      * For a polynomial P(x) The integral I(x) = &int;P(x) is
      * implemented so that I(0) = 0.  If this polynomial's degree

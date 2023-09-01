@@ -2,11 +2,14 @@ import org.bzdev.math.*;
 import org.bzdev.math.stats.BasicStats;
 import org.bzdev.math.StaticRandom;
 import org.bzdev.math.rv.*;
+import org.bzdev.lang.MathOps;
 
 
 public class PolynomialTest {
 
     static void integralTest() {
+
+
 	BezierPolynomial bpx =
 	    new BezierPolynomial(200.000,
 				 200.000,
@@ -428,7 +431,75 @@ public class PolynomialTest {
 	System.out.println("StatsRaise: sdev  = " + statsRaise.getSDev());
     }
 
+    public static void factorTest() throws Exception {
+
+	// This failed during a subsequent test at one point.
+	System.out.println("a1 = 9.0, b1 = 2.0, c1 = 10.0");
+	System.out.println("a2 = 9.0, b2 = 2.0, c2 = 10.0");
+	System.out.println("factor "
+			   + "Polynomial(100.0, 40.0, 184.0, 36.0, 81.0)");
+	Polynomial p = new Polynomial(100.0, 40.0, 184.0, 36.0, 81.0);
+	Polynomial[] factors = Polynomials.factorQuarticToQuadratics(p);
+	if (factors.length < 3) throw new Exception();
+
+	System.out.println("factor "
+			   + "Polynomial(225.0, 180.0, 366.0, 132.0, 121.0)");
+	p = new Polynomial(225.0, 180.0, 366.0, 132.0, 121.0);
+	factors = Polynomials.factorQuarticToQuadratics(p);
+	if (factors.length < 3) throw new Exception();
+    }
+
+    // To test Carlson's integral table.
+
+
+    static class Parms {
+	Polynomial P1;
+	Polynomial P2;
+	Polynomial P5;
+	int p1;
+	int p2;
+	int p5;
+
+	public void set(int p1, int p2, int p5,
+		     Polynomial P1,
+		     Polynomial P2,
+		     Polynomial P5)
+	{
+	    this.p1 = p1;
+	    this.p2 = p2;
+	    this.p5 = p5;
+	    this.P1 = P1;
+	    this.P2 = P2;
+	    this.P5 = P5;
+	}
+
+	public Parms() {
+	}
+
+	public Parms(int p1, int p2, int p5,
+		     Polynomial P1,
+		     Polynomial P2,
+		     Polynomial P5)
+	{
+	    set(p1, p2, p5, P1, P2, P5);
+	}
+    }
+
+    public static void initialCarlsonTest() {
+	Polynomial P1 = new Polynomial(2.7, -1.8, 0.9);
+	Polynomial P2 = new Polynomial(2.0, 2.4, 0.8);
+	Polynomial P3 = new Polynomial(1.1, -0.4);
+
+	double val = Polynomials.integrateRoot2Q(1, 1, -4, P1, P2, P3,
+						 -3.0, 2.0);
+	System.out.println("value = " + val);
+    }
+
+
     public static void main(String argv[]) throws Exception {
+	// initialCarlsonTest();
+
+        factorTest();
 	if (true) badcase();
 	// First test methods that use arrays as arguments
 	// as these are the ones the other methods call.
@@ -879,5 +950,451 @@ public class PolynomialTest {
 
 	integralTest();
 
+	System.out.println("shift test");
+	Polynomial PS = new Polynomial(0.7, 0.3);
+	Polynomial PSa = new Polynomial(PS);
+	PSa.shift(1.5);
+	for (int i = 0; i < 20; i++) {
+	    double x = ((double)i)/10.0;
+	    if (Math.abs(PS.valueAt(x + 1.5) - PSa.valueAt(x)) > 1.e-10) {
+		System.out.println("x = " + x
+				   + ", val1 = " + PS.valueAt(x + 1.5)
+				   + ", val2 = " + PSa.valueAt(x));
+		throw new Exception();
+	    }
+	}
+
+	PS = new Polynomial(0.7, 0.3, 2.3, 4.4, 5.5);
+	PSa = new Polynomial(PS);
+	PSa.shift(1.5);
+	for (int i = 0; i < 20; i++) {
+	    double x = ((double)i)/10.0;
+	    if (Math.abs(PS.valueAt(x + 1.5) - PSa.valueAt(x)) > 1.e-10) {
+		System.out.println("x = " + x
+				   + ", val1 = " + PS.valueAt(x + 1.5)
+				   + ", val2 = " + PSa.valueAt(x));
+		throw new Exception();
+	    }
+	}
+	double shift = PS.reducedFormShift();
+	double sf = PS.getCoefficientsArray()[PS.getDegree()];
+	PS.shift(shift).multiplyBy(1/sf);
+	double[] PSArray = PS.getCoefficients();
+	if (Math.abs(PSArray[PSArray.length-2]) > 1.e-10) {
+	    throw new Exception();
+	}
+	if (Math.abs(PSArray[PSArray.length-1] - 1.0) > 1.e-10) {
+	    throw new Exception();
+	}
+
+	System.out.println("factor Polynomial(2.0, -3.0, -12.0, 0.0, 1.0)");
+	Polynomial p = new Polynomial(2.0, -3.0, -12.0, 0.0, 1.0);
+	Polynomial[] ps = Polynomials.factorReducedQuartic(p);
+	if (ps == null) throw new Exception();
+	System.out.print("ps[0]: ");
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    System.out.print(ps[0].getCoefficientsArray()[i] + " ");
+	}
+	System.out.println();
+	System.out.print("ps[1]: ");
+	for (int i = 0; i <= ps[1].getDegree(); i++) {
+	    System.out.print(ps[1].getCoefficientsArray()[i] + " ");
+	}
+	System.out.println();
+	ps[0].multiplyBy(ps[1]);
+	System.out.print("ps[0]*ps[1]: ");
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    System.out.print(ps[0].getCoefficientsArray()[i] + " ");
+	}
+	if (p.getDegree() != ps[0].getDegree()) throw new Exception();
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    if (Math.abs(ps[0].getCoefficientsArray()[i]
+			 - p.getCoefficientsArray()[i]) > 1.e-10) {
+		throw new Exception();
+	    };
+	}
+
+	System.out.println();
+
+	System.out.println("factor Polynomial(-8.0, -19.0, 22.0, -8.0, 1.0)");
+	p = new Polynomial(-8.0, -19.0, 22.0, -8.0, 1.0);
+	Polynomial pr = new Polynomial(p);
+	shift = pr.reducedFormShift();
+	pr.shift(shift);
+	ps = Polynomials.factorReducedQuartic(pr);
+	ps[0].shift(-shift);
+	ps[1].shift(-shift);
+
+	System.out.print("ps[0]: ");
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    System.out.print(ps[0].getCoefficientsArray()[i] + " ");
+	}
+	System.out.println();
+	System.out.print("ps[1]: ");
+	for (int i = 0; i <= ps[1].getDegree(); i++) {
+	    System.out.print(ps[1].getCoefficientsArray()[i] + " ");
+	}
+	System.out.println();
+	ps[0].multiplyBy(ps[1]);
+	System.out.print("ps[0]*ps[1]: ");
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    System.out.print(ps[0].getCoefficientsArray()[i] + " ");
+	}
+	System.out.println();
+	if (p.getDegree() != ps[0].getDegree()) throw new Exception();
+	for (int i = 0; i <= ps[0].getDegree(); i++) {
+	    if (Math.abs(ps[0].getCoefficientsArray()[i]
+			 - p.getCoefficientsArray()[i]) > 1.e-10) {
+		throw new Exception();
+	    };
+	}
+
+	UniformIntegerRV irv = new UniformIntegerRV(-20, true, 20, true);
+	UniformDoubleRV drv = new UniformDoubleRV(-20.0, true, 20.0, true);
+
+	int last = 0;
+	int ircount = 0;	// irreducible count
+	for (int k = 0; k < 1000000; k++) {
+	    while (last == 0) last = irv.next();
+
+	    p = new Polynomial(((double)irv.next())/last,
+			       ((double)irv.next())/last,
+			       ((double) irv.next())/last,
+			       ((double) irv.next())/last,
+			       1.0);
+
+	    pr = new Polynomial(p);
+	    shift = pr.reducedFormShift();
+	    pr.shift(shift);
+	    ps = Polynomials.factorReducedQuartic(pr);
+	    if (ps == null) {
+		ircount++;
+		continue;
+	    }
+	    ps[0].shift(-shift);
+	    ps[1].shift(-shift);
+	    ps[0].multiplyBy(ps[1]);
+	    if (p.getDegree() != ps[0].getDegree()) throw new Exception();
+	    for (int i = 0; i <= ps[0].getDegree(); i++) {
+		if (Math.abs(ps[0].getCoefficientsArray()[i]
+			     - p.getCoefficientsArray()[i]) > 1.e-9) {
+		    System.out.println(ps[0].getCoefficientsArray()[i]
+				       + " != "
+				       + p.getCoefficientsArray()[i]);
+		    throw new Exception();
+		};
+	    }
+	}
+	System.out.println("ircount = " + ircount);
+	ircount = 0;
+	for (int k = 0; k < 1000000; k++) {
+	    p = new Polynomial(drv.next(), drv.next(), drv.next(), drv.next(),
+			       1.0);
+
+	    pr = new Polynomial(p);
+	    shift = pr.reducedFormShift();
+	    pr.shift(shift);
+	    ps = Polynomials.factorReducedQuartic(pr);
+	    if (ps == null) {
+		ircount++;
+		continue;
+	    }
+	    ps[0].shift(-shift);
+	    ps[1].shift(-shift);
+	    ps[0].multiplyBy(ps[1]);
+	    if (p.getDegree() != ps[0].getDegree()) throw new Exception();
+	    for (int i = 0; i <= ps[0].getDegree(); i++) {
+		if (Math.abs(ps[0].getCoefficientsArray()[i]
+			     - p.getCoefficientsArray()[i]) > 1.e-9) {
+		    System.out.println(ps[0].getCoefficientsArray()[i]
+				       + " != "
+				       + p.getCoefficientsArray()[i]);
+		    throw new Exception();
+		};
+	    }
+	}
+	System.out.println("ircount = " + ircount);
+	for (int k = 0; k < 1000000; k++) {
+	    double dlast = 0.0;
+	    while (Math.abs(dlast) < 1.0) dlast = drv.next();
+	    p = new Polynomial(drv.next(), drv.next(), drv.next(), drv.next(),
+			       dlast);
+
+	    try {
+		ps = Polynomials.factorQuarticToQuadratics(p);
+	    } catch (Exception e) {
+		double[] parray = p.getCoefficientsArray();
+		System.out.format("p: %s, %s, %s, %s, %s\n",
+				  parray[0], parray[1], parray[2], parray[3],
+				  parray[4]);
+		throw e;
+	    }
+	    for (int i = 1; i < ps.length; i++) {
+		ps[0].multiplyBy(ps[i]);
+	    }
+	    if (p.getDegree() != ps[0].getDegree()) throw new Exception();
+	    for (int i = 0; i <= ps[0].getDegree(); i++) {
+		double val1 = ps[0].getCoefficientsArray()[i];
+		double val2 = p.getCoefficientsArray()[i];
+		double denom = Math.max(Math.abs(val1), Math.abs(val2));
+		if (denom < 1.0) denom = 1.0;
+		if (Math.abs(val1 - val2)/denom > 1.e-9) {
+		    System.out.println(ps[0].getCoefficientsArray()[i]
+				       + " != "
+				       + p.getCoefficientsArray()[i]);
+		    // throw new Exception();
+		};
+	    }
+	}
+	System.out.println("ircount = " + ircount);
+
+	p = new Polynomial(10.0, 1.0, 1.0);
+	p.multiplyBy(new Polynomial(20.0, 2.0, 1.0));
+
+	GLQuadrature<Polynomial> glq = new GLQuadrature<>(8) {
+		protected double function(double t, Polynomial pn) {
+		    return Math.sqrt(pn.valueAt(t));
+		}
+	    };
+
+	glq.setParameters(p);
+	double integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+	System.out.println("integral1 = " + integral1);
+	double integral2 = glq.integrate(0.2, 0.8, 10);
+	System.out.println("integral2 = " + integral2);
+
+	System.out.println("scale polynomial by 3");
+	System.out.println("... expecting integral1 = "
+			   + Math.sqrt(3)*integral1);
+	System.out.println("... expecting integral2 = "
+			   + Math.sqrt(3)*integral2);
+	p.multiplyBy(3.0);
+	glq.setParameters(p);
+
+	integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+	System.out.println("integral1 = " + integral1);
+	integral2 = glq.integrate(0.2, 0.8, 50);
+	System.out.println("integral2 = " + integral2);
+
+	System.out.println("known test case");
+	p = new Polynomial(9.0, 6.0, 6.0, 2.0, 1.0);
+	glq.setParameters(p);
+	integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+	System.out.println("integral1 = " + integral1);
+	integral2 = glq.integrate(0.2, 0.8, 50);
+	System.out.println("integral2 = " + integral2);
+
+	System.out.println("... random tests");
+
+
+	double a1, b1, c1, a2, b2, c2;
+
+	int ecount = 0;
+	irv = new UniformIntegerRV(-20, true, 20, true);
+	for (int i = 0; i < 1000000; i++) {
+	    do {
+		a1 = irv.next();
+		b1 = irv.next();
+		c1 = irv.next();
+	    } while (a1 < 1.0 || c1 <= 0.0 || b1*b1 >= 4*a1*c1);
+	    do {
+		a2 = irv.next();
+		b2 = irv.next();
+		c2 = irv.next();
+	    } while (a2 < 1.0 || c2 <= 0.0 || b2*b2 >= 4*a2*c2);
+	    p = new Polynomial(c1, b1, a1);
+	    p.multiplyBy(new Polynomial(c2, b2, a2));
+	    glq.setParameters(p);
+	    try {
+		integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+	    } catch (Exception e) {
+		System.out.println("a1 = " + a1
+				   + ", b1 = " + b1
+				   +", c1 = " + c1);
+		System.out.println("a2 = " + a2
+				   + ", b2 = " + b2
+				   +", c2 = " + c2);
+		double darray[] = p.getCoefficientsArray();
+		System.out.print("p");
+		for (int k = 0; k < 5; k++) {
+		    System.out.print(((k == 0)?": ": ", ") + darray[k]);
+		}
+		System.out.println();
+		System.out.println(e.getClass() +": " + e.getMessage());
+		ecount++;
+		continue;
+	    }
+	    integral2 = glq.integrate(0.2, 0.8, 100);
+	    if (Math.abs(integral1 - integral2) > 1.e-10) {
+		System.out.print("p: ");
+		double[] parray = p.getCoefficientsArray();
+		for (int k = 0; k < 5; k++) {
+		    System.out.print(((k == 0)? ": ": ", ") + parray[k]);
+		}
+		System.out.println();
+		System.out.println("integral1 = " + integral1);
+		System.out.println("integral2 = " + integral2);
+		throw new Exception();
+	    }
+	}
+	System.out.println("ecount = " + ecount);
+
+	ecount = 0;
+	for (int i = 0; i < 1000000; i++) {
+	    do {
+		a1 = drv.next();
+		b1 = drv.next();
+		c1 = drv.next();
+	    } while (a1 < 1.0 || c1 <= 0.0 || b1*b1 >= 4*a1*c1);
+	    do {
+		a2 = drv.next();
+		b2 = drv.next();
+		c2 = drv.next();
+	    } while (a2 < 1.0 || c2 <= 0.0 || b2*b2 >= 4*a2*c2);
+	    p = new Polynomial(c1, b1, a1);
+	    p.multiplyBy(new Polynomial(c2, b2, a2));
+	    glq.setParameters(p);
+	    try {
+		integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+	    } catch (Exception e) {
+		System.out.println(e.getMessage());
+		ecount++;
+		continue;
+	    }
+	    integral2 = glq.integrate(0.2, 0.8, 100);
+	    double max = Math.max(Math.abs(integral2), 1.0);
+	    if (Math.abs(integral1 - integral2)/max > 1.e-9) {
+		System.out.println("i = " + i);
+		System.out.println("integral1 = " + integral1);
+		double integral3 = glq.integrate(0.2, 0.8, 200);
+		System.out.println("integral3 = " + integral3);
+		System.out.println("integral2 = " + integral2);
+
+		if (Math.abs(integral1 - integral3)
+		    / Math.abs(integral1 - integral2) > 0.5) {
+		    throw new Exception();
+		}
+	    }
+	}
+	System.out.println("ecount = " + ecount);
+
+	System.out.println();
+	System.out.println("check integrateRoot2Q");
+
+	int pvalues[][] = {
+	    {-1, -1, 0},
+	    {-3, 1, 0},
+	    {-3, -1, 0},
+	    {-1, -1, -2},
+	    {1, -1, -4},
+	    {-1, -1, -4},
+	    {-1, -1, 2},
+	    {1, -1, 0},
+	    {-1, -1, 4},
+	    {1, 1, 0},
+	    {1, -1, -2},
+	    {1, 1, -2},
+	    {1, 1, -4},
+	};
+
+	UniformIntegerRV pvrv = new UniformIntegerRV(0, true, 13, false);
+	Polynomial q1 = new Polynomial(2.0, 1.0, 1.0);
+	Polynomial q2 = new Polynomial(3.0, 2.0, 1.0);
+	Polynomial q5 = new Polynomial(5.0, 1.0);
+	Parms parms= new Parms();
+	GLQuadrature<Parms> glq2 = new GLQuadrature<>(8) {
+		protected double function(double t, Parms parms) {
+		    return MathOps.pow(parms.P1.valueAt(t), parms.p1, 2)
+		    * MathOps.pow(parms.P2.valueAt(t), parms.p2, 2)
+		    * MathOps.pow(parms.P5.valueAt(t), parms.p5, 2);
+		}
+	    };
+	glq2.setParameters(parms);
+	for (int j = 0; j < 100000; j++) {
+	    for (int i = 0; i < pvalues.length; i++) {
+		try {
+		    parms.set(pvalues[i][0], pvalues[i][1],
+			      pvalues[i][2],
+			      q1, q2, q5);
+
+		    double val = Polynomials
+			.integrateRoot2Q(pvalues[i][0], pvalues[i][1],
+					 pvalues[i][2],
+					 q1, q2, q5,
+					 0.2, 0.8);
+		    double integral = glq2.integrate(0.2, 0.8, 100);
+		    integral1 = integral;
+		    if (Math.abs(val - integral) > 1.e-7) {
+			integral = glq2.integrate(0.2, 0.8, 200);
+		    }
+		    if (Math.abs(val - integral) > 1.e-7) {
+			System.out
+			    .format("j = %d, i = %d: [%d, %d, %d, %d, %d] "
+				    + "integral = %s\n",
+				    j, i,
+				    pvalues[i][0], pvalues[i][1],
+				    pvalues[i][1], pvalues[i][0],
+				    pvalues[i][2], val);
+			System.out.println("... numeric integral = " + integral
+					   + ", was " + integral1);
+			continue;
+		    }
+		    try {
+			double val1 = Polynomials
+			    .integrateRoot2Q(pvalues[i][1], pvalues[i][0],
+					     pvalues[i][2],
+					     q2, q1, q5,
+					     0.2, 0.8);
+			double max = Math.max(Math.abs(val), Math.abs(val1));
+			if (max < 1.0) max = 1.0;
+			if (Math.abs(val - val1)/max > 1.e-10) {
+			    throw new Exception("exchange error: "
+						+ val +" != " + val1);
+			}
+		    } catch(Exception e) {
+			System.out.format("... [%d, %d, %d, %d, %d]: %s\n",
+					  pvalues[i][1], pvalues[i][0],
+					  pvalues[i][0], pvalues[i][1],
+					  pvalues[i][2],
+					  e.getMessage());
+		    }
+		} catch (Exception e) {
+		    System.out.format("[%d, %d, %d, %d, %d] test failed\n",
+				      pvalues[i][0], pvalues[i][1],
+				      pvalues[i][1], pvalues[i][0],
+				      pvalues[i][2]);
+		    e.printStackTrace(System.out);
+		}
+	    }
+	    do {
+		a1 = drv.next();
+		b1 = drv.next();
+		c1 = drv.next();
+	    } while (a1 < 1.0 || c1 <= 1.0 || b1 < 1.0 ||  b1*b1 >= 4*a1*c1);
+	    q1 = new Polynomial(c1, b1, a1);
+	    /*
+	    System.out.format("q1 = %g + %gt + %gt\u00B2\n",
+			      c1, b1, a1);
+	    */
+	    do {
+		a2 = drv.next();
+		b2 = drv.next();
+		c2 = drv.next();
+	    } while (a2 < 1.0 || c2 <= 1.0 || b2 < 1.0 || b2*b2 >= 4*a2*c2);
+	    q2 = new Polynomial(c2, b2, a2);
+	    /*
+	    System.out.format("q2 = %g + %gt + %gt\u00B2\n",
+			      c2, b2, a2);
+	    */
+	    do {
+		a2 = drv.next();
+		b2 = drv.next();
+	    } while (a2 < 1.0 || b2 < 1.0);
+	    q5 = new Polynomial(a2, b2);
+	    /*
+	    System.out.format("q5 = %g + %gt\n",
+			      a2, b2);
+	    */
+	}
     }
 }

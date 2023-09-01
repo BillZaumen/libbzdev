@@ -11,6 +11,17 @@ import org.bzdev.lang.MathOps;
 
 public class Path2DInfoTest {
 
+    // FOR CUBIC CASE
+    // https://www.maa.org/sites/default/files/Brookfield2007-103574.pdf
+    // describes how to factor a quartic polynomial into two quadratic
+    // polynomials.
+    // check out B.C. Carlson,
+    // "A Table of Elliptic Integrals: Two Quadratic Factors".
+    // https://www.ams.org/journals/mcom/1992-59-199/S0025-5718-1992-1134720-4/S0025-5718-1992-1134720-4.pdf
+    // See http://www.circuitwizard.de/metapost/arclength.pdf for a
+    // discussion of how to get the path length of a cubic Bezier curve
+    // and comments about Carlson's notation.
+
     public static double integrateRootP2(double x, double a, double b, double c)
 	throws Exception
     {

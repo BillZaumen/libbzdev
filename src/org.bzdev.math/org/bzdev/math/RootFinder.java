@@ -1691,7 +1691,7 @@ public abstract class RootFinder<P> {
      * provided in Java 11.0.1.
      * <P>
      * A cubic function
-     * f(x) = ax<sup>3</sup> + bx<sup>2</sup> + cx ++ d has an
+     * f(x) = ax<sup>3</sup> + bx<sup>2</sup> + cx + d has an
      * inflection point at -b/(3a). The number of critical
      * points is dependent on the value
      * &Delta;<sub>0</sub> = b<sup>2</sup> - 3ac:
@@ -1747,7 +1747,7 @@ public abstract class RootFinder<P> {
      * @param eqn the input/output array containing the roots (starting at
      *        index 0) for output and the coefficients ordered so that
      *        eqn[0] = d, eqn[1] = c, eqn[2] = b, and eqn[3] = a.
-     * @return the number of roots; -1 if the coefficients a and b are zero
+     * @return the number of roots; -1 if the coefficients a, b, and c are zero
      */
     public static int solveCubic(double[] eqn) {
 	return solveCubic(eqn, eqn);
@@ -1914,7 +1914,7 @@ public abstract class RootFinder<P> {
      * provided in Java 11.0.1.
      * <P>
      * A cubic function
-     * f(x) = ax<sup>3</sup> + bx<sup>2</sup> + cx ++ d has an
+     * f(x) = ax<sup>3</sup> + bx<sup>2</sup> + cx + d has an
      * inflection point at -b/(3a). The number of critical
      * points is dependent on the value
      * &Delta;<sub>0</sub> = b<sup>2</sup> - 3ac:
@@ -1972,7 +1972,7 @@ public abstract class RootFinder<P> {
      *        eqn[0] = d, eqn[1] = c, eqn[2] = b, and eqn[3] = a.
      * @param res the output array containing the roots (starting at
      *        index 0) in numerical order
-     * @return the number of roots; -1 if the coefficients a and b are zero
+     * @return the number of roots; -1 if the coefficients a, b, and c are zero
      */
     public static int solveCubic(double[] eqn, double[] res) {
 	double norm = eqn[3];
@@ -3495,7 +3495,7 @@ public abstract class RootFinder<P> {
 
     /**
      * Solve the quartic equation
-     * ax<sup>4</sup> + bx<sup>3</sup> + cx<sup>2</sup> + dx +e = 0
+     * ax<sup>4</sup> + bx<sup>3</sup> + cx<sup>2</sup> + dx + e = 0
      * and store the results in the argument array.
      * The algorithm is based on the description in the Wikipedia article
      * on the
@@ -3527,7 +3527,8 @@ public abstract class RootFinder<P> {
      *        where eqn[0] = e, eqn[1] = d, eqn[2] = c, eqn[3] = d, and
      *        eqn[4] = e (the array length must be at least 5), also used
      *        as the output array
-     * @return the number of real-valued solutions
+     * @return the number of real-valued solutions; -1 if a, b, c, and d
+     *         are 0
      */
     public static int solveQuartic(double[] eqn) {
 	return solveQuartic(eqn, eqn);
@@ -3536,7 +3537,7 @@ public abstract class RootFinder<P> {
 
     /**
      * Solve the quartic equation
-     * ax<sup>4</sup> + bx<sup>3</sup> + cx<sup>2</sup> + dx +e = 0
+     * ax<sup>4</sup> + bx<sup>3</sup> + cx<sup>2</sup> + dx + e = 0
      * and store the results in an output array.
      * The algorithm is based on the description in the Wikipedia article
      * on the
@@ -3569,7 +3570,8 @@ public abstract class RootFinder<P> {
      *        eqn[4] = e (the array length must be at least 5)
      * @param res an array whose length is at least 4 that will contain
      *         the results
-     * @return the number of real-valued solutions
+     * @return the number of real-valued solutions; -1 if a, b, c, and d
+     *         are 0
      */
     private static int solveQuartic(double[] eqn, double[] res) {
 	double a = eqn[4];
