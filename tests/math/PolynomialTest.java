@@ -5,7 +5,450 @@ import org.bzdev.math.rv.*;
 import org.bzdev.lang.MathOps;
 
 
+
 public class PolynomialTest {
+
+    static double a = 0.0;
+    static double b = 0.0;
+    static double c = 0.0;
+
+    static void testAbsRootQ() throws Exception {
+	// partial test: ../geom/Path2DInfoTest.java has a more
+	// comprehensive one.
+	double value;
+	double value2;
+
+	Polynomial p15 = new Polynomial(578.25, -1080.0, 506.25);
+	double p15val = Polynomials
+	    .integrateRootP2(1.0, 578.25, -1080.0, 506.25);
+	double p15val0 = Polynomials
+	    .integrateRootP2(0.0, 578.25, -1080.0, 506.25);
+
+	if (Math.abs((p15val - p15val0) - 12.883531828512188)/12 > 1.e-10) {
+	    System.out.println("p15val = " + p15val);
+	    System.out.println("p15val0 = " + p15val0);
+	    System.out.println("diff = " +(p15val - p15val0));
+	    throw new Exception();
+	}
+
+	Polynomial p = new Polynomial(3.0);
+	Polynomial rp = new Polynomial(4.0);
+	if (Math.abs(Polynomials.integrateAbsPRootQ(3.0, p, rp) - 18.0)
+	    > 1.e-10) {
+	    throw new Exception();
+	}
+	p = new Polynomial(2.0, 3.0);
+	Polynomial pi = new Polynomial(0.0, 2.0, 3.0/2);
+	value = Polynomials.integrateAbsPRootQ(3.0, p, rp);
+	if (Math.abs(value - 2*pi.valueAt(3.0)) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    throw new Exception();
+	}
+	p = new Polynomial (4.0, 3.0, 2.0);
+	pi = new Polynomial(0.0, 4.0, 3.0/2, 2.0/3);
+	value = Polynomials.integrateAbsPRootQ(3.0, p, rp);
+	if (Math.abs(value - 2*pi.valueAt(3.0)) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    throw new Exception();
+	}
+	Polynomial p1 = new Polynomial(2.0, 3.0);
+	Polynomial rp1 = new Polynomial(2.0, 3.0, 4.0);
+	GLQuadrature glq = GLQuadrature.newInstance((t) -> {
+		return Math.abs(p1.valueAt(t))*Math.sqrt(rp1.valueAt(t));
+	}, 8);
+	value = Polynomials.integrateAbsPRootQ(3.0, p1, rp1);
+	double evalue = glq.integrate(0.0, 3.0, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+	 Polynomial p2 = new Polynomial(-2.0, 3.0);
+	 Polynomial rp2 = new Polynomial(2.0, 3.0, 4.0);
+	 glq = GLQuadrature.newInstance((t) -> {
+		 return Math.abs(p2.valueAt(t))*Math.sqrt(rp2.valueAt(t));
+	}, 8);
+	value = Polynomials.integrateAbsPRootQ(3.0, p2, rp2);
+	evalue = glq.integrate(0.0, 2.0/3.0, 10)
+	    + glq.integrate(2.0/3.0, 3.0, 10);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    double evalue2 = glq.integrate(0.0, 1.5, 100)
+		+ glq.integrate(1.5, 3.0, 100);
+	    System.out.println("expected value2 = " + evalue2);
+	    double evalue3 = glq.integrate(0.0, 1.5, 200)
+		+ glq.integrate(1.5, 3.0, 200);
+	    System.out.println("expected value3 = " + evalue3);
+	    throw new Exception();
+	}
+	 Polynomial p3 = new Polynomial(-2.0, 3.0);
+	 Polynomial rp3 = new Polynomial(5.0);
+	 glq = GLQuadrature.newInstance((t) -> {
+		 return Math.abs(p3.valueAt(t))*Math.sqrt(rp3.valueAt(t));
+	}, 8);
+	value = Polynomials.integrateAbsPRootQ(3.0, p3, rp3);
+	evalue = glq.integrate(0.0, 2.0/3.0, 100)
+	    + glq.integrate(2.0/3.0, 3.0, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+	Polynomial p4 = new Polynomial(8, -8.0, 2.0);
+	Polynomial rp4 = new Polynomial(5.0);
+	 glq = GLQuadrature.newInstance((t) -> {
+		 return Math.abs(p4.valueAt(t))*Math.sqrt(rp4.valueAt(t));
+	}, 8);
+	value = Polynomials.integrateAbsPRootQ(3.0, p4, rp4);
+	evalue = glq.integrate(0.0, 2.0, 100)
+	    + glq.integrate(2.0, 3.0, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+
+	Polynomial p5 = new Polynomial(24, -14.0, 2.0);
+	Polynomial rp5 = new Polynomial(5.0);
+	glq = GLQuadrature.newInstance((t) -> {
+		return Math.abs(p5.valueAt(t))*Math.sqrt(rp5.valueAt(t));
+	    }, 8);
+	value = Polynomials.integrateAbsPRootQ(2.5, p5, rp5);
+	evalue = glq.integrate(0.0, 2.5, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+
+	value = Polynomials.integrateAbsPRootQ(3.5, p5, rp5);
+	evalue = glq.integrate(0.0, 3.0, 100)
+	    + glq.integrate(3.0, 3.5, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+	value = Polynomials.integrateAbsPRootQ(4.5, p5, rp5);
+	evalue = glq.integrate(0.0, 3.0, 100)
+	    + glq.integrate(3.0, 4.0, 100)
+	    + glq.integrate(4.0, 4.5, 100);
+	if (Math.abs(value - evalue) > 1.e-10) {
+	    System.out.println("value = " + value);
+	    System.out.println("expected value = " + evalue);
+	    throw new Exception();
+	}
+    }
+
+
+    static void testIntegrateRootP2() throws Exception {
+
+	RealValuedFunctOps integrand = (uu) -> {
+	    return Math.sqrt(a + b * uu + c*uu*uu);
+	};
+	RealValuedFunctOps integrandX = (uu) -> {
+	    return uu*Math.sqrt(a + b * uu + c*uu*uu);
+	};
+	GLQuadrature glq = new GLQuadrature(10) {
+		protected double function(double t) {
+		    return integrand.valueAt(t);
+		}
+	    };
+
+	GLQuadrature glqx = new GLQuadrature(10) {
+		protected double function(double t) {
+		    return integrandX.valueAt(t);
+		}
+	    };
+
+
+	double v0, v1, v2;
+	double v0x, v1x, v2x;
+
+	System.out.println("... small c test");
+	a = 10.0;
+	b = 7.0;
+	c= .0001;
+	v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	System.out.println("v0 = " + v0);
+	v1 = Polynomials.integrateRootP2(1.0, a, b, c);
+	v1 = v1 - v0;
+
+	v2 = glq.integrate(0, 1.0, 100);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-9) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    System.out.println("v1 - v2 = " + (v1 - v2));
+	    throw new Exception();
+	}
+
+
+	a = 10.0;
+	b = 1e-5;
+	c = 0.0;
+
+	v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	System.out.println("v0 = " + v0);
+	v1 = Polynomials.integrateRootP2(1.0, a, b, c);
+	v1 = v1 - v0;
+
+	v2 = glq.integrate(0, 1.0, 100);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+
+	a = 1017.0;
+	b = -4068.0;
+	c = 4068.0;
+	v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	System.out.println("v0 = " + v0);
+	v1 = Polynomials.integrateRootP2(1.0, a, b, c);
+	v1 = v1 - v0;
+
+	v2 = glq.integrate(0, 1.0, 100);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+
+	a = 40.286798096407296;
+	b = -81.39024991061399;
+	c = 68.35837614076863;
+	v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	System.out.println("v0 = " + v0);
+	v1 = Polynomials.integrateRootP2(1.0, a, b, c) - v0;
+	v2 = glq.integrate(0, 1.0, 100);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+
+	a = 2.0;
+	b = 4.0;
+	c = 2.0;
+
+	v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	System.out.println("v0 = " + v0);
+
+	v1 = Polynomials.integrateRootP2(1.0, a, b, c) - v0;;
+
+	v2 = glq.integrate(0, 1.0, 100);
+	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+	    throw new Exception();
+	}
+
+	double uarray[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+	for (double u: uarray) {
+	    v1 = Polynomials.integrateRootP2(u, a, b, c) - v0;
+	    v2 = glq.integrate(0.0, u);
+	    if (Math.abs(v1 - v2)
+		/ Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
+		throw new Exception();
+	    }
+	}
+
+	UniformDoubleRV rv = new UniformDoubleRV(-100.0, true, 100.0, true);
+	int icnt = 0;
+	BasicStats stats = new BasicStats.Population();
+	BasicStats statsx = new BasicStats.Population();
+	for (int i = 0; i < 1000000; i++) {
+	    a = rv.next();
+	    b = rv.next();
+	    c = rv.next();
+	    if (c == 0.0) continue;
+	    if ((a + b + c) < 0.0) continue;
+	    if (a < 0.0) continue;
+	    double descr = b*b - 4*a*c;
+	    double r = Double.POSITIVE_INFINITY;
+	    if (Math.abs(descr) < 1.e-10) {
+		r = -b/(2*c);
+	    }
+	    if (descr > 0) {
+		double min = -b/(2*c);
+		if (min > 0.0 && min < 1.0) continue;
+		double rdescr2 = Math.sqrt(descr)/2;
+		double r1 = min - rdescr2;
+		double r2 = min + rdescr2;
+		if (r1 > 0.0 && r1 < 1.0) continue;
+		if (r2 > 0.0 && r2 < 1.0) continue;
+	    }
+	    try {
+		v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+		v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	    } catch (Exception e) {
+		if (e instanceof ArithmeticException) {
+		    continue;
+		} else {
+		    throw e;
+		}
+	    }
+	    for (double u: uarray) {
+		boolean badvx = false;
+		try {
+		    v1 = Polynomials.integrateRootP2(u, a, b, c) - v0;
+		    v1x = Polynomials.integrateXRootP2(u, a, b, c);
+		    badvx = Math.abs(v1x - v0x)
+			/ Math.max(Math.abs(v1x), Math.abs(v0x)) < 1.e-8;
+		    v1x -= v0x;
+		    if (badvx) continue;
+		} catch (Exception e) {
+		    if (e instanceof ArithmeticException) {
+			continue;
+		    } else {
+			System.out.println("i = " + i);
+			System.out.println(e.getMessage() + ": "
+					   + "a = " + a
+					   + ", b = " +b
+					   + ", c = " +c);
+			System.out.println("u = " + u);
+			throw e;
+		    }
+		}
+		if (Double.isNaN(v1)) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1 = NaN");
+		    throw new Exception();
+		}
+		if (Double.isNaN(v1x)) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1x = NaN");
+		    throw new Exception();
+		}
+		v2 = ((0 < r) && (r < u))? (glq.integrate(0.0, r, 50)
+			       + glq.integrate(r, u, 50)):
+		    glq.integrate(0.0, u, 100);
+		double delta = Math.abs(v1 - v2)
+		    / Math.max(1.0, Math.max(Math.abs(v1), Math.abs(v2)));
+		if (delta > 1.e-2) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+		stats.add(delta);
+		v2x = ((0 < r) && (r < u))? (glqx.integrate(0.0, r, 50)
+			       + glqx.integrate(r, u, 50)):
+		    glqx.integrate(0.0, u, 100);
+		delta = Math .abs(v1x - v2x)
+		    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+		if (delta > 1.e-2) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+		    throw new Exception();
+		}
+		statsx.add(delta);
+	    }
+	    icnt++;
+	    c = 0.0;
+	    if (a < 0.0 ||  a+b < 0.0) continue;
+	    v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	    v0x =  Polynomials.integrateXRootP2(0.0, a, b, c);
+	    for (double u: uarray) {
+		boolean badvx = false;
+		v1 = Polynomials.integrateRootP2(u, a, b, c) - v0;
+		v2 = ((0 < r) && (r < u))? (glq.integrate(0.0, r, 50)
+			       + glq.integrate(r, u, 50)):
+		    glq.integrate(0.0, u, 100);
+		if (Math.abs(v1 - v2)
+		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+		v1x = Polynomials.integrateXRootP2(u, a, b, c);
+		if (Math.abs(v1x - v0x)/Math.max(Math.abs(v1x), Math.abs(v0x))
+		    < 1.e-18) continue;
+		v1x -= v0x;
+		v2x = ((0 < r) && (r < u))? (glqx.integrate(0.0, r, 50)
+			       + glqx.integrate(r, u, 50)):
+		    glqx.integrate(0.0, u, 100);
+		if (Math.abs(v1x - v2x)
+		    / Math.max(Math.abs(v1x), Math.abs(v2x)) > 1.e-2) {
+		    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+		    throw new Exception();
+		}
+	    }
+	    b  = 0.0;
+	    if (a < 0.0) continue;
+	    v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	    v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	    for (double u: uarray) {
+		v1 = Polynomials.integrateRootP2(u, a, b, c) - v0;
+		v2 = ((0 < r) && (r < u))? (glq.integrate(0.0, r, 50)
+			       + glq.integrate(r, u, 50)):
+		    glq.integrate(0.0, u, 100);
+		if (Math.abs(v1 - v2)
+		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
+		    throw new Exception();
+		}
+		v1x = Polynomials.integrateXRootP2(u, a, b, c);
+		if (Math.abs(v1x - v0x)/Math.max(Math.abs(v1x), Math.abs(v0x))
+		    < 1.e-8) continue;
+		v1x -= v0x;
+		v2x = ((0 < r) && (r < u))? (glqx.integrate(0.0, r, 50)
+			       + glqx.integrate(r, u, 50)):
+		    glqx.integrate(0.0, u, 100);
+		if (Math.abs(v1x - v2x)
+		    / Math.max(Math.abs(v1x), Math.abs(v2x)) > 1.e-2) {
+		    System.out.println("i = " + i);
+		    System.out.println("a = " + a);
+		    System.out.println("b = " + b);
+		    System.out.println("c = " + c);
+		    System.out.println("u = " + u);
+		    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+		    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+		    throw new Exception();
+		}
+	    }
+	}
+	System.out.println("icnt = " + icnt);
+	if (stats.size() == 0) {
+	    System.out.println("no values of delta");
+	} else {
+	    System.out.println("delta = " + stats.getMean()
+			       + " \u00B1 " + stats.getSDev());
+	}
+	if (statsx.size() == 0) {
+	    System.out.println("no values of deltax");
+	} else {
+	    System.out.println("deltax = " + statsx.getMean()
+			       + " \u00B1 " + statsx.getSDev());
+	}
+    }
+
 
     static void integralTest() {
 
@@ -36,7 +479,372 @@ public class PolynomialTest {
 			   + bpy.integralAt(1.0));
     }
 
+    static void printArray(String name, double[] array) {
+	System.out.print(name + ":");
+	for (double v: array) {
+	    System.out.print(" " + v);
+	}
+	System.out.println();
+    }
+    static void printArray(String name, Polynomial p) {
+	printArray(name, p.getCoefficientsArray());
+    }
+
+
     static void badcase() throws Exception {
+
+	double a1, a2, b1, b2, c1, c2, val, eval;
+	Polynomial tp;
+
+	double v0x, v1x, v2x, u, delta;
+	RealValuedFunctOps integrandX = (uu) -> {
+	    return uu*Math.sqrt(a + b * uu + c*uu*uu);
+	};
+	GLQuadrature glqx = new GLQuadrature(10) {
+		protected double function(double t) {
+		    return integrandX.valueAt(t);
+		}
+	    };
+
+	double val0, val1, val2;
+	RealValuedFunctOps integrand = (uu) -> {
+	    return Math.sqrt(a + b * uu + c*uu*uu);
+	};
+	GLQuadrature glq = new GLQuadrature(10) {
+		protected double function(double t) {
+		    return integrand.valueAt(t);
+		}
+	    };
+
+	a = 93.01889004986154;
+	b = -55.53800275486001;
+	c = 5.92765100548894;
+	u = 0.1;
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	if (v0x != 0.0) throw new Exception("v0x = " + v0x);
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+	if (Double.isNaN(v1x)) throw new Exception();
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+
+
+	a = 73.79073403467174;
+	b = -4.196333275388042E-4;
+	c = -4.502589249849706;
+	u = 0.1;
+	val0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	val1 = Polynomials.integrateRootP2(u, a, b, c);
+	System.out.println("val0 = " +val0 +", val1 = " + val1);
+	val1 -= val0;
+	System.out.println("val1 = " + val1);
+	val2 = glq.integrate(0.0, u, 100);
+	System.out.println("val2 = " + val2);
+	delta = Math .abs(val1 - val2)
+	    / Math.max(1.0, Math.max(Math.abs(val1), Math.abs(val2)));
+	if (delta > 1.e-6) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("val1 = " + val1 + ", val2 = " + val2);
+	    throw new Exception();
+	}
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	if (v0x != 0.0) throw new Exception("v0x = " + v0x);
+	System.out.println("... compute v1x");
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+	a = 52.67218051744058;
+	b = 89.09876633418148;
+	c = 4.0758807805153765;
+	u = 0.2;
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	if (v0x != 0.0) throw new Exception("v0x = " + v0x);
+	System.out.println("... compute v1x");
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+
+
+
+	a = 5.655490196608142;
+	b = 26.88177275582447;
+	c = 0.020245158929668605;
+	u = 0.8;
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	if (v0x != 0.0) throw new Exception("v0x = " + v0x);
+	System.out.println("... compute v1x");
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+	a = 2.0;
+	b = 3.0;
+	c = 4.0;
+	val0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	val1 = Polynomials.integrateRootP2(3.0, a, b, c);
+	System.out.println("val0 = " +val0 +", val1 = " + val1);
+	val1 -= val0;
+	System.out.println("val1 = " + val1);
+	val2 = glq.integrate(0.0, 3.0, 100);
+	System.out.println("val2 = " + val2);
+	delta = Math .abs(val1 - val2)
+	    / Math.max(1.0, Math.max(Math.abs(val1), Math.abs(val2)));
+	if (delta > 1.e-6) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("val1 = " + val1 + ", val2 = " + val2);
+	    throw new Exception();
+	}
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	if (v0x != 0.0) throw new Exception("v0x = " + v0x);
+	v1x = Polynomials.integrateXRootP2(3.0, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, 3.0, 100);
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+	a = 101907.61256434761;
+	b = -247290.7579205503;
+	c = 150020.00218176623;
+
+	val0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	val1 = Polynomials.integrateRootP2(1.0, a, b, c);
+	System.out.println("val0 = " +val0 +", val1 = " + val1);
+	val1 -= val0;
+	System.out.println("val1 = " + val1);
+	val2 = glq.integrate(0.0, 1.0, 100);
+	System.out.println("val2 = " + val2);
+	delta = Math .abs(val1 - val2)
+	    / Math.max(1.0, Math.max(Math.abs(val1), Math.abs(val2)));
+	if (delta > 1.e-6) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("val1 = " + val1 + ", val2 = " + val2);
+	    throw new Exception();
+	}
+
+
+	a = 85.55827757758047;
+	b = 3.0217228129458817E-5;
+	c = 0.0;
+	u = 0.1;
+	System.out.println("root = " + (-a/b));
+
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+
+
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-9) {
+	    System.out.println("delta = " + delta);
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+
+	System.out.println("a = 7.5...., b = 74.4..., c= 3.2...e-5");
+	a = 7.5108446888724245;
+	b = 74.49868380335275;
+	c = 8.255099176324165E-5;
+	u = 1.0;
+	double descrx = b*b - 4*a*c;
+	System.out.println("descr = " + descrx);
+	System.out.println("root = " + (-b + Math.sqrt(descrx)));
+
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	v1x = Polynomials.integrateXRootP2(u, a, b, c);
+	System.out.println("v0x = " +v0x +", v1x = " + v1x);
+
+	v1x = v1x - v0x;
+	v2x = glqx.integrate(0.0, u, 100);
+	System.out.println("final v1x = " + v1x);
+	System.out.println("v2x = " + v2x);
+
+
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-2) {
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	}
+
+
+	a = 90.34082621137378;
+	b = -86.8539279211837;
+	c = 4.89958642404531E-4;
+	u = 1.0;
+
+	v0x = Polynomials.integrateXRootP2(0.0, a, b, c);
+	v1x = Polynomials.integrateXRootP2(u, a, b, c) - v0x;
+	v2x = glqx.integrate(0.0, u);
+
+	delta = Math .abs(v1x - v2x)
+	    / Math.max(1.0, Math.max(Math.abs(v1x), Math.abs(v2x)));
+	if (delta > 1.e-2) {
+	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
+	    throw new Exception();
+	}
+
+	a = 77.65472037143329;
+	b = -9.645253430112476;
+	c = 0.2744434748120739;
+
+	// X = a + bx + cx^2  (CRC table integral of 1/sqrt(X)
+
+
+	double descr1 = b*b - 4*a*c;
+	double rdescr1 = Math.sqrt(descr1);
+	System.out.println("sqrt(descr1) = " + rdescr1);
+	double r1 = -b/(2*c) - rdescr1/2;
+	double r2 = -b/(2*c) + rdescr1/2;
+	System.out.println("r1 = " + r1);
+	System.out.println("r2 = " + r2);
+	System.out.println("q = " +(4*a*c - b*b));
+	RealValuedFunctOps X1 = (z) -> {
+	   return  a + b*z + c*z*z;
+	};
+	System.out.println ("X(0) = " + X1.valueAt(0.0));
+	System.out.println ("X(1) = " + X1.valueAt(1.0));
+	double argval0 =  Math.sqrt(X1.valueAt(0.0)) + b/(2*Math.sqrt(c));
+	double argval1 = Math.sqrt(X1.valueAt(1.0))
+	    + 1.0*Math.sqrt(c) + b/(2*Math.sqrt(c));
+	System.out.println("at 0, sqrt(X) = xsqrt(c) + b/(2sqrt(c)) = "
+			   + argval0);
+	System.out.println("at 1, sqrt(X) = xsqrt(c) + b/(2sqrt(c)) = "
+			   + argval1);
+	if ((argval1 <= 0.0) != (argval0 <= 0.0)) throw new Exception();
+	try {
+	double v0 = Polynomials.integrateRootP2(0.0, a, b, c);
+	double v1 = Polynomials.integrateRootP2(1.0, a, b, c);
+	System.out.println("v0 = " + v0);
+	System.out.println("v1 = " + v1);
+	if (Double.isNaN(v0)) throw new Exception();
+	if (Double.isNaN(v1)) throw new Exception();
+	} catch (ArithmeticException ea) {
+	    System.out.println(ea.getMessage());
+	    System.out.println("... expected an error");
+	}
+
+	/*
+	Polynomial poly1 = new Polynomial(10.083251953125,
+					-51.5654296875,
+					66.89794921875,
+					-2.4873046875,
+					0.028564453125);
+	*/
+
+	Polynomial[] polys = {
+	    new Polynomial(1091.25, -4545.0, 8373.375, -6483.375, 1732.78125),
+	    new Polynomial(169.03125, -317.25, -680.0625,
+			   447.74999999999994, 1732.78125),
+	    new Polynomial(2592.0, -18576.0, 38916.0, -20268.0, 3330.0),
+	    new Polynomial(10.083251953125,
+			   -51.5654296875,
+			   66.89794921875,
+			   -2.4873046875,
+			   0.028564453125),
+
+	    new Polynomial(6165.000000000001,
+			   -34560.0,
+			   64404.0,
+			   -45648.0,
+			   12321.0)
+	};
+
+	int index = 0;
+	for (Polynomial poly1: polys) {
+	    System.out.println("poly1 = polys[" +(index++) + "]");
+	    try {
+		System.out.println("integrateRootP4(poly1) = "
+				   + Polynomials.integrateRootP4(poly1,
+								 0.0, 1.0));
+		final Polynomial ipoly = poly1;
+		GLQuadrature iglq = new GLQuadrature(8) {
+			protected double function(double t) {
+			    return Math.sqrt(ipoly.valueAt(t));
+			}
+		    };
+		System.out.println("integrateRootP4(poly1) numeric = "
+				   + iglq.integrate(0.0, 1.0, 400));
+
+		Polynomial[] poly1s = Polynomials
+		    .factorQuarticToQuadratics(poly1);
+		System.out.println("poly1s.length = " + poly1s.length);
+		printArray("poly1s[0]", poly1s[0]);
+		printArray("poly1s[1]", poly1s[1]);
+		printArray("poly1s[2]", poly1s[2]);
+		Polynomial prod = poly1s[0].multiply(poly1s[1])
+		    .multiply(poly1s[2]);
+		printArray("prod", prod);
+		for (int i = 1; i < 3; i++) {
+		    double[] array = poly1s[i].getCoefficientsArray();
+		    double a = array[2];
+		    double b = array[1];
+		    double c = array[0];
+		    double descr = b*b - 4*a*c;
+		    System.out.println("roots for poly1s["+i+"]");
+		    System.out.println("... descr = " + descr
+				       + ", min value = "
+				       + poly1s[i].valueAt((-b/(2*a))));
+		    if (descr == 0) {
+			System.out.println("... r = " + -b/(2*c));
+		    } else if (descr > 0) {
+			double rdescr = Math.sqrt(descr);
+			System.out.println("r1 = " + ((-b - rdescr)/(2*a)));
+			System.out.println("r2 = " + ((-b + rdescr)/(2*a)));
+		    } else {
+			System.out.println("... no roots");
+		    }
+		}
+	    } catch (ArithmeticException e) {
+		System.out.println("... not integrable (expected)");
+	    }
+	}
+
 	int deg1 = 10;
 	int deg2 = 1;
 	double[] p1 = new double[deg1+1];
@@ -496,11 +1304,253 @@ public class PolynomialTest {
     }
 
 
+    private static void timingTestP4() {
+
+	//  discontinuous 1st deriv test.
+	GLQuadrature glql = GLQuadrature.newInstance(Math::abs, 8);
+	for (int i = 1; i <= 10; i++) {
+	    System.out.format("glql.integrate(-1.0, 1.0, %d) = %s\n",
+			      i, glql.integrate(-1.0, 1.0, i));
+	}
+
+
+	// compare use ofo elliptic integrals to numberic intergration.
+
+	// neither have real roots.
+	Polynomial p1 = new Polynomial(4.0, 3.0, 100.0);
+	Polynomial p2 = new Polynomial(3.0, 2.0, 200.0);
+
+	p1.multiplyBy(p1);
+	p2.multiplyBy(p2);
+	Polynomial p = new Polynomial(p1);
+	p.incrBy(p2);
+
+	RealValuedFunctOps f = (x) -> {
+	    return Math.sqrt(p.valueAt(x));
+	};
+
+	GLQuadrature glq = GLQuadrature.newInstance(f, 8);
+
+	long t0 = System.nanoTime();
+	int limit = 100000;
+
+	int index = 2;
+	double val = glq.integrate(0.0, 1.0, index++);
+
+	for (;;) {
+	    double tmp = glq.integrate(0.0, 1.0, index);
+	    if (tmp == val) break;
+	    val = tmp;
+	    index++;
+	}
+	System.out.println("number of subdivisions = " + index);
+
+	int scaleFactor = 4;
+
+	double sum = 0.0;
+	double val1 = 0.0;
+	double val2 = 0.0;
+	double val3 = 0.0;
+	for (int i = 0; i < limit; i++) {
+	    val1 = Polynomials.integrateRootP4(p, 0.0, 1.0);
+	    sum += val1;
+	}
+	long t1 = System.nanoTime();
+	for (int i = 0; i < limit; i++) {
+	    val2 = glq.integrate(0.0, 1.0, index);
+	    sum += val2;
+	}
+	long t2 = System.nanoTime();
+	for (int i = 0; i < limit; i++) {
+	    Polynomials.factorQuarticToQuadratics(p);
+	}
+	long t3 = System.nanoTime();
+	sum = 0.0;
+	for (int i = 0; i < limit; i++) {
+	    val3 = glq.integrate(0.0, 1.0, index*scaleFactor);
+	    sum += val3;
+	}
+	long t4 = System.nanoTime();
+
+	System.out.println("time1 = " + (t1 - t0));
+	System.out.println("time2 = " + (t2 - t1));
+	System.out.println("time3 = " + (t3 - t2));
+	System.out.println("time4 = " + (t4 - t3));
+	System.out.println("val1 = " + val1);
+	System.out.println("val2 = " + val2);
+	System.out.println("val3 = " + val2);
+    }
+
+    public static void testApprox() throws Exception {
+
+	double a = 7.0;
+	double b = 3.0;
+	// double c = 2.0;
+	double c = 0.001;
+
+	RealValuedFunctOps integral1 = (x) -> {
+	    return (2.0/(3*b))*MathOps.pow(a+b*x, 3, 2)
+	    + (c/(15*b*b*b))*(8*a*a - 4*a*b*x + 3*b*b*x*x)*Math.sqrt(a+b*x)
+	    - (2.0/(3*b)*MathOps.pow(a, 3, 2)
+	       + (c/(15*b*b*b))*8*a*a*Math.sqrt(a));
+	};
+
+
+	RealValuedFunctOps integral = (x) -> {
+	    double z = x*b/a;
+	    double term1 = (2*MathOps.pow(a,3,2)/(3*b)
+			    + 8*c*MathOps.pow(a,5,2)/(15*b*b*b))
+		* (Math.sqrt(1+z) - 1.0);
+	    double term2 = ((2*Math.sqrt(a)/3
+			     - 4*MathOps.pow(a, 3, 2)*c/(15*b*b)) * x
+			    + 3*c*x*x*Math.sqrt(a)/(15*b))
+		* Math.sqrt(1+z);
+
+	    return term1 + term2;
+	};
+
+	GLQuadrature glq = GLQuadrature.newInstance((x) -> {
+		return Math.sqrt(a+b*x) + (c/2.0)*x*x/Math.sqrt(a+b*x);
+	    }, 8);
+
+	System.out.println("integral(0) = " +integral.valueAt(0.0));
+	System.out.println("integral1 = " +integral1.valueAt(0.8));
+	System.out.println("integral = " +integral.valueAt(0.8));
+
+	System.out.println("integral (numeric) = "
+			   + glq.integrate(0.0, 0.8, 100));
+	System.out.println("integral (numeric2) = "
+			   + glq.integrate(0.0, 0.8, 200));
+
+	integral1 = (x) -> {
+	    return -2*(2*a - 3*b*x)*(a+b*x)*Math.sqrt(a+b*x)/(15*b*b)
+	    + (c/2)*(2*x*x*x/(7*b)
+		     - (6*a/(7*b))*(2*(8*a*a-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+		   * Math.sqrt(a+b*x)
+	    - (-2*2*a*a/(15*b*b) + (c/2)*(-(6*a)/(7*b))*(2*8*a*a)/(15*b*b*b))
+	      * Math.sqrt(a);
+	};
+
+	RealValuedFunctOps integral2 = (x) -> {
+	    return -2*(2*a*a -a*b*x-3*b*b*x*x)*Math.sqrt(a+b*x)/(15*b*b)
+	    + (c/2)*(2*x*x*x/(7*b)
+		     - (6*a/(7*b))*(2*(8*a*a-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+		   * Math.sqrt(a+b*x)
+	    - (-2*2*a*a/(15*b*b) + (c/2)*(-(6*a)/(7*b))*(2*8*a*a)/(15*b*b*b))
+	      * Math.sqrt(a);
+	};
+
+	RealValuedFunctOps integral3 = (x) -> {
+	    return -2*(2*a*a -a*b*x-3*b*b*x*x)*Math.sqrt(a+b*x)/(15*b*b)
+	    + (c)*(x*x*x/(7*b)
+		     - (6*a/(7*b))*((8*a*a-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+		   * Math.sqrt(a+b*x)
+	    - (-2*2*a*a/(15*b*b) + (c)*(-(6*a)/(7*b))*(8*a*a)/(15*b*b*b))
+	      * Math.sqrt(a);
+	};
+
+	RealValuedFunctOps integral4 = (x) -> {
+	    double z = b*x/a;
+	    return -2*(2*a*a -a*b*x-3*b*b*x*x)*Math.sqrt(a)*Math.sqrt(1+z)
+	             /(15*b*b)
+	    + (c)*(x*x*x/(7*b)
+		     - (6*a/(7*b))*((8*a*a-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+		* Math.sqrt(a)*Math.sqrt(1+z)
+	    - (-2*2*a*a/(15*b*b)*Math.sqrt(a)
+	       + (c)*(-(6*a)/(7*b))*(8*a*a)*Math.sqrt(a)/(15*b*b*b));
+
+	};
+
+	RealValuedFunctOps integral5 = (x) -> {
+	    double z = b*x/a;
+	    return -2*(2*a*a*Math.sqrt(a)/(15*b*b)
+		       - (a*b*x+3*b*b*x*x)*Math.sqrt(a)/(15*b*b))
+			* Math.sqrt(1+z)
+	    - (c)*(6*a/(7*b))*((8*a*a)/(15*b*b*b))* Math.sqrt(a)*Math.sqrt(1+z)
+	    + (c)*(x*x*x/(7*b)
+		     - (6*a/(7*b))*((-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+		* Math.sqrt(a)*Math.sqrt(1+z)
+	    - (-2*2*a*a/(15*b*b)*Math.sqrt(a)
+	       + (c)*(-(6*a)/(7*b))*(8*a*a)*Math.sqrt(a)/(15*b*b*b));
+	};
+
+	RealValuedFunctOps integral6 = (x) -> {
+	    double z = b*x/a;
+	    double term1 = (-2*(2*a*a*Math.sqrt(a)/(15*b*b))
+			    - (c)*(6*a/(7*b))*((8*a*a)/(15*b*b*b))
+			    * Math.sqrt(a))*Math.sqrt(1+z);
+	    double term2 =  (-2*(-(a*b*x+3*b*b*x*x)*Math.sqrt(a)/(15*b*b))
+	               + (c)*(x*x*x/(7*b) - (6*a/(7*b))
+			      *((-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+			     * Math.sqrt(a))*Math.sqrt(1+z);
+	    double term3 = - (-2*2*a*a/(15*b*b)*Math.sqrt(a)
+	       + (c)*(-(6*a)/(7*b))*(8*a*a)*Math.sqrt(a)/(15*b*b*b));
+	    return term1 + term2 + term3;
+	};
+
+	integral = (x) -> {
+	    double z = b*x/a;
+	    double term1 = (-2*(2*a*a*Math.sqrt(a)/(15*b*b))
+			    - (c)*(6*a/(7*b))*((8*a*a)/(15*b*b*b))
+			    * Math.sqrt(a))*(Math.sqrt(1+z) - 1);
+	    double term2 =  (-2*(-(a*b*x+3*b*b*x*x)*Math.sqrt(a)/(15*b*b))
+	               + (c)*(x*x*x/(7*b) - (6*a/(7*b))
+			      *((-4*a*b*x + 3*b*b*x*x)/(15*b*b*b)))
+			     * Math.sqrt(a))*Math.sqrt(1+z);
+	    return term1 + term2;
+	};
+
+	glq = GLQuadrature.newInstance((x) -> {
+		return x*(Math.sqrt(a+b*x) + (c/2.0)*x*x/Math.sqrt(a+b*x));
+	    }, 8);
+
+	GLQuadrature glq2 = GLQuadrature.newInstance((x) -> {
+		return x*Math.sqrt(a + b*x + c*x*x);
+	    }, 8);
+
+	System.out.println("multipy integrand by x");
+	System.out.println("integral1 = " +integral1.valueAt(0.8));
+	System.out.println("integral2 = " +integral2.valueAt(0.8));
+	System.out.println("integral3 = " +integral3.valueAt(0.8));
+	System.out.println("integral4 = " +integral4.valueAt(0.8));
+	System.out.println("integral5 = " +integral5.valueAt(0.8));
+	System.out.println("integral6 = " +integral6.valueAt(0.8));
+	System.out.println("integral = " + integral.valueAt(0.8));
+
+	System.out.println("integral (numeric) = "
+			   + glq.integrate(0.0, 0.8, 100));
+	System.out.println("integral (numeric2) = "
+			   + glq.integrate(0.0, 0.8, 200));
+	System.out.println("glq2 case = " +glq2.integrate(0.0, 0.8, 200));
+
+    }
+
+
+
     public static void main(String argv[]) throws Exception {
+	if (false) {
+	    timingTestP4();
+	    System.exit(0);
+	}
+
+	testApprox();
+
+
+
+	if (true) badcase();
+
+	testAbsRootQ();
+
 	// initialCarlsonTest();
+	Polynomial pt = new Polynomial(8.0, -4.0, 2.0);
+	pt.multiplyBy(2.0);
+	System.out.print("pt:");
+	for (double v: pt.getCoefficientsArray()) {
+	    System.out.print(" " + v);
+	}
+	System.out.println();
 
         factorTest();
-	if (true) badcase();
 	// First test methods that use arrays as arguments
 	// as these are the ones the other methods call.
 
@@ -1265,6 +2315,12 @@ public class PolynomialTest {
 	    double max = Math.max(Math.abs(integral2), 1.0);
 	    if (Math.abs(integral1 - integral2)/max > 1.e-9) {
 		System.out.println("i = " + i);
+		System.out.println("a1 = " + a1);
+		System.out.println("b1 = " + b1);
+		System.out.println("c1 = " + c1);
+		System.out.println("a2 = " + a2);
+		System.out.println("b2 = " + b2);
+		System.out.println("c2 = " + c2);
 		System.out.println("integral1 = " + integral1);
 		double integral3 = glq.integrate(0.2, 0.8, 200);
 		System.out.println("integral3 = " + integral3);
@@ -1310,6 +2366,8 @@ public class PolynomialTest {
 		}
 	    };
 	glq2.setParameters(parms);
+	BasicStats stats = new BasicStats.Population();
+	double maxDelta = 0;
 	for (int j = 0; j < 100000; j++) {
 	    for (int i = 0; i < pvalues.length; i++) {
 		try {
@@ -1339,6 +2397,10 @@ public class PolynomialTest {
 					   + ", was " + integral1);
 			continue;
 		    }
+		    double delta = Math.abs(val - integral)
+			/ Math.max(1.0, Math.max(val, integral));
+		    maxDelta = Math.max(maxDelta, delta);
+		    stats.add(delta);
 		    try {
 			double val1 = Polynomials
 			    .integrateRoot2Q(pvalues[i][1], pvalues[i][0],
@@ -1396,5 +2458,16 @@ public class PolynomialTest {
 			      a2, b2);
 	    */
 	}
+	if (stats.size() == 0) {
+	    System.out.println("no values of delta");
+	} else {
+	    System.out.println("delta = " + stats.getMean()
+			       + " \u00B1 " + stats.getSDev());
+	    System.out.println("maxDelta = " + maxDelta);
+	}
+
+	System.out.println("testing integrateRootP2");
+	testIntegrateRootP2();
+	System.exit(0);
     }
 }

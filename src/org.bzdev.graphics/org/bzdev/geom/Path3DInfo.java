@@ -38,26 +38,32 @@ public class Path3DInfo {
 			     double[] coords)
 	throws Exception
     {
-	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[3])
-	    .deriv();
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[3]);
 
-	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[4])
-	    .deriv();
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[4]);
 
-	BezierPolynomial pz = new BezierPolynomial(z0, coords[2], coords[5])
-	    .deriv();
+	BezierPolynomial pz = new BezierPolynomial(z0, coords[2], coords[5]);
+
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
+	BezierPolynomial pzd = pz.deriv();
+
 
 	double[] array = Polynomials
-	    .fromBezier(Polynomials.multiply(px, px)
-			.add(Polynomials.multiply(py, py))
-			.add(Polynomials.multiply(pz, pz))
+	    .fromBezier(Polynomials.multiply(pxd, pxd)
+			.add(Polynomials.multiply(pyd, pyd))
+			.add(Polynomials.multiply(pzd, pzd))
 			.getCoefficientsArray(),
 			0, 2);
 
 	double a = array[0];
 	double b = array[1];
 	double c = array[2];
-	return Path2DInfo.integrateRootP2(u, a, b, c);
+	try {
+	    return Polynomials.integrateRootP2(u, a, b, c);
+	} catch (ArithmeticException ea) {
+	    return Path2DInfo.getSegmentLength(u, px, py, pz);
+	}
     }
 
 

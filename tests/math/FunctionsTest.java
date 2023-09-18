@@ -433,11 +433,10 @@ public class FunctionsTest {
 
     static void initialCarlsonTest() throws Exception {
 	// An attempt to integrate the square root of a quartic
-	// 9 + 6x + 6x^2 + 2x^3 + x^4 disagrees with GL quadrature.
+	// 9 + 6x + 6x^2 + 2x^3 + x^4 had disagreed with GL quadrature.
 	// expected values calculated using
 	// https://calcresource.com/eval-elliptic-carlson.html
 	// as an independent source of values.
-
 
 	double[] args1 = {
 	    605.8143191089465 ,

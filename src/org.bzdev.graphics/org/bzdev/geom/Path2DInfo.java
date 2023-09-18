@@ -19,6 +19,7 @@ import org.bzdev.util.IntComparator;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
@@ -43,12 +44,14 @@ public class Path2DInfo {
 	throws Exception
     {
 	// a + bx +cx^2 to fit CRC handbook integral tables
+	// c will always be positive, or at least non-negative.
 	if (c == 0.0) {
 	    // CRC Standard Math Tables, page 291
+	    if (a < 0.0) throw new Exception("cannot integrate");
 	    if (b == 0.0) {
-		if (a < 0.0) throw new Exception("cannot integrate");
 		return Math.sqrt(a)*x;
 	    }
+	    if (a + b*x < 0.0) throw new Exception("cannot integrate");
 	    return (2.0/(3.0*b))
 		* (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
 	}
@@ -57,7 +60,14 @@ public class Path2DInfo {
 	    // r = -b /(2*c);
 	    // polynomial = c*(x-r)^2 so integrate sqrt(c)*(x-r);
 	    double rootc = Math.sqrt(c);
-	    return rootc*x*x/2 + x*b/(2*rootc);
+	    double r = -b/(2*c);
+	    if (r > 0.0 && r < x) {
+		double rval = rootc*rootc*rootc/2 + b/2;
+		return Math.abs(rval)
+		    + Math.abs(rootc*x*x/2 + x*b/(2*rootc) - rval);
+	    } else {
+		return Math.abs(rootc*x*x/2 + x*b/(2*rootc));
+	    }
 	}
 	if (q < 0.0) throw new Exception("cannot integrate");
 	// CRC Standard Math Tables, page 297
@@ -74,27 +84,831 @@ public class Path2DInfo {
 	return f.valueAt(x) - f.valueAt(0.0);
     }
 
-    static double quadLength(double u, double x0, double y0, double[] coords)
+    static double integrateProotQ(double u, Polynomial p, Polynomial rp)
 	throws Exception
     {
-	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2])
-	    .deriv();
+	int pdeg = p.getDegree();
+	int rpdeg = rp.getDegree();
+	if (pdeg == 0 && rpdeg == 0) {
+	    // corner case - both are 0 degree polynomials
+	    return p.getCoefficientsArray()[0]
+		* Math.sqrt(rp.getCoefficientsArray()[0])
+		* u;
+	} else if (pdeg == 1) {
+	    if (rpdeg == 0) {
+		p.multiplyBy(Math.sqrt(rp.getCoefficientsArray()[0]));
+		Polynomial integral = p.integral();
+		return integral.valueAt(u);
+	    } else if (rpdeg == 2) {
+		double[] array = rp.getCoefficientsArray();
+		double a = array[0];
+		double b = array[1];
+		double c = array[2];
+		array = p.getCoefficientsArray();
+		double ival = integrateRootP2(u, a, b, c);
+		double X = rp.valueAt(u);
+		double val2 = array[1]*X*Math.sqrt(X)/(3*c)
+		    + (array[0] - array[1]*b/(2*c))*ival ;
+		X = rp.valueAt(0.0);
+		double val1 = array[1]*X*Math.sqrt(X)/(3*c);
+		return val2 - val1;
+	    } else {
+		throw new UnexpectedExceptionError();
+	    }
+	} else if (pdeg == 2) {
+	    // rpdeg must be 0.
+	    p.multiplyBy(Math.sqrt(rp.valueAt(0)));
+	    Polynomial integral = p.integral();
+	    return integral.valueAt(u);
+	} else {
+	    throw new UnexpectedExceptionError();
+	}
+    }
 
-	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3])
-	    .deriv();
+    private static final int SL_GLQ_ITERATIONS = 200;
+
+
+    // shared with Path3DInfo.java
+    static double getSegmentLength(double t, BezierPolynomial px,
+				   BezierPolynomial py, BezierPolynomial pz)
+    {
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
+	BezierPolynomial pzd = (pz == null)? null: pz.deriv();
+
+	GLQuadrature glq = GLQuadrature.newInstance((u) -> {
+		double dpx = pxd.valueAt(u);
+		double dpy = pyd.valueAt(u);
+		double pdz = (pzd == null)? 0.0: pzd.valueAt(u);
+		return Math.sqrt(dpx*dpx + dpy*dpy + pdz*pdz);
+	    }, 8);
+
+	int degx = pxd.getDegree();
+	int degy = pyd.getDegree();
+	int degz = (pz == null)? -1: pz.getDegree();
+
+
+	double[] xarray = Polynomials.fromBezier(null,
+						 pxd.getCoefficientsArray(),
+						 0, degx);
+	double[] yarray = Polynomials.fromBezier(null,
+						 pxd.getCoefficientsArray(),
+						 0, degy);
+	double[] zarray = (degz < 0)? new double[0]:
+	    Polynomials.fromBezier(null, pxd.getCoefficientsArray(), 0, degz);
+
+
+	// When we switch from a Bernstein to a monomial basis,
+	// the degree of the polynomial may decrease.
+	for (int i = degx; i > 0; i--) {
+	    if (xarray[i] == 0.0) degx--;
+	    else break;
+	}
+	for (int i = degy; i > 0; i--) {
+	    if (xarray[i] == 0.0) degy--;
+	    else break;
+	}
+	for (int i = degz; i > 0; i--) {
+	    if (zarray[i] == 0.0) degz--;
+	    else break;
+	}
+	double r1x = Double.NaN, r2x = Double.NaN,
+	    r1y = Double.NaN, r2y = Double.NaN,
+	    r1z = Double.NaN, r2z = Double.NaN;
+
+	int nrx = 0, nry = 0, nrz = 0;
+	if (degx == 2) {
+	    double descr = xarray[1]*xarray[1] - 4*xarray[0]*xarray[2];
+	    if (descr < 0) nrx = 0;
+	    else if (descr == 0) nrx = 1;
+	    else nrx = 2;
+	    if (nrx == 1) {
+		r1x = -xarray[1]/(2*xarray[2]);
+	    } else if (nrx == 2) {
+		double rdescr = Math.sqrt(descr);
+		r1x = (-xarray[1] - rdescr)/(2*xarray[2]);
+		r2x = (-xarray[1] + rdescr)/(2*xarray[2]);
+	    }
+	} else if (degx == 1) {
+	    r1x = -xarray[0]/xarray[1];
+	    nrx = 1;
+	}
+	if (r1x > r2x) {
+	    double tmp = r1x;
+	    r1x = r2x;
+	    r2x = tmp;
+	}
+
+	double xroots[] = new double[nrx];
+	if (nrx > 0) xroots[0] = r1x;
+	if (nrx > 1) xroots[1] = r2x;
+
+	if (degy == 2) {
+	    double descr = yarray[1]*yarray[1] - 4*yarray[0]*yarray[2];
+	    if (descr < 0) nry = 0;
+	    else if (descr == 0) nry = 1;
+	    else nry = 2;
+	    if (nry == 1) {
+		r1y = -yarray[1]/(2*yarray[2]);
+	    } else if (nry == 2) {
+		double rdescr = Math.sqrt(descr);
+		r1y = (-yarray[1] - rdescr)/(2*yarray[2]);
+		r2y = (-yarray[1] + rdescr)/(2*yarray[2]);
+	    }
+	} else if (degy == 1) {
+	    r1y = -yarray[0]/yarray[1];
+	    nry = 1;
+	}
+	if (r1y > r2y) {
+	    double tmp = r1y;
+	    r1y = r2y;
+	    r2y = tmp;
+	}
+
+	double yroots[] = new double[nry];
+	if (nry > 0) yroots[0] = r1y;
+	if (nry > 1) yroots[1] = r2y;
+
+	if (degz > 0) {
+	    if (degz == 2) {
+		double descr = zarray[1]*zarray[1] - 4*zarray[0]*zarray[2];
+		if (descr < 0) nrz = 0;
+		else if (descr == 0) nrz = 1;
+		else nrz = 2;
+		if (nrz == 1) {
+		    r1z = -zarray[1]/(2*zarray[2]);
+		} else if (nrz == 2) {
+		    double rdescr = Math.sqrt(descr);
+		    r1z = (-zarray[1] - rdescr)/(2*zarray[2]);
+		    r2z = (-zarray[1] + rdescr)/(2*zarray[2]);
+		}
+	    } else if (degz == 1) {
+		r1z = -zarray[0]/zarray[1];
+		nrz = 1;
+	    }
+	}
+	if (r1z > r2z) {
+	    double tmp = r1z;
+	    r1z = r2z;
+	    r2z = tmp;
+	}
+	double zroots[] = new double[nrz];
+	if (nrz > 0) zroots[0] = r1z;
+	if (nrz > 1) zroots[1] = r2z;
+
+	int cnt = 0;
+	double[] roots;
+
+	// if (pz == null) {
+	double[] roots0 = new double[nrx + nry + nrz];
+	int ind0 = 0;
+	for (int i = 0; i < nrx; i++) {
+	    roots0[ind0++] =xroots[i];
+	}
+	for (int i = 0; i < nry; i++) {
+	    roots0[ind0++] =yroots[i];
+	}
+	if (pz != null) {
+	    for (int i = 0; i < nry; i++) {
+		roots0[ind0++] =zroots[i];
+	    }
+	}
+	Arrays.sort(roots0);
+	int cnt0 = 0;
+	for (int i = 1; i < roots0.length; i++) {
+	    if (roots0[i-1] == roots0[i]) cnt0++;
+	}
+	roots = new double[roots0.length - cnt0];
+	cnt = roots.length;
+	ind0 = 0;
+	if (roots.length > 0) {
+	    roots[ind0++] = roots0[0];
+	    for (int i = 1; i < roots0.length; i++) {
+		if (roots0[i-1] != roots0[i]) {
+		    roots[ind0++] = roots0[i];
+		}
+	    }
+	}
+	int ind = 0;
+	while (ind < cnt) {
+	    if (roots[ind] <= 0.0) {
+		ind++;
+	    } else {
+		break;
+	    }
+	}
+	for (int i = ind; i < cnt; i++) {
+	    if (roots[i] >= t) {
+		cnt = i;
+		break;
+	    }
+	}
+	if (ind == cnt) cnt = 0;
+	if (cnt == 0) {
+	    return glq.integrate(0.0, t, SL_GLQ_ITERATIONS);
+	} else {
+	    double sum = glq.integrate(0.0, roots[ind], SL_GLQ_ITERATIONS);
+	    for (int i = ind+1; i < cnt; i++) {
+		sum += glq.integrate(roots[i-1], roots[i], SL_GLQ_ITERATIONS);
+	    }
+	    sum += glq.integrate(roots[cnt-1], t, SL_GLQ_ITERATIONS);
+	    return sum;
+	}
+    }
+
+    public static double quadLength(double u,
+				    double x0, double y0, double[] coords)
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2]);
+
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3]);
+
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
 
 	double[] array = Polynomials
-	    .fromBezier(Polynomials.multiply(px, px)
-			.add(Polynomials.multiply(py, py))
+	    .fromBezier(Polynomials.multiply(pxd, pxd)
+			.add(Polynomials.multiply(pyd, pyd))
 			.getCoefficientsArray(),
 			0, 2);
 
 	double a = array[0];
 	double b = array[1];
 	double c = array[2];
-	return integrateRootP2(u, a, b, c);
+	// System.out.println("a = " + a);
+	// System.out.println("b = " + b);
+	// System.out.println("c = " + c);
+	try {
+	    return Polynomials.integrateRootP2(u, a, b, c);
+	} catch (ArithmeticException ea) {
+	    // just in case.
+	    return getSegmentLength(u, px, py, null);
+	}
     }
 
+    static double cubicLength(double u, double x0, double y0, double[] coords)
+    {
+	return cubicLength(0, false, u, x0, y0, coords);
+    }
+
+    static double cubicLength(int depth, boolean split,
+			      double u, double x0, double y0, double[] coords)
+    {
+	if (split) {
+	    depth++;
+	    double[] scoords = new double[12];
+	    PathSplitter.split(PathIterator.SEG_CUBICTO,
+			       x0, y0, coords, 0, scoords, 0, 0.5);
+	    if (u <= 0.5) {
+		u *= 2;
+		return cubicLength(depth, false,  u, x0, y0, scoords);
+	    } else {
+		double len1 = cubicLength(depth, false, 1.0, x0, y0, scoords);
+		x0 = scoords[4];
+		y0 = scoords[5];
+		System.arraycopy(scoords, 6, scoords, 0, 6);
+		u -= 0.5;
+		u *= 2;
+		return len1 + cubicLength(depth, false, u, x0, y0, scoords);
+	    }
+	}
+
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2],
+						   coords[4]);
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3],
+						   coords[5]);
+
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
+
+	double[] marray = Polynomials.fromBezier(null,
+						  pxd.getCoefficientsArray(),
+						 0, 2);
+	// Fix up any roundoff errors where the value should be zero.
+	double max = 0.0;
+	for (double v: marray) {
+	    max = Math.max(max, v);
+	}
+	if (max != 0.0) {
+	    for (int i = 0; i < marray.length; i++) {
+		if (Math.abs(marray[i])/max < 1.e-12) {
+		    marray[i] = 0.0;
+		}
+	    }
+	}
+	Polynomial Px = new  Polynomial(marray);
+	marray = Polynomials.fromBezier(null,
+					pyd.getCoefficientsArray(),
+					0, 2);
+	max = 0.0;
+	for (double v: marray) {
+	    max = Math.max(max, v);
+	}
+	if (max != 0.0) {
+	    for (int i = 0; i < marray.length; i++) {
+		if (Math.abs(marray[i])/max < 1.e-12) {
+		    marray[i] = 0.0;
+		}
+	    }
+	}
+	Polynomial Py = new  Polynomial(marray);
+
+	int degPx = Px.getDegree();
+	int degPy = Py.getDegree();
+	try {
+	    if (degPx > degPy) {
+		return cubicLength(u, Py, Px);
+		/*
+		  Polynomial tmp = Px;
+		  Px = Py;
+		  Py = tmp;
+		  int itmp = degPx;
+		  degPx = degPy;
+		  degPy = itmp;
+		*/
+	    } else {
+		double result =  cubicLength(u, Px, Py);
+		return result;
+	    }
+	} catch (ArithmeticException e) {
+	    if ((e instanceof Polynomials.RootP4Exception)
+		&& (depth < 1)) {
+		return cubicLength(depth, true, u, x0, y0, coords);
+	    } else {
+		// cannot split due to depth limit. Fall back to
+		// numerical integration.
+		// double result =  getCubicLength(u, x0, y0, coords);
+		double result = getSegmentLength(u, px, py, null);
+		return result;
+	    }
+	}
+    }
+
+    // Note: this may modify Px or Py: it is a separate method merely
+    // for testing.
+    static double cubicLength (double u, Polynomial Px, Polynomial Py)
+	throws ArithmeticException
+    {
+	// special cases.
+	int degPx = Px.getDegree();
+	int degPy = Py.getDegree();
+	/*
+	System.out.println("degPx = " + degPx +", degPy = " + degPy);
+	printArray("Px", Px);
+	printArray("Py", Py);
+	*/
+	double[] marray = null;
+	if (degPx == 1) {
+	    if (degPy == 1) {
+		Px.multiplyBy(Px);
+		Py.multiplyBy(Py);
+		Px.incrBy(Py);
+		marray = Px.getCoefficientsArray();
+		// cases2[0] = true;
+		return Polynomials
+		    .integrateRootP2(u, marray[0], marray[1], marray[2])
+		    - Polynomials.integrateRootP2(0.0,
+						  marray[0],
+						  marray[1],
+						  marray[2]);
+	    }
+	    // If we got here degPy is 2
+	} else if (degPx == 0) {
+	    if (Px.getCoefficientsArray()[0] == 0.0) {
+		// integrate |Py|
+		Polynomial integral = Py.integral();
+		switch (Py.getDegree()) {
+		case 0:
+		    return Math.abs(integral.valueAt(u)
+				    - integral.valueAt(0.0));
+		case 1:
+		    marray = Py.getCoefficientsArray();
+		    double r = -marray[0] / marray[1];
+		    if (r > 0.0 && r < u) {
+			double val = integral.valueAt(r);
+			return Math.abs(val)
+			    + Math.abs(integral.valueAt(u) - val);
+		    } else {
+			return Math.abs(integral.valueAt(u));
+		    }
+		case 2:
+		    marray = Py.getCoefficientsArray();
+		    double descr = marray[1]*marray[1] - 4*marray[0]*marray[2];
+		    if (descr <= 0.0) {
+			return Math.abs(integral.valueAt(u)
+					- integral.valueAt(0.0));
+		    }
+		    double rdescr = Math.sqrt(descr);
+		    double r1 = (-marray[1] - rdescr)/(2*marray[2]);
+		    double r2 = (-marray[1] + rdescr)/(2*marray[2]);
+		    if (r2 < r1) {
+			double tmp = r1;
+			r1 = r2;
+			r2 = tmp;
+		    }
+		    if (r2 < 0.0 || r1 == r2) {
+			return Math.abs(integral.valueAt(u)
+					- integral.valueAt(0.0));
+		    } else if (r1 > 0.0 && r1 < u) {
+			double integral1 = integral.valueAt(r1);
+			double sum = Math.abs(integral1);
+			if (r2 < u) {
+			    double integral2 = integral.valueAt(r2);
+			    sum += Math.abs(integral2 - integral1);
+			    sum += Math.abs(integral.valueAt(u) - integral2);
+			} else {
+			    sum += Math.abs(integral.valueAt(u) - integral1);
+			}
+			return sum;
+		    } else if (r2 > 0.0 && r2 < u) {
+			double integral1 = integral.valueAt(r2);
+			double sum = Math.abs(integral.valueAt(r2));
+			sum += Math.abs(integral.valueAt(u) - integral1);
+			return sum;
+		    } else {
+			return Math.abs(integral.valueAt(u)
+					- integral.valueAt(0.0));
+		    }
+		}
+	    } else {
+		// no root case: Px^2 is a constant > 0 so
+		// Px^2 + Py^2 is always positive
+		Px.multiplyBy(Px);
+		Py.multiplyBy(Py);
+		Px.incrBy(Py);
+		// cases2[1] = true;
+		switch (Px.getDegree()) {
+		case 0:
+		    double factor = Math.sqrt(Px.getCoefficientsArray()[0]);
+		    return factor*u;
+		case 2:
+		    double[] array = Px.getCoefficientsArray();
+		    return Polynomials
+			    .integrateRootP2(u, array[0], array[1], array[2])
+			    - Polynomials
+			    .integrateRootP2(0, array[0], array[1], array[2]);
+		case 4:
+		    return Polynomials.integrateRootP4(Px, 0.0, u);
+		}
+	    }
+	}
+	// At this point, degPy == 2 as the other values of degPy were already
+	// handled. In addition degPx is at least 1.
+	double[] arrayX = Px.getCoefficientsArray();
+	double[] arrayY = Py.getCoefficientsArray();
+	double scaleX = arrayX[degPx];
+	double scaleY = arrayY[degPy];
+	Px.multiplyBy(1.0/scaleX);
+	Py.multiplyBy(1.0/scaleY);
+
+
+	// in case of roundoff errors
+	arrayX[degPx] = 1.0;
+	arrayY[degPy] = 1.0;
+	double c = arrayX[0];
+	double b = arrayX[1];
+	double b2 = b*b;
+	double c4 = 4*c;
+	double descrX = b2 - c4;
+	if (Math.abs(descrX)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrX = 0;
+	}
+	c = arrayY[0];
+	b = arrayY[1];
+	b2 = b*b;
+	c4 = 4*c;
+	double descrY = b2 - c4;
+	if (Math.abs(descrY)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrY = 0;
+	}
+
+	int nx = (degPx == 1)? 1: ((descrX >=  0)? 2: 0);
+	int ny = (descrY >= 0)? 2: 0;
+	double[] rootsX = (nx == 2)? new double[2]:
+	    (nx == 1)? new double[1]: null;
+	double[] rootsY = (ny == 2)? new double[2]: null;
+	if (nx == 1) {
+	    rootsX[0] = -arrayX[0];
+	} else if (nx == 2) {
+	    double rdescrX = Math.sqrt(descrX);
+	    rootsX[0] = (-arrayX[1] - rdescrX)/2.0;
+	    rootsX[1] = (-arrayX[1] + rdescrX)/2.0;
+	}
+	if (ny == 2) {
+	    double rdescrY = Math.sqrt(descrY);
+	    rootsY[0] = (-arrayY[1] - rdescrY)/2.0;
+	    rootsY[1] = (-arrayY[1] + rdescrY)/2.0;
+	}
+	/*
+	for (int i = 0; i < rootsX.length; i++) {
+	    System.out.format("rootsX[%d] = %s\n", i, rootsX[i]);
+	}
+	for (int i = 0; i < rootsY.length; i++) {
+	    System.out.format("rootsy[%d] = %s\n", i, rootsY[i]);
+	}
+	*/
+	if (nx == 1 && ny == 2) {
+	    boolean test1 = Math.abs(rootsX[0] - rootsY[0]) < 1.e-12;
+	    boolean test2 = Math.abs(rootsX[0] - rootsY[1]) < 1.e-12;
+	    if (!test1 && ! test2) {
+		// no common roots
+		Px.multiplyBy(scaleX);
+		Px.multiplyBy(Px);
+		Py.multiplyBy(scaleY);
+		Py.multiplyBy(Py);
+		Px.incrBy(Py);
+		return Polynomials.integrateRootP4(Px, 0.0, u);
+	    }
+	    Polynomial p = new Polynomial(1.0);
+	    boolean useX0 = false;
+	    boolean useY0 = false;
+	    boolean useY1 = false;
+	    if (test1) {
+		p.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+		useX0 = true; useY0 = true;
+	    }
+	    if (test2 && !useX0) {
+		p.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+		useX0 = true; useY1 = true;
+	    }
+	    Polynomial rpx = new Polynomial(1.0);
+	    Polynomial rpy = new Polynomial(1.0);
+	    if (!useX0) {
+		rpx.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+	    }
+	    if (!useY0) {
+		rpy.multiplyBy(new Polynomial(-rootsY[0], 1.0));
+	    }
+	    if (!useY1) {
+		rpy.multiplyBy(new Polynomial(-rootsY[1], 1.0));
+	    }
+	    rpx.multiplyBy(scaleX);
+	    rpx.multiplyBy(rpx);
+	    rpy.multiplyBy(scaleY);
+	    rpy.multiplyBy(rpy);
+	    rpx.incrBy(rpy);
+	    // cases2[2] = true;
+	    // return integrateProotQ(u, p, rpx);
+	    return Polynomials.integrateAbsPRootQ(u, p, rpx);
+
+	} else if (nx == 2 && ny == 2) {
+	    boolean test1 = Math.abs(rootsX[0] - rootsY[0]) < 1.e-12;
+	    boolean test2 = Math.abs(rootsX[0] - rootsY[1]) < 1.e-12;
+	    boolean test3 = Math.abs(rootsX[1] - rootsY[0]) < 1.e-12;
+	    boolean test4 = Math.abs(rootsX[1] - rootsY[1]) < 1.e-12;
+	    Polynomial p = new Polynomial(1.0);
+	    boolean useX0 = false;
+	    boolean useX1 = false;
+	    boolean useY0 = false;
+	    boolean useY1 = false;
+	    if (test1) {
+		p.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+		useX0 = true; useY0 = true;
+	    }
+	    if (test2 && !useX0) {
+		p.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+		useX0 = true; useY1 = true;
+	    }
+	    if (test3 && !useX1 && !useY0) {
+		p.multiplyBy(new Polynomial(-rootsX[1], 1.0));
+		useX1 = true; useY0 = true;
+	    }
+	    if (test4 && !useX1 && !useY1) {
+		p.multiplyBy(new Polynomial(-rootsX[1], 1.0));
+		useX1 = true; useY1 = true;
+	    }
+	    Polynomial rpx = new Polynomial(1.0);
+	    Polynomial rpy= new Polynomial(1.0);
+	    if (!useX0) {
+		rpx.multiplyBy(new Polynomial(-rootsX[0], 1.0));
+	    }
+	    if (!useX1) {
+		rpx.multiplyBy(new Polynomial(-rootsX[1], 1.0));
+	    }
+	    if (!useY0) {
+		rpy.multiplyBy(new Polynomial(-rootsY[0], 1.0));
+	    }
+	    if (!useY1) {
+		rpy.multiplyBy(new Polynomial(-rootsY[1], 1.0));
+	    }
+	    int n = p.getDegree();
+	    if (n == 0) {
+		// no common roots.
+		Px.multiplyBy(scaleX);
+		Px.multiplyBy(Px);
+		Py.multiplyBy(scaleY);
+		Py.multiplyBy(Py);
+		Px.incrBy(Py);
+		// printArray("rootsX", rootsX);
+		// printArray("rootsY", rootsY);
+		// cases2[3] = true;
+		return Polynomials.integrateRootP4(Px, 0.0, u);
+	    } else if (n == 1) {
+		// cases2[4] = true;
+		rpx.multiplyBy(scaleX);
+		rpx.multiplyBy(rpx);
+		rpy.multiplyBy(scaleY);
+		rpy.multiplyBy(rpy);
+		rpx.incrBy(rpy);
+		// return  integrateProotQ(u, p, rpx);
+		return Polynomials.integrateAbsPRootQ(u, p, rpx);
+	    } else if (n == 2) {
+		// rp must have a degree of 0, with its only coefficient
+		// having a value of 1.
+		double[] array = p.getCoefficientsArray();
+		c = array[0];
+		b = array[1];
+		double descr = b*b - 4*c;
+		if (Math.abs(descr) < 1.e-12) descr = 0;
+		Polynomial integral = p.integral();
+		if (descr <= 0) {
+		    // all values of p have the same sign with one
+		    // zero (when descr == 0)
+		    // cases2[5] = true;
+		    return Math.sqrt(scaleX*scaleX + scaleY*scaleY)
+			* Math.abs(integral.valueAt(u));
+		} else {
+		    double rdescr = Math.sqrt(descr);
+		    double r1 = (-b - rdescr)/2;
+		    double r2 = (-b + rdescr)/2;
+		    double scale = Math.sqrt(scaleX*scaleX + scaleY*scaleY);
+		    if (r1 > 0.0 && u <= r1) {
+			// cases2[6] = true;
+			/*
+			System.out.println("scaleX = " + scaleX);
+			System.out.println("scaleY = " + scaleY);
+			System.out.println("scale = " + scale);
+			System.out.println("r1 = " + r1);
+			System.out.println("r2 = " + r2);
+			printArray("p", p);
+			printArray("integral", integral);
+			*/
+			return scale * Math.abs(integral.valueAt(u));
+		    } else if (r1 > 0.0 && u <= r2) {
+			double sum = Math.abs(integral.valueAt(r1));
+			sum += Math.abs(integral.valueAt(u)
+					- integral.valueAt(r1));
+			// cases2[7] = true;
+			return scale * sum;
+		    } else if (r1 > 0.0 && u > r2) {
+			double sum = Math.abs(integral.valueAt(r1));
+			sum += Math.abs (integral.valueAt(r2)
+					 - integral.valueAt(r1));
+			sum += Math.abs(integral.valueAt(u)
+					- integral.valueAt(r2));
+			// cases2[8] = true;
+			return scale * sum;
+		    } else if (r1 <= 0.0 && r2 > 0 && u > r2) {
+			double sum = Math.abs(integral.valueAt(r2));
+			sum += Math.abs(integral.valueAt(u)
+					- integral.valueAt(r2));
+			// cases2[9] = true;
+			return scale * sum;
+		    } else {
+			/*
+			System.out.println("scaleX = " + scaleX);
+			System.out.println("scaleY = " + scaleY);
+			System.out.println("scale = " + scale);
+			System.out.println("r1 = " + r1);
+			System.out.println("r2 = " + r2);
+			printArray("p", p);
+			printArray("integral", integral);
+			System.out.println("u = " + u);
+			System.out.println("integral(u) = "
+					   + integral.valueAt(u));
+			*/
+			// cases2[10] = true;
+			return scale * Math.abs(integral.valueAt(u));
+		    }
+		}
+	    }
+	    throw new UnexpectedExceptionError();
+	} else {
+	    // both do not have real roots or matching roots
+	    Px.multiplyBy(scaleX);
+	    Px.multiplyBy(Px);
+	    Py.multiplyBy(scaleY);
+	    Py.multiplyBy(Py);
+	    Px.incrBy(Py);
+	    return Polynomials.integrateRootP4(Px, 0.0, u);
+	}
+    }
+
+    /*
+    static double cubicLength(double u, double x0, double y0, double[] coords)
+	throws Exception
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[2],
+						   coords[4]);
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[3],
+						   coords[5]);
+
+	px = px.deriv();
+	py = py.deriv();
+
+	Polynomial Px = new
+	    Polynomial(Polynomials.fromBezier(null,
+					      px.getCoefficientsArray(),
+					      0, 2));
+	Polynomial Py = new
+	    Polynomial(Polynomials.fromBezier(null,
+					      py.getCoefficientsArray(),
+					      0, 2));
+
+	double[] arrayX = Px.getCoefficientsArray();
+	double[] arrayY = Py.getCoefficientsArray();
+	double scaleX = arrayX[2];
+	double scaleY = arrayY[2];
+	Px.multiplyBy(1.0/scaleX);
+	Py.multiplyBy(1.0/scaleY);
+	// in case of roundoff errors
+	arrayX[2] = 1.0;
+	arrayY[2] = 1.0;
+	double c = arrayX[0];
+	double b = arrayX[1];
+	double b2 = b*b;
+	double c4 = 4*c;
+	double descrX = b2 - c4;
+	if (Math.abs(descrX)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrX = 0;
+	}
+	c = arrayY[0];
+	b = arrayY[1];
+	b2 = b*b;
+	c4 = 4*c;
+	double descrY = b2 - c4;
+	if (Math.abs(descrY)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrY = 0;
+	}
+
+	int nx = (descrX >=  0)? 2: 0;
+	int ny = (descrY >= 0)? 2: 0;
+	double[] rootsX = (nx == 2)? new double[2]: null;
+	double[] rootsY = (ny == 2)? new double[2]: null;
+	if (nx == 2) {
+	    double rdescrX = Math.sqrt(descrX);
+	    rootsX[0] = (-arrayX[1] - rdescrX)/2.0;
+	    rootsX[1] = (-arrayX[1] + rdescrX)/2.0;
+	}
+	if (ny == 2) {
+	    double rdescrY = Math.sqrt(descrY);
+	    rootsY[0] = (-arrayY[1] - rdescrY)/2.0;
+	    rootsY[1] = (-arrayY[1] + rdescrY)/2.0;
+	}
+	int n = 0;
+	if (nx == 2 && ny == 2) {
+	    boolean test1 = Math.abs(rootsX[0] - rootsY[0]) < 1.e-12;
+	    boolean test2 = Math.abs(rootsX[0] - rootsY[1]) < 1.e-12;
+	    boolean test3 = Math.abs(rootsX[1] - rootsY[0]) < 1.e-12;
+	    boolean test4 = Math.abs(rootsX[1] - rootsY[1]) < 1.e-12;
+	    Polynomial p = new Polynomial(1.0);
+	    boolean useX0 = false;
+	    boolean useX1 = false;
+	    boolean useY0 = false;
+	    boolean useY1 = false;
+	    if (test1) {
+		p.multiplyBy(new Polynomial(rootsX[0], 1.0));
+		useX0 = true; useY0 = true;
+	    }
+	    if (test2 && !useX0) {
+		p.multiplyBy(new Polynomial(rootsX[0], 1.0));
+		useX0 = true; useY1 = true;
+
+	    }
+	    if (test3 && !useX1 && !useY0) {
+		p.multiplyBy(new Polynomial(rootsX[1], 1.0));
+		useX1 = true; useY0 = true;
+	    }
+	    if (test4 && !useX1 && !useY1) {
+		p.multiplyBy(new Polynomial(rootsX[1], 1.0));
+	    }
+	    Polynomial rp = new Polynomial(1.0);
+	    if (!useX0) {
+		rp.multiplyBy(new Polynomial(rootsX[0], 1.0));
+	    }
+	    if (!useX1) {
+		rp.multiplyBy(new Polynomial(rootsX[1], 1.0));
+	    }
+	    if (!useY0) {
+		rp.multiplyBy(new Polynomial(rootsY[0], 1.0));
+	    }
+	    if (!useY1) {
+		rp.multiplyBy(new Polynomial(rootsY[1], 1.0));
+	    }
+	    return Math.sqrt(Math.abs(scaleX*scaleY))
+		* integrateProotQ(u, p, rp);
+	} else {
+	    // both do not have real roots.
+	    Px.multiplyBy(Px);
+	    Py.multiplyBy(Py);
+	    Px.incrBy(Py);
+	    return Polynomials.integrateRootP4(Px, 0.0, u);
+	}
+    }
+    */
     // just static
     private Path2DInfo() {}
 

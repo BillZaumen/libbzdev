@@ -7,6 +7,33 @@ public class GLQuadratureTest {
 
     // test function
     public static void main(String argv[]) throws Exception {
+
+
+	Polynomial p6 = new Polynomial(4.0, 6.0, 2.0);
+	Polynomial rp6 = new Polynomial(6.0, 9.0, 3.0);
+
+	GLQuadrature glq1 = GLQuadrature.newInstance((t) -> {
+		double xv = p6.valueAt(t);
+		double yv = rp6.valueAt(t);
+		return Math.sqrt(xv*xv + yv*yv);
+	    }, 8);
+
+	GLQuadrature glq2 = new GLQuadrature(8) {
+		protected double function (double t) {
+		    double xv = p6.valueAt(t);
+		    double yv = rp6.valueAt(t);
+		    return Math.sqrt(xv*xv + yv*yv);
+		}
+	    };
+	double value1 = glq1.integrate(0.0, 0.8);
+	double value2 = glq2.integrate(0.0, 0.8);
+	System.out.println("value1 = " + value1);
+	System.out.println("value2 = " + value2);
+
+	if (Math.abs(value1 - value2) > 1.e-10) throw new Exception();
+
+
+
 	int max = 16;
 	int lower = 2;
 	if (argv.length == 1) {

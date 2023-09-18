@@ -119,6 +119,13 @@ root:
 	@echo -------- RootFinderTest ------------
 	$(JAVA) RootFinderTest
 
+rootc:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	@echo -------- RootFinderTest - Cubic------------
+	$(JAVA) RootFinderCubic
+
 fft:
 	(cd ../.. ; make jars)
 	mkdir -p classes

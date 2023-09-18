@@ -5108,6 +5108,8 @@ public class Functions {
     // https://en.wikipedia.org/wiki/Carlson_symmetric_form#Incomplete_elliptic_integrals
     // (which has the correct equations).
 
+    private static double CARLSON_LIMIT = 1.e-4;
+
     /**
      * Carlson symmetric form R<sub>F</sub> for elliptic integrals.
      * R<sub>F</sub>(x,y,z) is defined as
@@ -5174,7 +5176,7 @@ public class Functions {
 	    dy = 1 - y/A;
 	    dz = 1 - z/A;
 	} while (Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
-			  Math.abs(dz)) > 1.e-7);
+			  Math.abs(dz)) > CARLSON_LIMIT);
 	double e2 = dx*dy + dy*dz + dz*dx;
 	double e22 = e2*e2;
 	double e3 = dx*dy*dz;
@@ -5205,7 +5207,33 @@ public class Functions {
 	    String msg = errorMsg("secondArgPos", y);
 	    throw new IllegalArgumentException(msg);
 	}
-	return RF(x, y, y);
+	// return RF(x, y, y);
+
+	// Based on Billie Carlson and Elaine Notis,
+	// Algorithm 577, ACM Transactions on Mathematical Software
+	// Volume 7, Number 3, pages 398--403, September 1981.
+	// https://people.math.sc.edu/Burkardt/f77_src/toms577/toms577.f
+	// for an on-line copy.
+
+	double result, A, lambda, dx, dy, dz;
+	do {
+	    lambda = 2*Math.sqrt(x*y) + y;
+	    x += lambda;
+	    y += lambda;
+	    x /= 4.0;
+	    y /= 4.0;
+	    A = (x + y + y)/ 3.0;
+	    dx = 1 - x/A;
+	    dy = 1 - y/A;
+	} while (Math.max(Math.abs(dx), Math.abs(dy)) > CARLSON_LIMIT);
+	double e2 = 2*dx*dy + dy*dy ;
+	double e22 = e2*e2;
+	double e3 = dx*dy*dy;
+	return (1.0 - e2/10 + e3/14 + e22/24 - 3.0*e2*e3/44
+		/*- 5*e22*e2/208 + 3*e3*e3/104 + e22*e3/16*/)
+	    / Math.sqrt(A);
+
+
     }
 
 
@@ -5258,7 +5286,7 @@ public class Functions {
 	    dy = 1 - y/A;
 	    dz = 1 - z/A;
 	} while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
-			 Math.abs(dz)) > 1.e-7);
+			 Math.abs(dz)) > CARLSON_LIMIT);
 	double dz2 = dz*dz;
 	double dz3 = dz2*dz;
 	double e2 = dx*dy + dy*dz + 3*dz*dz + 3*dz*dx + 2*dy*dz;
@@ -5355,7 +5383,7 @@ public class Functions {
 	    dz = 1 - z/A;
 	    dp = 1 - p/A;
 	} while(Math.max(Math.max(Math.abs(dx), Math.abs(dy)),
-			 Math.max(Math.abs(dz), Math.abs(dp))) > 1.e-7);
+			 Math.max(Math.abs(dz), Math.abs(dp))) > CARLSON_LIMIT);
 	double dz2 = dz*dz;
 	double dz3 = dz2*dz;
 	double dp2 = dp*dp;

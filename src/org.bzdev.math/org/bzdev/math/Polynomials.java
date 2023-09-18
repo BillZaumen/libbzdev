@@ -1,6 +1,7 @@
 package org.bzdev.math;
 import java.util.Arrays;
 import org.bzdev.lang.MathOps;
+import org.bzdev.lang.UnexpectedExceptionError;
 
 //@exbundle org.bzdev.math.lpack.Math
 
@@ -459,9 +460,10 @@ public class Polynomials {
     {
 	if (s == 0.0) {
 	    if (result == null) {
-		result = new Polynomial();
+		result = new Polynomial(0.0);
 	    } else {
-		result.softReset(-1);
+		result.softReset(0);
+		result.degree = 0;
 	    }
 	    return result;
 	}
@@ -1296,6 +1298,222 @@ public class Polynomials {
     }
 
     /**
+     * Compute the integral of |p(x)|sqrt(rp(x)) where p and rp are
+     * polynomials with degrees 0, 1, or 2, and 0 or 2 respectively.
+     * If p has a degree of 2, rp must have a degree of 0.
+     * @param u the upper limit of integration
+     * @param p A 0, 1st, or 2nd degree polynomial
+     * @param rp A 0 or 2nd degree polynomial
+     */
+    public static double integrateAbsPRootQ(double u,
+					    Polynomial p,
+					    Polynomial rp)
+	throws IllegalArgumentException, ArithmeticException
+    {
+	// p should really be sqrt(p^2), so it may flip signs when x
+	// is a root of p as the square root is always non-negative.
+
+	int pdeg = p.getDegree();
+	int rpdeg = rp.getDegree();
+	if (pdeg != 0 && pdeg != 1 && pdeg != 2) {
+	    String msg = errorMsg("degreeError1", pdeg);
+	    throw new IllegalArgumentException(msg);
+	}
+	if (rpdeg != 0 && rpdeg != 2) {
+	    String msg = errorMsg("degreeError3", rpdeg);
+	    throw new IllegalArgumentException(msg);
+	}
+
+	if (pdeg == 0 && rpdeg == 0) {
+	    // corner case - both are 0 degree polynomials
+	    return Math.abs(p.getCoefficientsArray()[0])
+		* Math.sqrt(rp.getCoefficientsArray()[0])
+		* u;
+	} else if (pdeg == 1) {
+	    if (rpdeg == 0) {
+		double[] pa = p.getCoefficientsArray();
+		if (pa[1] < 0.0) {
+		    p.multiplyBy(-1.0);
+		}
+		double r = -pa[0]/pa[1];
+		double factor = Math.sqrt(rp.getCoefficientsArray()[0]);
+		// double[] tmp = p.getCoefficientsArray();
+		Polynomial integral = p.integral();
+		if (r > 0.0 && r < u) {
+		    double rval = integral.valueAt(r);
+		    return factor * (Math.abs(rval)
+				     + Math.abs(integral.valueAt(u) - rval));
+		}
+		return factor * Math.abs(integral.valueAt(u));
+	    } else if (rpdeg == 2) {
+		double[] array0 = rp.getCoefficientsArray();
+		double a = array0[0];
+		double b = array0[1];
+		double c = array0[2];
+		double[] array = p.getCoefficientsArray();
+		if (array[1] < 0.0) {
+		    p.multiplyBy(-1.0);
+		}
+		double r = -array[0]/array[1];
+		RealValuedFunctOps integral = (t) -> {
+		    try {
+			return array[0] * integrateRootP2(t, a, b, c)
+			+ array[1] * integrateXRootP2(t, a, b, c);
+		    } catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		    }
+		};
+		try {
+		    if (r > 0.0 && r < u) {
+			/*
+			  double ival = integrateRootP2signed(u, a, b, c);
+			  double X = rp.valueAt(u);
+			  double val3 = array[1]*X*Math.sqrt(X)/(3*c)
+			  + (array[0] - array[1]*b/(2*c))*ival ;
+			  ival = integrateRootP2signed(r, a, b, c);
+			  X = rp.valueAt(r);
+			  double val2 = array[1]*X*Math.sqrt(X)/(3*c)
+			  + (array[0] - array[1]*b/(2*c))*ival ;
+			  X = rp.valueAt(0.0);
+			  double val1 = array[1]*X*Math.sqrt(X)/(3*c);
+			*/
+			double val1 = integral.valueAt(0.0);
+			double val2 = integral.valueAt(r);
+			double val3 = integral.valueAt(u);
+			return Math.abs(val2 - val1) + Math.abs(val3 - val2);
+		    } else {
+			/*
+			  double ival = integrateRootP2signed(u, a, b, c);
+			  double X = rp.valueAt(u);
+			  double val2 = array[1]*X*Math.sqrt(X)/(3*c)
+			  + (array[0] - array[1]*b/(2*c))  *ival ;
+			  X = rp.valueAt(0.0);
+			  double val1 = array[1]*X*Math.sqrt(X)/(3*c);
+			  return Math.abs(val2 - val1);
+			*/
+			double val = integral.valueAt(u) - integral.valueAt(0.0);
+			return Math.abs(val);
+		    }
+		} catch(RuntimeException er) {
+		    Throwable throwable = er.getCause();
+		    if (throwable instanceof ArithmeticException) {
+			throw (ArithmeticException) throwable;
+		    } else {
+			throw new ArithmeticException(er.getMessage());
+		    }
+		}
+	    } else {
+		throw new UnexpectedExceptionError();
+	    }
+	} else if (pdeg == 2) {
+	    // rpdeg must be 0.
+	    if (rpdeg != 0) {
+		String msg = errorMsg("degreeError", pdeg, rpdeg);
+		throw new ArithmeticException(msg);
+	    }
+	    double[] pa = p.getCoefficientsArray();
+	    if (pa[2] < 0) {
+		p.multiplyBy(-1.0);
+	    }
+	    double descr = pa[1]*pa[1] - 4 * pa[0]*pa[2];
+	    double max = Math.max(Math.abs(pa[0]), Math.abs(pa[1]));
+	    max = Math.max(max, Math.abs(pa[2]));
+	    if (Math.abs(descr)/max < 1.e-12) descr = 0.0;
+	    if (descr <= 0.0) {
+		Polynomial integral = p.integral();
+		return Math.sqrt(rp.valueAt(0))*Math.abs(integral.valueAt(u));
+	    } else {
+		double rdescr = Math.sqrt(descr);
+		double a2 = 2*pa[2];
+		double r1 = (-pa[1] - rdescr)/a2;
+		double r2 = (-pa[1] + rdescr)/a2;
+		if (r2 < r1) {
+		    double tmp = 41;
+		    r1 = r2;
+		    r2 = tmp;
+		}
+		Polynomial integral = p.integral();
+		// NOTE: integral.valueAt(0.0) = 0 for polynomials.
+		if (r1 > 0 && r1 < u) {
+		    double val1 = integral.valueAt(r1);
+		    double sum = Math.abs(val1);
+		    if (u <= r2) {
+			sum += Math.abs(integral.valueAt(u) - val1);
+			return Math.sqrt(rp.valueAt(0))*sum;
+		    } else {
+			double val2 = integral.valueAt(r2);
+			sum += Math.abs(val2 - val1);
+			sum += Math.abs(integral.valueAt(u) - val2);
+			return Math.sqrt(rp.valueAt(0))*sum;
+		    }
+		} else {
+		    return Math.sqrt(rp.valueAt(0))
+			* Math.abs(integral.valueAt(u));
+		}
+	    }
+	} else {
+	    throw new UnexpectedExceptionError();
+	}
+    }
+
+    /**
+     * Exception to indicate that the polynomial passed to
+     * {@link Polynomials#integrateRootP4(Polynomial,double,double)}
+     * has a factor with whose minimum value is close to zero.
+     * When this condition occurs, floating point errors may make the
+     * computed value questionable.
+     */
+    public static class RootP4Exception extends ArithmeticException {
+	RootP4Exception(String msg) {
+	    super(msg);
+	}
+    }
+
+    private static double rootP4Limit = /*1.e-6*/ 1.e-4;
+
+    /**
+     * Set the limit for the minimum value for a factor of
+     * the polynomiial passed to
+     * {@link Polynomials#integrateRootP4(Polynomial,double,double)}.
+     * The polynomial, if factoring is successful, will have three
+     * values: a 0 degree polynomial (a scalar), and two second-degree
+     * polynomals whose x<sup>2</sup> term is 1.0.  Both factors must
+     * be polynomials with positive values for all values of their
+     * arguments. When the minimum is too close to zero compared to
+     * the maximum of the absolute value of the polynomial's coefficients,
+     * an exeception will be thrown as an indication that the results
+     * are not reliable.
+     * <P>
+     * To turn off this test, set the limit to 0.0.  The default value
+     * is 1.e-4.
+     * @param value the value for the limit
+     */
+    public static void setRootP4Limit(double value) {
+	rootP4Limit = value;
+    }
+
+    /**
+     * Get the value set by {@link #setRootP4Limit(double)} or its
+     * default value if {@link #setRootP4Limit(double)} has not been
+     * called.
+     * @return the value
+     * @see #setRootP4Limit(double)
+     */
+    public static double getRootP4Limit() {
+	return rootP4Limit;
+    }
+
+    private static boolean testRootP4 = false;
+
+    /**
+     * Test that factoring is accurate when integrateRootP4 is called.
+     * @param value true if factoring should be tested; false otherwise.
+     */
+    public static void testRootP4(boolean value) {
+	testRootP4 = value;
+    }
+
+    /**
      * Integrate the square root of a quartic polynomial that has no
      * real roots.
      * The value of the polynomial must be positive for all values of
@@ -1316,37 +1534,76 @@ public class Polynomials {
     public static double integrateRootP4(Polynomial p, double y, double x)
 	throws IllegalArgumentException, ArithmeticException
     {
-	if (p == null || p.getDegree() != 4) {
+	if (p == null) {
 	    throw new IllegalArgumentException(errorMsg("nullArg"));
+	}
+	if (p.getDegree() != 4) {
+	    throw new IllegalArgumentException(errorMsg("wrongDegree4"));
 	}
 	Polynomial[] factors = factorQuarticToQuadratics(p);
 	double scale = (factors[0].getCoefficientsArray()[0]);
 
-	Polynomial testp = new Polynomial(scale);
-	testp.multiplyBy(factors[1]);
-	testp.multiplyBy(factors[2]);
-	double[] ar1 = p.getCoefficientsArray();
-	double[] ar2 = testp.getCoefficientsArray();
-	double max = 1.0;
-	for (int i = 0; i < 5; i++) {
-	    max = Math.max(max, Math.abs(ar1[i]));
-	}
-	for (int i = 0; i < 5; i++) {
-	    if (Math.abs(ar1[i] - ar2[i]) / max > 1.e-8) {
-		throw new ArithmeticException("factoring not accurate: "
-					      + ar1[i] + " != "
-					      + ar2[i]);
+	if (testRootP4) {
+	    Polynomial testp = new Polynomial(scale);
+	    testp.multiplyBy(factors[1]);
+	    testp.multiplyBy(factors[2]);
+	    double[] ar1 = p.getCoefficientsArray();
+	    double[] ar2 = testp.getCoefficientsArray();
+	    double max = 1.0;
+	    for (int i = 0; i < 5; i++) {
+		max = Math.max(max, Math.abs(ar1[i]));
+	    }
+	    for (int i = 0; i < 5; i++) {
+		if (Math.abs(ar1[i] - ar2[i]) / max > 1.e-8) {
+		    double v1 = ar1[i];
+		    double v2 = ar2[i];
+		    String msg = errorMsg("badFactoring", v1, v2);
+		    throw new ArithmeticException(msg);
+		}
 	    }
 	}
+	double mindescr = Double.POSITIVE_INFINITY;
 	for (int i = 1; i < 3; i++) {
 	    double[] farray = factors[i].getCoefficientsArray();
-	    if (4*farray[0] <= farray[1]*farray[1]) {
-		throw new ArithmeticException("cannot integrate");
+	    double val1 = 4*farray[0];
+	    double val2 = farray[1]*farray[1];
+	    if ( val1 <= val2 ) {
+		String msg = errorMsg("badDescr", (val2 - val1));
+		throw new ArithmeticException(msg);
+	    } else {
+		double minx = -farray[1]/2;
+		double minValue = Math.abs(factors[i].valueAt(minx));
+		double maxc = Math.max(1.0, Math.abs(farray[0]));
+		maxc = Math.max (maxc, Math.abs(farray[1]));
+		if (minValue/maxc < rootP4Limit) {
+		    /*
+		    double rdescr = Math.sqrt(val2 - val1);
+		    double diff = Math.max((x - y)*10);1.e-
+		    int iscale;
+		    if (diff < 1.0 || diff < (double)Integer.MAX_VALUE) {
+			iscale 10 + (int) Math.ceil(Math.log(diff/10));
+		    } else {
+			iscale = 10;
+		    }
+		    int delta = 10 * iscale;
+		    if ((y < x && minx > y-rdescr && minx < x+rdescr)
+			|| (y > x && minx > x-rdescr && minx < y + rdescr)) {
+			System.out.println("rdescr = " + rdescr);
+			delta = 50 * iscale;
+		    }
+		    GLQuadrature glq = new GLQuadrature(8) {
+			    protected double function(double t) {
+				return Math.sqrt(p.valueAt(t));
+			    }
+			};
+		    return glq.integrate(y, x, delta);
+		    */
+		    throw new RootP4Exception(errorMsg("badMinValue"));
+		}
 	    }
 	}
-	return Math.sqrt(scale)*
-	    integrateRoot2Q(1, 1, 0, factors[1], factors[2], null,
-			    y, x);
+	return Math.sqrt(scale) *
+		integrateRoot2Q(1, 1, 0, factors[1], factors[2], null, y, x);
     }
 
     /**
@@ -1631,6 +1888,457 @@ public class Polynomials {
 	}
 	String msg = errorMsg("illegalCarlsonParms", p1, p2, p5);
 	throw new IllegalArgumentException(msg);
+    }
+
+    private static Polynomial root1pzm1 = new
+	Polynomial (0.0, 0.5, -1.0/8.0, 1/16.0, -5/128.0);
+
+    /**
+     * Compute an indefinite integral of the square root of the
+     * polynomial a + bx + cx<sup>2</sup>.
+     * The polynomial must have a non-negative value at x=0 and at the
+     * upper limit of integration.
+     * @param x the upper limit of integration
+     * @param a the zeroth order coefficient of a polynomial
+     * @param b the first order coefficient of a polynomial
+     * @param c the second order coefficient of a polynomial
+     * @return the value of the integral
+     * @throws ArithmeticException if the integral cannot be computed
+     */
+    public static double integrateRootP2(double x, double a, double b, double c)
+	throws ArithmeticException
+    {
+	// a + bx +cx^2 to fit CRC handbook integral tables
+
+	if (x == 0.0) return 0.0;
+	double cxsq = c*x*x;
+	double bx = b*x;
+
+	double tv1 = Math.min(Math.abs(a), Math.abs(a+bx));
+
+	if (a > 0.0 && c != 0.0 &&  Math.abs(cxsq)/tv1 < 0.001) {
+	    // We can approximate sqrt(a + bx + cx^2) by
+	    // sqrt(a+bx)sqrt(1 - cx^2/(a+bx)) which is approximately
+	    // sqrt(a+bx) -(1/2)cx^2/sqrt(a+bx) and integrate that.
+	    double z = b*x/a;
+	    double abx = 1 + z;
+	    double a32 = MathOps.pow(a,3,2);
+	    double a52 = a*a32;
+	    double asq = a*a;
+	    double bsq = b*b;
+	    double bcubed = bsq*b;
+	    double roota = Math.sqrt(a);
+	    double rootabx = Math.sqrt(abx);
+	    boolean test = Math.abs(b*x/a) <= 0.001;
+	    double rootabxm1;
+	    if (test) {
+		// for small z, use a taylor series, keeping the first
+		// few terms.
+		rootabxm1 = root1pzm1.valueAt(z);
+	    } else {
+		rootabxm1 = rootabx - 1.0;
+	    }
+
+	    double term1 = (2*a32/(3*b) + 8*c*a52/(15*bcubed)) * rootabxm1;
+
+	    double term2 = ((2*roota/3 - 4*a32*c/(15*bsq)) * x
+			    + 3*c*x*x*roota/(15*b)) * rootabx;
+
+	    return term1 + term2;
+	}
+
+	if (c == 0.0) {
+	    // CRC Standard Math Tables, page 291
+	    if (a < 0.0) {
+		throw new ArithmeticException(errorMsg("notIntegrableAC", a));
+	    }
+	    if (b == 0.0) {
+		return Math.sqrt(a)*x;
+	    }
+	    if (a + b*x < 0.0) {
+		throw new
+		    ArithmeticException(errorMsg("notIntegrableABXC", a, b, x));
+	    }
+	    if (Math.abs(b*x/a) < .001) {
+		// use a Tayler series - the constant terms cancel.
+		double z = b*x/a;
+		double scale = 2*Math.sqrt(a)/(3*b);
+		Polynomial p = new Polynomial(a,a);
+		p.multiplyBy(new Polynomial(1, 0.5, -1/8.0,
+					    1/16.0, -5.0/128.0, 7.0/256.0));
+		p.getCoefficientsArray()[0] = 0.0;
+		return scale*p.valueAt(z);
+	    } else {
+		return (2.0/(3.0*b))
+		    * (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
+	    }
+	}
+	// CRC Standard Math Tables, page 297
+	double q = 4*a*c - b*b;
+	if (q == 0) {
+	    // reduces to a polynomial: integrate sqrt(c)(x-r) where
+	    // r = -b/2c.  The integral is sqrt(c)(x*x/2 - rx).
+	    // if (c < 0) throw new Exception("cannot integrate");
+	    double rc = Math.sqrt(c);
+	    double r =-b/(2*c);
+	    if (0 < r && r < x) {
+		// double term1 = (rc*r*r + r*b/rc)/2;
+		double term1 = -rc*r*r/2;
+		//double term2 = (rc*x*x + x*b/rc)/2 - term1;
+		double term2 = rc*(x*x/2 -r*x) - term1;
+		return Math.abs(term1) + Math.abs(term2);
+	    } else if (x < r && r < 0) {
+		// double term1 = (rc*r*r + r*b/rc)/2;
+		double term1 = -rc*r*r/2;
+		// double term2 = (rc*x*x + x*b/rc)/2 - term1;
+		double term2 = rc*(x*x/2 -r*x) - term1;
+		return -(Math.abs(term1) + Math.abs(term2));
+	    } else {
+		// return (rc*x*x + x*b/rc)/2;
+		double term = Math.abs(rc*(x*x/2 - r*x));
+		return (x >= 0)? term: -term;
+	    }
+	}
+	double expr = a + b*x + c*x*x;
+	if (expr < 0) {
+	    String msg = errorMsg("notIntegrableXNeg", x);
+	    throw new ArithmeticException(msg);
+	}
+	if (a < 0) {
+	    String msg = errorMsg("notIntegrableXZero");
+	    throw new ArithmeticException(msg);
+	}
+	double root = Math.sqrt(expr);
+	double term1 = ((2*c*x + b)*root - b*Math.sqrt(a))/(4*c);
+	double kinverse = q/(4*c);
+	double iexpr;
+	if (c > 0) {
+	    double rootc = Math.sqrt(c);
+	    // iexpr = Math.log(root + x*rootc+ b/(2*rootc)) / Math.sqrt(c);
+	    // Seethe CRC integral table (Integrals 181 & 182,
+	    // October 1963 printing)
+	    // Also see
+	    // https://www.math.stonybrook.edu/~bishop/classes/math126.F20/CRC_integrals.pdf
+	    if (q > 0) {
+		// no real roots.
+		iexpr = (Functions.asinh((2*c*x + b)/Math.sqrt(q))
+			 - Functions.asinh(b/Math.sqrt(q)))
+		    / Math.sqrt(c);
+	    } else {
+		double rnq = Math.sqrt(-q);
+		double c2  = c*2;
+		double r1 = (-b - rnq)/c2;
+		double r2 = (-b + rnq)/c2;
+		if (x > 0) {
+		    if (r1 > 0 && r1 < x) {
+			String msg = errorMsg("notIntegrableRoot",r1, x);
+			throw new ArithmeticException(msg);
+		    } else if (r2 > 0 && r2 < x) {
+			String msg = errorMsg("notIntegrableRoot", r2, x);
+			throw new ArithmeticException (msg);
+		    }
+		} else if (x < 0) {
+		    if (r2 < 0 && r2 > x) {
+			String msg = errorMsg("notIntegrableRoot", r2, x);
+			throw new ArithmeticException (msg);
+		    } else if (r1 < 0 && r1 > x) {
+			String msg = errorMsg("notIntegrableRoot",r1, x);
+			throw new ArithmeticException(msg);
+		    }
+		}
+		double bcval = b/(2*rootc);
+		double bcvalabs = Math.abs(bcval);
+		double logterm = root + x*rootc;
+		if ((Math.abs(a) + Math.abs(b) + Math.abs(c)) < bcvalabs) {
+		    iexpr = (Math.log1p(logterm/bcval)
+			     - Math.log1p(Math.sqrt(a)/bcval))
+			     / Math.sqrt(c);
+		} else {
+		    double logarg = logterm + bcval;
+		    if (logarg < 0.0) {
+			logarg = -logarg;
+		    }
+		    double logarg0 = Math.sqrt(a) + bcval;
+		    if (logarg0 < 0.0) logarg0 = -logarg0;
+		    iexpr = (Math.log(logarg) - Math.log(logarg0))
+			     / Math.sqrt(c);
+		}
+	    }
+	} else {
+	    // c < 0 so for large positive or negative x, the polynomial is
+	    // negative.  We can only integrate if x is between the
+	    // two roots, and it must have two roots.
+	    if (q > 0) {
+		// values all negative because c < 0, so square root
+		// is not real
+		String msg = errorMsg("notIntegrableNoRoots", c);
+		throw new ArithmeticException (msg);
+	    } else {
+		double rnq = Math.sqrt(-q);
+		double c2  = c*2;
+		double r1 = (-b - rnq)/c2;
+		double r2 = (-b + rnq)/c2;
+		if (x < r1 || x > r2) {
+		    String msg = errorMsg("notIntegrableRoots2", r1, r2, x);
+		    throw new ArithmeticException (msg);
+		}
+	    }
+	    iexpr = (Math.asin((-2*c*x - b)/Math.sqrt(-q))
+		     - Math.asin(-b/Math.sqrt(-q)))
+		/ Math.sqrt(-c);
+	}
+	double term2 = kinverse*iexpr/2;
+	return term1 + term2;
+    }
+
+    /**
+     * Compute an indefinite integral of x times the square root of the
+     * polynomial a + bx + cx<sup>2</sup>.
+     * The polynomial must have a non-negative value at x=0 and at the
+     * upper limit of integration.
+     * @param x the upper limit of integration
+     * @param a the zeroth order coefficient of a polynomial
+     * @param b the first order coefficient of a polynomial
+     * @param c the second order coefficient of a polynomial
+     * @return the value of the integral
+     * @throws ArithmeticException if the integral cannot be computed
+     */
+    public static double integrateXRootP2(double x,
+					  double a, double b, double c)
+	throws ArithmeticException
+    {
+	// a + bx +cx^2 to fit CRC handbook integral tables
+	if (x == 0.0) return 0.0;
+
+
+	/*
+	// NOT YET WORKING & not sure why, so comment out until
+	// the reason for the discrepancy is found. Oddly, similar
+	// code with the same a, b, c works for integrateRootP2.
+
+	double cxsq = c*x*x;
+	double bx = b*x;
+
+	double tv1 = Math.min(Math.abs(a), Math.abs(a+bx));
+	System.out.println("tv1 = " + tv1);
+	System.out.println("cxsq = " + cxsq);
+	if (a > 0.0 && c != 0.0 &&  Math.abs(cxsq)/tv1 < 0.001) {
+	    // We can approximate sqrt(a + bx + cx^2) by
+	    // sqrt(a+bx)sqrt(1 - cx^2/(a+bx)) which is approximately
+	    // sqrt(a+bx) -(1/2)cx^2/sqrt(a+bx) and integrate that.
+	    double z = b*x/a;
+	    double abx = 1 + z;
+	    double roota = Math.sqrt(a);
+	    double rootabx = Math.sqrt(abx);
+	    double asq = a*a;
+	    double bsq = b*b;
+	    double bcubed =bsq*b;
+	    double xsq = x*x;
+	    double ab = a*b;
+	    boolean test = Math.abs(b*x/a) <= 0.001;
+	    double rootabxm1;
+	    if (test) {
+		// for small z, use a taylor series, keeping the first
+		// few terms.
+		rootabxm1 = root1pzm1.valueAt(z);
+	    } else {
+		rootabxm1 = rootabx - 1.0;
+	    }
+
+	    double term1 = (-2*(2*asq*Math.sqrt(a)/(15*bsq))
+			    - (c)*(6*a/(7*b))*((8*asq)/(15*bcubed))
+			    * Math.sqrt(a))*(rootabxm1);
+
+	    double term2 =  (-2*(-(ab*x+3*bsq*xsq)*Math.sqrt(a)/(15*bsq))
+			     + (c)*(xsq*x/(7*b) - (6*a/(7*b))
+				    *((-4*ab*x + 3*bsq*xsq)/(15*bcubed)))
+			     * Math.sqrt(a))*rootabx;
+
+	    return term1 + term2;
+	}
+	*/
+	if (c == 0.0) {
+	    // CRC Standard Math Tables, page 291
+	    if (a < 0.0) {
+		String msg = errorMsg("notIntegrableAC", a);
+		throw new ArithmeticException(msg);
+	    }
+	    if (b == 0.0) {
+		return Math.sqrt(a)*x*x/2;
+	    }
+	    if (a + b*x < 0.0) {
+		String msg = errorMsg("notIntegrableABXC", a, b, x);
+		throw new ArithmeticException(msg);
+	    }
+	    // integrating x sqrt(a+bx): in CRC tables
+	    // return -(2*(2*a - 3*b*x)*MathOps.pow(a+b*x, 3, 2)) / (15*b*b);
+	    if (Math.abs(b*x/a) < 0.001) {
+		// use a taylor series expansion due to numerical accuracy
+		// issues.
+		double scale = 2*Math.sqrt(a)/(15*b*b);
+		double z = b*x/a;
+		Polynomial p0 = new Polynomial(2*a*a);
+		Polynomial p1 = new Polynomial(a,a);
+		Polynomial p2 = new Polynomial(2*a,-3*a);
+		Polynomial p3 = new Polynomial(1, 0.5, -1/8.0,
+					       1/16.0, -5.0/128.0, 7.0/256.0);
+		p1.multiplyBy(-1.0);
+		p1.multiplyBy(p2);
+		p1.multiplyBy(p3);
+		p0.incrBy(p1);
+		return scale*p0.valueAt(z);
+	    } else {
+		return (2/(15*b*b))*(2*a*MathOps.pow(a,3,2)
+				     -(2*a-3*b*x)*MathOps.pow(a+b*x, 3, 2));
+	    }
+	}
+	double q = 4*a*c - b*b;
+	if (q == 0.0) {
+	    // r = -b /(2*c);
+	    // polynomial = c*(x-r)^2 so integrate  x*sqrt(c)*(x-r)
+	    // = sqrt(c)*(x*x -r*x)
+	    // ==> sqrt(c)(x*x*x/3 -r*x*x/2)
+	    if (c < 0.0) {
+		String msg = errorMsg("notIntegrableNoRoots", c);
+		throw new ArithmeticException(msg);
+	    }
+	    double rootc = Math.sqrt(c);
+	    double r =-b/(2*c);
+	    double r2 = r*r;
+	    double r3 = r*r*r;
+	    double x2 = x*x;
+	    double x3 = x2*x;
+	    if (x >= 0) {
+		if (0 < r && r < x) {
+		    double term1 = rootc*(r3/6.0);
+		    double term2 = rootc*(x3/3.0 -r*x2/2) - term1;
+		    return Math.abs(term1) + Math.abs(term2);
+		} else {
+		    return Math.abs(rootc*(x3/3.0 -r*x2/2));
+		}
+	    } else {		// x < 0
+		if (x < r && r < 0) {
+		    // double term1 = rootc*(r3/3.0 -r*r2/2);
+		    double term1 = -rootc*r3/6;
+		    double term2 = rootc*(x3/3.0 -r*x2/2) ;
+		    return Math.abs(term1) + Math.abs(term2);
+		} else  {
+		    return Math.abs(rootc*(x3/3.0 -r*x2/2));
+		}
+	    }
+	} else {
+	    // CRC Tables have the integral of x sqrt(X) where
+	    // X = a + bx +cx^2
+	    double X = a + b*x + c*x*x;
+	    double k = 4*c/q;
+	    if (X < 0.0) {
+		String msg = errorMsg("notIntegrableXNeg", x);
+		throw new ArithmeticException(msg);
+	    }
+	    if (a < 0) {
+		String msg = errorMsg("notIntegrableXZero");
+		throw new ArithmeticException(msg);
+	    }
+	    // integral of x sqrt(X) = X sqrtX/(3c) -(b/(2c) integral sqrt(X)
+	    // but integral of sqrt(X) is
+	    // (2cx+b)sqrt(X)/(4c) + (1/2k) integral of 1/sqrt(X).
+	    // so we have a polynomial times sqrt(X) - (b/(4kc)(integral
+	    // 1/sqrt(X)).  The polynomial is
+	    // (1/3c)(a-3b^2/(8c) + (b/4)x + cx^2)
+	    double term0 = a-3*b*b/(8*c);
+	    double term =  term0 + b*x/4 + c*x*x;
+	    double rootX = Math.sqrt(X);
+	    double term1 = (term*rootX - term0*Math.sqrt(a))/(3*c);
+	    double rootc = Math.sqrt(c);
+	    double iexpr;
+	    // following copied (without comments) from rootP2 case.
+	    if (c > 0) {
+		if (q > 0) {
+		    // no real roots.
+		    iexpr = (Functions.asinh((2*c*x + b)/Math.sqrt(q))
+			     - Functions.asinh(b/Math.sqrt(q)))
+			/ rootc;
+		} else {
+		    double rnq = Math.sqrt(-q);
+		    double c2  = c*2;
+		    double r1 = (-b - rnq)/c2;
+		    double r2 = (-b + rnq)/c2;
+		    if (r2 < r1) {
+			double tmp = r1;
+			r1 = r2;
+			r2 = tmp;
+		    }
+		    if (x > 0) {
+			if (r1 >= 0 && r1 < x) {
+			    String msg = errorMsg("notIntegrableRoot", r1, x);
+			    throw new ArithmeticException (msg);
+			} else if (r2 > 0 && r2 < x) {
+			    String msg = errorMsg("notIntegrableRoot", r2, x);
+			    throw new ArithmeticException (msg);
+			}
+		    } else if (x < 0) {
+			if (r2 < 0 && r2 > x) {
+			    String msg = errorMsg("notIntegrableRoot", r2, x);
+			    throw new ArithmeticException (msg);
+			} else if (r1 < 0 && r1 > x) {
+			    String msg = errorMsg("notIntegrableRoot", r1, x);
+			    throw new ArithmeticException (msg);
+			}
+		    }
+		    double bcval = b/(2*rootc);
+		    double bcvalabs = Math.abs(bcval);
+		    double logterm = rootX + x*rootc;
+		    if ((Math.abs(a) + Math.abs(b) + Math.abs(c)) < bcvalabs) {
+			iexpr = (Math.log1p(logterm/bcval)
+				 - Math.log1p(Math.sqrt(a)/bcval)) / rootc;
+		    } else {
+			double logarg = logterm + bcval;
+			double logarg0 = Math.sqrt(a) + bcval;
+			if (logarg < 0.0) {
+			    logarg = -logarg;
+			}
+			if (logarg0 < 0.0) {
+			    logarg0 = -logarg0;
+			}
+			iexpr = (Math.log(logarg) - Math.log(logarg0)) / rootc;
+		    }
+		}
+	    } else {
+		if (q > 0) {
+		    String msg = errorMsg("notIntegrableNoRoots", c);
+		    throw new ArithmeticException (msg);
+		} else {
+		    double rnq = Math.sqrt(-q);
+		    double c2  = c*2;
+		    double r1 = (-b - rnq)/c2;
+		    double r2 = (-b + rnq)/c2;
+		    if (r2 < r1) {
+			double tmp = r1;
+			r1 = r2;
+			r2 = tmp;
+		    }
+
+		    if (x < r1 || x > r2) {
+			String msg = errorMsg("notIntegrableRoots2", r1,r2,x);
+			throw new ArithmeticException (msg);
+		    }
+		}
+		double sqrtnq = Math.sqrt(-q);
+		double argx = (-2*c*x - b)/sqrtnq;
+		double arg0 = -b/sqrtnq;
+		if (((1.0 - argx < 0.001) && (1.0 - arg0 < 0.001))
+		    ||(( 1 + argx < 0.001) && (1 + arg0 < 0.001))) {
+		    String msg = errorMsg("notIntegrableAsin");
+		    throw new ArithmeticException(msg);
+		} else {
+		    iexpr = (Math.asin((-2*c*x - b)/Math.sqrt(-q))
+			     - Math.asin(-b/Math.sqrt(-q)))/Math.sqrt(-c);
+		    if (iexpr == -0.0) iexpr = 0.0;
+		}
+	    }
+	    double term2 = b*iexpr/(4*k*c);
+	    return term1 - term2 ;
+	}
     }
 }
 

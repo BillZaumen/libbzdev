@@ -76,7 +76,7 @@ public class Polynomial extends RealValuedFunction {
 	super();
 	this.coefficients = new double[degree+1];
 	System.arraycopy(coefficients, 0, this.coefficients, 0, degree+1);
-	while (degree >= 0 && coefficients[degree] == 0.0) degree--;
+	while (degree > 0 && coefficients[degree] == 0.0) degree--;
 	this.degree = degree;
 
     }
@@ -95,7 +95,7 @@ public class Polynomial extends RealValuedFunction {
 	int degree = coefficients.length - 1;
 	this.coefficients = new double[degree+1];
 	System.arraycopy(coefficients, 0, this.coefficients, 0, degree+1);
-	while (degree >= 0 && coefficients[degree] == 0.0) degree--;
+	while (degree > 0 && coefficients[degree] == 0.0) degree--;
 	this.degree = degree;
     }
 
@@ -114,16 +114,19 @@ public class Polynomial extends RealValuedFunction {
 	    this.coefficients = new double[coefficients.length];
 	System.arraycopy(coefficients, 0, this.coefficients, 0,
 			 coefficients.length);
-	while (degree >= 0 && coefficients[degree] == 0.0) degree--;
+	while (degree > 0 && coefficients[degree] == 0.0) degree--;
     }
     
     /**
-     * Reset this polynomial so that it is empty.
+     * Reset this polynomial so that the polynomial is empty
+     * but so that the existing coefficients are not modified.
      * If necessary, enough space will be allocated to store the
      * coefficients of a polynomial whose degree is equal to or
-     * less than the argument, but the internal array will not be modified
+     * less than the argument, but the internal array will not be changed
+     * to a new array
      * unless a new array has to be allocated, and if the array is
-     * extended, the old values will be preserved.
+     * extended, the old values will be preserved.  A polynomial is
+     * considered to be empty if {@link #getDegree()} returns -1.
      * <P>
      * This method is appropriate when one will set all of the coefficients
      * explicitly or when the old values need to be temporarily preserved
@@ -154,6 +157,17 @@ public class Polynomial extends RealValuedFunction {
 	} else {
 	    Arrays.fill(coefficients, 0, degree+1, 0.0);
 	}
+    }
+
+
+    /**
+     * Decrease the degree of a polynomial so that the highest orde
+     * term does not have a coefficient equal to 0.
+     * This method should be used if coefficients are explicitly
+     * modified.
+     */
+    public void truncate() {
+	while (degree > 0 && (coefficients[degree] == 0.0)) degree--;
     }
 
     /**
@@ -198,7 +212,7 @@ public class Polynomial extends RealValuedFunction {
 	    this.coefficients = new double[dp1];
 	}
 	System.arraycopy(coefficients, 0, this.coefficients, 0, dp1);
-	while (degree >= 0 && coefficients[degree] == 0.0) degree--;
+	while (degree > 0 && coefficients[degree] == 0.0) degree--;
 	this.degree = degree;
     }
 
@@ -401,7 +415,7 @@ public class Polynomial extends RealValuedFunction {
 	    last = i;
 	}
 	result.degree = degree - 2;
-	while (result.degree >= 0
+	while (result.degree > 0
 	       && result.coefficients[result.degree] == 0.0) {
 	    result.degree--;
 	}
@@ -429,9 +443,8 @@ public class Polynomial extends RealValuedFunction {
     }
 
     /**
-     * Multiply this polynomial by adding another polynomial to this
+     * Modify this polynomial by adding another polynomial to this
      * polynomial.
-     * This polynomial is modified.
      * @param p the polynomial by which this polynomial is incremented
      */
     public void incrBy(Polynomial p) {
@@ -440,7 +453,6 @@ public class Polynomial extends RealValuedFunction {
 
     /**
      * Modify this polynomial by multiplying it by a scalar.
-     * This polynomial is modified.
      * @param s the scalar
      */
     public void multiplyBy(double s) {
@@ -449,7 +461,6 @@ public class Polynomial extends RealValuedFunction {
 
     /**
      * Modify this polynomial by multiplying it by another polynomial.
-     * This polynomial is modified.
      * @param p the polynomial by which this polynomial is multiplied
      */
     public void multiplyBy(Polynomial p) {
