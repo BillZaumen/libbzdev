@@ -23,303 +23,6 @@ public class Path2DInfoTest {
     // discussion of how to get the path length of a cubic Bezier curve
     // and comments about Carlson's notation.
 
-    // Used when the (dx/du)^2 + (dy/du)^2 is a quadratic.
-    public static double integrateRootP2(double x, double a, double b, double c)
-	throws Exception
-    {
-	// a + bx +cx^2 to fit CRC handbook integral tables
-	if (c == 0.0) {
-	    // CRC Standard Math Tables, page 291
-	    if (a < 0.0) throw new Exception("cannot integrate");
-	    if (b == 0.0) {
-		return Math.sqrt(a)*x;
-	    }
-	    if (a + b*x < 0.0) throw new Exception("cannot integrate");
-	    return (2.0/(3.0*b))
-		* (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
-	}
-	double q = 4*a*c - b*b;
-	if (q == 0.0) {
-	    // r = -b /(2*c);
-	    // polynomial = c*(x-r)^2 so integrate sqrt(c)*(x-r);
-	    double rc = Math.sqrt(c);
-	    double r =-b/(2*c);
-	    if (0 < r && r < x) {
-		double term1 = (rc*r*r + r*b/rc)/2;
-		double term2 = (rc*x*x + x*b/rc)/2 - term1;
-		return Math.abs(term1) + Math.abs(term2);
-	    } else if (r < 0 && x < r) {
-		double term1 = (rc*r*r + r*b/rc)/2;
-		double term2 = (rc*x*x + x*b/rc)/2 - term1;
-		return - (Math.abs(term1) + Math.abs(term2));
-	    } else {
-		double sign = (x < 0)? -1.0: 1.0;
-		return sign * Math.abs(rc*x*x + x*b/rc)/2;
-	    }
-
-	    /*
-	    double rootc = Math.sqrt(c);
-	    double r =-b/(2*c);
-	    if (r > 0.0 && r < x) {
-		double rval = rootc*rootc*rootc/2 + b/2;
-		return Math.abs(rval)
-		    + Math.abs(rootc*x*x/2 + x*b/(2*rootc) - rval);
-	    } else {
-		if (x == 0.0) return 0.0;
-		return Math.abs(rootc*x*x/2 + x*b/(2*rootc));
-	    }
-	    */
-	}
-	// if (q < 0.0) throw new Exception("cannot integrate");
-	if (q < 0.0) {
-	    if (c < 0) throw new Exception("cannot integrate");
-	    double x2 = x*x;
-	    double rootc = Math.sqrt(c);
-	    double expr = a + b*x + c*x2;
-	    double root = Math.sqrt(expr);
-	    double val = ((2*c*x + b)*root/(4*c)
-			  + Math.log(root + x*rootc + b/(2*rootc))/rootc)
-		- (b*root/(4*c)
-		   + Math.log(root + b/(2*rootc))/rootc);
-	    return Math.abs(val);
-
-	}
-	// CRC Standard Math Tables, page 297
-	double k = 4*c / q;
-	RealValuedFunctOps f = (u) -> {
-	    double u2 = u*u;
-	    double rootc = Math.sqrt(c);
-	    double expr = a + b*u + c*u2;
-	    double root = Math.sqrt(expr);
-	    return ((2*c*u + b)*root/(4*c)
-		    + Functions.asinh((2*c*u + b)/Math.sqrt(q))
-		    / (rootc * 2 * k));
-	};
-	return f.valueAt(x) - f.valueAt(0.0);
-    }
-
-    static double integrateRootP2signed(double x,
-					double a, double b, double c)
-	throws Exception
-    {
-	// a + bx +cx^2 to fit CRC handbook integral tables
-	if (c == 0.0) {
-	    // CRC Standard Math Tables, page 291
-	    if (a < 0.0) throw new Exception("cannot integrate");
-	    if (b == 0.0) {
-		return Math.sqrt(a)*x;
-	    }
-	    if (a + b*x < 0.0) throw new Exception("cannot integrate");
-	    return (2.0/(3.0*b))
-		* (MathOps.pow(a+b*x, 3, 2) - MathOps.pow(a, 3, 2));
-	}
-	// CRC Standard Math Tables, page 297
-	double q = 4*a*c - b*b;
-	if (q == 0) {
-	    // reduces to a polynomial
-	    // if (c < 0) throw new Exception("cannot integrate");
-	    double rc = Math.sqrt(c);
-	    double r =-b/(2*c);
-	    if (0 < r && r < x) {
-		double term1 = (rc*r*r + r*b/rc)/2;
-		double term2 = (rc*x*x + x*b/rc)/2 - term1;
-		return Math.abs(term1) + Math.abs(term2);
-	    } else {
-		return (rc*x*x + x*b/rc)/2;
-	    }
-	}
-	double rootc = Math.sqrt(c);
-	double expr = a + b*x + c*x*x;
-	double root = Math.sqrt(expr);
-	double term1 = (2*c*x + b)*root/(4*c);
-	double kinverse = q/(4*c);
-	double iexpr;
-	if (c > 0) {
-	    if (q > 0) {
-		// no real roots.
-		iexpr = Functions.asinh((2*c*x + b)/Math.sqrt(q))
-		    / Math.sqrt(c);
-	    } else {
-		double rnq = Math.sqrt(-q);
-		double c2  = c*2;
-		double r1 = (-b - rnq)/c2;
-		double r2 = (-b + rnq)/c2;
-		if (r1 >= 0 && r1 < x) {
-		    throw new Exception ("cannot integrate");
-		} else if (r2 > 0 && r2 <= x) {
-		    throw new Exception ("cannot integrate");
-		}
-		// iexpr = Math.log(root + x*rootc+ b/(2*rootc)) / Math.sqrt(c);
-		double bcval = b/(2*rootc);
-		double bcvalabs = Math.abs(bcval);
-		double logterm = root + x*rootc;
-		if ((Math.abs(a) + Math.abs(b) + Math.abs(c)) < bcvalabs) {
-		    iexpr = Math.log1p(logterm/bcval) / Math.sqrt(c);
-		} else {
-		    double logarg = logterm + bcval;
-		    if (logarg <= 0.0) {
-			/*
-			if (a < 0.0 || b > 0.0) {
-			    // We need sqrt(a) < -b/(2sqrt(c), which is true
-			    // if q = 4ac - b^2 < 0.  We handled the q=0 case
-			    // above, so q < 0 at this point.
-			    String msg = "not integrable: log argument = "
-				+ logarg;
-			    throw new ArithmeticException(msg);
-			}
-			*/
-			logarg = -logarg;
-		    }
-		    iexpr = Math.log(logarg) / Math.sqrt(c);
-		}
-	    }
-	} else {
-	    // c < 0 so for large positive or negative x, the polynomial is
-	    // negative.  We can only integrate if x is between the
-	    // two roots, and it must have two roots.
-	    if (q > 0) {
-		// values all negative because c < 0, so square root
-		// is not real
-		throw new Exception ("cannot integrate");
-	    } else {
-		double rnq = Math.sqrt(-q);
-		double c2  = c*2;
-		double r1 = (-b - rnq)/c2;
-		double r2 = (-b + rnq)/c2;
-		if (x < r1 || x > r2) {
-		    throw new Exception ("cannot integrate");
-		}
-	    }
-	    iexpr = Math.asin((-2*c*x - b)/Math.sqrt(-q))/Math.sqrt(-c);
-	}
-	double term2 = kinverse*iexpr/2;
-	return term1 + term2;
-    }
-
-    public static double integrateXRootP2signed(double x,
-						double a, double b, double c)
-	throws Exception
-    {
-	// a + bx +cx^2 to fit CRC handbook integral tables
-	if (c == 0.0) {
-	    // CRC Standard Math Tables, page 291
-	    if (a < 0.0) throw new Exception("cannot integrate");
-	    if (b == 0.0) {
-		return Math.sqrt(a)*x*x/2;
-	    }
-	    if (a + b*x < 0.0) throw new Exception("cannot integrate");
-	    // integrating x sqrt(a+bx): in CRC tables
-	    return -(2*(2*a - 3*b*x)*MathOps.pow(a+b*x, 3, 2)) / (15*b*b);
-	}
-	double q = 4*a*c - b*b;
-	if (q == 0.0) {
-	    // r = -b /(2*c);
-	    // polynomial = c*(x-r)^2 so integrate  x*sqrt(c)*(x-r)
-	    // = sqrt(c)*(x*x -r*x)
-	    // ==> sqrt(c)(x*x*x/3 -r*x*x/2)
-	    if (c < 0.0) throw new ArithmeticException("c negative");
-	    double rootc = Math.sqrt(c);
-	    double r =-b/(2*c);
-	    double x2 = x*x;
-	    double x3 = x2*x;
-	    return rootc*(x3/3.0 -r*x2/2);
-	} else {
-	    // CRC Tables have the integral of x sqrt(X) where
-	    // X = a + bx +cx^2
-	    double X = a + b*x + c*x*x;
-	    double k = 4*c/q;
-	    if (X < 0.0) throw new ArithmeticException("cannot integrate");
-	    /*
-	    double term1 = X*Math.sqrt(X)/3;
-	    double term2 = b*integrateRootP2signed(x, a, b, c)/2;
-	    System.out.println("term1 = " + term1);
-	    System.out.println("term2 = " + term2);
-	    return (term1 - term2)/c;
-	    */
-	    // integral of x sqrt(X) = X sqrtX/(3c) -(b/(2c) integral sqrt(X)
-	    // but integral of sqrt(X) is
-	    // (2cx+b)sqrt(X)/(4c) + (1/2k) integral of 1/sqrt(X).
-	    // so we have a polynomial times sqrt(X) - (b/(4kc)(integral
-	    // 1/sqrt(X)).  The polynomial is
-	    // (1/3c)(a-3b^2/(8c) + (b/4)x + cx^2)
-	    double term = a-3*b*b/(8*c) + b*x/4 + c*x*x;
-	    double rootX = Math.sqrt(X);
-	    double term1 = term*rootX/(3*c);
-	    double rootc = Math.sqrt(c);
-	    double iexpr;
-	    // following copied (without comments) from rootP2 case.
-	    if (c > 0) {
-		if (q > 0) {
-		    // no real roots.
-		    iexpr = Functions.asinh((2*c*x + b)/Math.sqrt(q))
-			/ rootc;
-		} else {
-		    double rnq = Math.sqrt(-q);
-		    double c2  = c*2;
-		    double r1 = (-b - rnq)/c2;
-		    double r2 = (-b + rnq)/c2;
-		    if (r1 >= 0 && r1 < x) {
-			throw new Exception ("cannot integrate");
-		    } else if (r2 > 0 && r2 <= x) {
-			throw new Exception ("cannot integrate");
-		    }
-		    iexpr = Math.log(rootX + x*rootc+ b/(2*rootc))
-			/ rootc;
-		}
-	    } else {
-		if (q > 0) {
-		    throw new Exception ("cannot integrate");
-		} else {
-		    double rnq = Math.sqrt(-q);
-		    double c2  = c*2;
-		    double r1 = (-b - rnq)/c2;
-		    double r2 = (-b + rnq)/c2;
-		    if (x < r1 || x > r2) {
-			throw new Exception ("cannot integrate");
-		    }
-		}
-		iexpr = Math.asin((-2*c*x - b)/Math.sqrt(-q))/Math.sqrt(-c);
-	    }
-	    double term2 = b*iexpr/(4*k*c);
-	    return term1 - term2 ;
-	}
-	/*
-	double expr = a + b*x + c*x2;
-	double root = Math.sqrt(expr);
-	double c4 = 4*c;
-	double term1 = (2*c*x + b)*root/(c4);
-	double kinverse = q/(c4);
-
-	// if (q < 0.0) throw new Exception("cannot integrate");
-	if (q < 0.0) {
-	    if (c < 0) throw new Exception("cannot integrate");
-
-	    double x2 = x*x;
-	    double rootc = Math.sqrt(c);
-	    double expr = a + b*x + c*x2;
-	    double root = Math.sqrt(expr);
-	    double val = ((2*c*x + b)*root/(4*c)
-			  + Math.log(root + x*rootc + b/(2*rootc))/rootc)
-		- (b*root/(4*c)
-		   + Math.log(root + b/(2*rootc))/rootc);
-	    return Math.abs(val);
-
-	} else {
-	}
-	// CRC Standard Math Tables, page 298
-	double k = 4*c / q;
-	RealValuedFunctOps f = (u) -> {
-	    double u2 = u*u;
-	    double rootc = Math.sqrt(c);
-	    double expr = a + b*u + c*u2;
-	    double root = Math.sqrt(expr);
-	    return ((2*c*u + b)*root/(4*c)
-		    + Functions.asinh((2*c*u + b)/Math.sqrt(q))
-		    / (rootc * 2 * k));
-	};
-	return f.valueAt(x) - f.valueAt(0.0);
-	*/
-    }
 
 
     public static double quadLength(double x0, double y0, double[] coords)
@@ -470,527 +173,8 @@ public class Path2DInfoTest {
 	}
     }
 
-
-    public static void testQuadLengthSigned() throws Exception {
-
-	RealValuedFunctOps integrand = (uu) -> {
-	    return Math.sqrt(a + b * uu + c*uu*uu);
-	};
-	GLQuadrature glq = new GLQuadrature(10) {
-		protected double function(double t) {
-		    return integrand.valueAt(t);
-		}
-	    };
-
-	double v0, v1, v2;
-
-
-	a = 1017.0;
-	b = -4068.0;
-	c = 4068.0;
-	v0 = integrateRootP2signed(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-	v1 = integrateRootP2signed(1.0, a, b, c);
-	double v1a = integrateRootP2(1.0, a, b, c);
-	System.out.println("v1 (no shift) = "  +v1);
-	System.out.println("v1a (no shift, unsigned) = " + v1a);
-	v1 = v1 - v0;
-
-	v2 = glq.integrate(0, 1.0, 100);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-	a = 40.286798096407296;
-	b = -81.39024991061399;
-	c = 68.35837614076863;
-	v0 = integrateRootP2signed(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-	v1 = integrateRootP2signed(1.0, a, b, c) - v0;
-	v2 = glq.integrate(0, 1.0, 100);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-	a = 2.0;
-	b = 4.0;
-	c = 2.0;
-
-	v0 = integrateRootP2signed(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-
-	v1 = integrateRootP2signed(1.0, a, b, c) - v0;;
-
-	v2 = glq.integrate(0, 1.0, 100);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-	double uarray[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	for (double u: uarray) {
-	    v1 = integrateRootP2signed(u, a, b, c) - v0;
-	    v2 = glq.integrate(0.0, u);
-	    if (Math.abs(v1 - v2)
-		/ Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-		throw new Exception();
-	    }
-	}
-
-	UniformDoubleRV rv = new UniformDoubleRV(-100.0, true, 100.0, true);
-	int icnt = 0;
-	for (int i = 0; i < 1000000; i++) {
-	    a = rv.next();
-	    b = rv.next();
-	    c = rv.next();
-	    try {
-		v0 = integrateRootP2signed(0.0, a, b, c);
-	    } catch (Exception e) {
-		if (e.getMessage().startsWith("cannot integrate")) {
-		    continue;
-		} else {
-		    throw e;
-		}
-	    }
-	    for (double u: uarray) {
-		try {
-		    v1 = integrateRootP2signed(u, a, b, c) - v0;
-		} catch (Exception e) {
-		    if (e.getMessage().startsWith("cannot integrate")) {
-			continue;
-		    } else {
-			System.out.println("i = " + i);
-			System.out.println(e.getMessage() + ": "
-					   + "a = " + a
-					   + ", b = " +b
-					   + ", c = " +c);
-			throw e;
-		    }
-		}
-		v2 = glq.integrate(0.0, u, 100);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("i = " + i);
-		    System.out.println("a = " + a);
-		    System.out.println("b = " + b);
-		    System.out.println("c = " + c);
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	    icnt++;
-	    c = 0.0;
-	    if (a < 0.0 ||  a+b < 0.0) continue;
-	    v0 = integrateRootP2signed(0.0, a, b, c);
-	    for (double u: uarray) {
-		v1 = integrateRootP2signed(u, a, b, c) - v0;
-		v2 = glq.integrate(0.0, u);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	    b  = 0.0;
-	    if (a < 0.0) continue;
-	    v0 = integrateRootP2signed(0.0, a, b, c);
-	    for (double u: uarray) {
-		v1 = integrateRootP2signed(u, a, b, c) - v0;
-		v2 = glq.integrate(0.0, u);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	}
-	System.out.println("icnt = " + icnt);
-    }
-
-    public static void testXRootP2Signed() throws Exception {
-
-	RealValuedFunctOps integrand = (uu) -> {
-	    return uu*Math.sqrt(a + b * uu + c*uu*uu);
-	};
-	GLQuadrature glq = new GLQuadrature(10) {
-		protected double function(double t) {
-		    return integrand.valueAt(t);
-		}
-	    };
-
-	double v0, v1, v2;
-
-
-	a = 32.329353109866105;
-	b = -71.21659652236845;
-	c = -0.0025530965026234753;
-
-	try {
-	    v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	    v1 = Polynomials.integrateXRootP2(0.1, a, b, c);
-	    System.out.println("... v0 = " + v0);
-	    System.out.println("... (before sub) v1 = " + v1);
-	    v1 -= v0;
-	    v2 = glq.integrate(0.0, 0.1, 100);
-	    if (Math.abs(v1 - v2) > 1.e-10) {
-		System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		throw new Exception();
-	    }
-	} catch (ArithmeticException ea) {
-	    System.out.println(ea.getMessage() + " - exception expected");
-	}
-	a = 83.37182451721756;
-	b = -1.3211939446478027E-5;
-	c = 0.0;
-	v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	v1 = Polynomials.integrateXRootP2(0.1, a, b, c);
-	System.out.println("... v0 = " + v0);
-	System.out.println("... (before sub) v1 = " + v1);
-	v1 -= v0;
-	v2 = glq.integrate(0.0, 0.1, 100);
-	if (Math.abs(v1 - v2) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-
-	/*
-	a = 70.79193218210668;
-	b = 90.84858606787893;
-	c = 8.403310992974866E-4;
-	double xe = -b/(2*c);
-	System.out.println("x for extremum = " +xe);
-	System.out.println("extremum value = "
-			   + (a + b*xe + c*xe*xe));
-
-
-	double scale = Math.sqrt(c);
-	double aa = a/c;
-	double bb = b/c;
-	double cc = 1.0;
-	double v0a = integrateXRootP2signed(0.0, aa, bb ,cc);
-	double v1a = integrateXRootP2signed(1.0, aa, bb ,cc);
-	System.out.println("v0a/scale =  " + v0a);
-	System.out.println("v1a/scale =  " + v1a);
-	v1a -= v0a;
-	v0a *= scale;
-	v1a *= scale;
-	System.out.println("v0a =  " + v0a);
-	System.out.println("v1a =  " + v1a);
-
-	v0 = integrateXRootP2signed(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-	v1 = integrateXRootP2signed(1.0, a, b, c);
-	System.out.println ("v1 (before subtraction) = " + v1);
-	v1 -= v0;
-	v2 = glq.integrate(0, 1.0, 600);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-	*/
-
-
-	/*
-	a = 31.842439156209565;
-	b = 66.6645685627023;
-	c = 1.0252483254191702E-4;
-
-	double xe = -b/(2*c);
-	System.out.println("x for extremum = " +xe);
-	System.out.println("extremum value = "
-			   + (a + b*xe + c*xe*xe));
-
-
-	double scale = Math.sqrt(c);
-	double aa = a/c;
-	double bb = b/c;
-	double cc = 1.0;
-	double v0a = integrateXRootP2signed(0.0, aa, bb ,cc);
-	double v1a = integrateXRootP2signed(1.0, aa, bb ,cc);
-	System.out.println("v0a/scale =  " + v0a);
-
-	System.out.println("v1a/scale =  " + v1a);
-	v1a -= v0a;
-	v0a *= scale;
-	v1a *= scale;
-	System.out.println("v0a =  " + v0a);
-	System.out.println("v1a =  " + v1a);
-
-	v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-	v1 = Polynomials.integrateXRootP2(1.0, a, b, c);
-	System.out.println ("v1 (before subtraction) = " + v1);
-	v1 -= v0;
-	v2 = glq.integrate(0, 1.0, 600);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-	*/
-	a = 40.286798096407296;
-	b = -81.39024991061399;
-	c = 68.35837614076863;
-	v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-	v1 = Polynomials.integrateXRootP2(1.0, a, b, c) - v0;
-	v2 = glq.integrate(0, 1.0, 100);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-	a = 2.0;
-	b = 4.0;
-	c = 2.0;
-
-	v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	System.out.println("v0 = " + v0);
-
-	v1 = Polynomials.integrateXRootP2(1.0, a, b, c) - v0;;
-
-	v2 = glq.integrate(0, 1.0, 100);
-	if (Math.abs(v1 - v2) / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-	    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-	    throw new Exception();
-	}
-
-	double uarray[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-	for (double u: uarray) {
-	    v1 = Polynomials.integrateXRootP2(u, a, b, c) - v0;
-	    v2 = glq.integrate(0.0, u);
-	    if (Math.abs(v1 - v2)
-		/ Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-10) {
-		throw new Exception();
-	    }
-	}
-
-	UniformDoubleRV rv = new UniformDoubleRV(-100.0, true, 100.0, true);
-	int icnt = 0;
-	for (int i = 0; i < 1000000; i++) {
-	    a = rv.next();
-	    b = rv.next();
-	    c = rv.next();
-	    try {
-		v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	    } catch (Exception e) {
-		if (e instanceof ArithmeticException) {
-		    continue;
-		} else {
-		    System.out.println("i = " + i);
-		    System.out.println(e.getMessage() + ": "
-				       + "a = " + a
-				       + ", b = " +b
-				       + ", c = " +c);
-		    System.out.println("u = 0.0");
-		    throw e;
-		}
-	    }
-	    for (double u: uarray) {
-		try {
-		    v1 = Polynomials.integrateXRootP2(u, a, b, c);
-		    v1 -= v0;
-		} catch (ArithmeticException ea) {
-		    continue;
-		} catch (Exception e) {
-		    System.out.println("i = " + i);
-		    System.out.println(e.getMessage() + ": "
-				       + "a = " + a
-				       + ", b = " +b
-				       + ", c = " +c);
-		    System.out.println("u = " + u);
-		    throw e;
-		}
-		v2 = glq.integrate(0.0, u, 100);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("i = " + i);
-		    System.out.println("a = " + a);
-		    System.out.println("b = " + b);
-		    System.out.println("c = " + c);
-		    System.out.println("u = " + u);
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	    icnt++;
-	    c = 0.0;
-	    if (a < 0.0 ||  a+b < 0.0) continue;
-	    v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	    for (double u: uarray) {
-		try {
-		    v1 = Polynomials.integrateXRootP2(u, a, b, c) - v0;
-		} catch (ArithmeticException ea) {
-		    continue;
-		}
-		v2 = glq.integrate(0.0, u, 100);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("a = " + a);
-		    System.out.println("b = " + b);
-		    System.out.println("c = " + c);
-		    System.out.println("u = " + u);
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	    b  = 0.0;
-	    if (a < 0.0) continue;
-	    v0 = Polynomials.integrateXRootP2(0.0, a, b, c);
-	    for (double u: uarray) {
-		v1 = Polynomials.integrateXRootP2(u, a, b, c) - v0;
-		v2 = glq.integrate(0.0, u, 100);
-		if (Math.abs(v1 - v2)
-		    / Math.max(Math.abs(v1), Math.abs(v2)) > 1.e-2) {
-		    System.out.println("a = " + a);
-		    System.out.println("b = " + b);
-		    System.out.println("c = " + c);
-		    System.out.println("u = " + u);
-		    System.out.println("v1 = " + v1 + ", v2 = " + v2);
-		    throw new Exception();
-		}
-	    }
-	}
-	System.out.println("icnt = " + icnt);
-    }
-
-
     static boolean cases[] = new boolean[11];
 
-    static double integrateProotQ(double u, Polynomial p, Polynomial rp)
-	throws Exception
-    {
-	// p should really be sqrt(p^2), so it may flip signs when x
-	// is a root of p as the square root is always non-negative.
-
-	int pdeg = p.getDegree();
-	int rpdeg = rp.getDegree();
-	if (pdeg == 0 && rpdeg == 0) {
-	    // corner case - both are 0 degree polynomials
-	    cases[0] = true;
-	    return Math.abs(p.getCoefficientsArray()[0])
-		* Math.sqrt(rp.getCoefficientsArray()[0])
-		* u;
-	} else if (pdeg == 1) {
-	    if (rpdeg == 0) {
-		double[] pa = p.getCoefficientsArray();
-		if (pa[1] < 0.0) {
-		    p.multiplyBy(-1.0);
-		}
-		double r = -pa[0]/pa[1];
-		double factor = Math.sqrt(rp.getCoefficientsArray()[0]);
-		// double[] tmp = p.getCoefficientsArray();
-		Polynomial integral = p.integral();
-		if (r > 0.0 && r < u) {
-		    cases[1] = true;
-		    double rval = integral.valueAt(r);
-		    return factor * (Math.abs(rval)
-				     + Math.abs(integral.valueAt(u) - rval));
-		}
-		cases[2] = true;
-		return factor * Math.abs(integral.valueAt(u));
-	    } else if (rpdeg == 2) {
-		double[] array0 = rp.getCoefficientsArray();
-		double a = array0[0];
-		double b = array0[1];
-		double c = array0[2];
-		double[] array = p.getCoefficientsArray();
-		if (array[1] < 0.0) {
-		    p.multiplyBy(-1.0);
-		}
-		double r = -array[0]/array[1];
-		RealValuedFunctOps integral = (t) -> {
-		    try {
-			return array[0] * integrateRootP2signed(t, a, b, c)
-			+ array[1] * Polynomials.integrateXRootP2(t, a, b, c);
-		    } catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		    }
-		};
-
-		if (r > 0.0 && r < u) {
-		    /*
-		    double ival = integrateRootP2signed(u, a, b, c);
-		    double X = rp.valueAt(u);
-		    double val3 = array[1]*X*Math.sqrt(X)/(3*c)
-			+ (array[0] - array[1]*b/(2*c))*ival ;
-		    ival = integrateRootP2signed(r, a, b, c);
-		    X = rp.valueAt(r);
-		    double val2 = array[1]*X*Math.sqrt(X)/(3*c)
-			+ (array[0] - array[1]*b/(2*c))*ival ;
-		    X = rp.valueAt(0.0);
-		    double val1 = array[1]*X*Math.sqrt(X)/(3*c);
-		    */
-		    cases[3] = true;
-		    double val1 = integral.valueAt(0.0);
-		    double val2 = integral.valueAt(r);
-		    double val3 = integral.valueAt(u);
-		    return Math.abs(val2 - val1) + Math.abs(val3 - val2);
-		} else {
-		    /*
-		    double ival = integrateRootP2signed(u, a, b, c);
-		    double X = rp.valueAt(u);
-		    double val2 = array[1]*X*Math.sqrt(X)/(3*c)
-			+ (array[0] - array[1]*b/(2*c))  *ival ;
-		    X = rp.valueAt(0.0);
-		    double val1 = array[1]*X*Math.sqrt(X)/(3*c);
-		    return Math.abs(val2 - val1);
-		    */
-		    cases[4] = true;
-		    double val = integral.valueAt(u) - integral.valueAt(0.0);
-		    return Math.abs(val);
-		}
-	    } else {
-		throw new UnexpectedExceptionError();
-	    }
-	} else if (pdeg == 2) {
-	    // rpdeg must be 0.
-	    if (rpdeg != 0) throw new Exception();
-	    double[] pa = p.getCoefficientsArray();
-	    if (pa[2] < 0) {
-		p.multiplyBy(-1.0);
-	    }
-	    double descr = pa[1]*pa[1] - 4 * pa[0]*pa[2];
-	    double max = Math.max(Math.abs(pa[0]), Math.abs(pa[1]));
-	    max = Math.max(max, Math.abs(pa[2]));
-	    if (Math.abs(descr)/max < 1.e-12) descr = 0.0;
-	    if (descr <= 0.0) {
-		Polynomial integral = p.integral();
-		cases[5] = true;
-		return Math.sqrt(rp.valueAt(0))*Math.abs(integral.valueAt(u));
-	    } else {
-		double rdescr = Math.sqrt(descr);
-		double a2 = 2*pa[2];
-		double r1 = (-pa[1] - rdescr)/a2;
-		double r2 = (-pa[1] + rdescr)/a2;
-		Polynomial integral = p.integral();
-		// NOTE: integral.valueAt(0.0) = 0 for polynomials.
-		if (r1 > 0 && r1 < u) {
-		    double val1 = integral.valueAt(r1);
-		    double sum = Math.abs(val1);
-		    if (u <= r2) {
-			sum += Math.abs(integral.valueAt(u) - val1);
-			cases[6] = true;
-			return Math.sqrt(rp.valueAt(0))*sum;
-		    } else {
-			double val2 = integral.valueAt(r2);
-			sum += Math.abs(val2 - val1);
-			sum += Math.abs(integral.valueAt(u) - val2);
-			cases[7] = true;
-			return Math.sqrt(rp.valueAt(0))*sum;
-		    }
-		} else {
-		    cases[8] = true;
-		    return Math.sqrt(rp.valueAt(0))
-			* Math.abs(integral.valueAt(u));
-		}
-	    }
-	} else {
-	    throw new UnexpectedExceptionError();
-	}
-    }
 
     static void printArray(String name, double[] array) {
 	System.out.print(name + ":");
@@ -1028,67 +212,11 @@ public class Path2DInfoTest {
 	return cubicLength(0, false, u, x0, y0, coords);
     }
 
+
     static double cubicLength(int depth, boolean split,
 			      double u, double x0, double y0, double[] coords)
 	throws Exception
     {
-	/*
-	System.out.println("cubicLength:");
-	System.out.println("... u = " + u);
-	System.out.println("... x0 = " + x0);
-	System.out.println("... y0 = " + y0);
-	printArray("... coords", coords);
-	*/
-	/*
-	boolean split = (depth < 2);
-
-	if (split) {
-	    double maxc = Math.max(Math.abs(x0), Math.abs(y0));
-	    for (int i = 0; i < 6; i++) {
-		maxc = Math.max(maxc, Math.abs(coords[i]));
-	    }
-	    if (maxc > 0) {
-		for (int i = 0; i < 6;  i += 2) {
-		    if (Math.abs(x0 - coords[i])/maxc > 1.e-10
-			|| Math.abs(y0 - coords[i+1])/maxc > 1.e-10) {
-			split = false;
-			break;
-		    }
-		}
-	    } else {
-		for (int i = 0; i < 6;  i += 2) {
-		    if (x0 != coords[i] || y0 != coords[i+1]) {
-			split = false;
-			break;
-		    }
-		}
-	    }
-	    if (split) return 0.0;	// identical control points
-
-	    if (x0 == coords[4] && y0 == coords[5]) split = true;
-	    if (split == false) {
-		double v1[] = {coords[0] - x0, coords[1] - y0};
-		double v2[] = {coords[2] - coords[4], coords[3] - coords[5]};
-		double dotp = VectorOps.dotProduct(v1, v2);
-		if (dotp > 0.0) {
-		    split = true;
-		} else {
-		    double v3[] = {coords[4] - x0, coords[5] - y0};
-		    double dotp1 = VectorOps.dotProduct(v1, v3);
-		    double norm1sq = VectorOps.normSquared(v1);
-		    if (norm1sq > 0.0 && dotp1 <= 0.0) {
-			split = true;
-		    } else {
-			double dotp2 = VectorOps.dotProduct(v2, v3);
-			double norm2sq = VectorOps.normSquared(v2);
-			if (norm2sq > 0.0 && dotp2 >= 0.0) {
-			    split = true;
-			}
-		    }
-		}
-	    }
-	}
-	*/
 	if (split) {
 	    depthcnt++;
 	    depth++;
@@ -1182,7 +310,7 @@ public class Path2DInfoTest {
 		numericCount++;
 		// cannot split due to depth limit. Fall back to
 		// numerical integration.
-		double result =  getCubicLength2(u, x0, y0, coords);
+		double result =  getCubicLength(u, x0, y0, coords);
 		return result;
 	    }
 	} finally {
@@ -1394,7 +522,7 @@ public class Path2DInfoTest {
 	    rpy.multiplyBy(rpy);
 	    rpx.incrBy(rpy);
 	    cases2[2] = true;
-	    return integrateProotQ(u, p, rpx);
+	    return Polynomials.integrateAbsPRootQ(u, p, rpx);
 
 	} else if (nx == 2 && ny == 2) {
 	    boolean test1 = Math.abs(rootsX[0] - rootsY[0]) < 1.e-12;
@@ -1455,7 +583,8 @@ public class Path2DInfoTest {
 		rpy.multiplyBy(scaleY);
 		rpy.multiplyBy(rpy);
 		rpx.incrBy(rpy);
-		return  integrateProotQ(u, p, rpx);
+		// return  integrateProotQ(u, p, rpx);
+		return Polynomials.integrateAbsPRootQ(u, p, rpx);
 	    } else if (n == 2) {
 		// rp must have a degree of 0, with its only coefficient
 		// having a value of 1.
@@ -1540,6 +669,8 @@ public class Path2DInfoTest {
 
     static Polynomial rptest = null;
 
+
+
     static void testCubicLength() throws Exception {
 
 	BasicSplinePath2D spath = new
@@ -1561,7 +692,7 @@ public class Path2DInfoTest {
 		break;
 	    case PathIterator.SEG_CUBICTO:
 		splen += cubicLength(1.0, spx, spy, spcoords);
-		splen2 += getCubicLength2(1.0, spx, spy, spcoords);
+		splen2 += getCubicLength(1.0, spx, spy, spcoords);
 		spx = spcoords[4];
 		spy = spcoords[5];
 	    }
@@ -1675,19 +806,20 @@ public class Path2DInfoTest {
 
 	p = new Polynomial(3.0);
 	rp = new Polynomial(4.0);
-	if (Math.abs(integrateProotQ(3.0, p, rp) - 18.0) > 1.e-10) {
+	if (Math.abs(Polynomials.integrateAbsPRootQ(3.0, p, rp) - 18.0)
+	    > 1.e-10) {
 	    throw new Exception();
 	}
 	p = new Polynomial(2.0, 3.0);
 	Polynomial pi = new Polynomial(0.0, 2.0, 3.0/2);
-	value = integrateProotQ(3.0, p, rp);
+	value = Polynomials.integrateAbsPRootQ(3.0, p, rp);
 	if (Math.abs(value - 2*pi.valueAt(3.0)) > 1.e-10) {
 	    System.out.println("value = " + value);
 	    throw new Exception();
 	}
 	p = new Polynomial (4.0, 3.0, 2.0);
 	pi = new Polynomial(0.0, 4.0, 3.0/2, 2.0/3);
-	value = integrateProotQ(3.0, p, rp);
+	value = Polynomials.integrateAbsPRootQ(3.0, p, rp);
 	if (Math.abs(value - 2*pi.valueAt(3.0)) > 1.e-10) {
 	    System.out.println("value = " + value);
 	    throw new Exception();
@@ -1697,7 +829,7 @@ public class Path2DInfoTest {
 	GLQuadrature glq = GLQuadrature.newInstance((t) -> {
 		return p1.valueAt(t)*Math.sqrt(rp1.valueAt(t));
 	}, 8);
-	value = integrateProotQ(3.0, p1, rp1);
+	value = Polynomials.integrateAbsPRootQ(3.0, p1, rp1);
 	double evalue = glq.integrate(0.0, 3.0, 10);
 	if (Math.abs(value - evalue) > 1.e-10) {
 	    System.out.println("value = " + value);
@@ -1709,7 +841,7 @@ public class Path2DInfoTest {
 	 glq = GLQuadrature.newInstance((t) -> {
 		 return Math.abs(p2.valueAt(t))*Math.sqrt(rp2.valueAt(t));
 	}, 8);
-	value = integrateProotQ(3.0, p2, rp2);
+	value = Polynomials.integrateAbsPRootQ(3.0, p2, rp2);
 	evalue = glq.integrate(0.0, 2.0/3.0, 10)
 	    + glq.integrate(2.0/3.0, 3.0, 10);
 	if (Math.abs(value - evalue) > 1.e-10) {
@@ -1728,7 +860,7 @@ public class Path2DInfoTest {
 	 glq = GLQuadrature.newInstance((t) -> {
 		 return Math.abs(p3.valueAt(t))*Math.sqrt(rp3.valueAt(t));
 	}, 8);
-	value = integrateProotQ(3.0, p3, rp3);
+	value = Polynomials.integrateAbsPRootQ(3.0, p3, rp3);
 	evalue = glq.integrate(0.0, 2.0/3.0, 100)
 	    + glq.integrate(2.0/3.0, 3.0, 100);
 	if (Math.abs(value - evalue) > 1.e-10) {
@@ -1741,7 +873,7 @@ public class Path2DInfoTest {
 	 glq = GLQuadrature.newInstance((t) -> {
 		 return Math.abs(p4.valueAt(t))*Math.sqrt(rp4.valueAt(t));
 	}, 8);
-	value = integrateProotQ(3.0, p4, rp4);
+	value = Polynomials.integrateAbsPRootQ(3.0, p4, rp4);
 	evalue = glq.integrate(0.0, 2.0, 100)
 	    + glq.integrate(2.0, 3.0, 100);
 	if (Math.abs(value - evalue) > 1.e-10) {
@@ -1755,7 +887,7 @@ public class Path2DInfoTest {
 	glq = GLQuadrature.newInstance((t) -> {
 		return Math.abs(p5.valueAt(t))*Math.sqrt(rp5.valueAt(t));
 	    }, 8);
-	value = integrateProotQ(2.5, p5, rp5);
+	value = Polynomials.integrateAbsPRootQ(2.5, p5, rp5);
 	evalue = glq.integrate(0.0, 2.5, 100);
 	if (Math.abs(value - evalue) > 1.e-10) {
 	    System.out.println("value = " + value);
@@ -1763,7 +895,7 @@ public class Path2DInfoTest {
 	    throw new Exception();
 	}
 
-	value = integrateProotQ(3.5, p5, rp5);
+	value = Polynomials.integrateAbsPRootQ(3.5, p5, rp5);
 	evalue = glq.integrate(0.0, 3.0, 100)
 	    + glq.integrate(3.0, 3.5, 100);
 	if (Math.abs(value - evalue) > 1.e-10) {
@@ -1771,7 +903,7 @@ public class Path2DInfoTest {
 	    System.out.println("expected value = " + evalue);
 	    throw new Exception();
 	}
-	value = integrateProotQ(4.5, p5, rp5);
+	value = Polynomials.integrateAbsPRootQ(4.5, p5, rp5);
 	evalue = glq.integrate(0.0, 3.0, 100)
 	    + glq.integrate(3.0, 4.0, 100)
 	    + glq.integrate(4.0, 4.5, 100);
@@ -1779,14 +911,6 @@ public class Path2DInfoTest {
 	    System.out.println("value = " + value);
 	    System.out.println("expected value = " + evalue);
 	    throw new Exception();
-	}
-
-	for (int i = 0; i < 9; i++) {
-	    if (!cases[i]) {
-		System.out.println("cases[" + i + "] = " + cases[i]);
-		throw new Exception("missing case for integrateProotQ");
-	    }
-	    cases[i] = false;
 	}
 
 	Polynomial p6 = new Polynomial(4.0, 6.0, 2.0);
@@ -1848,24 +972,19 @@ public class Path2DInfoTest {
 	y0 = 21.0;
 	UniformIntegerRV irv = new UniformIntegerRV(1, true, 40, true);
 
-	int acount = 0;
+	numericCount = 0;
 	for (int i = 0; i < 1000000; i++) {
+	    if (i > 0 && (i % 100000 == 0)) {
+		System.out.println("... " + ((i*100)/1000000) + "%");
+	    }
 	    double[] coords3 = {
 		(double)irv.next(), (double)irv.next(),
 		(double)irv.next(), (double)irv.next(),
 		(double)irv.next(), (double)irv.next()
 	    };
-	    /*
-	    if ((coords3[0] == x0 && coords3[1] == y0)
-		|| (coords3[2] == coords3[4] && coords3[3] == coords3[5])) {
-		// continue;
-	    }
-	    */
+	    // acount no longer used here
 	    try {
 		len = cubicLength(1.0, x0, y0, coords3);
-	    } catch (ArithmeticException ea) {
-		acount++;
-		continue;
 	    } catch (Exception e) {
 		System.out.print("i = " + i +", coords3:");
 		for (double v: coords3) {
@@ -1874,19 +993,15 @@ public class Path2DInfoTest {
 		System.out.println();
 		throw e;
 	    }
-	    try {
-		elen = Path2DInfo.segmentLength(PathIterator.SEG_CUBICTO,
-						x0, y0, coords3);
-	    } catch (Exception e) {
-		// If segmentLength fails, do a direct integral
-		elen = getCubicLength(1.0, x0, y0, coords3);
-	    }
+	    elen = getCubicLength(1.0, x0, y0, coords3);
 
 	    if (Math.abs(len - elen)/elen > 1.e-6) {
-		double elen1 = getCubicLength(1.0, x0, y0, coords3);
-		double elen2 = getCubicLength2(1.0, x0, y0, coords3);
+		System.out.println("len = " + len);
+		System.out.println("elen = " + elen);
+		double elen1 = getCubicLengthSR(1.0, x0, y0, coords3);
+		double elen2 = getCubicLength(1.0, x0, y0, coords3);
 		if ((elen != elen2) && Math.abs(len - elen2)/elen2 <= 1.e-6) {
-		    continue;
+		    throw new Exception( elen +" != " + elen2);
 		}
 
 		System.out.print("i = " + i +", coords3:");
@@ -1905,7 +1020,7 @@ public class Path2DInfoTest {
 	    }
 	}
 
-	System.out.println("acount = " + acount);
+	System.out.println("numericCount = " + numericCount);
 
 	boolean done = true;
 	for (int i = 0; i < 11; i++) {
@@ -1920,8 +1035,9 @@ public class Path2DInfoTest {
 	}
     }
 
-    static double getCubicLength(double t,
-				 double x0, double y0, double[] coords)
+    // version using simpson's rule.
+    static double getCubicLengthSR(double t,
+				   double x0, double y0, double[] coords)
     {
 	var px = new BezierPolynomial (x0, coords[0], coords[2], coords[4]);
 	var py = new BezierPolynomial (y0, coords[1], coords[3], coords[5]);
@@ -2089,7 +1205,7 @@ public class Path2DInfoTest {
 	return getSegmentLength(t, px, py, null);
     }
 
-    static double getCubicLength2(double t,
+    static double getCubicLength(double t,
 				 double x0, double y0, double[] coords)
     {
 	var px = new BezierPolynomial (x0, coords[0], coords[2], coords[4]);
@@ -2317,7 +1433,7 @@ public class Path2DInfoTest {
 	    System.out.println("coords18 ...");
 	    len = cubicLength(1.0, x0, y0, coords18);
 	    elen = getCubicLength(1.0, x0, y0, coords18);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords18);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords18);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-8) {
@@ -2341,7 +1457,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(2, true, 1.0, x0, y0, coords17);
 	    elen = getCubicLength(1.0, x0, y0, coords17);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords17);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords17);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-8) {
@@ -2361,10 +1477,10 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(2, true, 1.0, x0, y0, coords16);
 	    elen = getCubicLength(1.0, x0, y0, coords16);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords16);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords16);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
-	    if (Math.abs(elen2 - len)/elen > 1.e-8) {
+	    if (Math.abs(elen - len)/elen > 1.e-8) {
 		for (int i = 0; i < 11; i++) {
 		    if (cases2[i]) {
 			System.out.println("cases2[" + i + "] = " + cases2[i]);
@@ -2390,7 +1506,7 @@ public class Path2DInfoTest {
 		System.out.println("*** trying i = " + i);
 		len = cubicLength(2, true, 1.0, x15s[i], y15s[i], coords15s[i]);
 		elen = getCubicLength(1.0, x15s[i], y15s[i], coords15s[i]);
-		elen2 = getCubicLength2(1.0, x15s[i], y15s[i], coords15s[i]);
+		elen2 = getCubicLengthSR(1.0, x15s[i], y15s[i], coords15s[i]);
 		System.out.println("len = " + len +", elen = " + elen);
 		System.out.println(".... elen2 = " + elen2);
 		if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2407,7 +1523,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(0, true, 1.0, x0, y0, coords15);
 	    elen = getCubicLength(1.0, x0, y0, coords15);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords15);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords15);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2423,7 +1539,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(2, false, 1.0, x0, y0, coords14);
 	    elen = getCubicLength(1.0, x0, y0, coords14);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords14);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords14);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2443,7 +1559,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(2, false, 1.0, x0, y0, coords13);
 	    elen = getCubicLength(1.0, x0, y0, coords13);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords13);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords13);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2472,7 +1588,7 @@ public class Path2DInfoTest {
 	    if (j != 1) continue;
 	    len = cubicLength(2, false, 1.0, xs[j], ys[j], coords12s[j]);
 	    elen = getCubicLength(1.0, xs[j], ys[j], coords12s[j]);
-	    elen2 = getCubicLength2(1.0, xs[j], ys[j], coords12s[j]);
+	    elen2 = getCubicLengthSR(1.0, xs[j], ys[j], coords12s[j]);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2491,7 +1607,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(2, false, 1.0, x0, y0, coords12);
 	    elen = getCubicLength(1.0, x0, y0, coords12);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords12);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords12);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2511,7 +1627,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords11);
 	    elen = getCubicLength(1.0, x0, y0, coords11);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords11);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords11);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2565,7 +1681,7 @@ public class Path2DInfoTest {
 	    System.out.println("slen = " + (len1 + len2));
 
 	    elen = getCubicLength(1.0, x0, y0, coords10);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords10);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords10);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2589,7 +1705,7 @@ public class Path2DInfoTest {
 	    double coords9[] = {19.0, 21.0, 17.0, 16.0, 24.0, 29.0};
 	    len = cubicLength(1.0, x0, y0, coords9);
 	    elen = getCubicLength(1.0, x0, y0, coords9);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords9);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords9);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2609,7 +1725,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords8);
 	    elen = getCubicLength(1.0, x0, y0, coords8);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords8);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords8);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2629,7 +1745,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords7);
 	    elen = getCubicLength(1.0, x0, y0, coords7);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords7);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords7);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2649,7 +1765,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords6);
 	    elen = getCubicLength(1.0, x0, y0, coords6);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords6);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords6);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len)/elen > 1.e-4) {
@@ -2669,7 +1785,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords5);
 	    elen = getCubicLength(1.0, x0, y0, coords5);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords5);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords5);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 
@@ -2690,7 +1806,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords4);
 	    elen = getCubicLength(1.0, x0, y0, coords4);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords4);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords4);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len) > 1.e-4) {
@@ -2710,7 +1826,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords3);
 	    elen = getCubicLength(1.0, x0, y0, coords3);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords3);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords3);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	} catch (ArithmeticException e) {
@@ -2721,7 +1837,7 @@ public class Path2DInfoTest {
 	try {
 	    len = cubicLength(1.0, x0, y0, coords2);
 	    elen = getCubicLength(1.0, x0, y0, coords2);
-	    elen2 = getCubicLength2(1.0, x0, y0, coords2);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords2);
 	    System.out.println("len = " + len +", elen = " + elen);
 	    System.out.println(".... elen2 = " + elen2);
 	    if (Math.abs(elen - len) > 1.e-4) {
@@ -5023,9 +4139,9 @@ public class Path2DInfoTest {
 	int slind = 1;
 	for(;;) {
 	    SL_GLQ_ITERS = sv;
-	    double len2 = getCubicLength2(1.0, slx0, sly0, slcoords);
+	    double len2 = getCubicLength(1.0, slx0, sly0, slcoords);
 	    SL_GLQ_ITERS = slind;
-	    double len1 = getCubicLength2(1.0, slx0, sly0, slcoords);
+	    double len1 = getCubicLength(1.0, slx0, sly0, slcoords);
 	    if (Math.abs(len1 - len2) < 1.e-14) {
 		System.out.println("SL_GLQ_ITERS = " + SL_GLQ_ITERS);
 		System.out.println("len1 = " + len1);
