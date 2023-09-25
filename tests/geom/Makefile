@@ -661,6 +661,14 @@ info2d:
 	@echo -------- Path2DInfoTest ------------
 	@$(JAVA) Path2DInfoTest
 
+info2d-timing:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo -------- Path2DInfoTest ------------
+	@$(JAVA) Path2DInfoTest timing
+
+
 info3d:
 	(cd ../.. ; make jars)
 	mkdir -p classes

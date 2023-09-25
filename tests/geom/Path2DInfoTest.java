@@ -9,6 +9,7 @@ import org.bzdev.util.PrimArrays;
 import org.bzdev.util.IntComparator;
 import org.bzdev.math.rv.UniformDoubleRV;
 import org.bzdev.lang.MathOps;
+import org.bzdev.math.stats.BasicStats;
 
 public class Path2DInfoTest {
 
@@ -207,7 +208,7 @@ public class Path2DInfoTest {
     static int callCount = 0;
 
     static double cubicLength(double u, double x0, double y0, double[] coords)
-	throws Exception
+	throws ArithmeticException
     {
 	return cubicLength(0, false, u, x0, y0, coords);
     }
@@ -215,7 +216,7 @@ public class Path2DInfoTest {
 
     static double cubicLength(int depth, boolean split,
 			      double u, double x0, double y0, double[] coords)
-	throws Exception
+	throws ArithmeticException
     {
 	if (split) {
 	    depthcnt++;
@@ -260,7 +261,7 @@ public class Path2DInfoTest {
 	// Fix up any roundoff errors where the value should be zero.
 	double max = 0.0;
 	for (double v: marray) {
-	    max = Math.max(max, v);
+	    max = Math.max(max, Math.abs(v));
 	}
 	if (max != 0.0) {
 	    for (int i = 0; i < marray.length; i++) {
@@ -275,7 +276,7 @@ public class Path2DInfoTest {
 					0, 2);
 	max = 0.0;
 	for (double v: marray) {
-	    max = Math.max(max, v);
+	    max = Math.max(max, Math.abs(v));
 	}
 	if (max != 0.0) {
 	    for (int i = 0; i < marray.length; i++) {
@@ -321,7 +322,7 @@ public class Path2DInfoTest {
     // Note: this may modify Px or Py: it is a separate method merely
     // for testing.
     static double cubicLength (double u, Polynomial Px, Polynomial Py)
-	throws Exception
+	throws ArithmeticException
     {
 	// special cases.
 	int degPx = Px.getDegree();
@@ -1226,23 +1227,23 @@ public class Path2DInfoTest {
 	GLQuadrature glq = GLQuadrature.newInstance((u) -> {
 		double dpx = pxd.valueAt(u);
 		double dpy = pyd.valueAt(u);
-		double pdz = (pzd == null)? 0.0: pzd.valueAt(u);
-		return Math.sqrt(dpx*dpx + dpy*dpy + pdz*pdz);
+		double dpz = (pzd == null)? 0.0: pzd.valueAt(u);
+		return Math.sqrt(dpx*dpx + dpy*dpy + dpz*dpz);
 	    }, 8);
 
 	int degx = pxd.getDegree();
 	int degy = pyd.getDegree();
-	int degz = (pz == null)? -1: pz.getDegree();
+	int degz = (pz == null)? -1: pzd.getDegree();
 
 
 	double[] xarray = Polynomials.fromBezier(null,
 						 pxd.getCoefficientsArray(),
 						 0, degx);
 	double[] yarray = Polynomials.fromBezier(null,
-						 pxd.getCoefficientsArray(),
+						 pyd.getCoefficientsArray(),
 						 0, degy);
 	double[] zarray = (degz < 0)? new double[0]:
-	    Polynomials.fromBezier(null, pxd.getCoefficientsArray(), 0, degz);
+	    Polynomials.fromBezier(null, pzd.getCoefficientsArray(), 0, degz);
 
 
 	// When we switch from a Bernstein to a monomial basis,
@@ -1252,7 +1253,7 @@ public class Path2DInfoTest {
 	    else break;
 	}
 	for (int i = degy; i > 0; i--) {
-	    if (xarray[i] == 0.0) degy--;
+	    if (yarray[i] == 0.0) degy--;
 	    else break;
 	}
 	for (int i = degz; i > 0; i--) {
@@ -1356,7 +1357,7 @@ public class Path2DInfoTest {
 	    roots0[ind0++] =yroots[i];
 	}
 	if (pz != null) {
-	    for (int i = 0; i < nry; i++) {
+	    for (int i = 0; i < nrz; i++) {
 		roots0[ind0++] =zroots[i];
 	    }
 	}
@@ -4129,7 +4130,347 @@ public class Path2DInfoTest {
 	System.out.println("... intersection test done");
     }
 
+
     public static void main(String argv[]) throws Exception {
+
+	final double[] coefficients = new double[8];
+	if (argv.length > 0 && argv[0].equals("timing")) {
+	    // Performance test - a path is created using SplinePath2D,
+	    // initialied with two functions: a linear function for an
+	    // X coordinate and the first 8 terms of a Fourier series
+	    // (sin only, no cos) with random coefficients.  The idea is
+	    // to test a lot of curves that are smooth and somewhat
+	    // typical of what users may generate.
+
+	    double pcoords[] = new double[6];
+	    DoubleRandomVariable drv = new
+		UniformDoubleRV(-10.0, true, 10.0, true);
+	    final int N = 1000;
+	    SplinePath2D path = null;
+	    SplinePath2D[] paths = new SplinePath2D[N];
+	    RealValuedFunctOps fx = (u) -> {
+		return u*100.0;
+	    };
+	    RealValuedFunctOps fy = (u) -> {
+		double sum = 0.0;
+		double uu = 1.0;
+		for (int j = 0; j < coefficients.length; j++) {
+		    sum += (j == 0)? coefficients[0]:
+			Math.sin(u/(2*Math.PI)*j);
+		}
+		return sum;
+	    };
+	    BasicStats stats = new BasicStats.Population();
+	    BasicStats stats3 = new BasicStats.Population();
+	    // The smalller value has an excessively long running time
+	    // for the timing test and is off by 2e-14 istead of 2e-15.
+	    // double flatness = 0.0000000001;
+
+	    // With this value delta3 (the delta for this test) is
+	    // around 2e-12 instead of 2e-15, but the running time
+	    // is 3312 ms instead.
+	    double flatness = 0.0000001;
+	    for (int i = 0; i < N; i++) {
+		if (i > 0 && (i%100 == 0)) System.out.println("... i = " + i);
+		for (int j = 0; j < coefficients.length; j++) {
+		    coefficients[j] = drv.next();
+		}
+		path = new SplinePath2D(Path2D.WIND_EVEN_ODD,
+				       fx, fy, 0.0, 1.0, 64, false);
+		paths[i] = path;
+		PathIterator pit = path.getPathIterator(null);
+		double px0 = 0.0, py0 = 0.0;
+		double sum1 = 0.0;
+		double sum2 = 0.0;
+		while (!pit.isDone()) {
+		    switch(pit.currentSegment(pcoords)) {
+		    case PathIterator.SEG_MOVETO:
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    case PathIterator.SEG_LINETO:
+			// only cubics
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    case PathIterator.SEG_QUADTO:
+			// only cubics
+			px0 = pcoords[2];
+			py0 = pcoords[3];
+			break;
+		    case PathIterator.SEG_CUBICTO:
+			sum1 += cubicLength(1.0, px0, py0, pcoords);
+			sum2 += getCubicLength(1.0, px0, py0, pcoords);
+			px0 = pcoords[4];
+			py0 = pcoords[5];
+			break;
+		    default:
+			throw new Exception();
+		    }
+		    pit.next();
+		}
+		double delta = Math.abs(sum1 - sum2)
+		    / ((sum2 < 1.0)? 1.0: sum2);
+		stats.add(delta);
+		double sum3 = 0.0;
+		pit = path.getPathIterator(null, flatness);
+		while (!pit.isDone()) {
+		    switch(pit.currentSegment(pcoords)) {
+		    case PathIterator.SEG_MOVETO:
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    case PathIterator.SEG_LINETO:
+			double dx = pcoords[0] - px0;
+			double dy = pcoords[1] - py0;
+			sum3 += Math.sqrt(dx*dx + dy*dy);
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    default:
+			throw new Exception();
+		    }
+		    pit.next();
+		}
+		double delta3 = Math.abs(sum2 - sum3)
+		    / ((sum2 < 1.0)? 1.0: sum2);
+		stats3.add(delta3);
+	    }
+	    System.out.println("delta (analytic/numeric) = " + stats.getMean()
+			       + " \u00B1 " + stats.getSDev());
+	    System.out.println("delta (flattened/numeric) = " + stats3.getMean()
+			       + " \u00B1 " + stats3.getSDev());
+
+	    System.out.println("callCount = " + callCount);
+	    System.out.println("numericCount = " + numericCount);
+	    System.out.println("depthcnt = " + depthcnt);
+
+	    int M = 10;
+	    long tm0 = System.nanoTime();
+	    for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+		    path = paths[i];
+		    PathIterator pit = path.getPathIterator(null);
+		    double px0 = 0.0, py0 = 0.0;
+		    double sum1 = 0.0;
+		    while (!pit.isDone()) {
+			switch(pit.currentSegment(pcoords)) {
+			case PathIterator.SEG_MOVETO:
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			case PathIterator.SEG_LINETO:
+			    // only cubics
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			case PathIterator.SEG_QUADTO:
+			    // only cubics
+			    px0 = pcoords[2];
+			    py0 = pcoords[3];
+			    break;
+			case PathIterator.SEG_CUBICTO:
+			    sum1 += cubicLength(1.0, px0, py0, pcoords);
+			    // sum2 += getCubicLength(1.0, px0, py0, pcoords);
+			    px0 = pcoords[4];
+			    py0 = pcoords[5];
+			    break;
+			default:
+			    throw new Exception();
+			}
+			pit.next();
+		    }
+		}
+	    }
+	    long tm1 = System.nanoTime();
+	    for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+		    path = paths[i];
+		    PathIterator pit = path.getPathIterator(null);
+		    double px0 = 0.0, py0 = 0.0;
+		    double sum1 = 0.0;
+		    while (!pit.isDone()) {
+			switch(pit.currentSegment(pcoords)) {
+			case PathIterator.SEG_MOVETO:
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			case PathIterator.SEG_LINETO:
+			    // only cubics
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			case PathIterator.SEG_QUADTO:
+			    // only cubics
+			    px0 = pcoords[2];
+			    py0 = pcoords[3];
+			    break;
+			case PathIterator.SEG_CUBICTO:
+			    sum1 += cubicLength(1.0, px0, py0, pcoords);
+			    // sum2 += getCubicLength(1.0, px0, py0, pcoords);
+			    px0 = pcoords[4];
+			    py0 = pcoords[5];
+			    break;
+			default:
+			    throw new Exception();
+			}
+			pit.next();
+		    }
+		}
+
+		PathIterator pit = path.getPathIterator(null);
+		double px0 = 0.0, py0 = 0.0;
+		double sum2 = 0.0;
+		while (!pit.isDone()) {
+		    switch(pit.currentSegment(pcoords)) {
+		    case PathIterator.SEG_MOVETO:
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    case PathIterator.SEG_LINETO:
+			// only cubics
+			px0 = pcoords[0];
+			py0 = pcoords[1];
+			break;
+		    case PathIterator.SEG_QUADTO:
+			// only cubics
+			px0 = pcoords[2];
+			py0 = pcoords[3];
+			break;
+		    case PathIterator.SEG_CUBICTO:
+			sum2 += getCubicLength(1.0, px0, py0, pcoords);
+			px0 = pcoords[4];
+			py0 = pcoords[5];
+			break;
+		    default:
+			throw new Exception();
+		    }
+		    pit.next();
+		}
+	    }
+	    long tm2 = System.nanoTime();
+	    for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+		    path = paths[i];
+		    PathIterator pit = path.getPathIterator(null, flatness);
+		    double px0 = 0.0, py0 = 0.0;
+		    double sum3 = 0.0;
+		    while (!pit.isDone()) {
+			switch(pit.currentSegment(pcoords)) {
+			case PathIterator.SEG_MOVETO:
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			case PathIterator.SEG_LINETO:
+			    double dx = pcoords[0] - px0;
+			    double dy = pcoords[1] - px0;
+			    sum3 += Math.sqrt(dx*dx + dy*dy);
+			    px0 = pcoords[0];
+			    py0 = pcoords[1];
+			    break;
+			default:
+			    throw new Exception();
+			}
+			pit.next();
+		    }
+		}
+	    }
+	    long tm3 = System.nanoTime();
+	    System.out.println("analytic: " + ((tm1 - tm0)/1000000)
+			       +" ms");
+	    System.out.println("numeric: " + ((tm2 - tm1)/1000000)
+			       +" ms");
+	    System.out.println("flattened (flatness = " + flatness
+			       + ") = " + ((tm3 - tm2)/1000000)
+			       +" ms");
+	    System.out.println("Circle test");
+	    Path2D cpath = Paths2D.createArc(100.0, 100.0, 100.0, 150.0,
+					     2*Math.PI, Math.PI/360);
+	    cpath.closePath();
+	    PathIterator cpit = cpath.getPathIterator(null);
+	    double cx0 = 0.0, cy0 = 0.0;
+	    double cx = 0.0, cy = 0.0;
+	    double csum1 = 0.0;
+	    double csum2 = 0.0;
+	    double tmp1, tmp2, tmp;
+	    while (!cpit.isDone()) {
+		switch(cpit.currentSegment(pcoords)) {
+		case PathIterator.SEG_CLOSE:
+		    tmp1 = cx - cx0;
+		    tmp2 = cy - cy0;
+		    tmp = Math.sqrt(tmp1*tmp1 + tmp2*tmp2);
+		    csum1 += tmp;
+		    csum2 += tmp;
+		    break;
+		case PathIterator.SEG_MOVETO:
+		    cx0 = pcoords[0];
+		    cy0 = pcoords[1];
+		    cx = cx0;
+		    cy = cy0;
+		    break;
+		case PathIterator.SEG_LINETO:
+		    // only cubics
+		    cx = pcoords[0];
+		    cy = pcoords[1];
+		    break;
+		case PathIterator.SEG_QUADTO:
+		    // only cubics
+		    cx = pcoords[2];
+		    cy = pcoords[3];
+		    break;
+		case PathIterator.SEG_CUBICTO:
+		    csum1 += cubicLength(1.0, cx, cy, pcoords);
+		    csum2 += getCubicLength(1.0, cx, cy, pcoords);
+		    cx = pcoords[4];
+		    cy = pcoords[5];
+		    break;
+		default:
+		    throw new Exception();
+		}
+		cpit.next();
+	    }
+	    System.out.println("100\u03c0 = " + (100.0*Math.PI));
+	    System.out.println("circular arc (analytic) = " + csum1);
+	    System.out.println("circular arc (numeric) = " + csum2);
+	    flatness /= 1000.0;
+	    cpit = cpath.getPathIterator(null, flatness);
+	    double csum3 = 0.0;
+	    Adder adder = new Adder.Kahan();
+	    int fcnt = 0;
+	    while (!cpit.isDone()) {
+		fcnt++;
+		switch(cpit.currentSegment(pcoords)) {
+		case PathIterator.SEG_CLOSE:
+		    tmp1 = cx - cx0;
+		    tmp2 = cy - cy0;
+		    tmp = Math.sqrt(tmp1*tmp1 + tmp2*tmp2);
+		    adder.add(tmp);
+		    break;
+		case PathIterator.SEG_MOVETO:
+		    cx0 = pcoords[0];
+		    cy0 = pcoords[1];
+		    cx = cx0;
+		    cy = cy0;
+		    break;
+		case PathIterator.SEG_LINETO:
+		    tmp1 = pcoords[0] - cx;
+		    tmp2 = pcoords[1] - cy;
+		    tmp = Math.sqrt(tmp1*tmp1 + tmp2*tmp2);
+		    adder.add(tmp);
+		    cx = pcoords[0];
+		    cy = pcoords[1];
+		    break;
+		default:
+		    throw new Exception();
+		}
+		cpit.next();
+	    }
+	    System.out.println("flattened (flatness = " + flatness
+			       + ") = " + adder.getSum());
+	    System.out.println("... number of flattened segments = " + fcnt);
+
+	    System.exit(0);
+	}
 
 	int sv = SL_GLQ_ITERS;
 	double slx0 = 20.0;

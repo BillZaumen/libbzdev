@@ -70,7 +70,7 @@ public class BezierPolynomial extends RealValuedFunction {
      * the coefficient for the B<sup>i,n</sup> term is stored in an
      * array at index i, thus making a<sub>0</sub> the first index in p's
      * coefficient array (which is newly allocated)
-    * The degree is  used to set an internal table size.
+    * The degree is used to set an internal table size.
     * @param coefficients the coefficients for this polynomial.
     * @param degree the degree of a polynomial that this
     *        instance should support.
@@ -280,6 +280,20 @@ public class BezierPolynomial extends RealValuedFunction {
 		result.coefficients[1] = coefficients[0];
 	    }
 	} else {
+	    double np1 = rdegree;
+	    for (int j = 1; j <= rdegree; j++) {
+		double sum = coefficients[0];
+		double c = 0.0;
+		for (int nu = 1; nu < j; nu++) {
+		    double term = coefficients[nu];
+		    double y = term - c;
+		    double t = sum + y;
+		    c = (t - sum) -y;
+		    sum = t;
+		}
+		result.coefficients[j] = sum / np1;
+	    }
+	    /*
 	    result.coefficients[1] = coefficients[0];
 	    double sum = coefficients[0];
 	    double c = 0.0;
@@ -292,6 +306,7 @@ public class BezierPolynomial extends RealValuedFunction {
 		sum = t;
 	    }
 	    result.coefficients[rdegree] = sum/np1;
+	    */
 	}
 	return result;
     }
@@ -304,30 +319,11 @@ public class BezierPolynomial extends RealValuedFunction {
      * @return the integral of the polynomial, evaluated at x
      */
     public double integralAt(double x) {
-	if (degree < 1) return 0.0;
+	if (x == 0.0) return 0.0;
 	if (degree == 0 && coefficients[0] == 0.0) {
 	    return 0.0;
 	}
-	// use Kahan's addition algorithm to reduce
-	// floating-point errors.
-
-	double sum = coefficients[0];
-	double c = 0.0;
-	double sum2 = 0.0;
-	double c2 = 0.0;
-	int np1 = degree+1;
-	for (int j = 1; j < np1; j++) {
-	    double y2 = ((sum/np1)*Functions.B(j,np1,x)) - c2;
-	    double t2 = sum2  + y2;
-	    c2 = (t2 - y2) - y2;
-	    sum2 = t2;
-	    double y = coefficients[j] - c;
-	    double t = sum + y;
-	    c = (t - sum) - y;
-	    sum = t;
-	}
-	sum2 += ((sum/np1)*Functions.B(np1,np1,x)) - c2;
-	return sum2;
+	return integral().valueAt(x);
     }
 
     @Override

@@ -450,7 +450,7 @@ public class PolynomialTest {
     }
 
 
-    static void integralTest() {
+    static void integralTest() throws Exception {
 
 
 	BezierPolynomial bpx =
@@ -465,6 +465,41 @@ public class PolynomialTest {
 				 -250.000);
 
 	BezierPolynomial dydu = bpy.deriv();
+	BezierPolynomial dyduIntegral  = dydu.integral();
+	double[]  bpyArray = bpy.getCoefficientsArray();
+	double [] dyduIntegralArray = dyduIntegral.getCoefficientsArray();
+	double diff = bpyArray[0] - dyduIntegralArray[0];
+	for (int i = 0; i < bpyArray.length; i++) {
+	    double delta = Math.abs((bpyArray[i] - dyduIntegralArray[i])
+				    - diff);
+	    if (delta > 1.e-10) {
+		System.out.println("delta = " + delta);
+		System.out.println("bpy.getDegree() = " + bpy.getDegree());
+		System.out.println("dydu.getDegree() = " + dydu.getDegree());
+		System.out.println("dyduIntegral.getDegree() = "
+				   + dyduIntegral.getDegree());
+		System.out.println("bpyArray[" + i +"] = " +bpyArray[i]);
+		System.out.println("dyduIntegralArray[" + i +"] = "
+				   +dyduIntegralArray[i]);
+		System.out.println("dyduIntegralArray[" + i +"] + diff = "
+				   +(dyduIntegralArray[i] + diff));
+		System.out.println("diff = " + diff);
+		throw new Exception();
+	    }
+	}
+	double args[] = {0.0, 0.1, 0.2, 0.5, 0.8, 1.0};
+	boolean err = false;
+	for (double u: args) {
+	    double val1 = dydu.integralAt(u);
+	    double val2 = dyduIntegral.valueAt(u);
+	    if (Math.abs(val1 - val2) > 1.e-10) {
+		System.out.println("u = " + u + ", val1 = " + val1
+				   + ", val2 = " + val2);
+		err = true;
+	    }
+	}
+	if (err) throw new Exception();
+
 	/*
 	BezierPolynomial integrand = bpy.multiply(bpy);
 	integrand.multiplyBy(bpx);

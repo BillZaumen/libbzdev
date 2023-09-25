@@ -52,8 +52,8 @@ public class Path2DInfo {
 	GLQuadrature glq = GLQuadrature.newInstance((u) -> {
 		double dpx = pxd.valueAt(u);
 		double dpy = pyd.valueAt(u);
-		double pdz = (pzd == null)? 0.0: pzd.valueAt(u);
-		return Math.sqrt(dpx*dpx + dpy*dpy + pdz*pdz);
+		double dpz = (pzd == null)? 0.0: pzd.valueAt(u);
+		return Math.sqrt(dpx*dpx + dpy*dpy + dpz*dpz);
 	    }, 8);
 
 	int degx = pxd.getDegree();
@@ -65,10 +65,10 @@ public class Path2DInfo {
 						 pxd.getCoefficientsArray(),
 						 0, degx);
 	double[] yarray = Polynomials.fromBezier(null,
-						 pxd.getCoefficientsArray(),
+						 pyd.getCoefficientsArray(),
 						 0, degy);
 	double[] zarray = (degz < 0)? new double[0]:
-	    Polynomials.fromBezier(null, pxd.getCoefficientsArray(), 0, degz);
+	    Polynomials.fromBezier(null, pzd.getCoefficientsArray(), 0, degz);
 
 
 	// When we switch from a Bernstein to a monomial basis,
@@ -78,7 +78,7 @@ public class Path2DInfo {
 	    else break;
 	}
 	for (int i = degy; i > 0; i--) {
-	    if (xarray[i] == 0.0) degy--;
+	    if (yarray[i] == 0.0) degy--;
 	    else break;
 	}
 	for (int i = degz; i > 0; i--) {
@@ -182,7 +182,7 @@ public class Path2DInfo {
 	    roots0[ind0++] =yroots[i];
 	}
 	if (pz != null) {
-	    for (int i = 0; i < nry; i++) {
+	    for (int i = 0; i < nrz; i++) {
 		roots0[ind0++] =zroots[i];
 	    }
 	}
@@ -229,6 +229,17 @@ public class Path2DInfo {
 	}
     }
 
+    /**
+     * Compute the length of a quadratic path segment from its start to
+     * a position specified by the path parameter.
+     * @param u the path parameter in the range [0.0, 1.0]
+     * @param x0 the X coordinate of the first control point
+     * @param y0 the Y coordinate of the first control point
+     * @param coords the remaining control points in order, with even
+     *        indices for X coordinates and odd indices for Y coordinates
+     *        (only the first 4 indices will be used)
+     * @return the path length from u = 0 to the given value of u.
+     */
     public static double quadLength(double u,
 				    double x0, double y0, double[] coords)
     {
@@ -260,7 +271,19 @@ public class Path2DInfo {
 	}
     }
 
-    static double cubicLength(double u, double x0, double y0, double[] coords)
+    /**
+     * Compute the length of a cubic path segment from its start to
+     * a position specified by the path parameter.
+     * @param u the path parameter in the range [0.0, 1.0]
+     * @param x0 the X coordinate of the first control point
+     * @param y0 the Y coordinate of the first control point
+     * @param coords the remaining control points in order, with even
+     *        indices for X coordinates and odd indices for Y coordinates
+     *        (only the first 6 indices will be used)
+     * @return the path length from u = 0 to the given value of u.
+     */
+    public static double cubicLength(double u, double x0, double y0,
+				     double[] coords)
     {
 	return cubicLength(0, false, u, x0, y0, coords);
     }
@@ -302,7 +325,7 @@ public class Path2DInfo {
 	// Fix up any roundoff errors where the value should be zero.
 	double max = 0.0;
 	for (double v: marray) {
-	    max = Math.max(max, v);
+	    max = Math.max(max, Math.abs(v));
 	}
 	if (max != 0.0) {
 	    for (int i = 0; i < marray.length; i++) {
@@ -317,7 +340,7 @@ public class Path2DInfo {
 					0, 2);
 	max = 0.0;
 	for (double v: marray) {
-	    max = Math.max(max, v);
+	    max = Math.max(max, Math.abs(v));
 	}
 	if (max != 0.0) {
 	    for (int i = 0; i < marray.length; i++) {
@@ -4876,20 +4899,12 @@ public class Path2DInfo {
 		coords[1] = lastMoveToY;
 	    }
 	    SegmentData data = new SegmentData(st, x0, y0, coords, last);
-	    boolean quadCaseWorked = false;
 
 	    if (st == PathIterator.SEG_QUADTO) {
-		try {
-		    length = quadLength(1.0, x0, y0, coords);
-		    quadCaseWorked = true;
-		} catch (Exception e) {
-		    // nothing to do. Because quadCaseWorked is false,
-		    // we'll handle the SEG_QUADTO case numerically.
-		}
-	    }
-
-	    if (st != PathIterator.SEG_MOVETO
-		|| (st == PathIterator.SEG_QUADTO && !quadCaseWorked)) {
+		length = quadLength(1.0, x0, y0, coords);
+	    } else if (st == PathIterator.SEG_CUBICTO) {
+		length = cubicLength(1.0, x0, y0, coords);
+	    } else if (st != PathIterator.SEG_MOVETO) {
 		if (st == PathIterator.SEG_CLOSE
 		    || st == PathIterator.SEG_LINETO) {
 		    // special case - for straight lines, this is faster. The
