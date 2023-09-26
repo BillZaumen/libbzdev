@@ -732,6 +732,27 @@ public class Path3DInfoTest {
 	if (missing) throw new Exception();
     }
 
+    static void badcases() throws Exception {
+	double t1 = 0.0;
+	double t2 = 0.015625;
+	int type = 3;
+	double x = -196.9615506024416;
+	double y = -98.4807753012208;
+	double z = 0.0;
+	double coords[] =  {
+	    0.0, 0.0, 0.0,
+	    23.26910921960485, 11.634554609802425, 0.0,
+	    46.538218439209714, 23.269109219604857, 0.0
+	};
+
+	double len = Path3DInfo.segmentLength(t2, type,
+					      x, y, z,
+					      coords);
+	System.out.println("len = " + len);
+	if (len < 0.0 || Double.isNaN(len)) throw new Exception();
+    }
+
+
     static void testGetCubicLength() throws Exception {
 	Path2D cpath2d = Paths2D.createArc(100.0, 100.0, 100.0, 150.0,
 					 2*Math.PI, Math.PI/360);
@@ -797,6 +818,7 @@ public class Path3DInfoTest {
 
     public static void main(String argv[]) throws Exception {
 
+	badcases();
 	testGetCubicLength();
 
 	testCubicLength();
@@ -819,6 +841,7 @@ public class Path3DInfoTest {
 	double x = 0.0; double y = 0.0; double z = 0.0;
 	double x0 = 0.0; double y0 = 0.0; double z0 = 0.0;;
 	double lastX = 0.0; double lastY = 0.0; double lastZ = 0.0;
+	double len1, len2;
 	while (!pit.isDone()) {
 	    int type = pit.currentSegment(coords);
 	    switch (type) {
@@ -839,6 +862,10 @@ public class Path3DInfoTest {
 		}
 		if (z != Path3DInfo.getZ(0.5, 0.0, 0.0, 0.0, type, coords)) {
 		    throw new Exception("Path3DInfo.getZ failed");
+		}
+		if (0.0 != Path3DInfo.segmentLength(0.4, type, 0.0, 0.0, 0.0,
+						    coords)) {
+		    throw new Exception("Path3DInfo.getSegmentLength failed");
 		}
 		break;
 	    case PathIterator.SEG_LINETO:
@@ -887,6 +914,12 @@ public class Path3DInfoTest {
 			throw new Exception
 			    ("non-zero second derivative");
 		    }
+		}
+		len1 = Path3DInfo.segmentLength(0.4, type, x, y, z, coords);
+		len2 = Path3DInfo.segmentLength(type, x, y, z, coords) * 0.4;
+		if (Math.abs(len1 - len2) > 1.e-10) {
+		    throw new
+			Exception("Path2DInfo.getSegmentLength failed");
 		}
 		x = coords[0];
 		y = coords[1];
@@ -952,6 +985,12 @@ public class Path3DInfoTest {
 			throw new Exception("Z second derivative failed");
 		    }
 		}
+		len1 = Path3DInfo.segmentLength(0.4, type, x, y, z, coords);
+		len2 = quadLength(0.4, x, y, z, coords);
+		if (Math.abs(len1 - len2) > 1.e-10) {
+		    throw new
+			Exception("Path2DInfo.getSegmentLength failed");
+		}
 		x = coords[3];
 		y = coords[4];
 		z = coords[5];
@@ -1011,6 +1050,12 @@ public class Path3DInfoTest {
 			throw new Exception("Y second derivative failed");
 		    }
 		}
+		len1 = Path3DInfo.segmentLength(0.4, type, x, y, z, coords);
+		len2 = cubicLength(0.4, x, y, z, coords);
+		if (Math.abs(len1 - len2) > 1.e-10) {
+		    throw new
+			Exception("Path2DInfo.getSegmentLength failed");
+		}
 		x = coords[6];
 		y = coords[7];
 		z = coords[8];
@@ -1020,6 +1065,12 @@ public class Path3DInfoTest {
 		coords[0] = lastX;
 		coords[1] = lastY;
 		coords[2] = lastZ;
+		len1 = Path3DInfo.segmentLength(0.4, type, x, y, z, coords);
+		len2 = Path3DInfo.segmentLength(type, x, y, z, coords) * 0.4;
+		if (Math.abs(len1 - len2) > 1.e-10) {
+		    throw new
+			Exception("Path2DInfo.getSegmentLength failed");
+		}
 		x = coords[0];
 		y = coords[1];
 		z = coords[2];

@@ -41,6 +41,70 @@ public class Path2DInfo {
 
     private static final int SL_GLQ_ITERATIONS = 200;
 
+    /**
+     * Get the length of a subpath of a path segment.
+     * <P>
+     * When the path parameter is {@link PathIterator#SEG_CLOSE},
+     * the array must contain the X and Y coordinates of the path's
+     * initial point in that order.
+     * @param u the path parameter for the end of the subpath which
+     *        includes all points on the path whose path parameters
+     *        are in the range [0, u]
+     * @param type either {@link PathIterator#SEG_MOVETO}
+     *        {@link PathIterator#SEG_LINETO},
+     *        {@link PathIterator#SEG_QUADTO},
+     *        {@link PathIterator#SEG_CUBICTO}, or
+     *        {@link PathIterator#SEG_CLOSE}
+     * @param x0 the X coordinate at the start of the segment
+     * @param y0 the Y cooredinate at the start of the segment
+     * @param coords the remaining control points, with the X coordinate
+     *        followed immediately by the Y coordinate for each
+     * @return the path-sgement length
+     * @throws IllegalArgumentException if the type argument is not
+     *         recognized or if the fifth argument is null or is too short
+     */
+    public static double segmentLength(double u, int type,
+				       double x0, double y0,
+				        double[] coords)
+	throws IllegalArgumentException
+    {
+	switch (type) {
+	case PathIterator.SEG_MOVETO:
+	    return 0.0;
+	case PathIterator.SEG_CLOSE:
+	case PathIterator.SEG_LINETO:
+	    if (coords == null || coords.length < 2) {
+		String msg = errorMsg("argarraylength5");
+		throw new IllegalArgumentException(msg);
+	    }
+	    double dx = (coords[0] - x0)*u;
+	    double dy = (coords[1] - y0)*u;
+	    if (dx == 0.0) {
+		if (dy == 0.0) return 0.0;
+		else return Math.abs(dy);
+	    } else if (dy == 0.0) {
+		return Math.abs(dx);
+	    } else {
+		return Math.sqrt(dx*dx + dy*dy);
+	    }
+	case PathIterator.SEG_QUADTO:
+	    if (coords == null || coords.length < 4) {
+		String msg = errorMsg("argarraylength5");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return quadLength(u, x0, y0, coords);
+	case PathIterator.SEG_CUBICTO:
+	    if (coords == null || coords.length < 6) {
+		String msg = errorMsg("argarraylength5");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return cubicLength(u, x0, y0, coords);
+	default:
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
+	}
+    }
+
+
     // shared with Path3DInfo.java
     static double getSegmentLength(double t, BezierPolynomial px,
 				   BezierPolynomial py, BezierPolynomial pz)
@@ -58,7 +122,7 @@ public class Path2DInfo {
 
 	int degx = pxd.getDegree();
 	int degy = pyd.getDegree();
-	int degz = (pz == null)? -1: pz.getDegree();
+	int degz = (pz == null)? -1: pzd.getDegree();
 
 
 	double[] xarray = Polynomials.fromBezier(null,
@@ -382,6 +446,29 @@ public class Path2DInfo {
 	}
     }
 
+    static void printArray(String name, double[] array) {
+	System.out.print(name + ":");
+	for (double v: array) {
+	    System.out.print(" " + v);
+	}
+	System.out.println();
+    }
+
+    static void printArray(String name, double[] array, int limit) {
+	System.out.print(name + ":");
+	for (double v: array) {
+	    if ((limit--) > 0) {
+		System.out.print(" " + v);
+	    }
+	}
+	System.out.println();
+    }
+
+    static void printArray(String name, Polynomial p) {
+	printArray(name, p.getCoefficientsArray());
+    }
+
+
     // Note: this may modify Px or Py: it is a separate method merely
     // for testing.
     static double cubicLength (double u, Polynomial Px, Polynomial Py)
@@ -390,6 +477,7 @@ public class Path2DInfo {
 	// special cases.
 	int degPx = Px.getDegree();
 	int degPy = Py.getDegree();
+
 	/*
 	System.out.println("degPx = " + degPx +", degPy = " + degPy);
 	printArray("Px", Px);

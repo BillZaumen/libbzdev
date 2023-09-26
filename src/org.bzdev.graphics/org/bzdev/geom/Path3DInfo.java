@@ -39,6 +39,77 @@ import org.bzdev.math.VectorOps;
 public class Path3DInfo {
 
     /**
+     * Get the length of a subpath of a path segment.
+     * <P>
+     * When the path parameter is {@link PathIterator3D#SEG_CLOSE},
+     * the array must contain the X, Y, and Z coordinates of the path's
+     * initial point in that order.
+     * @param u the path parameter for the end of the subpath which
+     *        includes all points on the path whose path parameters
+     *        are in the range [0, u]
+     * @param type either {@link PathIterator3D#SEG_MOVETO}
+     *        {@link PathIterator3D#SEG_LINETO},
+     *        {@link PathIterator3D#SEG_QUADTO},
+     *        {@link PathIterator3D#SEG_CUBICTO}, or
+     *        {@link PathIterator3D#SEG_CLOSE}
+     * @param x0 the X coordinate at the start of the segment
+     * @param y0 the Y cooredinate at the start of the segment
+     * @param z0 the X cooredinate at the start of the segment
+     * @param coords the remaining control points, with the X coordinate
+     *        followed immediately by the Y coordinate and then the Z
+     *        coordinate for each
+     * @return the path-sgement length
+     * @throws IllegalArgumentException if the type argument is not
+     *         recognized or if the fifth argument is null or is too short
+     */
+    public static double segmentLength(double u, int type,
+				       double x0, double y0, double z0,
+				       double[] coords)
+	throws IllegalArgumentException
+    {
+	switch (type) {
+	case PathIterator3D.SEG_MOVETO:
+	    return 0.0;
+	case PathIterator3D.SEG_CLOSE:
+	case PathIterator3D.SEG_LINETO:
+	    if (coords == null || coords.length < 3) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    double dx = (coords[0] - x0)*u;
+	    double dy = (coords[1] - y0)*u;
+	    double dz = (coords[2] - z0)*u;
+	    if (dx == 0.0 && dy == 0.0) {
+		if (dz == 0.0) return 0.0;
+		else return Math.abs(dz);
+	    } else if (dx == 0.0 && dz == 0.0) {
+		if (dy == 0.0) return 0.0;
+		return  Math.abs(dy);
+	    } else if (dy == 0.0 && dz == 0.0) {
+		if (dx == 0.0) return 0.0;
+		return  Math.abs(dx);
+	    } else {
+		return Math.sqrt(dx*dx + dy*dy + dz*dz);
+	    }
+
+	case PathIterator3D.SEG_QUADTO:
+	    if (coords == null || coords.length < 6) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return quadLength(u, x0, y0, z0, coords);
+	case PathIterator3D.SEG_CUBICTO:
+	    if (coords == null || coords.length < 9) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return cubicLength(u, x0, y0, z0, coords);
+	default:
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
+	}
+    }
+
+    /**
      * Compute the length of a quadratic path segment from its start to
      * a position specified by the path parameter.
      * @param u the path parameter in the range [0.0, 1.0]
@@ -111,7 +182,7 @@ public class Path3DInfo {
 	if (split) {
 	    depth++;
 	    double[] scoords = new double[18];
-	    PathSplitter.split(PathIterator.SEG_CUBICTO,
+	    PathSplitter.split(PathIterator3D.SEG_CUBICTO,
 			       x0, y0, z0, coords, 0, scoords, 0, 0.5);
 	    if (u <= 0.5) {
 		u *= 2;
@@ -628,11 +699,11 @@ public class Path3DInfo {
 	boolean sawClose = false;
 	while(!pit.isDone()) {
 	    switch(pit.currentSegment(coords)) {
-	    case PathIterator.SEG_MOVETO:
+	    case PathIterator3D.SEG_MOVETO:
 		startx = coords[0];
 		starty = coords[1];
 		startz = coords[2];
-	    case PathIterator.SEG_LINETO:
+	    case PathIterator3D.SEG_LINETO:
 		list.add(coords[0]);
 		list.add(coords[1]);
 		list.add(coords[2]);
@@ -641,7 +712,7 @@ public class Path3DInfo {
 		lastz = coords[3];
 		sawClose = false;
 		break;
-	    case PathIterator.SEG_QUADTO:
+	    case PathIterator3D.SEG_QUADTO:
 		if (all) {
 		    list.add(coords[0]);
 		    list.add(coords[1]);
@@ -655,7 +726,7 @@ public class Path3DInfo {
 		lastz = coords[5];
 		sawClose = false;
 		break;
-	    case PathIterator.SEG_CUBICTO:
+	    case PathIterator3D.SEG_CUBICTO:
 		if (all) {
 		    list.add(coords[0]);
 		    list.add(coords[1]);
@@ -672,7 +743,7 @@ public class Path3DInfo {
 		lastz = coords[8];
 		sawClose = false;
 		break;
-	    case PathIterator.SEG_CLOSE:
+	    case PathIterator3D.SEG_CLOSE:
 		if (sawClose == false && lastx == startx && lasty == starty
 		    && lastz == startz) {
 		    int sz = list.size();
@@ -981,7 +1052,7 @@ public class Path3DInfo {
 	 *        should be at least 3 and the maximum size needed is 9.
 	 * @param last the previous SegmentData for a path; null if there
 	 *        is none
-	 * @see PathIterator
+	 * @see PathIterator3D
 	 * @exception IllegalArgumentException a value was out of range
 	 * @exception ArrayIndexOutOfBoundsException the array argument was
 	 *            two small
@@ -1005,7 +1076,8 @@ public class Path3DInfo {
 	    c0x0 = c0 - x0;
 	    c1y0 = c1 - y0;
 	    c2z0 = c2 - z0;
-	    if (st == PathIterator3D.SEG_LINETO || st == PathIterator3D.SEG_CLOSE) {
+	    if (st == PathIterator3D.SEG_LINETO
+		|| st == PathIterator3D.SEG_CLOSE) {
 		return;
 	    }
 	    // c2c0 = c2 - c0;
@@ -1462,25 +1534,25 @@ public class Path3DInfo {
 	 */
 	public boolean curvatureExists(UValues uv) {
 	    switch(st) {
-	    case PathIterator.SEG_MOVETO:
+	    case PathIterator3D.SEG_MOVETO:
 		return false;
-	    case PathIterator.SEG_LINETO:
+	    case PathIterator3D.SEG_LINETO:
 		if (x0 == c0 && y0 == c1 && z0 == c2) return false;
 		break;
-	    case PathIterator.SEG_CLOSE:
+	    case PathIterator3D.SEG_CLOSE:
 		if (x0 == c0 && y0 == c1 && z0 == c2) {
 		    if (uv.u > 0.0) return false;
 		    if (last == null) return false;
 		    return last.curvatureExists(uvOne);
 		}
 		break;
-	    case PathIterator.SEG_QUADTO:
+	    case PathIterator3D.SEG_QUADTO:
 		if (x0 == c0 && y0 == c1 && z0 == c2
 		    && x0 == c3 && y0 == c4 && z0 == c5) {
 		    return false;
 		}
 		break;
-	    case  PathIterator.SEG_CUBICTO:
+	    case  PathIterator3D.SEG_CUBICTO:
 		if (x0 == c0 && y0 == c1 && z0 == c2
 		    && x0 == c3 && y0 == c4 && z0 == c5
 		    && x0 == c6 && y0 == c7 && z0 == c8) {
@@ -1511,7 +1583,7 @@ public class Path3DInfo {
 	 *         vector does not exist
 	 */
 	public boolean getTangent(UValues uv, double[] array, int offset) {
-	    if (st == PathIterator.SEG_CLOSE) {
+	    if (st == PathIterator3D.SEG_CLOSE) {
 		if (x0 == c0 && y0 == c1 && z0 == c2) {
 		    if (uv.u == 0.0) {
 			return last.getTangent(uv, array, offset);
@@ -1521,7 +1593,7 @@ public class Path3DInfo {
 			return false;
 		    }
 		}
-	    } else if (st == PathIterator.SEG_LINETO) {
+	    } else if (st == PathIterator3D.SEG_LINETO) {
 		double tmp = c0x0*c0x0 + c1y0*c1y0 + c2z0*c2z0;
 		if (tmp == 0.0) return false;
 		tmp = Math.sqrt(tmp);
@@ -1569,7 +1641,7 @@ public class Path3DInfo {
 	 *         vector does not exist
 	 */
 	public boolean getNormal(UValues uv, double[] array, int offset) {
-	    if (st == PathIterator.SEG_LINETO || st == PathIterator.SEG_CLOSE) {
+	    if (st == PathIterator3D.SEG_LINETO || st == PathIterator3D.SEG_CLOSE) {
 		return false;
 	    }
 	    double[] vtmp = new double[3];
@@ -1587,7 +1659,7 @@ public class Path3DInfo {
 	    tmp = VectorOps.dotProduct(ttmp, ttmp);
 	    tmp = Math.sqrt(tmp);
 	    if (tmp == 0.0) {
-		if (st != PathIterator.SEG_CUBICTO) return false;
+		if (st != PathIterator3D.SEG_CUBICTO) return false;
 		UValues uvuv = uv.equals(uvZero)? uvOne:
 		    uv.equals(uvOne)? uvZero:
 		    (uv.u <= 0.5)? uvOne: uvZero;
@@ -1704,8 +1776,9 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0;
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
      *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
      *         and PathIterator3D.SEG_CLOSE)
      * @param  coords the coordinates array as defined by
@@ -1758,15 +1831,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0;
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of the y coordinate
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -1811,15 +1885,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0;
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of dx/ds
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -1863,15 +1938,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0;
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of dy/du
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -1915,15 +1991,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0;
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of dy/du
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -1968,15 +2045,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of ds/du
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2039,15 +2117,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *       is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>x/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2095,15 +2174,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>y/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2148,15 +2228,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>y/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2205,15 +2286,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>x/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2261,15 +2343,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>y/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2317,15 +2400,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>y/du<sup>2</sup>;
      * @exception IllegalArgumentException u is out of range or the type
      *         does not have a legal value
@@ -2376,15 +2460,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by 
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the value of d<sup>2</sup>s/du<sup>2</sup>; Double.NaN if
      *         not defined but zero if the type is
      *         {@link PathIterator3D#SEG_MOVETO PathIterator3D.SEG_MOVETO}
@@ -2393,7 +2478,7 @@ public class Path3DInfo {
      * @exception ArrayIndexOutOfBoundsException the array argument was
      *            two small
      * @exception NullPointerException the array argument was null
-     * @see PathIterator
+     * @see PathIterator3D
      */
     public static double d2sDu2(double u, double x0, double y0, double z0,
 				int type, double[] coords)
@@ -2479,15 +2564,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the curvature; Double.NaN if not defined (this may happen
      *         if a line segment has zero length)
      * @exception IllegalArgumentException u is out of range or the type
@@ -2544,15 +2630,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the curvature; Double.NaN if not defined (this may happen
      *         if a line segment has zero length)
      * @exception IllegalArgumentException u is out of range or the type
@@ -2607,15 +2694,16 @@ public class Path3DInfo {
      * @param y0 the Y coordinate of the point on the segment for u = 0
      * @param z0 the Z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator.SEG_MOVETO, PathIterator.SEG_LINETO,
-     *         PathIterator.SEG_QUADTO, PathIterator.SEG_CUBICTO
-     *         and PathIterator.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the X and Y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the X and Y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return true if the tangent vector exists; false if the tangent
      *         vector does not exist
      */
@@ -2623,7 +2711,7 @@ public class Path3DInfo {
 				     double x0, double y0, double z0,
 				     int type, double[] coords)
     {
-	if (type == PathIterator.SEG_MOVETO) {
+	if (type == PathIterator3D.SEG_MOVETO) {
 	    return false;
 	}
 	double xp = Path3DInfo.dxDu(u, x0, y0, z0, type, coords);
@@ -2664,7 +2752,7 @@ public class Path3DInfo {
      * @param y0 the Y coordinate of the point on the segment for u = 0
      * @param z0 the Y coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
+     *        {@link PathIterator3D PathIterator3D}
      *        (values may be PathIterator3D.SEG_MOVETO,
      *        PathIterator3D.SEG_LINETO, PathIterator3D.SEG_QUADTO,
      *        PathIterator3D.SEG_CUBICTO, and PathIterator3D.SEG_CLOSE)
@@ -2681,8 +2769,9 @@ public class Path3DInfo {
 				    double x0, double y0, double z0,
 				    int type, double[] coords)
     {
-	if (type == PathIterator.SEG_LINETO || type == PathIterator.SEG_CLOSE
-	    || type == PathIterator.SEG_MOVETO) {
+	if (type == PathIterator3D.SEG_LINETO
+	    || type == PathIterator3D.SEG_CLOSE
+	    || type == PathIterator3D.SEG_MOVETO) {
 	    return false;
 	}
 	double[] vtmp = new double[3];
@@ -2700,7 +2789,7 @@ public class Path3DInfo {
 	tmp = VectorOps.dotProduct(ttmp, ttmp);
 	tmp = Math.sqrt(tmp);
 	if (tmp == 0) {
-	    if (type != PathIterator.SEG_CUBICTO) return false;
+	    if (type != PathIterator3D.SEG_CUBICTO) return false;
 	    double uu = (u == 0.0)? 1.0:
 		(u == 1.0)? 0.0:
 		(u <= 0.5)? 1.0: 0.0;
@@ -2738,7 +2827,7 @@ public class Path3DInfo {
      * @param y0 the Y coordinate of the point on the segment for u = 0
      * @param z0 the Y coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by
-     *        {@link java.awt.geom.PathIterator PathIterator}
+     *        {@link PathIterator3D PathIterator3D}
      *        (values may be PathIterator3D.SEG_MOVETO,
      *        PathIterator3D.SEG_LINETO, PathIterator3D.SEG_QUADTO,
      *        PathIterator3D.SEG_CUBICTO, and PathIterator3D.SEG_CLOSE)
@@ -3046,15 +3135,16 @@ public class Path3DInfo {
      * @param y0 the y coordinate of the point on the segment for u = 0
      * @param z0 the z coordinate of the point on the segment for u = 0
      * @param type the segment type as defined by 
-     *        {@link java.awt.geom.PathIterator PathIterator}
-     *        (values may be PathIterator3D.SEG_MOVETO, PathIterator3D.SEG_LINETO,
-     *         PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
-     *         and PathIterator3D.SEG_CLOSE)
-     * @param  coords the coordinates array as defined by
-     *         {@link java.awt.geom.PathIterator PathIterator}, but with
-     *         coords[0] and coords[1] set to the x and y coordinates
-     *         respectively for the last MOVETO operation when the type
-     *         is PathIterator3D.SEG_CLOSE
+     *        {@link PathIterator3D PathIterator3D}
+     *        (values may be PathIterator3D.SEG_MOVETO,
+     *        PathIterator3D.SEG_LINETO,
+     *        PathIterator3D.SEG_QUADTO, PathIterator3D.SEG_CUBICTO
+     *        and PathIterator3D.SEG_CLOSE)
+     * @param coords the coordinates array as defined by
+     *        {@link java.awt.geom.PathIterator PathIterator}, but with
+     *        coords[0] and coords[1] set to the x and y coordinates
+     *        respectively for the last MOVETO operation when the type
+     *        is PathIterator3D.SEG_CLOSE
      * @return the segment length
      */
     public static double segmentLength(final int type,
@@ -3085,9 +3175,9 @@ public class Path3DInfo {
 		    return Math.sqrt(dx*dx + dy*dy + dz*dz);
 		}
 	    }
-	case PathIterator.SEG_QUADTO:
+	case PathIterator3D.SEG_QUADTO:
 		return quadLength(1.0, x0, y0, z0, coords);
-	case PathIterator.SEG_CUBICTO:
+	case PathIterator3D.SEG_CUBICTO:
 	    return cubicLength(1.0, x0, y0, z0, coords);
 	default:
 	    // Old code used before we switched to
@@ -3303,8 +3393,10 @@ public class Path3DInfo {
 			if (dz == 0.0) length = 0.0;
 			else length = Math.abs(dz);
 		    } else if (dx == 0.0 && dz == 0.0) {
+			if (dy == 0.0) length = 0.0;
 		        length = Math.abs(dy);
 		    } else if (dy == 0.0 && dz == 0.0) {
+			if (dx == 0.0) length = 0.0;
 			length = Math.abs(dx);
 		    } else {
 			length = Math.sqrt(dx*dx + dy*dy + dz*dz);
@@ -3561,7 +3653,7 @@ public class Path3DInfo {
 	boolean closed = false;
 	while (!pi.isDone()) {
 	    switch(pi.currentSegment(coords)) {
-	    case PathIterator.SEG_MOVETO:
+	    case PathIterator3D.SEG_MOVETO:
 		path1.reset();
 		path2.reset();
 		path = path1;
@@ -3574,7 +3666,7 @@ public class Path3DInfo {
 		}
 		path.moveTo(lastx, lasty, lastz);
 		break;
-	    case PathIterator.SEG_LINETO:
+	    case PathIterator3D.SEG_LINETO:
 		if (closed) {
 		    throw new IllegalArgumentException(errorMsg("badSegClose"));
 		}
@@ -3587,7 +3679,7 @@ public class Path3DInfo {
 		    path.moveTo(x, y, z);
 		}
 		break;
-	    case PathIterator.SEG_QUADTO:
+	    case PathIterator3D.SEG_QUADTO:
 		if (closed) {
 		    throw new IllegalArgumentException(errorMsg("badSegClose"));
 		}
@@ -3601,7 +3693,7 @@ public class Path3DInfo {
 		    path.moveTo(x, y, z);
 		}
 		break;
-	    case PathIterator.SEG_CUBICTO:
+	    case PathIterator3D.SEG_CUBICTO:
 		if (closed) {
 		    throw new IllegalArgumentException(errorMsg("badSegClose"));
 		}
@@ -3616,7 +3708,7 @@ public class Path3DInfo {
 		    path.moveTo(x, y, z);
 		}
 		break;
-	    case PathIterator.SEG_CLOSE:
+	    case PathIterator3D.SEG_CLOSE:
 		if (closed) break;
 		if (xx != lastx || yy != lasty || zz != lastz) {
 		    path.lineTo(lastx, lasty, lastz);
@@ -3641,20 +3733,20 @@ public class Path3DInfo {
     /**
      * Count the number of segments in the  first continuous portion of a
      * path that are Drawable.
-     * Drawable segments exclude PathIterator.SEG_MOVETO segments and
-     * PathIterator.SEG_CLOSE segments whose current point is the same
-     * as that of a previous PathIterator.SEG_MOVETO segment.  The
-     * test ignores any segments after a second PathIterator.SEG_MOVE,
-     * excluding an initial set of back-to-back PathIterator.SEG_MOVE
-     * segments, or a first PathIterator.SEG_CLOSE.  If the last point
-     * is the segment preceding a PathIterator.SEG_CLOSE segment is
+     * Drawable segments exclude PathIterator3D.SEG_MOVETO segments and
+     * PathIterator3D.SEG_CLOSE segments whose current point is the same
+     * as that of a previous PathIterator3D.SEG_MOVETO segment.  The
+     * test ignores any segments after a second PathIterator3D.SEG_MOVE,
+     * excluding an initial set of back-to-back PathIterator3D.SEG_MOVE
+     * segments, or a first PathIterator3D.SEG_CLOSE.  If the last point
+     * is the segment preceding a PathIterator3D.SEG_CLOSE segment is
      * equal to t he initial segment (whose type is first
-     * PathIterator.SEG_MOVETO), the terminating
-     * PathIterator.SEG_CLOSE segment is not included in the count.
+     * PathIterator3D.SEG_MOVETO), the terminating
+     * PathIterator3D.SEG_CLOSE segment is not included in the count.
      * @param path the path
      * @return true if the path is closed; false otherwise
      * @throws IllegalStateException if the path does not start with a
-     *         segment whose type is PathIterator.SEG_MOVE.
+     *         segment whose type is PathIterator3D.SEG_MOVE.
      */
     public static int numberOfDrawableSegments(Path3D path) {
 	double[] tmp = new double[9];
@@ -3665,7 +3757,7 @@ public class Path3DInfo {
 	if (!pi.isDone()) {
 	    do {
 		// count++;
-		if (pi.currentSegment(tmp) == PathIterator.SEG_MOVETO) {
+		if (pi.currentSegment(tmp) == PathIterator3D.SEG_MOVETO) {
 		    lastx = tmp[0]; lasty = tmp[1]; lastz = tmp[2];
 		    startx = lastx; starty = lasty; startz = lastz;
 		} else {
@@ -3674,31 +3766,31 @@ public class Path3DInfo {
 		}
 		pi.next();
 	    } while (!pi.isDone()
-		     && pi.currentSegment(tmp) == PathIterator.SEG_MOVETO);
+		     && pi.currentSegment(tmp) == PathIterator3D.SEG_MOVETO);
 	}
 	while (!pi.isDone()) {
 	    switch(pi.currentSegment(tmp)) {
-	    case PathIterator.SEG_MOVETO:
+	    case PathIterator3D.SEG_MOVETO:
 		lastx = tmp[0];
 		lasty = tmp[1];
 		lastz = tmp[2];
 		return count;
-	    case PathIterator.SEG_LINETO:
+	    case PathIterator3D.SEG_LINETO:
 		lastx = tmp[0];
 		lasty = tmp[1];
 		lastz = tmp[2];
 		break;
-	    case PathIterator.SEG_QUADTO:
+	    case PathIterator3D.SEG_QUADTO:
 		lastx = tmp[3];
 		lasty = tmp[4];
 		lastz = tmp[5];
 		break;
-	    case PathIterator.SEG_CUBICTO:
+	    case PathIterator3D.SEG_CUBICTO:
 		lastx = tmp[6];
 		lasty = tmp[7];
 		lasty = tmp[8];
 		break;
-	    case PathIterator.SEG_CLOSE:
+	    case PathIterator3D.SEG_CLOSE:
 		startx = (double)(float)startx;
 		starty = (double)(float)starty;
 		startz = (double)(float)startz;
@@ -3728,7 +3820,7 @@ public class Path3DInfo {
 	boolean justSawMove = false;
 	while (!pi.isDone()) {
 	    int mode = pi.currentSegment(tmp);
-	    if (mode == PathIterator.SEG_MOVETO) {
+	    if (mode == PathIterator3D.SEG_MOVETO) {
 		if (sawMove && !justSawMove) {
 		    return false;
 		}
@@ -3737,7 +3829,7 @@ public class Path3DInfo {
 		pi.next();
 		continue;
 	    }
-	    if (mode == PathIterator.SEG_CLOSE) return true;
+	    if (mode == PathIterator3D.SEG_CLOSE) return true;
 	    justSawMove = false;
 	    pi.next();
 	}

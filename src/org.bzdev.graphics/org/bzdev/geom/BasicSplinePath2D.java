@@ -2071,15 +2071,21 @@ public class BasicSplinePath2D extends SplinePath2D {
 	    Path2DInfo.SegmentData segdata =
 		new Path2DInfo.SegmentData(entry.type, entry.x, entry.y,
 					   entry.coords, null);
-	    synchronized (glq4seglen) {
+	    // synchronized (glq4seglen) {
 		for (int i = 1; i < numberOfIntervals/*+1*/; i++) {
-		    double t1 = ((double)(i-1))/numberOfIntervals;
+		    // double t1 = ((double)(i-1))/numberOfIntervals;
 		    double t2 = ((double)(i))/numberOfIntervals;
+		    /*
 		    segindex = i;
 		    // svalues[i] = svalues[i-1] + glq.integrate(t1, t2);
 		    svalues[i] = svalues[i-1]
 			+ glq4seglen.integrateWithP(u4seglen[segindex],
 						    segdata);
+		    */
+		    svalues[i] = svalues[0] +
+			Path2DInfo.segmentLength(t2, entry.type,
+						 entry.x, entry.y,
+						 entry.coords);
 		    dvalues[i] = Path2DInfo.dsDu(t2, entry.x, entry.y,
 						 entry.type, entry.coords);
 		}
@@ -2092,7 +2098,7 @@ public class BasicSplinePath2D extends SplinePath2D {
 						     1.0/numberOfIntervals,
 						     CubicSpline.Mode.HERMITE,
 						     dvalues);
-	    }
+	    // }
 	    if (inversionLimit >= 0.0) {
 		sublengths[index].setInversionLimit(inversionLimit);
 	    }
@@ -2282,6 +2288,32 @@ public class BasicSplinePath2D extends SplinePath2D {
 	}
     }
 
+    boolean enhancedAccuracy = false;
+
+    /**
+     * Set the accuracy mode.
+     * The accuracy mode determines how distances are computed from path
+     * parameters and how distances along a parh are converted to path
+     * parameters.  When the mode is set to true, a slower, but more
+     * accurate computation is done.  When false, precomputed splines are
+     * used. For typical animations, the value <CODE>false</CODE> is
+     * appropriate.
+     * @param mode true for enhanced accuracy; false for normal accuracy
+     */
+    public void setAccuracyMode(boolean mode) {
+	enhancedAccuracy = mode;
+    }
+
+    /**
+     * Get the accuracy mode
+     * @return true for more accuracy; false for 'normal' accuracy
+     * @see #setAccuracyMode(boolean)
+     */
+    public boolean getAccuracyMode() {
+	return enhancedAccuracy;
+    }
+
+
     /**
      * Get the distance traversed on a subpath.
      * If u2 &lt; u1, the value returned is negative.
@@ -2371,7 +2403,18 @@ public class BasicSplinePath2D extends SplinePath2D {
 		if (ind1 == ind2) {
 		    // sum += glq.integrate(t1, t2);
 		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
-		    adder.add(spline.valueAt(t2) - spline.valueAt(t1));
+		    if (enhancedAccuracy) {
+			adder.add(Path2DInfo.segmentLength(t2, entry1.type,
+							   entry1.x,
+							   entry1.y,
+							   entry1.coords)
+				  - Path2DInfo.segmentLength(t1, entry1.type,
+							     entry1.x,
+							     entry1.y,
+							     entry1.coords));
+		    } else {
+			adder.add(spline.valueAt(t2) - spline.valueAt(t1));
+		    }
 		} else {
 		    if (ind1 != ind) {
 			// if ind1 == ind, the sum will be covered
@@ -2382,7 +2425,20 @@ public class BasicSplinePath2D extends SplinePath2D {
 			*/
 			// sum += glq.integrate(t1, 1.0);
 			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
-			adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
+			if (enhancedAccuracy) {
+			    adder.add(Path2DInfo
+				      .segmentLength(1.0, entry1.type,
+						     entry1.x,
+						     entry1.y,
+						     entry1.coords)
+				      - Path2DInfo
+				      .segmentLength(t1, entry1.type,
+						     entry1.x,
+						     entry1.y,
+						     entry1.coords));
+			} else {
+			    adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
+			}
 		    }
 		    // double psum1 = adder.getSum();
 		    /*
@@ -2452,7 +2508,15 @@ public class BasicSplinePath2D extends SplinePath2D {
 			*/
 			// sum += glq.integrate(0.0, t2);
 			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
-			adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
+			if (enhancedAccuracy) {
+			    adder.add(Path2DInfo
+				      .segmentLength(t2, entry2.type,
+						     entry2.x,
+						     entry2.y,
+						     entry2.coords));
+			} else {
+			    adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
+			}
 		    }
 		}
 		return adder.getSum();
@@ -2475,7 +2539,20 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    */
 		    // sum += glq.integrate(t1, t2);
 		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
-		    adder.add(spline.valueAt(t2) - spline.valueAt(t1));
+		    if (enhancedAccuracy) {
+			adder.add(Path2DInfo
+				  .segmentLength(t2, entry1.type,
+						 entry1.x,
+						 entry1.y,
+						 entry1.coords)
+				  - Path2DInfo
+				  .segmentLength(t1, entry1.type,
+						 entry1.x,
+						 entry1.y,
+						 entry1.coords));
+		    } else {
+			adder.add(spline.valueAt(t2) - spline.valueAt(t1));
+		    }
 		} else {
 		    if (ind != ind1) {
 			/*
@@ -2485,7 +2562,20 @@ public class BasicSplinePath2D extends SplinePath2D {
 			*/
 			// sum += glq.integrate(t1, 1.0);
 			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
-			adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
+			if (enhancedAccuracy) {
+			    adder.add(Path2DInfo
+				      .segmentLength(1.0, entry1.type,
+						     entry1.x,
+						     entry1.y,
+						     entry1.coords)
+				      - Path2DInfo
+				      .segmentLength(t1, entry1.type,
+						     entry1.x,
+						     entry1.y,
+						     entry1.coords));
+			} else {
+			    adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
+			}
 		    }
 		    while (ind < ind2) {
 			// System.out.println("adding segment " + ind);
@@ -2506,7 +2596,15 @@ public class BasicSplinePath2D extends SplinePath2D {
 			*/
 			spline = getSublength(ind2);
 			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
-			adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
+			if (enhancedAccuracy) {
+			    adder.add(Path2DInfo
+				      .segmentLength(t2, entry2.type,
+						     entry2.x,
+						     entry2.y,
+						     entry2.coords));
+			} else {
+			    adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
+			}
 			/*
 			System.out.println("adding 0.0 to " + t2
 					   + " for ind2 = " + ind2);
@@ -2592,6 +2690,31 @@ public class BasicSplinePath2D extends SplinePath2D {
 		final CubicSpline spline = getSublength(index);
 		try {
 		    du = spline.inverseAt(sd);
+		    if (enhancedAccuracy) {
+			// if du matches a knot, we have nothing to do.
+			int n = spline.countKnots() - 1;
+			double ndu = du*n;
+			double dutmp = Math.round(ndu)/n;
+			if (Math.abs(dutmp - du) > 1.e-12) {
+			    final double sbase = spline.valueAt(0.0);
+			    Path2DInfo.Entry entry = entries[index];
+			    RootFinder nf = RootFinder.Newton
+				.newInstance((t) -> {
+					return Path2DInfo
+					    .segmentLength(t, entry.type,
+							   entry.x, entry.y,
+							   entry.coords);
+				    }, (t) -> {
+					return Path2DInfo
+					    .dsDu(t, entry.x, entry.y,
+						  entry.type, entry.coords);
+				    });
+			    // The knots of the spline are evenly spaced.
+			    double lb = Math.floor(ndu)/n;
+			    double ub = Math.ceil(ndu)/n;
+			    du = nf.solve(sd - sbase, du, lb, ub);
+			}
+		    }
 		} catch (IllegalArgumentException e) {
 		    // If ds/du is close to 0.0 the inverse may fail.
 		    // In that case, we use Brent's algorithm. This case
@@ -2635,14 +2758,40 @@ public class BasicSplinePath2D extends SplinePath2D {
 		// is 1.
 		index = -index - 2;
 		double du;
+		final CubicSpline spline = getSublength(index);
 		try {
-		    du = getSublength(index).inverseAt(s);
+		    du = spline.inverseAt(s);
+		    if (enhancedAccuracy) {
+			// if du matches a knot, we have nothing to do.
+			int n = spline.countKnots() - 1;
+			double ndu = du*n;
+			double dutmp = Math.round(ndu)/n;
+			if (Math.abs(dutmp - du) > 1.e-12) {
+			    final double sbase = spline.valueAt(0.0);
+			    Path2DInfo.Entry entry = entries[index];
+			    RootFinder nf = RootFinder.Newton
+				.newInstance((t) -> {
+					return Path2DInfo
+					    .segmentLength(t, entry.type,
+							   entry.x, entry.y,
+							   entry.coords);
+				    }, (t) -> {
+					return Path2DInfo
+					    .dsDu(t, entry.x, entry.y,
+						  entry.type, entry.coords);
+				    });
+			    // The knots of the spline are evenly spaced.
+			    double lb = Math.floor(ndu)/n;
+			    double ub = Math.ceil(ndu)/n;
+			    du = nf.solve(s-sbase, du, lb, ub);
+			}
+		    }
 		} catch (IllegalArgumentException e) {
 		    // If ds/du is close to 0.0 the inverse may fail.
 		    // In that case, we use Brent's algorithm. This case
 		    // should not occur very often. It did show up in a
 		    // test program.
-		    final CubicSpline spline = getSublength(index);
+		    // final CubicSpline spline = getSublength(index);
 		    RootFinder rf = new RootFinder.Brent() {
 			    public double function(double u) {
 				return spline.valueAt(u);

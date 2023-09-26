@@ -245,6 +245,13 @@ public class BasicPath3DTest {
 	    double u1 = upair[0];
 	    double u2 = upair[1];
 	    double len = loop.getPathLength(u1, u2);
+	    loop.setAccuracyMode(true);
+	    double len3 = loop.getPathLength(u1, u2);
+	    loop.setAccuracyMode(false);
+	    System.out.println("len = " + len + ", len3 = " + len3);
+	    if (Math.abs(len-len3)/Math.abs(len) > 1.e-10) {
+		throw new Exception();
+	    }
 	    double len1 = loop3D1.getPathLength(u1, u2);
 	    double len2 = loop3D2.getPathLength(u1, u2);
 	    if (Math.abs(len-len1) > 1.e-10 || Math.abs(len-len2) > 1.e-10) {
@@ -306,6 +313,24 @@ public class BasicPath3DTest {
 				   + ", loop.u(s) = " + loop.u(s));
 		errcount++;
 	    }
+	    loop.setAccuracyMode(true);
+	    double s2 = loop.s(u);
+	    if (Math.abs(s-s2)/s > 1.e-8) {
+		System.out.println("s = " +s);
+		System.out.println("s2 = " +s2);
+		throw new Exception();
+	    }
+	    double delta2 = Math.abs(u - loop.u(s2))/Math.max(1.0, Math.abs(u));
+	    if (delta2 > 1.e-7) {
+		System.out.println("s = " + s);
+		System.out.println("s2 = " + s2);
+		System.out.println("u = " + u);
+		System.out.println("loop.u(s2) = " + loop.u(s2));
+		System.out.println("delta = " + delta);
+		System.out.println("delta2 = " + delta2);
+		throw new Exception();
+	    }
+	    loop.setAccuracyMode(false);
 	}
 	if (errcount > 0) throw new Exception("... failed");
 

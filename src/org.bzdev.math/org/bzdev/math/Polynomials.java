@@ -1974,8 +1974,12 @@ public class Polynomials {
 	    }
 	}
 	// CRC Standard Math Tables, page 297
-	double q = 4*a*c - b*b;
-	if (q == 0) {
+	double qterm1 = 4*a*c;
+	double qterm2 = b*b;
+	// double q = 4*a*c - b*b;
+	double q = qterm1 - qterm2;
+	double qtest = Math.abs(q) / Math.max(Math.abs(qterm1), qterm2);
+	if (qtest < 1.e-10) {
 	    // reduces to a polynomial: integrate sqrt(c)(x-r) where
 	    // r = -b/2c.  The integral is sqrt(c)(x*x/2 - rx).
 	    // if (c < 0) throw new Exception("cannot integrate");
@@ -2192,8 +2196,12 @@ public class Polynomials {
 				     -(2*a-3*b*x)*MathOps.pow(a+b*x, 3, 2));
 	    }
 	}
-	double q = 4*a*c - b*b;
-	if (q == 0.0) {
+	double qterm1 = 4*a*c;
+	double qterm2 = b*b;
+	// double q = 4*a*c - b*b;
+	double q = qterm1 - qterm2;
+	double qtest = Math.abs(q) / Math.max(Math.abs(qterm1), qterm2);
+	if (qtest < 1.e-10) {
 	    // r = -b /(2*c);
 	    // polynomial = c*(x-r)^2 so integrate  x*sqrt(c)*(x-r)
 	    // = sqrt(c)*(x*x -r*x)

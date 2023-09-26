@@ -111,6 +111,14 @@ public class BasicPathTest {
 	    double u1 = 180 * random.nextGaussian();
 	    double u2 = 180 * random.nextGaussian();
 	    double len = circle.getDistance(u1, u2);
+	    circle.setAccuracyMode(true);
+	    double len2 = circle.getDistance(u1, u2);
+	    circle.setAccuracyMode(false);
+
+	    if (Math.abs(len-len2)/Math.max(1.0, Math.abs(len)) > 1.e-8) {
+		throw new Exception();
+	    }
+
 	    double estimated = (Math.PI / 9.0) * (u2 - u1) * 100;
 	    double limit = (estimated == 0.0)? 1.0e-3:
 		Math.abs(estimated) * 1.0e-3;
@@ -126,6 +134,8 @@ public class BasicPathTest {
 	    double s = circle.s(u);
 	    double uu = circle.u(s);
 	    System.out.println("u = " + u + ", s = " + s +", uu = " + uu);
+
+
 	    
 	    u = -10.0001;
 	    double s1 = circle.s(u);
@@ -147,6 +157,23 @@ public class BasicPathTest {
 				   + ", s = " + s
 				   + ", circle.u(s) = " + circle.u(s));
 	    }
+	    circle.setAccuracyMode(true);
+	    double s2 = circle.s(u);
+	    if (Math.abs(s-s2)/s > 1.e-8) {
+		System.out.println("s = " +s);
+		System.out.println("s2 = " +s2);
+		throw new Exception();
+	    }
+	    double delta2 = Math.abs(u - circle.u(s2));
+	    if (delta2 > 1.e-7) {
+		System.out.println("s = " + s);
+		System.out.println("s2 = " + s2);
+		System.out.println("u = " + u);
+		System.out.println("circle.u(s2) = " + circle.u(s2));
+		System.out.println("delta = " + delta);
+		throw new Exception();
+	    }
+	    circle.setAccuracyMode(false);
 	}
 
 	System.out.println("circle curvature = " + circle.curvature(0.0));
