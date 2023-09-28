@@ -5236,7 +5236,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			throw new IllegalArgumentException(msg);
 		    }
 		    pushValue(object);
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    String msg = errorMsg("indexAssigned");
 		    throw new ObjectParser.Exception(msg, e,
 						     opToken.getFileName(),
@@ -5255,7 +5255,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			    (errorMsg("nullMethodRefTarget"));
 		    }
 		    pushValue(createMethodRef2(target, methodName));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    String msg = errorMsg("methodRefFailed");
 		    throw new ObjectParser.Exception(msg, e,
 						     opToken.getFileName(),
@@ -5307,7 +5307,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			Number n1 = (Number) o2;
 			pushValue(add(n1, n2));
 		    }
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5317,7 +5317,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case UNARY_MINUS:
 		try {
 		    pushValue(changeSign((Number)popValue()));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5329,7 +5329,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(sub(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5341,7 +5341,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(mult(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5353,7 +5353,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(div(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5365,7 +5365,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(mod(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5377,7 +5377,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(mathmod(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5389,7 +5389,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(lshift(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5401,7 +5401,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(rshift(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5413,7 +5413,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(urshift(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5424,7 +5424,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		try {
 		    Number n = (Number) popValue();
 		    pushValue(not(n));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5435,7 +5435,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		try {
 		    Boolean b = (Boolean) popValue();
 		    pushValue(lnot(b));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5447,7 +5447,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    String msg;
 		    try {
 			msg = (String) popValue();
-		    } catch (Exception e) {
+		    } catch (java.lang.Exception e) {
 			throw new ObjectParser.Exception(e.getMessage(), e,
 							 opToken.getFileName(),
 							 orig,
@@ -5462,7 +5462,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(and(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5474,7 +5474,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(or(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5486,7 +5486,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(xor(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5498,7 +5498,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Boolean b2 = (Boolean) popValue();
 		    Boolean b1 = (Boolean) popValue();
 		    pushValue(land(b1, b2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5510,7 +5510,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Boolean b2 = (Boolean) popValue();
 		    Boolean b1 = (Boolean) popValue();
 		    pushValue(lor(b1, b2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5522,7 +5522,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(gt(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5534,7 +5534,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(ge(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5546,7 +5546,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(lt(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5558,7 +5558,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(le(n1, n2));
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -5583,7 +5583,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    } else {
 			pushValue(clasz.isAssignableFrom(obj.getClass()));
 		    }
-		} catch (Exception e) {
+		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
 						     orig,
@@ -8325,6 +8325,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		// change to UNARY_MINUS or BINARY_MINUS while parsing.
 		if (prev == null || ptype == Operator.OPAREN
 		    || ptype == Operator.OBRACE
+		    || ptype == Operator.OBJOPENBRACE
 		    || ptype == Operator.OBRACKET
 		    || ptype == Operator.VAR
 		    || ptype == Operator.ASSIGN1
@@ -8567,7 +8568,11 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case '+':
 		if (prev == null || ptype == Operator.OPAREN
 		    || ptype == Operator.OBRACE
+		    || ptype == Operator.OBJOPENBRACE
 		    || ptype == Operator.OBRACKET
+		    || ptype == Operator.VAR
+		    || ptype == Operator.ASSIGN1
+		    || ptype == Operator.ASSIGN2
 		    || ptype == Operator.COMMA
 		    || ptype == Operator.ACTIVE_COMMA) {
 		    next = new Token(Operator.UNARY_PLUS, "+",

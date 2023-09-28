@@ -297,7 +297,7 @@ public class ExprScriptTest {
 	    obj = parser.parse(estr);
 	    System.out.println(obj + estr);
 	    estr = "=20/3";
-	    obj = parser.parse(est
+	    obj = parser.parse(estr);
 	    System.out.println(obj + estr);
 	    estr = "=function(){var a = 20; var b = 30; (a+b)/(b-a)}()";
 	    obj = parser.parse(estr);

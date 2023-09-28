@@ -130,11 +130,18 @@ compile:
 	javac -d classes -p ../../BUILD  --add-modules org.bzdev *.java
 
 badesp:
+	(cd ../.. ; make jars)
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
 	./scrun bad2.esp || echo EXCEPTION EXPECTED
 	./scrun  bad3.esp || echo EXCEPTION EXPECTED
 	./scrun  bad4.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+bad5:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun --stackTrace bad5.esp
 	chmod u-x scrun
 
 ctest: compile
