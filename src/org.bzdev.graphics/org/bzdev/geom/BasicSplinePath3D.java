@@ -2654,6 +2654,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 		    // sum += glq.integrate(t1, t2);
 		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
 		    if (enhancedAccuracy) {
+			/*
 			adder.add(Path3DInfo.segmentLength(t2, entry1.type,
 							   entry1.x,
 							   entry1.y,
@@ -2664,6 +2665,10 @@ public class BasicSplinePath3D extends SplinePath3D {
 							     entry1.y,
 							     entry1.z,
 							     entry1.coords));
+			*/
+			RealValuedFunctOps distf = entry1
+			    .getSegmentLengthFunction();
+			adder.add(distf.valueAt(t2) - distf.valueAt(t1));
 		    } else {
 			adder.add(spline.valueAt(t2) - spline.valueAt(t1));
 		    }
@@ -2678,6 +2683,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 			// sum += glq.integrate(t1, 1.0);
 			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
 			if (enhancedAccuracy) {
+			    /*
 			    adder.add(Path3DInfo
 				      .segmentLength(1.0, entry1.type,
 						     entry1.x,
@@ -2690,6 +2696,11 @@ public class BasicSplinePath3D extends SplinePath3D {
 						     entry1.y,
 						     entry1.z,
 						     entry1.coords));
+			    */
+			    RealValuedFunctOps distf = entry1.
+				getSegmentLengthFunction();
+			    adder.add(entry1.getSegmentLength()
+				      - distf.valueAt(t1));
 			} else {
 			    adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
 			}
@@ -2736,12 +2747,17 @@ public class BasicSplinePath3D extends SplinePath3D {
 			// sum += glq.integrate(0.0, t2);
 			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
 			if (enhancedAccuracy) {
+			    /*
 			    adder.add(Path3DInfo
 				      .segmentLength(t2, entry2.type,
 						     entry2.x,
 						     entry2.y,
 						     entry2.z,
 						     entry2.coords));
+			    */
+			    RealValuedFunctOps distf = entry2
+				.getSegmentLengthFunction();
+			    adder.add(distf.valueAt(t2));
 			} else {
 			    adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
 			}
@@ -2767,6 +2783,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 		    // sum += glq.integrate(t1, t2);
 		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
 		    if (enhancedAccuracy) {
+			/*
 			adder.add(Path3DInfo
 				  .segmentLength(t2, entry1.type,
 						 entry1.x,
@@ -2779,6 +2796,10 @@ public class BasicSplinePath3D extends SplinePath3D {
 						 entry1.y,
 						 entry1.z,
 						 entry1.coords));
+			*/
+			RealValuedFunctOps distf = entry1
+			    .getSegmentLengthFunction();
+			adder.add(distf.valueAt(t2) - distf.valueAt(t1));
 		    } else {
 			adder.add(spline.valueAt(t2) - spline.valueAt(t1));
 		    }
@@ -2792,6 +2813,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 			// sum += glq.integrate(t1, 1.0);
 			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
 			if (enhancedAccuracy) {
+			    /*
 			    adder.add(Path3DInfo
 				      .segmentLength(1.0, entry1.type,
 						     entry1.x,
@@ -2804,6 +2826,11 @@ public class BasicSplinePath3D extends SplinePath3D {
 						     entry1.y,
 						     entry1.z,
 						     entry1.coords));
+			    */
+			    RealValuedFunctOps distf = entry1
+				.getSegmentLengthFunction();
+			    adder.add(entry1.getSegmentLength()
+				      - distf.valueAt(t1));
 			} else {
 			    adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
 			}
@@ -2828,12 +2855,17 @@ public class BasicSplinePath3D extends SplinePath3D {
 			spline = getSublength(ind2);
 			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
 			if (enhancedAccuracy) {
+			    /*
 			    adder.add(Path3DInfo
 				      .segmentLength(t2, entry2.type,
 						     entry2.x,
 						     entry2.y,
 						     entry2.z,
 						     entry2.coords));
+			    */
+			    RealValuedFunctOps distf = entry2
+				.getSegmentLengthFunction();
+			    adder.add(distf.valueAt(t2));
 			} else {
 			    adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
 			}
@@ -2923,14 +2955,19 @@ public class BasicSplinePath3D extends SplinePath3D {
 			if (Math.abs(dutmp - du) > 1.e-12) {
 			    final double sbase = spline.valueAt(0.0);
 			    Path3DInfo.Entry entry = entries[index];
+			    final RealValuedFunctOps distf = entry
+				.getSegmentLengthFunction();
 			    RootFinder nf = RootFinder.Newton
 				.newInstance((t) -> {
+					/*
 					return Path3DInfo
 					    .segmentLength(t, entry.type,
 							   entry.x,
 							   entry.y,
 							   entry.z,
 							   entry.coords);
+					*/
+					return distf.valueAt(t);
 				    }, (t) -> {
 					return Path3DInfo
 					    .dsDu(t, entry.x, entry.y, entry.z,
@@ -2998,14 +3035,19 @@ public class BasicSplinePath3D extends SplinePath3D {
 			if (Math.abs(dutmp - du) > 1.e-12) {
 			    Path3DInfo.Entry entry = entries[index];
 			    final double sbase = spline.valueAt(0.0);
+			    RealValuedFunctOps distf = entry
+				.getSegmentLengthFunction();
 			    RootFinder nf = RootFinder.Newton
 				.newInstance((t) -> {
+					/*
 					return Path3DInfo
 					    .segmentLength(t, entry.type,
 							   entry.x,
 							   entry.y,
 							   entry.z,
 							   entry.coords);
+					*/
+					return distf.valueAt(t);
 				    }, (t) -> {
 					return Path3DInfo
 					    .dsDu(t, entry.x, entry.y, entry.z,

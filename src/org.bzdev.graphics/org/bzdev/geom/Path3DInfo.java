@@ -20,6 +20,7 @@ import org.bzdev.math.GLQuadrature;
 import org.bzdev.math.Adder;
 import org.bzdev.math.Adder.Kahan;
 import org.bzdev.math.BezierPolynomial;
+import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.math.Polynomials;
 import org.bzdev.math.Polynomial;
 
@@ -110,6 +111,94 @@ public class Path3DInfo {
     }
 
     /**
+     * Provide a function to compute the length of a subpath of a path segment.
+     * <P>
+     * When the path parameter is {@link PathIterator3D#SEG_CLOSE},
+     * the array must contain the X, Y, and Z coordinates of the path's
+     * initial point in that order.
+     * @param u the path parameter for the end of the subpath which
+     *        includes all points on the path whose path parameters
+     *        are in the range [0, u]
+     * @param type either {@link PathIterator3D#SEG_MOVETO}
+     *        {@link PathIterator3D#SEG_LINETO},
+     *        {@link PathIterator3D#SEG_QUADTO},
+     *        {@link PathIterator3D#SEG_CUBICTO}, or
+     *        {@link PathIterator3D#SEG_CLOSE}
+     * @param x0 the X coordinate at the start of the segment
+     * @param y0 the Y cooredinate at the start of the segment
+     * @param z0 the X cooredinate at the start of the segment
+     * @param coords the remaining control points, with the X coordinate
+     *        followed immediately by the Y coordinate and then the Z
+     *        coordinate for each
+     * @return a function that will compute the length of a subsegment
+     *         of a path segement from the segment's start to the point
+     *         specified by a path parameter provided as the function's
+     *         argument
+     * @throws IllegalArgumentException if the type argument is not
+     *         recognized or if the fifth argument is null or is too short
+     * @throws ArithmeticException if a real-valued function could not be
+     *         provided
+     */
+    public static RealValuedFunctOps
+	segmentLengthFunction(int type, double x0, double y0, double z0,
+			      double[] coords)
+	throws IllegalArgumentException, ArithmeticException
+    {
+	switch (type) {
+	case PathIterator3D.SEG_MOVETO:
+	    return new RealValuedFunctOps() {
+		public double valueAt(double u) {
+		    return 0.0;
+		}
+	    };
+	case PathIterator3D.SEG_CLOSE:
+	case PathIterator3D.SEG_LINETO:
+	    if (coords == null || coords.length < 3) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    final double fdx = (coords[0] - x0);
+	    final double fdy = (coords[1] - y0);
+	    final double fdz = (coords[2] - z0);
+
+	    return new RealValuedFunctOps() {
+		public double valueAt(double u) {
+		    double dx = fdx*u;
+		    double dy = fdy*u;
+		    double dz = fdz*u;
+		    if (dx == 0.0 && dy == 0.0) {
+			if (dz == 0.0) return 0.0;
+			else return Math.abs(dz);
+		    } else if (dx == 0.0 && dz == 0.0) {
+			if (dy == 0.0) return 0.0;
+			return  Math.abs(dy);
+		    } else if (dy == 0.0 && dz == 0.0) {
+			if (dx == 0.0) return 0.0;
+			return  Math.abs(dx);
+		    } else {
+			return Math.sqrt(dx*dx + dy*dy + dz*dz);
+		    }
+		}
+	    };
+	case PathIterator3D.SEG_QUADTO:
+	    if (coords == null || coords.length < 6) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return quadLengthFunction(x0, y0, z0, coords);
+	case PathIterator3D.SEG_CUBICTO:
+	    if (coords == null || coords.length < 9) {
+		String msg = errorMsg("argarraylength6");
+		throw new IllegalArgumentException(msg);
+	    }
+	    return cubicLengthFunction(x0, y0, z0, coords);
+	default:
+	    throw new IllegalArgumentException(errorMsg("piUnknown"));
+	}
+    }
+
+
+    /**
      * Compute the length of a quadratic path segment from its start to
      * a position specified by the path parameter.
      * @param u the path parameter in the range [0.0, 1.0]
@@ -153,6 +242,53 @@ public class Path3DInfo {
 	} catch (ArithmeticException ea) {
 	    return Path2DInfo.getSegmentLength(u, px, py, pz);
 	}
+    }
+
+    /**
+     * Provide a function that computes the length of a quadratic path
+     * segment from its start to a position specified by a path
+     * parameter.
+     * @param x0 the X coordinate of the first control point
+     * @param y0 the Y coordinate of the first control point
+     * @param z0 the Z coordinate of the first control point
+     * @param coords the remaining control points in order, with each
+     *        control point represented by 3 consecutive elements
+     *        contining a control point's X coordinate, Y coordinate,
+     *        and Z coordinate respectively (only the first 6 indices
+     *         will be used)
+     * @return a function of the path parameter providing the length of
+     *         a path segment from its start to the point specified by the
+     *         path parameter provided as the function's argument
+     */
+    public static RealValuedFunctOps
+	quadLengthFunction(double x0, double y0, double z0, double[] coords)
+    {
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[3]);
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[4]);
+
+	BezierPolynomial pz = new BezierPolynomial(z0, coords[2], coords[5]);
+
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
+	BezierPolynomial pzd = pz.deriv();
+
+
+	double[] array = Polynomials
+	    .fromBezier(Polynomials.multiply(pxd, pxd)
+			.add(Polynomials.multiply(pyd, pyd))
+			.add(Polynomials.multiply(pzd, pzd))
+			.getCoefficientsArray(),
+			0, 2);
+
+	final double a = array[0];
+	final double b = array[1];
+	final double c = array[2];
+	return new RealValuedFunctOps() {
+	    public double valueAt(double u) {
+		return Polynomials.integrateRootP2(u, a, b, c);
+	    }
+	};
     }
 
     /**
@@ -321,11 +457,11 @@ public class Path3DInfo {
 		marray = Px.getCoefficientsArray();
 		// cases[0] = true;
 		return Polynomials
-		    .integrateRootP2(u, marray[0], marray[1], marray[2])
+		    .integrateRootP2(u, marray[0], marray[1], marray[2])/*
 		    - Polynomials.integrateRootP2(0.0,
 						  marray[0],
 						  marray[1],
-						  marray[2]);
+						  marray[2])*/;
 	    }
 	    // If we got here degPz is 2 because the polynomials were
 	    // sorted so that deg(Px) <= deg(Py) <= deg(Pz)
@@ -355,8 +491,8 @@ public class Path3DInfo {
 		    // cases[3] = true;
 		    return Polynomials
 			    .integrateRootP2(u, array[0], array[1], array[2])
-			    - Polynomials
-			    .integrateRootP2(0, array[0], array[1], array[2]);
+			/*- Polynomials
+			  .integrateRootP2(0, array[0], array[1], array[2])*/;
 		case 4:
 		    //cases[4] = true;
 		    return Polynomials.integrateRootP4(Px, 0.0, u);
@@ -616,6 +752,452 @@ public class Path3DInfo {
 	}
     }
 
+    /**
+     * Compute a function that provides the length of a cubic path
+     * segment from its start to a position specified by the path
+     * parameter.
+     * @param x0 the X coordinate of the first control point
+     * @param y0 the Y coordinate of the first control point
+     * @param z0 the Z coordinate of the first control point
+     * @param coords the remaining control points in order, with each
+     *        control point represented by 3 consecutive elements
+     *        contining a control point's X coordinate, Y coordinate,
+     *        and Z coordinate respectively (only the first 9 indices
+     *        will be used)
+     * @return a function of the path parameter that computes the length
+     *         of a path segment from its start to the point corresponding
+     *         to the path parameter provided as the function's argument
+     */
+    static public RealValuedFunctOps
+	cubicLengthFunction(double x0, double y0, double z0, double[] coords)
+    {
+
+	BezierPolynomial px = new BezierPolynomial(x0, coords[0], coords[3],
+						   coords[6]);
+
+	BezierPolynomial py = new BezierPolynomial(y0, coords[1], coords[4],
+						   coords[7]);
+
+	BezierPolynomial pz = new BezierPolynomial(z0, coords[2], coords[5],
+						   coords[8]);
+
+	BezierPolynomial pxd = px.deriv();
+	BezierPolynomial pyd = py.deriv();
+	BezierPolynomial pzd = pz.deriv();
+
+	double[] marray = Polynomials.fromBezier(null,
+						  pxd.getCoefficientsArray(),
+						 0, 2);
+	// Fix up any roundoff errors where the value should be zero.
+	double max = 0.0;
+	for (double v: marray) {
+	    max = Math.max(max, Math.abs(v));
+	}
+	if (max != 0.0) {
+	    for (int i = 0; i < marray.length; i++) {
+		if (Math.abs(marray[i])/max < 1.e-12) {
+		    marray[i] = 0.0;
+		}
+	    }
+	}
+	Polynomial Px = new  Polynomial(marray);
+	marray = Polynomials.fromBezier(null,
+					pyd.getCoefficientsArray(),
+					0, 2);
+	max = 0.0;
+	for (double v: marray) {
+	    max = Math.max(max, Math.abs(v));
+	}
+	if (max != 0.0) {
+	    for (int i = 0; i < marray.length; i++) {
+		if (Math.abs(marray[i])/max < 1.e-12) {
+		    marray[i] = 0.0;
+		}
+	    }
+	}
+	Polynomial Py = new Polynomial(marray);
+
+	marray = Polynomials.fromBezier(null,
+					pzd.getCoefficientsArray(),
+					0, 2);
+	max = 0.0;
+	for (double v: marray) {
+	    max = Math.max(max, Math.abs(v));
+	}
+	if (max != 0.0) {
+	    for (int i = 0; i < marray.length; i++) {
+		if (Math.abs(marray[i])/max < 1.e-12) {
+		    marray[i] = 0.0;
+		}
+	    }
+	}
+	Polynomial Pz = new Polynomial(marray);
+
+	Polynomial parray[] = {Px, Py, Pz};
+	Arrays.sort(parray, 0, 3,
+		    (p1, p2) -> {
+			int d1 = p1.getDegree();
+			int d2 = p2.getDegree();
+			return d1 - d2;
+		    });
+	Px = parray[0];
+	Py = parray[1];
+	Pz = parray[2];
+	return cubicLengthFunction(Px, Py, Pz);
+    }
+
+    static RealValuedFunctOps cubicLengthFunction(Polynomial Px,
+						  Polynomial Py,
+						  Polynomial Pz)
+	throws ArithmeticException
+    {
+	// special cases.
+	int degPx = Px.getDegree();
+	int degPy = Py.getDegree();
+	int degPz = Pz.getDegree();
+	// degPx <= degPy <= degPz due to the sorting before this
+	// was called.
+
+	/*
+	System.out.println("degPx = " + degPx +", degPy = " + degPy
+			   + ", degPz = " + degPz);
+	printArray("Px", Px);
+	printArray("Py", Py);
+	printArray("Pz", Pz);
+	*/
+
+	double[] marray = null;
+	if (degPx == 1) {
+	    if (degPz == 1) {
+		// degPy must also be 1
+		Px.multiplyBy(Px);
+		Py.multiplyBy(Py);
+		Pz.multiplyBy(Pz);
+		Px.incrBy(Py);
+		Px.incrBy(Pz);
+		marray = Px.getCoefficientsArray();
+		final double a = marray[0];
+		final double b = marray[1];
+		final double c = marray[2];
+		// cases[0] = true;
+		return new RealValuedFunctOps() {
+		    public double valueAt(double u) {
+			return Polynomials.integrateRootP2(u, a, b, c);
+		    }
+		};
+	    }
+	    // If we got here degPz is 2 because the polynomials were
+	    // sorted so that deg(Px) <= deg(Py) <= deg(Pz)
+	} else if (degPx == 0) {
+	    if (Px.getCoefficientsArray()[0] == 0.0) {
+		// integrate sqrt(Py^2 + Pz^2) as there are no X components
+		// This reduces to the 2D case, so  just use that.
+		// cases[1] = true;
+		return Path2DInfo.cubicLengthFunction(Py, Pz);
+	    } else {
+		// no root case: Px^2 is a constant > 0 so
+		// Px^2 + Py^2 + Pz^2 is always positive => there
+		// are no roots.
+		Px.multiplyBy(Px);
+		Py.multiplyBy(Py);
+		Pz.multiplyBy(Pz);
+		Px.incrBy(Py);
+		Px.incrBy(Pz);
+		final Polynomial PX = Px;
+		final double[] array = Px.getCoefficientsArray();
+		// The sum of squares implies the degree must be even
+		switch (Px.getDegree()) {
+		case 0:
+		    final double factor = Math.sqrt(array[0]);
+		    // cases[2] = true;
+		    return new RealValuedFunctOps() {
+			public double valueAt(double u) {
+			    return factor*u;
+			}
+		    };
+		case 2:
+		    // double[] array = Px.getCoefficientsArray();
+		    // cases[3] = true;
+		    return new RealValuedFunctOps() {
+			public double valueAt(double u) {
+			    return Polynomials
+				.integrateRootP2(u,
+						 array[0], array[1], array[2]);
+			}
+		    };
+		case 4:
+		    //cases[4] = true;
+		    return Polynomials.integralOfRootP4(PX);
+		}
+	    }
+	}
+	// At this point, deg(Pz) == 2 and deg(Px) must be at least 1,
+	// so deg(Py) > 0.
+	double[] arrayX = Px.getCoefficientsArray();
+	double[] arrayY = Py.getCoefficientsArray();
+	double[] arrayZ = Pz.getCoefficientsArray();
+	double scaleX = arrayX[degPx];
+	double scaleY = arrayY[degPy];
+	double scaleZ = arrayZ[degPz];
+	Px.multiplyBy(1.0/scaleX);
+	Py.multiplyBy(1.0/scaleY);
+	Pz.multiplyBy(1.0/scaleZ);
+
+
+	// in case of roundoff errors
+	arrayX[degPx] = 1.0;
+	arrayY[degPy] = 1.0;
+	arrayZ[degPz] = 1.0;
+
+	HashMap<Double,Integer> rmapX = new HashMap<>();
+	HashMap<Double,Integer> rmapY = new HashMap<>();
+	HashMap<Double,Integer> rmapZ = new HashMap<>();
+
+	double c = arrayX[0];
+	double b = arrayX[1];
+	double b2 = b*b;
+	double c4 = 4*c;
+	double descrX = b2 - c4;
+	if (Math.abs(descrX)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrX = 0;
+	}
+	if (degPx == 1) {
+	    rmapX.put(-c, 1);
+	} else if (degPx == 2) {
+	    if (descrX == 0) {
+		rmapX.put(-b/2.0, 2);
+	    } else if (descrX > 0) {
+		double rdescrX = Math.sqrt(descrX);
+		rmapX.put((-b - rdescrX)/2.0, 1);
+		rmapX.put((-b + rdescrX)/2.0, 1);
+	    }
+	}
+	/*
+	for (Map.Entry<Double,Integer> ent: rmapX.entrySet()) {
+	    System.out.println("x root " + ent.getKey()
+			       + ", multiplicity = " + ent.getValue());
+	}
+	*/
+
+	c = arrayY[0];
+	b = arrayY[1];
+	b2 = b*b;
+	c4 = 4*c;
+	double descrY = b2 - c4;
+	if (Math.abs(descrY)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrY = 0;
+	}
+	if (degPy == 1) {
+	    rmapY.put(-c, 1);
+	} else if (degPy == 2) {
+	    if (descrY == 0) {
+		rmapY.put(-b/2.0, 2);
+	    } else if (descrY > 0) {
+		double rdescrY = Math.sqrt(descrY);
+		rmapY.put((-b - rdescrY)/2.0, 1);
+		rmapY.put((-b + rdescrY)/2.0, 1);
+	    }
+	}
+	/*
+	for (Map.Entry<Double,Integer> ent: rmapY.entrySet()) {
+	    System.out.println("y root " + ent.getKey()
+			       + ", multiplicity = " + ent.getValue());
+	}
+	*/
+	c = arrayZ[0];
+	b = arrayZ[1];
+	b2 = b*b;
+	c4 = 4*c;
+	double descrZ = b2 - c4;
+	double rdescrZ = Double.NaN;
+	if (Math.abs(descrZ)/Math.max(b2, Math.abs(c4)) < 1.e-12) {
+	    descrZ = 0;
+	}
+	if (degPz == 1) {
+	    rmapZ.put(-c, 1);
+	} else if (degPz == 2) {
+	    if (descrZ == 0) {
+		rmapZ.put(-b/2.0, 2);
+	    } else if (descrZ > 0) {
+		rdescrZ = Math.sqrt(descrZ);
+		rmapZ.put((-b - rdescrZ)/2.0, 1);
+		rmapZ.put((-b + rdescrZ)/2.0, 1);
+	    }
+	}
+	/*
+	for (Map.Entry<Double,Integer> ent: rmapZ.entrySet()) {
+	    System.out.println("z root " + ent.getKey()
+			       + ", multiplicity = " + ent.getValue());
+	}
+	*/
+
+	Map<Double,Integer> rmap = new HashMap<>();
+	for (Map.Entry<Double,Integer> entry: rmapX.entrySet()) {
+	    double root = entry.getKey();
+	    int max = entry.getValue();
+	    if (max > 0) {
+		if (rmapY.containsKey(root)) {
+		    int omax = rmapY.get(root);
+		    if (omax < max) max = omax;
+		} else {
+		    max = 0;
+		}
+		if (max > 0) {
+		    if (rmapZ.containsKey(root)) {
+			int omax = rmapZ.get(root);
+			if (omax < max) max = omax;
+		    } else {
+			max = 0;
+		    }
+		}
+	    }
+	    if (max > 0) {
+		rmap.put(root, max);
+	    }
+	}
+
+	switch (rmap.size()) {
+	case 0:
+	    // no common roots.
+	    Px.multiplyBy(scaleX);
+	    Px.multiplyBy(Px);
+	    Py.multiplyBy(scaleY);
+	    Py.multiplyBy(Py);
+	    Pz.multiplyBy(scaleZ);
+	    Pz.multiplyBy(Pz);
+	    Px.incrBy(Py);
+	    Px.incrBy(Pz);
+	    // cases[5] = true;
+	    return Polynomials.integralOfRootP4(Px);
+	case 1:
+	    // one common root (single or double);
+	    for (Map.Entry<Double,Integer> entry: rmap.entrySet()) {
+		double root = entry.getKey();
+		double cnt = entry.getValue();
+		if (cnt == 2) {
+		    // double root, so the square root is constant
+		    // and with two roots, the absolute value is
+		    // just the polynomial sqaured.
+		    final double scale = Math.sqrt(scaleX*scaleX
+					     + scaleY*scaleY
+					     + scaleZ*scaleZ);
+		    Polynomial p = new Polynomial(-root, 1.0);
+		    p.multiplyBy(p);
+		    final Polynomial integral = p.integral();
+		    // cases[6] = true;
+		    return new RealValuedFunctOps() {
+			public double valueAt(double u) {
+			    return scale * integral.valueAt(u);
+			}
+		    };
+		} else {
+		    // single root.
+		    Polynomial p = new Polynomial(-root, 1.0);
+		    Polynomial rpx = new Polynomial(1.0);
+		    for (Map.Entry<Double,Integer> entryX: rmapX.entrySet()) {
+			double r = entryX.getKey();
+			double cntx = entryX.getValue();
+			if (r == root) cntx--;
+			while (cntx > 0) {
+			    rpx.multiplyBy(new Polynomial(-r, 1.0));
+			    cntx--;
+			}
+		    }
+		    Polynomial rpy = new Polynomial(1.0);
+		    for (Map.Entry<Double,Integer> entryY: rmapY.entrySet()) {
+			double r = entryY.getKey();
+			double cnty = entryY.getValue();
+			if (r == root) cnty--;
+			while (cnty > 0) {
+			    rpy.multiplyBy(new Polynomial(-r, 1.0));
+			    cnty--;
+			}
+		    }
+		    Polynomial rpz = new Polynomial(1.0);
+		    for (Map.Entry<Double,Integer> entryZ: rmapZ.entrySet()) {
+			double r = entryZ.getKey();
+			double cntz = entryZ.getValue();
+			if (r == root) cntz--;
+			while (cntz > 0) {
+			    rpz.multiplyBy(new Polynomial(-r, 1.0));
+			    cntz --;
+			}
+		    }
+		    // at this point, rpx, rpy, and rpz are either 0 or
+		    // first degree polynomials, with at least 1 a first
+		    // degree polynomial.
+		    rpx.multiplyBy(scaleX);
+		    rpx.multiplyBy(rpx);
+		    rpy.multiplyBy(scaleY);
+		    rpy.multiplyBy(rpy);
+		    rpz.multiplyBy(scaleZ);
+		    rpz.multiplyBy(rpz);
+		    rpx.incrBy(rpy);
+		    rpx.incrBy(rpz);
+		    // cases[7] = true;
+		    // return Polynomials.integrateAbsPRootQ(u, p, rpx);
+		    final Polynomial P = p;
+		    final Polynomial Q = rpx;
+		    return new RealValuedFunctOps() {
+			public double valueAt(double u) {
+			    return Polynomials.integrateAbsPRootQ(u, P, Q);
+			}
+		    };
+		}
+	    }
+	case 2:
+	    // two separate roots. The polynomial whose square root
+	    // is taken is a 0 degree polynomial (i.e., a scalar),
+	    // but we have to integrate the absolute value
+	    // |(u - r1)(u - r2)|.  The result is a sum of absolute
+	    // values with no roots between the limits of integration
+	    // for each integral in the sum.
+	    {
+		final double r1 = (-b - rdescrZ)/2;
+		final double r2 = (-b + rdescrZ)/2;
+		final double scale = Math.sqrt(scaleX*scaleX
+					       + scaleY*scaleY
+					       + scaleZ*scaleZ);
+		Polynomial p = new Polynomial(1.0);
+		p.multiplyBy(new Polynomial(-r1, 1.0));
+		p.multiplyBy(new Polynomial(-r2, 1.0));
+		final Polynomial integral = p.integral();
+		return new RealValuedFunctOps() {
+		    public double valueAt(double u) {
+			if (r1 > 0.0 && u <= r1) {
+			    // cases[8] = true;
+			    return scale * Math.abs(integral.valueAt(u));
+			} else if (r1 > 0.0 && u <= r2) {
+			    double sum = Math.abs(integral.valueAt(r1));
+			    sum += Math.abs(integral.valueAt(u)
+					    - integral.valueAt(r1));
+			    // cases[9] = true;
+			    return scale * sum;
+			} else if (r1 > 0.0 && u > r2) {
+			    double sum = Math.abs(integral.valueAt(r1));
+			    sum += Math.abs (integral.valueAt(r2)
+					     - integral.valueAt(r1));
+			    sum += Math.abs(integral.valueAt(u)
+					    - integral.valueAt(r2));
+			    // cases[10] = true;
+			    return scale * sum;
+			} else if (r1 <= 0.0 && r2 > 0 && u > r2) {
+			    double sum = Math.abs(integral.valueAt(r2));
+			    sum += Math.abs(integral.valueAt(u)
+					    - integral.valueAt(r2));
+			    // cases[11] = true;
+			    return scale * sum;
+			} else {
+			    // cases[12] = true;
+			    return scale*Math.abs(integral.valueAt(u));
+			}
+		    }
+		};
+	    }
+	default:
+	    throw new UnexpectedExceptionError();
+	}
+    }
 
     // just static
     private Path3DInfo() {}
@@ -2896,6 +3478,7 @@ public class Path3DInfo {
 	private double segmentLength;
 	double[] coords;
 	SegmentData data;
+	RealValuedFunctOps segmentLengthFunction = null;
 
 	/**
 	 * Get an index indicating the segment's position along a path.
@@ -2922,6 +3505,23 @@ public class Path3DInfo {
 	 * @return the length of the segment
 	 */
 	public double getSegmentLength() {return segmentLength;}
+
+	/**
+	 * Get a function that will compute the length of a subsegment
+	 * from the start of of the segment to a point specified by the
+	 * segment's path parameter.
+	 * <P>
+	 * In some unsual cases, a function is not available due to
+	 * numerical accuracy issues, in which case numerical integration
+	 * may be used.
+	 * @return a function that computes the subsegment length given
+	 *         a path parameter provided as the function's argument;
+	 *         null if a function is not available.
+	 */
+	public RealValuedFunctOps getSegmentLengthFunction() {
+	    return segmentLengthFunction;
+	}
+
 
 	/**
 	 * Get the coordinate array for the segment.
@@ -3501,19 +4101,27 @@ public class Path3DInfo {
 	    default:
 		throw new IllegalArgumentException(errorMsg("piUnknown"));
 	    }
-	    if (fullEntry) {
-		list.add(new Entry(i, st, x0, y0, z0, lastX, lastY, lastZ,
-				   length, coords, data));
-	    } else {
-		list.add(new Entry(i, st, null,
-				   new Point3D.Double(lastX, lastY, lastZ),
-				   length, coords, data));
+	    Entry nextEntry = (fullEntry)?
+		new Entry(i, st, x0, y0, z0, lastX, lastY, lastZ,
+			  length, coords, data):
+		new Entry(i, st, null,
+			  new Point3D.Double(lastX, lastY, lastZ),
+			  length, coords, data);
+	    try {
+		if (fullEntry) {
+		    nextEntry.segmentLengthFunction =
+			segmentLengthFunction(st, x0, y0, z0, coords);
+		}
+	    } catch (ArithmeticException ea) {
+		nextEntry.segmentLengthFunction = null;
 	    }
+	    list.add(nextEntry);
 	    last = data;
 	    pit.next();
 	}
 	return list;
     }
+
 
     /**
      * Print information about the segments that make up a path, or the

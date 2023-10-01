@@ -528,6 +528,26 @@ public class PolynomialTest {
 
     static void badcase() throws Exception {
 
+	Polynomial Px = new Polynomial(360.0, -3600.0, 15120.0,
+				       -30600.0, 26010.0);
+
+	Polynomial[] Pxs = Polynomials.factorQuarticToQuadratics(Px);
+	Polynomial Pt = new Polynomial(1.0);
+	for (int i = 0; i < Pxs.length; i++) {
+	    Pt.multiplyBy(Pxs[i]);
+	}
+	printArray("Px", Px);
+	printArray("Pxs[0]", Pxs[0]);
+	printArray("Pxs[1]", Pxs[1]);
+	printArray("Pxs[2]", Pxs[2]);
+	printArray("Pt", Pt);
+
+
+	double len = Polynomials.integrateRootP4(Px, 0.0, 0.4);
+	if (Double.isNaN(len)) {
+	    throw new Exception();
+	}
+
 	double a1, a2, b1, b2, c1, c2, val, eval;
 	Polynomial tp;
 
@@ -569,8 +589,6 @@ public class PolynomialTest {
 	    System.out.println("v1x = " + v1x + ", v2x = " + v2x);
 	    throw new Exception();
 	}
-
-
 
 	a = 73.79073403467174;
 	b = -4.196333275388042E-4;
@@ -813,6 +831,7 @@ public class PolynomialTest {
 	*/
 
 	Polynomial[] polys = {
+	    new Polynomial(360.0, -3600.0, 15120.0, -30600.0, 26010.0),
 	    new Polynomial(1091.25, -4545.0, 8373.375, -6483.375, 1732.78125),
 	    new Polynomial(169.03125, -317.25, -680.0625,
 			   447.74999999999994, 1732.78125),
@@ -1570,6 +1589,27 @@ public class PolynomialTest {
 
 	testApprox();
 
+	if (false) {
+	    Polynomials.setRootP4SFLimit(0.1);
+	    double delta = 1.e-7;
+	    Polynomial dp1 =new Polynomial(0.1176470588235294,
+					   -0.5882352941176471,
+					   1.0);
+	    Polynomial dp2 =new Polynomial(0.1176470588235294 + delta,
+					   -0.5882352941176471 + delta,
+					   1.0);
+	    final Polynomial dp = dp1.multiply(dp2);
+	    GLQuadrature dpq = GLQuadrature.newInstance((u) -> {
+		    return Math.sqrt(dp.valueAt(u));
+		}, 8);
+
+	    double dplen1 = Polynomials.integrateRootP4(dp, 0.0, 1.0);
+	    double dplen2 = dpq.integrate(0.0, 1.0, 200);
+	    System.out.println("dplen1 = " + dplen1);
+	    System.out.println("dplen2 = " + dplen2);
+	    System.exit(0);
+	}
+
 
 
 	if (true) badcase();
@@ -2325,6 +2365,7 @@ public class PolynomialTest {
 	System.out.println("ecount = " + ecount);
 
 	ecount = 0;
+	double integral3;
 	for (int i = 0; i < 1000000; i++) {
 	    do {
 		a1 = drv.next();
@@ -2341,10 +2382,17 @@ public class PolynomialTest {
 	    glq.setParameters(p);
 	    try {
 		integral1 = Polynomials.integrateRootP4(p, 0.2, 0.8);
+		integral2 =  Polynomials.integrateRootP4(p, 0.0, 0.4);
+		integral3 = Polynomials.integralOfRootP4(p).valueAt(0.4);
 	    } catch (Exception e) {
 		System.out.println(e.getMessage());
 		ecount++;
 		continue;
+	    }
+	    if (integral2 != integral3) {
+		System.out.println("integral2 = " + integral2);
+		System.out.println("integral3 = " + integral3);
+		throw new Exception();
 	    }
 	    integral2 = glq.integrate(0.2, 0.8, 100);
 	    double max = Math.max(Math.abs(integral2), 1.0);
@@ -2357,7 +2405,7 @@ public class PolynomialTest {
 		System.out.println("b2 = " + b2);
 		System.out.println("c2 = " + c2);
 		System.out.println("integral1 = " + integral1);
-		double integral3 = glq.integrate(0.2, 0.8, 200);
+		integral3 = glq.integrate(0.2, 0.8, 200);
 		System.out.println("integral3 = " + integral3);
 		System.out.println("integral2 = " + integral2);
 

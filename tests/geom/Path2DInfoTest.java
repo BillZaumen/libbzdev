@@ -163,6 +163,12 @@ public class Path2DInfoTest {
 	    }
 	    double val1 = quadLength(x0, y0, coords);
 	    double val2 = getQuadLength(1.0, x0, y0, coords);
+
+	    double vv1 = Path2DInfo.quadLength(0.4, x0, y0, coords);
+	    double vv2 = Path2DInfo.quadLengthFunction(x0, y0, coords)
+		.valueAt(0.4);
+	    if (vv1 != vv2) throw new Exception();
+
 	    if (Math.abs(val1 - val2)/Math.max(val1, val2) > 1.e-6) {
 		System.out.println("x0 = " + x0);
 		System.out.println("y0 = " + y0);
@@ -327,6 +333,7 @@ public class Path2DInfoTest {
 	// special cases.
 	int degPx = Px.getDegree();
 	int degPy = Py.getDegree();
+
 	/*
 	System.out.println("degPx = " + degPx +", degPy = " + degPy);
 	printArray("Px", Px);
@@ -974,9 +981,10 @@ public class Path2DInfoTest {
 	UniformIntegerRV irv = new UniformIntegerRV(1, true, 40, true);
 
 	numericCount = 0;
-	for (int i = 0; i < 100000; i++) {
-	    if (i > 0 && (i % 10000 == 0)) {
-		System.out.println("... " + ((i*100)/100000) + "%");
+	int itlimit = 100000;
+	for (int i = 0; i < itlimit; i++) {
+	    if (i > 0 && (i % (itlimit/10) == 0)) {
+		System.out.println("... " + ((i*100)/itlimit) + "%");
 	    }
 	    double[] coords3 = {
 		(double)irv.next(), (double)irv.next(),
@@ -1018,6 +1026,27 @@ public class Path2DInfoTest {
 		    continue;
 		}
 		throw new Exception();
+	    }
+	    try {
+		double vv1 = Path2DInfo.cubicLength(0.4, x0, y0, coords3);
+		double vv2 = Path2DInfo.cubicLengthFunction(x0, y0, coords3)
+		    .valueAt(0.4);
+		try {
+		    double vv3 = Path2DInfo
+			.segmentLengthFunction(PathIterator.SEG_CUBICTO,
+					       x0, y0, coords3).valueAt(0.4);
+		    if (Math.abs(vv1-vv3) > 1.e-10) throw new Exception();
+		} catch (ArithmeticException ae) {}
+		if (vv1 != vv2) {
+		    System.out.println("vv1 = " + vv1);
+		    System.out.println("vv2 = " + vv2);
+		    System.out.println("x0 = " + x0);
+		    System.out.println("y0 = " + y0);
+		    printArray("coords3", coords3);
+		    throw new Exception();
+		}
+	    } catch (ArithmeticException ea) {
+		continue;
 	    }
 	}
 
@@ -1428,6 +1457,36 @@ public class Path2DInfoTest {
 	// cases that failed at some point.
 	double x0 = 20.0; double y0 = 21.0;
 	double len, elen, elen2;
+
+	double coords19[] = {22.0, 15.0, 28.0, 27.0, 1.0, 18.0};
+	try {
+	    System.out.println("coords19 ...");
+	    len = cubicLength(1.0, x0, y0, coords19);
+	    if (Double.isNaN(len)) throw new Exception();
+	    elen = getCubicLength(1.0, x0, y0, coords19);
+	    elen2 = getCubicLengthSR(1.0, x0, y0, coords19);
+	    System.out.println("len = " + len +", elen = " + elen);
+	    System.out.println(".... elen2 = " + elen2);
+	    if (Math.abs(elen - len)/elen > 1.e-8) {
+		for (int i = 0; i < 11; i++) {
+		    if (cases2[i]) {
+			System.out.println("cases2[" + i + "] = " + cases2[i]);
+		    }
+		}
+		printArray("coords19", coords19);
+		if (Math.abs(elen2 - elen) < 1.e-4)  {
+		    throw new Exception();
+		}
+	    }
+	} catch (ArithmeticException e) {
+	    for (int i = 0; i < 11; i++) {
+		if (cases2[i]) {
+		    System.out.println("cases2[" + i + "] = " + cases2[i]);
+		}
+	    }
+	    System.out.println(e.getMessage() + " ... expected");
+	}
+
 
 	double coords18[] = {34.0, 4.0, 39.0, 39.0, 34.0, 15.0};
 	try {
@@ -4552,6 +4611,12 @@ public class Path2DInfoTest {
 						    coords)) {
 		    throw new Exception("Path2DInfo.getSegmentLength failed");
 		}
+		if (0.0 != Path2DInfo.segmentLengthFunction(type, 0.0, 0.0,
+							    coords)
+		    .valueAt(0.4)) {
+			throw new Exception
+			    ("Path2DInfo.getSegmentLengthFunction failed");
+		}
 		break;
 	    case PathIterator.SEG_LINETO:
 		System.out.println("LINETO (" + coords[0]
@@ -4601,6 +4666,11 @@ public class Path2DInfoTest {
 		if (Math.abs(len1 - len2) > 1.e-10) {
 		    throw new
 			Exception("Path2DInfo.getSegmentLength failed");
+		}
+		if (Math.abs(len1 - Path2DInfo
+			     .segmentLengthFunction(type, x, y, coords)
+			     .valueAt(0.4)) > 1.e-10) {
+		    throw new Exception();
 		}
 		x = coords[0];
 		y = coords[1];
@@ -4663,6 +4733,11 @@ public class Path2DInfoTest {
 		if (Math.abs(len1 - len2) > 1.e-10) {
 		    throw new
 			Exception("Path2DInfo.getSegmentLength failed");
+		}
+		if (Math.abs(len1 - Path2DInfo
+			     .segmentLengthFunction(type, x, y, coords)
+			     .valueAt(0.4)) > 1.e-10) {
+		    throw new Exception();
 		}
 		x = coords[2];
 		y = coords[3];
@@ -4730,6 +4805,13 @@ public class Path2DInfoTest {
 		    throw new
 			Exception("Path2DInfo.getSegmentLength failed");
 		}
+		try {
+		    if (Math.abs(len1 - Path2DInfo
+				 .segmentLengthFunction(type, x, y, coords)
+				 .valueAt(0.4)) > 1.e-10) {
+			throw new Exception();
+		    }
+		} catch (ArithmeticException ae) {}
 		x = coords[4];
 		y = coords[5];
 		break;
@@ -4766,6 +4848,7 @@ public class Path2DInfoTest {
 	}
 
 	Path2DInfo.SegmentData sd = null;
+
 	for(Path2DInfo.Entry entry: Path2DInfo.getEntries(path)) {
 	    Point2D start = entry.getStart();
 	    x0 = (start == null)? 0.0: start.getX();
@@ -4881,6 +4964,18 @@ public class Path2DInfoTest {
 	    int ind = entry.getIndex();
 	    if (ind >= segStart && ind < segEnd) {
 		segtotal += entry.getSegmentLength();
+	    }
+	    RealValuedFunctOps lf = entry.getSegmentLengthFunction();
+	    if (lf != null) {
+		if (Math.abs(entry.getSegmentLength() - lf.valueAt(1.0))
+		    > 1.e-10) {
+		    System.out.println("lf.valueAt(1.0) = "
+				       + lf.valueAt(1.0));
+		    System.out.println("entry.getSegmentLength() = "
+				       + entry.getSegmentLength());
+
+		    throw new Exception();
+		}
 	    }
 	    double[] c = entry.getCoords();
 	    System.out.println("coords[0] = " + c[0]);

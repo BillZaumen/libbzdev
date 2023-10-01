@@ -1513,6 +1513,39 @@ public class Polynomials {
 	testRootP4 = value;
     }
 
+    private static double rootP4SFLimit = 1.e-7;
+
+    /**
+     * Set the limit for the minimum relative difference for the factors of
+     * the polynomiial passed to
+     * {@link Polynomials#integrateRootP4(Polynomial,double,double)}.
+     * The polynomial, if factoring is successful, will have three
+     * values: a 0 degree polynomial (a scalar), and two second-degree
+     * polynomals whose x<sup>2</sup> term is 1.0.  Both factors must
+     * be polynomials with positive values for all values of their
+     * arguments. If the two second-degree polynomials are equal, the
+     * integral reduces to that for the absolute value of a quadratic
+     * polynomial.  If they differ by a small amount, an approximation
+     * based on a Taylor series expansion is used (keeping the first
+     * order terms in the expansion is equivalent to averaging the two
+     * quadratics).  <P> The default value for the limit is 1.e-7.
+     * @param value the value for the limit
+     */
+    public static void setRootP4SFLimit(double value) {
+	rootP4SFLimit = value;
+    }
+
+    /**
+     * Get the value set by {@link #setRootP4SFLimit(double)} or its
+     * default value if {@link #setRootP4SFLimit(double)} has not been
+     * called.
+     * @return the value
+     * @see #setRootP4Limit(double)
+     */
+    public static double getRootP4SFLimit() {
+	return rootP4SFLimit;
+    }
+
     /**
      * Integrate the square root of a quartic polynomial that has no
      * real roots.
@@ -1576,6 +1609,96 @@ public class Polynomials {
 		double maxc = Math.max(1.0, Math.abs(farray[0]));
 		maxc = Math.max (maxc, Math.abs(farray[1]));
 		if (minValue/maxc < rootP4Limit) {
+		    throw new RootP4Exception(errorMsg("badMinValue"));
+		}
+	    }
+	}
+	double[] fa1 = factors[1].getCoefficientsArray();
+	double[] fa2 = factors[2].getCoefficientsArray();
+	double xymax = Math.max(Math.abs(x), Math.abs(y));
+	xymax = Math.max(1.0, xymax);
+	if (Math.abs(fa1[0] - fa2[0]) < rootP4SFLimit
+	    && Math.abs(fa1[1] - fa2[1])*xymax < rootP4SFLimit) {
+	    // if the two factors are identical, we can just
+	    // integrate one and use the absolute value.
+	    factors[2].incrBy(factors[1]);
+	    factors[2].multiplyBy(0.5);
+	    Polynomial integral = factors[2].integral();
+	    return ((x > y)? Math.sqrt(scale):
+		    -Math.sqrt(scale))
+		* Math.abs(integral.valueAt(x) - integral.valueAt(y));
+	}
+
+	return Math.sqrt(scale) *
+		integrateRoot2Q(1, 1, 0, factors[1], factors[2], null, y, x);
+    }
+
+
+    /**
+     * Integral of the square root of a quartic polynomial that has no
+     * real roots.
+     * The value of the polynomial must be positive for all values of
+     * its argument.
+     * <P>
+     * Note: this method can be used in computing the length of a
+     * cubic B&eacute;zier curve up to intermediate values of the
+     * path parameter.  When used multiple times, it is faster than
+     * {@link #integrateRootP4(Polynomial,double,double)} because the
+     * polynomial is factored only once.
+     * @param p the polynomial whose square root is to be integrated
+         * @throws NullPointerException an argument was null
+     * @throws IllegalArgumentException if the polynomial is not a quartic
+     *         polynomial
+     * @exception ArithmeticException if factorization failed, probably
+     *            because of a round-off error, or if the factors are not
+     *            positive for all values of their arguments
+     */
+    public static RealValuedFunctOps
+	integralOfRootP4(Polynomial p)
+	throws IllegalArgumentException, ArithmeticException
+    {
+	if (p == null) {
+	    throw new IllegalArgumentException(errorMsg("nullArg"));
+	}
+	if (p.getDegree() != 4) {
+	    throw new IllegalArgumentException(errorMsg("wrongDegree4"));
+	}
+	final Polynomial[] factors = factorQuarticToQuadratics(p);
+	final double scale = (factors[0].getCoefficientsArray()[0]);
+
+	if (testRootP4) {
+	    Polynomial testp = new Polynomial(scale);
+	    testp.multiplyBy(factors[1]);
+	    testp.multiplyBy(factors[2]);
+	    double[] ar1 = p.getCoefficientsArray();
+	    double[] ar2 = testp.getCoefficientsArray();
+	    double max = 1.0;
+	    for (int i = 0; i < 5; i++) {
+		max = Math.max(max, Math.abs(ar1[i]));
+	    }
+	    for (int i = 0; i < 5; i++) {
+		if (Math.abs(ar1[i] - ar2[i]) / max > 1.e-8) {
+		    double v1 = ar1[i];
+		    double v2 = ar2[i];
+		    String msg = errorMsg("badFactoring", v1, v2);
+		    throw new ArithmeticException(msg);
+		}
+	    }
+	}
+	double mindescr = Double.POSITIVE_INFINITY;
+	for (int i = 1; i < 3; i++) {
+	    double[] farray = factors[i].getCoefficientsArray();
+	    double val1 = 4*farray[0];
+	    double val2 = farray[1]*farray[1];
+	    if ( val1 <= val2 ) {
+		String msg = errorMsg("badDescr", (val2 - val1));
+		throw new ArithmeticException(msg);
+	    } else {
+		double minx = -farray[1]/2;
+		double minValue = Math.abs(factors[i].valueAt(minx));
+		double maxc = Math.max(1.0, Math.abs(farray[0]));
+		maxc = Math.max (maxc, Math.abs(farray[1]));
+		if (minValue/maxc < rootP4Limit) {
 		    /*
 		    double rdescr = Math.sqrt(val2 - val1);
 		    double diff = Math.max((x - y)*10);1.e-
@@ -1602,8 +1725,29 @@ public class Polynomials {
 		}
 	    }
 	}
-	return Math.sqrt(scale) *
-		integrateRoot2Q(1, 1, 0, factors[1], factors[2], null, y, x);
+
+	return new RealValuedFunctOps() {
+	    public double valueAt(double x) {
+		double[] fa1 = factors[1].getCoefficientsArray();
+		double[] fa2 = factors[2].getCoefficientsArray();
+		double xymax = Math.max(1.0, x);
+		if (Math.abs(fa1[0] - fa2[0]) < rootP4SFLimit
+		    && Math.abs(fa1[1] - fa2[1])*xymax < rootP4SFLimit) {
+		    // if the two factors are identical, we can just
+		    // integrate one and use the absolute value.
+		    Polynomial p = new Polynomial(factors[1]);
+		    p.incrBy(factors[2]);
+		    p.multiplyBy(0.5);
+		    Polynomial integral = p.integral();
+		    return ((x > 0.0)? Math.sqrt(scale):
+			    -Math.sqrt(scale))
+			* Math.abs(integral.valueAt(x));
+		} else {
+		    return Math.sqrt(scale) *
+			integrateRoot2Q(1, 1, 0, factors[1], factors[2], null,
+					0.0, x);	    }
+	    }
+	};
     }
 
     /**
@@ -1897,7 +2041,8 @@ public class Polynomials {
      * Compute an indefinite integral of the square root of the
      * polynomial a + bx + cx<sup>2</sup>.
      * The polynomial must have a non-negative value at x=0 and at the
-     * upper limit of integration.
+     * upper limit of integration. For convenience, the integral will
+     * have a value of 0 when x=0.
      * @param x the upper limit of integration
      * @param a the zeroth order coefficient of a polynomial
      * @param b the first order coefficient of a polynomial
