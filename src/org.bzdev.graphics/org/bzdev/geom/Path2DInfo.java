@@ -112,9 +112,6 @@ public class Path2DInfo {
      * When the path parameter is {@link PathIterator#SEG_CLOSE},
      * the array must contain the X and Y coordinates of the path's
      * initial point in that order.
-     * @param u the path parameter for the end of the subpath which
-     *        includes all points on the path whose path parameters
-     *        are in the range [0, u]
      * @param type either {@link PathIterator#SEG_MOVETO}
      *        {@link PathIterator#SEG_LINETO},
      *        {@link PathIterator#SEG_QUADTO},
@@ -129,7 +126,7 @@ public class Path2DInfo {
      *         argument
      * @throws IllegalArgumentException if the type argument is not
      *         recognized or if the fifth argument is null or is too short
-     * @throws ArithmenticException if a real-valued function could not be
+     * @throws ArithmeticException if a real-valued function could not be
      *         constructed
      */
     public static RealValuedFunctOps

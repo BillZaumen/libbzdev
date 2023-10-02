@@ -1365,18 +1365,6 @@ public class Polynomials {
 		};
 		try {
 		    if (r > 0.0 && r < u) {
-			/*
-			  double ival = integrateRootP2signed(u, a, b, c);
-			  double X = rp.valueAt(u);
-			  double val3 = array[1]*X*Math.sqrt(X)/(3*c)
-			  + (array[0] - array[1]*b/(2*c))*ival ;
-			  ival = integrateRootP2signed(r, a, b, c);
-			  X = rp.valueAt(r);
-			  double val2 = array[1]*X*Math.sqrt(X)/(3*c)
-			  + (array[0] - array[1]*b/(2*c))*ival ;
-			  X = rp.valueAt(0.0);
-			  double val1 = array[1]*X*Math.sqrt(X)/(3*c);
-			*/
 			double val1 = integral.valueAt(0.0);
 			double val2 = integral.valueAt(r);
 			double val3 = integral.valueAt(u);
@@ -2260,52 +2248,6 @@ public class Polynomials {
 	if (x == 0.0) return 0.0;
 
 
-	/*
-	// NOT YET WORKING & not sure why, so comment out until
-	// the reason for the discrepancy is found. Oddly, similar
-	// code with the same a, b, c works for integrateRootP2.
-
-	double cxsq = c*x*x;
-	double bx = b*x;
-
-	double tv1 = Math.min(Math.abs(a), Math.abs(a+bx));
-	System.out.println("tv1 = " + tv1);
-	System.out.println("cxsq = " + cxsq);
-	if (a > 0.0 && c != 0.0 &&  Math.abs(cxsq)/tv1 < 0.001) {
-	    // We can approximate sqrt(a + bx + cx^2) by
-	    // sqrt(a+bx)sqrt(1 - cx^2/(a+bx)) which is approximately
-	    // sqrt(a+bx) -(1/2)cx^2/sqrt(a+bx) and integrate that.
-	    double z = b*x/a;
-	    double abx = 1 + z;
-	    double roota = Math.sqrt(a);
-	    double rootabx = Math.sqrt(abx);
-	    double asq = a*a;
-	    double bsq = b*b;
-	    double bcubed =bsq*b;
-	    double xsq = x*x;
-	    double ab = a*b;
-	    boolean test = Math.abs(b*x/a) <= 0.001;
-	    double rootabxm1;
-	    if (test) {
-		// for small z, use a taylor series, keeping the first
-		// few terms.
-		rootabxm1 = root1pzm1.valueAt(z);
-	    } else {
-		rootabxm1 = rootabx - 1.0;
-	    }
-
-	    double term1 = (-2*(2*asq*Math.sqrt(a)/(15*bsq))
-			    - (c)*(6*a/(7*b))*((8*asq)/(15*bcubed))
-			    * Math.sqrt(a))*(rootabxm1);
-
-	    double term2 =  (-2*(-(ab*x+3*bsq*xsq)*Math.sqrt(a)/(15*bsq))
-			     + (c)*(xsq*x/(7*b) - (6*a/(7*b))
-				    *((-4*ab*x + 3*bsq*xsq)/(15*bcubed)))
-			     * Math.sqrt(a))*rootabx;
-
-	    return term1 + term2;
-	}
-	*/
 	if (c == 0.0) {
 	    // CRC Standard Math Tables, page 291
 	    if (a < 0.0) {
