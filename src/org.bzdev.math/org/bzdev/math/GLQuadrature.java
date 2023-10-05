@@ -955,7 +955,7 @@ abstract public class GLQuadrature<P> {
      * Integrate the function using multiple subintervals.
      * The interval [a,b] is divided into m intervals, each
      * of which is integrated separately and summed.  This is useful
-     * when the argument n passed to the constructor is very large
+     * when the argument n passed to the constructor is not very large
      * due to numerical accuracy issues in computing the values
      * at a particular point for Legendre polynomials with a very
      * high degree.
@@ -1014,7 +1014,7 @@ abstract public class GLQuadrature<P> {
      * subintervals.
      * The interval [a,b] is divided into m intervals, each
      * of which is integrated separately and summed.  This is useful
-     * when the argument n passed to the constructor is very large
+     * when the argument n passed to the constructor is not very large
      * due to numerical accuracy issues in computing the values
      * at a particular point for Legendre polynomials with a very
      * high degree.

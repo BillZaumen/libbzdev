@@ -327,6 +327,14 @@ public class ExpressionParser implements ObjectParser<Object>
 	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
 		     Operator.CLASS, Operator.SWAP);
 
+    private static final EnumSet<Operator> notBeforeOBRACE
+	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
+		     Operator.CLASS, Operator.SWAP, Operator.CBRACE,
+		     Operator.CBRACKET, Operator.OBJCLOSEBRACE,
+		     Operator.NEW, Operator.THROW, Operator.VARIABLE_NAME,
+		     Operator.EXIST_TEST);
+
+
     // for these tokens, when tracing, display the value as well as the name
     private static final EnumSet<Operator> traceValueSet
 	= EnumSet.of(Operator.FUNCTION_KEYWORD, Operator.VAR);
@@ -8929,6 +8937,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		tokens.add(next);
 		break;
 	    case '{':
+		if (notBeforeOBRACE.contains(ptype)) {
+		    String  msg = errorMsg("syntaxError");
+		    throw new ObjectParser.Exception
+			(msg, filenameTL.get(), s, i);
+		}
 		if (ptype == Operator.BACKQUOTE) {
 		    level += 1 + LEVEL_OFFSET;
 		    next = new Token(Operator.OPAREN, "(", offset+i, level);

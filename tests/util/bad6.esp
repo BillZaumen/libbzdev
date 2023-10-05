@@ -1,0 +1,3 @@
+
+var spec = [{visible: false}
+	    {text: "foo"}];

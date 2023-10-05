@@ -1,0 +1,11 @@
+#+T
+[
+    {withPrefix: "object",
+     withIndex: [
+	{type: "RECTANGLE",
+	 config: [
+	     {x: -10}
+	 ]}
+     ]
+    }
+]
