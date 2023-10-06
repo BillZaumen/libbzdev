@@ -102,6 +102,11 @@ all: compile
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
+	./scrun bad2.esp || echo EXCEPTION EXPECTED
+	./scrun bad3.esp || echo EXCEPTION EXPECTED
+	./scrun bad4.esp || echo EXCEPTION EXPECTED
+	./scrun bad5.esp || echo EXCEPTION EXPECTED
+	./scrun bad6.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
 	@echo ---- Supplier Test ----
 	@$(JAVA) SupplierTest
@@ -136,7 +141,9 @@ badesp:
 	./scrun bad2.esp || echo EXCEPTION EXPECTED
 	./scrun  bad3.esp || echo EXCEPTION EXPECTED
 	./scrun  bad4.esp || echo EXCEPTION EXPECTED
+	./scrun  bad5.esp || echo EXCEPTION EXPECTED
 	./scrun  bad6.esp || echo EXCEPTION EXPECTED
+	./scrun bad7.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
 
 bad6:
@@ -237,6 +244,41 @@ elist: compile
 otest: compile
 	@echo ----- ObjectParser Test -------
 	@$(JAVA) OTest
+
+etests: compile
+	@echo ----- ExpressionParser Test -------
+	@$(JAVA) ExpressionTest
+	@echo ----- ExpressionParser Test '(lexical scoping)' -------
+	@$(JAVA) ExprScriptTest3
+	@echo ----- ExpressionParser Test '(issues from EPTS)' -------
+	@$(JAVA) ExprScriptTest4
+	@echo ----- ExpressionParser Test '(va list)' -------
+	@$(JAVA) ExprScriptTest5
+	@echo ----- ExpressionParser Test '(var.identifier)' -------
+	@$(JAVA) ExprScriptTest6
+	@echo ----- ExpressionParser Test '(second var.identifier)' -------
+	@$(JAVA) ExprScriptTest7
+	@echo ----- ExpressionParser Test '(functional interface test)' -------
+	@$(JAVA) ExprScriptTest8
+	@echo - ExpressionParser Test '(functional interface, method ref test)' -
+	@$(JAVA) ExprScriptTest9
+	@echo ---- ExpressionParser Test '(class for an array)' ----
+	@$(JAVA) ExprScriptTest11
+	@echo - ExpressionParser Test '(implicit casting)' -
+	@$(JAVA) ExprScriptTest12 | cmp - test12.expected || \
+		( echo failed && exit 1)
+	@echo - ExpressionParser Test '(use of Optional methods)' -
+	@$(JAVA) ExprScriptTest13
+	@$(JAVA) ExprScriptTest13 test13a.html
+	cmp test13.html test13a.html || ( echo failed && exit 1 )
+	@echo - ExpressionParser Test '( == in arguments)' -
+	@$(JAVA) ExprScriptTest14
+	@echo - ExpressionParser Test '( .class.METHOD)' -
+	@$(JAVA) ExprScriptTest15
+	@echo - ExpressionParser Test '( .foreach())' -
+	@$(JAVA) ExprScriptTest16
+
+
 
 etest: compile
 	@echo ----- ExpressionParser Test -------

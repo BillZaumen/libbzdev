@@ -1,11 +1,6 @@
-#+T
-[
-    {withPrefix: "object",
-     withIndex: [
-	{type: "RECTANGLE",
-	 config: [
-	     {x: -10}
-	 ]}
-     ]
-    }
-]
+function foo() {10}
+function(a) {a*a}
+
+function(a) {a*a}(10);
+
+(10 + 20) {foo: 10}

@@ -7269,6 +7269,11 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 	Token getFunct() {return funct;}
 
+	boolean isLambda = false;
+	void setIsLambda() {
+	    isLambda = true;
+	}
+	boolean isLambda() {return isLambda;}
 
 	Object value;
 	void setValue(Object value) {
@@ -8937,7 +8942,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		tokens.add(next);
 		break;
 	    case '{':
-		if (notBeforeOBRACE.contains(ptype)) {
+		if (notBeforeOBRACE.contains(ptype)
+		    || (ptype == Operator.CPAREN && !prev.isLambda())) {
 		    String  msg = errorMsg("syntaxError");
 		    throw new ObjectParser.Exception
 			(msg, filenameTL.get(), s, i);
@@ -9242,6 +9248,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		parenPeer = (parenPeers.size() ==0)? null: parenPeers.pop();
 		if (functkwSeen) {
 		    expectingOBrace = true;
+		    next.setIsLambda();
 		}
 		functkwSeen = false;
 		functParams = false;
