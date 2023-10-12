@@ -3,25 +3,47 @@ package org.bzdev.math.stats;
 /**
  * Statistic for Welch's T Test.  Welch's t-test compares two independent data
  * sets X<sub>1</sub> and X<sub>2</sub> to determine if a difference
- * in their mean values is statistically significant.  The statistic
- * is* t = (<span style="text-decoration: overline">X<sub>1</sub></span>
+ * in their mean values is statistically significant.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]},
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
+ * The statistic (See <A HREF="https://www.datanovia.com/en/lessons/types-of-t-test/unpaired-t-test/welch-t-test/">https://www.datanovia.com/en/lessons/types-of-t-test/unpaired-t-test/welch-t-test/</A>)
+ * is
+ * $$t = \frac{\mbox{x&#x0305;}_1 - \mbox{x&#x0305;}_2}{
+ *    \sqrt{\frac{s_{X_1}^2}{n_1} + \frac{s_{X_2}^2}{n_2}}
+ * }$$
+
+ * <!-- t = (<span style="text-decoration: overline">X<sub>1</sub></span>
  * - <span style="text-decoration: overline">X<sub>2</sub></span>)
  * / sqrt(s<sub>X<sub>1</sub></sub>/n<sub>1</sub>
- * + s<sub>X<sub>2</sub></sub>/n<sub>2</sub>)
+ * + s<sub>X<sub>2</sub></sub>/n<sub>2</sub>)-->
  * where
  * <UL>
- *  <LI> <span style="text-decoration: overline">X<sub>1</sub></span> is
- *       the mean for data set X<sub>1</sub>.
- *  <LI> <span style="text-decoration: overline">X<sub>2</sub></span> is
- *       the mean for data set X<sub>2</sub>.
- *  <LI> s<sub>X<sub>1</sub></sub> is the sample standard deviation for
- *       data set X<sub>1</sub>.
- *  <LI> s<sub>X<sub>2</sub></sub> is the sample standard deviation for
- *       data set X<sub>2</sub>.
+ *  <LI> $\mbox{x&#x0305;}_1$
+ *      <!-- <span style="text-decoration: overline">X<sub>1</sub></span>-->
+ *      is the mean for data set X<sub>1</sub>.
+ *  <LI> $\mbox{x&#x0305;}_2$
+ *       <!-- <span style="text-decoration: overline">X<sub>2</sub></span>-->
+ *       is the mean for data set X<sub>2</sub>.
+ *  <LI> s<sub>X<sub>1</sub></sub> is the sample standard deviation
+ *       for  data set X<sub>1</sub>.
+ *  <LI> s<sub>X<sub>2</sub></sub> is the sample standard deviation
+ *       for data set X<sub>2</sub>.
  *  <LI> n<sub>1</sub> is the size of data set X<sub>1</sub>
  *  <LI> n<sub>2</sub> is the size of data set X<sub>2</sub>
  * </UL>
- * The number of degrees of freedom is approximated by the equation
+ * The number of degrees of freedom $\nu$ is approximated by the equation
+ * $$\nu \approx \frac{(\frac{s_{X_1}^2}{n_1} + \frac{s_{X_2}^2}{n_2})^2}{
+ * \frac{s_{X_1}^4}{n_1^2\nu_1} + \frac{s_{X_2}^4}{n_2^2\nu_2}
+ * }$$
  * &nu; &cong; (s<sub>X<sub>1</sub></sub><sup>2</sup>/n<sub>1</sub>
  * + s<sub>X<sub>2</sub></sub><sup>2</sup>/n<sub>2</sub>)<sup>2</sup>
  * / (s<sub>X<sub>1</sub></sub><sup>4</sup>/(n<sub>1</sub>&nu;<sub>1</sub>
@@ -194,7 +216,7 @@ public class WelchsTStat extends Statistic {
      * Two-Sample T-Tests Allowing Unequal Variance</A>
      * describes how to compute the noncentrality parameter.
      * The difference is equal to &mu;<sub>1</sub> - &mu;<sub>0</sub> where
-     * &mu;<sub>0<sub> = 0 (the value assumed by the null hypothesis
+     * &mu;<sub>0</sub> = 0 (the value assumed by the null hypothesis
      * H<sub>0</sub>) and &mu;<sub>1</sub> is the value assumed by an
      * alternate hypothesis H<sub>1</sub>.
      * @param diff the difference of the H1 mean value and the H0 mean value.

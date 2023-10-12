@@ -32,6 +32,16 @@ import java.io.Writer;
  * Class providing static methods to obtain information about paths
  * defined by java.awt.geom.Path2D.
  * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * The method {@link Path2DInfo#shiftClosedPath(Path2D,double,double)}
  * returns a modified path (the same path as its argument but with its
  * starting point shifted).  The classes {@link Paths2D} and
@@ -7102,11 +7112,18 @@ public class Path2DInfo {
 
     /**
      * Get the moments about the center of mass for the area inside a shape.
+     * For a shape S with an area A,
      * <UL>
+     *   <LI> moments[0][0] = $\frac1A \int_S x^2 dA$.
+     *   <LI> moments[0][1] = $\frac1A \int_S xy dA$.
+     *   <LI> moments[1][0] = $\frac1A \int_S xy dA$.
+     *   <LI> moments[1][1] = $\frac1A \int_S y^2 dA$.
+     * <NOSCRIPT>
      *   <LI> moments[0][0] = (1/A) &int;x<sup>2</sup>dA.
      *   <LI> moments[0][1] = (1/A) &int;xydA.
      *   <LI> moments[1][0] = (1/A) &int;xydA.
      *   <LI> moments[1][1] = (1/A) &int;y<sup>2</sup>dA.
+     * </NOSCRIPT>
      * </UL>
      * <P>
      * Note: the moment of inertia tensor has different
@@ -7130,12 +7147,19 @@ public class Path2DInfo {
     /**
      * Get the moments for the area inside a shape modified by an
      * affine transformation and about the center of mass of the modified
-     * shape.
+     * shape.  If S is the shape after applying an affine transformation an
+     * A is the corresponding area,
      * <UL>
+     *   <LI> moments[0][0] = $\frac1A \int_S x^2 dA$.
+     *   <LI> moments[0][1] = $\frac1A \int_S xy dA$.
+     *   <LI> moments[1][0] = $\frac1A \int_S xy dA$.
+     *   <LI> moments[1][1] = $\frac1A \int_S y^2 dA$.
+     *   <NOSCRIPT>
      *   <LI> moments[0][0] = (1/A) &int;x<sup>2</sup>dA.
      *   <LI> moments[0][1] = (1/A) &int;xydA.
      *   <LI> moments[1][0] = (1/A) &int;xydA.
      *   <LI> moments[1][1] = (1/A) &int;y<sup>2</sup>dA.
+     *   </NOSCRIPT>
      * </UL>
      * <P>
      * Note: the moment of inertia tensor has different
@@ -7199,12 +7223,19 @@ public class Path2DInfo {
 
     /**
      * Get the moments for the area inside a shape about a reference point.
-     * For a reference point (x<sub>r</sub>, y<sub>r</sub>)
+     * For a reference point (x<sub>r</sub>, y<sub>r</sub>) and a shape S
+     * with area A,
      * <UL>
+     *   <LI> moments[0][0] = $\frac1A \int_S (x -x_r)^2 dA$.
+     *   <LI> moments[0][1] = $\frac1A \int_S (x-x_r)(y-y_r) dA$.
+     *   <LI> moments[1][0] = $\frac1A \int_S (x-x_r)(y-y_r) dA$.
+     *   <LI> moments[1][1] = $\frac1A \int_S (y-y_r)^2 dA$.
+     *   <NOSCRIPT>
      *   <LI> moments[0][0] = (1/A) &int;(x-x<sub>r</sub>)<sup>2</sup>dA.
      *   <LI> moments[0][1] = (1/A) &int;(x-x<sub>r</sub>)(y-y<sub>r</sub>)dA.
      *   <LI> moments[1][0] = (1/A) &int;(x-x<sub>r</sub>)(y-y<sub>r</sub>)dA.
      *   <LI> moments[1][1] = (1/A) &int;(y-y<sub>r</sub>)<sup>2</sup>dA.
+     *   </NOSCRIPT>
      * </UL>
      * <P>
      * Note: the moment of inertia tensor has different
@@ -7274,12 +7305,19 @@ public class Path2DInfo {
     /**
      * Get the moments for the area inside a shape about a reference point
      * after applying an affine transform to both.
-     * For a reference point (x<sub>r</sub>, y<sub>r</sub>)
+     * For a reference point (x<sub>r</sub>, y<sub>r</sub>) given a
+     * transformed shape S whose area is A,
      * <UL>
+     *   <LI> moments[0][0] = $\frac1A \int_S (x -x_r)^2 dA$.
+     *   <LI> moments[0][1] = $\frac1A \int_S (x-x_r)(y-y_r) dA$.
+     *   <LI> moments[1][0] = $\frac1A \int_S (x-x_r)(y-y_r) dA$.
+     *   <LI> moments[1][1] = $\frac1A \int_S (y-y_r)^2 dA$.
+     *   <NOSCRIPT>
      *   <LI> moments[0][0] = (1/A) &int;(x-x<sub>r</sub>)<sup>2</sup>dA.
      *   <LI> moments[0][1] = (1/A) &int;(x-x<sub>r</sub>)(y-y<sub>r</sub>)dA.
      *   <LI> moments[1][0] = (1/A) &int;(x-x<sub>r</sub>)(y-y<sub>r</sub>)dA.
      *   <LI> moments[1][1] = (1/A) &int;(y-y<sub>r</sub>)<sup>2</sup>dA.
+     *   </NOSCRIPT>
      * </UL>
      * <P>
      * Note: the moment of inertia tensor has different
@@ -7327,11 +7365,18 @@ public class Path2DInfo {
      * This conversion is for the case where the shape whose moments
      * were calculated lies in the X-Y plane. For a moments matrix M,
      * the value returned is the matrix
+     * $$ \left(\begin{array}{ccc}
+     *   M_{11} &amp; -M_{01} &amp; 0 \\
+     *   -M_{10} &amp; M_{00} &amp; 0 \\
+     *   0 &amp; 0 &amp; (M_{00} - M_{11})
+     *\end{array}\right)$$
+     * <NOSCRIPT>
      * <BLOCKQUOTE><PRE>
      *     |  M<sub>11</sub>  -M<sub>01</sub>      0     |
      *     | -M<sub>10</sub>   M<sub>00</sub>      0     |.
      *     |   0     0   (M<sub>00</sub>+M<sub>11</sub>) |
      * </PRE></BLOCKQUOTE>
+     * </NOSCRIPT>
      * To compute the principal moments of inertia and their corresponding
      * axes, use {@link SurfaceOps#principalMoments(double[][])} and
      * {@link SurfaceOps#principalAxes(double[][])}.

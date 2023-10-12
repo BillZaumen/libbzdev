@@ -73,12 +73,12 @@ public class ConnectingLine2D extends AnimationObject2D  {
 
     /**
      * Configure path parameters for a line's end points.
-     * If getX1, getY1, getX2, and getY2 are the supplies passed to
+     * If getX1, getY1, getX2, and getY2 are the suppliers passed to
      * {@link #configure(DoubleSupplier,DoubleSupplier,DoubleSupplier,DoubleSupplier)},
      * if P<sub>1</sub> is the point whose coordinates are provided by
      * getX1 and getY1, and if P<sub>2</sub> is the point whose
-     * coordinates are provided by getX1 and getY1, then
-     * a point on the line is given by
+     * coordinates are provided by getX2 and getY2, then
+     * a point P(u) on the line is given by
      * P(u) = P<sub>1</sub>(1-u) + P<sub>2</sub>u for u &isin; [0, 1].
      * @param u1 is the parameter u &isin; [0, 1] for the first end of
      *        the line

@@ -4,6 +4,17 @@ package org.bzdev.math;
 
 /**
  * Bicubic Interpolation class.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This class constructs a real-valued function f with two arguments u
  * and v that implements bicubic interpolation: approximation of a
  * function over a rectangular interval using a cubic polynomial. The
@@ -73,14 +84,22 @@ package org.bzdev.math;
  * <a href="http://www.idav.ucdavis.edu/education/CAGDNotes/Matrix-Cubic-Bezier-Patch/Matrix-Cubic-Bezier-Patch.html">A matrix representation of a cubic b&eacute;zier patch</a>.
  * <P>
  * The interpolated value of f(u,v) can be written as
+ * $$ (1\  u \ u^2 \ u^3) M P M^T \left(
+ * \begin{array}{c} 1 \\ v \\ v^2 \\ v^3 \end{array} \right)$$
+ * <NOSCRIPT>
  * <br>
  * [1 u u<sup>2</sup> u<sup>3</sup>] M P M<sup>T</sup> [1 v v<sup>2</sup> v<sup>3</sup>]<sup>T</sup>
  * <br>
+ * </NOSCRIPT>
  * where M is a constant matrix given in the citation and P is a matrix
  * of control points.  The interpolated value is
- * P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub> summed over i and j
- * from 0 to 3 inclusive.  The functions B<sub>k,n</sub>(t) are Bernstein
- * polynomials defined as C(n,i)t<sup>i</sup>(1-t)<sup>n-i</sup>.
+ * P<sub>i,j</sub>B<sub>i,3</sub>(u)B<sub>j,3</sub>(v) summed over i and j
+ * from 0 to 3 inclusive.
+ * The functions $B_{k,n}$ are Bernstein polynomials
+ * <!-- The functions B<sub>k,n</sub>(t) are Bernstein -->
+ * defined by $$ B_{k,n}(t) = \left(\begin{array}{c} n \\ k\end{array}\right)
+ * t^k (1-t)^{n-i}$$.
+ * <!-- polynomials defined as C(n,i)t<sup>i</sup>(1-t)<sup>n-i</sup>.-->
  * Because this interpolator produces a real
  * value, the control points are one dimensional (for the multidimensional
  * case, each component is handled separately).

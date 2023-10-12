@@ -6,7 +6,7 @@ package org.bzdev.math;
  * <P>
  * For an m-by-n matrix A with m &ge; n, the singular value decomposition is
  * an m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and
- * an n-by-n orthogonal matrix V so that A = U*S*V<sup>T</sup>.
+ * an n-by-n orthogonal matrix V so that A = USV<sup>T</sup>.
  * For an m-by-n matrix A with m &lt; n, the singular value decomposition is
  * an m-by-m orthogonal matrix U, and m-by-m diagonal matrix S, and
  * an n-by-m orthogonal matrix V so that A = U*S*V<sup>T</sup>.

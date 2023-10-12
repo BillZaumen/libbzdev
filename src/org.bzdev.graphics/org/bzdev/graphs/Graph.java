@@ -3370,12 +3370,13 @@ import org.bzdev.util.SafeFormatter;
       * the following tick specifications:
       * <UL>
       *    <LI> <code>new Graph.TickSpec(10.0, 1.0, 9, "%3.0f", 5.0)</code>.
-      *         This will create ticks with labels at x values of
-      *         1.0, 10.0, and 100.0 (user-space values are 0.0, 1.0, and 2.0
-      *         respectively).
+      *         This will create ticks with labels at x values of 1.0,
+      *         10.0, and 100.0 (graph-coordinate-space values are
+      *         0.0, 1.0, and 2.0 respectively).
       *    <LI> <code>new Graph.TickSpec(5.0, 1.0, 9, 4)</code>.
-      *         This will create ticks at 5.0 and 50.0 (user-space values
-      *         are log<sub>10</sub>(5) and log<sub>20</sub>(50) respectively).
+      *         This will create ticks at 5.0 and 50.0
+      *         (graph-coordinate-space values are log<sub>10</sub>(5)
+      *         and log<sub>10</sub>(50) respectively).
       *    <LI> <code> new Graph.TickSpec(3.0, 0.5, 1)</code>.
       *         This will create tick marks at 2, 3, 4, 5, 6, 7, 8, 9,
       *         20, 30, 40, 50, 60, 70, 80, and 90. It will also specify

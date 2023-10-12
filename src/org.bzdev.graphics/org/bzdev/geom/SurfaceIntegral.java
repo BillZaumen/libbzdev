@@ -5,10 +5,23 @@ import org.bzdev.math.*;
 
 /**
  * Class providing surface integrals.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * A scalar field f can be integrated over a surface S:
- * &int;<sub>S</sub>fdA.
+ * $\int_S f dA$.
+ * <!-- &int;<sub>S</sub>fdA.-->
  * Similarly a vector field <B>v</B> can be integrated over S:
- * &int;<sub>S</sub><B>v&sdot;n</B>dA.
+ * $\int_S \mathbf{v \cdot n} dA$.
+ * <!-- &int;<sub>S</sub><B>v&sdot;n</B>dA.-->
  * The constructors provide the scalar or vector fields as
  * functions of (x, y, z), plus a degree for a polynomial
  * approximation to these fields at the surface. This degree

@@ -7,14 +7,26 @@ import org.bzdev.math.stats.ChiSquareDistr;
 
 /**
  * Class representing common operations for least square fits.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * A collection of data points y<sub>i</sub>, each corresponding to a
  * value of an argument x, x<sub>i</sub> is represented by some function
  * y(x; a), where x is the function's argument and 'a' is a vector of
  * parameters.  A least-squares fit minimizes the quantity
- * <blockquote>
+ * $$\chi^2 = \sum_i \frac{[y_i - y(x_i; a)]^2}{\sigma_i^2}$$
+ * <NOSCRIPT><blockquote>
  *   &chi;<sup>2</sup> &equiv; &sum;<sub>i</sub>[y<sub>i</sub>-y(x<sub>i</sub>; a)]<sup>2</sup>/&sigma;<sub>i</sub><sup>2</sup>.
- * </blockquote>
- * where /&sigma;<sub>i</sub> is the standard deviation for y<sub>i</sub>.
+ * </blockquote></NOSCRIPT>
+ * where &sigma;<sub>i</sub> is the standard deviation for y<sub>i</sub>.
  * Errors in the variable x are assumed to be negligible.
  * <P>
  * A basic assumption is that each y<sub>i</sub> is the value of a random
@@ -503,18 +515,31 @@ public abstract class LeastSquaresFit extends RealValuedFunction {
 
     /**
      * Class for linear least-squares fit.
+     * <P>
+     * <script>
+     * MathJax = {
+     *	  tex: {
+     *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+     *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+     * };
+     * </script>
+     * <script id="MathJax-script" async
+     *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+     * </script>
      * For a description of the algorithms used, see 
      * <A href="http://ipnpr.jpl.nasa.gov/progress_report/42-122/122E.pdf">
      * P. H. Richter, "Estimating Errors in Least-Squares Fitting",
      * TDA Progress Report 42-122, JPL, 1995.</A>
      * <P>
-     * A linear least squares fit fits a function
-     *   y(x; a) &equiv; &sum;<sub>j</sub> a<sub>j</sub>X<sub>j</sub>(x)
+     * Given a set of functions $X_j$ and corefficients $a_j$,
+     * a linear least squares fit fits a function
+     * $y(x; a) = \sum_j a_jX_j(x)$
+     * <!--y(x; a) &equiv; &sum;<sub>j</sub> a<sub>j</sub>X<sub>j</sub>(x)-->
      * to a set of values y<sub>i</sub> corresponding to a value of
      * x given by x<sub>i</sub>.  The function y(x;a) is a linear function
      * of the parameters a but not necessarily of the variable x. Each
      * value y<sub>i</sub> is a random variable with a standard deviation
-     * given by &sigma;<sub>i</sub>
+     * given by &sigma;<sub>i</sub>.
      */
     public abstract static class Linear extends LeastSquaresFit {
 	private double[][] H = null;

@@ -11,6 +11,17 @@ import org.bzdev.lang.MathOps;
 
 /**
  * Class implementing elementary and special functions.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * Nested classes are used to define classes associated with particular
  * functions.  Methods directly implemented in this class are
  * provided for common cases.  In some cases, the usual Java convention
@@ -33,19 +44,25 @@ import org.bzdev.lang.MathOps;
  *          <li> B(i,n,x) - computes a Bernstein polynomial of degree n
  *                       and order i at a point x. These polynomials are
  *                       defined as follows:
- * <blockquote>
+ *     $$ B_{i,n}(x) = \left(\begin{array}{c}n\\i\end{array}\right)
+ *        x^i(1-x)^{n-i}$$
+ * <NOSCRIPT><blockquote>
  * <code>
  *   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/n\<br>
  *   Bernstein(i,n,x)&nbsp;=&nbsp;|&nbsp;&nbsp;&nbsp;|x<sup>i</sup>(1-x)<sup>n-i</sup><br>
  *   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\i/
  * </code>
- * </blockquote>
+ * </blockquote></NOSCRIPT>
  *          <li> dBdx(i,n,x) - computes the first derivative with respect
  *               to x of Bernstein(i,n,x).
  *          <li> d2Bdx2(i,n,x) - computes the second derivative with respect
  *               to x of B(i,n,x).
  *          <li> B(n, &lambda;, &tau;...) - computes a Bernstein polynomial for
  *               barycentric coordinates, given by
+ *    $$ B^n_{\mathbf{\lambda}}(\tau)
+ *          = \frac{n!}{\lambda_0!\lambda_1!\ldots\lambda_{n-1}
+ *            \tau_0^{\lambda_0}\tau_1^{\lambda_1} \cdots
+ *            \tau_{n-1}^{\lambda_{n-1}}
  * <blockquote>
  * <code>
  *
@@ -54,9 +71,9 @@ import org.bzdev.lang.MathOps;
  *    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lambda;<sub>1</sub>!&lambda;<sub>2</sub>!...&lambda;<sub>m</sub>!
  * </code>
  * </blockquote>
- *               where m is the length of the vectors &lambda; and
+ *               where n is the length of the vectors &lambda; and
  *               &tau;, and where the sum of the components of
- *               &lambda; must be 1. Barycentric coordinates are also
+ *               &lambda; must be n. Barycentric coordinates are also
  *               defined so that the sum of the components of &tau;
  *               is 1, but this constraint must be satisfied by the
  *               caller.
@@ -71,34 +88,41 @@ import org.bzdev.lang.MathOps;
  *       <UL>
  *          <li> J(n,x) - computes J<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> dJdx(n,x) - computes d[J<sub>n</sub>(x)]/dx for integer
+ *          <li> dJdx(n,x) - computes $\frac{d}{dx}J_n(x)$
+ *               <!--d[J<sub>n</sub>(x)]/dx--> for integer
  *                        and real values of x
  *          <li> Y(n,x) - computes Y<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> dYdx(n,x) - computes d[Y<sub>n</sub>(x)]/dx for integer
- *                        and real values of x
+ *          <li> dYdx(n,x) - computes $\frac{d}{dx}Y_n(x)$
+ *                        <!--d[Y<sub>n</sub>(x)]/dx--> for integer
+ *                        and real values of x.
  *          <li> j(n,x) - computes j<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> djdx(n,x) - computes d[j<sub>n</sub>(x)]/dx for integer
+ *          <li> djdx(n,x) - computes $\frac{d}{dx}j_n(x)$
+ *                        <!--d[j<sub>n</sub>(x)]/dx--> for integer
  *                        and real values of x
  *          <li> y(n,x) - computes y<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> dydx(n,x) - computes d[y<sub>n</sub>(x)]/dx for integer
+ *          <li> dydx(n,x) - computes $\frac{d}{dx}y_n(x)$
+ *                        <!--d[y<sub>n</sub>(x)]/dx--> for integer
  *                        and real values of x
  *          <li> I(n,x) - computes I<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> dIdx(n,x) - computes d[I<sub>n</sub>(x)]/dx for integer
+ *          <li> dIdx(n,x) - computes $\frac{d}{dx}I_n(x)$
+ *                        <!--d[I<sub>n</sub>(x)]/dx--> for integer
  *                        and real values of x
  *          <li> K(n,x) - computes K<sub>n</sub>(x) for integer and real
  *                        values of n.
- *          <li> dKdx(n,x) - computes d[K<sub>n</sub>(x)]/dx for integer
+ *          <li> dKdx(n,x) - computes $\frac{d}{dx}K_n(x)$
+ *                        <!--d[K<sub>n</sub>(x)]/dx--> for integer
  *                        and real values of x
  *       </UL>
  *  <li> the beta function &Beta;(x,y), which is defined as
  *       &Gamma;(x)&Gamma;(y)/&Gamma;(x+y). In addition, the
  *       incomplete beta function, defined as
- *       &Beta;<sub>x</sub>(a,b) = &int;<sub>0</sub><sup>x</sup>
- *       t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt, along with the
+ *       $B_x(a,b) = \int_{t=0}^x t^{a-1}(1-t)^{b-1} dt$,
+ *       <!--&Beta;<sub>x</sub>(a,b) = &int;<sub>0</sub><sup>x</sup>
+ *       t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt,--> along with the
  *       regularized incomplete beta function I<sub>x</sub>(a, b)
  *       are provided.
  *  <li> confluent hypergeometric functions:
@@ -129,7 +153,8 @@ import org.bzdev.lang.MathOps;
  *       characteristic. The notation used in publications is not
  *       consistent.
  *  <li> the error function
- *       erf(x) = (2/&pi;<sup>1/2</sup>)&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt
+ *       $\mathrm{erf}(x) = \frac{2}{\sqrt{\pi}\int_{t=0}{x} e^{-t^2} dt$
+ *       <!--erf(x) = (2/&pi;<sup>1/2</sup>)&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt-->
  *       and the complementary error function
  *       erfc(x) = 1 - erf(x).  Both are provided because for large x, erf(x)
  *       asymptotically approaches 1.0.
@@ -181,12 +206,14 @@ import org.bzdev.lang.MathOps;
  *         <li> L(n,x) - computes the value of the Laguerre polynomial
  *              L<sub>n</sub>(x).
  *         <li> dLdx(n,x) - computes the value of derivative
- *              d[L<sub>n</sub>(x)]/dx of a Laguerre polynomial with
+ *              $\frac{dL_n(x)}{dx}$
+ *              <!--d[L<sub>n</sub>(x)]/dx--> of a Laguerre polynomial with
  *              respect to x.
  *         <li> L(n, &alpha;, x) - computes the value of the associated
  *              Laguerre polynomial L<sub>n</sub><sup>(&alpha;)</sup>(x).
  *         <li> dLdx(n,&alpha;,x) - computes the value of derivative
- *              d[L<sub>n</sub><sup>&alpha;</sup>(x)]/dx of an
+ *              $\frac{dL_n^\alpha(x)}{dx}$
+ *              <!--d[L<sub>n</sub><sup>&alpha;</sup>(x)]/dx--> of an
  *              associated Laguerre polynomial with  respect to x.
  *       </UL>
  *  <li> Legendre polynomials and associated Legendre functions with
@@ -197,8 +224,10 @@ import org.bzdev.lang.MathOps;
  *                (the derivative of Legendre polynomials of degree n with
  *                respect to x).
  *           <li> P(n,m,x) computes the associated Legendre function
- *                P<sup>m</sup><sub>n</sub>(x) for integer values of n and m.
- *           <li> dPdx(n,m,x) computes dP<sup>m</sup><sub>n</sub>/dx
+ *                $P^m_n(x)$ <!--P<sup>m</sup><sub>n</sub>(x)-->
+ *                for integer values of n and m.
+ *           <li> dPdx(n,m,x) computes $\frac{dP^m_n(x)}{dx}$
+ *                <!--dP<sup>m</sup><sub>n</sub>/dx-->
  *                (the derivative of the associated Legendre polynomial of
  *                degree n and order m with respect to x).
  *       </UL>
@@ -2470,7 +2499,8 @@ public class Functions {
      * @param n the degree of the Bernstein polynomial
      * @param x the point at which to evaluate the Bernstein polynomial's
      *        derivative
-     * @return the value of dB<sub>i,n</sub>(x)/dx
+     * @return the value of $\frac{d}{dx}B_{i,n}(x)
+     *         <!--dB<sub>i,n</sub>(x)/dx-->
      * @exception IllegalArgumentException the second argument was
      *            out of range
      */
@@ -2490,7 +2520,8 @@ public class Functions {
      * @param n the degree of the Bernstein polynomial
      * @param x the point at which to evaluate the Bernstein polynomial's
      *        derivative
-     * @return the value of d<sup>2</sup>B<sub>i,n</sub>(x)/dx<sup>2</sup>
+     * @return the value of $\frac{d^2}{dx^2}B_{i,n}(x)$
+     *         <!--d<sup>2</sup>B<sub>i,n</sub>(x)/dx<sup>2</sup>00-->
      * @exception IllegalArgumentException the second argument was
      *            out of range
      */
@@ -2501,9 +2532,9 @@ public class Functions {
     /**
      * Bernstein polynomials for a barycentric basis.
      * A barycentric basis is one in which there are m coordinates
-     * &tau; = (&tau;<sub>0</sub>, &tau;<sub>1</sub>, ... , &tau;<sub>m-1</sub>)
+     * &tau; = (&tau;<sub>0</sub>, &tau;<sub>1</sub>, ... , &tau;<sub>n-1</sub>)
      * with the constraint
-     * &tau;<sub>0</sub> +  &tau;<sub>1</sub> + ... + &tau;<sub>m-1</sub> = 1.
+     * &tau;<sub>0</sub> +  &tau;<sub>1</sub> + ... + &tau;<sub>n-1</sub> = 1.
      * <P>
      * Bernstein polynomials for a barycentric basis are given by the
      * equation
@@ -2521,7 +2552,7 @@ public class Functions {
      * @param n the degree of the polynomial
      * @param lambda the order of the polynomial, with each component in the
      *        range [0, n] listed in the order &lambda;<sub>0</sub>,
-     *        &lambda;<sub>1</sub>, ... , &lambda;<sub>m-1</sub>
+     *        &lambda;<sub>1</sub>, ... , &lambda;<sub>n-1</sub>
      * @param tau barycentric coordinates at which to evaluate the polynomial,
      *        with these arguments in the order &tau;<sub>0</sub>,
      *        &tau;<sub>1</sub>, ... , &tau;<sub>m-1</sub>
@@ -2567,12 +2598,14 @@ public class Functions {
      * @param n the degree of the polynomial
      * @param lambda the order of the polynomial, with each component in the
      *        range [0, n] listed in the order &lambda;<sub>0</sub>,
-     *        &lambda;<sub>1</sub>, ... , &lambda;<sub>m-1</sub>
+     *        &lambda;<sub>1</sub>, ... , &lambda;<sub>n-1</sub>
      * @param tau barycentric coordinates at which to evaluate the polynomial,
      *        with these arguments in the order &tau;<sub>0</sub>,
      *        &tau;<sub>1</sub>, ... , &tau;<sub>m-1</sub>
      * @return the value of the derivative of a Bernstein polynomial
-     *         &part;B<sup>n</sup><sub>&lambda;</sub>/&part;&tau;<sub>i</sub>
+     *         $\frac{\partial}{\partial x_i}
+     *          B^n_{\mathbf{\lambda}}(\mathbf{\tau})$
+     *         <!--&part;B<sup>n</sup><sub>&lambda;</sub>/&part;&tau;<sub>i</sub>-->
      *         where i is the value of the argument named tauInd
      * @exception IllegalArgumentException an argument was out of bounds
      */
@@ -2626,9 +2659,11 @@ public class Functions {
      *        &lambda;<sub>1</sub>, ... , &lambda;<sub>m-1</sub>
      * @param tau barycentric coordinates at which to evaluate the polynomial,
      *        with these arguments in the order &tau;<sub>0</sub>,
-     *        &tau;<sub>1</sub>, ... , &tau;<sub>m-1</sub>
+     *        &tau;<sub>1</sub>, ... , &tau;<sub>n-1</sub>
      * @return the value of the derivative of a Bernstein polynomial
-     *         &part;<sup>2</sup>B<sup>n</sup><sub>&lambda;</sub>/(&part;&tau;<sub>i</sub>&part;&tau;<sub>j</sub>)
+     *         $\frac{\partial^2}{\partial \tau_i \partial \tau_j}
+     *         B^n_{\mathbf{\lambda}}(\mathbf{\tau})$
+     *         <!--&part;<sup>2</sup>B<sup>n</sup><sub>&lambda;</sub>/(&part;&tau;<sub>i</sub>&part;&tau;<sub>j</sub>)-->
      *         where i is the value of the argument named tauInd1 and
      *         j is the value of the argument named tauInd2 (both may have
      *         the same value)
@@ -3052,7 +3087,8 @@ public class Functions {
      * an real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[J<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}J_\nu(x)$
+     *         <!-- d[J<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dJdx(double nu, double x) {
 	if (nu == 0.0) return -J(1, x);
@@ -3064,7 +3100,8 @@ public class Functions {
      * an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[J<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}J_\nu(x)$
+     *         <!--d[J<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dJdx(int nu, double x) {
 	if (nu == 0) return -J(1, x);
@@ -3180,7 +3217,8 @@ public class Functions {
      * a real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[Y<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}Y_\nu(x)$
+     *         <!--d[Y<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dYdx(double nu, double x) {
 	return (Y(nu-1.0, x) - Y(nu + 1.0, x))/2.0;
@@ -3191,7 +3229,8 @@ public class Functions {
      * an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[Y<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}Y_\nu(x)$
+     *         <!--d[Y<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dYdx(int nu, double x) {
 	return (Y(nu-1.0, x) - Y(nu + 1.0, x))/2.0;
@@ -3358,7 +3397,8 @@ public class Functions {
      * kind (K) for a real-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[K<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}K_\nu(x)$
+     *         <!--d[K<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dKdx(double nu, double x) {
 	return -(K(nu-1, x) + K(nu+1, x))/ 2.0;
@@ -3369,7 +3409,8 @@ public class Functions {
      * kind (K) for an integer-valued order.
      * @param nu the order of the function
      * @param x the function's argument.
-     * @return the value of d[K<sub>&nu;</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}K_\nu(x)$
+     *         <!--d[K<sub>&nu;</sub>(x)]/dx-->
      */
     public static double dKdx(int nu, double x) {
 	return -(K(nu-1, x) + K(nu+1, x))/ 2.0;
@@ -3420,7 +3461,8 @@ public class Functions {
      * kind.
      * @param n the order of the function
      * @param x the argument for the function
-     * @return the value of d[j<sub>n</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}j_n(x)$
+     *         <!--d[j<sub>n</sub>(x)]/dx-->
      */
 	 public static double djdx(int n, double x) {
 	return (n*j(n-1, x) - (n+1)*j(n+1, x))/(2*n+1);
@@ -3476,7 +3518,8 @@ public class Functions {
      * kind.
      * @param n the order of the function
      * @param x the argument for the function
-     * @return the value of d[y<sub>n</sub>(x)]/dx
+     * @return the value of $\frac{d}{dx}y_n(x)$
+     *         <!--d[y<sub>n</sub>(x)]/dx-->
      */
     public static double dydx(int n, double x) {
 	return (n*y(n-1, x) - (n+1)*y(n+1, x))/(2*n+1);
@@ -4030,7 +4073,8 @@ public class Functions {
      * @param n the degree of the Legendre function
      * @param m the order of the Legendre function
      * @param x the point at which the derivative should be evaluated
-     * @return the value of the derivative d[P<sub>n</sub><sup>m</sup>(x)]/dx
+     * @return the value of the derivative $\frac{d}{dx}P_n^m(x)$
+     *         <!--d[P<sub>n</sub><sup>m</sup>(x)]/dx-->
      */
     public static double P(int n, int m, double x) {
 	return LegendrePolynomial.valueAt(n,m,x);
@@ -5413,8 +5457,10 @@ public class Functions {
     /**
      * Compute the complete elliptic integral of the first kind.
      * The complete elliptic integral of the first kind is defined as
-     * F(k) = <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2</span></sup></span><sub>&theta;=0</sub>
-     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
+     * $$F(k) = \int_{\theta=0}^{\frac\pi2} \frac1{1-k^2\sin^2\theta}
+     * d\theta\ .$$
+     * <!-- F(k) = <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2</span></sup></span><sub>&theta;=0</sub>
+     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.-->
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -5437,8 +5483,10 @@ public class Functions {
     /**
      * Compute the incomplete elliptic integral of the first kind.
      * The incomplete elliptic integral of the first kind is defined as
-     * F(k, &phi;) = <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
-     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.
+     * $$F(\phi,k) = \int_{\theta=0}^{\phi}
+     *  \frac{d\theta}{\sqrt{1-k^2 \sin^2 \theta}} \ .$$
+     * <!--F(k, &phi;) = <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
+     * (1 / &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;)) d&theta;.-->
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -5506,9 +5554,12 @@ public class Functions {
 
     /**
      * Compute a complete elliptic integral of the second kind.
-     * The integral is defined by eE(k) =
+     * The integral is defined by
+     *  $$ E(k) = \int_{\theta=0}^{\frac{\pi}2}\sqrt{1-k^2\sin^2 \theta}
+     *  d\theta\ .$$
+     * <!--eE(k) =
      * <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2</span></sup></span><sub>&theta;=0</sub>
-     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
+     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta; -->
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -5531,9 +5582,12 @@ public class Functions {
 
     /**
      * Compute an incomplete elliptic integral of the second kind.
-     * The integral is defined by eE(&phi;, k) =
+     * The integral is defined by
+     *  $$ E(\phi,k) = \int_{\theta=0}^{\phi}\sqrt{1-k^2\sin^2 \theta}
+     *  d\theta\ .$$
+     * <!-- eE(&phi;, k) =
      * <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
-     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;
+     * &radic;(1 - k<sup>2</sup> sin<sup>2</sup> &theta;) d&theta;-->
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -5591,10 +5645,13 @@ public class Functions {
 
     /**
      * Compute the complete elliptic integral of the third kind.
-     * The integral is defined by ePI(k, n) =
+     * The integral is defined by
+     * $$ \Pi(n,k) = \int_{\theta=0}^{\frac{\pi}{2}}
+     *   \frac{d\theta}{(1-n\sin^2\theta)\sqrt{1-k^2\sin^2\theta}}\ .$$
+     * <!--ePI(k, n) =
      * <span style="vertical-align: bottom; font-size: 150%">&int;<sup><span style="font-size:90%">&pi;/2;</span></sup></span><sub>&theta;=0</sub>
      * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
-     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
+     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta; -->
      * <P>
      * The notation used is the same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -5622,10 +5679,15 @@ public class Functions {
 
     /**
      * Compute an incomplete elliptic integral of the third kind.
-     * The integral is defined by ePI(&phi;, k, n) =
+
+     * The integral is defined by
+     * $$ \Pi(n,\phi,k) = \int_{\theta=0}^{\phi}
+     *   \frac{d\theta}{(1-n\sin^2\theta)\sqrt{1-k^2\sin^2\theta}}\ .$$
+
+     * <!-- ePI(&phi;, k, n) =
      * <span style="vertical-align: bottom font-size: 150%;">&int;<sup><span style="font-size:90%;">&phi;</span></sup></span><sub>&theta;=0</sub>
      * 1/((1 - n sin<sup>2</sup> &theta;)(&radic;(1 -
-     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta;
+     * k<sup>2</sup> sin<sup>2</sup> &theta;))) d&theta; -->
      * <P>
      * The notation used is the  same as that used for the
      * <A HREF="https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/libs/math/doc/sf_and_dist/html/math_toolkit/special/ellint/ellint_intro.html">Legendre form</A>.
@@ -6459,8 +6521,9 @@ public class Functions {
 
     /**
      * Compute the confluent hypergeometric function M(a, b, z).
-     * M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
-     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!)
+     * $$M(a,b,z) = \sum_{i=0}^\infty \frac{(a)_iz^i}{(b)_ii!}$$
+     * <!--M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
+     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!) -->
      *  where (a)<sub>i</sub> is a Pochhammer symbol.
      * @param a the first argument
      * @param b the second argument
@@ -6509,9 +6572,10 @@ public class Functions {
     /**
      * Compute the confluent hypergeometric function M(a, b, z) when
      * a is a long integer.
-     * M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
-     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!)
-     *  where (a)<sub>i</sub> is a Pochhammer symbol.
+     * $$M(a,b,z) = \sum_{i=0}^\infty \frac{(a)_iz^i}{(b)_ii!}$$
+     * <!--M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
+     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!) -->
+     * where (a)<sub>i</sub> is a Pochhammer symbol.
      * @param a the first argument
      * @param b the second argument
      * @param z the third argument
@@ -6549,8 +6613,9 @@ public class Functions {
     /**
      * Compute the confluent hypergeometric function M(a, b, z) when
      * a and b are long integers.
-     * M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
-     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!)
+     * $$M(a,b,z) = \sum_{i=0}^\infty \frac{(a)_iz^i}{(b)_ii!}$$
+     * <!-- M(a,b,z) = &sum;<sub>i=0</sub><sup>&infin;</sup>
+     * ((a)<sub>i</sub>z<sup>i</sup>) / ((b)<sub>i</sub>i!) -->
      *  where (a)<sub>i</sub> is a Pochhammer symbol.
      * @param a the first argument
      * @param b the second argument
@@ -6700,7 +6765,8 @@ public class Functions {
     /**
      * Compute the error function.
      * The error function is defined as
-     * erf(x) = (2/&pi;<sup>1/2</sup>);&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt.
+     * $\mathrm{erf}(x) = \frac{2}{\sqrt{\pi}}\int_{t=0}^{x} e^{-t^2} dt$.
+     * <!--erf(x) = (2/&pi;<sup>1/2</sup>);&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt.-->
      * <P>
      * The implementation uses Equation 7.1.5 (Abramowitz and Stegun) and
      * and when x &ge; 3.5, uses 1-erfc(x).
@@ -7021,8 +7087,9 @@ public class Functions {
     /**
      * Compute the incomplete beta function &Beta;<sub>x</sub>(a,b).
      * The incomplete beta function is defined as
-     * &Beta;<sub>x</sub>(a,b) = &int;<sub>0</sub><sup>x</sup>
-     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt.
+     * $B_x(a,b) = \int_{t=0}^x t^{a-1}(1-t)^{b-1} dt$.
+     * <!-- &Beta;<sub>x</sub>(a,b) = &int;<sub>0</sub><sup>x</sup>
+     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt. -->
      * @param x the limit to the integral
      * @param a the first argument
      * @param b the second argument
@@ -7059,9 +7126,11 @@ public class Functions {
     /**
      * Compute the derivative with respect to x of the incomplete
      * beta function &Beta;<sub>x</sub>(a,b).  The incomplete beta
-     * function is defined as &Beta;<sub>x</sub>(a,b) =
+     * function is defined as
+     * $B_x(a,b) = \int_{t=0}^x t^{a-1}(1-t)^{b-1} dt$.
+     * <!-- &Beta;<sub>x</sub>(a,b) =
      * &int;<sub>0</sub><sup>x</sup>
-     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt.
+     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt. -->
      * @param x the limit to the integral
      * @param a the first argument
      * @param b the second argument
@@ -7074,9 +7143,10 @@ public class Functions {
     /**
      * Compute the second derivative with respect to x of the incomplete
      * beta function &Beta;<sub>x</sub>(a,b).  The incomplete beta
-     * function is defined as &Beta;<sub>x</sub>(a,b) =
+     * function is defined as
+     * <!-- &Beta;<sub>x</sub>(a,b) =
      * &int;<sub>0</sub><sup>x</sup>
-     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt.
+     * t<sup>a-1</sup>(1-t)<sup>b-1</sup> dt.-->
      * @param x the limit to the integral
      * @param a the first argument
      * @param b the second argument
@@ -7312,7 +7382,8 @@ public class Functions {
      * The Airy functions Ai and Bi are solutions to the
      * differential equation y'' - xy = 0.
      * @param x the argument
-     * @return the value of d[Ai(x]/ dx
+     * @return the value of $\frac{d}{dx}\mathrm{Ai}(x)$
+     *         <!--d[Ai(x]/ dx -->
      */
     public static double dAidx(double x) {
 	if (x == 0.0) return Ai0p;
@@ -7357,7 +7428,8 @@ public class Functions {
      * The Airy functions Ai and Bi are solutions to the
      * differential equation y'' - xy = 0.
      * @param x the argument
-     * @return the value of d[Bi(x)]/dx
+     * @return the value of $\frac{d}{dx}\mathrm{Bi}(x)$
+     *         <!--d[Bi(x)]/dx -->
      */
     public static double dBidx(double x) {
 	if (x == 0.0) return Bi0p;
@@ -7455,7 +7527,8 @@ public class Functions {
      * Compute the value of the derivative of a Laguerre polynomial.
      * @param n the degree of the polynomial
      * @param x the argument
-     * @return the derivative d[L<sub>n</sub>(x)]/dx.
+     * @return the derivative $\frac{d}{dx}L_n(x)$
+     *             <!--d[L<sub>n</sub>(x)]/dx.-->
      */
     public static double dLdx(int n, double x) {
 	double z = -x;
@@ -7522,7 +7595,8 @@ public class Functions {
      * @param n the degree of the polynomial
      * @param alpha the order of the associated Laguerre polynomial
      * @param x the argument
-     * @return the derivative d[L<sub>n</sub><sup>(&alpha;)</sup>(x)]/dx.
+     * @return the derivative $\frac{d}{dx}L_n^\alpha(x)$
+     *         <!--d[L<sub>n</sub><sup>(&alpha;)</sup>(x)]/dx.-->
      */
     public static double dLdx(int n, double alpha, double x) {
 	if (n == 0) return 0.0;

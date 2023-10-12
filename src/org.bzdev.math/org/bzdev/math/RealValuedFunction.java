@@ -6,6 +6,17 @@ import javax.script.ScriptException;
 
 /**
  * Class  defining a real-valued function with a real argument.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This is intended for cases in which a function should be passed
  * as an argument.
  * <P>

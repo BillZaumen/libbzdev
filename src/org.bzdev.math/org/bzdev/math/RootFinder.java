@@ -7,6 +7,17 @@ import org.bzdev.lang.MathOps;
 
 /**
  * Root finder.  
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * Solves the equation y = f(x,p) for x, where x and y have a
  * type of double and p has a type set by a type parameter and
  * represents a set of parameters that do not vary.
@@ -1708,8 +1719,10 @@ public abstract class RootFinder<P> {
      *       (-b - (27ad - b<sup>3</sup>)<sup>1/3</sup> / (3a).
      *   <LI>if &Delta; is positive, there are two critical points
      *       with the inflection point between these two.  The
-     *       critical points are (-b - sqrt(&Delta;<sub>0</sub>))/(3a)
-     *       and (-b + sqrt(&Delta;<sub>0</sub>))/(3a). If one of these
+     *       critical points are $(-b-\sqrt{\Delta_0})/(3a)$
+     *       <!--(-b - sqrt(&Delta;<sub>0</sub>))/(3a)-->
+     *       and $(-b + sqrt{\Delta_0})/(3a)$.
+     *       <!--(-b + sqrt(&Delta;<sub>0</sub>))/(3a).--> If one of these
      *       is a root r (both cannot be roots), it is a double root, and
      *       the other root has the value -(2ar  + b)/a. Otherwise,
      *       let x<sub>1</sub> be the lower of these two critical points
@@ -1718,9 +1731,10 @@ public abstract class RootFinder<P> {
      *         <LI> If f(x<sub>1</sub>) and f&Prime;(x<sub>1</sub>)
      *               have opposite signs, there is a real root below
      *               x<sub>1</sub>. One can find the root using Newton's
-     *               method with an initial guess x<sub>g</sub> =
-     *               x<sub>1</sub> -
-     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>1</sub>)/f(x<sub>1</sub>),
+     *               method with an initial guess
+     *               $x_g = x_1 - (\frac32)^m\sqrt{-2f(x_1)/f\prime(x_1)}$,
+     *               <!-- x<sub>g</sub> =  x<sub>1</sub> -
+     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>1</sub>)/f(x<sub>1</sub>)-->,
      *               where m is the smallest non-negative integer such that
      *               f(x<sub>g</sub>) and f(x<sub>1</sub> have opposite
      *               signs.
@@ -1736,9 +1750,10 @@ public abstract class RootFinder<P> {
      *         <LI> If f(x<sub>2</sub>) and f&Prime;(x<sub>2</sub>)
      *               have opposite signs, there is a real root above
      *               x<sub>2</sub>.  One can find the root using Newton's
-     *               method with an initial guess x<sub>g</sub> =
-     *               x<sub>2</sub> -
-     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>2</sub>)/f(x<sub>2</sub>),
+     *               method with an initial guess
+     *               $x_g = x_2 - (\frac32)^m\sqrt{-2f(x_2)/f\prime(x_2)}$,
+     *               <!--x<sub>g</sub> = x<sub>2</sub> -
+     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>2</sub>)/f(x<sub>2</sub>),-->
      *               where m is the smallest non-negative integer such that
      *               f(x<sub>g</sub>) and f(x<sub>2</sub> have opposite
      *               signs.
@@ -1819,7 +1834,7 @@ public abstract class RootFinder<P> {
      * The algorithm starts by setting x<sub>1</sub> to the value of
      * a guess that is provided by one of this methods arguments.
      * <P>
-     * A * sequence of values {x<sub>1</sub>, ... x<sub>n</sub>, ...} is
+     * A sequence of values {x<sub>1</sub>, ... x<sub>n</sub>, ...} is
      * generated as follows:
      * For x<sub>n</sub>, if f(x<sub>n</sub>) - y = 0, then
      * x<sub>n+1</sub> = x<n>. Otherwise
@@ -1931,19 +1946,25 @@ public abstract class RootFinder<P> {
      *       (-b - (27ad - b<sup>3</sup>)<sup>1/3</sup> / (3a).
      *   <LI>if &Delta; is positive, there are two critical points
      *       with the inflection point between these two.  The
-     *       critical points are (-b - sqrt(&Delta;<sub>0</sub>))/(3a)
-     *       and (-b + sqrt(&Delta;<sub>0</sub>))/(3a). If one of these
-     *       is a root r (both cannot be roots), it is a double root, and
-     *       the other root has the value -(2ar  + b)/a. Otherwise,
-     *       let x<sub>1</sub> be the lower of these two critical points
-     *        and let x<sub>2</sub> be the higher of these two values.
+     *       critical points are
+     *       $(-b - \sqrt{\Delta_0})/(3a)$
+     *       <!--(-b - sqrt(&Delta;<sub>0</sub>))/(3a)-->
+     *       and
+     *       $(-b + \sqrt{\Delta_0})/(3a)$.
+     *       <!--(-b + sqrt(&Delta;<sub>0</sub>))/(3a).-->
+     *       If one of these is a root r (both cannot be roots), it
+     *       is a double root, and the other root has the value
+     *       -(2ar + b)/a. Otherwise, let x<sub>1</sub> be the lower of
+     *       these two critical points and let x<sub>2</sub> be the
+     *       higher of these two values.
      *       <UL>
      *         <LI> If f(x<sub>1</sub>) and f&Prime;(x<sub>1</sub>)
      *               have opposite signs, there is a real root below
      *               x<sub>1</sub>. One can find the root using Newton's
-     *               method with an initial guess x<sub>g</sub> =
-     *               x<sub>1</sub> -
-     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>1</sub>)/f(x<sub>1</sub>),
+     *               method with an initial guess
+     *               $x_g = x_1 - (\frac32)^m\sqrt{-2f(x_1)/f\prime(x_1)}$,
+     *               <!-- x<sub>g</sub> = x<sub>1</sub> -
+     *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>1</sub>)/f(x<sub>1</sub>),-->
      *               where m is the smallest non-negative integer such that
      *               f(x<sub>g</sub>) and f(x<sub>1</sub> have opposite
      *               signs.
@@ -1959,8 +1980,9 @@ public abstract class RootFinder<P> {
      *         <LI> If f(x<sub>2</sub>) and f&Prime;(x<sub>2</sub>)
      *               have opposite signs, there is a real root above
      *               x<sub>2</sub>.  One can find the root using Newton's
-     *               method with an initial guess x<sub>g</sub> =
-     *               x<sub>2</sub> -
+     *               method with an initial guess
+     *               $x_g = x_2 - (\frac32)^m\sqrt{-2f(x_2)/f\prime(x_2)}$,
+     *               x<sub>g</sub> = x<sub>2</sub> -
      *     (3/2)<sup>m</sup>sqrt(-2f&Prime;(x<sub>2</sub>)/f(x<sub>2</sub>),
      *               where m is the smallest non-negative integer such that
      *               f(x<sub>g</sub>) and f(x<sub>2</sub> have opposite

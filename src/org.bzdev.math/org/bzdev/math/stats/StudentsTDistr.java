@@ -5,6 +5,17 @@ import org.bzdev.math.Functions;
 
 /**
  * Class providing methods for Student's t-distribution.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * The use of A, P and Q follows the convention in Abramowitz and
  * Stegun, "Handbook of Mathematical Functions" (10th printing [1972],
  * 9th Dover printing), chapter 26. Some of the methods have names
@@ -12,7 +23,8 @@ import org.bzdev.math.Functions;
  * convention, in order to conform to this text.
  * <P>
  * This distribution is the distribution of a random variable
- * T = Z sqrt(&nu;/V) where
+ * $T = Z \sqrt{\frac{\nu}{V}}$ where
+ * <!--T = Z sqrt(&nu;/V) where -->
  * <UL>
  *   <LI> Z is a Gaussian (or normal) random variable with an expected
  *        (or mean) value of 0 and a stadard deviation of 1.
@@ -22,8 +34,10 @@ import org.bzdev.math.Functions;
  * </UL>
  * <P>
  * This class also handles the noncentral t distribution, where the
- * random variable T = (Z + &mu;) sqrt (&nu;/V), where &mu; is the
- * noncentrality parameter and Z, V, and &nu; are defined above.
+ * random variable $T = (Z + \mu)\sqrt{\frac{\nu}{V}}$,
+ * <!--T = (Z + &mu;) sqrt (&nu;/V), -->
+ * where &mu; is the noncentrality parameter and Z, V, and &nu;
+ * are defined above.
  */
 public class StudentsTDistr extends ProbDistribution {
 

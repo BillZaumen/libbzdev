@@ -6,6 +6,17 @@ import java.util.Arrays;
 
 /**
  * Class representing an F-test statistic for Levene's test.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This class defines a statistic W that allows one to determine
  * if multiple subgroups (a total of k subgroups) of a sample of size N
  * have the same variances. The number of data points in the i<sup>th</sup>
@@ -13,14 +24,18 @@ import java.util.Arrays;
  * the i<sup>th</sup> is denoted as Y<sub>ij</sub>.
  * <P>
  * The statistic W is defined as
- * W = ((N-k)/(k-1) (&sum;<sub>i=0</sub><sup>k-1</sup>
+ * $$W = \frac{N-k}{k-1} \frac{\sum_{i=0}^{k-1}N_i(\mbox{z&#x0305;}_{i.}n -
+ *  \mbox{z&#x0305;}_{..})^2}{\sum_{i=0}^{k-1}\sum_{j=0}^{N_i-1}
+ *  (z_{ij} - \mbox{z&#x0305;}_{i.})^2}$$
+ * <!--W = ((N-k)/(k-1) (&sum;<sub>i=0</sub><sup>k-1</sup>
  * (<span style="text-decoration: overline">Z</span><sub>i.</sub>
  *  - <span style="text-decoration: overline">Z</span><sub>..</sub>)<sup>2</sup>) /
  *  ( &sum;<sub>i=0</sub><sup>k-1</sup>
  *    &sum;<sub>j=0</sub><sup>N<sub>i</sub>-1</sup>
  *    (Z<sub>ij</sub> -
- *    <span style="text-decoration: overline">Z</span><sub>i.</sub>)<sup>2</sup>)
- * where Z<sub>ij</sub> = |Y<sub>ij</sub> - M<sub>i</sub>|, and where
+ *    <span style="text-decoration: overline">z</span><sub>i.</sub>)<sup>2</sup>)-->
+ * where N<sub>i</sub> is the sample size of the i<sup>th</sup> subgroup,
+ * z<sub>ij</sub> = |Y<sub>ij</sub> - M<sub>i</sub>|, and where
  * M<sub>i</sub> is defined as either
  * <OL>
  *    <LI> the mean of the i<sup>th</sup> subgroup.
@@ -33,7 +48,9 @@ import java.util.Arrays;
  * Please see
  * <A href="http://www.itl.nist.gov/div898/handbook/eda/section3/eda35a.htm">
  * Levene Test for Equality of Variances</A> for a full description of this
- * test.
+ * test.  There is one notation difference: this document uses a lower case
+ * 'z' instead of an upper case 'Z' to work around a bug in mathjax by
+ * using Unicode combining characters.
  */
 public class LeveneStat extends FStat {
 
@@ -42,11 +59,11 @@ public class LeveneStat extends FStat {
     /**
      * The mode for a Levene's test.
      * Levene's original paper used the mean value of each
-     * subgroup when computing the array Z<sub>ij</sub> used
+     * subgroup when computing the array z<sub>ij</sub> used
      * by {@link LeveneStat}.
      * For k subgroups indexed by i, with j the index within
      * a subgroup, then for a data set Y<sub>ij</sub>,
-     * Z<sub>ij</sub> = |Y<sub>ij</sub> - M<sub>i</sub>|
+     * z<sub>ij</sub> = |Y<sub>ij</sub> - M<sub>i</sub>|
      * where M<sub>i</sub> is defined as either
      * <OL>
      * <LI> the mean of the i<sup>th</sup> subgroup.

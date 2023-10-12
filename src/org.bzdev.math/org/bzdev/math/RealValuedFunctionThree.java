@@ -6,6 +6,17 @@ import javax.script.ScriptException;
 
 /**
  * Class  defining a real-valued function with three real arguments.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This is intended for cases in which a function should be passed
  * as an argument.
  * <P>
@@ -559,22 +570,57 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
      * f(x<sub>1</sub>,x<sub>2</sub>), these methods are defined as follows:
      * <UL>
      *   <LI><CODE>valueAt</CODE> returns  f(x<sub>1</sub>,x<sub>2</sub>).
-     *   <LI><CODE>deriv1At</CODE> returns &part;f/&part;x<sub>1</sub>
-     *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
-     *   <LI><CODE>deriv2At</CODE> returns &part;f/&part;x<sub>2</sub>
-     *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
+     *   <LI><CODE>deriv1At</CODE> returns $\frac{\partial f}{\partial x_1}$
+     *             <!-- &part;f/&part;x<sub>1</sub> -->
+     *             evaluated at the point
+     *            (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv2At</CODE> returns $\frac{\partial f}{\partial x_2}$
+     *             <!-- &part;f/&part;x<sub>2</sub> -->
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv3At</CODE> returns $\frac{\partial f}{\partial x_3}$
+     *             <!-- &part;f/&part;x<sub>3</sub> -->
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
      *   <LI><CODE>deriv11At</CODE> returns
-     *             &part;<sup>2</sup>f/&part;x<sub>1</sub><sup>2</sup>
-     *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
+     *             $\frac{\partial^2 f}{\partial x_1^2}$
+     *             <!-- &part;<sup>2</sup>f/&part;x<sub>1</sub><sup>2</sup> -->
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
      *   <LI><CODE>deriv12At</CODE> returns
-     *             &part;<sup>2</sup>f/&part;x<sub>1</sub>&part;x<sub>2</sub>
-     *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
+     *             $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     *             <!-- &part;<sup>2</sup>f/&part;x<sub>1</sub>&part;x<sub>2</sub> -->
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv13At</CODE> returns
+     *             $\frac{\partial^2 f}{\partial x_1 \partial x_3}$
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
      *   <LI><CODE>deriv21At</CODE> returns
-     *             &part;<sup>2</sup>f/&part;x<sub>2</sub>&part;x<sub>1</sub>
+     *             $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     *             <!-- &part;<sup>2</sup>f/&part;x<sub>2</sub>&part;x<sub>1</sub> -->
      *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
      *   <LI><CODE>deriv22At</CODE> returns
-     *             &part;<sup>2</sup>f/&part;x<sub>1</sub><sup>2</sup>
-     *             evaluated at the point (x<sub>1</sub>,x<sub>2</sub>).
+     *             $\frac{\partial^2 f}{\partial x_2^2}$
+     *             <!-- &part;<sup>2</sup>f/&part;x<sub>1</sub><sup>2</sup> -->
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv23At</CODE> returns
+     *             $\frac{\partial^2 f}{\partial x_2 \partial x_3}$
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv31At</CODE> returns
+     *             $\frac{\partial^2 f}{\partial x_3 \partial x_1}$
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv32At</CODE> returns
+     *             $\frac{\partial^2 f}{\partial x_3 \partial x_2}$
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
+     *   <LI><CODE>deriv33At</CODE> returns
+     *             $\frac{\partial^2 f}{\partial x_3^2}$
+     *             evaluated at the point
+     *             (x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
      * </UL>
      * @param scriptingContext the scripting context
      * @param object an object from a scripting environment defining
@@ -782,9 +828,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     /**
      * {@inheritDoc}
      * <P>
-     * This method calls a method named deriviAt(...) where is the value of
-     * the first argument. One should usually override those methods (for
-     * i in [1,3]) instead of this one.
+     * This method calls a method named
+     * deriv<CODE>&lt;</CODE>i+1<CODE>&gt;</CODE>At(...) where i is
+     * the value of the first argument. One should usually override
+     * those methods instead of this one.
      */
     @Override
     public final double derivAt(int i, double... args) throws
@@ -806,8 +853,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function computing  &part;f / &part;x<sub>1</sub>.
-     * @return a function that computes &part;f / &part;x<sub>1</sub>
+     * Get a function computing $\frac{\partial f}{\partial x_1}$.
+     * <!-- &part;f / &part;x<sub>1</sub>. -->
+     * @return a function that computes $\frac{\partial f}{\partial x_1}$
+     *         <!-- &part;f / &part;x<sub>1</sub> -->
      *         where f is this real-valued function
      */
     public RealValuedFunctThreeOps deriv1() {
@@ -819,8 +868,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>1</sub>
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_1}$
+     * <!-- &part;f / &part;x<sub>1</sub> -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -875,8 +924,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function computing  &part;f / &part;x<sub>2</sub>.
-     * @return a function that computes &part;f / &part;x<sub>2</sub>
+     * Get a function computing  $\frac{\partial f}{\partial x_2}$.
+     * <!--&part;f / &part;x<sub>2</sub>. -->
+     * @return a function that computes $\frac{\partial f}{\partial x_2}$
+     *         <!-- &part;f / &part;x<sub>2</sub> -->
      *         where f is this real-valued function
      */
     public RealValuedFunctThreeOps deriv2() {
@@ -888,8 +939,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>2</sub>
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_2}$
+     * <!-- &part;f / &part;x<sub>2</sub> -->
      * for a function f(x<sub>2</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -944,8 +995,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function computing  &part;f / &part;x<sub>3</sub>.
-     * @return a function that computes &part;f / &part;x<sub>3</sub>
+     * Get a function computing $\frac{\partial f}{\partial x_3}$.
+     * <!-- &part;f / &part;x<sub>3</sub>. -->
+     * @return a function that computes $\frac{\partial f}{\partial x_3}$
+     *         <!-- &part;f / &part;x<sub>3</sub> -->
      *         where f is this real-valued function
      */
     public RealValuedFunctThreeOps deriv3() {
@@ -957,8 +1010,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>3</sub>
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_3}$
+     * <!-- &part;f / &part;x<sub>3</sub> -->
      * for the function f(x<sub>1</sub>,x<sub>2</sub>,x<sub>3</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1011,7 +1064,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes the value of partial derivative
-     * that would be computed by calling {@link derivAt(int,double...)}.
+     * that would be computed by calling
+     * {@link secondDerivAt(int,int,double...)}.
      * @param i the argument index for the first derivative
      * @param j the argument index for the second derivative
      * @return the function
@@ -1028,9 +1082,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     /**
      * {@inheritDoc}
      * <P>
-     * This method calls a method named derivijAt(...) where i and j
-     * are the values of the first two arguments. One should usually
-     * override those methods (for i and j in [1,3]) instead of this one.
+     * This method calls a method named
+     * deriv<CODE>&lt;</CODE>i+1<CODE>&gt;&lt;</CODE>j+1<CODE>&gt;</CODE>At(...)
+     * where i and j are the values of the first two arguments. One should
+     * usually override those methods instead of this one.
      */
     @Override
     public final double secondDerivAt(int i, int j, double... args) throws
@@ -1072,11 +1127,11 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> where
-     * f is this function.
-     * @return a function that computes
-     *         &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>
+     * Get a function that computes $\frac{\partial^2 f}{\partial x_1^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> -->
+     * where f is this function.
+     * @return a function that computes $\frac{\partial^2 f}{\partial x_1^2}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> -->
      */
     public RealValuedFunctThreeOps deriv11() {
 	return new RealValuedFunctThreeOps() {
@@ -1087,8 +1142,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>
+     * Evaluate the partial derivative $\frac{\partial^2 f}{\partial x_1^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1144,9 +1199,15 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!--&part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
      * where f is this function.
      * @return a function that computes
+     *         $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
+     * where f is this function.
+     *
+     *
      *         &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
      */
     public RealValuedFunctThreeOps deriv12() {
@@ -1159,7 +1220,10 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
+     * where f is this function.
+     *     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1215,10 +1279,12 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>3</sub>)
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_3}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
      * where f is this function.
      * @return a function that computes
-     *         &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>3</sub>)
+     *          $\frac{\partial^2 f}{\partial x_1 \partial x_3}$
+     *         <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>3</sub>) -->
      */
     public RealValuedFunctThreeOps deriv13() {
 	return new RealValuedFunctThreeOps() {
@@ -1231,7 +1297,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>3</sub>)
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_3}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>3</sub>) -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1287,10 +1354,12 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
      * where f is this function.
      * @return a function that computes
-     *         &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
+     *         $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     *         <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
      */
     public RealValuedFunctThreeOps deriv21() {
 	return new RealValuedFunctThreeOps() {
@@ -1302,7 +1371,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1357,9 +1427,9 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> where
-     * f is this function.
+     * Get a function that computes $\frac{\partial^2 f}{\partial x_2^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
+     *  where f is this function.
      * @return a function that computes
      *         &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
      */
@@ -1372,8 +1442,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
+     * Evaluate the partial derivative $\frac{\partial^2 f}{\partial x_2^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1429,8 +1499,9 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>3</sup> where
-     * f is this function.
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_3}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>3</sup> -->
+     * where f is this function.
      * @return a function that computes
      *         &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>3</sup>
      */
@@ -1444,7 +1515,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>3</sub>)
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_3}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>3</sub>) -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1500,8 +1572,9 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>1</sup> where
-     * f is this function.
+     * $\frac{\partial^2 f}{\partial x_3 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>1</sup> -->
+     * where f is this function.
      * @return a function that computes
      *         &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>1</sup>
      */
@@ -1515,7 +1588,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>3</sub> &part;x<sub>1</sub>)
+     * $\frac{\partial^2 f}{\partial x_3 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>3</sub> &part;x<sub>1</sub>) -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1571,10 +1645,12 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> where
-     * f is this function.
+     * $\frac{\partial^2 f}{\partial x_3 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> -->
+     * where f is this function.
      * @return a function that computes
-     *         &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup>
+     *         $\frac{\partial^2 f}{\partial x_3 \partial x_2}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> -->
      */
     public RealValuedFunctThreeOps deriv32() {
 	return new RealValuedFunctThreeOps() {
@@ -1586,7 +1662,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>3</sub> &part;x<sub>2</sub>)
+     * $\frac{\partial^2 f}{\partial x_3 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>3</sub> &part;x<sub>2</sub>) -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
@@ -1641,11 +1718,11 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> where
-     * f is this function.
-     * @return a function that computes
-     *         &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup>
+     * Get a function that computes $\frac{\partial^2 f}{\partial x_3^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> -->
+     * where f is this function.
+     * @return a function that computes $\frac{\partial^2 f}{\partial x_3^2}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> -->
      */
     public RealValuedFunctThreeOps deriv33() {
 	return new RealValuedFunctThreeOps() {
@@ -1657,8 +1734,8 @@ public class  RealValuedFunctionThree extends RealValuedFunctionVA
 
 
     /**
-     * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup>
+     * Evaluate the partial derivative $\frac{\partial^2 f}{\partial x_3^2}$
+     * <!--&part;<sup>2</sup>f / &part;x<sub>3</sub><sup>2</sup> -->
      * for a function f(x<sub>1</sub>x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument

@@ -6,15 +6,26 @@ import java.util.Arrays;
 
 /**
  * Class representing an F-test statistic.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * An F-test statistic is based on the F distribution.
  * An F distribution is the distribution of the random variable
  * (X<sub>1</sub>/&nu;<sub>1</sub>) / (X<sub>2</sub>/&nu;<sub>2</sub>),
  * where X<sub>1</sub> and X<sub>2</sub> are independent random variables
- * with a &Chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
+ * with a &chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
  * &nu;<sub>2</sub> degrees of freedom respectively.
  * <P>
  * For noncentral F-distributions, the random variable X<sub>1</sub> defined
- * above has a noncentral &Chi;<sup>2</sup> distribution with a
+ * above has a noncentral &chi;<sup>2</sup> distribution with a
  * noncentrality parameter &lambda;.  This class provides methods to
  * compute the noncentrality parameter.
  */
@@ -106,24 +117,25 @@ public abstract class FStat extends Statistic {
      * distributed random variables is &mu;<sub>i</sub> and these
      * random variables have variances equal to 1.0, then the
      * distribution of the sum of the squares of these random
-     * variables is a noncentral &Chi;<sup>2</sup> distribution with k
+     * variables is a noncentral &chi;<sup>2</sup> distribution with k
      * degrees of freedom and a noncentrality parameter &lamba;. For
      * the statistic provided by this class, each of these random
      * variables is a ratio of a difference and a quantity that is
      * essential a standard deviation.  The difference is the
      * difference between a value X<sub>i</sub> and an expected value
      * E<sub>i</sub>, and the standard deviation is the standard deviation
-     * for X<sub>i</sub>. The &Chi;<sup>2</sup> distribution assumes that
+     * for X<sub>i</sub>. The &chi;<sup>2</sup> distribution assumes that
      * these ratios have a normal distribution with unit variances and a
-     * mean of 0.  For a noncentral &Chi;<sup>2</sup> distribution, the
+     * mean of 0.  For a noncentral &chi;<sup>2</sup> distribution, the
      * ratios are assumed to have a non-zero mean. The noncentrality
      * parameter &lambda; is defined by
-     * &lambda; = &sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub>, where
+     * $\lambda = \sum_{i=1}^k \mu_i$,
+     * <!--&lambda; = &sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub>,--> where
      * &mu;<sub>i</sub> is the mean value of the i<sup>th</sup> ratio.
      * <P>
      * If there are k degrees of freedom, but additional terms in the
-     * &Chi;</sup>2</sup> sum, it is possible to define k variables
-     * z<sub>i</sub> so that &Chi;</sup>2</sup> = z<sub>1</sub><sup>2</sup>
+     * &chi;</sup>2</sup> sum, it is possible to define k variables
+     * z<sub>i</sub> so that &chi;</sup>2</sup> = z<sub>1</sub><sup>2</sup>
      *  + ... + z<sub>k</sub><sup>2</sup>, where the mean of each z<sub>i</sub>
      * is zero and its standard deviation is 1. The same value for &lamba;
      * will be obtained.  All the x<sub>i</sub> variables must satisfy
@@ -168,10 +180,12 @@ public abstract class FStat extends Statistic {
      * and the corresponding mean value
      * &mu;<sub>i</sub> = &delta;<sub>i</sub> / &sigma;<sub>i</sub>.
      * The distribution of
-     * &sum;<sub>i=1</sub><sup>k</sup>
-     * (Y<sub>i</sub> + &delta;<sub>i</sub>)/&sigma;<sub>i</sub>
-     * is thus a noncentral &Chi;<sup>2</sup> with a non-centrality parameter
-     * &lambda; = &sum;<sub>i=1</sub><sup>k</sup> &mu;<sub>i</sub>.
+     * $\sum_{i=1}^k \frac{Y_i +\delta_i}{\sigma_i}$
+     * <!-- &sum;<sub>i=1</sub><sup>k</sup>
+     * (Y<sub>i</sub> + &delta;<sub>i</sub>)/&sigma;<sub>i</sub>-->
+     * is thus a noncentral &chi;<sup>2</sup> with a non-centrality parameter
+     * $\lambda = \sum_{i=1}^k \mu_i$.
+     * <!--&lambda; = &sum;<sub>i=1</sub><sup>k</sup> &mu;<sub>i</sub>.-->
      * <P>
      * This method computes &lambda; for the case were the differences
      * &delta;<sub>i</sub> are identical.  If the number of variables is

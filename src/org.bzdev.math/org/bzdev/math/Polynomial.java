@@ -5,6 +5,17 @@ import java.util.Arrays;
 
 /**
  * Class representing polynomials using a monomial basis.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * Methods include ones for computing a polynomial's value,
  * obtaining or modifying a polynomial's coefficients,
  * computing integrals and derivatives of a polynomial, and
@@ -313,9 +324,8 @@ public class Polynomial extends RealValuedFunction {
     }
 
     /**
-     * Integrate a polynomial.
-     * For a polynomial P(x) The integral I(x) = &int;P(x) is
-     * implemented so that I(0) = 0.  If this polynomial's degree
+     * Integrate a polynomial $P$ by computing $\int_{t=0}^xP(t)dt$.
+     * If this polynomial's degree
      * as returned by {@link #getDegree()} is -1, which indicates that
      * the polynomial is not defined, a
      * new polynomial with a degree of -1 will be returned.
@@ -343,8 +353,7 @@ public class Polynomial extends RealValuedFunction {
 
     /**
      * Evaluated the integral of a polynomial.
-     * For a polynomial P(x) The integral I(x) = &int;P(x) is
-     * implemented so that I(0) = 0.
+     * For a polynomial P(x) The value is $\int_{t=0}^xP(t)dt$.
      * @param x the polynomial's argument
      * @return the integral of the polynomial, evaluated at x
      */

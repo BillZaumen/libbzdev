@@ -8,11 +8,11 @@ import org.bzdev.math.Functions;
  * An F-distribution is the distribution of the random variable
  * (X<sub>1</sub>/&nu;<sub>1</sub>) / (X<sub>2</sub>/&nu;<sub>2</sub>),
  * where X<sub>1</sub> and X<sub>2</sub> are independent random variables
- * with a &Chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
+ * with a &chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
  * &nu;<sub>2</sub> degrees of freedom respectively.
  * <P>
  * For noncentral F-distributions, the random variable X<sub>1</sub> defined
- * above has a noncentral &Chi;<sup>2</sup> distribution with a
+ * above has a noncentral &chi;<sup>2</sup> distribution with a
  * noncentrality parameter &lambda;.
  */
 public class FDistr extends ProbDistribution {
@@ -40,9 +40,9 @@ public class FDistr extends ProbDistribution {
     private double lambda;
 
     /**
-     * Determine if this object is a noncentral &Chi;<sup>2</sup>
+     * Determine if this object is a noncentral &chi;<sup>2</sup>
      * distribution.
-     * @return true if this object is a noncentral &Chi;<sup>2</sup>
+     * @return true if this object is a noncentral &chi;<sup>2</sup>
      *         distribution; false otherwise.
      */
     public boolean isNonCentral() {return nonCentral;}
@@ -51,7 +51,7 @@ public class FDistr extends ProbDistribution {
      * Get the noncentrality parameter.
      * @return the noncentrality parameter
      * @exception IllegalStateException this object is not a
-     *            noncentral &Chi;<sup>2</sup> distribution
+     *            noncentral &chi;<sup>2</sup> distribution
      */
     public double getLambda() {
 	if (!nonCentral) throw new IllegalStateException
@@ -69,7 +69,7 @@ public class FDistr extends ProbDistribution {
      * defined by
      * (X<sub>1</sub>/&nu;<sub>1</sub>) / (X<sub>2</sub>/&nu;<sub>2</sub>)
      * where X<sub>1</sub> and X<sub>2</sub> are independent random
-     * variables, each with a &Chi;<sup>2</sup> distribution and
+     * variables, each with a &chi;<sup>2</sup> distribution and
      * where X<sub>1</sub> has &nu;<sub>1</sub> degrees of freedom and
      * X<sub>2</sub> has &nu;<sub>2</sub> degrees of freedom.
      * @param nu1 the number of degrees of freedom for the first
@@ -88,9 +88,9 @@ public class FDistr extends ProbDistribution {
      * defined by
      * (X<sub>1</sub>/&nu;<sub>1</sub>) / (X<sub>2</sub>/&nu;<sub>2</sub>)
      * where X<sub>1</sub> and X<sub>2</sub> are independent random
-     * variables, with X<sub>1</sub> having a noncentral &Chi;<sup>2</sup>
+     * variables, with X<sub>1</sub> having a noncentral &chi;<sup>2</sup>
      * distribution with &nu;<sub>1</sub> degrees of freedom and with
-     * X<sub>2</sub> having a &Chi;<sup>2</sup> distribution with
+     * X<sub>2</sub> having a &chi;<sup>2</sup> distribution with
      * &nu;<sub>2</sub> degrees of freedom.
      * @param nu1 the number of degrees of freedom for the first
      *        random variable  X<sub>1</sub>
@@ -142,7 +142,7 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables with a
-     * &Chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
+     * &chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
      * &nu;<sub>2</sub> degrees of freedom respectively.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>
@@ -175,7 +175,7 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables with a
-     * &Chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
+     * &chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
      * &nu;<sub>2</sub> degrees of freedom respectively.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>
@@ -202,7 +202,7 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables with a
-     * &Chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
+     * &chi;<sup>2</sup> distribution with &nu;<sub>1</sub> and
      * &nu;<sub>2</sub> degrees of freedom respectively.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>
@@ -225,9 +225,9 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables where
-     * X<sub>1</sub> has a noncentral &Chi;<sup>2</sup> distribution
+     * X<sub>1</sub> has a noncentral &chi;<sup>2</sup> distribution
      * with &nu;<sub>1</sub> degrees of freedom and a noncentrality
-     * parameter &lambda;, and where X<sub>2</sub> has a &Chi;<sup>2</sup>
+     * parameter &lambda;, and where X<sub>2</sub> has a &chi;<sup>2</sup>
      * distribution with &nu;<sub>2</sub> degrees of freedom.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>
@@ -275,9 +275,9 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables where
-     * X<sub>1</sub> has a noncentral &Chi;<sup>2</sup> distribution
+     * X<sub>1</sub> has a noncentral &chi;<sup>2</sup> distribution
      * with &nu;<sub>1</sub> degrees of freedom and a noncentrality
-     * parameter &lambda;, and where X<sub>2</sub> has a &Chi;<sup>2</sup>
+     * parameter &lambda;, and where X<sub>2</sub> has a &chi;<sup>2</sup>
      * distribution with &nu;<sub>2</sub> degrees of freedom.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>
@@ -314,9 +314,9 @@ public class FDistr extends ProbDistribution {
      * F = (X<sub>1</sub>/&nu;<sub>1</sub>) /
      * (X<sub>2</sub>/&nu;<sub>2</sub>), where X<sub>1</sub> and
      * X<sub>2</sub> are independent random variables where
-     * X<sub>1</sub> has a noncentral &Chi;<sup>2</sup> distribution
+     * X<sub>1</sub> has a noncentral &chi;<sup>2</sup> distribution
      * with &nu;<sub>1</sub> degrees of freedom and a noncentrality
-     * parameter &lambda;, and where X<sub>2</sub> has a &Chi;<sup>2</sup>
+     * parameter &lambda;, and where X<sub>2</sub> has a &chi;<sup>2</sup>
      * distribution with &nu;<sub>2</sub> degrees of freedom.
      * @param f a value of the random variable F
      * @param nu1 the number of degrees of freedom &nu;<sub>1</sub>

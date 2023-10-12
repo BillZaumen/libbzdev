@@ -4,6 +4,17 @@ import org.bzdev.math.LeastSquaresFit;
 
 /**
  * Base class for classes statistics for Student's t-test.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]},
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * Each subclass provides a different statistic. A description of the
  * statistic for each subclass is provided in the documentation for
  * that subclass. For a test of the differences between two data sets
@@ -16,7 +27,7 @@ import org.bzdev.math.LeastSquaresFit;
  * <P>
  * As described by the documentation for {@link StudentsTDistr},
  * the Student's t distribution is that of the random variable
- * T = Z sqrt(&nu;/V) where
+ * $T = Z \sqrt{\frac{\nu}{V}}$ <!-- T = Z sqrt(&nu;/V)--> where
  * <UL>
  *   <LI> Z is a Gaussian (or normal) random variable with an expected
  *        value of 0 and a mean of 1.
@@ -27,7 +38,8 @@ import org.bzdev.math.LeastSquaresFit;
  * In a typical case, V will be a sample standard deviation
  * divided by the square of the corresponding population standard deviation.
  * Similarly, Z will be the sample mean of a random number for a
- * sample size of n divided by &sigma;/sqrt(n) where &sigma; is the
+ * sample size of n divided by $\frac{\sigma}{\sqrt{n}}$
+ * <!-- &sigma;/sqrt(n) --> where &sigma; is the
  * the random number's population standard deviation.
  */
 public abstract class StudentsTStat extends Statistic {
@@ -61,7 +73,6 @@ public abstract class StudentsTStat extends Statistic {
      * Get a noncentral distribution for this statistic.
      * The definition of &mu; provided by {@link StudentsTDistr},
      * has to be applied to specific cases.
-
      * @param mu the noncentrality parameter
      * @return the probability distribution
      * @exception IllegalArgumentException the argument is not allowed
@@ -77,35 +88,51 @@ public abstract class StudentsTStat extends Statistic {
     /**
      * Get the noncentrality parameter given a difference in mean values.
      * A Student's t-test can typically be written as
-     * T = ((<span style="text-decoration: overline">X</span>
-     * - &mu;<sub>0</sub>)/(&sigma;/sqrt(n)))/((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;))
+     * $$ T = \frac{\mbox{x&#x0305;} - \mu_0}{
+     *          \frac{\sigma}{\sqrt{n}} \sqrt{\frac{S}{\sigma^2\nu}}
+     *        }$$
+     * <!--T = ((<span style="text-decoration: overline">X</span>
+     * - &mu;<sub>0</sub>)/(&sigma;/sqrt(n)))/((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;))-->
      * where &nu; is the number of degrees of freedom, &sigma; is the population
      * standard deviation of a random variable for which
-     * <span style="text-decoration: overline">X</span> is the sample mean of
+     * <span style="text-decoration: overline">x</span> is the sample mean of
      * X, &mu;<sub>0</sub> is the population mean of X,
      * n is the sample size, and S is a sum of
-     * squares.  Note that sqrt(S/(&sigma;<sup>2</sup>&nu;) will be the
-     * sample standard deviation for a suitable choice of &nu;
+     * squares.  Note that $\sqrt{\frac{S}{\sigma^2\nu}}$
+     * <!--sqrt(S/(&sigma;<sup>2</sup>&nu;)-->
+     * will be the
+     * sample standard deviation for a suitable choice of &nu;.
      * <P>
      * If we set &theta; = &mu;<sub>1</sub> - &mu;<sub>0</sub>, we can
      * express T as
-     * T = ((<span style="text-decoration: overline">X</span>
+     *$$T = \frac{\mbox{x&#x0305;} - \mu_0 +\theta - \theta
+     * }{
+     * \frac{\sigma}{\sqrt{n}} \frac{S/\sigma^2}{\sqrt{\nu}}
+     * }$$
+     * <!-- T = ((<span style="text-decoration: overline">X</span>
      * - &mu;<sub>0</sub> - &theta; + &theta;)/(&sigma;/sqrt(n))) /
-     * ((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;)) or
-     * T = ((<span style="text-decoration: overline">X</span>
+     * ((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;))--> or
+     * $$T = \frac{\mbox{x&#x0305;} - \mu_1 + \theta
+     * }{
+     * \frac{\sigma}{\sqrt{n}} \frac{S/\sigma^2}{\sqrt{\nu}}
+     * } \ .$$
+     * <!-- T = ((<span style="text-decoration: overline">X</span>
      * - &mu;<sub>1</sub> + &theta;)/(&sigma;/sqrt(n))) /
-     * ((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;))
-     * If we set Z = (<span style="text-decoration: overline">X</span>
-     * - &mu;<sub>1</sub>)/(&sigma;/sqrt(n)) and
-     * &mu; = &theta;/(&sigma;/sqrt(n)), then T can be written as
-     * (Z + &mu;)/sqrt(V/&nu;).  If the actual mean is &mu;<sub>1</sub>,
+     * ((sqrt(S/&sigma;<sup>2</sup>))/sqrt(&nu;)) -->
+     * If we set $Z = \frac{\mbox{x&#x0305;} - \mu_1}{\sigma/\sqrt{n}}$
+     * <!-- Z = (<span style="text-decoration: overline">X</span>
+     * - &mu;<sub>1</sub>)/(&sigma;/sqrt(n))--> and
+     * $\mu = \frac{\theta}{\sigma/\sqrt{n}}$,
+     * <!-- &mu; = &theta;/(&sigma;/sqrt(n)),--> then T can be written as
+     * $\frac{Z+\mu}{\sqrt{V/\nu}}$.
+     * <!-- (Z + &mu;)/sqrt(V/&nu;).-->  If the actual mean is &mu;<sub>1</sub>,
      * then Z has a normal distribution with a mean of zero and a
-     * variance of 1. Meanwhile V has a &Chi;<sup>2</sup> distribution
+     * variance of 1. Meanwhile V has a &chi;<sup>2</sup> distribution
      * with &nu; degrees of freedom, and Z and V are
      * independent. Consequently, the random variable
-     * (Z + &mu;)/sqrt(V/&nu;) has a noncentral t distribution characterized
-     * by the number of degrees of freedom &nu; and the noncentrality
-     * parameter &mu;
+     * $\frac{Z + \mu}{\sqrt{V/\nu}}$ <!--(Z + &mu;)/sqrt(V/&nu;)-->
+     * has a noncentral t distribution characterized by the number of
+     * degrees of freedom &nu; and the noncentrality parameter &mu;.
      * <P>
      * For citations for specific cases, please see
      * <UL>
@@ -118,6 +145,9 @@ public abstract class StudentsTStat extends Statistic {
      *        Statistical power of the t-tests</A> for the one-sample case.
      *    <LI>
      * </UL>
+     * The notation in this documentation will differ slightly due to the use
+     * of a lower-case x instead of an upper-case X as part of a work-around
+     * for a mathjax bug involving the LaTeX 'overline' command.
      * @param diff the difference of the H1 mean value and the H0 mean value.
      */
     public abstract double getNCParameter(double diff);
@@ -125,6 +155,17 @@ public abstract class StudentsTStat extends Statistic {
     /**
      * Statistic for Student's t-test for the comparison of two
      * means given independent samples with the same variance.
+     * <P>
+     * <script>
+     * MathJax = {
+     *	  tex: {
+     *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+     *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+     * };
+     * </script>
+     * <script id="MathJax-script" async
+     *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+     * </script>
      * The test determines if the difference between the mean values
      * for two data sets is statistically significant.
      * <P>
@@ -132,11 +173,29 @@ public abstract class StudentsTStat extends Statistic {
      * Student's t-test: Comparison of two means</A>" has a
      * description of the test.
      * If the data sets are X<sub>1</sub> and X<sub>2</sub>, then the statistic
-     * is t = (<span style="text-decoration: overline">X</span><sub>1</sub>
+     * is $$t =\frac{\mbox{x&#x0305;}_1 - \mbox{x&#x0305;}_2}{
+     *    s_{X_1X_2}\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}$$
+     * <!--t = (<span style="text-decoration: overline">X</span><sub>1</sub>
      * - <span style="text-decoration: overline">X</span><sub>2</sub>)
      * / (s<sub>X<sub>1</sub>X<sub>2</sub></sub>
-     * sqrt(1/n<sub>1</sub> + 1/n<sub>2</sub>) where
+     * sqrt(1/n<sub>1</sub> + 1/n<sub>2</sub>)--> where
      * <UL>
+     *    <LI> $s_{X_1X_2} = \sqrt{\frac{(n_1-1)s_{X_1}^2 + (n_2-1)s_{X_2}^2}{
+     *          n_1 + n_2 - 2}}$.
+     *    <LI> $\mbox{x&#x0305;}_1$ is the mean for the data set $X_1$.
+     *    <LI> $\mbox{x&#x0305;}_2$ is the mean for the data set $X_2$.
+     *    <LI> $n_1$ is the size of the data set $X_1$.
+     *    <LI> $n_2$ is the size of the data set $X_2$.
+     *    <LI> $s_{X_1}$ is the sample standard deviation for the data
+     *         set $X_1$.
+     *    <LI> $s_{X_2}$ is the sample standard deviation for the data
+     *         set $X_2$.
+     * </UL>
+     * The notation differs slightly from that used in the citations due
+     * to a bug in mathjax that prevents overlines from being displayed
+     * reliably, and as a result, upper-case X was changed to a lower-case x
+     * when there is a bar over it.
+     * <NOSCRIPT><UL>
      *  <LI>s<sub>X<sub>1</sub>X<sub>2</sub></sub> =
      *      sqrt(((n<sub>1</sub>-1)s<sub>X<sub>1</sub></sub><sup>2</sup>
      *      + (n<sub>2</sub>-1)s<sub>X<sub>2</sub></sub><sup>2</sup>)
@@ -151,7 +210,7 @@ public abstract class StudentsTStat extends Statistic {
      *       data set X<sub>1</sub>.
      *  <LI> s<sub>X<sub>2</sub></sub> is the sample standard deviation for
      *       data set X<sub>2</sub>.
-     * </UL>
+     * </UL></NOSCRIPT>
      */
     public static class Mean2 extends StudentsTStat {
 	
@@ -279,12 +338,25 @@ public abstract class StudentsTStat extends Statistic {
 
     /**
      * Student's t-test for determining if the mean value of a data set
-     * has a specified value. For a data set X, the statistic is
-     * t = (<span style="text-decoration: overline">X</span> - &mu;<sub>0</sub>)
-     * / (s<sub>X</sub> / sqrt(n))
+     * has a specified value.
+     * <P>
+     * <script>
+     * MathJax = {
+     *	  tex: {
+     *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+     *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+     * };
+     * </script>
+     * <script id="MathJax-script" async
+     *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+     * </script>
+     * For a data set X, the statistic is
+     * $t = \frac{\mbox{x&#x0305;} - \mu_0}{(s_X/\sqrt{n})}$
+     * <!-- t = (<span style="text-decoration: overline">X</span> - &mu;<sub>0</sub>)
+     * / (s<sub>X</sub> / sqrt(n))-->
      * where
      * <UL>
-     *   <LI> <span style="text-decoration: overline">X</span> is the mean
+     *   <LI> <span style="text-decoration: overline">x</span> is the mean
      *        value of the data set X.
      *   <LI> &mu;<sub>0</sub> is the value against which the mean of X is
      *        to be tested.

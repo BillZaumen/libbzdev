@@ -12,6 +12,17 @@ import org.bzdev.math.GLQuadrature;
 
 /**
  * Class to compute a path integral of a vector or scalar field.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * An instance of this class is created by providing the vector or
  * scalar fields and can then be used to find the path integral for a
  * given path.
@@ -136,7 +147,8 @@ public class PathIntegral {
     /**
      * Constructor for the line integral of a scalar field.
      * The value of the integral for a path P is
-     * &int;f(x,y) ds = &int;f(x,y)(ds/du)du, where u is the path
+     * $\int f(x,y) ds = \int f(x,y) \frac{ds}{du} du$,
+     * <!-- &int;f(x,y) ds = &int;f(x,y)(ds/du)du, --> where u is the path
      * parameter for P, and where x and y are values on the path
      * corresponding to each value of the path parameter u.
      * <P>
@@ -188,7 +200,8 @@ public class PathIntegral {
     /**
      * Constructor for the line integral of a vector field.
      * The value of the integral for a path P is
-     * &int;(F<sub>x</sub>(x,y)(dx/du) + F<sub>y</sub>(x,y)(dy/du)) du,
+     * $\int (F_x(x,y) \frac{dx}{du} + F_y(x,y) \frac{dy}{du}) du$,
+     * <!-- &int;(F<sub>x</sub>(x,y)(dx/du) + F<sub>y</sub>(x,y)(dy/du)) du,-->
      * where the limits of integration are those appropriate for
      * covering a path whose path parameter is u, and where the values
      * of x and y used in the integration are those corresponding to
@@ -338,9 +351,12 @@ public class PathIntegral {
     /**
      * Constructor for the 3D line integral of a scalar field.
      * The value of the integral for a path P is
-     * &int;f(x,y) ds = &int;f(x,y)(ds/du)du, where u is the path
-     * parameter for P, and where x and y are values on the path
-     * corresponding to each value of the path parameter u.
+     * $\int f(x,y) ds = \int f(x,y) \frac{ds}{du} du
+     * = \int f(x,y) \sqrt{(\frac{dx}{du})^2 + (\frac{dy}{du})^2} du$,
+     * <!-- &int;f(x,y) ds = &int;f(x,y)(ds/du)du,-->
+     * where u is the path parameter for P, and where x and y are
+     * values on the path corresponding to each value of the path
+     * parameter u.
      * <P>
      * If p(x,y,z) is a polynomial approximation to sf, then
      * the corresponding value for n is the degree of the polynomial
@@ -384,7 +400,8 @@ public class PathIntegral {
     /**
      * Constructor for the 3D line integral of a vector field.
      * The value of the integral for a path P is
-     * &int;(F<sub>x</sub>(x,y)(dx/du) + F<sub>y</sub>(x,y)(dy/du)) du,
+     * $\int (F_x(x,y)\frac{dx}{du} + F_y(x,y)\frac{dy}{du}) du$,
+     * <!-- &int;(F<sub>x</sub>(x,y)(dx/du) + F<sub>y</sub>(x,y)(dy/du)) du,-->
      * where the limits of integration are those appropriate for
      * covering a path whose path parameter is u, and where the values
      * of x and y used in the integration are those corresponding to

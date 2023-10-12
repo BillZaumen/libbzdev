@@ -8,9 +8,27 @@ import org.bzdev.lang.UnexpectedExceptionError;
 //@exbundle org.bzdev.geom.lpack.Geom
 
 /**
- * The AffineTransform3D class represents a 3D affine transform.  These
+ * The AffineTransform3D class represents a 3D affine transform.
+ * <script>
+ * MathJax = {
+ *   tex: {
+ *      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
+ * These
  * transforms are linear transforms represented by the following matrix
- * equation:
+ * equation: $$\left (\begin{array}{c}x\prime \\ y\prime \\ z\prime \\ 1
+ * \end{array}\right ) = \left (\begin{array}{cccc}
+ * m_{00} &amp; m_{01} &amp; m_{02} &amp; m_{03} \\
+ * m_{10} &amp; m_{11} &amp; m_{12} &amp; m_{13} \\
+ * m_{20} &amp; m_{21} &amp; m_{22} &amp; m_{23} \\
+ *  0 &amp; 0 &amp; 0 &amp; 1
+ * \end{array}\right )$$
+ * <NOSCRIPT>
  * <pre>
  * <code>
  *   _   _      _              _   _   _
@@ -20,6 +38,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
  *  |_ 1 _|    |_ 0   0   0  1 _| |_ 1 _|
  * </code>
  * </pre>
+ * </NOSCRIPT>
  * <P>
  * Affine Transformations can be constructed by concatenating a series of
  * translations, scaling transformation, rotations, and shears.  They can

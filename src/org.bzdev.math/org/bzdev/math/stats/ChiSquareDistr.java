@@ -3,9 +3,19 @@ import org.bzdev.math.Functions;
 //@exbundle org.bzdev.math.stats.lpack.Stats
 
 /**
- * Class providing methods for the &Chi;<sup>2</sup> distribution.
+ * Class providing methods for the &chi;<sup>2</sup> distribution.
  * <P>
- * The &Chi;<sup>2</sup> distribution is the distribution of the sum
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
+ * The &chi;<sup>2</sup> distribution is the distribution of the sum
  * of the squares of k independent random variables, each with a
  * normal distribution and with unit variances.  For the default
  * statistic, the means of these variables are zero. For a noncentral
@@ -17,16 +27,18 @@ import org.bzdev.math.Functions;
  * that start with an upper-case letter, contrary to the usual Java
  * convention, in order to conform to this text.
  * <P> 
- * For non-central &Chi;<sup>2</sup> distributions, the the notation
+ * For non-central &chi;<sup>2</sup> distributions, the the notation
  * in Abramowitz and Stegun (See Equation 26.4.25) is followed.  This
  * corresponds to the case where, when there are k degrees of freedom,
+ * $\mu_i$
  * &mu;<sub>i</sub> is the mean value of the random variable
- * X<sub>i</sub>, and the random variable described by the
- * distribution is
- * &Chi;<sup>2</sup> = &sum;<sub>i=1</sub><sup>k</sup>
- * X<sub>i</sub><sup>2</sup>.
+ * $X_i$, and the random variable described by the
+ * distribution is $\chi^2 = \sum_{i=1}^k X_i^2$.
+ * <!-- &chi;<sup>2</sup> = &sum;<sub>i=1</sub><sup>k</sup>
+ * X<sub>i</sub><sup>2</sup>. -->
  * The parameter &lambda; is the noncentrality parameter and is given by
- *  &lambda;=&sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub><sup>2</sup>.
+ * $\lambda = \sum_{i=1}^k \mu_i^2$.
+ * <!--&lambda;=&sum;<sub>i=1</sub><sup>k</sup>&mu;<sub>i</sub><sup>2</sup>. -->
  */
 public class ChiSquareDistr extends ProbDistribution {
 
@@ -47,9 +59,9 @@ public class ChiSquareDistr extends ProbDistribution {
     private double lambda;
 
     /**
-     * Determine if this object is a non-central &Chi;<sup>2</sup>
+     * Determine if this object is a non-central &chi;<sup>2</sup>
      * distribution.
-     * @return true if this object is a non-central &Chi;<sup>2</sup>
+     * @return true if this object is a non-central &chi;<sup>2</sup>
      *         distribution; false otherwise.
      */
     public boolean isNonCentral() {return nonCentral;}
@@ -58,7 +70,7 @@ public class ChiSquareDistr extends ProbDistribution {
      * Get the non-centrality parameter.
      * @return the non-centrality parameter
      * @exception IllegalStateException this object is not a
-     *            non-central &Chi;<sup>2</sup> distribution
+     *            non-central &chi;<sup>2</sup> distribution
      */
     public double getLambda() {
 	if (!nonCentral) throw new IllegalStateException
@@ -79,7 +91,7 @@ public class ChiSquareDistr extends ProbDistribution {
     }
 
     /**
-     * Constructor for a non-central &Chi;<sup>2</sup> distribution.
+     * Constructor for a non-central &chi;<sup>2</sup> distribution.
      * &lambda; is defined as the sum of the squares of the means of the
      * random variables whose squares are summed.
      * @param nu the number of degrees of freedom
@@ -121,10 +133,10 @@ public class ChiSquareDistr extends ProbDistribution {
     }
 
     /**
-     * Get the probability density for a &Chi;<sup>2</sup> distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * Get the probability density for a &chi;<sup>2</sup> distribution.
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
-     * @return the &Chi;<sup>2</sup> probability density
+     * @return the &chi;<sup>2</sup> probability density
      */
     public static double pd(double chi2, long nu) {
 	double k2 = nu/2.0;
@@ -134,8 +146,8 @@ public class ChiSquareDistr extends ProbDistribution {
 
 
     /**
-     * Get the cumulative probability for a &Chi;<sup>2</sup> distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * Get the cumulative probability for a &chi;<sup>2</sup> distribution.
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
      * @return the corresponding value of the cumulative probability
      *         distribution
@@ -162,8 +174,8 @@ public class ChiSquareDistr extends ProbDistribution {
 
     /**
      * Get the complement of the cumulative probability for
-     * a &Chi;<sup>2</sup> distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * a &chi;<sup>2</sup> distribution.
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
      * @return a value mathematically equal to 1 - P(chi2, nu)
      */
@@ -201,12 +213,12 @@ public class ChiSquareDistr extends ProbDistribution {
 
 
     /**
-     * Get the probability density for a non-central  &Chi;<sup>2</sup>
+     * Get the probability density for a non-central  &chi;<sup>2</sup>
      *  distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
      * @param lambda the non-centrality parameter for the distribution
-     * @return the value of the noncentral &Chi;<sup>2</sup> probability
+     * @return the value of the noncentral &chi;<sup>2</sup> probability
      *         density for the specified parameters
      */
     public static double pd(double chi2, long nu, double lambda) {
@@ -225,8 +237,8 @@ public class ChiSquareDistr extends ProbDistribution {
 
     /**
      * Get the cumulative probability distribution for a non-central
-     * &Chi;<sup>2</sup> distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * &chi;<sup>2</sup> distribution.
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
      * @param lambda the non-centrality parameter for the distribution
      * @return the value of the cummulative distribution function for the
@@ -248,8 +260,8 @@ public class ChiSquareDistr extends ProbDistribution {
 
     /**
      * Get the complement of the cumulative probability distribution for
-     * a non-central &Chi;<sup>2</sup> distribution.
-     * @param chi2 the &Chi;<sup>2</sup> value
+     * a non-central &chi;<sup>2</sup> distribution.
+     * @param chi2 the &chi;<sup>2</sup> value
      * @param nu the number of degrees of freedom
      * @param lambda the non-centrality parameter for the distribution
      * @return the value of the complement of the cummulative

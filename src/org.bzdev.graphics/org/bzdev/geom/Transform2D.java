@@ -108,7 +108,7 @@ public interface Transform2D {
      *    x' = f(x,y)
      *    y' = g(x,y)
      * </pre>
-     * and the first partial derivatives of f and gexist, then
+     * and the first partial derivatives of f and g exist, then
      * we can approximate the transform at a point
      * (x<sub>0</sub>,y<sub>0</sub>) by
      * <pre>

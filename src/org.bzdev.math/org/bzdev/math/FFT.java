@@ -489,6 +489,17 @@ public abstract class FFT {
 
     /**
      * FFT normalization mode.
+     * <P>
+     * <script>
+     * MathJax = {
+     *	  tex: {
+     *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+     *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+     * };
+     * </script>
+     * <script id="MathJax-script" async
+     *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+     * </script>
      * There are multiple conventions regarding how Fourier transforms
      * are defined.  For an FFT, these affect how a transform is
      * normalized. 
@@ -496,9 +507,11 @@ public abstract class FFT {
     public enum Mode {
 	/**
 	 *  The transform is defined by
-	 *  X<sub>k</sub> = &sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>,
+	 *  $X_k = \sum_{n=0}^{N-1} x_ne^{-2\pi kni/N}$,
+	 *  <!-- X<sub>k</sub> = &sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>,-->
 	 * and the inverse transform is defined by
-	 *  x<sub>n</sub> = (1/N)&sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>,
+	 *  $x_n = \frac1N \sum_{k=0}^{N-1} X_ke^{2\pi kni/N}$,
+	 *  <!-- x<sub>n</sub> = (1/N)&sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>, -->
 	 * where the indices have values in the range [0, N-1).
 	 * This is particularly useful when using an FFT to compute a
 	 * convolution or cross correlation.
@@ -506,9 +519,11 @@ public abstract class FFT {
 	NORMAL,
 	/**
 	 *  The transform is defined by
-	 *  X<sub>k</sub> = (1/&radic;<SPAN style="text-decoration: overline">N</SPAN>)&sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>,
+	 *  $X_k = \frac1{\sqrt{N}}\sum_{n=0}^{N-1} x_ne^{-2\pi kni/N}$,
+	 *  <!-- X<sub>k</sub> = (1/&radic;<SPAN style="text-decoration: overline">N</SPAN>)&sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>, -->
 	 * and the inverse transform is defined by
-	 *  x<sub>n</sub> = (1/&radic;<SPAN style="text-decoration: overline">N</SPAN>)&sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>,
+	 *  $x_n = \frac1{\sqrt{N}}\sum_{k=0}^{N-1} X_ke^{2\pi kni/N}$,
+	 *  <!-- x<sub>n</sub> = (1/&radic;<SPAN style="text-decoration: overline">N</SPAN>)&sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>, -->
 	 * where the indices have values in the range [0, N-1).
 	 * This is useful when one wants the norm of a vector and its
 	 * transform to be identical, as is typically the case in
@@ -517,9 +532,11 @@ public abstract class FFT {
 	SYMMETRIC,
 	/**
 	 *  The transform is defined by
-	 *  X<sub>k</sub> = (1/N)&sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>,
+	 *  $X_k = \frac1N \sum_{n=0}^{N-1} x_ne^{-2\pi kni/N}$,
+	 *  <!-- X<sub>k</sub> = (1/N)&sum;<sub>n</sub>x<sub>n</sub>e<sup>-i2&pi;kn/N</sup>, -->
 	 * and the inverse transform is defined by
-	 *  x<sub>n</sub> = &sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>,
+	 *  $x_n = \sum_{k=0}^{N-1} X_ke^{2\pi kni/N}$,
+	 *  <!-- x<sub>n</sub> = &sum;<sub>k</sub>X<sub>k</sub>e<sup>i2&pi;kn/N</sup>, -->
 	 * where the indices have values in the range [0, N-1).
 	 * This is useful for statistics applications due to the
 	 * definition of the characteristic function.

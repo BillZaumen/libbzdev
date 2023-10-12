@@ -7,6 +7,17 @@ import javax.script.ScriptException;
 /**
  * Class  defining a real-valued function with an arbitrary number
  * of arguments.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This is intended for cases in which a function should be passed
  * as an argument.
  * <P>
@@ -446,26 +457,29 @@ public class RealValuedFunctionVA
      * the derivative is a second partial derivative with respect to
      * x<sub>i</sub> and x<sub>j</sub>.
      * For a real-valued function
-     * f(x<sub>1</sub>,x<sub>2</sub>), these methods are defined as
+     * f(x<sub>0</sub>,x<sub>1</sub>,...), these methods are defined as
      * follows:
      * <UL>
      *   <LI><CODE>valueAt</CODE> returns
-     *             f(x<sub>1</sub>,x<sub>2</sub>,...)  with the values
-     *             x<sub>1</sub>... stored in a Java array that
-     *             provides valueAt's argument
-     *   <LI><CODE>derivAt</CODE> returns &part;f/&part;x<sub>i</sub>
-     *       evaluated at the point (x<sub>1</sub>,x<sub>2</sub>,
-     *       ...), where i is the first argument and the values
-     *       x<sub>1</sub>... are stored in a Java array that provides
-     *       the third argument for derivAt
+     *             f(x<sub>0</sub>,x<sub>1</sub>,...)  with the values
+     *             x<sub>0</sub>... stored in a Java
+     *             array that provides valueAt's argument(s).
+     *   <LI><CODE>derivAt</CODE> returns $\frac{\partial f}{\partial x_i}$
+     *       <!-- &part;f/&part;x<sub>i</sub> -->
+     *       evaluated at the point (x<sub>0</sub>,x<sub>1</sub>,
+     *       ...), where i is the index into the  array
+     *        indicating the argument with respect to which differentiation
+     *        occures. The values
+     *       x<sub>0</sub>... are stored in an  array and provide the
+     *        point at which the derivative is evaluated.
      *   <LI><CODE>secondDerivAt</CODE> returns
-     *             &part;<sup>2</sup>f/&part;x<sub>i</sub>&part;x<sub>j</sub>
-     *             evaluated at the point
-     *             (x<sub>1</sub>,x<sub>2</sub>,...), where i is the
-     *             first argument, j is the second argument, and and
-     *             the values x<sub>1</sub>... are stored in a Java
-     *             array that provides the third argument for
-     *             secondDerivAt
+     *       $\frac{\partial^2 f}{\partial x_i \partial x_j}$
+     *       <!-- &part;<sup>2</sup>f/&part;x<sub>i</sub>&part;x<sub>j</sub> -->
+     *       evaluated at the point  (x<sub>0</sub>,x<sub>1</sub>,...),
+     *       where i and j are indices into the array containing
+     *       the arguments and  indicate with respect to which arguments
+     *       the differentiation occurs.
+     *       The values x<sub>0</sub>... are stored in an array.
      * </UL>
      * Except for the integer-valued indices, all the arguments for these
      * methods are double-precision numbers. If one of these methods is not
@@ -475,7 +489,6 @@ public class RealValuedFunctionVA
      * The object that the scripting language provides can also define several
      * other methods:
      * <UL>
-
      *  <IT> <CODE>getDomainMin</CODE> returns the greatest lower
      *       bound for the i<sup>th</sup> component x<sub>i</sub> of the
      *       points in the function's domain, where i is the
@@ -522,24 +535,26 @@ public class RealValuedFunctionVA
      * by their names. These functions (when not null) must satisfy the
      * following conditions:
      * <UL>
-     *   <LI>the scriting-language function whose name is the
+     *   <LI>the scripting-language function whose name is the
      *       <CODE>fname</CODE> argument of this method returns
-     *       f(x<sub>1</sub>,x<sub>2</sub>,...)  with the values
-     *       x<sub>1</sub>... stored in a Java array that provides
-     *       valueAt's argument
+     *       f(x<sub>0</sub>,x<sub>1</sub>,...)  with the values
+     *       x<sub>0</sub>... stored in a Java array that provides
+     *       valueAt's argument.
      *   <LI>the scripting-language function whose name is the
      *       <CODE>derivName</CODE> argument of this method returns
-     *       &part;f/&part;x<sub>i</sub> evaluated at the point
-     *       (x<sub>1</sub>,x<sub>2</sub>, ...), where i is the first
-     *       argument and the values x<sub>1</sub>... are stored in a
-     *       Java array that provides the third argument for derivAt
+     *       $\frac{\partial f}{\partial x_i}$
+     *       <!-- &part;f/&part;x<sub>i</sub> --> evaluated at the point
+     *       (x<sub>0</sub>,x<sub>1</sub>, ...), where i is the first
+     *       argument and the values x<sub>0</sub>... are stored in a
+     *       Java array that provides the second argument for derivAt.
      *   <LI>the scripting-language function whose name is the
      *       <CODE>secondDerivName</CODE> argument of this method returns
-     *       &part;<sup>2</sup>f/&part;x<sub>i</sub>&part;x<sub>j</sub>
-     *       evaluated at the point (x<sub>1</sub>,x<sub>2</sub>,...),
+     *       $\frac{\partial^2 f}{\partial x_i \partial x_j}$
+     *       <!-- &part;<sup>2</sup>f/&part;x<sub>i</sub>&part;x<sub>j</sub> -->
+     *       evaluated at the point (x<sub>0</sub>,x<sub>1</sub>,...),
      *       where i is the first argument, j is the second argument,
-     *       and and the values x<sub>1</sub>... are stored in a Java
-     *       array that provides the third argument for secondDerivAt
+     *       and the values x<sub>0</sub>... are stored in a Java
+     *       array that provides the third argument for secondDerivAt.
      * </UL>
      * @param minArgLength the minimum number of double-precision arguments
      *        for methods that allow a variable number of arguments;
@@ -703,11 +718,11 @@ a     */
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>i</sub>
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_i}$
+     * <!--&part;f / &part;x<sub>i</sub> -->
      * for a function f(x<sub>0</sub>,x<sub>1</sub>, ...).
      * @param i the index indicating that the partial derivative is computed
-     *        for the i<sup>th</sup> argument
+     *        for the i<sup>th</sup> argument, numbered from zero
      * @param args the function f's arguments
      * @return the value of the partial derivative for the given argument
      * @exception IllegalArgumentException the function's argument(s)
@@ -757,15 +772,17 @@ a     */
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub>&part;x<sub>1</sub>
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * $\frac{\partial^2 f}{\partial x_i \partial z_j}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub>&part;x<sub>1</sub> -->
+     * for a function f(x<sub>0</sub>,x<sub>1</sub>, ...).
      * @param i the index indicating that the partial derivative is computed
-     *        for the i<sup>th</sup> argument
+     *        for the i<sup>th</sup> argument, numbered from 0
      * @param j the index indicating that the partial derivative is computed
-     *        for the j<sup>th</sup> argument
+     *        for the j<sup>th</sup> argument, numbered from 0
      * @param args the function f's arguments
      * @return the value of the partial derivative 
-     *         &part;<sup>2</sup>f / &part;x<sub>i</sub>&part;x<sub>j</sub>
+     *         $\frac{\partial^2 f}{\partial x_i \partial z_j}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>i</sub>&part;x<sub>j</sub> -->
      *         for the given arguments x<sub>0</sub>, x<sub>1</sub>, ...
      * @exception IllegalArgumentException the function's arguments
      *            were out of range

@@ -2,27 +2,42 @@ package org.bzdev.math;
 
 /**
  * Interpolation based on cubic triangular Bernstein-B&eacute;zier patches.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This interpolator computes values by using the following
  * expression:
- * <blockquote>
+ * $$ \sum_{|\lambda| = 3} \beta_\lambda B^3_\lambda(u,v,w) $$
+ * <NOSCRIPT><blockquote>
  * <pre><span style="font-size: 125%;">
  *      <span style="font-size: 200%">&sum;</span><sub>|&lambda;|=3</sub> &beta;<sub>&lambda;</sub>B<sup>3</sup><sub>&lambda;</sub>(u,v,w)
  * </span></pre>
- * </blockquote>
+ * </blockquote></NOSCRIPT>
  * where u + v + w = 1, &lambda;= (&lambda;<sub>1</sub>,&lambda;<sub>2</sub>,&lambda;<sub>3</sub>)
  * represent three indices, each in the range [0,3], and
  * |&lambda;| is defined as
  * &lambda;<sub>1</sub>+&lambda;<sub>2</sub>+&lambda;<sub>3</sub>.
- * B<sup>3</sup><sub>&lambda;</sub>(u,v,w)
+ * $B^3_\lambda (u,v,w)$
+ * <!-- B<sup>3</sup><sub>&lambda;</sub>(u,v,w) -->
  * is a Bernstein polynomial of degree 3 over a triangle specified by
  * barycentric coordinates (u, v, w), and is defined by the equation
- * <blockquote>
+ * $$ B^3_\lambda (u,v,w) = \frac{3!}{\lambda_1!\lambda_2!\lambda_3!}
+ *    u^{\lambda_1}v^{\lambda_2}w^{\lambda_3} $$
+ * <NOSCRIPT><blockquote>
  * <pre><span style="font-size:125%;">
  *                  3!
  * B<sup>3</sup><sub>&lambda;</sub>(u,v,w) = -------- u<sup>&lambda;<sub>1</sub></sup>v<sup>&lambda;<sub>2</sub></sup>w<sup>&lambda;<sub>3</sub></sup>
  *              &lambda;<sub>1</sub>!&lambda;<sub>2</sub>!&lambda;<sub>3</sub>!
  * </span></pre>
- * </blockquote>
+ * </blockquote></NOSCRIPT>
  * <P>
  * By convention, we will use (u,v) as independent variables and set
  * w = 1 - (u + v).  The control points are located as follows:

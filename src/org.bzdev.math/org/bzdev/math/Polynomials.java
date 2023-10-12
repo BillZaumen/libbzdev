@@ -7,6 +7,17 @@ import org.bzdev.lang.UnexpectedExceptionError;
 
 /**
  * Class providing operations on polynomials.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * The methods in this class are static methods.
  */
 public class Polynomials {
@@ -19,9 +30,10 @@ public class Polynomials {
      * Convert a monomial polynomial to one using a Bernstein basis
      * with the same degree.
      * When this method exits,
-     * &sum;<sup>n</sup><sub>i=0</sub>a<sub>i</sub>x<sup>i</sup> =
+     * $$ \sum_{i=0}^n a_i x^i = \sum_{i=0}^n \beta_i B_{i,n}(x) \ .$$
+     * <!--&sum;<sup>n</sup><sub>i=0</sub>a<sub>i</sub>x<sup>i</sup> =
      * &sum;<sup>n</sup><sub>i=0</sub>&beta;<sub>i</sub>
-     * B<sub>i,n</sub>x<sup>i</sup>.
+     * B<sub>i,n</sub>x<sup>i</sup>-->.
      * <P>
      * The length of the array a must be at least n+1.
      * @param a the polynomial's coefficients using a monomial basis.
@@ -40,9 +52,10 @@ public class Polynomials {
      * Convert a monomial polynomial to one using a Bernstein basis
      * with the same degree, providing an output array.
      * When this method exits,
-     * &sum;<sup>n</sup><sub>i=0</sub>a<sub>i</sub>x<sup>i</sup> =
+     * $$ \sum_{i=0}^n a_i x^i = \sum_{i=0}^n \beta_i B_{i,n}(x) \ .$$
+     * <!-- &sum;<sup>n</sup><sub>i=0</sub>a<sub>i</sub>x<sup>i</sup> =
      * &sum;<sup>n</sup><sub>i=0</sub>&beta;<sub>i</sub>
-     * B<sub>i,n</sub>x<sup>i</sup>.
+     * B<sub>i,n</sub>x<sup>i</sup>.-->
      * <P>
      * The length of the array a must be at least n+1 and the length
      * of the array beta, if not null, must be at least offset + n + 1.
@@ -103,10 +116,14 @@ public class Polynomials {
     /**
      * Convert from a Bernstein basis to a monomial basis.
      * The conversion uses the relation
-     * &sum;<sup>n</sup><sub>j=0</sub>&beta;<sub>j</sub>B<sub>j,n</sub>(t)
+     * $$\sum_{j=0}^n\beta_jB_{j,n}(t) =
+     *   \sum_{i=0}^n\sum_{k=0}^i\beta_k(-1)^{i-k}
+     *   \left(\begin{array}{c}n\\i\end{array}\right)
+     *   \left(\begin{array}{c}i\\k\end{array}\right)t^i\ .$$
+     * <!-- &sum;<sup>n</sup><sub>j=0</sub>&beta;<sub>j</sub>B<sub>j,n</sub>(t)
      * = &sum;<sup>n</sup><sub>i=0</sub>&sum;<sup>i</sup><sub>k=0</sub>
      * &beta;<sub>k</sub>(-1)<sup>i-k</sup>C(n,i)C(i,k)t<sup>i</sup> where
-     * C(n,m) = n!/((n-m)!m!).
+     * C(n,m) = n!/((n-m)!m!). -->
      * @param beta an array containing the coefficients using a
      *         Bernstein basis
      * @param offset the offset into the array for the 0th Bernstein
@@ -122,10 +139,14 @@ public class Polynomials {
      * Convert from a Bernstein basis to a monomial basis, providing an
      * array to store the monomial coefficients.
      * The conversion uses the relation
-     * &sum;<sup>n</sup><sub>j=0</sub>&beta;<sub>j</sub>B<sub>j,n</sub>(t)
+     * $$\sum_{j=0}^n\beta_jB_{j,n}(t) =
+     *   \sum_{i=0}^n\sum_{k=0}^i\beta_k(-1)^{i-k}
+     *   \left(\begin{array}{c}n\\i\end{array}\right)
+     *   \left(\begin{array}{c}i\\k\end{array}\right)t^i\ .$$
+     * <!--&sum;<sup>n</sup><sub>j=0</sub>&beta;<sub>j</sub>B<sub>j,n</sub>(t)
      * = &sum;<sup>n</sup><sub>i=0</sub>&sum;<sup>i</sup><sub>k=0</sub>
      * &beta;<sub>k</sub>(-1)<sup>i-k</sup>C(n,i)C(i,k)t<sup>i</sup> where
-     * C(n,m) = n!/((n-m)!m!).
+     * C(n,m) = n!/((n-m)!m!).-->
      * @param result an array that will contain the coefficients for a
      *        monomial basis (this array will be the value returned unless
      *        it is null, in which case an array will be allocated).
@@ -1742,10 +1763,11 @@ public class Polynomials {
      * Integrate an expression containing the square roots of two
      * quadratic polynomials using elliptic integrals.
      * The integral is
-     * <BLOCKQUOTE>
+     * $$ \int_y^x A(t)^{p_1/2}B(t)^{p_2/2}(a_5+b_5t)^{p_3/2} dt \ .$$
+     * <NOSCRIPT><BLOCKQUOTE>
      * <SPAN style="font-size: 150%">&int;<sub><SPAN style="font-size:70%">y</SPAN></sub></SPAN><SPAN style="font-size: 200%">&#8239;<sup><SPAN style="font-size:150%;">x</SPAN></sup></SPAN>
      * A(t)<sup>p&#x2081;/2;</sup>B(t)<sup>p&#x2082;/2</sup>(a<sub>5</sub>+b<sub>5</sub>)<sup>p&#x2085;/2</sup> dt
-     * </BLOCKQUOTE>
+     * </BLOCKQUOTE></NOSCRIPT>
      * where A(t) = f<sub>1</sub> +g<sub>1</sub>t + h<sub>1</sub>t<sup>2</sup>
      * and B(t) = f<sub>2</sub> +g<sub>2</sub>t + h<sub>2</sub>t<sup>2</sup>
      * are quadratic polynomials whose values are
@@ -1770,7 +1792,7 @@ public class Polynomials {
      * <TR><TD>1</TD><TD>1</TD><TD>-4</TD></TR>
      * <TABLE>
      * The caller must ensure that neither quadratic polynomials has a
-     * real root.
+     * real root and that they are different polynomials.
      * <P>
      * See B. C. Carlson,
      * "<A HREF="https://www.ams.org/journals/mcom/1992-59-199/S0025-5718-1992-1134720-4/S0025-5718-1992-1134720-4.pdf">

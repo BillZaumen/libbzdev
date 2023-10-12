@@ -31,6 +31,16 @@ import java.security.*;
  * planar triangles, cubic B&eacute;zier triangles, and cubic B&eacute;zier
  * patches.
  * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * A surface is represented by a set of segments. There is an orientation
  * defined for each type based on the right-hand rule:
  * <UL>
@@ -11826,13 +11836,25 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     * $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indices
+     * starting at zero), the integrals are over the volume of the
+     * shape, and v is the volume of the shape.
      * @param shape the shape whose moments are computed
      * @param p the point about which to compute the moments
      * @return the moments
@@ -11879,13 +11901,25 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     * $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indices
+     * starting at zero, the integrals are over the volume of the
+     * shape, and v is the volume of the shape.
      * <P>
      * The size estimate is used to determine how many threads to
      * use when computing the moments in parallel.
@@ -11929,13 +11963,25 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     *  $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indices
+     * starting at zero), the integrals are over the volume of the
+     * shape, and v is the volume of the shape.
      * @param shape the shape whose moments are computed
      * @param p the point about which to compute the moments
      * @param v the  shape's volume
@@ -11982,16 +12028,28 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     *  $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indices
+     * starting at zero), the integrals are over the volume of the
+     * shape, and v is the volume of the shape.
      * <P>
-     * The size estimate is used to determine how many threads to
-     * use when computing the moments in parallel.
+     * The size estimate is used to determine how many threads to use
+     * when computing the moments in parallel.
      * @param shape the shape whose moments are computed
      * @param p the point about which to compute the moments
      * @param v the  shape's volume
@@ -12035,13 +12093,25 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     *  $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indices
+     * starting at zero), the integrals are over the volume of the
+     * shape, and v is the volume of the shape.
      * <P>
      * Flatness parameters are described in the documentation for
      * {@link SurfaceIntegral#SurfaceIntegral(int,RealValuedFunctThreeOps,RealValuedFunctThreeOps,RealValuedFunctThreeOps,double)},
@@ -12096,13 +12166,25 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
      *    <LI>z = r<sub>z</sub> - p<sub>z</sub>
      * </UL>
      * the moments returned are
-     * <BLOCKQUOTE><PRE>
+     *  $$ M = \left(\begin{array}{ccc}
+     *  \int \frac{x^2}{v} dV
+     *      &amp; \int \frac{xy}{v} dV
+     *      &amp; \int \frac{xz}{v} dV \\
+     *  \int \frac{yx}{v} dV
+     *      &amp; \int \frac{y^2}{v} dV
+     *      &amp; \int \frac{yz}{v} dV \\
+     *  \int \frac{zx}{v} dV
+     *      &amp; \int \frac{zy}{v} dV
+     *      &amp; \int \frac{z%2}{v} dV
+     * \end{array}\right)$$
+     * <NOSCRIPT><BLOCKQUOTE><PRE>
      *     | &int;x<sup>2</sup>/v dV  &int;xy/v dV  &int;xz/v dV |
      * M = | &int;yx/v dV  &int;y<sup>2</sup>/v dV  &int;yz/v dV |
      *     | &int;zx/v dV  &int;zy/v dV  &int;z<sup>2</sup>/v dV |
-     * <PRE></BLOCKQUOTE>
-     * where M[i][j] corresponds to M<sub>ij</sub> and the integrals
-     * are over the volume of the shape and v is the volume of the shape.
+     * <PRE></BLOCKQUOTE></NOSCRIPT>
+     * where M[i][j] corresponds to M<sub>ij</sub> (with indicies
+     * starting at zero), the integrals are over the volume of the
+     * shape and v is the volume of the shape.
      * <P>
      * Flatness parameters are described in the documentation for
      * {@link SurfaceIntegral#SurfaceIntegral(int,RealValuedFunctThreeOps,RealValuedFunctThreeOps,RealValuedFunctThreeOps,double)},

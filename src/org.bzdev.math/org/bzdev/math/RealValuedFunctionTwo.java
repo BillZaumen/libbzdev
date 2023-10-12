@@ -8,6 +8,16 @@ import javax.script.ScriptException;
  * Class  defining a real-valued function with two real arguments.
  * This is intended for cases in which a function should be passed
  * as an argument.
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * <P>
  * A subclass will typically override one or more of the methods
  * valueAt, deriv1At, deriv2At, deriv11At, deriv12At, deriv21At, and
@@ -602,7 +612,7 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
      * <P>
      * This method calls a method named
      * <CODE>deriv</CODE>&lt;i+1&gt;<CODE>At(...)</CODE> where
-     * <CODE>i</CODE>is the value of
+     * <CODE>i</CODE> is the value of
      * the first argument of this method. One should usually override
      * those methods (for (i+1) in [1,2]) instead of this one.
      */
@@ -624,8 +634,10 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function computing  &part;f / &part;x<sub>1</sub>.
-     * @return a function that computes &part;f / &part;x<sub>1</sub>
+     * Get a function computing  $\frac{\partial f}{\partial x_1}$.
+     * <!-- &part;f / &part;x<sub>1</sub>. -->
+     * @return a function that computes $\frac{\partial f}{\partial x_1}$
+     *         <!--&part;f / &part;x<sub>1</sub>-->
      */
     public RealValuedFunctTwoOps deriv1() {
 	return new RealValuedFunctTwoOps() {
@@ -636,9 +648,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>1</sub>
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_1}$
+     * <!-- &part;f / &part;x<sub>1</sub> -->
+     * for a function f(x<sub>1</sub>, x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -691,8 +703,10 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     }
 
     /**
-     * Get a function computing  &part;f / &part;x<sub>2</sub>.
-     * @return a function that computes &part;f / &part;x<sub>2</sub>
+     * Get a function computing $\frac{\partial f}{\partial x_2}$.
+     * <!-- &part;f / &part;x<sub>2</sub>. -->
+     * @return a function that computes $\frac{\partial f}{\partial x_2}$
+     *         <!-- &part;f / &part;x<sub>2</sub> -->
      */
     public RealValuedFunctTwoOps deriv2() {
 	return new RealValuedFunctTwoOps() {
@@ -703,9 +717,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>2</sub>
-     * for a function f(x<sub>2</sub>x<sub>2</sub>).
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_2}$
+     * <!-- &part;f / &part;x<sub>2</sub> -->
+     * for a function f(x<sub>1</sub>,x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -778,9 +792,10 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     /**
      * {@inheritDoc}
      * <P>
-     * This method calls a method named derivijAt(...) where i and j
-     * are the values of the first two arguments. One should usually
-     * override those methods (for i and j in [1,2]) instead of this one.
+     * This method calls a method named
+     * deriv<CODE>&lt;</CODE>i+1<CODE>&gt;&lt;</CODE>j+1</CODE>&lt;</CODE>At(...)
+     * where i and j are the values of the first two arguments.
+     * One should usually override those methods instead of this one.
      */
     @Override
     public final double secondDerivAt(int i, int j, double... args) throws
@@ -813,10 +828,11 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> where
+     * $\frac{\partial^2 f}{\partial x_1^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> --> where
      * f is this function.
-     * @return a function that computes
-     *         &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>
+     * @return a function that computes $\frac{\partial^2 f}{\partial x_1^2}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>-->
      */
     public RealValuedFunctTwoOps deriv11() {
 	return new RealValuedFunctTwoOps() {
@@ -828,8 +844,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * $ \frac{\partial^2 f}{\partial x_1^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> -->
+     * for a function f(x<sub>1</sub>,x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -883,10 +900,12 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
      * where f is this function.
      * @return a function that computes
-     *         &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
+     *         $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     *         <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
      */
     public RealValuedFunctTwoOps deriv12() {
 	return new RealValuedFunctTwoOps() {
@@ -898,8 +917,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
+     * for a function f(x<sub>1</sub>,x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -953,10 +973,12 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
      * where f is this function.
      * @return a function that computes
-     *         &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
+     *         $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     *         <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
      */
     public RealValuedFunctTwoOps deriv21() {
 	return new RealValuedFunctTwoOps() {
@@ -968,8 +990,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
+     * for a function f(x<sub>1</sub>,x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -1023,10 +1046,11 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
 
     /**
      * Get a function that computes
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
+     * $\frac{\partial^2 f}{\partial x_2^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
      * where f is this function.
-     * @return a function that computes
-     *         &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
+     * @return a function that computes $\frac{\partial^2 f}{\partial x_2^2}$
+     *         <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
      */
     public RealValuedFunctTwoOps deriv22() {
 	return new RealValuedFunctTwoOps() {
@@ -1037,9 +1061,9 @@ public class  RealValuedFunctionTwo extends RealValuedFunctionVA
     }
 
     /**
-     * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
-     * for a function f(x<sub>1</sub>x<sub>2</sub>).
+     * Evaluate the partial derivative $\frac{\partial^2 f}{\partial x_2^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
+     * for a function f(x<sub>1</sub>,x<sub>2</sub>).
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument

@@ -4,7 +4,17 @@ import org.bzdev.math.RealValuedFunctTwoOps;
 
 /**
  * Interface for named objects that provide a function of two arguments.
- *
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  */
 public interface NamedFunctionTwoOps
     extends NamedObjectOps, RealValuedFunctTwoOps
@@ -94,9 +104,9 @@ public interface NamedFunctionTwoOps
 	IllegalArgumentException, UnsupportedOperationException;
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>1</sub>
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_1}$
+     * <!-- &part;f / &part;x<sub>1</sub>-->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -109,9 +119,9 @@ public interface NamedFunctionTwoOps
 	IllegalArgumentException, UnsupportedOperationException;
 
     /**
-     * Evaluate the partial derivative
-     * &part;f / &part;x<sub>2</sub>
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * Evaluate the partial derivative $\frac{\partial f}{\partial x_2}$
+     * <!-- &part;f / &part;x<sub>2</sub> -->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -125,8 +135,9 @@ public interface NamedFunctionTwoOps
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup>
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * $\frac{\partial^2 f}{\partial x_1^2}$
+     * <!--&part;<sup>2</sup>f / &part;x<sub>1</sub><sup>2</sup> -->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -140,8 +151,9 @@ public interface NamedFunctionTwoOps
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>)
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * $\frac{\partial^2 f}{\partial x_1 \partial x_2}$
+     * <!--&part;<sup>2</sup>f / (&part;x<sub>1</sub> &part;x<sub>2</sub>) -->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -156,8 +168,9 @@ public interface NamedFunctionTwoOps
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>)
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * $\frac{\partial^2 f}{\partial x_2 \partial x_1}$
+     * <!-- &part;<sup>2</sup>f / (&part;x<sub>2</sub> &part;x<sub>1</sub>) -->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument
@@ -171,8 +184,9 @@ public interface NamedFunctionTwoOps
 
     /**
      * Evaluate the partial derivative
-     * &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup>
-     * for the function f(x<sub>1</sub>x<sub>2</sub>) defined by this object.
+     * $\frac{\partial^2 f}{\partial x_2^2}$
+     * <!-- &part;<sup>2</sup>f / &part;x<sub>2</sub><sup>2</sup> -->
+     * for the function f(x<sub>1</sub>,x<sub>2</sub>) defined by this object.
      * @param arg1 the function's first argument
      * @param arg2 the function's second argument
      * @return the value of the partial derivative for the given argument

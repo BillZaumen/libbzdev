@@ -6,6 +6,17 @@ import java.util.Arrays;
 
 /**
  * Class implementing vector-valued NURBS (Non Uniform Rational B-Splines).
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This class supports both periodic and non-periodic NURBS, and is
  * very similar to the {@link BSplineArray} class.  For purposes of
  * this class, a periodic NURBS array adds additional knots and
@@ -31,7 +42,16 @@ import java.util.Arrays;
  * </ul>
  * <P>
  * The basis functions are defined as follows:
- * <ul>
+ * $$\begin{eqnarray}
+ *     N_{i,0}(u) &amp; = &amp; \left\{\begin{array}{ll}
+ *         1 &amp; \mbox {if $u_i \le u  &lt; u_{i+1}$} \\
+ *         0 &amp; \mbox{if $u &lt; u_i$ or $u_{i+1} \le u$}
+ *         \end{array}\right . \\
+ *     N_{i,p}(u) &amp; = &amp; \mbox{$N_{i,p-1}(u)\frac{u-u_i}{u_{i+p}-u_i}
+ *          + N_{i+1,p-1}(u)\frac{u_{i+p+1}-u}{u_{i+p+1}-u_{i+1}}$
+ *           for $p &gt; 0$}
+ * \end{eqnarray}$$
+ * <NOSCRIPT><ul>
  *    <li> N<sub>i,0</sub>(u) = 1 if u<sub>i</sub> &le; u &lt; u<sub>i+1</sub>.
  *    <li> N<sub>i,0</sub>(u) = 0 if u &lt; u<sub>i</sub> or u<sub>i+1</sub>
  *         &le; u.
@@ -39,13 +59,14 @@ import java.util.Arrays;
  *         N<sub>i,p-1</sub>(u) (u-u<sub>i</sub>) &frasl; (u<sub>i+p</sub>-u<sub>i</sub>)
  *         + N<sub>i+1,p-1</sub>(u) (u<sub>i+p+1</sub>-u)
  *           &frasl; (u<sub>i+p+1</sub>-u<sub>i+1</sub>) for p &gt; 0.
- * </ul>
+ * </ul></NOSCRIPT>
  * The value of the function defined by this spline at a point u is equal to
- * <blockquote>
+ * $$f(u) = \sum^n_{i=0} P_iN_{i,p}$$
+ * <NOSCRIPT><blockquote>
  *    (&sum;<sup>n</sup><sub>i=0</sub> N<sub>i,p</sub>(u)
  *    w<sub>i</sub>P<sub>i</sub>) / (&sum;<sup>n</sup><sub>i=0</sub>
  *    N<sub>i,p</sub>(u)w<sub>i</sub>)
- * </blockquote>
+ * </blockquote></NOSCRIPT>
  * with a domain [u<sub>p</sub>, u<sub>m-p</sub>] for non-periodic splines
  * and (-&infin;, &infin;) for periodic splines (for a periodic spline,
  * the value of u will be shifted by an appropriate multiple of the period

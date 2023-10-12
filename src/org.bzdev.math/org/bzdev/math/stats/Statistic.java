@@ -4,6 +4,17 @@ package org.bzdev.math.stats;
 
 /**
  * Class representing a statistic.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]},
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * Subclasses implement specific statistics. This class declares
  * common methods and defines methods for computing p values and
  * critical values. The documentation for a subclass  describes the
@@ -54,12 +65,14 @@ package org.bzdev.math.stats;
  * <P>
  * As an example of the use of nocentrality parameter, Student's
  * t-distribution with &nu; degrees of freedom is the distribution of a
- * random variable T defined as T = Z sqrt(&nu;/V) where Z is a normal
+ * random variable T defined as $T = \sqrt{\frac{\mu}{V}}$
+ * <!--T = Z sqrt(&nu;/V)--> where Z is a normal
  * distribution with an expected value of 0 and a variance of 1,
- * V has a &Chi;<sup>2</sup> distribution with &nu; degrees of freedom,
+ * V has a &chi;<sup>2</sup> distribution with &nu; degrees of freedom,
  * and Z and V are independent. The noncentral t-distribution is defined
  * as the distribution of the random variable T defined by
- * T = (Z+&mu;) sqrt(&nu;/V) using the same assumptions for Z and V,
+ * $T = (Z + \mu)\sqrt{\frac{\mu}{V}}$
+ * <!-- T = (Z+&mu;) sqrt(&nu;/V) --> using the same assumptions for Z and V,
  * and with &mu; being a constant.  This effectively just shifts Z by
  * a constant but results in a different distribution than the distribution
  * when &mu; is zero.

@@ -6,6 +6,17 @@ import org.bzdev.lang.CallableArgsReturns;
 
 /**
  * Class providing a cubic spline for an evenly spaced set of values.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * The spline approximates a function f such that y = f(x). When
  * the values used to compute the spline are evenly spaced, look-up
  * is faster than otherwise.

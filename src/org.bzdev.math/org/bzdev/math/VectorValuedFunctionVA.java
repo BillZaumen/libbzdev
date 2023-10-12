@@ -4,6 +4,17 @@ package org.bzdev.math;
 
 /**
  * Vector-valued functions with a variable number of arguments.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  */
 public abstract class VectorValuedFunctionVA implements VADomainOps {
 
@@ -167,8 +178,8 @@ public abstract class VectorValuedFunctionVA implements VADomainOps {
 
 
     /**
-     * Evaluate the first partial derivative
-     * &part;f / &part;x<sub>i</sub>
+     * Evaluate the first partial derivative $\frac{\partial f}{x_i}$
+     * <!-- &part;f / &part;x<sub>i</sub> -->
      * for a function f(x<sub>0</sub>,x<sub>1</sub>, ...).
      * <P>
      * A subclass must implement

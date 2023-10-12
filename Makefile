@@ -33,7 +33,7 @@ JROOT := $(shell while [ ! -d src -a `pwd` != / ] ; do cd .. ; done ; pwd)
 JAVA_VERSION = 11
 JAVAC = javac --release $(JAVA_VERSION)
 JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected  \
-	-Xdoclint:all,-missing,-html
+	-Xdoclint:all,-missing,-html --allow-script-in-comments
 
 JAVADOC_VERSION = $(shell javadoc --version | sed -e 's/javadoc //' \
 		| sed -e 's/[.].*//')

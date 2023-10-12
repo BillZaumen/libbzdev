@@ -7,6 +7,17 @@ import java.util.Hashtable;
  * Implementation of Gauss-Legendre quadrature that returns multiple
  * integrals over the same range, with the results stored in an
  * array.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * n-point Gaussian quadrature will produce exact results when
  * integrating a polynomial of degree (2n-1). It computes the
  * integral over the range [-1, 1] as a weighted sum of the
@@ -17,12 +28,15 @@ import java.util.Hashtable;
  * requires the integrand be evaluated a relatively small number of
  * times. As an example of its use, an electrostatic field can be
  * computed from a charge density by evaluation the integral
- * <BLOCKQUOTE>
- *     <B>E</B>(<B>x</B><sub>2</sub> &int; &rho;(<B>x</B><sub>1</sub>)
+ * $$ \mathbf{E}(\mathbf{x}_2) = \int \rho(\mathbf{x}_1
+ *   \frac{\mathbf{x}_2 - \mathbf{x}_1}{|\mathbf{x}_2 - \mathbf{x}_1|^3}
+ *   d\mathbf{x}_1$$
+ * <NOSCRIPT><BLOCKQUOTE>
+ *     <B>E</B>(<B>x</B><sub>2</sub>) =  &int; &rho;(<B>x</B><sub>1</sub>)
  *     (<B>x</B><sub>2</sub>-<B>x</B><sub>1</sub>)
  *     /|<B>x</B><sub>2</sub>-<B>x</B><sub>1</sub>|<sup>3</sup>
- *       d<B>x</B><sub>2</sub>.
- * </BLOCKQUOTE>
+ *       d<B>x</B><sub>1</sub>.
+ * </BLOCKQUOTE></NOSCRIPT>
  * While one could compute three integrals, one for each component,
  * the term |<B>x</B><sub>2</sub>-<B>x</B><sub>1</sub>|<sup>3</sup>|,
  * which is common to all three integrals, would be computed multiple

@@ -1332,9 +1332,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	 * segment' is not aligned with the Z axis.  If the Z
 	 * component of the segment's normal vector is nz and the
 	 * normal factor is larger than 0.0, the color factor is
-	 * multiplied by exp(-(1.0-nz)/normalFactor). Since the normal
-	 * vector has a length of 1.0, when the normal vector does not
-	 * point in the positive Z direction, nz will be less than 1.0
+	 * multiplied by exp(-(1.0-n<sub>z</sub>)/normalFactor).
+	 * Since the normal vector has a length of 1.0, when the
+	 * normal vector does not point in the positive Z direction,
+	 * nz will be less than 1.0
 	 * and the color factor will be reduced.
 	 * @return the normal factor; 0.0 if there is none
 	 */
@@ -1346,12 +1347,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	 * After a coordinate transformation, the normal factor is
 	 * used to reduce the color factor towards 0.0 when a surface
 	 * segment' is not aligned with the Z axis.  If the Z
-	 * component of the segment's normal vector is nz and the
+	 * component of the segment's normal vector is n<sub>z</sub> and the
 	 * normal factor is larger than 0.0, the color factor is
-	 * multiplied by exp(-(1.0-nz)/normalFactor). Since the normal
-	 * vector has a length of 1.0, when the normal vector does not
-	 * point in the positive Z direction, nz will be less than 1.0
-	 * and the color factor will be reduced.
+	 * multiplied by exp(-(1.0-n<sub>z</sub>)/normalFactor).
+	 * Since the normal vector has a length of 1.0, when the
+	 * normal vector does not point in the positive Z direction,
+	 * n<sub>z</sub> will be less than 1.0 and the color factor will be
+	 * reduced.
 	 * @param factor the normal factor; 0.0 or negative if there is none
 	 */
 	void setNormalFactor(double factor);
@@ -2327,7 +2329,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	/**
 	 * Get the normal factor.
 	 * When not zero, for each triangle, the color factor will be
-	 * scaled by exp(-(1-n<sub>z)</sub>/f), where f is the normal
+	 * scaled by exp(-(1-n<sub>z</sub>)/f), where f is the normal
 	 * factor and n<sub>z</sub> is the Z component of a triangle's
 	 * normal vector (normalized so its length is 1).
 	 * @return the normal factor

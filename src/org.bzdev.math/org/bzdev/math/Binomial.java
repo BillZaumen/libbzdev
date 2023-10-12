@@ -4,15 +4,29 @@ import java.math.BigInteger;
 
 /**
  * Class for computing binomial coefficients.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * The methods are all static.  One computes a single binomial
  * coefficient and the others use the equation
- * <br>
+ * $$ \left( \begin{array}{c}n \\ m\end{array} \right) =
+ *    \left( \begin{array}{c}n-1 \\ m-1\end{array} \right) +
+ *    \left( \begin{array}{c}n-1 \\ m\end{array} \right) $$
+ * <NOSCRIPT><br>
  * <PRE>
  *    / n \       / n-1 \      /  n-1 \
  *    |   |   =  |       |  + |        |
  *    \ m /       \ m-1 /      \   m  /
  *</PRE>
- * <P>
+ * <P></NOSCRIPT>
  * to compute multiple values efficiently.
  */
 public class Binomial {
@@ -52,11 +66,12 @@ public class Binomial {
     /**
      * Compute a binomial coefficient C(n,m).
      * The normal notation is
-     * <blockquote><pre>
+     * $$\left(\begin{array}{c}n \\ m \end{array}\right) = \frac{n!}{m!(n-m)!}$$
+     * <NOSCRIPT><blockquote><pre>
      *    / n \          n!
      *    |   |   =   --------
      *    \ m /       m!(n-m)!
-     * </pre></blockquote>
+     * </pre></blockquote></NOSCRIPT>
      * The value is computed using the relation
      * <blockquote> <pre>
      *     C(n,k) = (n/k)C(n-1,k-1)
@@ -112,11 +127,12 @@ public class Binomial {
     /**
      * Compute a binomial coefficient C(n,m) as a double-precision number.
      * The normal notation is
-     * <blockquote><pre>
+     * $$\left(\begin{array}{c}n \\ m \end{array}\right) = \frac{n!}{m!(n-m)!}$$
+     * <NOSCRIPT><blockquote><pre>
      *    / n \          n!
      *    |   |   =   --------
      *    \ m /       m!(n-m)!
-     * </pre></blockquote>
+     * </pre></blockquote></NOSCRIPT>
      * The for n &lt; 65, the value is computed using the relation
      * <blockquote><pre>
      *     C(n,k) = (n/k)C(n-1,k-1)

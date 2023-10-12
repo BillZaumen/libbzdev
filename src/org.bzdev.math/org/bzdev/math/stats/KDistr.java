@@ -4,6 +4,17 @@ import org.bzdev.math.VectorOps;
 
 /**
  * Class providing methods for the Kolmogorov distribution.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * All the methods for this class are static methods.
  * The use of A, P and Q follows the convention in Abramowitz and
  * Stegun, "Handbook of Mathematical Functions" (10th printing [1972],
@@ -16,12 +27,16 @@ import org.bzdev.math.VectorOps;
  * is the distribution of the quantity
  * D<sub>n</sub> = max(D<sub>n</sub><sup>-</sup>,D<sub>n</sub><sup>+</sup>)
  * where
+ *  <LI> $D_n^- = \max_{i=1}^n (x_i - \frac{i-1}n)$.
+ *  <LI> $D_n^+ = \max_{i=1}^n (\frac{i}{n} - x_i)$.
  * <UL>
+ * </UL>
+ * <NOSCRIPT><UL>
  *   <LI> D<sub>n</sub><sup>-</sup> =
  *        max<sub>i=1,...,n</sub>{x<sub>i</sub>- (i-1)/n}
- *   <LI> D<sub>n</sub><sup>-</sup> =
+ *   <LI> D<sub>n</sub><sup>+</sup> =
  *        max<sub>i=1,...,n</sub>{i/n - x<sub>i</sub>}
- * </UL>
+ * </UL></NOSCRIPT>
  * <P>
  * The algorithms used are described in
  * <A href="https://www.jstatsoft.org/article/view/v008i18/kolmo.pdf">

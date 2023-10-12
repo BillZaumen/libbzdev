@@ -2,13 +2,24 @@ package org.bzdev.math;
 import org.bzdev.lang.CallableArgsReturns;
 
 /**
- * Abstract class defining a cubic spline.  The spline approximates a
- * function f such that y = f(x). When the knots (the points the
- * spline passes through) are evenly spaced in terms of their X
- * values, look-up is faster than otherwise.  Because of this, two
- * classes are provided {@link CubicSpline1 CubicSpline1} for splines
- * based on knots whose X values are evenly spaced and {@link
- * CubicSpline2 CubicSpline2} for knots whose X values have an
+ * Abstract class defining a cubic spline.
+ * <P>
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
+ * The spline approximates a function f such that y = f(x). When the
+ * knots (the points the spline passes through) are evenly spaced in
+ * terms of their X values, look-up is faster than otherwise.  Because
+ * of this, two classes are provided {@link CubicSpline1 CubicSpline1}
+ * for splines based on knots whose X values are evenly spaced and
+ * {@link CubicSpline2 CubicSpline2} for knots whose X values have an
  * arbitrarily spacing.
  * <P>
  * A spline can be created in any of several modes described by
@@ -234,7 +245,8 @@ public abstract class CubicSpline extends RealValuedFunction {
     /**
      * Get the coefficients &beta;<sub>i</sub> for the segments of
      * this spline when represented as a sum of Bernstein polynomials
-     * &sum;<sup>3</sup><sub>i=0</sub>&beta;<sub>i</sub>B<sub>i,3</sub>(t)
+     * $\sum^3_{i=0}\beta_i B_{i,3}(t)$
+     * <!-- &sum;<sup>3</sup><sub>i=0</sub>&beta;<sub>i</sub>B<sub>i,3</sub>(t) -->
      * where t&isin;[0,1].
      * <P>
      * There are 4 coefficients per segment, but for a spline, the
