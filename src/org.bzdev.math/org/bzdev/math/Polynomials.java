@@ -1639,7 +1639,7 @@ public class Polynomials {
 	}
 
 	return Math.sqrt(scale) *
-		integrateRoot2Q(1, 1, 0, factors[1], factors[2], null, y, x);
+		integrateRoot2Q(factors[1], factors[2],  y, x);
     }
 
 
@@ -1753,8 +1753,8 @@ public class Polynomials {
 			* Math.abs(integral.valueAt(x));
 		} else {
 		    return Math.sqrt(scale) *
-			integrateRoot2Q(1, 1, 0, factors[1], factors[2], null,
-					0.0, x);	    }
+			integrateRoot2Q(factors[1], factors[2], 0.0, x);
+		}
 	    }
 	};
     }
@@ -2044,6 +2044,87 @@ public class Polynomials {
 	throw new IllegalArgumentException(msg);
     }
 
+    // Special case (p1 = 1, p2 = 1, p5 = 0), done seperately because
+    // it is used to compute cubic Bezier path lengths and we can
+    // eliminate some tests to provide a slight performance improvement.
+    private static double integrateRoot2Q(Polynomial P1, Polynomial P2,
+					  double y, double x)
+	throws NullPointerException, IllegalArgumentException
+    {
+	if (P1 == null || P2 == null) {
+	    throw new NullPointerException(errorMsg("nullArg"));
+	}
+	if (x == y) return 0.0;
+	if (x < y) {
+	    return -integrateRoot2Q(P1, P2, x, y);
+	}
+	double array[] = P1.getCoefficientsArray();
+	double f1 = array[0];
+	double g1 = array[1];
+	double h1 = array[2];
+	array = P2.getCoefficientsArray();
+	double f2 = array[0];
+	double g2 = array[1];
+	double h2 = array[2];
+
+	double xi1 = Math.sqrt(f1 + g1*x + h1*x*x);
+	double xi2 = Math.sqrt(f2 + g2*x + h2*x*x);
+	double eta1 = Math.sqrt(f1 + g1*y + h1*y*y);
+	double eta2 = Math.sqrt(f2 + g2*y + h2*y*y);
+	double xi1p = (g1 + 2*h1*x)/(2*xi1);
+	double eta1p = (g1 + 2*h1*y)/(2*eta1);
+	double B = xi1p*xi2 - eta1p*eta2;
+	double E = xi1p*xi1*xi1*xi2 - eta1p*eta1*eta1*eta2;
+	double theta1 = xi1*xi1 + eta1*eta1 - h1*MathOps.pow(x-y, 2);
+	double theta2 = xi2*xi2 + eta2*eta2 - h2*MathOps.pow(x-y, 2);
+	double zeta1 = Math.sqrt(MathOps.pow(xi1+eta1,2)
+				 - h1*MathOps.pow(x-y,2));
+	double zeta2 = Math.sqrt(MathOps.pow(xi2+eta2,2)
+				 - h2*MathOps.pow(x-y,2));
+	double U = (xi1*eta2 + eta1*xi2)/(x-y);
+	double M = zeta1*zeta2/(x-y);
+	double delta11 = Math.sqrt(4*f1*h1 - g1*g1);
+	double delta22 = Math.sqrt(4*f2*h2 - g2*g2);
+	double delta12 = Math.sqrt(2*f1*h2 + 2*f2*h1 - g1*g2);
+	double Delta = Math.sqrt(MathOps.pow(delta12, 4)
+				 - delta11*delta11*delta22*delta22);
+	double DeltaPlus = delta12*delta12 + Delta;
+	double DeltaMinus = delta12*delta12 - Delta;
+	double LplusSq  = M*M + DeltaPlus;
+	double LminusSq = M*M + DeltaMinus;
+	double G = 2*Delta*DeltaPlus*Functions.RD(M*M,LminusSq,LplusSq)/3
+	    + Delta/(2*U)
+	    + (delta12*delta12*theta1 - delta11*delta11*theta2)/(4*xi1*eta1*U);
+	double RF = Functions.RF(M*M,LminusSq,LplusSq);
+	double Sigma = G - DeltaPlus*RF + B;
+	double S = (xi1*eta1*theta2 + xi2*eta2*theta1)/MathOps.pow(x-y,2);
+	double A1111 = xi1*xi2 - eta1*eta2;
+	double psi0 = g1*h2 - g2*h1;
+	double psi0sq = psi0*psi0;
+	double Lambda0 = delta11*delta11*h2/h1;
+	double Omega0sq = M*M + Lambda0;
+	double X0 = -(xi1p*xi2 + eta1p*eta2)/(x - y);
+	double mu0 = h1/(xi1*eta1);
+	double T0 = mu0*S + 2*h1*h2;
+	double V0sq = mu0*mu0*(S*S + Lambda0*U*U);
+	// double a0 = S*Omega0sq/U + 2*Lambda0*U;
+	double b0sq = (S*S/(U*U) + Lambda0)*Omega0sq*Omega0sq;
+	double a0sq = b0sq
+		+ Lambda0*(DeltaPlus-Lambda0)*(Lambda0-DeltaMinus);
+	double H0 = delta11*delta11*psi0
+		* (Functions.RJ(M*M,LminusSq,LplusSq,Omega0sq)/3
+		   + Functions.RC(a0sq,b0sq)/2)/(h1*h1)
+		- X0*Functions.RC(T0*T0,V0sq);
+
+	return (delta22*delta22/(h2*h2) - delta11*delta11/(h1*h1))
+	    * (psi0*H0 + (Lambda0 - delta12*delta12)*RF)/8
+	    - ((3*psi0sq - 4*h1*h2*delta12*delta12)
+	       *(Sigma + delta12*delta12*RF)/(24*h1*h1*h2*h2))
+	    + (Delta*Delta*RF -psi0*A1111)/(12*h1*h2)
+	    + E/(3*h1);
+    }
+
+
     private static Polynomial root1pzm1 = new
 	Polynomial (0.0, 0.5, -1.0/8.0, 1/16.0, -5/128.0);
 
@@ -2073,8 +2154,8 @@ public class Polynomials {
 
 	if (a > 0.0 && c != 0.0 &&  Math.abs(cxsq)/tv1 < 0.001) {
 	    // We can approximate sqrt(a + bx + cx^2) by
-	    // sqrt(a+bx)sqrt(1 - cx^2/(a+bx)) which is approximately
-	    // sqrt(a+bx) -(1/2)cx^2/sqrt(a+bx) and integrate that.
+	    // sqrt(a+bx)sqrt(1 + cx^2/(a+bx)) which is approximately
+	    // sqrt(a+bx) + (1/2)cx^2/sqrt(a+bx) and integrate that.
 	    double z = b*x/a;
 	    double abx = 1 + z;
 	    double a32 = MathOps.pow(a,3,2);
