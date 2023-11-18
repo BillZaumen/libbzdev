@@ -345,9 +345,11 @@ EZkGuAZaQIpl1efRDE2vEbM8l83CtKl8-mLzWEg==
   <P>
     Successfully verifying these passphrases requires that that the
     public key can verify a signature constructed using the user's
-    password and the server's certificate, and two different servers
-    cannot use the same certificate sharing the certificate's private
-    key.
+    password and the server's certificate.  Note that two different
+    servers cannot use the same certificate without sharing the
+    certificate's private key. In addition, the signature includes
+    a timestamp, encoded in the passphrase, so that passphrases are
+    valid for only a short time.
   <P>
     For reference, The Google certificate used was
     <BLOCKQUOTE><PRE><CODE>
