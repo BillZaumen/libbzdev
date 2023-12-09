@@ -6008,6 +6008,277 @@ public class Path2DInfo {
 	return adder.getSum();
     }
 
+    /**
+     * Integrate the differential form &omega; = xdy along a path.
+     * @param pi the path iterator providing the path to follow
+     * @param simpleLoop true if the path must be a single loop terminated by
+     *        a {@link PathIterator#SEG_CLOSE} segment; false otherwise
+     * @return the value of the integral
+     */
+    private static double integralxDy(PathIterator pi,
+					      boolean singleLoop)
+    {
+	double[] coords = new double[6];
+	if (pi.isDone()) return 0.0;
+	int st = pi.currentSegment(coords);
+	if (st != PathIterator.SEG_MOVETO) {
+	    throw new IllegalArgumentException(errorMsg("illFormedPath"));
+	}
+	// double sum = 0.0;
+	Adder adder = new Adder.Kahan();
+	double lastX = coords[0];
+	double lastY = coords[1];
+	double lastMoveToX = lastX;
+	double lastMoveToY = lastY;
+	boolean mustStop = false;
+	boolean noFinalClose = true; // test for closed path
+	while (!pi.isDone()) {
+	    if (mustStop) {
+		throw new IllegalArgumentException(errorMsg("notSimpleClosedPath"));
+	    }
+	    st = pi.currentSegment(coords);
+	    if (st == PathIterator.SEG_CLOSE) {
+		noFinalClose = false;
+		coords[0] = lastMoveToX;
+		coords[1] = lastMoveToY;
+		if (singleLoop) mustStop = true;
+	    }
+	    if (st != PathIterator.SEG_MOVETO) {
+		if (st == PathIterator.SEG_CLOSE
+		    || st == PathIterator.SEG_LINETO) {
+		    // linear case - we'll save multiplications by computing
+		    // the integral in closed form.
+		    double cmy = coords[1] - lastY;
+		    double cmx = coords[0] - lastX;
+		    if (cmy != 0.0 || cmx != 0.0) {
+			double k1 = coords[0]*cmy;
+			double k2 = lastX * cmy;
+			// sum += (k1 + k2)/2.0;
+			adder.add((k1 + k2)/2.0);
+			/*
+			if (Math.abs((k1+k2)/2.0
+				     - glq.integrate(lastX, lastY, st, coords))
+			    > 1.0e-8) {
+			    throw new RuntimeException("Exact integral failed");
+			}
+			*/
+		    }
+		} else {
+		    // sum += glq.integrate(lastX, lastY, st, coords);
+		    int degree = (st == PathIterator.SEG_QUADTO)? 2: 3;
+		    BezierPolynomial bx = (degree == 2)?
+			new BezierPolynomial(lastX, coords[0], coords[2]):
+			new BezierPolynomial(lastX, coords[0],
+					     coords[2], coords[4]);
+		    BezierPolynomial by = (degree  == 2)?
+			new BezierPolynomial(lastY, coords[1], coords[3]):
+			new BezierPolynomial(lastY, coords[1],
+					     coords[3], coords[5]);
+		    BezierPolynomial dydu = by.deriv();
+		    bx.multiplyBy(dydu);
+		    BezierPolynomial integrand = bx;
+		    adder.add(integrand.integralAt(1.0));
+		    /*
+		    adder.add(glq.integrate(lastX, lastY, st, coords));
+		    */
+		}
+	    }
+	    switch (st) {
+	    case PathIterator.SEG_CLOSE:
+		lastX = lastMoveToX;
+		lastY = lastMoveToY;
+		/*
+		  coords[0] = lastMoveToX;
+		  coords[1] = lastMoveToY;
+		  lastX = coords[0];
+		  lastY = coords[1];
+		*/
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_MOVETO:
+		noFinalClose = true;
+		lastX = coords[0];
+		lastY = coords[1];
+		lastMoveToX = lastX;
+		lastMoveToY = lastY;
+		// fullEntry = (i > 0);
+		break;
+	    case PathIterator.SEG_LINETO:
+		lastX = coords[0];
+		lastY = coords[1];
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_QUADTO:
+		lastX = coords[2];
+		lastY = coords[3];
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		lastX = coords[4];
+		lastY = coords[5];
+		// fullEntry = true;
+		break;
+	    default:
+		throw new IllegalArgumentException(errorMsg("piUnknown"));
+	    }
+	    pi.next();
+	}
+	if (singleLoop && !mustStop) {
+	    throw new IllegalArgumentException(errorMsg("notSimpleClosedPath"));
+	}
+	if (noFinalClose) {
+	    // We implicitly close the path with a straight line segment.
+	    double cmy = lastMoveToY - lastY;
+	    double cmx = lastMoveToX - lastX;
+	    if (cmy != 0.0 || cmx != 0.0) {
+		// this is a linear case as before, so we can do the
+		//integral in closed form.
+		double k1 = lastMoveToX*cmy;
+		double k2 = lastX*cmy;
+		adder.add((k1 + k2)/2.0);
+
+	    }
+	}
+	// return sum;
+	return adder.getSum();
+    }
+
+    /**
+     * Integrate the differential form &omega; = -ydx along a path.
+     * @param pi the path iterator providing the path to follow
+     * @param simpleLoop true if the path must be a single loop terminated by
+     *        a {@link PathIterator#SEG_CLOSE} segment; false otherwise
+     * @return the value of the integral
+     */
+    private static double integralMinusyDx(PathIterator pi,
+					      boolean singleLoop)
+    {
+	double[] coords = new double[6];
+	if (pi.isDone()) return 0.0;
+	int st = pi.currentSegment(coords);
+	if (st != PathIterator.SEG_MOVETO) {
+	    throw new IllegalArgumentException(errorMsg("illFormedPath"));
+	}
+	// double sum = 0.0;
+	Adder adder = new Adder.Kahan();
+	double lastX = coords[0];
+	double lastY = coords[1];
+	double lastMoveToX = lastX;
+	double lastMoveToY = lastY;
+	boolean mustStop = false;
+	boolean noFinalClose = true; // test for closed path
+	while (!pi.isDone()) {
+	    if (mustStop) {
+		throw new IllegalArgumentException(errorMsg("notSimpleClosedPath"));
+	    }
+	    st = pi.currentSegment(coords);
+	    if (st == PathIterator.SEG_CLOSE) {
+		noFinalClose = false;
+		coords[0] = lastMoveToX;
+		coords[1] = lastMoveToY;
+		if (singleLoop) mustStop = true;
+	    }
+	    if (st != PathIterator.SEG_MOVETO) {
+		if (st == PathIterator.SEG_CLOSE
+		    || st == PathIterator.SEG_LINETO) {
+		    // linear case - we'll save multiplications by computing
+		    // the integral in closed form.
+		    double cmy = coords[1] - lastY;
+		    double cmx = coords[0] - lastX;
+		    if (cmy != 0.0 || cmx != 0.0) {
+			double k1 =  - coords[1]*cmx;
+			double k2 =  - lastY * cmx;
+			// sum += (k1 + k2)/2.0;
+			adder.add((k1 + k2)/2.0);
+			/*
+			if (Math.abs((k1+k2)/2.0
+				     - glq.integrate(lastX, lastY, st, coords))
+			    > 1.0e-8) {
+			    throw new RuntimeException("Exact integral failed");
+			}
+			*/
+		    }
+		} else {
+		    // sum += glq.integrate(lastX, lastY, st, coords);
+		    int degree = (st == PathIterator.SEG_QUADTO)? 2: 3;
+		    BezierPolynomial bx = (degree == 2)?
+			new BezierPolynomial(lastX, coords[0], coords[2]):
+			new BezierPolynomial(lastX, coords[0],
+					     coords[2], coords[4]);
+		    BezierPolynomial by = (degree  == 2)?
+			new BezierPolynomial(lastY, coords[1], coords[3]):
+			new BezierPolynomial(lastY, coords[1],
+					     coords[3], coords[5]);
+		    BezierPolynomial dxdu = bx.deriv();
+		    by.multiplyBy(dxdu);
+		    by.multiplyBy(-1);
+		    BezierPolynomial integrand = by;
+		    adder.add(integrand.integralAt(1.0));
+		    /*
+		    adder.add(glq.integrate(lastX, lastY, st, coords));
+		    */
+		}
+	    }
+	    switch (st) {
+	    case PathIterator.SEG_CLOSE:
+		lastX = lastMoveToX;
+		lastY = lastMoveToY;
+		/*
+		  coords[0] = lastMoveToX;
+		  coords[1] = lastMoveToY;
+		  lastX = coords[0];
+		  lastY = coords[1];
+		*/
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_MOVETO:
+		noFinalClose = true;
+		lastX = coords[0];
+		lastY = coords[1];
+		lastMoveToX = lastX;
+		lastMoveToY = lastY;
+		// fullEntry = (i > 0);
+		break;
+	    case PathIterator.SEG_LINETO:
+		lastX = coords[0];
+		lastY = coords[1];
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_QUADTO:
+		lastX = coords[2];
+		lastY = coords[3];
+		// fullEntry = true;
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		lastX = coords[4];
+		lastY = coords[5];
+		// fullEntry = true;
+		break;
+	    default:
+		throw new IllegalArgumentException(errorMsg("piUnknown"));
+	    }
+	    pi.next();
+	}
+	if (singleLoop && !mustStop) {
+	    throw new IllegalArgumentException(errorMsg("notSimpleClosedPath"));
+	}
+	if (noFinalClose) {
+	    // We implicitly close the path with a straight line segment.
+	    double cmy = lastMoveToY - lastY;
+	    double cmx = lastMoveToX - lastX;
+	    if (cmy != 0.0 || cmx != 0.0) {
+		// this is a linear case as before, so we can do the
+		//integral in closed form.
+		double k1 =  - lastMoveToY*cmx;
+		double k2 =  - lastY*cmx;
+		adder.add((k1 + k2)/2.0);
+	    }
+	}
+	// return sum;
+	return adder.getSum();
+    }
+
+
     static final int N4FORM_XY = 5;
     static double[] u4form_xy = GLQuadrature.getArguments(0.0, 1.0, N4FORM_XY);
     static UValues[] uv4form_xy = new UValues[N4FORM_XY];
@@ -7600,7 +7871,8 @@ public class Path2DInfo {
     }
 
     /**
-     * Compute the area of a shape specified by a path iterator.
+     * Compute the area of a shape specified by a path iterator, using
+     * the differential form xdy - ydx.
      * The winding rule for the path iterator must be
      * {@link java.awt.geom.PathIterator#WIND_NON_ZERO}. It is the
      * caller's responsibility to ensure the following:
@@ -7609,6 +7881,7 @@ public class Path2DInfo {
      *       {@link java.awt.geom.PathIterator#WIND_NON_ZERO}.
      *  <li> each subpath is closed.
      *  <li> subpaths do not intersect.
+     *  <li> a subpath does not cross itself.
      *  <li> The angular direction (clockwise versus counterclockwise) are
      *       opposite for holes than for outer boundaries.
      * </ul>
@@ -7621,9 +7894,14 @@ public class Path2DInfo {
      * Accuracy is set by the floating-point representation - the algorithm
      * used is exact.  Time complexity is linear in the number of path
      * segments.
+     * <P>
+     * Note: the path integrals of the forms (x/2)dy-(y/2)ydx, xdy, and -ydx
+     * produce the same values when evaluated exactly. The values may,
+     * however, differ due to floating point accuracy.
      * @param pi a path iterator.
      * @return the area of the shape specified by the path iterator pi
      * @exception IllegalArgumentException the winding rule is not correct.
+     * @see #areaOf(PathIterator, boolean)
      */
     public static double areaOf(PathIterator pi)
 	throws IllegalArgumentException
@@ -7634,6 +7912,54 @@ public class Path2DInfo {
 	return Math.abs(integralxDyMinusyDx(pi, false)/2.0);
     }
 
+    /**
+     * Compute the area of a shape specified by a path iterator, using
+     * the differential form xdy or -ydx.
+     * The winding rule for the path iterator must be
+     * {@link java.awt.geom.PathIterator#WIND_NON_ZERO}. It is the
+     * caller's responsibility to ensure the following:
+     * <ul>
+     *  <li> the winding rule for the path iterator is
+     *       {@link java.awt.geom.PathIterator#WIND_NON_ZERO}.
+     *  <li> each subpath is closed.
+     *  <li> subpaths do not intersect.
+     *  <li> a subpath does not cross itself.
+     *  <li> The angular direction (clockwise versus counterclockwise) are
+     *       opposite for holes than for outer boundaries.
+     * </ul>
+     * Methods that take a {@link java.awt.Shape} as an argument will
+     * automatically ensure that these constraints are met (perhaps by
+     * creating an Area).  This method is provided for cases where the
+     * computation must be as fast as possible.  The path iterator will
+     * be modified by this method.
+     * <P>
+     * Accuracy is set by the floating-point representation - the algorithm
+     * used is exact.  Time complexity is linear in the number of path
+     * segments.
+     * <P>
+     * Note: the path integrals of the forms (x/2)dy-(y/2)ydx, xdy, and -ydx
+     * produce the same values when evaluated exactly. The values may,
+     * however, differ due to floating point accuracy. Using this method
+     * twice, with different values of the argumnet xdy, provides a rough
+     * estimate of numerical accuracy. The execution time for this method
+     * is slightly faster than that provided by
+     * {@link #areaOf(PathIterator)}.
+     * @param pi a path iterator.
+     * @param xdy true if the differential form is xdy; false if the
+     *        differential form is -ydx
+     * @return the area of the shape specified by the path iterator pi
+     * @exception IllegalArgumentException the winding rule is not correct.
+     * @see #areaOf(PathIterator)
+     */
+    public static double areaOf(PathIterator pi, boolean xdy)
+	throws IllegalArgumentException
+    {
+	if (pi.getWindingRule() != PathIterator.WIND_NON_ZERO) {
+	    throw new IllegalArgumentException("wrongWindingRule");
+	}
+	return Math.abs(xdy? integralxDy(pi, false):
+			integralMinusyDx(pi, false));
+    }
 
     /**
      * Compute the area of a shape specified by a path iterator and affine
@@ -7647,6 +7973,7 @@ public class Path2DInfo {
      *       {@link java.awt.geom.PathIterator#WIND_NON_ZERO}.
      *  <li> each subpath is closed.
      *  <li> subpaths do not intersect.
+     *  <li> a subpath does not cross itself.
      *  <li> The angular direction (clockwise versus counterclockwise) are
      *       opposite for holes than for outer boundaries.
      * </ul>

@@ -335,6 +335,66 @@ public class AreaTest {
 			   + ", expecting " + (Math.PI * r * r)
 			   + " for perfect circle");
 
+	System.out.println("high-res circle area (using xdy-ydx) = "
+			   + Path2DInfo.areaOf(hrcircle.getPathIterator(null)));
+	System.out.println("high-res circle area (using xdy) = "
+			   + Path2DInfo.areaOf(hrcircle.getPathIterator(null),
+					       true));
+	System.out.println("high-res circle area (using -ydx) = "
+			   + Path2DInfo.areaOf(hrcircle.getPathIterator(null),
+					       true));
+
+	SplinePath2D crossedLoop = new SplinePath2D();
+	for (int i = 0; i < 360; i++) {
+	    double theta = Math.toRadians(i * 1.0);
+	    xshr[i] = r * Math.cos(theta);
+	    yshr[i] = r * Math.sin(2*theta);
+	}
+	crossedLoop.addCycle(xshr, yshr, 360);
+	double crossedLoopArea = Path2DInfo.areaOf(crossedLoop);
+	System.out.println("loop area = " + crossedLoopArea);
+	if (Math.abs(crossedLoopArea) < 1.e-5) {
+	    throw new Exception();
+	}
+
+	double cla2 = Path2DInfo.areaOf(crossedLoop.getPathIterator(null));
+	if (Math.abs(cla2) > 1.e-5) {
+	    throw new Exception();
+	}
+
+	Path2D narrowRect = new Path2D.Double();
+
+	narrowRect.moveTo(1.0, 0.0);
+	narrowRect.lineTo(11.0, 0.0);
+	narrowRect.lineTo(11.0, 1.e-20); 
+	narrowRect.lineTo(1.0, 1.e-20);
+	narrowRect.lineTo(1.0, 0.0);
+	narrowRect.closePath();
+	System.out.println("narrowRect area (xdy-ydx) = " +
+			   Path2DInfo.areaOf(narrowRect.getPathIterator(null)));
+	System.out.println("narrowRect area (xdy) = " +
+			   Path2DInfo.areaOf(narrowRect.getPathIterator(null),
+					     true));
+	System.out.println("narrowRect area (-ydx) = " +
+			   Path2DInfo.areaOf(narrowRect.getPathIterator(null),
+					     false));
+	Path2D genpath = new Path2D.Double();
+
+	genpath.moveTo(1.0, 1.0);
+	genpath.lineTo(2.0, 3.0);
+	genpath.quadTo(4.0, 6.0, 7.0, 8.0);
+	genpath.curveTo(7.0, 9.0, 4.0, 8.5, 2.0, 5.0);
+	genpath.closePath();
+	System.out.println("genpath area (xdy-ydx) = " +
+			   Path2DInfo.areaOf(genpath.getPathIterator(null)));
+	System.out.println("genpath area (xdy) = " +
+			   Path2DInfo.areaOf(genpath.getPathIterator(null),
+					     true));
+	System.out.println("genpath area (-ydx) = " +
+			   Path2DInfo.areaOf(genpath.getPathIterator(null),
+					     false));
+
+
 	System.exit(0);
     }
 }
