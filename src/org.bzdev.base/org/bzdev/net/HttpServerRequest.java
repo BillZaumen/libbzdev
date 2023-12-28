@@ -214,7 +214,7 @@ public interface HttpServerRequest {
      * Returns a java.util.Map of the parameters of this request.
      * Request parameters are extra information sent with the request.
      * For HTTP, parameters are contained in a URL's query string
-     * or posted form data.
+     * or posted form data with content type application/x-www-form-urlencoded.
      * @return an immutable java.util.Map containing parameter names
      *         as keys and parameter values as map values.
      */
@@ -225,7 +225,8 @@ public interface HttpServerRequest {
      * if the parameter does not exist.
      * Request parameters are extra information sent with the
      * request. For HTTP requests, parameters are contained in the
-     * query string or posted form data.
+     * query string or posted form data with content type
+     * application/x-www-form-urlencoded.
      * <P>
      * Users should only use this method when sure that the parameter
      * has only one value. If the parameter might have more than one
@@ -250,6 +251,8 @@ public interface HttpServerRequest {
      * Returns an array of String objects containing all of the values
      * the given request parameter has, or null if the parameter does
      * not exist.
+     * For HTTP POST requests, the content must be form data with content
+     * type application/x-www-form-urlencoded.
      * <P>
      * When used with a servlet, if the parameter data was sent in the
      * request body, such as occurs with an HTTP POST request, then
@@ -268,6 +271,8 @@ public interface HttpServerRequest {
      * of the parameters contained in this request.
      * If the request has no parameters, the method returns an
      * empty Enumeration.
+     * For HTTP POST requests, the content must be form data with content
+     * type application/x-www-form-urlencoded.
      * <P>
      * When used with a servlet, if the parameter data was sent in the
      * request body, such as occurs with an HTTP POST request, then
@@ -286,6 +291,8 @@ public interface HttpServerRequest {
      * If the request has no parameters, the method returns an
      * empty set. This method is provided as a convenience:
      * unlike enumerations, sets can be used in 'for' loops.
+     * For HTTP POST requests, the content must be form data with content
+     * type application/x-www-form-urlencoded.
      * <P>
      * When used with a servlet, if the parameter data was sent in the
      * request body, such as occurs with an HTTP POST request, then

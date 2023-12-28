@@ -54,7 +54,7 @@ public class SecureBasicTest {
 	    throw new Exception();
 	}
 
-	passwordStr = ":foo:" + passwordStr;
+	// passwordStr = ":foo:" + passwordStr;
 	sigarray = ops.decodePassword(passwordStr);
 	if (!ops.checkPassword(sigarray, null, thepw)) {
 	    throw new Exception();
@@ -291,6 +291,18 @@ public class SecureBasicTest {
 	SecureBasicUtilities ops1 = new SecureBasicUtilities(privatePem);
 
 	SecureBasicUtilities ops2 = new SecureBasicUtilities(publicPem);
+
+	byte[] testData = "this is a test".getBytes("UTF-8");
+	Signature signer = ops1.getSigner();
+	signer.update(testData);
+	byte[] tdsig = signer.sign();
+	Signature verifier = ops2.getVerifier();
+	verifier.update(testData);
+	if (verifier.verify(tdsig)) {
+	    System.out.println("tdsig valid for testData");
+	} else {
+	    throw new Exception();
+	}
 
 	PrivateKey privateKey = ops1.getPrivateKey();
 	PublicKey publicKey = ops2.getPublicKey();

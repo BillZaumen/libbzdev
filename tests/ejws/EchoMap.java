@@ -25,15 +25,28 @@ public class EchoMap extends WebMap {
 					  WebMap.RequestInfo requestInfo)
 	throws IOException, EjwsException
     {
-	Map<String,String> qmap = null;
+	Map<String,String[]> qmap = null;
+	System.out.println("contentLength = " + requestInfo.getContentLength());
+	qmap  = requestInfo.getParameterMap();
+	System.out.println("query = " + query);
+	if (qmap != null && qmap.size() > 0) {
+	    System.out.println("parameters:");
+	    for (Map.Entry<String,String[]>entry: qmap.entrySet()) {
+		System.out.println("    " + entry.getKey() + ": "
+				   + entry.getValue()[0]);
+	    }
+	}
 	if (requestInfo.getMethod() != HttpMethod.POST) {
 	    throw new EjwsException("POST was missing");
 	}
 	String type = requestInfo.getMediaType();
 	
+
 	System.out.println("type = " + type);
 	InputStream ris = requestInfo.getDecodedInputStream();
-	if (type.equalsIgnoreCase("multipart/form-data")) {
+	if (false) {
+	    ris.transferTo(System.out);
+	} else if (type.equalsIgnoreCase("multipart/form-data")) {
 	    String boundary = requestInfo.getFromHeader("content-type",
 							"boundary");
 	    System.out.println("boundary = \"" + boundary + "\"");

@@ -138,6 +138,10 @@ test11:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) Test11
 
+test11-post:
+	curl --form txt=text http://localhost:8080/post/
+
+
 htest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

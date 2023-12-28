@@ -409,7 +409,7 @@ public class SecureBasicUtilities {
      * keys for this instance of {@link SecureBasicUtilities}.
      * @return the encryption algorithm
      */
-    public String getEncryptionAlgorith() {return encryptionAlgorithm;}
+    public String getEncryptionAlgorithm() {return encryptionAlgorithm;}
 
     /**
      * Get the signature algorithm used for the public and/or private
@@ -417,6 +417,46 @@ public class SecureBasicUtilities {
      * @return the signature algorithm
      */
     public String getSignatureAlgorithm() {return signatureAlgorithm;}
+
+    /**
+     * Get an initialized {@link Signature} for signing.
+     * The caller should use the {@link Signature} methods named
+     * <CODE>update</CODE> and <CODE>sign</CODE> to create the
+     * signature.
+     * @return an initialized {@link Signature}; null if there this
+     *   object was not created with a private key
+     * @throws GeneralSecurityException if the private key is not valid
+     * @see Signature
+     */
+    public Signature getSigner() throws GeneralSecurityException {
+	if (privateKey == null) return null;
+	String provider = sigpmap.get(signatureAlgorithm);
+	Signature signature = (provider == null)?
+	    Signature.getInstance(signatureAlgorithm):
+	    Signature.getInstance(signatureAlgorithm, provider);
+	signature.initSign(privateKey);
+	return signature;
+    }
+
+    /**
+     * Get an initialized {@link Signature} for verification.
+     * The caller should use the {@link Signature} methods named
+     * <CODE>update</CODE> and <CODE>verify</CODE> to verify the
+     * signature.
+     * @return an initialized {@link Signature}; null if there this
+     *   object was not created with a public key
+     * @throws GeneralSecurityException if the public key is not valid
+     * @see Signature
+     */
+    public Signature getVerifier() throws GeneralSecurityException {
+	if (publicKey == null) return null;
+	String provider = sigpmap.get(signatureAlgorithm);
+	Signature signature = (provider == null)?
+	    Signature.getInstance(signatureAlgorithm):
+	    Signature.getInstance(signatureAlgorithm, provider);
+	signature.initVerify(publicKey);
+	return signature;
+    }
 
 
     // used by various  constructors.
