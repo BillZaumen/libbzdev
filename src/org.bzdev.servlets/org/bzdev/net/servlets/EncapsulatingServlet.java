@@ -213,6 +213,11 @@ public abstract class EncapsulatingServlet extends HttpServlet {
 	    }
 
 	    @Override
+	    public String getRemoteAddr() {
+		return req.getRemoteAddr();
+	    }
+
+	    @Override
 	    public String getContextPath() {
 		return req.getContextPath();
 	    }
