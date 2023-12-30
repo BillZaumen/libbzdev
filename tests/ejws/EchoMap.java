@@ -43,6 +43,8 @@ public class EchoMap extends WebMap {
 	
 
 	System.out.println("type = " + type);
+	System.out.println("remoteAddr = " + requestInfo.getRemoteAddr());
+
 	InputStream ris = requestInfo.getDecodedInputStream();
 	if (false) {
 	    ris.transferTo(System.out);

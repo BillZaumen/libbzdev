@@ -494,6 +494,21 @@ abstract public class WebMap {
 	}
 
 	@Override
+	public String getRemoteAddr() {
+	    InetSocketAddress saddr = exchange.getRemoteAddress();
+	    if (saddr == null) return null;
+	    InetAddress addr = saddr.getAddress();
+	    if (addr == null) return null;
+	    String address = addr.toString();
+	    int index = address.indexOf('/');
+	    if (index == -1) {
+		return address;
+	    } else {
+		return address.substring(index+1);
+	    }
+	}
+
+	@Override
 	public String getProtocol() {
 	    return exchange.getProtocol();
 	}

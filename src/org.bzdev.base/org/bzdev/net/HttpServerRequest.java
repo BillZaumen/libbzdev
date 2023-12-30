@@ -452,6 +452,14 @@ public interface HttpServerRequest {
     }
 
     /**
+     * Return the IP (Internet Protocol) address of the client, last
+     * proxy, or router/switch using NAT (Network Address
+     * Translation), that sent this request.
+     * @return the address
+     */
+    String getRemoteAddr();
+
+    /**
      * Extract parameters from a request header.
      * This method assumes that a header contains a single value
      * and that multiple values would be separated by commas.
