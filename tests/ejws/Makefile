@@ -17,6 +17,12 @@ all:
 	$(JAVA) WebxmlParserTest example junk
 	rm junk
 
+dirtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) DirTest
+
 test:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -140,6 +146,9 @@ test11:
 
 test11-post:
 	curl --form txt=text http://localhost:8080/post/
+
+test11-get:
+	curl http://localhost:8080/post/?txt1=text&txt2=text2
 
 
 htest:
@@ -270,6 +279,13 @@ atest8:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest8 /usr/share/doc/libbzdev-doc/api/ \
 		~/.config/sbl/example.sbl testUser
+
+utest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) UtilTest "./"
+	cat junk
 
 cert:
 	rm -f thelio-ks.jks thelio-ts.jks

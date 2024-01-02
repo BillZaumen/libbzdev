@@ -2762,7 +2762,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    //throw new IllegalArgumentException();
 	}
 	return parm.keyType;
     }
@@ -2786,7 +2785,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.factoryClass;
     }
@@ -2805,7 +2803,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.parmKeyType;
     }
@@ -2829,7 +2826,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.type;
     }
@@ -2850,7 +2846,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.rvmode;
     }
@@ -2868,7 +2863,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.glb;
     }
@@ -2888,7 +2882,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.lbClosed;
     }
@@ -2906,7 +2899,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    // throw new IllegalArgumentException();
 	}
 	return parm.lub;
     }
@@ -2926,7 +2918,6 @@ abstract public class NamedObjectFactory<
 	Parm parm = parmMap.get(name);
 	if (parm == null) {
 	    throw new IllegalArgumentException(errorMsg("badParmName", name));
-	    //throw new IllegalArgumentException();
 	}
 	return parm.ubClosed;
     }

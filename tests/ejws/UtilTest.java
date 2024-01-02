@@ -10,7 +10,7 @@ import org.bzdev.util.CopyUtilities;
 public class UtilTest {
     static public void main(String argv[]) {
 	try {
-	    WebMap webmap = new
+	    DirWebMap webmap = new
 		DirWebMap(new File(System.getProperty("user.dir")));
 
 	    File file = new File(argv[0]);

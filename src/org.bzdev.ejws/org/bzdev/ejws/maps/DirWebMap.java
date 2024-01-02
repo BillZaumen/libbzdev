@@ -19,7 +19,7 @@ import javax.imageio.ImageWriter;
  * to the constructor.  This file must be a directory.
  */
 
-public class DirWebMap extends WebMap {
+public class DirWebMap extends WebMap implements WebMap.ColorSpec {
 
     // LinkedList<String> welcomeList = new LinkedList<String>();
     // HashMap<String,String> suffixToMimeType =
@@ -33,9 +33,71 @@ public class DirWebMap extends WebMap {
     }
 
     /**
+     * DirWebMap configurator.
+     * An instance of this object can be used as the argument
+     * for a {@link DirWebMap}'s constructor.
+     */
+    public static class Config {
+	File root;
+	String color;
+	String bgcolor;
+	String linkColor;
+	String visitedColor;
+
+	/**
+	 * Constructor.
+	 * The arguments linkColor and visitedColor can both be null
+	 * but if one is not null, the other must also not be null.
+	 * @param root a File representing the directory within which
+	 *        resources will be found
+	 * @param color the CSS color for text
+	 * @param bgcolor the CSS color for the background
+	 * @param linkColor the CSS color for links; null to ignore
+	 * @param visitedColor the CSS color for visited links; null to ignore
+	 * @throws IllegalArgumentException if color or bgcolor are missing
+	 *         or if only one of linkColor or visitedColor is null.
+	 */
+	public Config(File root, String color, String bgcolor,
+		      String linkColor, String visitedColor)
+	    throws IllegalArgumentException
+	{
+	    if (root == null || color == null || bgcolor == null) {
+		throw new IllegalArgumentException(errorMsg("nullArgs1or2"));
+	    }
+	    if ((linkColor == null || visitedColor == null)
+		&& (linkColor != visitedColor)) {
+		throw new IllegalArgumentException(errorMsg("nullArgs3or4"));
+	    }
+	    this.root = root;
+	    this.color = color;
+	    this.bgcolor = bgcolor;
+	    this.linkColor = linkColor;
+	    this.visitedColor = visitedColor;
+	}
+    }
+
+    String color = "black";
+    String bgcolor = "lightgray";
+    String linkColor = null;
+    String visitedColor = null;
+
+    @Override
+    public String getColor() {return color;}
+
+    @Override
+    public String getBackgroundColor() {return bgcolor;}
+
+    @Override
+    public String getLinkColor() {return linkColor;}
+
+    @Override
+    public String getVisitedColor() {return visitedColor;}
+
+    /**
      * Constructor.
      * @param root a File representing the directory within which
-     * resources will be found.
+     *        resources will be found or an instance of
+     *        {@link DirWebMap.Config}
      * @exception IOException an IO error occurred
      * @exception IllegalArgumentException The argument is not an
      *            instance of {@link File}
@@ -45,9 +107,17 @@ public class DirWebMap extends WebMap {
     {
 	if (root instanceof File) {
 	    setRoot((File) root);
+	} else if (root instanceof DirWebMap.Config) {
+	    DirWebMap.Config config = (DirWebMap.Config) root;
+	    setRoot(config.root);
+	    color = config.color;
+	    bgcolor = config.bgcolor;
+	    linkColor = config.linkColor;
+	    visitedColor = config.visitedColor;
+
 	} else {
 	    throw new
-		IllegalArgumentException(errorMsg("constrArgNotFile"));
+		IllegalArgumentException(errorMsg("constrArgNotFileOrConfig"));
 		/*("Argument to constructor is "
 		  + "not an instance of java.io.File");*/
 	}
@@ -64,7 +134,7 @@ public class DirWebMap extends WebMap {
 		this.rootURI = root.toURI();
 	    } else {
 		throw new IllegalArgumentException
-		    (errorMsg("rootNotDirectory"));
+		    (errorMsg("rootNotDirectory", root));
 	    }
 	}
     }

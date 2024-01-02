@@ -1840,7 +1840,7 @@ public class Polynomials {
 	if ((Math.abs(p1) % 2 == 0) || (Math.abs(p2) % 2 == 0)
 	    || Math.abs(p5) %2 == 1) {
 	    String msg = errorMsg("illegalCarlsonParms", p1, p2, p5);
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(msg);
 	}
 
 	boolean exchange = (p2 == -3 && p1 == 1)

@@ -22,6 +22,7 @@ import java.security.MessageDigest;
  */
 class RootHandler implements HttpHandler {
 
+    /*
     static void copyStream(InputStream is, OutputStream os)
 	throws IOException
     {
@@ -34,6 +35,33 @@ class RootHandler implements HttpHandler {
 	}
 	os.flush();
 	// System.out.println("total bytes sent = " + total);
+    }
+    */
+    WebMap.ColorSpec colorSpec = new WebMap.ColorSpec() {
+	    private final String color = "black";
+	    private final String bgcolor = "lightgray";
+	    private final String linkColor = null;
+	    private final String visitedColor = null;
+	    @Override
+	    public String getColor() {return color;}
+
+	    @Override
+	    public String getBackgroundColor() {return bgcolor;}
+
+	    @Override
+	    public String getLinkColor() {return linkColor;}
+
+	    @Override
+	    public String getVisitedColor() {return visitedColor;}
+	};
+
+    /**
+     * Set the colors for directory-like listings.
+     * @param colorSpec the color specification for directory-like
+     *        listings
+     */
+    public void setRootColors(WebMap.ColorSpec colorSpec) {
+	this.colorSpec = colorSpec;
     }
 
 
@@ -148,7 +176,8 @@ class RootHandler implements HttpHandler {
 		    // substring that is in prefixMap.  In this case, we
 		    // create a directory listing.
 		    WebMap.Info info =
-			EjwsUtilities.printHtmlDir(pset, path, "UTF-8", null);
+			EjwsUtilities.printHtmlDir(pset, path, "UTF-8",
+						   colorSpec);
 		    Headers headers = t.getResponseHeaders();
 		    headers.set("Content-Type", info.getMIMEType());
 		    t.sendResponseHeaders(200, info.getLength());

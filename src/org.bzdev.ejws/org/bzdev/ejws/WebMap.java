@@ -309,6 +309,37 @@ abstract public class WebMap {
     }
 
     /**
+     * Interface for providing background colors for
+     * directory (or similar) listings.
+     */
+    public static interface ColorSpec {
+	/**
+	 * Get the foreground color to use for HTML pages.
+	 * @return the CSS color for the foreground
+	 */
+	String getColor();
+
+	/**
+	 * Get the background color to use for HTML pages.
+	 * @return the CSS color for the background
+	 */
+	String getBackgroundColor();
+
+	/**
+	 * Get the color to use for unvisited links.
+	 * @return the CSS color for links
+	 */
+	String getLinkColor();
+
+	/**
+	 * Get the color to use for visited links.
+	 * @return the CSS color for visited links
+	 */
+	String getVisitedColor();
+    }
+
+
+    /**
      * HTTP Request data.
      * This data structure is passed as an argument to
      * {@link #getInfoFromPath(String,String,String,String,WebMap.RequestInfo)}

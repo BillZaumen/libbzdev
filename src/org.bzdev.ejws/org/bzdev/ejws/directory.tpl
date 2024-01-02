@@ -4,8 +4,18 @@
 <HEAD>
 <META http-equiv="Content-Type" content="text/html; charset=$(encoding)">
 <TITLE>Directory for $(dirname)</TITLE>
+<STYLE>
+  BODY {
+      background-color: $(bgcolor);
+      color: $(color);
+  }$(+linkColor:linkColorEnd)
+  A {color: $(linkColor)}
+  A:link {color: $(linkColor)}
+  A:visited {color: $(visitedColor)}
+  $(linkColorEnd)
+</STYLE>
 </HEAD>
-<BODY  style="background-color: lightgray">
+<BODY>
 <b>$(dirname) directory listing:</b>
 <ul>$(items:endItems)
 <li><a href="$(href)">$(isDirectory:endDir)<B>$(endDir)$(entry)$(isDirectory:endDir)</B>$(endDir)</a>$(endItems)

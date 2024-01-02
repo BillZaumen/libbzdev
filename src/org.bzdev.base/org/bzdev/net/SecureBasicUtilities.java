@@ -599,7 +599,8 @@ public class SecureBasicUtilities {
 	    if (key instanceof PrivateKey) {
 		privateKey = (PrivateKey)key;
 	    } else {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("noPrivateKey", alias);
+		throw new IllegalArgumentException(msg);
 	    }
 	    Certificate cert = ks.getCertificate(alias);
 	    if (cert == null) {
@@ -607,7 +608,8 @@ public class SecureBasicUtilities {
 	    }
 	    publicKey = cert.getPublicKey();
 	    if (!publicKey.getAlgorithm().equals(privateKey.getAlgorithm())) {
-		throw new IllegalArgumentException();
+		String msg = errorMsg("publicPrivateAlg");
+		throw new IllegalArgumentException(msg);
 	    }
 	    signatureAlgorithm = sigalg;
 	    type = Type.BOTH;

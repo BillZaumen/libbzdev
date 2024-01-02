@@ -17,8 +17,8 @@ public class TemplateProcessorTest {
 	}
 	try {
 	    // Test bugs that were found during use.
-	    FileReader fr = new FileReader("circle.tpl");
 	    OutputStreamWriter osw = new OutputStreamWriter(System.out);
+	    FileReader fr = new FileReader("circle.tpl");
 	    TemplateProcessor.KeyMap map = new TemplateProcessor.KeyMap();
 	    map.put("circle", "circle");
 	    TemplateProcessor tp = new TemplateProcessor(map);

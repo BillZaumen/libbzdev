@@ -13,59 +13,6 @@ import java.util.zip.*;
  *  Useful methods for writing handlers and subclasses of WebMap.
  */
 public class EjwsUtilities {
-    /*
-     * Copy an input stream to an output stream.
-     * The input stream is copied from its current position to its
-     * end.
-     * @param is the input stream
-     * @param os the output stream
-    public static void copyStream(InputStream is, OutputStream os)
-	throws IOException
-    {
-	byte[] buffer = new byte[4096];
-	int len = 0;
-	long total = 0;
-	while ((len = is.read(buffer)) != -1) {
-	    os.write(buffer, 0, len);
-	    total += len;
-	}
-	os.flush();
-	// System.out.println("total bytes sent = " + total);
-    }
-     */
-
-    /*
-     * Copy an input stream to an Appendable.
-     * The input stream is copied from its current position to its
-     * end.
-     * @param is the input stream
-     * @param a is the object used to store the copy
-     * @param charset the character encoding used by the input stream.
-    public static void copyStream(InputStream is, Appendable a,
-				  Charset charset)
-	throws IOException
-    {
-	int sz = 4096;
-	char[] buffer = new char[sz];
-	CharBuffer cbuf = CharBuffer.wrap(buffer);
-	int len = 0;
-	long total = 0;
-
-	InputStreamReader r = new InputStreamReader(is, charset);
-
-	while ((len = r.read(buffer, 0, sz)) != -1) {
-	    cbuf.position(0);
-	    cbuf.limit(len);
-	    a.append(cbuf, 0, len);
-	    total += len;
-	}
-	if (a instanceof Flushable) {
-	    ((Flushable) a).flush();
-	}
-	// System.out.println("total bytes sent = " + total);
-    }
-     */
-
     /**
      * HTML encode a string.
      * HTML encoding replaces the special characters "&lt;", "&gt;", and
@@ -73,7 +20,6 @@ public class EjwsUtilities {
      * @param string the string to encode
      * @return the encoded string
      */
-
     public static String htmlEncode(String string) {
 	StringTokenizer tk = new StringTokenizer(string, "<>&", true);
 	StringBuilder sb = new StringBuilder(64 + string.length());
@@ -120,13 +66,13 @@ public class EjwsUtilities {
      * @param dir a directory
      * @param uri a URI or path for the directory
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @return a WebMap.Info instance for the directory listing
      * @exception IOException an IO exception occurred
      */
     public static WebMap.Info printHtmlDir(File dir, String uri,
 					   String encoding,
-					   WebMap webmap)
+					   WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	if (!dir.canRead()) {
@@ -135,7 +81,7 @@ public class EjwsUtilities {
 	File[] files = dir.listFiles();
 	ByteArrayOutputStream bos =
 	    new ByteArrayOutputStream(1024 + 128 * files.length);
-	printHtmlDir(dir, files, uri, encoding, bos, webmap);
+	printHtmlDir(dir, files, uri, encoding, bos, colorSpec);
 	return new WebMap.Info(new ByteArrayInputStream(bos.toByteArray()),
 			       bos.size(),
 			       "text/html;charset=\"" + htmlEncode(encoding)
@@ -151,19 +97,19 @@ public class EjwsUtilities {
      * @param dir a directory
      * @param uri a URI or path for the directory
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @param os the output stream on which to print the file
      * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(File dir, String uri,
 				    String encoding, OutputStream os,
-				    WebMap webmap)
+				    WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	if (!(dir.isDirectory() && dir.canRead())) {
 	    return;
 	}
-	printHtmlDir(dir, dir.listFiles(), uri, encoding, os, webmap);
+	printHtmlDir(dir, dir.listFiles(), uri, encoding, os, colorSpec);
     }
 
     private static TemplateProcessor.KeyMap EMPTY_MAP
@@ -171,10 +117,12 @@ public class EjwsUtilities {
 
     private static void printHtmlDir(File dir, File[] files, String uri,
 				     String encoding, OutputStream os,
-				     WebMap webmap)
+				     WebMap.ColorSpec colorSpec)
 	throws IOException
     {
-	boolean hideWebInf = webmap.getWebInfHidden();
+	WebMap webmap = (colorSpec instanceof WebMap)? (WebMap)colorSpec:
+	    null;
+	boolean hideWebInf = (webmap == null)? false: webmap.getWebInfHidden();
 	if (dir.isDirectory()) {
 	    TemplateProcessor.KeyMap map = new TemplateProcessor.KeyMap();
 	    map.put("dirname", uri);
@@ -202,7 +150,7 @@ public class EjwsUtilities {
 		    boolean isdir = file.isDirectory();
 		    if (isdir == false)  {
 			String fn = file.getName();
-			fn = webmap.stripGZipSuffix(fn);
+			fn = (webmap == null)? fn: webmap.stripGZipSuffix(fn);
 			file = new File(parent, fn);
 		    }
 		    URI furi = (parent == null)? file.toURI():
@@ -218,6 +166,10 @@ public class EjwsUtilities {
 		    dirmaps[i++] = dirmap;
 		}
 	    }
+	    map.put("bgcolor", colorSpec.getBackgroundColor());
+	    map.put("color", colorSpec.getColor());
+	    map.put("linkColor", colorSpec.getLinkColor());
+	    map.put("visitedColor", colorSpec.getVisitedColor());
 	    map.put("items", dirmaps);
 	    TemplateProcessor processor = new TemplateProcessor(map);
 	    Reader rd = new InputStreamReader
@@ -250,17 +202,17 @@ public class EjwsUtilities {
      * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the remainder of the zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @return a WebMap.Info instance for the directory listing
      * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(File file, String uri, String zprepath, String zpath,
-		     String encoding, WebMap webmap)
+		     String encoding, WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	return printHtmlDir(new FileInputStream(file), uri, zprepath, zpath,
-			    encoding, webmap);
+			    encoding, colorSpec);
     }
 
     /**
@@ -281,18 +233,18 @@ public class EjwsUtilities {
      * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @return a WebMap.Info instance for the directory listing
      * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(InputStream is, String uri, String zprepath,
 		     String zpath, String encoding,
-		     WebMap webmap)
+		     WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
-	printHtmlDir(is, uri, zprepath, zpath, encoding, bos, webmap);
+	printHtmlDir(is, uri, zprepath, zpath, encoding, bos, colorSpec);
 	return new WebMap.Info(new ByteArrayInputStream(bos.toByteArray()),
 			       bos.size(),
 			       "text/html;charset=\"" + htmlEncode(encoding)
@@ -317,16 +269,16 @@ public class EjwsUtilities {
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(File file, String uri, String zpath,
 				    String encoding, OutputStream os,
-				    WebMap webmap)
+				    WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	printHtmlDir(new FileInputStream(file), uri, null, zpath,
-		     encoding, os, webmap);
+		     encoding, os, colorSpec);
     }
 
     /**
@@ -348,16 +300,18 @@ public class EjwsUtilities {
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(InputStream is, String uri,
 				    String zprepath, String zpath,
 				    String encoding, OutputStream os,
-				    WebMap webmap)
+				    WebMap.ColorSpec colorSpec)
 	throws IOException
     {
-	boolean hideWebInf = webmap.getWebInfHidden();
+	WebMap webmap = (colorSpec instanceof WebMap)? (WebMap)colorSpec:
+	    null;
+	boolean hideWebInf = (webmap == null)? false: webmap.getWebInfHidden();
 	TemplateProcessor.KeyMap map = new TemplateProcessor.KeyMap();
 	if (!uri.endsWith("/")) {
 	    uri = uri + "/";
@@ -384,7 +338,7 @@ public class EjwsUtilities {
 				  || name.equals("WEB-INF")))) {
 		name = name.substring(zipPath.length());
 		if (webmap != null && !name.endsWith("/")) {
-		    name = webmap.stripGZipSuffix(name);
+		    name = (webmap == null)? name: webmap.stripGZipSuffix(name);
 		}
 		int ind = name.indexOf('/');
 		if (ind == -1 || ind == name.length()-1) {
@@ -407,6 +361,10 @@ public class EjwsUtilities {
 	    }
 	    dirmaps[i++] = dirmap;
 	}
+	map.put("bgcolor", colorSpec.getBackgroundColor());
+	map.put("color", colorSpec.getColor());
+	map.put("linkColor", colorSpec.getLinkColor());
+	map.put("visitedColor", colorSpec.getVisitedColor());
 	map.put("items", dirmaps);
 	TemplateProcessor processor = new TemplateProcessor(map);
 	Reader rd = new InputStreamReader
@@ -436,17 +394,17 @@ public class EjwsUtilities {
      * @param zprepath the initial part of a zip-file entry's name
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @return a WebMap.Info instance for the directory listing
      * @exception IOException an IO exception occurred
      */
     public static WebMap.Info
 	printHtmlDir(ZipFile zipfile, String uri, String zprepath, String zpath,
-		     String encoding, WebMap webmap)
+		     String encoding, WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
-	printHtmlDir(zipfile, uri, zprepath, zpath, encoding, bos, webmap);
+	printHtmlDir(zipfile, uri, zprepath, zpath, encoding, bos, colorSpec);
 	return new WebMap.Info(new ByteArrayInputStream(bos.toByteArray()),
 			       bos.size(),
 			       "text/html;charset=\"" + htmlEncode(encoding)
@@ -473,16 +431,18 @@ public class EjwsUtilities {
      * @param zpath the initial part of a zip-file entry's name
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream on which to print the file
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(ZipFile zipfile, String uri,
 				    String zprepath, String zpath,
 				    String encoding, OutputStream os,
-				    WebMap webmap)
+				    WebMap.ColorSpec colorSpec)
 	throws IOException
     {
-	boolean hideWebInf = webmap.getWebInfHidden();
+	WebMap webmap = (colorSpec instanceof WebMap)? (WebMap)colorSpec:
+	    null;
+	boolean hideWebInf = (webmap == null)? false: webmap.getWebInfHidden();
 	if (uri == null) uri = "/";
 	if (!uri.endsWith("/")) {
 	    uri = uri + "/";
@@ -515,7 +475,7 @@ public class EjwsUtilities {
 				  || name.equals("WEB-INF/")))) {
 		name = name.substring(zipPath.length());
 		if (webmap != null && !name.endsWith("/")) {
-		    name = webmap.stripGZipSuffix(name);
+		    name = (webmap == null)? name: webmap.stripGZipSuffix(name);
 		}
 		int ind = name.indexOf('/');
 		if (ind == -1 || ind == name.length()-1) {
@@ -539,6 +499,10 @@ public class EjwsUtilities {
 	    }
 	    dirmaps[i++] = dirmap;
 	}
+	map.put("bgcolor", colorSpec.getBackgroundColor());
+	map.put("color", colorSpec.getColor());
+	map.put("linkColor", colorSpec.getLinkColor());
+	map.put("visitedColor", colorSpec.getVisitedColor());
 	map.put("items", dirmaps);
 	TemplateProcessor processor = new TemplateProcessor(map);
 	Reader rd = new InputStreamReader
@@ -562,18 +526,19 @@ public class EjwsUtilities {
      * @param pathSet a set of paths
      * @param prefix the initial path prefix
      * @param encoding the character encoding used by the HTML generated
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @return an object encapsulating the directory listing and information
      *         useful for displaying the listing.
      * @exception IOException an IO exception occurred
      */
     static public WebMap.Info printHtmlDir(Set<String> pathSet,
 					   String prefix,
-					   String encoding, WebMap webmap)
+					   String encoding,
+					   WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 	ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
-	printHtmlDir(pathSet, prefix, encoding, bos, webmap);
+	printHtmlDir(pathSet, prefix, encoding, bos, colorSpec);
 	return new WebMap.Info(new ByteArrayInputStream(bos.toByteArray()),
 			       bos.size(),
 			       "text/html;charset=\"" + htmlEncode(encoding)
@@ -594,15 +559,18 @@ public class EjwsUtilities {
      * @param prefix the initial path prefix
      * @param encoding the character encoding used by the HTML generated
      * @param os the output stream
-     * @param webmap the instance of WebMap that called this method
+     * @param colorSpec the instance of WebMap.ColorSpec that called this method
      * @exception IOException an IO exception occurred
      */
     public static void printHtmlDir(Set<String> pathSet, String prefix,
 				    String encoding, OutputStream os,
-				    WebMap webmap)
+				    WebMap.ColorSpec colorSpec)
 	throws IOException
     {
 
+
+	WebMap webmap = (colorSpec instanceof WebMap)? (WebMap)colorSpec:
+	    null;
 	boolean hideWebInf = (webmap == null)? false: webmap.getWebInfHidden();
 
 	TemplateProcessor.KeyMap map = new TemplateProcessor.KeyMap();
@@ -614,7 +582,7 @@ public class EjwsUtilities {
 	    if (path.startsWith(prefix)) {
 		String p = path.substring(prefix.length());
 		if (webmap != null && !p.endsWith("/")) {
-		    p = webmap.stripGZipSuffix(p);
+		    p = (webmap == null)? p: webmap.stripGZipSuffix(p);
 		}
 		int ind = p.indexOf('/');
 		if(ind > 0) {
@@ -636,6 +604,10 @@ public class EjwsUtilities {
 	    }
 	    dirmaps[i++] = dirmap;
 	}
+	map.put("bgcolor", colorSpec.getBackgroundColor());
+	map.put("color", colorSpec.getColor());
+	map.put("linkColor", colorSpec.getLinkColor());
+	map.put("visitedColor", colorSpec.getVisitedColor());
 	map.put("items", dirmaps);
 	TemplateProcessor processor = new TemplateProcessor(map);
 	Reader rd = new InputStreamReader
@@ -648,6 +620,6 @@ public class EjwsUtilities {
     }
 }
 
-//  LocalWords:  WebMap os Appendable charset lt dir uri hideWebInf
+//  LocalWords:  WebMap ColorSpec os Appendable charset lt dir uri hideWebInf
 //  LocalWords:  html dirname href zpath InputStream zipfile zis UTF
 //  LocalWords:  ZipInputStream pathSet

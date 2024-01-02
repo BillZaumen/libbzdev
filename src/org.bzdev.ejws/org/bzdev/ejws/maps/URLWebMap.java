@@ -296,35 +296,6 @@ public class URLWebMap extends WebMap {
 	    throw new IllegalArgumentException(msg, ee);
 	}
 	try {
-	    /*
-	    if (jarProtocol) {
-		JarURLConnection jc = (JarURLConnection)url.openConnection();
-		if (dirlist) {
-		    ZipFile zipfile = jc.getJarFile();
-		    return EjwsUtilities.printHtmlDir(zipfile, prepath,
-						      encapsulatedBase, path,
-						      "UTF-8",
-						      this);
-		}
-		if (jc == null) {
-		    URL u;
-		    boolean compress = false;
-		    for (String p: gzipPaths(path)) {
-			u  = new URL(base + p);
-			jc = (JarURLConnection)u.openConnection();
-			if (jc != null) {
-			    compress = true;
-			    break;
-			}
-		    }
-		}
-		if (jc == null) return null;
-		String mt = getMimeType(path);
-		long len = jc.getContentLength();
-		InputStream is1 = jc.getInputStream();
-
-	    }
-	    */
 	    URLConnection c = url.openConnection();
 	    if (c == null) return null;
 

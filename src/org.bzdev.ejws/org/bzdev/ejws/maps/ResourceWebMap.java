@@ -17,7 +17,7 @@ import javax.imageio.ImageWriter;
  * The sole argument to the constructor is a system resource name to which
  * a request URI's path, excluding the prefix, will be appended.
  */
-public class ResourceWebMap extends WebMap {
+public class ResourceWebMap extends WebMap implements WebMap.ColorSpec {
 
     LinkedList<String> welcomeList = new LinkedList<String>();
     HashMap<String,String> suffixToMimeType =
@@ -33,9 +33,71 @@ public class ResourceWebMap extends WebMap {
     }
 
     /**
+     * DirWebMap configurator.
+     * An instance of this object can be used as the argument
+     * for a {@link DirWebMap}'s constructor.
+     */
+    public static class Config {
+	String root;
+	String color;
+	String bgcolor;
+	String linkColor;
+	String visitedColor;
+
+	/**
+	 * Constructor.
+	 * The arguments linkColor and visitedColor can both be null
+	 * but if one is not null, the other must also not be null.
+	 * @param root the initial portion of a resource name (if it does not
+	 *        end in a '/', a '/' will be appended automatically)
+	 * @param color the CSS color for text
+	 * @param bgcolor the CSS color for the background
+	 * @param linkColor the CSS color for links; null to ignore
+	 * @param visitedColor the CSS color for visited links; null to ignore
+	 * @throws IllegalArgumentException if color or bgcolor are missing
+	 *         or if only one of linkColor or visitedColor is null.
+	 */
+	public Config(String root, String color, String bgcolor,
+		      String linkColor, String visitedColor)
+	    throws IllegalArgumentException
+	{
+	    if (root == null || color == null || bgcolor == null) {
+		throw new IllegalArgumentException(errorMsg("nullArgs1or2"));
+	    }
+	    if ((linkColor == null || visitedColor == null)
+		&& (linkColor != visitedColor)) {
+		throw new IllegalArgumentException(errorMsg("nullArgs3or4"));
+	    }
+	    this.root = root;
+	    this.color = color;
+	    this.bgcolor = bgcolor;
+	    this.linkColor = linkColor;
+	    this.visitedColor = visitedColor;
+	}
+    }
+
+    String color = "black";
+    String bgcolor = "lightgray";
+    String linkColor = null;
+    String visitedColor = null;
+
+    @Override
+    public String getColor() {return color;}
+
+    @Override
+    public String getBackgroundColor() {return bgcolor;}
+
+    @Override
+    public String getLinkColor() {return linkColor;}
+
+    @Override
+    public String getVisitedColor() {return visitedColor;}
+
+    /**
      * Constructor.
      * @param root the initial portion of a resource name (if it does not
-     *        end in a '/', a '/' will be appended automatically)
+     *        end in a '/', a '/' will be appended automatically) or an
+     *        instance of {@link ResourceWebMap.Config}.
      * @throws IOException if an IO error ocurred
      * @throws IllegalArgumentException if the argumnent is not a string
      *         and not the value null
@@ -51,6 +113,19 @@ public class ResourceWebMap extends WebMap {
 	    if (rootResourcePath.startsWith("/")) {
 		rootResourcePath = rootResourcePath.substring(1);
 	    }
+	} else if (root != null && root instanceof ResourceWebMap.Config) {
+	    ResourceWebMap.Config config = (ResourceWebMap.Config) root;
+	    rootResourcePath = config.root;
+	    if (!rootResourcePath.endsWith("/")) {
+		rootResourcePath = rootResourcePath + "/";
+	    }
+	    if (rootResourcePath.startsWith("/")) {
+		rootResourcePath = rootResourcePath.substring(1);
+	    }
+	    color = config.color;
+	    bgcolor = config.bgcolor;
+	    linkColor = config.linkColor;
+	    visitedColor = config.visitedColor;
 	} else {
 	    throw new
 		IllegalArgumentException(errorMsg("constrArgNotString"));

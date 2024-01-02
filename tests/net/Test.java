@@ -51,6 +51,11 @@ public class Test {
 	System.out.println("query2 = " + query2);
 	Map<String,String> map2 = WebDecoder.formDecode(query1);
 	Map<String,String[]> map2mv = WebDecoder.formDecodeMV(query1);
+	for (String key: map.keySet()) {
+	    if (!map.get(key).equals(map2mv.get(key)[0])) {
+		throw new Exception();
+	    }
+	}
 	if (map2.size() != map.size()) throw new Exception("size");
 	for (Map.Entry<String,String> entry: map2.entrySet()) {
 	    String key = entry.getKey();

@@ -15,9 +15,10 @@ import javax.imageio.ImageWriter;
 /**
  * WebMap for resources in a ZIP, WAR, or JAR file.
  * The sole argument to a ZipWebMap's constructor is a file or
- * file name referring to a ZIP, WAR, or JAR file.
+ * file name referring to a ZIP, WAR, or JAR file, or an instance of
+ * {@link ZipWebMap.Config} providing the same information.
  */
-public class ZipWebMap extends WebMap {
+public class ZipWebMap extends WebMap implements WebMap.ColorSpec {
 
     URI rootURI = null;
     ZipFile zipfile = null;
@@ -26,9 +27,81 @@ public class ZipWebMap extends WebMap {
 	return WebMapErrorMsg.errorMsg(key, args);
     }
 
+
+    /**
+     * DirWebMap configurator.
+     * An instance of this object can be used as the argument
+     * for a {@link DirWebMap}'s constructor.
+     */
+    public static class Config {
+	File root;
+	String color;
+	String bgcolor;
+	String linkColor;
+	String visitedColor;
+
+	/**
+	 * Constructor.
+	 * The arguments linkColor and visitedColor can both be null
+	 * but if one is not null, the other must also not be null.
+	 * @param root a File representing the directory within which
+	 *        resources will be found
+	 * @param color the CSS color for text
+	 * @param bgcolor the CSS color for the background
+	 * @param linkColor the CSS color for links; null to ignore
+	 * @param visitedColor the CSS color for visited links; null to ignore
+	 * @throws IllegalArgumentException if color or bgcolor are missing
+	 *         or if only one of linkColor or visitedColor is null.
+	 */
+	public Config(Object  root, String color, String bgcolor,
+		      String linkColor, String visitedColor)
+	    throws IllegalArgumentException
+	{
+	    if (root instanceof String) {
+		root = new File((String)root);
+	    } else if (!(root instanceof File)) {
+		String msg = errorMsg("constrArgNotFileOrString");
+		throw new IllegalArgumentException(msg);
+	    }
+
+
+	    if (root == null || color == null || bgcolor == null) {
+		throw new IllegalArgumentException(errorMsg("nullArgs1or2"));
+	    }
+	    if ((linkColor == null || visitedColor == null)
+		&& (linkColor != visitedColor)) {
+		throw new IllegalArgumentException(errorMsg("nullArgs3or4"));
+	    }
+	    this.root = (File)root;
+	    this.color = color;
+	    this.bgcolor = bgcolor;
+	    this.linkColor = linkColor;
+	    this.visitedColor = visitedColor;
+	}
+    }
+
+    String color = "black";
+    String bgcolor = "lightgray";
+    String linkColor = null;
+    String visitedColor = null;
+
+    @Override
+    public String getColor() {return color;}
+
+    @Override
+    public String getBackgroundColor() {return bgcolor;}
+
+    @Override
+    public String getLinkColor() {return linkColor;}
+
+    @Override
+    public String getVisitedColor() {return visitedColor;}
+
+
     /**
      * Constructor.
-     * @param root a File denoting a directory
+     * @param root a ZIP file or a String naming a ZIP file or an instance
+     *        of {@link ZipWebMap.Config}
      * @throws IOException if an IO error occurred
      * @throws IllegalArgumentException if root is not an instance of
      *         {@link File}
@@ -36,6 +109,15 @@ public class ZipWebMap extends WebMap {
     public ZipWebMap(Object root)
 	throws IOException, IllegalArgumentException
     {
+	if (root instanceof ZipWebMap.Config) {
+	    ZipWebMap.Config config = (ZipWebMap.Config) root;
+	    root = config.root;
+	    color = config.color;
+	    bgcolor = config.bgcolor;
+	    linkColor = config.linkColor;
+	    visitedColor = config.visitedColor;
+	}
+
 	if (root instanceof String) {
 	    root = new File((String)root);
 	}
@@ -43,7 +125,7 @@ public class ZipWebMap extends WebMap {
 	    setRoot((File) root);
 	} else {
 	    throw new
-		IllegalArgumentException(errorMsg("constrArgNotFile"));
+		IllegalArgumentException(errorMsg("constrArgNotFileOrString"));
 	}
     }
 

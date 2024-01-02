@@ -1255,6 +1255,58 @@ public class EmbeddedWebServer {
 	executorServiceFactory = callable;
     }
 
+    WebMap.ColorSpec colorSpec = new WebMap.ColorSpec() {
+	    private final String color = "black";
+	    private final String bgcolor = "lightgray";
+	    private final String linkColor = null;
+	    private final String visitedColor = null;
+	    @Override
+	    public String getColor() {return color;}
+
+	    @Override
+	    public String getBackgroundColor() {return bgcolor;}
+
+	    @Override
+	    public String getLinkColor() {return linkColor;}
+
+	    @Override
+	    public String getVisitedColor() {return visitedColor;}
+	};
+
+    /**
+     * Set the colors used by a RootHandler.
+     * @param color the CSS color for text
+     * @param bgcolor the CSS color for the background
+     * @param linkColor the CSS color for links; null to ignore
+     * @param visitedColor the CSS color for visited links; null to ignore
+     * @throws IllegalArgumentException if color or bgcolor are missing
+     *         or if only one of linkColor or visitedColor is null.
+     */
+    public void setRootColors(final String color, final String bgcolor,
+			      final String linkColor, final String visitedColor)
+    {
+	if (color == null || bgcolor == null) {
+	    throw new IllegalArgumentException(errorMsg("nullArgs1or2"));
+	}
+	if ((linkColor == null || visitedColor == null)
+	    && (linkColor != visitedColor)) {
+	    throw new IllegalArgumentException(errorMsg("nullArgs3or4"));
+	}
+	colorSpec = new WebMap.ColorSpec() {
+		@Override
+		public String getColor() {return color;}
+
+		@Override
+		public String getBackgroundColor() {return bgcolor;}
+
+		@Override
+		public String getLinkColor() {return linkColor;}
+
+		@Override
+		public String getVisitedColor() {return visitedColor;}
+	    };
+    }
+
     /**
      * Start the web server.
      * Starting a server that is already running has no effect.
@@ -1275,7 +1327,9 @@ public class EmbeddedWebServer {
 		IllegalStateException(errorMsg("serverStopping"));
 	}
 	if (!prefixMap.containsKey("/") && !addedRootImplicitly) {
-	    server.createContext("/", new RootHandler(prefixMap))
+	    RootHandler rhandler = new RootHandler(prefixMap);
+	    rhandler.setRootColors(colorSpec);
+	    server.createContext("/", rhandler)
 		.getFilters().add(new TraceFilter());
 	    addedRootImplicitly = true;
 	}
