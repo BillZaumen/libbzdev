@@ -4,9 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.nio.charset.Charset;
+
+import org.bzdev.io.*;
 
 //@exbundle org.bzdev.net.lpack.Net
 
@@ -152,6 +155,25 @@ public class PemDecoder {
 	    }
 	}
     }
+
+     /**
+     * Decode headers and PEM-encoded data from a Reader.
+     * This is a convenience method for the case were a Reader
+     * is available, but not an input stream.
+     * @param r a reader providing optional headers and
+     *        PEM-encoded data
+     * @return a {@link Result} object storing the decoded data
+     * @throws IOException if an IO error occurred
+     */
+    public static Result decode(Reader r) throws IOException {
+	StringBuilder sb = new StringBuilder(1024);
+	AppendableWriter w = new AppendableWriter(sb);
+	r.transferTo(w);
+	w.flush();
+	w.close();
+	return decode(sb.toString());
+    }
+
 
     /**
      * Decode headers and PEM-encoded data from a string.

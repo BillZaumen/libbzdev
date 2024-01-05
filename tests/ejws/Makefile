@@ -47,6 +47,13 @@ stest2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) STest2
 
+stest2a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) STest2a
+
+
 stest3a:
 	(cd ../.. ; make jars)
 	mkdir -p classes

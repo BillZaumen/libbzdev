@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.StringReader;
 import java.net.*;
 import javax.net.ssl.*;
 import java.security.cert.*;
@@ -48,6 +49,24 @@ public class PemTest {
 			throw new Exception();
 		    }
 		}
+		result = PemDecoder.decode(new StringReader(sb.toString()));
+		if (!result.getHeaders().getFirst("encryption-algorithm")
+		    .equals(pkey.getAlgorithm())) {
+		    throw new Exception();
+		}
+		if (!result.getType().equals("PUBLIC KEY")) {
+		    throw new Exception();
+		}
+		decoded = result.getBytes();
+		if (decoded.length != encoded.length) {
+		    throw new Exception();
+		}
+		for (int i = 0; i < encoded.length; i++) {
+		    if (decoded[i] != encoded[i]) {
+			throw new Exception();
+		    }
+		}
+
 	    }
 	    System.exit(0);
 	}
