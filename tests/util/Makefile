@@ -144,7 +144,14 @@ badesp:
 	./scrun  bad5.esp || echo EXCEPTION EXPECTED
 	./scrun  bad6.esp || echo EXCEPTION EXPECTED
 	./scrun bad7.esp || echo EXCEPTION EXPECTED
+	./scrun  espResource.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
+
+badesp2:
+	(cd ../.. ; make jars)
+	chmod u+x scrun2
+	./scrun2 espResource.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun2
 
 bad6:
 	(cd ../.. ; make jars)

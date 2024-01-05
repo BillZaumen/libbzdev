@@ -61,7 +61,8 @@ msgtest:
 	 do grep -o '//@exbundle.*'  $$i | grep -o ' .*' | \
 		 sed 's/ \(.*\)/exbundle = "\1";/'; \
 	    echo 'BundleTest.setBundle(exbundle, "'$$i'");' ; \
-	    grep -o 'errorMsg(["][^;]*;' $$i | \
+	    sed -e 's/errorMsg2[(]/errorMsg2(/'g $$i | \
+	    grep -o 'errorMsg(["][^;]*;' | \
 	    sed \
 	      -e 's/"[ 	]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*);/", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);/' \
 	      -e 's/"[ 	]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*);/", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);/' \

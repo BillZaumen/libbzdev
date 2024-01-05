@@ -106,7 +106,11 @@ public class ExpressionParser implements ObjectParser<Object>
 	return (new SafeFormatter()).format(exbundle.getString(key), args)
 	    .toString();
     }
-
+    // Use in inner classes that are subclasses of some other class
+    // that defines errorMsg.
+    private static String errorMsg2(String key, Object... args) {
+	return errorMsg(key, args);
+    }
     private static enum Operator {
 	FUNCTION_KEYWORD,
 	BACKQUOTE,		// turn a block into a lambda expression
@@ -765,7 +769,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			String method = m.getName();
 			Object object = ESPObject.this.get(method);
 			if (object == null) {
-			    String msg = errorMsg("missingMethod", method);
+			    String msg = errorMsg2("missingMethod", method);
 			    throw new IllegalArgumentException(msg);
 			}
 			if (object instanceof ESPFunction) {
@@ -774,13 +778,13 @@ public class ExpressionParser implements ObjectParser<Object>
 			    int n2 = m.getParameterCount();
 			    if (n1 != n2) {
 				String msg =
-				    errorMsg("wrongArgCntM", method, n1, n2);
+				    errorMsg2("wrongArgCntM", method, n1, n2);
 				throw new IllegalArgumentException(msg);
 			    }
 			    return f.invoke(args);
 			    // return f.invoke(args);
 			} else {
-			    String msg = errorMsg("missingFunct", method);
+			    String msg = errorMsg2("missingFunct", method);
 			    throw new IllegalArgumentException(msg);
 			}
 		    }
@@ -822,11 +826,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		for (int i = 0; i < n; i++) {
 		    Object row = Array.get(matrix, i);
 		    if (row == null) {
-			String msg = errorMsg("nullRow", i);
+			String msg = errorMsg2("nullRow", i);
 			throw new IllegalArgumentException(msg);
 		    } else if (Array.getLength(row) != m) {
 			int rlen = Array.getLength(row);
-			String msg = errorMsg("wrongRowLen", i, rlen, m);
+			String msg = errorMsg2("wrongRowLen", i, rlen, m);
 			throw new IllegalArgumentException(msg);
 		    }
 		    ESPArray ourRow = new ESPArray();
@@ -890,7 +894,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    throws IllegalArgumentException
 	{
 	    if (clasz == null) {
-		throw new NullPointerException(errorMsg("nullArg", 1));
+		throw new NullPointerException(errorMsg2("nullArg", 1));
 	    } else if (clasz.equals(double.class)) {
 		return DoubleStream.of(toDoubleArray());
 	    } else if (clasz.equals(long.class)) {
@@ -898,7 +902,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    } else if (clasz.equals(int.class)) {
 		return IntStream.of(toIntArray());
 	    } else {
-		throw new IllegalArgumentException(errorMsg("toStreamErr"));
+		throw new IllegalArgumentException(errorMsg2("toStreamErr"));
 	    }
 
 	}
