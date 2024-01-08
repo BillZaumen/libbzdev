@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.LineNumberReader;
 import java.io.FileReader;
+import java.lang.module.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.nio.file.Path;
@@ -471,7 +472,7 @@ public class SCRunnerCmd {
 	    }
 	    return null;
 	} else {
-	    // for Windows or other operating systems that do
+	    // for Windowsa or other operating systems that do
 	    // not look like Unix, assume the configuration file
 	    // is in the same directory as the jar files.
 	    try {
@@ -539,6 +540,14 @@ public class SCRunnerCmd {
     }
 
     static void extendCodebase(String codebase, boolean modulePath) {
+	extendCodebase(codebase, modulePath, false);
+    }
+    static void extendCodebase(String codebase, boolean modulePath,
+			       boolean allowRemote) {
+	if (codebase == null || codebase.trim().length() == 0) {
+	    RuntimeException re = new RuntimeException("null codebase");
+	    re.printStackTrace();
+	}
 	try {
 	    URL[] urls = URLPathParser.getURLs(null, codebase,
 					       ourCodebaseDir,
@@ -565,6 +574,9 @@ public class SCRunnerCmd {
 			continue;
 		    }
 		} else {
+		    if (allowRemote == false) {
+			throw new IOException(errorMsg("remoteURL"));
+		    }
 		    if (urlMap.containsKey(url.toString())) {
 			if (urlMap.get(url.toString()) != modulePath) {
 			    String msg = errorMsg("doubleUse", url.toString());
@@ -592,6 +604,23 @@ public class SCRunnerCmd {
 			sbmp.append(pathSeparator);
 		    }
 		    sbmp.append(fname);
+		    File archive = new File(fname);
+		    if (!archive.isDirectory() && archive.canRead()) {
+			Path archivePath = archive.toPath();
+			String mod = ModuleFinder.of(archivePath)
+			    .findAll().stream().findFirst()
+			    .map(ModuleReference::descriptor)
+			    .map(ModuleDescriptor::name).orElse(null);
+			if (mod != null) {
+			    if (modSet.contains(mod) == false) {
+				if (sbmod.length() > 0) {
+				    sbmod.append(",");
+				}
+				sbmod.append(mod);
+				modSet.add(mod);
+			    }
+			}
+		    }
 		} else {
 		    if (sbcp.length() > 0) {
 			sbcp.append(pathSeparator);
@@ -699,7 +728,8 @@ public class SCRunnerCmd {
 	String initialClassPath = System.getProperty("java.class.path");
 	String mainModule = System.getProperty("jdk.module.main");
 
-	if (initialClassPath != null) {
+	if (initialClassPath != null
+	    && initialClassPath.trim().length() != 0) {
 	    String[] ccomps = initialClassPath.split(pathSeparator);
 	    for (String comp: ccomps) {
 		extendCodebase(comp, false);
@@ -707,7 +737,8 @@ public class SCRunnerCmd {
 	    // sbcp.append(initialClassPath);
 	}
 	String initialModulePath = System.getProperty("jdk.module.path");
-	if (initialModulePath != null) {
+	if (initialModulePath != null
+	    && initialModulePath.trim().length() != 0) {
 	    String[] mcomps = initialModulePath.split(pathSeparator);
 	    for (String comp: mcomps) {
 		extendCodebase(comp, true);
@@ -1036,7 +1067,7 @@ public class SCRunnerCmd {
 		}
 		String[] modules = argv[index].trim().split(",");
 		for (String mod: modules) {
-		    if (modSet.contains(argv[index]) == false) {
+		    if (modSet.contains(mod/*argv[index]*/) == false) {
 			if (sbmod.length() > 0) {
 			    sbmod.append(",");
 			}
@@ -1051,7 +1082,7 @@ public class SCRunnerCmd {
 			(errorMsg("missingArg", argv[--index]));
 		    System.exit(1);
 		}
-		extendCodebase(argv[index], true);
+		extendCodebase(argv[index], true, true);
 	    } else if (argv[index].equals("--classpathCodebase")) {
 		index++;
 		if (index == argv.length) {
@@ -1059,7 +1090,7 @@ public class SCRunnerCmd {
 			(errorMsg("missingArg", argv[--index]));
 		    System.exit(1);
 		}
-		extendCodebase(argv[index], false);
+		extendCodebase(argv[index], false, true);
 	    } else if (argv[index].equals("--resourcePath")) {
 		index++;
 		if (index == argv.length) {

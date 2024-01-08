@@ -1,0 +1,8 @@
+import (java.lang.System);
+
+var out = global.getWriter();
+var prop = System.getProperty("foo");
+
+out.println("prop = " + null);
+out.println("prop = " + prop);
+out.println(prop);

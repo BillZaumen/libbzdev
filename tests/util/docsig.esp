@@ -1,0 +1,3 @@
+import (org.bzdev.docsig.DocsigVerifier);
+var out = global.getWriter();
+out.println(DocsigVerifier.class);

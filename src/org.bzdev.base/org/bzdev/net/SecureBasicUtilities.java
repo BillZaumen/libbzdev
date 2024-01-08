@@ -634,7 +634,7 @@ public class SecureBasicUtilities {
 
     private static HashMap<String,String> pmap = new HashMap<>();
     static {
-	sigpmap.put("EC", "SunEC");
+	pmap.put("EC", "SunEC");
     }
 
     private static final String DIGEST = "SHA-256";

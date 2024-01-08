@@ -344,7 +344,10 @@ option, with the exception that a '|' has to be escaped.  If a codebase
 has classes in the unnamed package, the
 .B \-\-classpathCodebase
 option must be used as all code bases on the module path must contain
-classes in named packages.
+classes in named packages.  In addition, for the
+\-\-codebase
+option, the module corresponding to a JAR file will be automatically
+added.
 .TP
 .BI \-D NAME\fB=\fIVALUE
 Define the name of a Java property and give it a value.  See the java
@@ -458,7 +461,12 @@ option when the module path contains directories. Unlike Java, multiple
 .B \-p
 or
 .B \-\-module-path
-options may be provided. If so, the paths are combined.
+options may be provided. If so, the paths are combined.  For the JAR
+file case,
+.B scrunner
+will automatically add the module so an additional
+.B \-\-add-modules
+option is not needed for the JAR file's module.
 .TP
 .BI \-o\  OUTPUTFILE
 Specify a file

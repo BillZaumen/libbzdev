@@ -107,6 +107,10 @@ all: compile
 	./scrun bad4.esp || echo EXCEPTION EXPECTED
 	./scrun bad5.esp || echo EXCEPTION EXPECTED
 	./scrun bad6.esp || echo EXCEPTION EXPECTED
+	./scrun nulltest.esp
+	@echo --- docsig test ---
+	./scrun --codebase docsig.jar --exit docsig.esp
+	./scrun -p docsig.jar --exit docsig.esp
 	chmod u-x scrun
 	@echo ---- Supplier Test ----
 	@$(JAVA) SupplierTest
@@ -412,6 +416,25 @@ configProp: compile ../swing/config.foo
 	@echo (this is run in ../swing).  You will need a
 	@echo GPG key.
 	(cd ../swing; make config)
+
+docsig:
+	@ (cd ../.. ; make jars)
+	java -p ../../BUILD \
+		-m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
+		--stackTrace -p docsig.jar docsig.esp
+
+docsig-dryrun:
+	@ (cd ../.. ; make jars)
+	java -p ../../BUILD \
+		-m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
+		--dryrun \
+		--stackTrace --codebase docsig.jar docsig.esp
+
+nulltest:
+	@ (cd ../.. ; make jars)
+	java -p ../../BUILD:`pwd`/docsig.jar \
+		-m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
+		--stackTrace  nulltest.esp
 
 clean:
 	rm -rf classes

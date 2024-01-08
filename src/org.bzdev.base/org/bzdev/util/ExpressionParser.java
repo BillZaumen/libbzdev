@@ -5311,8 +5311,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Object o2 = popValue();
 		    Object o1 = popValue();
 		    if (o1 instanceof String || o2 instanceof String) {
-			String s1 = (o1 == null)? "null": o1.toString();
-			String s2 = (o2 == null)? "null": o2.toString();
+			String s1 = (o1 == null || o1 instanceof TypedNull)?
+			    "null": o1.toString();
+			String s2 = (o2 == null ||  o2 instanceof TypedNull)?
+			    "null": o2.toString();
 			pushValue(s1 + s2);
 		    } else {
 			Number n2 = (Number) o1;

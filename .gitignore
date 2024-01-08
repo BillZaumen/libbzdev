@@ -6,6 +6,7 @@
 *.isq
 *.mp4
 esp.elc
+!tests/util/docsig.jar
 \#*
 /BUILD/
 /org/bzdev/ejws/defaultCerts

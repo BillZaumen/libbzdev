@@ -94,8 +94,8 @@ all:
 	./run -vL:foo =10k printfoo.esp || echo ... EXCEPTION EXPECTED
 	./run -vB:foo:='(10 == 20)' printfoo.esp
 	./run -vB:foo '=(10 == 10)'  printfoo.esp
-	./run -vI:foo'="foo".length()' printfoo.esp
-	./run -vD:foo  =sin(PI/2)/2 printfoo.esp
+	./run -vI:foo '="foo".length()' printfoo.esp
+	./run -vD:foo  '=sin(PI/2)/2' printfoo.esp
 	@echo ---- actually run programs ----
 	./run --listScriptingLanguages
 	./run --listScriptingLanguages ECMAScript

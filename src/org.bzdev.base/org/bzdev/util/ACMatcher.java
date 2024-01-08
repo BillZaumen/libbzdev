@@ -58,7 +58,7 @@ public class ACMatcher  {
 	private int end;
 
 	/**
-	 * Get the index into the of strings array passed to the constructor
+	 * Get the index into the array of strings passed to the constructor
 	 * of {@link ACMatcher} for this match.
 	 * @return the index
 	 */
