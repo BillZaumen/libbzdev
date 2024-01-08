@@ -21,12 +21,14 @@ import java.util.function.Function;
  * Geeks website by Princi Singh as an example of
  * <A HREF="https://www.geeksforgeeks.org/aho-corasick-algorithm-pattern-searching/">
  * an Aho Corasick algorithm implementation</A>.  The modifications included
- * using a {@link BitSet} instead of an integer (which restricted the number
- * of patterns to less than 32), a dynamically configured alphabet, and
- * methods to provide iterators and streams.  The implementation in this
- * package is case sensitive.  Finally, the sequence being searched can
- * be represented as either a string or an array of characters, and the
- * search can be restricted to a subsequence of either.
+ * using a {@link BitSet} instead of an integer (which restricted the
+ * number of patterns to  32), a dynamically configured
+ * alphabet, and methods to provide iterators and streams. The
+ * implementation in this package can be configured to be either case
+ * sensitive or case insensitive.  Finally, the sequence being
+ * searched can be represented as either a string or an array of
+ * characters, and the search can be restricted to a subsequence of
+ * either.
  * <P>
  * The patterns to search for are passed to a constructor. The methods
  * used to search are named
@@ -91,12 +93,13 @@ public class ACMatcher  {
 	}
     }
     
- 
     HashMap<Character,Integer> alphabet;
     int[] alphabetArray = null;
     int asize = 0;
 
     String[] patterns = null;
+
+    boolean caseSensitive = true;
 
     private int getChar(char ch) {
 	if (alphabetArray != null) {
@@ -150,6 +153,7 @@ public class ACMatcher  {
  
 	    for(int j = 0; j < word.length(); ++j) {
 		int ch = getChar(word.charAt(j));
+
 		if (g[currentState][ch] == -1)
 		    g[currentState][ch] = states++;
  
@@ -195,7 +199,8 @@ public class ACMatcher  {
     private int findNextState(int currentState, char nextInput)
     {
 	int answer = currentState;
-	int ch = getChar(nextInput);
+	int ch = (caseSensitive)? getChar(nextInput):
+	    getChar(Character.toLowerCase(nextInput));
 
 	while (g[answer][ch] == -1) {
 	    answer = f[answer];
@@ -215,11 +220,24 @@ public class ACMatcher  {
 
     /**
      * Constructor using a variable number of arguments.
+     * The search is case sensitive.
      * @param first the first search string
      * @param rest the remaining search strings
      */
     public ACMatcher(String first, String... rest) {
-	this(getStringArray(first, rest));
+	this(false, getStringArray(first, rest));
+    }
+
+    /**
+     * Constructor using a variable number of arguments and indicating
+     * if the search is case sensitive or case insensitive.
+     * @param ignoreCase true if the search is case insensitive; false
+     *        if the search is case sensitive
+     * @param first the first search string
+     * @param rest the remaining search strings
+     */
+    public ACMatcher(boolean ignoreCase, String first, String... rest) {
+	this(ignoreCase, getStringArray(first, rest));
     }
 
     /**
@@ -283,12 +301,64 @@ public class ACMatcher  {
      */
 
     public <T> ACMatcher(Function<T,String> f, T[] specs) {
-	this(createPatterns(f, specs));
+	this(false, createPatterns(f, specs));
+    }
+
+    /**
+     * Constructor using an array of pattern specifications and specifying
+     * if the matcher is case sensitive.
+     * A function maps each pattern specification to the corresponding
+     * pattern. This can be used to associate each pattern with a
+     * enumeration, which can make the use of a <CODE>switch</CODE>
+     * statement more reliable when new cases are added.  For
+     * example,
+     * <BLOCKQUOTE><PRE><CODE>
+     * static enum SpecType {
+     *      TYPE1,
+     *      TYPE2,
+     *      ...
+     * }
+     * static class Spec {
+     *   SpecType type
+     *   String pattern;
+     *   public Spec(specType type, string pattern) {
+     *       this.type = type;
+     *       this.pattern = pattern;
+     * }
+     * ...
+     *   Spec specs[] = {
+     *       new Spec(SpecType.TYPE1, "foo"),
+     *       new Spec(SpecType.TYPE2, "bar"),
+     *       ...
+     *   };
+     *   ACMatcher matcher = new
+     *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
+     *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
+     *       int index = mr.getIndex();
+     *       switch (spec[index].type) {
+     *       case TYPE1:
+     *          ...
+     *       }
+     *   }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param ignoreCase true if the search is case insensitive; false
+     *        if the search is case sensitive
+     * @param f a function that maps a pattern specification to a pattern
+     * @param specs an array containing pattern specifications
+     * @param <T> the type of the objects used as a pattern specifications
+     */
+
+    public <T> ACMatcher(boolean ignoreCase,
+			 Function<T,String> f, T[] specs)
+    {
+	this(ignoreCase, createPatterns(f, specs));
     }
 
 
     /**
      * Get the patterns (search strings) for this matcher.
+     * If the search is case insensitive, the patterns will use
+     * lower case, regardless of the cases used in a constructor.
      * @return the patterns
      */
     public String[] getPatterns() {
@@ -299,9 +369,36 @@ public class ACMatcher  {
 
     /**
      * Constructor.
+     * The search is case sensitive.
      * @param strings the strings to match
      */
     public ACMatcher(String[] strings) {
+	this(false, strings);
+    }
+
+    /**
+     * Constructor specifying if the matcher is case sensitive or case
+     * insensitive.
+     * @param ignoreCase true if the search is case insensitive; false
+     *        if the search is case sensitive
+     * @param strings the strings to match
+     */
+    public ACMatcher(boolean ignoreCase, String[] strings) {
+	this.caseSensitive = !ignoreCase;
+	if (caseSensitive == false) {
+	    String nstrings[] = new String[strings.length];
+	    for (int i = 0; i < strings.length; i++) {
+		String s = strings[i];
+		int len = s.length();
+		StringBuilder sb = new StringBuilder(len);
+		for (int j = 0; j < len; j++) {
+		    sb.append(Character.toLowerCase(s.charAt(j)));
+		}
+		nstrings[i] = sb.toString();
+	    }
+	    strings = nstrings;
+	}
+
 	MAXS = 1;
 	int alen = 128;
 	int k = 0;
@@ -679,12 +776,10 @@ public class ACMatcher  {
 	    }
 	};
     }
-
 }
-
 
 //  LocalWords:  exbundle Aho Corasick substrings ACMatcher substring
 //  LocalWords:  SuffixArray Princi HREF BitSet subsequence Iterable
 //  LocalWords:  iterableOver GOTO TRIE matcher BLOCKQUOTE PRE enum
 //  LocalWords:  SpecType specType MatchResult mr interatorOver alen
-//  LocalWords:  getIndex iterable noNextElem
+//  LocalWords:  getIndex iterable noNextElem ignoreCase

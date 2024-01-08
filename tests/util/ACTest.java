@@ -9,6 +9,25 @@ public class ACTest {
 	test(matcher, text);
     }
 
+    static void test2(String[] patterns, String text) throws Exception {
+	ACMatcher matcher2 = new ACMatcher(true, patterns);
+	test2(matcher2, text.toUpperCase());
+    }
+
+    static void test2(ACMatcher matcher, String text) throws Exception
+    {
+	String[] patterns = matcher.getPatterns();
+	for (ACMatcher.MatchResult mr: matcher.iterableOver(text)) {
+	    int index = mr.getIndex();
+	    int start  = mr.getStart();
+	    int end = mr.getEnd();
+	    String match = text.substring(start, end);
+	    if (!match.equalsIgnoreCase(patterns[index])) {
+		throw new Exception();
+	    }
+	}
+    }
+
     static void test(ACMatcher matcher, String text) throws Exception {
 	int plen = matcher.size();
 	int count[] = new int[plen];
@@ -30,7 +49,6 @@ public class ACTest {
 		throw new Exception();
 	    }
 	}
-
 
 	SuffixArray.String sa = new SuffixArray.String(text,127);
 	for (int i = 0; i < patterns.length; i++) {
@@ -255,6 +273,8 @@ public class ACTest {
 	String text = "xyfoobarxfooxbaruubar";
 
 	test(patterns, text);
+
+	test2(patterns, text);
 	
 	matcher = new ACMatcher("foo",
 				"oo",
@@ -266,14 +286,13 @@ public class ACTest {
 
 	text = "foofofoo";
 	test(patterns, text);
-
 	test(patterns, "xxxxxxxxxxxx");
-
 
 	text = "ofofofofof";
 	matcher = new  ACMatcher("of", "ofof", "ofofof");
 	test(matcher, text);
 
+	System.out.println("trying random tests");
 
 	IntegerRandomVariable txtrv = new UniformIntegerRV((int)'a', (int)'e');
 	IntegerRandomVariable plenrv = new UniformIntegerRV(1, 64);

@@ -125,7 +125,7 @@ all: compile
 	@echo --- run configProp test interactively '(make configProp)' ---
 
 actest: compile
-	@$(JAVA) ACTest
+	$(JAVA) ACTest
 
 
 test7-sc:
