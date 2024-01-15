@@ -7,7 +7,7 @@
 <META http-equiv="Content-Script-Type" content="text/javascript">
 <TITLE>Error</TITLE>
 </HEAD>
-<BODY  style="background-color: lightgray">
+<BODY style="background-color: ${colors.background}; color: ${colors.foreground}">
 <P>
   An error occurred:
 </P>
@@ -16,6 +16,5 @@
   <li>Request URI: ${pageContext.errorData.requestURI}
   <li>${pageContext.errorData.throwable}
 </ul>
-<BODY>
 </BODY>
 </HTML>

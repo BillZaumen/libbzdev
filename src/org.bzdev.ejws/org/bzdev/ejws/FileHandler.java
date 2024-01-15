@@ -1369,10 +1369,76 @@ public class FileHandler implements HttpHandler {
 		long len = (info == null)? 0: info.getLength();
 		if (tracer != null) {
 		    String ct = "" + Thread.currentThread().getId();
+		    String s1 = t.getRequestURI().toString();
+		    String s2 = ee.getClass().toString();
+		    String s3 = ee.getMessage();
+		    String msg =
+			errorMsg("serverError", ct, method, s1, s2, s3);
+		    /*
 		    tracer.append("(" + ct + ") "+ method +": "
 				  + t.getRequestURI().toString()
 				  + "server error " + ee.getClass().toString()
-				  + ": " + ee.getMessage());
+				  + ": " + ee.getMessage() + "\n");
+		    */
+		    tracer.append(msg + "\n");
+		    if (stacktrace) {
+			PrintWriter pw = new
+			    PrintWriter(new AppendableWriter(tracer), true);
+			ee.printStackTrace(pw);
+			pw.flush();
+		    }
+		}
+		sendResponseHeaders(t, 500, len);
+		OutputStream os = t.getResponseBody();
+		try {
+		    is = (info == null)? null: info.getInputStream();
+		    if (is != null) {
+			long clen = is.transferTo(os);
+			if (clen != len) {
+			    throw new IOException(errorMsg("clen", len, clen));
+			}
+			os.flush();
+		    }
+		} finally {
+		    if (is != null) is.close();
+		}
+		return;
+	    } catch (IOException eeio) {
+		// normally for an IO error you would use 404, but
+		// normally map.getInfo returns null to indicate that
+		// a requested resource is missing. In this case, an
+		// IO error indicates something else happened.
+		WebMap.Info info;
+		try {
+		    info = map.getErrorInfo(500, eeio,  protocol, t);
+		} catch (EjwsException ejws) {
+		    info = null;
+		}
+		Headers headers = t.getResponseHeaders();
+		if (info != null) {
+		    headers.set("Content-Type", info.getMIMEType());
+		}
+		long len = (info == null)? 0: info.getLength();
+		if (tracer != null) {
+		    String ct = "" + Thread.currentThread().getId();
+		    String s1 = t.getRequestURI().toString();
+		    String s2 = eeio.getClass().toString();
+		    String s3 = eeio.getMessage();
+		    String msg =
+			errorMsg("serverError", ct, method, s1, s2, s3);
+		    /*
+		    tracer.append("(" + ct + ") "+ method +": "
+				  + t.getRequestURI().toString()
+				  + "server error " + ee.getClass().toString()
+				  + ": " + ee.getMessage() + "\n");
+		    */
+		    tracer.append(msg + "\n");
+		    if (stacktrace) {
+			PrintWriter pw = new
+			    PrintWriter(new AppendableWriter(tracer), true);
+			eeio.printStackTrace(pw);
+			pw.flush();
+		    }
 		}
 		sendResponseHeaders(t, 500, len);
 		OutputStream os = t.getResponseBody();
@@ -1401,11 +1467,18 @@ public class FileHandler implements HttpHandler {
 		}
 	    }
 	} catch (IOException eio) {
-	    if (stacktrace && tracer != null) {
-		PrintWriter pw = new PrintWriter(new AppendableWriter(tracer),
-						 true);
-		eio.printStackTrace(pw);
-		pw.flush();
+	    if (tracer != null) {
+		String ct = "" + Thread.currentThread().getId();
+		String cn = "java.io.IOException";
+		String m = eio.getMessage();
+		String msg = errorMsg("runtimeException", cn, m);
+		tracer.append("(" + ct + ") " + msg + "\n");
+		if (stacktrace) {
+		    PrintWriter pw = new
+			PrintWriter(new AppendableWriter(tracer), true);
+		    eio.printStackTrace(pw);
+		    pw.flush();
+		}
 	    }
 	    throw eio;
 	} finally {

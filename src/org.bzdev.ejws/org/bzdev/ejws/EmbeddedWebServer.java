@@ -1275,6 +1275,10 @@ public class EmbeddedWebServer {
 
     /**
      * Set the colors used by a RootHandler.
+     * This will also set the colors used in {@link WebMap} generated
+     * error pages unless the methods
+     * {@link WebMap#getErrorForegroundColor()} and
+     * {@link WebMap#getErrorBackgroundColor()} were overridden.
      * @param color the CSS color for text
      * @param bgcolor the CSS color for the background
      * @param linkColor the CSS color for links; null to ignore
@@ -1307,6 +1311,7 @@ public class EmbeddedWebServer {
 	    };
     }
 
+    private RootHandler rhandler = null;
     /**
      * Start the web server.
      * Starting a server that is already running has no effect.
@@ -1327,14 +1332,19 @@ public class EmbeddedWebServer {
 		IllegalStateException(errorMsg("serverStopping"));
 	}
 	if (!prefixMap.containsKey("/") && !addedRootImplicitly) {
-	    RootHandler rhandler = new RootHandler(prefixMap);
+	    rhandler = new RootHandler(prefixMap);
 	    rhandler.setRootColors(colorSpec);
 	    server.createContext("/", rhandler)
 		.getFilters().add(new TraceFilter());
 	    addedRootImplicitly = true;
 	}
+	if (rhandler != null) {
+	    rhandler.setRootColors(colorSpec);
+	}
 	for (String prefix: prefixMap.keySet()) {
 	    WebMap wm = getWebMap(prefix);
+	    wm.setErrorColors(colorSpec.getColor(),
+			      colorSpec.getBackgroundColor());
 	    if (!wm.isConfigured()) {
 		try {
 		    wm.configure();

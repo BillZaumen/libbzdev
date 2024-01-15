@@ -14,9 +14,9 @@ import javax.imageio.ImageWriter;
 
 /**
  * WebMap for resources in a {@link java.util.Properties} object.
- * The sole argument to a propertyWebMap's constructor is a
+ * The sole argument to a PpropertyWebMap's constructor is a
  * {@link java.util.Properties} instance whose keys are path
- * names or a {!link PropertiesWebMap.Config} providing a
+ * names or a {@link PropertiesWebMap.Config} providing a
  * {@link java.util.Properties} instance as its first argument.
  * The value associated with a property's name is the object that
  * should be be provided by the map.

@@ -55,17 +55,20 @@ class RootHandler implements HttpHandler {
 	    public String getVisitedColor() {return visitedColor;}
 	};
 
+    WebMap map = new RootWebMap();
+
     /**
-     * Set the colors for directory-like listings.
+     * Set the colors for directory-like listings and error pages.
      * @param colorSpec the color specification for directory-like
      *        listings
      */
     public void setRootColors(WebMap.ColorSpec colorSpec) {
 	this.colorSpec = colorSpec;
+	map.setErrorColors(colorSpec.getColor(),
+			   colorSpec.getBackgroundColor());
     }
 
 
-    WebMap map = new RootWebMap();
     Map<String,EmbeddedWebServer.PrefixData> prefixMap = null;
 
     /**

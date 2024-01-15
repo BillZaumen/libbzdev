@@ -93,7 +93,7 @@ abstract public class WebMap {
      * method is called, the list of methods is cleared and the method
      * {@link HttpMethod#TRACE} is automatically added
      * whether or not it is present in the argument list.
-     * @param methods the HTTP methods that this web map can implment
+     * @param methods the HTTP methods that this web map can implement
      */
     protected void setMethods(HttpMethod... methods) {
 	methodSet.clear();
@@ -338,6 +338,47 @@ abstract public class WebMap {
 	String getVisitedColor();
     }
 
+    // colors for error pages
+    String foregroundColor = "black";
+    String backgroundColor = "lightgray";
+
+    /**
+     * Set the foreground and background colors for error pages.
+     * This will be called by {@link EmbeddedWebServer} when the
+     * server starts.
+     * @param foregroundColor the CSS foreground color
+     * @param backgroundColor the CSS background color
+     * @see #getErrorForegroundColor()
+     * @see #getErrorBackgroundColor()
+     */
+    protected void setErrorColors(String foregroundColor,
+				   String backgroundColor)
+    {
+	if (foregroundColor != null) {
+	    this.foregroundColor = foregroundColor;
+	}
+	if (backgroundColor != null) {
+	    this.backgroundColor = backgroundColor;
+	}
+    }
+
+    /**
+     * Get the foreground color for error pages.
+     * The value is a string following the CSS specification.
+     * @return the foreground color
+     */
+    public String getErrorForegroundColor() {
+	return foregroundColor;
+    }
+
+    /**
+     * Get the background color for error pages.
+     * The value is a string following the CSS specification.
+     * @return the background color
+     */
+    public String getErrorBackgroundColor() {
+	return backgroundColor;
+    }
 
     /**
      * HTTP Request data.
@@ -1673,7 +1714,15 @@ abstract public class WebMap {
     protected Info getInfoFromPath(String path)
 	throws IOException, EjwsException
     {
-	return getInfoFromPath(null, path, null, null, null);
+	try {
+	    return getInfoFromPath(null, path, null, null, null);
+	} catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
     /**
@@ -1751,6 +1800,8 @@ abstract public class WebMap {
 	TemplateProcessor.KeyMap kmap = new TemplateProcessor.KeyMap();
 	kmap.put("pageContext.errorData.requestURI", uriString);
 	kmap.put("pageContext.errorData.statusCode", "" + code);
+	kmap.put("colors.foreground", getErrorForegroundColor());
+	kmap.put("colors.background", getErrorBackgroundColor());
 	if (key instanceof Throwable) {
 	    kmap.put("pageContext.errorData.throwable", key.toString());
 	}
@@ -2000,7 +2051,15 @@ abstract public class WebMap {
 	     || (path.charAt("WEB-INF".length()) == '/'))) {
 	    return null;
 	}
-	return getInfoFromPath(null, path, query, fragment, null);
+	try {
+	    return getInfoFromPath(null, path, query, fragment, null);
+	} catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
     /**
@@ -2043,8 +2102,16 @@ abstract public class WebMap {
 	    path = path.substring(1);
 	    // System.out.println(path);
 	}
-	return getInfoFromPath(base1, path, query, fragment,
-			       new RequestInfo(t));
+	try {
+	    return getInfoFromPath(base1, path, query, fragment,
+				   new RequestInfo(t));
+	} catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
     /**
@@ -2087,7 +2154,15 @@ abstract public class WebMap {
 	    path = path.substring(1);
 	    // System.out.println(path);
 	}
-	return getInfoFromPath(base1, path, query, fragment, null);
+	try {
+	    return getInfoFromPath(base1, path, query, fragment, null);
+	} catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
 
@@ -2109,7 +2184,15 @@ abstract public class WebMap {
 	    // System.out.println(path);
 	}
 	// String prepath = null;
-	return getInfoFromPath(null, path, null, null, null);
+	try {
+	    return getInfoFromPath(null, path, null, null, null);
+	} catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
     /**
@@ -2132,7 +2215,15 @@ abstract public class WebMap {
 	    path = path.substring(1);
 	    // System.out.println(path);
 	}
-	return getInfoFromPath(prepath, path, null, null, null);
+	try {
+	    return getInfoFromPath(prepath, path, null, null, null);
+	}  catch (RuntimeException e) {
+	    String nm = e.getClass().getName();
+	    String msg = errorMsg("runtimeException", nm, e.getMessage());
+	    EjwsException ee = new EjwsException(msg);
+	    ee.setStackTrace(e.getStackTrace());
+	    throw ee;
+	}
     }
 
 
@@ -2556,5 +2647,7 @@ abstract public class WebMap {
 //  LocalWords:  parseAll equalsIgnoreCase jsessionid ServerCookie
 //  LocalWords:  newInstance setVersion setHttpOnly getServer URL's
 //  LocalWords:  getAddress getHostString addToHeaders OurHeaderOps
-//  LocalWords:  handledResponse deconfigure EmbeddedWebServer
-//  LocalWords:  isConfigured
+//  LocalWords:  handledResponse deconfigure EmbeddedWebServer param
+//  LocalWords:  isConfigured unvisited lightgray foregroundColor
+//  LocalWords:  backgroundColor getErrorForegroundColor
+//  LocalWords:  getErrorBackgroundColor

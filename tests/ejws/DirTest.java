@@ -21,6 +21,7 @@ public class DirTest {
 		new DirWebMap.Config(new File("../../BUILD/api/"),
 				     "white", "black", "green", "green"),
 		null, true, true, true);
+	ews.setTracer("/", System.out);
 	ews.start();
     }
 }

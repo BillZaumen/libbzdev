@@ -171,6 +171,12 @@ test12:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) Test12
 
+errtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ErrorTest
+
 test0:
 	(cd ../.. ; make jars)
 	mkdir -p classes
