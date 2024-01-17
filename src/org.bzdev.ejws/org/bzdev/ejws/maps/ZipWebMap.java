@@ -44,8 +44,8 @@ public class ZipWebMap extends WebMap implements WebMap.ColorSpec {
 	 * Constructor.
 	 * The arguments linkColor and visitedColor can both be null
 	 * but if one is not null, the other must also not be null.
-	 * @param root a File representing the directory within which
-	 *        resources will be found
+	 * @param root a ZIP file, or a String providing the ZIP file's
+	 *         file name
 	 * @param color the CSS color for text
 	 * @param bgcolor the CSS color for the background
 	 * @param linkColor the CSS color for links; null to ignore
