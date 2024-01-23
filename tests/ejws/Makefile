@@ -17,6 +17,12 @@ all:
 	$(JAVA) WebxmlParserTest example junk
 	rm junk
 
+modtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) ModTest
+
 dirtest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

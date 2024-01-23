@@ -21,6 +21,12 @@ public class DirTest {
 		new DirWebMap.Config(new File("../../BUILD/api/"),
 				     "white", "black", "green", "green"),
 		null, true, true, true);
+	ews.add("/post/", ServletWebMap.class,
+		new ServletWebMap.Config(new NullAdapter(), null,
+					 true,
+					 HttpMethod.GET, HttpMethod.POST),
+		null, true, false, true);
+
 	ews.setTracer("/", System.out);
 	ews.start();
     }

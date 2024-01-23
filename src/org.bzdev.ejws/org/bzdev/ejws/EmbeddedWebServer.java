@@ -486,11 +486,7 @@ public class EmbeddedWebServer {
 	}
     }
 
-    private void setupServer(SSLSetup s /*
-                             InputStream ksis, char[] ksp,w char[] kepw,
-			     InputStream tsis, char[] tspw,
-			     InputStream crlis,
-			     final Configurator configurator*/)
+    private void setupServer(SSLSetup s)
 	throws IOException, KeyStoreException, CRLException,
 	       NoSuchAlgorithmException, CertificateException,
 	       KeyManagementException, UnrecoverableKeyException,
@@ -543,15 +539,46 @@ public class EmbeddedWebServer {
 	}
     }
 
+    private SSLSetup modifiedSetup = null;
+
+    /**
+     * Modify the setup configuration for an HTTPS server.
+     * This should be called before the service is stopped, after which
+     * it should be restarted. The argument is ignored for HTTP servers.
+     * <P>
+     * One use of this method is to handle the case in which a server's
+     * certificate has to be changed.
+     * @param s the configuration for an HTTPS server
+     */
+    public void modifyServerSetup(SSLSetup s)
+    {
+	if (useHTTPS) {
+	    modifiedSetup = s;
+	}
+    }
+
     // used when stop(int) is called. We create a new server.
     private void setupServer() {
 	try {
-	    server = useHTTPS?
-		HttpsServer.create(new InetSocketAddress(addr, port), backlog):
-		HttpServer.create(new InetSocketAddress(addr, port), backlog);
-	    if (server instanceof HttpsServer) {
-		HttpsServer sserver = (HttpsServer) server;
-		sserver.setHttpsConfigurator(httpsConfigurator);
+	    if (useHTTPS && modifiedSetup != null) {
+		try {
+		    setupServer(modifiedSetup);
+		} catch (Exception e) {
+		    String msg = errorMsg("notModified");
+		    throw new IOException(msg, e);
+		} finally {
+		    modifiedSetup = null;
+		}
+	    } else {
+		server = useHTTPS?
+		    HttpsServer.create(new InetSocketAddress(addr, port),
+				       backlog):
+		    HttpServer.create(new InetSocketAddress(addr, port),
+				      backlog);
+		if (server instanceof HttpsServer) {
+		    HttpsServer sserver = (HttpsServer) server;
+		    sserver.setHttpsConfigurator(httpsConfigurator);
+		}
 	    }
 	    if (serverStopping) {
 		for (Map.Entry<String,PrefixData> entry: prefixMap.entrySet()) {

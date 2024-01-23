@@ -10,4 +10,10 @@ public class NullAdapter implements ServletAdapter {
 	res.sendError(404);
     }
 
+    public void doPost(HttpServerRequest req, HttpServerResponse res)
+	throws IOException, ServletAdapter.ServletException
+    {
+	res.sendError(404);
+    }
+
 }
