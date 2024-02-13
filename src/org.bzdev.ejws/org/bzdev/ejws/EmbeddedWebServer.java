@@ -557,6 +557,31 @@ public class EmbeddedWebServer {
 	}
     }
 
+    /**
+     * Modify the setup configuration for an HTTPS server using a
+     * configured {@link CertManager}.
+     * This should be called before the service is stopped, after which
+     * it should be restarted. The argument is ignored for HTTP servers.
+     * <P>
+     * One use of this method is to handle the case in which a server's
+     * certificate has to be changed.
+     */
+    public void modifyServerSetup()
+    {
+	if (certManager != null) {
+	    try {
+		modifyServerSetup(certManager.getSetup());
+	    } catch (IOException e) {
+		String msg = errorMsg("modServerSetup", e.getMessage());
+		try {
+		    err.append(msg + "\n");
+		} catch (IOException eio) {
+		    System.err.println(msg);
+		}
+	    }
+	}
+    }
+
     // used when stop(int) is called. We create a new server.
     private void setupServer() {
 	try {
@@ -680,9 +705,37 @@ public class EmbeddedWebServer {
 	try {
 	    setupServer(sslSetup);
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    e.printStackTrace(System.err);
 	    throw new UnexpectedExceptionError(e);
 	}
+    }
+
+    CertManager certManager = null;
+
+    /**
+     * Constructor using a {@link CertManager}.
+     * A {@link CertManager} is an alternative to {@link SSLSetup} that
+     * allows certificates to be automatically obtained and renewed.
+     * @param addr the Internet address for this server; null for the
+     *        wildcard address
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @param nthreads the number of threads the server will use
+     * @param certManager the {@link CertManager}.
+     * @throws IOException an IO Exception occurred when accessing a
+     *         key store.
+     *
+     */
+    public EmbeddedWebServer(InetAddress addr,
+			     int port, int backlog, int nthreads,
+			     CertManager certManager)
+	throws IOException
+    {
+	this(addr, port, backlog, nthreads,
+	     (certManager == null)? (SSLSetup) null:
+	     certManager.getSetup());
+	this.certManager = certManager;
     }
 
     private List<InetAddress> addressList = null;
@@ -1271,7 +1324,7 @@ public class EmbeddedWebServer {
      * The argument uses a functional interface, so the factory can be
      * provided as a lambda expression.
      * The argument is an {@link Integer} whose value is the number of
-     * threads passed to a constructor of this class.
+     * threads passed to a constructor of the {@link ExecutorService}.
      * @param callable an object whose 'call' method (with an Integer argument)
      *        creates a new ExecutorService; null for the default
      */
@@ -1338,6 +1391,15 @@ public class EmbeddedWebServer {
 	    };
     }
 
+    /**
+     * Determine if the server is running.
+     * @return true if the server is running; false otherwise
+     */
+    public boolean serverRunning() {
+	return serverRunning;
+    }
+
+
     private RootHandler rhandler = null;
     /**
      * Start the web server.
@@ -1345,7 +1407,7 @@ public class EmbeddedWebServer {
      * @exception IllegalStateException the server is stopping or has been
      *            shut down
      */
-    public void start() {
+    public synchronized void start() {
 
 	if (serverRunning) {
 	    return;
@@ -1422,6 +1484,9 @@ public class EmbeddedWebServer {
 	}
 	serverRunning = true;
 	server.start();
+	if (certManager != null && certManager.isMonitoring() == false) {
+	    certManager.startMonitoring(this);
+	}
     }
 
 
@@ -1436,7 +1501,7 @@ public class EmbeddedWebServer {
      * @param delay the delay in seconds before the server is stopped.
      * @exception Exception an error occurred
      */
-    public void stop(int delay) throws Exception {
+    public synchronized void stop(int delay) throws Exception {
 	if (!serverRunning) {
 	    throw new
 		IllegalStateException(errorMsg("serverNotRunning"));
@@ -1494,6 +1559,9 @@ public class EmbeddedWebServer {
 	if (serverStopping) {
 	    throw new
 		IllegalStateException(errorMsg("serverAlreadyStopping"));
+	}
+	if (certManager != null && certManager.isMonitoring()) {
+	    certManager.stopMonitoring();
 	}
 	// serverStopping = true;
 	serverShutdown = true;

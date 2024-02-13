@@ -18,6 +18,7 @@ module org.bzdev.ejws {
     requires java.xml;
     requires jdk.httpserver;
     requires org.bzdev.base;
+    uses org.bzdev.ejws.CertManager;
 }
 
 //  LocalWords:  jdk httpserver HREF EJWS

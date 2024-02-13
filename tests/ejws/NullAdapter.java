@@ -7,12 +7,19 @@ public class NullAdapter implements ServletAdapter {
     public void doGet(HttpServerRequest req, HttpServerResponse res)
 	throws IOException, ServletAdapter.ServletException
     {
+	if (req.getParameter("foo") != null) {
+	     doPost(req,res);
+	     return;
+	}
 	res.sendError(404);
     }
 
     public void doPost(HttpServerRequest req, HttpServerResponse res)
 	throws IOException, ServletAdapter.ServletException
     {
+	if (req.getParameter("foo") != null) {
+	    System.out.println("foo = " + req.getParameter("foo"));
+	}
 	res.sendError(404);
     }
 

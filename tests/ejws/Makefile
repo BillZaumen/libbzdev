@@ -29,6 +29,12 @@ dirtest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) DirTest
 
+dirtest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) DirTest2
+
 test:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -305,6 +311,13 @@ utest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) UtilTest "./"
 	cat junk
+
+cmtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) CMTest
+
 
 cert:
 	rm -f thelio-ks.jks thelio-ts.jks

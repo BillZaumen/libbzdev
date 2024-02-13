@@ -79,6 +79,9 @@ public class EjwsUtilities {
 	    return null;
 	}
 	File[] files = dir.listFiles();
+	Arrays.sort(files,(f1, f2) -> {
+		return f1.getName().compareTo(f2.getName());
+	    });
 	ByteArrayOutputStream bos =
 	    new ByteArrayOutputStream(1024 + 128 * files.length);
 	printHtmlDir(dir, files, uri, encoding, bos, colorSpec);
@@ -109,7 +112,11 @@ public class EjwsUtilities {
 	if (!(dir.isDirectory() && dir.canRead())) {
 	    return;
 	}
-	printHtmlDir(dir, dir.listFiles(), uri, encoding, os, colorSpec);
+	File[] files = dir.listFiles();
+	Arrays.sort(files,(f1, f2) -> {
+		return f1.getName().compareTo(f2.getName());
+	    });
+	printHtmlDir(dir, files, uri, encoding, os, colorSpec);
     }
 
     private static TemplateProcessor.KeyMap EMPTY_MAP
