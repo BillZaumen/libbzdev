@@ -283,22 +283,39 @@ public abstract class CertManager {
     /**
      * Get the names of each available certificate manager.
      * A name is either "default" or the fully qualified class name
-     * of a certificate manager.
+     * of a certificate manager.  A manager may be listed twice
+     * if it explicitly specifies a name.  Explicitly specified
+     * names may be shared by more than one certificate manager.
      * @return the names of the certificate managers.
      */
     public static Set<String> providerNames() {
+	final TreeSet<String> result = new TreeSet<>();
+	ServiceLoader.load(CertManager.class).stream()
+	    .map(ServiceLoader.Provider::get)
+	    .forEach((m) -> {
+		    String name = m.getClass().getCanonicalName();
+		    result.add(name);
+		    name = m.providerName();
+		    if (name != null) {
+			result.add(name);
+		    }
+		});
+	/*
 	Set<String> result =  ServiceLoader.load(CertManager.class)
 	    .stream()
 	    .map((obj) -> {return obj.getClass().getCanonicalName();})
 	    .collect(Collectors.toSet());
+	*/
 	result.add("default");
-	return new TreeSet<String>(result);
+	return result;
     }
+
 
     /**
      * Return a new instance of a certificate manager given its name.
-     * @param providerName "default" for the default provider or the
-     *        fully qualified class name for the desired instance
+     * @param providerName "default" for the default provider, the
+     *        fully qualified class name for the desired instance, a
+     *        a provider name; or null for the first one available.
      */
     public static CertManager newInstance(String providerName) {
 	if (providerName.equals("default")) {
@@ -307,7 +324,12 @@ public abstract class CertManager {
 	ServiceLoader<CertManager>loader = ServiceLoader
 	    .load(CertManager.class);
 	for (CertManager manager: loader) {
-	    if (manager.getClass().getCanonicalName().equals(providerName)) {
+	    if (providerName == null) {
+		return manager;
+	    } else  if (manager.getClass().getCanonicalName()
+			.equals(providerName)) {
+		return manager;
+	    } else if (manager.providerName().equals(providerName)) {
 		return manager;
 	    }
 	}
@@ -407,6 +429,20 @@ public abstract class CertManager {
      */
     public String getEmail() {return email;}
 
+
+    /**
+     * Optional print name for a provider.
+     * The default name for a provider is its fully qualified class
+     * name.  This method provides an alternate name.  It may not be
+     * unique and may represent groups of providers.  Providers that
+     * use certbot should override this method to return the string
+     * "certbot".  The name "default" is reserved and must not be
+     * used.
+     * @return the provider name; null if one is not explicitly provided
+     */
+    public String providerName() {
+	return null;
+    }
 
     /**
      * Request a certificate.
@@ -922,5 +958,5 @@ public abstract class CertManager {
 //  LocalWords:  renewalRequestStatus genkeypair keyalg groupname SHA
 //  LocalWords:  secp sigalg withECDSA keypass dname providerName rfc
 //  LocalWords:  changeit localhost stopDelay certTrace truststore
-//  LocalWords:  configurator Configurators exportcert ews
-//  LocalWords:  multipleEWS
+//  LocalWords:  configurator Configurators exportcert ews toSet
+//  LocalWords:  multipleEWS certbot
