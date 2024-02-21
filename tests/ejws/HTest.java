@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class HTest {
     public static void main(String argv[]) throws Exception {
 	ErrorMessage.setStackTrace(true);
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 
 	HttpSessionOps sessionOps = new EjwsStateTable() {
 		@Override

@@ -7,7 +7,7 @@ import java.io.File;
 public class Test0 {
     public static void main(String argv[]) throws Exception {
 	// org.bzdev.util.ErrorMessage.setStackTrace(true);
-	EmbeddedWebServer ews = new EmbeddedWebServer(0, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(0);
 	System.out.println("using port " + ews.getPort());
 
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,

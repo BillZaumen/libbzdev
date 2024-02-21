@@ -8,7 +8,7 @@ public class Server {
     public static void main(String argv[]) throws Exception {
 
         System.setProperty("java.awt.headless", "true");
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 10, 20, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 10, 20);
 
 	ews.add("/", ResourceWebMap.class, "/", null, true, false, true);
 

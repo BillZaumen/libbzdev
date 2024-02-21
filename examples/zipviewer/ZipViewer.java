@@ -49,7 +49,7 @@ public class ZipViewer {
     }
     public static void main(String argv[]) {
 	try {
-	    ews = new EmbeddedWebServer(port, null);
+	    ews = new EmbeddedWebServer(port);
 	    if (argv.length == 0) {
 		System.exit(0);
 	    } else if (argv.length == 1) {

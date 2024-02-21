@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class Test3 {
     public static void main(String argv[]) throws Exception {
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080);
 
 	Properties properties = new Properties();
 	properties.put("foo.txt", "this is a test 1".getBytes("UTF-8"));

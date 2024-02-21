@@ -8,7 +8,7 @@ import java.net.URL;
 
 public class Test8 {
     public static void main(String argv[]) throws Exception {
-	EmbeddedWebServer ews = new EmbeddedWebServer(8081, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8081, 48, 2);
 
 	String cdir = System.getProperty("user.dir");
 

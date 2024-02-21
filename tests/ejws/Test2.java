@@ -7,7 +7,7 @@ public class Test2 {
     public static void main(String argv[]) throws Exception {
 	org.bzdev.util.ErrorMessage.setStackTrace(true);
 
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080);
 
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,
 		true, true, true);

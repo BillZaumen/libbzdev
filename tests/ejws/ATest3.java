@@ -17,7 +17,7 @@ public class ATest3 {
 	System.out.println(publicKeyPem);
 
 	auth.add("foo", publicKeyPem, "foo");
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");

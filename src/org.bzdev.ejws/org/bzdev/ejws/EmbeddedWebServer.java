@@ -651,6 +651,37 @@ public class EmbeddedWebServer {
     }
 
     /**
+     * Constructor for a wildcard IP address with a default backlog and
+     * a default number of threads, using a certificate manager.
+     * A {@link CertManager} is an alternative to {@link SSLSetup} that
+     * allows certificates to be automatically obtained and renewed.
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param certManager the {@link CertManager}.
+     * @exception Exception an error occurred.
+     */
+    public EmbeddedWebServer(int port, CertManager certManager)
+	throws Exception
+    {
+	this(port, DEFAULT_BACKLOG, getNumberOfPoolThreads(DEFAULT_BACKLOG),
+	     certManager);
+    }
+
+    /**
+     * Constructor for a wildcard IP address with a default backlog and
+     * a default number of threads for HTTP servers.
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @exception Exception an error occurred.
+     */
+    public EmbeddedWebServer(int port)
+	throws Exception
+    {
+	this(port, DEFAULT_BACKLOG, getNumberOfPoolThreads(DEFAULT_BACKLOG),
+	     (SSLSetup) null);
+    }
+
+    /**
      * Constructor for a wildcard IP address with a default number of threads.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
@@ -664,6 +695,38 @@ public class EmbeddedWebServer {
 	this(port, backlog, getNumberOfPoolThreads(backlog), sslSetup);
     }
 
+    /**
+     * Constructor for a wildcard IP address with a default number of threads
+     * using a certificate manager.
+     * A {@link CertManager} is an alternative to {@link SSLSetup} that
+     * allows certificates to be automatically obtained and renewed.
+   * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @param certManager the {@link CertManager}.
+     * @exception Exception an error occurred.
+     */
+    public EmbeddedWebServer(int port, int backlog, CertManager certManager)
+	throws Exception
+    {
+	this(port, backlog, getNumberOfPoolThreads(backlog), certManager);
+    }
+
+    /**
+     * Constructor for a wildcard IP address with a default number of threads
+     * for HTTP servers.
+     * A {@link CertManager} is an alternative to {@link SSLSetup} that
+     * allows certificates to be automatically obtained and renewed.
+   * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @exception Exception an error occurred.
+     */
+    public EmbeddedWebServer(int port, int backlog)
+	throws Exception
+    {
+	this(port, backlog, getNumberOfPoolThreads(backlog), (SSLSetup)null);
+    }
 
     /**
      * Constructor for a wildcard IP address.
@@ -679,6 +742,38 @@ public class EmbeddedWebServer {
 	throws Exception
     {
 	this(null, port, backlog, nthreads, sslSetup);
+    }
+
+    /**
+     * Constructor for a wildcard IP address using a certificate manager.
+     * A {@link CertManager} is an alternative to {@link SSLSetup} that
+     * allows certificates to be automatically obtained and renewed.
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @param nthreads the number of threads the server will use
+     * @param certManager the {@link CertManager}.
+     * @exception Exception an error occurred
+     */
+    public EmbeddedWebServer(int port, int backlog, int nthreads,
+			     CertManager certManager)
+	throws Exception
+    {
+	this(null, port, backlog, nthreads, certManager);
+    }
+
+    /**
+     * Constructor for a wildcard IP address for HTTP servers.
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @param nthreads the number of threads the server will use
+     * @exception Exception an error occurred
+     */
+    public EmbeddedWebServer(int port, int backlog, int nthreads)
+	throws Exception
+    {
+	this(null, port, backlog, nthreads, (SSLSetup) null);
     }
 
 
@@ -736,6 +831,25 @@ public class EmbeddedWebServer {
 	     (certManager == null)? (SSLSetup) null:
 	     certManager.getSetup());
 	this.certManager = certManager;
+    }
+
+    /**
+     * Constructor for HTTP servers.
+     * @param addr the Internet address for this server; null for the
+     *        wildcard address
+     * @param port the TCP port number for a server; 0 for a system-allocated
+     *             port
+     * @param backlog the TCP backlog (maximum number of pending connections)
+     * @param nthreads the number of threads the server will use
+     * @throws IOException an IO Exception occurred when accessing a
+     *         key store.
+     *
+     */
+    public EmbeddedWebServer(InetAddress addr,
+			     int port, int backlog, int nthreads)
+	throws IOException
+    {
+	this(addr, port, backlog, nthreads, (SSLSetup) null);
     }
 
     private List<InetAddress> addressList = null;

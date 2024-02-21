@@ -14,7 +14,7 @@ public class ATest2 {
 	System.out.println("auth mode = " + auth.getMode());
 	auth.add("foo", "foo");
 	auth.setTimeLimits(-2, 30, 45);
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
 	ews.add("/top/", DirWebMap.class,

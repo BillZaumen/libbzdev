@@ -14,7 +14,7 @@ public class ETest {
     {
 	if (ews == null) {
 	    // ews = new EmbeddedWebServer(port, 40, 1, false);
-	    ews = new EmbeddedWebServer(port, 40, 1, null);
+	    ews = new EmbeddedWebServer(port, 40, 1);
 	    if (port == 0) port = ews.getPort();
 	    ews.add("/", ResourceWebMap.class, "manual/",
 		    null, true, false, true);

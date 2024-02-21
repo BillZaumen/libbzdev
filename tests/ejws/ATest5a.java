@@ -7,7 +7,7 @@ import java.net.URL;
 public class ATest5a {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 	ews.add("/",
 		RedirectWebMap.class,
 		new URL("https://www.youtube.com/watch?v=tzQuuoKXVq0"),

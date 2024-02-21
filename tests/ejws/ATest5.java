@@ -12,7 +12,7 @@ public class ATest5 {
 	EjwsBasicAuthenticator auth =
 	    new EjwsBasicAuthenticator(realm);
 	auth.add("foo", "foo");
-	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, null);
+	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 	ews.add("/",
 		RedirectWebMap.class, new URL("https://www.sfgate.com"),
 		auth,
