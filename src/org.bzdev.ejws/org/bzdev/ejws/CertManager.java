@@ -242,7 +242,11 @@ public abstract class CertManager {
 
 	@Override
 	protected void requestRenewal() {
-	    rstatus = handleCertificateRequest(true);
+	    boolean rs = handleCertificateRequest(true);
+	    synchronized (monitor) {
+		rstatus = rs;
+		monitor.notifyAll();
+	    }
 	}
 	@Override
 	protected boolean renewalRequestStatus() throws InterruptedException {
@@ -250,6 +254,13 @@ public abstract class CertManager {
 		try {
 		    while (rstatus == false) {
 			monitor.wait();
+			Appendable tracer = getTracer();
+			if (tracer != null) {
+			    try {
+				tracer.append("... renewal request status = "
+					      + rstatus + "\n");
+			    } catch (IOException eio) {}
+			}
 		    }
 		    return true;
 		} catch (InterruptedException e) {
@@ -468,6 +479,8 @@ public abstract class CertManager {
      * Request that a certificate be renewed. If a new certificate
      * is available, this method must arrange for
      * {@link #renewalRequestStatus()} to return <CODE>true</CODE>.
+     * This method and {@link #renewalRequestStatus()} are called
+     * from different threads.
      */
     protected  abstract void requestRenewal();
 
@@ -476,7 +489,8 @@ public abstract class CertManager {
      * {@link requestRenewal} when that method generates a new
      * certificate.
      * This method should normally block until it will return
-     * <CODE>true</CODE>
+     * <CODE>true</CODE>. It,
+     * and {@link #requestRenewal()}, are called from different threads.
      * @return true if a new certificate is available; false if there was
      *         an error.
      */
