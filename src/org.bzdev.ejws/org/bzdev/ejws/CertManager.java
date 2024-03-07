@@ -526,6 +526,11 @@ public abstract class CertManager {
      * {@link #getHelper()} and if the result is not null, use that
      * server. If that server is not running, requestCertificate() should
      * ensure that any necessary prefixes have been added.
+     * <P>
+     * If this certificate manager needs a helper and
+     * {@link #getHelper()} returns null, this method must create the
+     * helper, configure it, start it, and shut it down before
+     * exiting.
      */
     protected abstract void requestCertificate();
 
@@ -544,6 +549,11 @@ public abstract class CertManager {
      * {@link #renewalRequestStatus()} to return <CODE>true</CODE>.
      * This method and {@link #renewalRequestStatus()} are called
      * from different threads.
+     * <P>
+     * If this certificate manager needs a helper and
+     * {@link #getHelper()} returns null, this method must create the
+     * helper, configure it, start it, and shut it down before
+     * exiting.
      */
     protected  abstract void requestRenewal();
 
@@ -675,7 +685,6 @@ public abstract class CertManager {
 	}
 	return interval*DAY*1000;
     }
-
 
     /**
      * Set the  protocol for the server to use
@@ -819,23 +828,30 @@ public abstract class CertManager {
      * managing certificates
      * (<A HREF="https://datatracker.ietf.org/doc/html/rfc8555"> RFC 8555</A>),
      * and these may make use of a separate web server using HTTP
-     * instead of HTTPS and running on port 80.  This method provides
-     * an {@link EmbeddedWebServer} that can be used for such
-     * purposes. After this method is called, the method
-     * {@link #requestCertificate}
-     * is expected to start this web server, provided that
-     * {@link #helperPort()} returns a non-zero value and the server is
-     * not already running.
+     * instead of HTTPS and running on port 80.  This method allows
+     * the caller to provide an {@link EmbeddedWebServer} that can be
+     * used for such purposes, with the added benefit of configuring
+     * additional prefixes to handle the case where a client is given
+     * a URL whose scheme is HTTP instead of HTTPS.
      * <P>
-     * If all of the following are true:
-     * <UL>
+     * If all of the following are true
+     * <OL>
      *   <LI> the argument to this method is not null,
      *   <LI> {@link #helperPort()} returns a non-zero value,
      *   <LI> the helper server is not an HTTPS server,
      *   <LI> the helper server is not currently running,
-     * </UL>
-     * then the server will be configured for use as a helper. This
-     * will typically require adding specific prefixes to the helper server.
+     * </OL>
+     * then the helper will be configured, typically adding prefixes
+     * needed for it to operate as a helper, and the helper will be
+     * started.
+     * <P>
+     * If a server is configured with this {@link CertManager} and that
+     * server is shut down, the helper will also be shut down and cannot
+     * be reused.  As a result, a {@link CertManager} that provides a
+     * helper should be used with only a single {@link EmbeddedWebServer}.
+     * Certificate manager providers should not try to start a helper
+     * that is already running.  It is a good practice to let the
+     * provider start the helper.
      * @param helper the embedded web server to use; null (the default)
      *        if none is provided
      * @return this {@link CertManager}
@@ -847,6 +863,7 @@ public abstract class CertManager {
 	if (helper != null && hport != 0 && !helper.usesHTTPS()
 	    && !helper.serverRunning()) {
 	    configureHelper(helper);
+	    helper.start();
 	}
 
 	return this;
@@ -1054,7 +1071,8 @@ public abstract class CertManager {
 	    }
 	}
 	certThreads =  monitorCertificate(ews);
-	    this.ews = ews;
+	stopcount = 0;
+	this.ews = ews;
     }
 
     /**
@@ -1072,6 +1090,12 @@ public abstract class CertManager {
 	    } catch (Exception e) {}
 	    certThreads = null;
 	    ews = null;
+	}
+	EmbeddedWebServer helper = getHelper();
+	if (helper != null && helper.serverRunning()) {
+	    // Shut down the helper because stopMonitoring
+	    // is called only by EmbeddedWebServer.shutdown.
+	    helper.shutdown(0);
 	}
     }
 }
@@ -1093,3 +1117,4 @@ public abstract class CertManager {
 //  LocalWords:  configurator Configurators exportcert ews toSet TCP
 //  LocalWords:  multipleEWS certbot setHelper configureHelper HREF
 //  LocalWords:  helperPort ResourceBundle getBundle getHelper
+//  LocalWords:  stopMonitoring
