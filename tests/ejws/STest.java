@@ -41,6 +41,10 @@ public class STest {
 			      null
 			      );
 	    */
+	if (!ews.usesHTTPS()) {
+	    throw new Exception("not HTTPS");
+	}
+
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,
 		true, true, true);
 

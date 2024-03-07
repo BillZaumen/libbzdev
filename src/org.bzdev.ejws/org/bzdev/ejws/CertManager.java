@@ -84,6 +84,10 @@ import org.bzdev.util.SafeFormatter;
  *   <LI><STRONG>{@link CertManager#setCertTrace(boolean)}</STRONG>.
  *       This indicates if new certificates should be be printed or not
  *       an {@link Appendable} for tracing has been configured.
+ *   <LI><STRONG>{@link CertManager#setHelper(EmbeddedWebServer)}</STRONG>.
+ *       This provides a 'helper' HTTP server that some certificate managers
+ *       require. While these certificate managers will create such a server,
+ *       one created with this method can run continuously.
  * </UL>
  * These methods return the {@link CertManager} on which they are called so
  * that one can write code such as
@@ -103,6 +107,15 @@ import org.bzdev.util.SafeFormatter;
  *   <LI><STRONG>{@link CertManager#requestRenewal()}</STRONG>.
  *   <LI><STRONG>{@link CertManager#renewalRequestStatus()}</STRONG>.
  * </UL>
+ * A provider may optionally implement the method
+ * {@link CertManager#providerName()} to provide a name for a manager that is
+ * more mnemonic than its class name, the method
+ * {@link CertManager#configureHelper(EmbeddedWebServer)} to configure
+ * an HTTP server (that is not running) for use by the provider, and the
+ * method {@link CertManager#helperPort()} to indicate the port on which
+ * an HTTP server should run, with 0 indicating that such a server is not
+ * needed.
+ * <P>
  * As usual, the module-info file for a subclass SUBCLASS should
  * contain the line
  * <BLOCKQUOTE><PRE>
@@ -363,6 +376,8 @@ public abstract class CertManager {
     String domain = null;
     EmbeddedWebServer.Configurator configurator = null;
 
+    EmbeddedWebServer helper = null;
+
     Appendable tracer = null;
 
     /**
@@ -456,6 +471,46 @@ public abstract class CertManager {
     }
 
     /**
+     * Determine if a certificate manager needs an HTTP server to
+     * create a certificate, providing that server's TCP port.
+
+     * For example, some implementations use the
+     * <A HREF="https://datatracker.ietf.org/doc/html/rfc8555">ACME</A>
+     *  protocol to obtain a certificate and use
+     * a server running HTTP on port 80 for that purpose.
+     * The default implementation returns 0, indicating that a server
+     * is not needed.  If this method returns a non-zero value and
+     * {@link #setHelper(EmbeddedWebServer)} was not called, a provider's
+     * implementation is expected to create a server running HTTP using
+     * the port returned by this method.
+     * @return the TCP port if a web server is needed; 0 otherwise
+     */
+    public  int helperPort() {return 0;}
+
+    /**
+     * Configure a helper HTTP server for use with this certificate
+     * manager.
+     * The default implementation of this method does nothing and should
+     * be overridden by providers such as ones that implement the
+     * <A HREF="https://datatracker.ietf.org/doc/html/rfc8555">ACME</A>
+     *  protocol, which requires a specific configuration for a server.
+     * <P>
+     * This method will be called by {@link #setHelper(EmbeddedWebServer)}
+     * when all of the following are true:
+     * <UL>
+     *   <LI> {@link #helperPort()} returns a non-zero value.
+     *   <LI> the argument to {@link #setHelper(EmbeddedWebServer)} is
+     *        not null and is an {@link EmbeddedWebServer} that is not
+     *        running.
+     *   <LI> the server provided by the argument is an HTTP server, not
+     *        an HTTPS server.
+     *</UL>
+     * @param helper the helper HTTP server
+     */
+    protected void configureHelper(EmbeddedWebServer helper) {
+    }
+
+    /**
      * Request a certificate.
      * When this method is called, the certificate should be
      * placed in a keystore specified by {@link #setKeystoreFile(File)}
@@ -463,6 +518,14 @@ public abstract class CertManager {
      * returned unless it is about to expire, and if there is none, a new
      * certificate should be created.  This method may return before
      * the operation is complete.
+     * <P>
+     * Some providers of this class (e.g., ones using the
+     * <A HREF="https://datatracker.ietf.org/doc/html/rfc8555">ACME</A>
+     * protocol) require a server running HTTP on a specified port.
+     * In this case, requestCertificate() should call
+     * {@link #getHelper()} and if the result is not null, use that
+     * server. If that server is not running, requestCertificate() should
+     * ensure that any necessary prefixes have been added.
      */
     protected abstract void requestCertificate();
 
@@ -733,6 +796,62 @@ public abstract class CertManager {
 	return this;
     }
 
+    /**
+     * Get a helper web server.
+     * Certificate authorities such as Lets-Encrypt use the ACME protocol for
+     * managing certificates
+     * (<A HREF="https://datatracker.ietf.org/doc/html/rfc8555"> RFC 8555</A>),
+     * and these may make use of a separate web server using HTTP
+     * instead of HTTPS and running on port 80. This method returns an
+     * {@link EmbeddedWebServer} that can be used for such
+     * purposes. When provided, the method {@link #requestCertificate}
+     * is expected to  start this web server if it is not already
+     * running after adding any prefixes it needs.
+     * @return the web server; null if none is provided
+     */
+    protected EmbeddedWebServer getHelper() {
+	return helper;
+    }
+
+    /**
+     * Set a helper web server.
+     * Certificate authorities such as Lets-Encrypt use the ACME protocol for
+     * managing certificates
+     * (<A HREF="https://datatracker.ietf.org/doc/html/rfc8555"> RFC 8555</A>),
+     * and these may make use of a separate web server using HTTP
+     * instead of HTTPS and running on port 80.  This method provides
+     * an {@link EmbeddedWebServer} that can be used for such
+     * purposes. After this method is called, the method
+     * {@link #requestCertificate}
+     * is expected to start this web server, provided that
+     * {@link #helperPort()} returns a non-zero value and the server is
+     * not already running.
+     * <P>
+     * If all of the following are true:
+     * <UL>
+     *   <LI> the argument to this method is not null,
+     *   <LI> {@link #helperPort()} returns a non-zero value,
+     *   <LI> the helper server is not an HTTPS server,
+     *   <LI> the helper server is not currently running,
+     * </UL>
+     * then the server will be configured for use as a helper. This
+     * will typically require adding specific prefixes to the helper server.
+     * @param helper the embedded web server to use; null (the default)
+     *        if none is provided
+     * @return this {@link CertManager}
+     * @see #configureHelper(EmbeddedWebServer)
+     */
+    public CertManager setHelper(EmbeddedWebServer helper) {
+	this.helper = helper;
+	int hport = helperPort();
+	if (helper != null && hport != 0 && !helper.usesHTTPS()
+	    && !helper.serverRunning()) {
+	    configureHelper(helper);
+	}
+
+	return this;
+    }
+
     private void traceCertificate() {
 	if (certTrace && tracer != null) {
 	    String pathsep = System.getProperty("file.separator");
@@ -754,7 +873,6 @@ public abstract class CertManager {
 	    } catch (IOException eio) {}
 	}
     }
-
 
     private boolean createCertificateIfNeeded() {
 	requestCertificate();
@@ -972,5 +1090,6 @@ public abstract class CertManager {
 //  LocalWords:  renewalRequestStatus genkeypair keyalg groupname SHA
 //  LocalWords:  secp sigalg withECDSA keypass dname providerName rfc
 //  LocalWords:  changeit localhost stopDelay certTrace truststore
-//  LocalWords:  configurator Configurators exportcert ews toSet
-//  LocalWords:  multipleEWS certbot
+//  LocalWords:  configurator Configurators exportcert ews toSet TCP
+//  LocalWords:  multipleEWS certbot setHelper configureHelper HREF
+//  LocalWords:  helperPort ResourceBundle getBundle getHelper

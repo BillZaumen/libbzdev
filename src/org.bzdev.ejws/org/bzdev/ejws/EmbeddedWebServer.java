@@ -253,6 +253,16 @@ public class EmbeddedWebServer {
     }
 
     /**
+     *  Determine if this server uses HTTP or HTTPS.
+     *  @return true if this server uses HTTPS; false if this server
+     *          uses HTTP
+     */
+    public boolean usesHTTPS() {
+	return useHTTPS;
+    }
+
+
+    /**
      * Return the port for this web server.
      * This is the port number passed to a constructor unless
      * that number is zero (which indicates that the system will
@@ -1819,12 +1829,18 @@ public class EmbeddedWebServer {
 //  LocalWords:  serverAlreadyStopping HttpHandler illegalArgCN jks
 //  LocalWords:  illegalArgument authenticator subclasses javascript
 //  LocalWords:  InetAddress setupServer LinkedBlockingQueue TimeUnit
-//  LocalWords:  shutdownNow serverRunning SSLSetup openjdk params
+//  LocalWords:  shutdownNow serverRunning SSLSetup openjdk params CN
 //  LocalWords:  HttpsConfigurator HttpsParameters SSLContext ksis
 //  LocalWords:  keystore truststore ejwsCerts truststore's changeit
 //  LocalWords:  configurator Configurators InputStream ksp kepw tsis
-//  LocalWords:  tspw crlis toCharArray restartFailed sslSetup
-//  LocalWords:  RequestInfo setSessionState getSessionState
-//  LocalWords:  deallocating deallocate withState HttpContext
-//  LocalWords:  EjwsStateTable Subclassing sessionOps stacktrace
-//  LocalWords:  addSessionFilter ExecutorService
+//  LocalWords:  tspw crlis toCharArray restartFailed sslSetup PRE
+//  LocalWords:  RequestInfo setSessionState getSessionState keytool
+//  LocalWords:  deallocating deallocate withState HttpContext genkey
+//  LocalWords:  EjwsStateTable Subclassing sessionOps stacktrace SHA
+//  LocalWords:  addSessionFilter ExecutorService BLOCKQUOTE keyalg
+//  LocalWords:  groupname secp sigalg withECDSA keypass storepass
+//  LocalWords:  dname thelio exportcert rfc importcert noprompt
+//  LocalWords:  CertManager modServerSetup notModified certManager
+//  LocalWords:  HtppHandler lightgray RootHandler bgcolor linkColor
+//  LocalWords:  getErrorForegroundColor getErrorBackgroundColor
+//  LocalWords:  visitedColor nullArgs
