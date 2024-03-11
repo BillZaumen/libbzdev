@@ -751,7 +751,9 @@ public abstract class CertManager {
      * Get the "store" password for a keystore.
      * @return the password; null if there is none
      */
-    protected char[] getKeystorePW() {return keystorePW;};
+    protected char[] getKeystorePW() {
+	return (keystorePW == null)? null: keystorePW.clone();
+    };
 
     /**
      * Set the key password for a keystore.
@@ -760,16 +762,17 @@ public abstract class CertManager {
      * @see CertManager#setKeystorePW(char[])
      */
     public CertManager setKeyPW(char[] pw) {
-	keyPW = pw.clone();
+	keyPW = (pw == null)? null: pw.clone();
 	return this;
     }
 
     /**
      * Get the key password for a keystore.
-     * @return the password; null if there is none
+     * @return the password; the keystore password if no key password has
+     *         been explicitly provided
      */
     protected char[] getKeyPW() {
-	return (keyPW ==null)? keystorePW: keyPW.clone();
+	return (keyPW == null)? getKeystorePW(): keyPW.clone();
     }
 
     /**
@@ -810,12 +813,19 @@ public abstract class CertManager {
      * Certificate authorities such as Lets-Encrypt use the ACME protocol for
      * managing certificates
      * (<A HREF="https://datatracker.ietf.org/doc/html/rfc8555"> RFC 8555</A>),
+
      * and these may make use of a separate web server using HTTP
-     * instead of HTTPS and running on port 80. This method returns an
-     * {@link EmbeddedWebServer} that can be used for such
-     * purposes. When provided, the method {@link #requestCertificate}
-     * is expected to  start this web server if it is not already
-     * running after adding any prefixes it needs.
+     * instead of HTTPS and typically running on port 80. This method
+     * returns an {@link EmbeddedWebServer} that can be used for such
+     * purposes. When provided, the method {@link #requestCertificate()}
+     * is expected to  start the helper if it is not already
+     * running and will start the helper after adding any prefixes
+     * needed as part of the process of obtaining a certificate.
+     * <P>
+     * When this method returns null, {@link #requestCertificate}
+     * and {@link #requestRenewal()} are expected to create a helper
+     * if needed, but will usually shut this helper down before
+     * returning.
      * @return the web server; null if none is provided
      */
     protected EmbeddedWebServer getHelper() {
@@ -929,10 +939,10 @@ public abstract class CertManager {
 	}
 
 	if(keystorePW != null) {
-	    sslSetup.keystorePassword(keystorePW);
+	    sslSetup.keystorePassword(getKeystorePW());
 	}
-	if (keyPW != null) {
-	    sslSetup.keyPassword(keyPW);
+	if (keyPW != null || keystorePW != null) {
+	    sslSetup.keyPassword(getKeyPW());
 	}
 
 	if (truststorePW != null) {
