@@ -41,7 +41,8 @@ public class CMTest {
 	    .setTracer(System.out)
 	    .setCertTrace(true)
 	    .setProtocol("TLS")
-	    .setHelper(ewsHelper);
+	    .setHelper(ewsHelper)
+	    .setMode(CertManager.Mode.TEST);
 
 
 	// Used only for a test of CertManager methods, so it uses

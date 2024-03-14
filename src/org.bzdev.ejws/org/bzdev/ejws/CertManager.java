@@ -142,6 +142,70 @@ public abstract class CertManager {
     }
 
 
+    /**
+     * Mode determining how a {@link CertManager} behaves.
+     */
+    public static enum Mode {
+	/**
+	 * Normal operation.
+	 * This is the default.
+	 */
+	NORMAL,
+	/**
+	 * Staging mode.
+	 * Some providers can create non-functional test certificates
+	 * because their certificate authority (for example, Lets Encrypt)
+	 * places limits on the number of actual certificates that can be
+	 * issued per unit time. If a certificate authority does not
+	 * have such an option, this mode should behave the same as
+	 * {@link Mode#NORMAL} mode.
+	 */
+	STAGED,
+	/**
+	 * Test mode.
+	 * In this case, a certificate may not be created.  The mode
+	 * TEST should be used only for initial testing where one
+	 * might want to check for logic errors or a failure to catch
+	 * various configuration errors. Providers may optionally
+	 * handle this mode in the same way as {@link Mode#STAGED}. A
+	 * server may not work when this mode is used, but one can
+	 * perform a standalone test (see the program CMTest.java in
+	 * the tests/ejws directory of this library's source code and
+	 * source code for the Docker image wtzbzdev/ejwsacme for
+	 * examples).
+	 * <P>
+	 * Note: the default provider treats all modes the same as
+	 * {@link Mode#NORMAL}.
+	 */
+	TEST
+    }
+
+    private Mode mode = Mode.NORMAL;
+
+    /**
+     * Set this certificate manager's mode.
+     * This method should be used only when debugging or during
+     * preliminary testing.
+     * @param mode the mode
+     * @return this certificate manage
+     * @see CertManager.Mode
+     */
+
+    public CertManager setMode(Mode mode) {
+	if (mode == null) mode = Mode.NORMAL;
+	this.mode = mode;
+	return this;
+    }
+
+
+    /**
+     * Get the current mode.
+     * @return the mode
+     */
+    public Mode getMode() {
+	return mode;
+    }
+
     // By default, if a keystore does not exist, it will
     // be created.
     private static class DefaultCertManager extends CertManager {
@@ -169,15 +233,31 @@ public abstract class CertManager {
 		}
 		return false;
 	    }
+	    if (getDomain() == null) {
+		if (tracer != null) {
+		    try {
+			tracer.append("Domain missing\n");
+		    } catch (IOException eio) {}
+		}
+		return false;
+	    }
 	    try {
 		File ks = getKeystoreFile();
+		if (ks == null) {
+		    if (tracer != null) {
+			try {
+			    tracer.append("Keytool File missing\n");
+			} catch (IOException eio) {}
+		    }
+		    return false;
+		}
 		this.ks = ks.getCanonicalPath();
 		if (ks.exists()) {
 		    try {
 			KeyStore keystore = KeyStore.getInstance(ks, carray);
 			Certificate cert = keystore
 			    .getCertificate("servercert");
-			if (cert instanceof X509Certificate) {
+			if (cert != null && cert instanceof X509Certificate) {
 			    X509Certificate xcert = (X509Certificate) cert;
 			    long tdiff = xcert.getNotAfter().getTime()
 				- Instant.now().toEpochMilli();
@@ -1123,8 +1203,8 @@ public abstract class CertManager {
 //  LocalWords:  certificateRequestStatus requestRenewal storepass pw
 //  LocalWords:  renewalRequestStatus genkeypair keyalg groupname SHA
 //  LocalWords:  secp sigalg withECDSA keypass dname providerName rfc
-//  LocalWords:  changeit localhost stopDelay certTrace truststore
+//  LocalWords:  changeit localhost stopDelay certTrace truststore OL
 //  LocalWords:  configurator Configurators exportcert ews toSet TCP
 //  LocalWords:  multipleEWS certbot setHelper configureHelper HREF
-//  LocalWords:  helperPort ResourceBundle getBundle getHelper
-//  LocalWords:  stopMonitoring
+//  LocalWords:  helperPort ResourceBundle getBundle getHelper CMTest
+//  LocalWords:  stopMonitoring ejws wtzbzdev ejwsacme
