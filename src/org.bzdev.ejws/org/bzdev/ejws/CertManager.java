@@ -262,7 +262,11 @@ public abstract class CertManager {
 			    long tdiff = xcert.getNotAfter().getTime()
 				- Instant.now().toEpochMilli();
 			    tdiff /= (DAY*1000);
-			    if (3*tdiff <= validity) {
+			    Certificate[] chain =
+				keystore.getCertificateChain("servercert");
+			    boolean notSelfSigned = (chain != null)
+				&& chain.length > 1;
+			    if (3*tdiff <= validity || notSelfSigned) {
 				ProcessBuilder pb1 = new
 				    ProcessBuilder(keytool,
 						   "-delete",

@@ -958,6 +958,12 @@ bezierbox:
 	@$(JAVA) BezierBox
 	@$(JAVA) BezierBox2
 
+hextest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) Path2DHexTest.java
+
 clean:
 	rm -rf classes
 	rm -f *.isq *.png *.stl condtest?.ps condtest?.eps circle.ps
