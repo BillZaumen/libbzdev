@@ -358,12 +358,25 @@ cwstest2:
 	$(JAVA) CWSTest2 cwstest2.config  || rm example.zip
 	rm -f example.zip
 
+cwstest3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	zip -r example.zip example
+	$(JAVA) CWSTest cwstest2.yaml  || rm example.zip
+	rm -f example.zip
 
 cwstest1-post:
 	curl --data foo=text http://localhost:8080/post/
 
 cwstest1-get:
 	curl http://localhost:8080/post/?foo=text
+
+cwstest3-post:
+	curl -k --data foo=text https://localhost:8443/post/
+
+cwstest3-get:
+	curl -k https://localhost:8443/post/?foo=text
 
 clean:
 	rm -rf classes

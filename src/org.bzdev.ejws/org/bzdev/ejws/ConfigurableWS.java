@@ -963,9 +963,16 @@ public class ConfigurableWS {
 			.setDomain(domain)
 			.setKeystoreFile(keyStoreFile)
 		        .setKeystorePW(keyStorePW)
-			.setKeyPW(keyPW)
-			.setTruststoreFile(trustStoreFile)
-			.setTruststorePW(trustStorePW);
+			.setKeyPW(keyPW);
+
+		    if (trustStoreFile != null) {
+			if (trustStorePW != null) {
+			cm.setTruststoreFile(trustStoreFile)
+			    .setTruststorePW(trustStorePW);
+			} else {
+			    log.println(errorMsg("noTrustStorePW"));
+			}
+		    }
 
 		    if (email != null) cm.setEmail(email);
 		    int hport = cm.helperPort();
@@ -991,8 +998,7 @@ public class ConfigurableWS {
 		    // authentication.
 		} else {
 		    if (domain == null) {
-
-			log.println(errorMsg("notDOmainForCN"));
+			log.println(errorMsg("noDomainForCM"));
 			log.println(errorMsg("ignoringCM"));
 		    }
 		    cm = null;
