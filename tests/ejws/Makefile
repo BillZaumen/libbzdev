@@ -342,6 +342,29 @@ cert2:
 	| keytool -importcert -alias thelio  -keystore thelio-ts2.jks \
 		-keypass changeit -storepass changeit -noprompt
 
+cwstest1:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	zip -r example.zip example
+	$(JAVA) CWSTest cwstest1.yaml  || rm example.zip
+	rm -f example.zip
+
+cwstest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	zip -r example.zip example
+	$(JAVA) CWSTest2 cwstest2.config  || rm example.zip
+	rm -f example.zip
+
+
+cwstest1-post:
+	curl --data foo=text http://localhost:8080/post/
+
+cwstest1-get:
+	curl http://localhost:8080/post/?foo=text
 
 clean:
 	rm -rf classes
+	rm -f example.zip
