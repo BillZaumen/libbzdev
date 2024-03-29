@@ -403,21 +403,22 @@ public class ConfigurableWS {
      */
     public String visitedColor() {return visitedColor;}
 
-    boolean defaultTrace = false;
-    boolean defaultStacktrace = false;
+    static boolean defaultTrace = false;
+    static boolean defaultStacktrace = false;
 
     /**
      * Set the defaults for tracing.
+     * The initial value for both arguments is false.
      * @param defaultTrace true if tracing is turned on by default; false
      *        otherwise
      * @param defaultStacktrace true if a stack trace should be provided
      *        when an error occurs during tracing; false otherwise
      */
-    public void setTraceDefaults(boolean defaultTrace,
+    public static void setTraceDefaults(boolean defaultTrace,
 				 boolean defaultStacktrace)
     {
-	this.defaultTrace = defaultTrace;
-	this.defaultStacktrace = defaultStacktrace;
+	ConfigurableWS.defaultTrace = defaultTrace;
+	ConfigurableWS.defaultStacktrace = defaultStacktrace;
     }
 
     boolean needHelperStart = false;
