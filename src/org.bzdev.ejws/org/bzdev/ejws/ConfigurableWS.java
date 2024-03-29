@@ -432,7 +432,7 @@ public class ConfigurableWS {
      * Get the properties defined in a configuration file.
      * @return the properties
      */
-    Properties getProperties() {return props;}
+    public Properties getProperties() {return props;}
 
     /**
      * Get the {@link EmbeddedWebServer} that will handle HTTP
