@@ -347,7 +347,30 @@ public class ConfigurableWS {
 
     boolean trace = false;
     boolean stacktrace = false;
+
+    /**
+     * Determine if tracing is configuredl
+     * @return true if tracing is configured; false otherwise
+     */
+    public boolean trace() {return trace;}
+
+    /**
+     * Determine if stack tracing is configured.
+     * @return true if stack tracing is configured; false otherwise
+     */
+    public boolean stacktrace() {return stacktrace;}
+
+
     PrintStream log = System.out;
+
+    /**
+     * Get the print stream used for logging.
+     * @return the print stream; null if there is none.
+     */
+    public PrintStream getLog() {
+	return log;
+    }
+
 
     // CSS colors.
     String color = "white";
