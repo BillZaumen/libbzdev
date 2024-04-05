@@ -769,10 +769,7 @@ public class ConfigurableWS {
 			JSObject object = (JSObject) obj;
 			JSObject config = object.get("config", JSObject.class);
 			for (String key: config.keySet()) {
-			    System.out.println("putting " + key +": "
-					       + config.get(key));
 			    props.put(key, "" + config.get(key));
-			    System.out.println("... " + props.getProperty(key));
 			}
 			prefixArray = object.get("contexts", JSArray.class);
 		    }
