@@ -70,6 +70,19 @@ sslutil1: compile
 sslutil2: compile
 	$(JAVA) SSLUtilTest tstore
 
+sslutil3: compile
+	$(JAVA) SSLUtilTest3
+
+#
+# Special case: requires going to ../ejws and running
+#    make cwstest3
+# in a separate window  before running
+#    make sslutil4
+#
+sslutil4: compile
+	$(JAVA) SSLUtilTest4
+
+
 sslutil121: compile
 	$(JAVA) SSLUtilTest - tstore -
 

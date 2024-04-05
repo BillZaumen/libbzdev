@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.SSLSessionContext;
@@ -353,6 +354,7 @@ public class EmbeddedWebServer {
 	char[] kspw = defaultpw;
 	char[] kepw = defaultpw;
 	InputStream tsis = null;
+	TrustManager[] tms = null;
 	char[] tspw = defaultpw;
 	Configurator configurator = (sslContext, HttpsParams) ->{};
 
@@ -380,12 +382,35 @@ public class EmbeddedWebServer {
 	}
 
 	/**
-	 * Provide an input stream for a truststore
-	 * @param is an input stream used to load the truststore
+	 * Provide an input stream for a truststore.
+	 * @param is an input stream used to load the truststore; null to
+	 *        cancel
 	 * @return this object
+	 * @throws IllegalStateException if {@link #trustManagers} has
+	 *         been called with a non-null value
+	 * @see #trustManagers(TrustManager[])
 	 */
 	public SSLSetup truststore(InputStream is) {
+	    if (tms != null) {
+		throw new IllegalStateException(errorMsg("tmset"));
+	    }
 	    this.tsis = is;
+	    return this;
+	}
+
+	/**
+	 * Provide trust managers.
+	 * @param tms the trust managers; null too cancel
+	 * @return this object
+	 * @throws IllegalStateException if a {#link #trusstore} was
+	 *         called with a non-null value
+	 * @see #truststore(InputStream)
+	 */
+	public SSLSetup trustManagers(TrustManager[] tms) {
+	    if (tsis != null) {
+		throw new IllegalStateException(errorMsg("tsset"));
+	    }
+	    this.tms = tms;
 	    return this;
 	}
 
@@ -531,7 +556,7 @@ public class EmbeddedWebServer {
 		tmf.init(ts);
 	    }
 	    sslContext.init(kmf.getKeyManagers(),
-			    ((tmf == null)? null: tmf.getTrustManagers()),
+			    ((tmf == null)? s.tms: tmf.getTrustManagers()),
 			    null);
 	    HttpsServer sserver = (HttpsServer) server;
 	    final Configurator conf = s.configurator;

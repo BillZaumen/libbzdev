@@ -15,6 +15,13 @@
       welcome:
         - index.html
 
+    - prefix: /http/
+      className: DirWebMap
+      useHTTP: true
+      arg: ../../BUILD/api
+      welcome:
+        - index.html
+
     - prefix: /sfgate/
       className: RedirectWebMap
       arg: "https://www.sfgate.com"

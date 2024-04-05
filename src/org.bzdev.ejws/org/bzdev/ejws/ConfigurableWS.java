@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.net.ssl.TrustManager;
 
 import org.bzdev.ejws.*;
 import org.bzdev.ejws.maps.*;
@@ -192,10 +193,11 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  * config:
  *    <STRONG>NAME</STRONG>: <STRONG>VALUE</STRONG>
  * #  ... (additional name-value pairs)
- * prefixes:
+ * contexts:
  *    - prefix:  <STRONG>PREFIX</STRONG>
  *      className: <STRONG>CLASSNAME</STRONG>
  *      arg: <STRONG>ARGUMENT</STRONG>
+ *      useHTTP: <STRONG>BOOLEAN</STRONG>
  *      welcome: 
  *        - <STRONG>PATH</STRONG>
  * #      ... (additional welcome path names)
@@ -215,7 +217,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      bgcolor: <STGRONG>CSS_COLOR</STGRONG>
  *      linkColor: <STRONG>CSS_COLOR</STRONG>
  *      visitedColor: <STGRONG>CSS_COLOR</STRONG>
- * #  ... (additional prefixes)
+ * #  ... (additional contexts)
  * ...
  * </PRE></BLOCKQUOTE>
  * where
@@ -233,7 +235,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *         <LI>{@link org.bzdev.ejws.maps.ServletWebMap}
  *      </UL>
  *      although the method
- *      {@link ConfigurableWS#addContext(String,String,String,Map,String[],HttpMethod[],String,String,String,String,boolean,boolean,boolean)},
+ *      {@link ConfigurableWS#addContext(String,String,String,boolean,Map,String[],HttpMethod[],String,String,String,String,boolean,boolean,boolean)},
  *       if implemented, may support additional web maps.
  *   <LI><STRONG>ARGUMENT</STRONG> is the string representation of the
  *      argument required to initialize a web map. For
@@ -247,6 +249,9 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *         <LI>{@link ServletWebMap}, the class name for a servlet adapter
  *             that has a zero-argument constructor.
  *      </UL>
+ *  <LI><STRONG>BOOLEAN</STRONG> is <STRONG>true</STRONG> or
+ *      <STRONG>false</STRONG>.  If absent, the default is
+ *      <STRONG>false</STRONG>.
  *  <LI><STRONG>PATH</STRONG> is the path to a "welcome" file
  *      If the path is a relative path, it is relative to the prefix path.
  *   <LI><STRONG>NAME</STRONG> is the name of a configuration property
@@ -262,11 +267,11 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      as a string.
  * </UL>
  * The "config:" section provides the same information as a corresponding
- * {link Properties} file. The "prefixes" section allows one to
+ * {link Properties} file. The "contexts" section allows one to
  * add specific prefixes to the web server without having to
  * use
  *  {@link EmbeddedWebServer#add(String,String,Object,com.sun.net.httpserver.Authenticator,boolean,boolean,boolean)}
- * explicitly. The value for "prefixes" is a list of YAML objects. For each
+ * explicitly. The value for "contexts" is a list of YAML objects. For each
  * object, the value of the key
  * <UL>
  *   <LI><STRONG>prefix</STRONG> is the path for an HTTP context corrsponding
@@ -277,6 +282,11 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      of an argument used to initialize a web map. For the class
  *      {@link ServletWebMap}, the argument is the fully qualified class
  *      name of a {@link ServletAdapter}.
+ *   <LI><STRONG>useHTTP</STRONG>, when true, preferrentially assigns
+ *      this context to the helper, which runs HTTP, rather than to
+ *      the server, which runs HTTPS when there is a helper.  If
+ *      false, or if there is no helper, or if this key is missing,
+ *      the context is assigned to the server.
  *   <LI><STRONG>welcome</STRONG> is a list of strings, each providing the
  *       path to a 'welcome' page for a given prefix.  If there are no
  *       welcome pages, this key may be omitted.
@@ -462,6 +472,9 @@ public class ConfigurableWS {
      * @param prefix the path for a context
      * @param className the class name for a {@link WebMap}
      * @param arg the argument used to configure the {@link WebMap}
+     * @param useHTTP true if the prefix is added to the helper server
+     *        when the helper server exists; false for the normal
+     *        behavior.
      * @param map a map assigning parameter names to parameter values
      * @param welcome the welcome paths; an empty array if there are none
      * @param methods the HTTP mehthods a servlet can use
@@ -480,7 +493,9 @@ public class ConfigurableWS {
      * @throws Exception if an error occurs
      */
     protected boolean addContext(String prefix, String className,
-				 String arg, Map<String,String> map,
+				 String arg,
+				 boolean useHTTP,
+				 Map<String,String> map,
 				 String[] welcome,
 				 HttpMethod[] methods,
 				 String color, String bgcolor,
@@ -511,6 +526,8 @@ public class ConfigurableWS {
 		if (arg == null) {
 		    throw new Exception(errorMsg("context2", "arg", prefix));
 		}
+		Boolean useHTTPB = obj.get("useHTTP", Boolean.class);
+		boolean useHTTP = (useHTTPB == null)? false: useHTTPB;
 		JSObject parameters = obj.get("parameters", JSObject.class);
 		Boolean nowebxmlB = obj.get("nowebxml", Boolean.class);
 		Boolean displayDirB = obj.get("displayDir", Boolean.class);
@@ -594,23 +611,26 @@ public class ConfigurableWS {
 		} else if (className.charAt(0) == '.') {
 		    className = className.substring(1);
 		}
-		if (!addContext(prefix, className, arg, map, welcome, methods,
+		EmbeddedWebServer svr = (useHTTP && helper != null)?
+		    helper: ews;
+		if (!addContext(prefix, className, arg, useHTTP,
+				map, welcome, methods,
 				color, bgcolor, linkColor, visitedColor,
 				nowebxml, displayDir, hideWebInf)) {
 		    if (className.equals("org.bzdev.ejws.maps.DirWebMap")) {
 			System.out.println("arg = " + arg);
-			ews.add(prefix, DirWebMap.class,
+			svr.add(prefix, DirWebMap.class,
 				new DirWebMap.Config(new File(arg),
 						     color, bgcolor,
 						     linkColor, visitedColor),
 				null, nowebxml, displayDir, hideWebInf);
 		    } else if (className
 			       .equals("org.bzdev.ejws.maps.RedirectWebMap")) {
-			ews.add(prefix, RedirectWebMap.class, arg,
+			svr.add(prefix, RedirectWebMap.class, arg,
 				null, nowebxml, displayDir, hideWebInf);
 		    } else if (className
 			       .equals("org.bzdev.ejws.maps.ResourceWebMap")) {
-			ews.add(prefix, ResourceWebMap.class,
+			svr.add(prefix, ResourceWebMap.class,
 				new ResourceWebMap.Config(arg,
 							  color, bgcolor,
 							  linkColor,
@@ -618,7 +638,7 @@ public class ConfigurableWS {
 				null, nowebxml, displayDir, hideWebInf);
 		    } else if (className
 			       .equals("org.bzdev.ejws.maps.ZipWebMap")) {
-			ews.add(prefix, ZipWebMap.class,
+			svr.add(prefix, ZipWebMap.class,
 				new ZipWebMap.Config(new File(arg),
 						     color, bgcolor,
 						     linkColor, visitedColor),
@@ -641,7 +661,7 @@ public class ConfigurableWS {
 			for (HttpMethod m: methods) {
 			    System.out.println("   ... " + m);
 			}
-			ews.add(prefix, ServletWebMap.class,
+			svr.add(prefix, ServletWebMap.class,
 				new ServletWebMap.Config(adapter, map,
 							 allowsQuery,
 							 methods),
@@ -653,7 +673,7 @@ public class ConfigurableWS {
 		    }
 		    if (welcome.length > 0) {
 			for (String path: welcome) {
-			    ews.getWebMap(prefix).addWelcome(path);
+			    svr.getWebMap(prefix).addWelcome(path);
 			}
 		    }
 		}
@@ -964,19 +984,26 @@ public class ConfigurableWS {
 	}
 	try {
 	    if (sslType != null) {
+		TrustManager[] tms = null;
 		if (loopback) {
 		    SSLUtilities.allowLoopbackHostname();
 		}
+		if (trustStoreFile != null && trustStorePW == null) {
+		    log.println(errorMsg("noTrustStorePW"));
+		    // We can't use a trust store without a password,
+		    // so set the trust store file to null
+		    trustStoreFile = null;
+		}
 		if (selfsigned) {
-		    SSLUtilities.installTrustManager(sslType,
-						     trustStoreFile,
-						     trustStorePW,
-						     (cert) -> {return true;});
+		    tms = SSLUtilities
+			.installTrustManager(sslType,
+					     trustStoreFile, trustStorePW,
+					     (cert) -> {return true;});
 		} else if (trustStoreFile != null) {
-		    SSLUtilities.installTrustManager(sslType,
-						     trustStoreFile,
-						     trustStorePW,
-						     (cert) -> {return false;});
+		    tms = SSLUtilities
+			.installTrustManager(sslType,
+					     trustStoreFile, trustStorePW,
+					     (cert) -> {return false;});
 		}
 		if (cm != null && domain != null) {
 		    cm.setProtocol(sslType)
@@ -989,7 +1016,9 @@ public class ConfigurableWS {
 		        .setKeystorePW(keyStorePW)
 			.setKeyPW(keyPW);
 
-		    if (trustStoreFile != null) {
+		    if (tms != null) {
+			cm.setTrustManagers(tms);
+		    } else if (trustStoreFile != null) {
 			if (trustStorePW != null) {
 			cm.setTruststoreFile(trustStoreFile)
 			    .setTruststorePW(trustStorePW);
@@ -1056,6 +1085,9 @@ public class ConfigurableWS {
 		    sslSetup.truststore(new FileInputStream(trustStoreFile))
 			.truststorePassword(trustStorePW);
 		    
+		}
+		if (cm == null && tms != null) {
+		    sslSetup.trustManagers(tms);
 		}
 	    } else {
 		// if sslType is null, we are using HTTP so any

@@ -218,7 +218,7 @@ public class SSLUtilities {
      *        certificate should be accepted
      * @see javax.net.ssl.SSLContext#getInstance(String)
      */
-    public static void
+    public static TrustManager[]
 	installTrustManager(String type,
 			    File trustKeyStore,
 			    char[] password,
@@ -346,11 +346,13 @@ public class SSLUtilities {
 	    };
 
 	SSLContext sslContext = SSLContext.getInstance(type);
-	sslContext.init(null, new TrustManager[] { customTm }, null);
+	TrustManager[] tms = new TrustManager[] { customTm };
+	sslContext.init(null, tms, null);
 
 	// You don't have to set this as the default context,
 	// it depends on the library you're using.
 	SSLContext.setDefault(sslContext);
+	return tms;
     }
 
     private static HostnameVerifier defaultHNV =

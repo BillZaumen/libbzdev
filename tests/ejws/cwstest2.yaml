@@ -6,6 +6,8 @@
     certificateManager: default
     keyStoreFile: keystore.jks
     sslType: TLS
+    allowLoopback: true
+    allowSelfSigned: true
     domain: localhost
     trace: true
     stackTrace: true
@@ -19,6 +21,14 @@
       arg: ../../BUILD/api
       welcome:
         - index.html
+
+    - prefix: /http/
+      className: DirWebMap
+      useHTTP: true
+      arg: ../../BUILD/api
+      welcome:
+        - index.html
+
 
     - prefix: /sfgate/
       className: RedirectWebMap

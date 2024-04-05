@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.security.KeyStore;
 import java.security.cert.*;
+import javax.net.ssl.TrustManager;
 
 import org.bzdev.util.SafeFormatter;
 
@@ -454,6 +455,7 @@ public abstract class CertManager {
     String protocol = null;
     File keystoreFile = null;
     File truststoreFile = null;
+    TrustManager[] trustManagers = null;
     char[] keystorePW = "changeit".toCharArray();
     char[] keyPW = null;
     char[] truststorePW = null;
@@ -811,11 +813,38 @@ public abstract class CertManager {
     }
 
     /**
-     * Get the file for a trust store.
-     * @param file the trust-store file; null if there is none
-     * @return this {@link CertManager}
+     * Provide trust managers.
+     * @param tms the trust managers; null too cancel
+     * @return this object
+     * @throws IllegalStateException if a {#link #t\setTrusstoreFile} was
+     *         called with a non-null value
+     * @see #setTruststoreFile(File)
      */
-    public CertManager setTruststoreFile(File file) {
+    public CertManager setTrustManagers(TrustManager[] tms)
+	throws IllegalStateException
+    {
+	if (truststoreFile != null) {
+	    throw new IllegalStateException("tsset1");
+	}
+	this.trustManagers = tms;
+	return this;
+    }
+
+    /**
+     * Provide a file containing a trust store.
+     * @param file a file containing a trust store; null to
+     *        cancel
+     * @return this object
+     * @throws IllegalStateException if {@link #trustManagers} has
+     *         been called with a non-null value
+     * @see #setTrustManagers(TrustManager[])
+     */
+    public CertManager setTruststoreFile(File file)
+	throws IllegalStateException
+    {
+	if (trustManagers != null) {
+	    throw new IllegalStateException("tmset1");
+	}
 	truststoreFile = file;
 	return this;
     }
@@ -1016,6 +1045,10 @@ public abstract class CertManager {
 	    new EmbeddedWebServer.SSLSetup(protocol);
 	if (keystoreFile != null) {
 	    sslSetup.keystore(new FileInputStream(keystoreFile));
+	}
+
+	if (trustManagers != null) {
+	    sslSetup.trustManagers(trustManagers);
 	}
 
 	if (truststoreFile != null) {

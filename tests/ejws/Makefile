@@ -363,7 +363,8 @@ cwstest3:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	zip -r example.zip example
-	$(JAVA) CWSTest cwstest2.yaml  || rm example.zip
+	$(JAVA) CWSTest cwstest2.yaml https://localhost:8443/api/  \
+		|| rm example.zip
 	rm -f example.zip
 
 cwstest1-post:
