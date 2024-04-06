@@ -1,0 +1,57 @@
+%YAML 1.2
+---
+  config:
+    port: 8443
+    helperPort: 8080
+    certificateManager: default
+    keyStoreFile: keystore.jks
+    sslType: TLS
+    allowLoopback: true
+    allowSelfSigned: true
+    domain: localhost
+    trace: true
+    stackTrace: true
+    foo: Foo
+    bar: Bar
+  contexts:
+    - prefix: /
+      className: DirWebMap
+      arg: ../../BUILD/api
+
+    - prefix: /api/
+      className: DirWebMap
+      arg: ../../BUILD/api
+      welcome:
+        - index.html
+
+    - prefix: /http/
+      className: DirWebMap
+      useHTTP: true
+      arg: ../../BUILD/api
+      welcome:
+        - index.html
+
+    - prefix: /sfgate/
+      className: RedirectWebMap
+      arg: "https://www.sfgate.com"
+
+    - prefix: /resource/
+      className: ResourceWebMap
+      arg: org/bzdev/ejws/
+
+    - prefix: /zip/
+      className: ZipWebMap
+      arg: example.zip
+
+    - prefix: /post/
+      className: ServletWebMap
+      arg: NullAdapter
+      parameters:
+         parm1: first parameter
+         parm2: second parameter
+      propertyNames: ["color", "bgcolor"]
+      methods: ["POST", "GET"]
+
+  key1: Key1
+  key2: Key2
+...

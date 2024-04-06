@@ -379,6 +379,15 @@ cwstest3-post:
 cwstest3-get:
 	curl -k https://localhost:8443/post/?foo=text
 
+cwstest4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	zip -r example.zip example
+	$(JAVA) CWSTest3 cwstest3.yaml  \
+		|| rm example.zip
+	rm -f example.zip
+
 clean:
 	rm -rf classes
 	rm -f example.zip

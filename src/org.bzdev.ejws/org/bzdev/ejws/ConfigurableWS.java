@@ -39,14 +39,14 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  * an additional server running HTTP will be provided. This server will
  * provide an HTTP redirect to the HTTPS server. An additional server
  * will not be provided when HTTPS is not used.
- * 
+ * <P>
  * When the configuration file is a Java {@link Properties} file using
  * the format described by the API documentation for
  * {@link Properties#load(Reader)}. A number of properties, called
  * "standard properties" below, are always available, but can be
  * supplemented by a set of properties provided in a constructor.
  * In addition, the input file can be a
- * <A HREF="https://linuxhandbook.com/yaml-basics/">YARM</A>
+ * <A HREF="https://linuxhandbook.com/yaml-basics/">YAML</A>
  * file as described <A HREF="#YAML">below</A>.
  * <P>
  * The standard properties can be grouped into three categories:
@@ -101,12 +101,12 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     option is useful for testing, but should not be used otherwise.
  *   <LI><B>certificateManager</B>. When present, the value is either
  *     a simple name or a fully-qualified class name for a certificate
- *     manager. The value "default" will set up DOCSIG so that a
+ *     manager. The value "default" will set up the server so that a
  *     self-signed certificate is automatically generated and the
  *     corresponding keystore file will be created if it is not already
  *     present.  Certificates are renewed automatically. The Docker
- *     container wtzbzdev/docsig includes a certificate manger  whose
- *     simple name is "AcmeClient" and that will get a certificate from the
+ *     container wtzbzdev/ejwsacme includes a certificate manger whose
+ *     simple name is "AcmeClient" and which will get a certificate from the
  *     Let's Encrypt certificate authority. In this case, the
  *     properties <B>domain</B> and <B>email</B> are required, and
  *     the server's DNS server must be configured to map the domain name
@@ -122,8 +122,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     error.  When <B>certMode</B> is <B>TEST</B>, programs that
  *     implement the ACME protocol will not actually be run. This
  *     value is intended for some tests of the AcmeClient provider.
- *   <LI><B>certName</B>. This is a name used to tag a certificate. The
- *     default is "docsig".
+ *   <LI><B>certName</B>. This is a name used to tag a certificate.
  *   <LI><B>domain</B>. This is the fully-qualified domain name for the
  *     server.  It is used to create the distinguished name in a
  *     certificate.
@@ -184,15 +183,16 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     stack trace.  The default is <B>false</B>.
  * </UL>
  * <P>
- * <A ID="YAML">YAML</A> can be used to format configuration files,
- * with some additional capabilities. A YAML configutation file must
+ * <A ID="YAML">YAML</A> can be used as a configuration-file format,
+ * which provides some additional capabilities. A YAML configuration file must
  * have a file-name suffix, either ".yml", ".yaml", ".YML", or ".YAML".
+ * The syntax is
  * <BLOCKQUOTE><PRE>
  * %YAML 1.2
  * ---
  * config:
  *    <STRONG>NAME</STRONG>: <STRONG>VALUE</STRONG>
- * #  ... (additional name-value pairs)
+ *    ... (additional name-value pairs)
  * contexts:
  *    - prefix:  <STRONG>PREFIX</STRONG>
  *      className: <STRONG>CLASSNAME</STRONG>
@@ -200,24 +200,25 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      useHTTP: <STRONG>BOOLEAN</STRONG>
  *      welcome: 
  *        - <STRONG>PATH</STRONG>
- * #      ... (additional welcome path names)
+ *        ... (additional welcome path names)
  *      parameters:
  *        <STRONG>NAME</STRONG>: <STRONG>VALUE</STRONG>
- * #      ... (additional parameters)
+ *        ... (additional parameters)
  *      propertyNames:
  *         - <STRONG>NAME</STRONG>
- * #       ... (additional property names)
+ *         ... (additional property names)
  *      methods:
  *         - <STRONG>METHOD</STRONG>
- * #       ... (additional methods)
+ *         ... (additional methods)
  *      nowebxml:  <STRONG>BOOLEAN</STRONG>
  *      displayDir: <STRONG>BOOLEAN</STRONG>
  *      hideWebInf: <STRONG>BOOLEAN</STRONG>
  *      color: <STRONG>CSS_COLOR</STRONG>
- *      bgcolor: <STGRONG>CSS_COLOR</STGRONG>
+ *      bgcolor: <STRONG>CSS_COLOR</STRONG>
  *      linkColor: <STRONG>CSS_COLOR</STRONG>
- *      visitedColor: <STGRONG>CSS_COLOR</STRONG>
- * #  ... (additional contexts)
+ *      visitedColor: <STRONG>CSS_COLOR</STRONG>
+ *    -... (additional contexts)
+ * ... (additional keys other than "config:" and "context:")
  * ...
  * </PRE></BLOCKQUOTE>
  * where
@@ -235,7 +236,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *         <LI>{@link org.bzdev.ejws.maps.ServletWebMap}
  *      </UL>
  *      although the method
- *      {@link ConfigurableWS#addContext(String,String,String,boolean,Map,String[],HttpMethod[],String,String,String,String,boolean,boolean,boolean)},
+ *      {@link ConfigurableWS#addContext(String,String,String,EmbeddedWebSever,Map,String[],HttpMethod[],String,String,String,String,boolean,boolean,boolean)},
  *       if implemented, may support additional web maps.
  *   <LI><STRONG>ARGUMENT</STRONG> is the string representation of the
  *      argument required to initialize a web map. For
@@ -274,7 +275,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  * explicitly. The value for "contexts" is a list of YAML objects. For each
  * object, the value of the key
  * <UL>
- *   <LI><STRONG>prefix</STRONG> is the path for an HTTP context corrsponding
+ *   <LI><STRONG>prefix</STRONG> is the path for an HTTP context corresponding
  *     to a {@link WebMap}.
  *   <LI><STRONG>className</STRONG> is the class name of the
  *      {@link WebMap}.
@@ -282,7 +283,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      of an argument used to initialize a web map. For the class
  *      {@link ServletWebMap}, the argument is the fully qualified class
  *      name of a {@link ServletAdapter}.
- *   <LI><STRONG>useHTTP</STRONG>, when true, preferrentially assigns
+ *   <LI><STRONG>useHTTP</STRONG>, when true, preferentially assigns
  *      this context to the helper, which runs HTTP, rather than to
  *      the server, which runs HTTPS when there is a helper.  If
  *      false, or if there is no helper, or if this key is missing,
@@ -318,10 +319,14 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *   <LI><STRONG>linkColor</STRONG> is the CSS color for links; null if
  *      for a default. This will override a standard property for the
  *      current prefix.
- *   <LI><STRONG>visitedColor</STRONG> is the CSS color for visited liks;
+ *   <LI><STRONG>visitedColor</STRONG> is the CSS color for visited links;
  *      null for a default. This will override a standard property for
  *      the current prefix.
  * </UL>
+ * Additional keys can be added as specified in the constructor
+ * {@link ConfigurableWS#ConfigurableWS(Set,Set,File,File)}, a capability
+ * provided for extensibility. Any such keys will normally be processed
+ * before the server is started.
  */
 public class ConfigurableWS {
 
@@ -355,11 +360,13 @@ public class ConfigurableWS {
     static final Set<String> cmPropertyNames =
 	Set.of("sslType", "domain", "keyStoreFile");
 
+    static final Set<String> standardKeys = Set.of("config", "contexts");
+
     boolean trace = false;
     boolean stacktrace = false;
 
     /**
-     * Determine if tracing is configuredl
+     * Determine if tracing is configured.
      * @return true if tracing is configured; false otherwise
      */
     public boolean trace() {return trace;}
@@ -408,7 +415,7 @@ public class ConfigurableWS {
 
     /**
     /**
-     * Get a CSS color for visitedlinks.
+     * Get a CSS color for visited links.
      * @return the color
      */
     public String visitedColor() {return visitedColor;}
@@ -436,13 +443,47 @@ public class ConfigurableWS {
     EmbeddedWebServer ews = null;
     
     Properties props = new Properties();
-    JSArray  prefixArray = null;
+    JSArray  contextArray = null;
+    JSObject remainder = null;
 
     /**
      * Get the properties defined in a configuration file.
+     * When the configuration file uses YAML syntax, these
+     * properties are the keys for the object that is the value
+     * for the top-level key "config".
      * @return the properties
      */
     public Properties getProperties() {return props;}
+
+    /**
+     * Get the contexts specified in the configuration file.
+     * This method returns a non-null value only for YAML configuration
+     * files. The values listed are the values for the top-level key
+     * "contexts".
+     * @return the contexts listed in the configuration file; null
+     *         if no contexts are specified.
+     */
+    public JSArray getContexts() {
+	return contextArray;
+    }
+
+    /**
+     * Get the keyword/value pairs specified at the top level of
+     * the configuration file.
+     * This method returns a non-null value only for YAML configuration
+     * files.
+     * <P>
+     * This method can be used if a YAML configuration file contains
+     * extra keys at its top level and is provided to make configuring
+     * a server extensible.
+     * @return an object containing the keyword/value pairs; null if
+     *         there are none or if the only keywords are "config"
+     *         or "contexts"
+     */
+    public JSObject getRemainder() {
+	return remainder;
+    }
+
 
     /**
      * Get the {@link EmbeddedWebServer} that will handle HTTP
@@ -450,6 +491,19 @@ public class ConfigurableWS {
      * @return the server
      */
     public EmbeddedWebServer  getServer() {return ews;}
+
+    /**
+     * Get the {@link EmbeddedWebServer} that will handle HTTP
+     * as a 'helper' for the server returned by {@link #getServer()}.
+     * When a helper exists, its default behavior is to provided an
+     * HTTP redirect to the the server returned by {@link #getServer()}.
+     * Additional contexts can be added to the helper server, either
+     * explicitly or implicitly (by setting useHTTP to true for a
+     * context).
+     * @return the helper server; null if there is none
+     */
+    public EmbeddedWebServer getHelper() {return helper;}
+
 
     /**
      * Set a system property indicating that the JVM is
@@ -472,12 +526,10 @@ public class ConfigurableWS {
      * @param prefix the path for a context
      * @param className the class name for a {@link WebMap}
      * @param arg the argument used to configure the {@link WebMap}
-     * @param useHTTP true if the prefix is added to the helper server
-     *        when the helper server exists; false for the normal
-     *        behavior.
+     * @param svr the server being modified
      * @param map a map assigning parameter names to parameter values
      * @param welcome the welcome paths; an empty array if there are none
-     * @param methods the HTTP mehthods a servlet can use
+     * @param methods the HTTP methods a servlet can use
      * @param color the CSS color for text
      * @param bgcolor the CSS color for the background
      * @param linkColor the CSS color for links
@@ -494,7 +546,7 @@ public class ConfigurableWS {
      */
     protected boolean addContext(String prefix, String className,
 				 String arg,
-				 boolean useHTTP,
+				 EmbeddedWebServer svr,
 				 Map<String,String> map,
 				 String[] welcome,
 				 HttpMethod[] methods,
@@ -509,10 +561,10 @@ public class ConfigurableWS {
     }
 
     private void addContexts() throws Exception {
-	if (prefixArray != null) {
-	    int sz = prefixArray.size();
+	if (contextArray != null) {
+	    int sz = contextArray.size();
 	    for (int i = 0; i < sz; i++) {
-		JSObject obj = prefixArray.get(i, JSObject.class);
+		JSObject obj = contextArray.get(i, JSObject.class);
 		String prefix = obj.get("prefix", String.class);
 		if (prefix == null) {
 		    throw new Exception(errorMsg("context1"));
@@ -539,7 +591,7 @@ public class ConfigurableWS {
 		    
 		String color = obj.get("color", String.class);
 		String bgcolor = obj.get("bgcolor", String.class);
-		String linkColor = obj.get("linkccolor", String.class);
+		String linkColor = obj.get("linkColor", String.class);
 		String visitedColor = obj.get("visitedColor", String.class);
 		if (color == null) color = color();
 		if (bgcolor == null) bgcolor = bgcolor();
@@ -613,7 +665,7 @@ public class ConfigurableWS {
 		}
 		EmbeddedWebServer svr = (useHTTP && helper != null)?
 		    helper: ews;
-		if (!addContext(prefix, className, arg, useHTTP,
+		if (!addContext(prefix, className, arg, svr,
 				map, welcome, methods,
 				color, bgcolor, linkColor, visitedColor,
 				nowebxml, displayDir, hideWebInf)) {
@@ -651,7 +703,7 @@ public class ConfigurableWS {
 			Constructor<? extends ServletAdapter> constructor
 			    = adapterClass.getConstructor();
 			ServletAdapter adapter = constructor.newInstance();
-			String allowsQueryS = obj.get("allowsQeury",
+			String allowsQueryS = obj.get("allowsQuery",
 						      String.class);
 			boolean allowsQuery = (allowsQueryS == null)? true:
 			    allowsQueryS.trim().equalsIgnoreCase("true");
@@ -681,13 +733,27 @@ public class ConfigurableWS {
 	}
     }
 
-
-    /**
+   /**
      * Constructor.
      * The configuration file is described {@link ConfigurableWS above}.
+     * @param configFile the configuration file
+     * @param logFile the log file ; null for standard output
+     * @throws Exception if an error occurs
+     */
+    public ConfigurableWS(File configFile, File logFile)
+	throws Exception
+    {
+	this(null, null, configFile, logFile);
+    }
+
+    /**
+     * Constructor specifying additional property names.
+     * The configuration file is described {@link ConfigurableWS above}.
      * <P>
-     * When the first argument is not null, the user is must handle
+     * When the first argument is not null, the user must handle
      * any configuration required by those properties explicitly.
+     * The method {@link #getProperties()} can be used to obtain the
+     * a {@link Properties} object providing the values for any property.
      * @param additionalPropertyNames additional property names; null if
      *        there are none.
      * @param configFile the configuration file
@@ -695,6 +761,37 @@ public class ConfigurableWS {
      * @throws Exception if an error occurs
      */
     public ConfigurableWS(Set<String> additionalPropertyNames,
+			  File configFile,
+			  File logFile)
+	throws Exception
+    {
+	this(additionalPropertyNames, null, configFile, logFile);
+    }
+
+
+    /**
+     * Constructor specifying additional property names and additional keys.
+     * The configuration file is described {@link ConfigurableWS above}.
+     * <P>
+     * When the first argument is not null, the user must handle
+     * any configuration required by those properties explicitly.
+     * The method {@link #getProperties()} can be used to obtain the
+     * a {@link Properties} object providing the values for any property.
+     * When the second argument is not null, the user  must handle
+     * any keys required by those properties explicitly.
+     * The method {@link #getRemainder()} can be used to obtain a
+     * {@link JSObject} with values accessed by any key other than
+     * "config" or "context".
+     * @param additionalPropertyNames additional property names; null if
+     *        there are none.
+     * @param additionalKeys additional keys for the top-level object in
+     *        a YAML-based configuration file; null if there are none
+     * @param configFile the configuration file
+     * @param logFile the log file ; null for standard output
+     * @throws Exception if an error occurs
+     */
+    public ConfigurableWS(Set<String> additionalPropertyNames,
+			  Set<String> additionalKeys,
 			  File configFile,
 			  File logFile)
 	throws Exception
@@ -718,6 +815,12 @@ public class ConfigurableWS {
 	if (additionalPropertyNames != null) {
 	    allowedNames.addAll(additionalPropertyNames);
 	}
+
+	TreeSet allowedKeys =new TreeSet<>(standardKeys);
+	if (additionalKeys != null) {
+	    allowedKeys.addAll(additionalKeys);
+	}
+
 
 	EmbeddedWebServer.SSLSetup sslSetup = null;
 	CertManager cm = null;
@@ -771,7 +874,19 @@ public class ConfigurableWS {
 			for (String key: config.keySet()) {
 			    props.put(key, "" + config.get(key));
 			}
-			prefixArray = object.get("contexts", JSArray.class);
+			contextArray = object.get("contexts", JSArray.class);
+			for (String key: object.keySet()) {
+			    if (!allowedKeys.contains(key)) {
+				log.println(errorMsg("ignoringKey", key));
+				continue;
+			    }
+			    if (key.equals("config")) continue;
+			    if (key.equals("contexts")) continue;
+			    if (remainder == null) {
+				remainder = new JSObject();
+			    }
+			    remainder.put(key, object.get(key));
+			}
 		    }
 		} else {
 		    props.load(r);
@@ -1140,10 +1255,10 @@ public class ConfigurableWS {
 	    String scheme = ews.usesHTTPS()? "HTTPS": "HTTP";
 	    log.println(errorMsg("ewsStart", ews.getPort(), scheme));
 	    if (needHelperStart) {
-		// In thius case, the cerfiicate manager does not
+		// In this case, the certificate manager does not
 		// use the helper and start it, so we'll start the
-		// helper manually as it will map http requests
-		// to https requests.
+		// helper manually as it will map HTTP requests
+		// to HTTPS requests.
 		helper.start();
 		log.println(errorMsg("helperStart", helper.getPort()));
 		needHelperStart = false;
@@ -1197,3 +1312,30 @@ public class ConfigurableWS {
 	ews.shutdown(delay);
     }
 }
+
+//  LocalWords:  exbundle HTTPS CertManager HREF YAML SSL PARMS rgb
+//  LocalWords:  bgcolor linkColor visitedColor keyStoreFile apos DNS
+//  LocalWords:  keyStorePassword keystore keyPassword trustStoreFile
+//  LocalWords:  trustStorePassword allowLoopback loopback DOCSIG TLS
+//  LocalWords:  allowSelfSigned certificateManager wtzbzdev docsig
+//  LocalWords:  AcmeClient AAAA certMode certName timeOffset sslType
+//  LocalWords:  stopDelay ipaddr TCP helperPort html nthreads yml
+//  LocalWords:  stackTrace yaml YML BLOCKQUOTE PRE config className
+//  LocalWords:  CLASSNAME arg useHTTP propertyNames nowebxml WebMap
+//  LocalWords:  displayDir hideWebInf ConfigurableWS addContext xml
+//  LocalWords:  EmbeddedWebSever HttpMethod boolean DirWebMap UTF
+//  LocalWords:  RedirectWebMap ResourceWebMap ZipWebMap servlet JVM
+//  LocalWords:  ServletWebMap EmbeddedWebServer ServletAdapter svr
+//  LocalWords:  extensibility defaultTrace defaultStacktrace logFile
+//  LocalWords:  getServer subclasses badMethod allowsQuery JSObject
+//  LocalWords:  cannotConfig configFile getProperties getRemainder
+//  LocalWords:  additionalPropertyNames additionalKeys buttonFGColor
+//  LocalWords:  buttonBGColor bquoteBGColor cdir getProperty dir ews
+//  LocalWords:  uadir argv noConfigFile confFile propFile println
+//  LocalWords:  ignoringKey stacktrace certificatManager ignoringCM
+//  LocalWords:  keystoreIsDir keystoreNotReadable truststoreIsDir
+//  LocalWords:  truststoreIgnored truststoreNotReadable localhost
+//  LocalWords:  badConfigProp missingPropName canNotReadConfig bzdev
+//  LocalWords:  nullConfigFile noTrustStorePW helperConflict api
+//  LocalWords:  noDomainForCM httpPorts setTracer serverException
+//  LocalWords:  ewsStart helperStart
