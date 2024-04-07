@@ -47,7 +47,9 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  * supplemented by a set of properties provided in a constructor.
  * In addition, the input file can be a
  * <A HREF="https://linuxhandbook.com/yaml-basics/">YAML</A>
- * file as described <A HREF="#YAML">below</A>.
+ * file as described <A HREF="#YAML">below</A>.  When the configuration
+ * file is a YAML file, its file name must end with the file-name
+ * extension "YAML", "yaml", "YML", or "yml".
  * <P>
  * The standard properties can be grouped into three categories:
  * <UL>
@@ -736,6 +738,8 @@ public class ConfigurableWS {
    /**
      * Constructor.
      * The configuration file is described {@link ConfigurableWS above}.
+     * When the configuration file is a YAML file, its file name must have
+     * the file-name extension "YAML", "yaml", "YML", or "yml".
      * @param configFile the configuration file
      * @param logFile the log file ; null for standard output
      * @throws Exception if an error occurs
@@ -749,6 +753,8 @@ public class ConfigurableWS {
     /**
      * Constructor specifying additional property names.
      * The configuration file is described {@link ConfigurableWS above}.
+     * When the configuration file is a YAML file, its file name must have
+     * the file-name extension "YAML", "yaml", "YML", or "yml".
      * <P>
      * When the first argument is not null, the user must handle
      * any configuration required by those properties explicitly.
@@ -772,6 +778,8 @@ public class ConfigurableWS {
     /**
      * Constructor specifying additional property names and additional keys.
      * The configuration file is described {@link ConfigurableWS above}.
+     * When the configuration file is a YAML file, its file name must have
+     * the file-name extension "YAML", "yaml", "YML", or "yml".
      * <P>
      * When the first argument is not null, the user must handle
      * any configuration required by those properties explicitly.
