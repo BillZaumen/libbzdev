@@ -153,6 +153,15 @@ public abstract class CertManager {
 	 */
 	NORMAL,
 	/**
+	 * Local mode.
+	 * Creating a certificate involves both local operations
+	 * and ones that require the use of a certificate authority.
+	 * This mode performs the local operations, prints a description
+	 * of any remote operations to a log file, and provides a
+	 * self-signed certificate for further testing.
+	 */
+	LOCAL,
+	/**
 	 * Staging mode.
 	 * Some providers can create non-functional test certificates
 	 * because their certificate authority (for example, Lets Encrypt)
@@ -168,10 +177,11 @@ public abstract class CertManager {
 	 * TEST should be used only for initial testing where one
 	 * might want to check for logic errors or a failure to catch
 	 * various configuration errors. Providers may optionally
-	 * handle this mode in the same way as {@link Mode#STAGED}. A
-	 * server may not work when this mode is used, but one can
-	 * perform a standalone test (see the program CMTest.java in
-	 * the tests/ejws directory of this library's source code and
+	 * handle this mode in the same way as {@link Mode#STAGED},
+	 * {@link Mode#LOCAL} or {@link Mode#NORMAL}. A server may not
+	 * work when this mode is used, but one can perform a
+	 * standalone test (see the program CMTest.java in the
+	 * tests/ejws directory of this library's source code and
 	 * source code for the Docker image wtzbzdev/ejwsacme for
 	 * examples).
 	 * <P>
