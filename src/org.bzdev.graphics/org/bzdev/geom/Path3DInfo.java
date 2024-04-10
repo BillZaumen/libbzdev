@@ -4197,7 +4197,7 @@ public class Path3DInfo {
 		m = 0;
 		break;
 	    default:
-		System.out.println(prefix +"   [unknown mode]");
+		out.println(prefix +"   [unknown mode]");
 	    }
 	    Point3D start = entry.getStart();
 	    if (start == null) {

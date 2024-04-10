@@ -10805,14 +10805,14 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 		Functions.Bernstein.dsumBdx(results, 0, 3, coords, 0, 3, u);
 		for (int i = 0; i < 3; i++) {
 		    if (Math.abs(results[i] - old[i]) > 1.e-12) {
-			System.out.println("old and result differ 1");
+			System.err.println("old and result differ 1");
 		    }
 		}
 	    } else if (v == 1.0) {
 		Functions.Bernstein.dsumBdx(results, 0, 3, coords, 12, 3, u);
 		for (int i = 0; i < 3; i++) {
 		    if (Math.abs(results[i] - old[i]) > 1.e-12) {
-			System.out.println("old and result differ 2");
+			System.err.println("old and result differ 2");
 		    }
 		}
 	    } else {

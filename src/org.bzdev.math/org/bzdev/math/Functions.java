@@ -7116,7 +7116,7 @@ public class Functions {
 	    term = (Functions.Beta(a+1, (double)n)
 		    / Functions.Beta(a+b, (double)n)) * xp;
 	}
-	System.out.println("n = " + n);
+	// System.out.println("n = " + n);
 	sum *= (Math.pow(x, a)*Math.pow(1-x, b) / a );
 	return sum;
 	// return  Math.pow(x,a)*hgF(a,1-b,a+1,x) / a;

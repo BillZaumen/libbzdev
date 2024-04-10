@@ -678,7 +678,6 @@ public class ConfigurableWS {
 				color, bgcolor, linkColor, visitedColor,
 				nowebxml, displayDir, hideWebInf)) {
 		    if (className.equals("org.bzdev.ejws.maps.DirWebMap")) {
-			System.out.println("arg = " + arg);
 			svr.add(prefix, DirWebMap.class,
 				new DirWebMap.Config(new File(arg),
 						     color, bgcolor,
@@ -715,12 +714,6 @@ public class ConfigurableWS {
 						      String.class);
 			boolean allowsQuery = (allowsQueryS == null)? true:
 			    allowsQueryS.trim().equalsIgnoreCase("true");
-			System.out.println("adapter = " + adapter);
-			System.out.println("allowsQuery = " + allowsQuery);
-			System.out.println("methods = " + methods);
-			for (HttpMethod m: methods) {
-			    System.out.println("   ... " + m);
-			}
 			svr.add(prefix, ServletWebMap.class,
 				new ServletWebMap.Config(adapter, map,
 							 allowsQuery,

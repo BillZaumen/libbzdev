@@ -236,7 +236,7 @@ public class TextFieldMenuItem extends JMenuItem
 					    Thread.sleep(100);
 					} catch (Exception e) {}
 				    }
-				    if (!done) System.out.println("not done");
+				    // if (!done) System.out.println("not done");
 				} catch (Exception e){}
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {

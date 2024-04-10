@@ -728,7 +728,7 @@ public class BasicSplinePath2D extends SplinePath2D {
 		m = 0;
 		break;
 	    default:
-		System.out.println(prefix +"   [unknown mode]");
+		out.println(prefix +"   [unknown mode]");
 	    }
 	    out.println(prefix + "    x: " + entries[i].x);
 	    out.println(prefix + "    y: " + entries[i].y);

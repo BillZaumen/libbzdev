@@ -542,7 +542,7 @@ public class BasicSplinePath3D extends SplinePath3D {
 		m = 6;
 		break;
 	    default:
-		System.out.println(prefix +"   [unknown mode]");
+		out.println(prefix +"   [unknown mode]");
 	    }
 	    out.println(prefix + "    x: " + entries[i].x);
 	    out.println(prefix + "    y: " + entries[i].y);

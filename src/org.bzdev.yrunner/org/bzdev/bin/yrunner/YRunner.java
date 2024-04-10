@@ -897,8 +897,10 @@ public class YRunner {
 		System.exit(1);
 	    }
 	} else if (index >= argv.length - 1) {
+	    /*
 	    System.out.println("index = " + index + ", argv.length = "
 			       + argv.length);
+	    */
 	    System.err.println(errorMsg("missingArgs"));
 	    System.exit(1);
 	}
