@@ -208,7 +208,6 @@ public abstract class CertManager {
 	return this;
     }
 
-
     /**
      * Get the current mode.
      * @return the mode
@@ -216,6 +215,35 @@ public abstract class CertManager {
     public Mode getMode() {
 	return mode;
     }
+
+    private boolean alwaysCreate = false;
+
+    /**
+     * Determine if certificates should always be created instead
+     * of being reused until they are close to expiring.
+     * The default is false.
+     * @return true if a certificate should always be created; false
+     *         otherwise
+     */
+    public boolean alwaysCreate() {return alwaysCreate;}
+
+    /**
+     * Set if certificates should always be created instead
+     * of being reused until they are close to expiring.
+     * The default is false.
+     * <P>
+     * This method's primary use is for testing so that any code
+     * written to renew a certificate is run as soon as a check for a
+     * renewal is made.
+     * @param mode true if a certificate should always be created; false
+     *              otherwise
+     * @return this certificate manage
+     */
+    public CertManager alwaysCreate(boolean mode) {
+	alwaysCreate = mode;
+	return this;
+    }
+
 
     // By default, if a keystore does not exist, it will
     // be created.
@@ -277,19 +305,23 @@ public abstract class CertManager {
 				keystore.getCertificateChain("servercert");
 			    boolean notSelfSigned = (chain != null)
 				&& chain.length > 1;
-			    if (3*tdiff <= validity || notSelfSigned) {
-				ProcessBuilder pb1 = new
-				    ProcessBuilder(keytool,
-						   "-delete",
-						   "-keystore", this.ks,
-						   "-storepass", spw,
-						   "-alias", "servercert");
-				pb1.redirectOutput
-				    (ProcessBuilder.Redirect.DISCARD);
-				pb1.redirectError
-			    (ProcessBuilder.Redirect.DISCARD);
-				Process p1 = pb1.start();
-				p1.waitFor();
+			    boolean ok = notSelfSigned
+				|| alwaysCreate();
+			    if (3*tdiff <= validity || ok) {
+				try {
+				    ProcessBuilder pb1 = new
+					ProcessBuilder(keytool,
+						       "-delete",
+						       "-keystore", this.ks,
+						       "-storepass", spw,
+						       "-alias", "servercert");
+				    pb1.redirectOutput
+					(ProcessBuilder.Redirect.DISCARD);
+				    pb1.redirectError
+					(ProcessBuilder.Redirect.DISCARD);
+				    Process p1 = pb1.start();
+				    p1.waitFor();
+				} catch (Exception ee){}
 			    } else {
 				// We already have a valid certificate
 				status = !renew;
