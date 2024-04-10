@@ -125,6 +125,12 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     implement the ACME protocol will not actually be run. This
  *     value is intended for some tests of the AcmeClient provider.
  *   <LI><B>certName</B>. This is a name used to tag a certificate.
+ *   <LI><B>alwaysCreate</B>. WHen present, the value may be
+ *     <STRONG>true</STRONG> or <STRONG>false</STRONG> (the default).
+ *     When true, a new certificate will be created every time a
+ *     certificate manager checks if the current certificate has
+ *     expired. This is useful for testing, but should not be used
+ *     otherwise.
  *   <LI><B>domain</B>. This is the fully-qualified domain name for the
  *     server.  It is used to create the distinguished name in a
  *     certificate.
@@ -354,7 +360,7 @@ public class ConfigurableWS {
 		"keyStoreFile", "trustStoreFile", "sslType",
 		"keyStorePassword", "keyPassword", "trustStorePassword",
 		"allowLoopback", "allowSelfSigned",
-		"certificateManager", "certMode",
+		"certificateManager", "certMode", "alwaysCreate",
 		"certName", "domain", "email", "timeOffset",
 		"interval", "stopDelay");
 
@@ -833,6 +839,7 @@ public class ConfigurableWS {
 	EmbeddedWebServer.SSLSetup sslSetup = null;
 	CertManager cm = null;
 	CertManager.Mode cmMode = CertManager.Mode.NORMAL;
+	boolean alwaysCreate = false;
 	String sslType = null;
 	File keyStoreFile = null;
 	char[] keyStorePW = null;
@@ -965,17 +972,31 @@ public class ConfigurableWS {
 		    if (s.equals("NORMAL")) {
 			CertManager.Mode certMode = CertManager.Mode.NORMAL;
 			cm.setMode(certMode);
+			log.println("certMode = NORMAL");
+		    } else if (s.equals("LOCAL")) {
+			CertManager.Mode certMode = CertManager.Mode.LOCAL;
+			cm.setMode(certMode);
+			log.println("certMode = LOCAL");
 		    } else if (s.equals("STAGED")) {
 			CertManager.Mode certMode = CertManager.Mode.STAGED;
 			cm.setMode(certMode);
+			log.println("certMode = STAGED");
 		    } else if (s.equals("TEST")) {
 			CertManager.Mode certMode = CertManager.Mode.TEST;
+			log.println("certMode = TEST");
 			cm.setMode(certMode);
 		    } else {
 			log.println("certMode \"" + s + "\" not recognized"
 				    + " - ignored");
 		    }
+		} else {
+		    log.println("certMode = NORMAL");
 		}
+
+		s = props.getProperty("alwaysCreate");
+		alwaysCreate = (s == null)?
+		    alwaysCreate: Boolean.parseBoolean(s);
+		log.println("alwaysCreate = " + alwaysCreate);
 
 		s = props.getProperty("keyStoreFile");
 		log.println("keyStoreFile = " + s);
@@ -1148,6 +1169,7 @@ public class ConfigurableWS {
 		    }
 
 		    if (email != null) cm.setEmail(email);
+		    if (alwaysCreate) cm.alwaysCreate(alwaysCreate);
 		    int hport = cm.helperPort();
 		    int hhport = (hport == 0)? helperPort: hport;
 		    if (helperPort != 0 && setHelperPort
