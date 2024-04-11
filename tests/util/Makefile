@@ -130,7 +130,8 @@ actest: compile
 
 not: compile
 	chmod u+x scrun
-	@./scrun not.esp
+	./scrun not.esp
+	./scrun not2.esp
 	chmod u-x scrun
 
 test7-sc: compile
