@@ -7668,7 +7668,7 @@ public class ExpressionParser implements ObjectParser<Object>
     private static final int EQ_OFFSET = -8;
     private static final int LOGICAL_OFFSET = -8; // from BITWISE
     private static final int COND_OFFSET = -14;	  // conditional: (?:)
-    private static final int VAR_OFFSET = -15;	  // var statement
+    private static final int VAR_OFFSET = -16;	  // var statement
     private static final int DOUBLE_COLON_OFFSET = -19;
     private static final int SEMICOLON_OFFSET = -20;
     private static final int ASSIGN_OFFSET = -10; // to be added to EQ_OFFSET

@@ -108,6 +108,7 @@ all: compile
 	./scrun bad5.esp || echo EXCEPTION EXPECTED
 	./scrun bad6.esp || echo EXCEPTION EXPECTED
 	./scrun nulltest.esp
+	./scrun not.esp
 	@echo --- docsig test ---
 	./scrun --codebase docsig.jar --exit docsig.esp
 	./scrun -p docsig.jar --exit docsig.esp
@@ -127,8 +128,12 @@ all: compile
 actest: compile
 	$(JAVA) ACTest
 
+not: compile
+	chmod u+x scrun
+	@./scrun not.esp
+	chmod u-x scrun
 
-test7-sc:
+test7-sc: compile
 	chmod u+x scrun
 	@./scrun test7-sc.esp
 	chmod u-x scrun
@@ -288,7 +293,19 @@ etests: compile
 	@$(JAVA) ExprScriptTest15
 	@echo - ExpressionParser Test '( .foreach())' -
 	@$(JAVA) ExprScriptTest16
-
+	@echo - ExpressionParser Test '( <=> operator)' -
+	@$(JAVA) ExprScriptTest17
+	@echo - ExpressionParser Test '( ` operator)' -
+	@$(JAVA) ExprScriptTest18
+	chmod u+x scrun
+	@$(HAS_JS) && ./scrun SciFormatterTest.js || echo -n
+	@./scrun SciFormatterTest.esp
+	./scrun not.esp
+	./scrun test7-sc.esp
+	./scrun --stackTrace bad5.esp  || echo EXCEPTION EXPECTED
+	./scrun  bad6.esp || echo EXCEPTION EXPECTED
+	@./scrun --stackTrace SciFormatterTest.esp
+	chmod u-x scrun
 
 
 etest: compile
