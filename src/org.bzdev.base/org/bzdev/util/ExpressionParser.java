@@ -8566,7 +8566,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		    nonNullPrev = null;
 		    continue;	// don't want to change prev and next
 		} else {
-		    level--;
+		    // level--;  (elim because we were drifting off)
+		    int clevel = condPeer.getLevel();
 		    next = new Token(Operator.COLON, ":",
 				     offset+i, condPeer.getLevel());
 		    next.setQmarkIndex(qmarkIndex++);
