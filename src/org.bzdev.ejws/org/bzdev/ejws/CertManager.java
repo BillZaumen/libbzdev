@@ -776,7 +776,7 @@ public abstract class CertManager {
      * @param timezone the time zone ID (e.g, UTC or America/Los_Angeles);
      *       null or an empty string for the system default
      * @return this {@link CertManager}
-     * @see TimeZone#getAvailableIds()
+     * @see TimeZone#getAvailableIDs()
      */
     public CertManager setTimeZone(String timezone) {
 	this.timezone = (timezone == null || timezone.trim().length() == 0)?
