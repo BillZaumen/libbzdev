@@ -704,10 +704,10 @@ public abstract class CertManager {
 
     /**
      * Set the time offset.
-     * This is the time of the day in seconds at which
-     * attempts to renew certificates will be made.  Time is measured
-     * using the server's time zone.  The number of days between
-     * renewal attempts are set by {@link #setInterval(int)}.
+     * This is the time of the day in seconds at which attempts to
+     * renew certificates will be made.  Time is measured from
+     * midnight using the server's time zone.  The number of days
+     * between renewal attempts are set by {@link #setInterval(int)}.
      * @param offset the time offset in seconds
      * @return this {@link CertManager}
      */
@@ -720,7 +720,7 @@ public abstract class CertManager {
      * Get the time offset.
      * This is the time of the day in seconds at which
      * attempts to renew certificates will be made.  Time is measured
-     * using the server's time zone.  The number of days between
+     * from midnight using the server's time zone.  The number of days between
      * renewal attempts are set by {@link #setInterval(int)}.
      * @return the time offset in seconds.
      */
@@ -765,8 +765,48 @@ public abstract class CertManager {
      */
     public int getStopDelay() {return stopDelay;}
 
+    private TimeZone timezone = TimeZone.getDefault();
+
+    /**
+     * Set the time zone given a time-zone ID.
+     * The Java class {@link TimeZone} provides a method to list the
+     * available time zone IDs.
+     * If the time zone ID is not recognized, the time zone will be
+     * set to GMT.
+     * @param timezone the time zone ID (e.g, UTC or America/Los_Angeles);
+     *       null or an empty string for the system default
+     * @return this {@link CertManager}
+     * @see TimeZone#getAvailableIds()
+     */
+    public CertManager setTimeZone(String timezone) {
+	this.timezone = (timezone == null || timezone.trim().length() == 0)?
+	    TimeZone.getDefault(): TimeZone.getTimeZone(timezone);
+	return this;
+    }
+
+    /**
+     * Set the time zone.
+     * @param timezone the time zone ID (e.g, UTC or America/Los_Angeles);
+     *       null for the system default
+     * @return this {@link CertManager}
+     */
+    public CertManager setTimeZone(TimeZone timezone) {
+	this.timezone = (timezone == null)? TimeZone.getDefault(): timezone;
+	return this;
+    }
+
+    /**
+     * Get the time-zone ID.
+     * @return the time-zone ID for this object
+     */
+    public String getTimeZone() {
+	return timezone.getID();
+    }
+
+    /*
     private static final int tzoffset =
 	(int)(TimeZone.getDefault().getRawOffset()/1000);
+    */
 
     /**
      * Get the waiting time in milliseconds from when a server
@@ -775,6 +815,9 @@ public abstract class CertManager {
      * @return the time interval in milliseconds
      */
     public long getInitialWaitMillis() {
+	int tzoffset = (int) ((timezone.getRawOffset() +
+			       timezone.getDSTSavings())
+			      / 1000);
 	if (interval == 0) {
 	    // An interval of 0 does not make sense so set
 	    // it to one minute: useful only for testing

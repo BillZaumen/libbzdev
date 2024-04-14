@@ -17,6 +17,15 @@ public class CMTest {
 	    .setInterval(5)
 	    .setStopDelay(2);
 
+	cm.setTimeZone("UTC");
+	System.out.println("timezone = " + cm.getTimeZone());
+	System.out.println("getInitialWaitMillis() = "
+			   + cm.getInitialWaitMillis());
+
+	cm.setTimeZone("");
+
+	System.out.println("timezone = " + cm.getTimeZone());
+
 	System.out.println("getInitialWaitMillis() = "
 			   + cm.getInitialWaitMillis());
 
