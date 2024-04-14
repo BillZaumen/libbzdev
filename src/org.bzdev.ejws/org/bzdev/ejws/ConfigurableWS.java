@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeSet;
 import javax.net.ssl.TrustManager;
 
@@ -137,6 +138,9 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *   <LI><B>email</B>. This is an email address used by some
  *     certificate authorities to send notifications about expiring
  *     certificates.
+ *   <LI><B>timezone</B>. The time zone ID (e.g., GMT or America/Los_Angeles)
+ *      that the server will use in determining when to schedule certificate
+ *      renewals provided that a certificate manager is used.
  *   <LI><B>timeOffset</B>. The time offset in seconds from
  *     midnight, local time, at which a server should determine if
  *     a certificate should be renewed.
@@ -362,7 +366,7 @@ public class ConfigurableWS {
 		"allowLoopback", "allowSelfSigned",
 		"certificateManager", "certMode", "alwaysCreate",
 		"certName", "domain", "email", "timeOffset",
-		"interval", "stopDelay");
+		"interval", "stopDelay", "timezone");
 
     // required property names if a certificate manager is used.
     static final Set<String> cmPropertyNames =
@@ -817,6 +821,7 @@ public class ConfigurableWS {
 	trace = defaultTrace;
 	stacktrace = defaultStacktrace;
 	InetAddress addr = null;
+	TimeZone timezone = TimeZone.getDefault();
 
 	TreeSet<String> allowedNames = new TreeSet<>(propertyNames);
 	if (additionalPropertyNames != null) {
@@ -1087,6 +1092,23 @@ public class ConfigurableWS {
 		certName = props.getProperty("certName", "docsig");
 		domain = props.getProperty("domain");
 		email = props.getProperty("email");
+
+		s = props.getProperty("timezone");
+		if (s != null) {
+		    s = s.trim();
+		    boolean tzok = false;
+		    for (String tz: TimeZone.getAvailableIDs()) {
+			if (tz.equals(s)) {
+			    timezone = TimeZone.getTimeZone(s);
+			    tzok = true;
+			    break;
+			}
+		    }
+		    if (tzok == false) {
+			log.println(errorMsg("unrecognizedTZ", s));
+		    }
+		}
+
 		s = props.getProperty("timeOffset");
 		timeOffset = (s == null)? 0: Integer.parseInt(s);
 		s = props.getProperty("interval");
@@ -1141,6 +1163,7 @@ public class ConfigurableWS {
 		}
 		if (cm != null && domain != null) {
 		    cm.setProtocol(sslType)
+			.setTimeZone(timezone)
 			.setInterval(interval)
 			.setStopDelay(stopDelay)
 			.setTimeOffset(timeOffset)
