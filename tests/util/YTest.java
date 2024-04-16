@@ -225,6 +225,34 @@ public class YTest {
 	    System.exit(1);
 	}
 
+	try {
+	    System.out.println("parsing merge.yaml");
+	    Reader r = new FileReader("merge.yaml", Charset.forName("UTF-8"));
+	    Object object = JSUtilities.YAML.parse(r);
+	    String[] keys = {
+		"defs", "test1", "test2", "test3"
+	    };
+	    for (String key: keys) {
+		Object o =  ((JSObject)object).get(key);
+		System.out.println("key = " + key);
+		if (o == null) {
+		    System.out.println("no value for key");
+		} else if (!(o instanceof JSObject)) {
+		    System.out.println("... " + o);
+		} else {
+		    JSObject obj = ((JSObject)object).get(key, JSObject.class);
+		    for (Map.Entry<String,Object> entry: obj.entrySet()) {
+			System.out.format("... %s: %s\n",
+					  entry.getKey(),
+					  entry.getValue());
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
 
 	ExpressionParser ep = new ExpressionParser(Math.class);
 

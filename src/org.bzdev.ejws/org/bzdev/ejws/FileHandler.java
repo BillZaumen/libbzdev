@@ -823,7 +823,8 @@ public class FileHandler implements HttpHandler {
      * This method should be used only for debugging.
      * If {@link #setTracer(Appendable,boolean)} was previously called,
      * the handling of stack traces will not be change.
-     * @param tracer the Appendable for tracing requests and responses
+     * @param tracer the Appendable for tracing requests and responses;
+     *        null to disable tracing
      */
     public void setTracer(Appendable tracer) {
 	this.tracer = tracer;
@@ -834,7 +835,8 @@ public class FileHandler implements HttpHandler {
      * This method should be used only for debugging.
      * The stack trace will be printed if {@link handle(HttpExchange)}
      * throws an exception and the first argument is not null.
-     * @param tracer the Appendable for tracing requests and responses
+     * @param tracer the Appendable for tracing requests and responses;
+     *        null to disable tracing
      * @param stacktrace true for a stack trace; false otherwise
      */
     public void setTracer(Appendable tracer, boolean stacktrace) {

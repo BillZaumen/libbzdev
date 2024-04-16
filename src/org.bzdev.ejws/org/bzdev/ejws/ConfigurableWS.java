@@ -189,10 +189,13 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     The number of threads the server can use. The default is 50.
  *   <LI><B>trace</B>. A value of <B>true</B> indicates that the
  *     execution of a request will be traced, printing out what
- *     occurred on standard output.  The default is <B>false</B>.
+ *     occurred on standard output.  The default is <B>false</B>
+ *     unless overrriden by
+ *     {@link ConfigurableWS#setTraceDefaults(boolean,boolean)}.
  *   <LI><B>stackTrace</B>. A value of <B>true</B> indicates that
  *     errors resulting from GET or POST methods will generate a
- *     stack trace.  The default is <B>false</B>.
+ *     stack trace.  The default is <B>false</B> unless overrriden by
+ *     {@link ConfigurableWS#setTraceDefaults(boolean,boolean)}.
  * </UL>
  * <P>
  * <A ID="YAML">YAML</A> can be used as a configuration-file format,
@@ -202,6 +205,8 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  * <BLOCKQUOTE><PRE>
  * %YAML 1.2
  * ---
+ * defs:
+ *  ... list of objects with YAML anchors; otherwise ignored
  * config:
  *    <STRONG>NAME</STRONG>: <STRONG>VALUE</STRONG>
  *    ... (additional name-value pairs)
@@ -229,6 +234,8 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *      bgcolor: <STRONG>CSS_COLOR</STRONG>
  *      linkColor: <STRONG>CSS_COLOR</STRONG>
  *      visitedColor: <STRONG>CSS_COLOR</STRONG>
+ *      trace: <STRONG>Boolean</STRONG>
+ *      stacktrace: <STRONG>Boolean</STRONG>
  *    -... (additional contexts)
  * ... (additional keys other than "config:" and "context:")
  * ...
@@ -324,6 +331,16 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *   <LI><STRONG>hideWebInf</STRONG> is true if any WEB-INF directory
  *      should be hidden; false otherwise. If not provided, the value
  *      is assumed to be true.
+ *   <LI><B>trace</B>. A value of <B>true</B> indicates that the
+ *     execution of a request will be traced, printing out what
+ *     occurred on standard output.  The default is the corresponding
+ *     parameter in the config object, and if there is none, a configurable
+ *     system  default is used.
+ *   <LI><B>stackTrace</B>. A value of <B>true</B> indicates that
+ *     errors resulting from GET or POST methods will generate a stack
+ *     trace. The default is the corresponding parameter in the config
+ *     object, and if there is none, a configurable system default is
+ *     used.
  *   <LI><STRONG>color</STRONG> is the CSS color for text.
  *      This will override a standard property for the current prefix.
  *   <LI><STRONG>bgcolor</STRONG> is the CSS color for the background.
@@ -372,7 +389,8 @@ public class ConfigurableWS {
     static final Set<String> cmPropertyNames =
 	Set.of("sslType", "domain", "keyStoreFile");
 
-    static final Set<String> standardKeys = Set.of("config", "contexts");
+    static final Set<String> standardKeys =
+	Set.of("defs", "config", "contexts");
 
     boolean trace = false;
     boolean stacktrace = false;
@@ -601,6 +619,12 @@ public class ConfigurableWS {
 		boolean displayDir = (displayDirB == null)? true: displayDirB;
 		boolean hideWebInf = (hideWebInfB == null)? true: hideWebInfB;
 		    
+		Boolean traceB = obj.get("trace", Boolean.class);
+		Boolean stacktraceB = obj.get("stacktrace", Boolean.class);
+		boolean trace = (traceB == null)? trace(): traceB;
+		boolean stacktrace = (stacktraceB == null)? stacktrace():
+		    stacktraceB;
+
 		String color = obj.get("color", String.class);
 		String bgcolor = obj.get("bgcolor", String.class);
 		String linkColor = obj.get("linkColor", String.class);
@@ -733,6 +757,10 @@ public class ConfigurableWS {
 			    svr.getWebMap(prefix).addWelcome(path);
 			}
 		    }
+		}
+		if (trace) {
+		    FileHandler fh = svr.getFileHandler(prefix);
+		    fh.setTracer(log, stacktrace);
 		}
 	    }
 	}

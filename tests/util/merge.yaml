@@ -1,0 +1,29 @@
+%YAML 1.2
+---
+defs: &def
+  foo: 10
+  bar: 20
+
+test1:
+  foo1: 30
+  <<:
+    foo3: 40
+    bar3: 50
+  bar1: 60
+  <<:
+    foo4: 3
+    bar4: 5
+  <<: *def
+  bar6: 40
+
+test2:
+  <<: *def
+
+test3:
+  xy: 20
+  <<: *def
+  <<:
+    u: 20
+    v: 30
+  xz: 30
+...

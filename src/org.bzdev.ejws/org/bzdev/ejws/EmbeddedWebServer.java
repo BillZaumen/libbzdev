@@ -1317,7 +1317,8 @@ public class EmbeddedWebServer {
      * <P>
      * This method is provided for convenience.
      * @param p the prefix (null implies the root prefix)
-     * @return the handler
+     * @return the handler; null if the handler is not an instance of
+     *         FileHandler
      */
     public FileHandler getFileHandler(String p) {
 	HttpHandler handler = getHttpHandler(p);

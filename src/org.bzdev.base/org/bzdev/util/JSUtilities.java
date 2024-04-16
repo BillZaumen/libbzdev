@@ -29,6 +29,26 @@ import java.util.ResourceBundle;
  */
 public class JSUtilities {
 
+    static void objectMerge(JSObject target, Object value,
+			    long lineno)
+	throws JSException
+    {
+	JSObject source = (value instanceof JSObject)?
+	    (JSObject) value: null;
+	if (source == null) {
+	    String msg = errorMsg("jsoExpected");
+	    throw new JSException(lineno, msg);
+	}
+	for (Map.Entry<String,Object> entry: source.entrySet()) {
+	    String key = entry.getKey();
+	    if (target.containsKey(key)) {
+		String msg = errorMsg("duplicateKey", key);
+		throw new JSException(lineno, msg);
+	    }
+	    target.putObject(key, entry.getValue());
+	}
+    }
+
     // resource bundle for messages used by exceptions and errors
     static ResourceBundle exbundle = ResourceBundle.getBundle
 	("org.bzdev.util.lpack.JSUtilities");
@@ -747,6 +767,28 @@ public class JSUtilities {
 		}
 	    }
 
+	    // pushChar is used by TAML to avoid confusing
+	    // '<<:' with the start of a tag.
+	    int prevchars[] = new int[16];
+	    int pcind = -1;
+
+	    /**
+	     * Push back an already-read character.
+	     * The pushback stack is short (maximum of 16 characters).
+	     * THe characters are assumed to be on the same line.
+	     * @param ch the character
+	     */
+	    protected void pushChar(int ch) {
+		prevchars[++pcind] = ch;
+		column--;
+	    }
+
+	    private void popChar() {
+		if (pcind == -1) return;
+		b = prevchars[pcind--];
+		column++;
+	    }
+
 	    /**
 	     * Read a character.
 	     * @return the next character
@@ -754,6 +796,10 @@ public class JSUtilities {
 	     */
 	    protected int nextChar() throws IOException {
 		int prevb = b;
+		if (pcind != -1) {
+		    popChar();
+		    return b;
+		}
 		b = r.read();
 		if (commentMode == CommentMode.YAML && b == '\t') {
 		    throw new IOException("tabsNotAllowed");
@@ -1120,11 +1166,15 @@ public class JSUtilities {
 		    }
 		    nextChar();
 		    Object value = parseValueJS(ydata);
-		    if (jsobject.containsKey(key)) {
-			String msg = errorMsg("duplicateKey", key);
-			throw new JSException(lineno, msg);
+		    if (ydata != null && key.equals("<<")) {
+			objectMerge(jsobject, value, lineno);
+		    } else {
+			if (jsobject.containsKey(key)) {
+			    String msg = errorMsg("duplicateKey", key);
+			    throw new JSException(lineno, msg);
+			}
+			jsobject.putObject(key, value);
 		    }
-		    jsobject.putObject(key, value);
 		    skipWhitespace();
 		    if (b == '}') {
 			locator.popLevel();
@@ -1854,7 +1904,7 @@ public class JSUtilities {
 	 * {@link JSUtilities.YAML.Parser#hasNext()} can be called to
 	 * determine if there is another object available.
 	 */
-	public static class Parser extends JSON.Parser {
+	public static class Parser extends JSON.Parser  {
 
 	    class YAMLData {
 
@@ -2025,6 +2075,21 @@ public class JSUtilities {
 		    if (skip) skipWhitespace();
 		} else if (b == '<') {
 		    nextChar();
+		    // Catch '<<:' so it isn't confused with a tag.
+		    if (b == '<') {
+			nextChar();
+			if (b == ':') {
+			    pushChar(':');
+			    pushChar('<');
+			    pushChar('<');
+			    nextChar();
+			    return;
+			} else {
+			    pushChar(b);
+			    pushChar('<');
+			    nextChar();
+			}
+		    }
 		    StringBuilder asb = new StringBuilder();
 		    asb.append('<');
 		    while (isTagChar(b)) {
@@ -2807,11 +2872,15 @@ public class JSUtilities {
 			    currentTag = null;
 			    currentTagRef = null;
 			}
-			if (object.containsKey(key)) {
-			    String msg = errorMsg("duplicateKey", key);
-			    throw new JSException(lineno, msg);
+			if (key.equals("<<")) {
+			    objectMerge(object, value, lineno);
+			} else {
+			    if (object.containsKey(key)) {
+				String msg = errorMsg("duplicateKey", key);
+				throw new JSException(lineno, msg);
+			    }
+			    object.putObject(key, value);
 			}
-			object.putObject(key, value);
 			lastkey = key;
 			key = null;
 			if (anchor != null) {
@@ -2820,10 +2889,6 @@ public class JSUtilities {
 		    } else if (col == nextIndent) {
 			currentTag = null;
 			currentTagRef = null;
-			if (object.containsKey(key)) {
-			    String msg = errorMsg("duplicateKey", key);
-			    throw new JSException(lineno, msg);
-			}
 			if (object.containsKey(key)) {
 			    String msg = errorMsg("duplicateKey", key);
 			    throw new JSException(lineno, msg);
@@ -2971,10 +3036,19 @@ public class JSUtilities {
 			    }
 			}
 			sb.setLength(0);
-			while (b == '.' ||
-			       Character.isJavaIdentifierPart((char)b)) {
+			if (b == '<') {
 			    sb.append((char)b);
 			    nextChar();
+			    if (b == '<') {
+				sb.append((char) b);
+			    }
+			    nextChar();
+			} else {
+			    while (b == '.' ||
+				   Character.isJavaIdentifierPart((char)b)) {
+				sb.append((char)b);
+				nextChar();
+			    }
 			}
 			if (b == ':') {
 			    long ln = lineno;
@@ -3062,14 +3136,23 @@ public class JSUtilities {
 		    }
 		}
 		int cloc = getColumn();
-		while (b != -1) {
-		    if (b == '.'
-			|| Character.isJavaIdentifierPart ((char)b)) {
-			sb.append((char)b);
-		    } else {
-			break;
-		    }
+		if (b == '<') {
+		    sb.append((char)b);
 		    nextChar();
+		    if (b == '<') {
+			sb.append((char) b);
+			nextChar();
+		    }
+		} else {
+		    while (b != -1) {
+			if (b == '.'
+			    || Character.isJavaIdentifierPart ((char)b)) {
+			    sb.append((char)b);
+			} else {
+			    break;
+			}
+			nextChar();
+		    }
 		}
 		if (b == ':') {
 		    locator.pushLevel();
