@@ -367,6 +367,12 @@ cwstest3:
 		|| rm example.zip
 	rm -f example.zip
 
+cwstest5:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) CWSTest cwstest4.yaml
+
 cwstest1-post:
 	curl --data foo=text http://localhost:8080/post/
 
@@ -384,7 +390,7 @@ cwstest4:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	zip -r example.zip example
-	$(JAVA) CWSTest3 cwstest3.yaml  \
+	$(JAVA) CWSTest cwstest3.yaml  \
 		|| rm example.zip
 	rm -f example.zip
 

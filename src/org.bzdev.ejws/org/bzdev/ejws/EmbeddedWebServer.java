@@ -1,6 +1,7 @@
 package org.bzdev.ejws;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.lang.CallableArgsReturns;
+import org.bzdev.io.AppendableWriter;
 import org.bzdev.net.HttpSessionOps;
 import org.bzdev.util.SafeFormatter;
 
@@ -1589,7 +1590,26 @@ public class EmbeddedWebServer {
 		    wm.configure();
 		    wm.setConfigured(true);
 		} catch (Exception e) {
-		    System.err.println("could not configure web map");
+		    String msg =
+			errorMsg("configFailed", prefix, e.getMessage());
+		    FileHandler fh = getFileHandler(prefix);
+		    if (fh != null) {
+			Appendable tracer = fh.getTracer();
+			if (tracer != null) {
+			    AppendableWriter aw = new AppendableWriter(tracer);
+			    PrintWriter pw = new PrintWriter(aw);
+			    boolean stacktracing = fh.getStacktracing();
+			    pw.println(msg);
+			    if (stacktracing) {
+				e.printStackTrace(pw);
+			    }
+			    pw.flush();
+			} else {
+			    System.err.println(msg);
+			}
+		    } else {
+			System.err.println(msg);
+		    }
 		    wm.deconfigure();
 		    wm.setConfigured(false);
 		}

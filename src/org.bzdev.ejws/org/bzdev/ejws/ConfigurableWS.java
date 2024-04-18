@@ -640,7 +640,13 @@ public class ConfigurableWS {
 		    new HashMap<String,String>();
 		if (parameters != null) {
 		    for (String key: parameters.keySet()) {
-			map.put(key, parameters.get(key,String.class));
+			try {
+			    map.put(key, parameters.get(key,String.class));
+			} catch (Exception e) {
+			    String msg =
+				errorMsg("getparm", prefix, key);
+			    throw new Exception(msg, e);
+			}
 		    }
 		}
 		if (propNames != null) {

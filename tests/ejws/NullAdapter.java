@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class NullAdapter implements ServletAdapter {
+
     @Override
     public void doGet(HttpServerRequest req, HttpServerResponse res)
 	throws IOException, ServletAdapter.ServletException
@@ -33,6 +34,7 @@ public class NullAdapter implements ServletAdapter {
 	res.sendError(404);
     }
 
+    @Override
     public void init(Map<String,String> map)
 	throws ServletAdapter.ServletException
     {
@@ -43,6 +45,11 @@ public class NullAdapter implements ServletAdapter {
 				  entry.getKey(), entry.getValue());
 	    }
 	    System.out.println("(not used)");
+	    if (map.get("foo") != null) {
+		System.out.println("saw foo: throwing exception");
+		throw new ServletAdapter
+		    .ServletException("found parameter foo");
+	    }
 	}
     }
 }

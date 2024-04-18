@@ -1,0 +1,15 @@
+%YAML 1.2
+---
+  config:
+    port: 8080
+    trace: true
+    stackTrace: true
+  contexts:
+    - prefix: /post/
+      className: ServletWebMap
+      arg: NullAdapter
+      parameters:
+        foo: "true"
+      propertyNames: ["color", "bgcolor"]
+      methods: ["POST", "GET"]
+...

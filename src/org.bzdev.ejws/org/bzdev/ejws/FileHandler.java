@@ -819,6 +819,23 @@ public class FileHandler implements HttpHandler {
     private boolean stacktrace = false;
 
     /**
+    * Get the {@link Appendable} used for tracing
+    * This method is restricted to this package and currently used
+    * only by EmbeddedWebServer.
+    * @return the {@link Appendable}; null if tracing is not enabled
+    */
+    Appendable getTracer() {return tracer;}
+
+    /**
+     * Determine if a stack tracing is requested for tracing.
+     * This method is restricted to this package and currently used
+     * only by EmbeddedWebServer.
+     * @return true if stack tracing is enabled; false otherwise.
+     */
+    boolean getStacktracing() {return stacktrace;}
+
+
+    /**
      * Set an Appendable for tracing.
      * This method should be used only for debugging.
      * If {@link #setTracer(Appendable,boolean)} was previously called,
