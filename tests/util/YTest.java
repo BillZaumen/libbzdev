@@ -185,6 +185,50 @@ public class YTest {
 	    System.exit(1);
 	}
 
+	try {
+	    System.out.println("Object with a null value");
+	    String s = "%YAML 1.2\n---\n  foo: null\n...\n";
+	    Object object = JSUtilities.YAML.parse(s);
+	    if (object instanceof JSObject) {
+		JSObject obj = (JSObject)object;
+		for (String key:  obj.keySet()) {
+		    System.out.println("... key = " + key);
+		    if (obj.get(key) != null) {
+			System.out.println("null value expected");
+			throw new Exception();
+		    }
+		}
+	    } else {
+		System.out.println("object = " + object);
+		throw new Exception();
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
+	try {
+	    System.out.println("Array with a null value");
+	    String s = "%YAML 1.2\n---\n  - null\n...\n";
+	    Object object = JSUtilities.YAML.parse(s);
+	    if (object instanceof JSArray) {
+		JSArray obj = (JSArray)object;
+		System.out.println("... array length = " + obj.size());
+		if (obj.get(0) != null) {
+		    System.out.println("null value expected");
+		    throw new Exception();
+		} else {
+		    System.out.println("... found a null value at index 0");
+		}
+	    } else {
+		System.out.println("object = " + object);
+		throw new Exception();
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+
 
 	try {
 	    System.out.println("parsing YTest11.yaml");

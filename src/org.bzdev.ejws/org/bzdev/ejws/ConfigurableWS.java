@@ -943,7 +943,12 @@ public class ConfigurableWS {
 			    log.println(errorMsg("noConfigSection"));
 			} else {
 			    for (String key: config.keySet()) {
-				props.put(key, "" + config.get(key));
+				Object value = config.get(key);
+				if (value != null) {
+				    // we don't want to turn null into
+				    // the string "null"
+				    props.put(key, "" + config.get(key));
+				}
 			    }
 			}
 			contextArray = object.get("contexts", JSArray.class);

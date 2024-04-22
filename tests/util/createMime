@@ -1,0 +1,10 @@
+#!/usr/bin/scrunner -sEUN:true
+import (org.bzdev.util.SharedMimeInfo);
+
+new SharedMimeInfo(global.getWriter())
+    .addConfigPropertyType(90, "application/foo", "foo",
+			   "foo type")
+    .addZipDocType(80, "application/bar+zip", "bar",
+		   "bar type")
+    .close();
+

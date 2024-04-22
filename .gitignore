@@ -101,6 +101,8 @@ examples/*.jpg
 examples/*.webm
 examples/*.stl
 examples/*.html
+examples/sbl/access.sbl
+examples/sbl/keystore.jks
 examples/smartmeter/tclasses/
 examples/smartmeter/ttmpsrc/
 scrunner.1.pdf

@@ -1,0 +1,9 @@
+#!/usr/bin/scrunner -sEUN:true
+
+import (org.bzdev.util,
+	[ConfigPropUtilities, ConfigPropUtilities.MimeInfoMode]);
+
+var w = global.getWriter();
+
+createMimeInfo(w, 80, "application/foo", "foo", null);
+

@@ -1,0 +1,6 @@
+#+T
+var string = "start";
+string = !true? "not b1":  "OK";
+
+#-T
+(string != "OK") && throw "string = " + string;

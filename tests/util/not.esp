@@ -1,0 +1,12 @@
+var b1 = true;
+var b2 = true;
+
+#+T #+S
+
+var string = !b1? "not b1":
+    !b2? "not b2":
+    "OK";
+
+#-S #-T
+
+(string != "OK") && throw "string = " + string;

@@ -578,8 +578,10 @@ public class SBL {
 						 */
 						 selfSignedTest);
 	    } else {
+		File truststore = null;
+		char[] pw = null;
 		SSLUtilities.installTrustManager("TLS",
-						 null, null,
+						 truststore, pw,
 						 /*
 						 (cert) -> {
 						     return selfsigned;
@@ -663,6 +665,7 @@ public class SBL {
 
 
     public static void main(String argv[]) throws Exception {
+
 	configDir.mkdirs();
 	System.setProperty("user.dir", configDir.getCanonicalPath());
 
