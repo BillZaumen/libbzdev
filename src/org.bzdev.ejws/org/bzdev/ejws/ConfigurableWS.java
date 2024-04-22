@@ -641,7 +641,18 @@ public class ConfigurableWS {
 		if (parameters != null) {
 		    for (String key: parameters.keySet()) {
 			try {
-			    map.put(key, parameters.get(key,String.class));
+			    Object value = parameters.get(key);
+			    if (value instanceof String) {
+				map.put(key, (String) value);
+			    } else if (value instanceof Number
+				       || value instanceof Boolean) {
+				map.put(key, value.toString());
+			    } else {
+				String msg =
+				    value.getClass().getCanonicalName();
+				msg = errorMsg("unexpectedValue", msg);
+				throw new Exception(msg);
+			    }
 			} catch (Exception e) {
 			    String msg =
 				errorMsg("getparm", prefix, key);
@@ -915,13 +926,30 @@ public class ConfigurableWS {
 		if (fname.endsWith(".yml") || fname.endsWith(".yaml")
 		    || fname.endsWith(".YML") || fname.endsWith(".YAML")) {
 		    Object obj = JSUtilities.YAML.parse(r);
-		    if (obj != null && obj instanceof JSObject) {
+		    if (obj == null) {
+			log.println(errorMsg("emptyConfigFile"));
+		    } else if (obj instanceof String) {
+			String string = (String)obj;
+			if (string.length() > 32) {
+			    string = string.substring(0, 33) + "...";
+			}
+			String msg = errorMsg("foundString");
+			msg = msg + " " + string;
+			log.println(msg);
+		    } else if (obj != null && obj instanceof JSObject) {
 			JSObject object = (JSObject) obj;
 			JSObject config = object.get("config", JSObject.class);
-			for (String key: config.keySet()) {
-			    props.put(key, "" + config.get(key));
+			if (config == null) {
+			    log.println(errorMsg("noConfigSection"));
+			} else {
+			    for (String key: config.keySet()) {
+				props.put(key, "" + config.get(key));
+			    }
 			}
 			contextArray = object.get("contexts", JSArray.class);
+			if (contextArray == null) {
+			    log.println("noContexts");
+			}
 			for (String key: object.keySet()) {
 			    if (!allowedKeys.contains(key)) {
 				log.println(errorMsg("ignoringKey", key));
