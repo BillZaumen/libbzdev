@@ -914,7 +914,8 @@ BUILD/sbl.jar: $(SBL_JFILES) $(SBL_RESOURCES1) \
 
 
 clean:
-	rm -f BUILD/libbzdev-*.jar BUILD/libbzdev.jar BUILD/libbzdev.policy
+	rm -f BUILD/libbzdev-*.jar BUILD/libbzdev.jar BUILD/libbzdev.policy \
+		sbl.jar scrunner.jar yrunner.jar lsnof.jar
 	rm -rf mods tmpsrc
 	rm -f esp.elc
 

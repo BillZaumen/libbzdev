@@ -15,7 +15,6 @@ public class YTest {
 
     public static void main(String argv[]) throws Exception {
 
-
 	try {
 	    System.out.println("parsing an empty Yaml file");
 	    String s = "%YAML 1.2\n---\n# Nothing to do!\n...\n";
@@ -25,7 +24,6 @@ public class YTest {
 	    e.printStackTrace();
 	    System.exit(1);
 	}
-
 
 	try {
 	    System.out.println("parsing an empty Yaml file");
@@ -1014,6 +1012,24 @@ public class YTest {
 				   + ", " + value.getClass());
 	    }
 	}
+
+	System.out.println("Try a space before a colon");
+	String sctest = "%YAML 1.2\n---\nfoo : bar\n...\n";
+	object =  (JSObject) JSUtilities.YAML.parse(sctest);
+	System.out.println("for key foo, value = " + object.get("foo"));
+	System.out.println("... try a string without a colon");
+	sctest = "%YAML 1.2\n---\n trying foo bar\n...\n";
+	obj =  JSUtilities.YAML.parse(sctest);
+	System.out.println(obj);
+	System.out.println("... try a string containing a colon");
+	sctest = "%YAML 1.2\n---\n trying foo : bar\n...\n";
+	obj =  JSUtilities.YAML.parse(sctest);
+	System.out.println(obj);
+
+	System.out.println("... trying a quoted string");
+	sctest = "%YAML 1.2\n---\n \"foo: bar\"\n...\n";
+	obj =  JSUtilities.YAML.parse(sctest);
+	System.out.println(obj + ", type is the " + obj.getClass());
 
 	System.out.println();
 	System.out.println("test multiple YAML documents");

@@ -769,12 +769,12 @@ public class JSUtilities {
 
 	    // pushChar is used by TAML to avoid confusing
 	    // '<<:' with the start of a tag.
-	    int prevchars[] = new int[16];
+	    int prevchars[] = new int[512];
 	    int pcind = -1;
 
 	    /**
 	     * Push back an already-read character.
-	     * The pushback stack is short (maximum of 16 characters).
+	     * The pushback stack is finite (maximum of 512 characters).
 	     * THe characters are assumed to be on the same line.
 	     * @param ch the character
 	     */
@@ -3050,6 +3050,22 @@ public class JSUtilities {
 				nextChar();
 			    }
 			}
+			if (b == ' ') {
+			    // Fix up spaces between a key and a colon
+			    int spacecnt = 0;
+			    while (b == ' ') {
+				spacecnt++;
+				nextChar();
+			    }
+			    if (b != ':') {
+				pushChar(b);
+				spacecnt--;
+				for (int isc = 0; isc < spacecnt; isc++) {
+				    pushChar(' ');
+				}
+				nextChar();
+			    }
+			}
 			if (b == ':') {
 			    long ln = lineno;
 			    nextChar();
@@ -3144,12 +3160,27 @@ public class JSUtilities {
 			nextChar();
 		    }
 		} else {
-		    while (b != -1) {
+		    while (b  != -1) {
 			if (b == '.'
 			    || Character.isJavaIdentifierPart ((char)b)) {
 			    sb.append((char)b);
 			} else {
 			    break;
+			}
+			nextChar();
+		    }
+		}
+		if (b == ' ') {
+		    // Fix up spaces between a key and a colon
+		    int spacecnt = 0;
+		    while (b == ' ') {
+			spacecnt++;
+			nextChar();
+		    }
+		    if (b != ':') {
+			pushChar(b);
+			for (int isc = 0; isc < spacecnt; isc++) {
+			    pushChar(' ');
 			}
 			nextChar();
 		    }

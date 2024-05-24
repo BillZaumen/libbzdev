@@ -453,6 +453,9 @@ nulltest:
 	java -p ../../BUILD:`pwd`/docsig.jar \
 		-m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
 		--stackTrace  nulltest.esp
+ytest0: compile
+	@echo ---- YTest0 -----
+	@$(JAVA) YTest0
 
 clean:
 	rm -rf classes

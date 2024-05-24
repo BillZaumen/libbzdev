@@ -949,7 +949,7 @@ public class TemplateProcessor {
 	try {
 	    boolean isEmpty = origTables.isEmpty();
 	    tables = isEmpty? new LinkedList<KeyMap>():
-		new LinkedList(origTables);
+		new LinkedList<KeyMap>(origTables);
 	    root.set(isEmpty? null: tables.getLast());
 	    processTemplate(template, 0, template.length, writer);
 	    writer.flush();

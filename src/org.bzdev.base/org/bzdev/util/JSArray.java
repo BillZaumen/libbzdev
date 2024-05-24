@@ -255,6 +255,7 @@ public class JSArray implements Iterable<Object>, JSOps {
      * @exception ArrayStoreException if the argument is not a superclass
      *         of the runtime type of this object's elements
      */
+    @SuppressWarnings("unchecked")
     public <T> T[] toArray(Class<T> clasz) {
 	int sz = list.size();
 	if (sz == 0) return (T[])Array.newInstance(clasz, 0);
@@ -355,6 +356,7 @@ public class JSArray implements Iterable<Object>, JSOps {
      * @return the matrix.
      * @exception IllegalStateException the conversion failed
      */
+    @SuppressWarnings("unchecked")
     public Object[][] toMatrix() throws IllegalStateException {
 	int sz = list.size();
 	if (sz == 0) {
@@ -403,6 +405,7 @@ public class JSArray implements Iterable<Object>, JSOps {
      * @return the array
      * @exception IllegalStateException the conversion failed
      */
+    @SuppressWarnings("unchecked")
     public <T> T[][] toMatrix(Class<T> clasz) throws IllegalStateException {
 	int sz = list.size();
 	if (sz == 0) {

@@ -282,7 +282,8 @@ public interface HttpServerRequest {
      * @return an enumeration of parameter names
      */
     default Enumeration<String> getParameterNames() {
-	return new IteratorEnumeration(getParameterMap().keySet().iterator());
+	return new
+	    IteratorEnumeration<String>(getParameterMap().keySet().iterator());
     }
 
     /**
