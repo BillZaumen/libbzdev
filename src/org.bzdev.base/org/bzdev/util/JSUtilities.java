@@ -3483,6 +3483,9 @@ public class JSUtilities {
 	    static final String LINE_SEPARATOR =
 		System.getProperty("line.separator");
 
+	    static boolean CRLS = (LINE_SEPARATOR.length() == 1
+				   && LINE_SEPARATOR.charAt(0) == '\r');
+
 	    /**
 	     * Parse a string.
 	     * This method is part of the implementation and is only
@@ -3516,17 +3519,25 @@ public class JSUtilities {
 		sb.setLength(0);
 		nextChar();
 		int nlcount = 0;
+		int spcount = 0;
 		while(b != -1) {
 		    switch (b) {
+		    case ' ':
+			spcount++;
+			break;
 		    case '\r':
 			nextChar();
-			if (b != '\n') {
-			    String msg = errorMsg("badNewLine");
-			    throw new JSException(lineno, msg);
+			if (!CRLS) {
+			    if (b != '\n') {
+				String msg = errorMsg("badNewLine");
+				throw new JSException(lineno, msg);
+			    }
+			    continue;
 			}
-			continue;
+			// fall through when CR ends a line
 		    case '\n':
 			nlcount = 0;
+			spcount = 0;
 			while (b != -1) {
 			    nextChar();
 			    while (Character.isWhitespace(b) && b != '\r'
@@ -3566,8 +3577,36 @@ public class JSUtilities {
 			}
 			continue;
 		    case '\\':
+			for (int i = 0; i < spcount; i++) {
+			    sb.append(' ');
+			}
+			spcount = 0;
 			nextChar();
 			switch (b) {
+			case '\r':
+			    if (CRLS) {
+				nextChar();
+				while (b == ' ') {
+				    nextChar();
+				}
+			    } else {
+				nextChar();
+				if (b == '\n') {
+				    nextChar();
+				    while (b == ' ') {
+					nextChar();
+				    }
+				} else {
+				    sb.append(' ');
+				}
+			    }
+			    continue;
+			case '\n':
+			    nextChar();
+			    while (b == ' ') {
+				nextChar();
+			    }
+			    continue;
 			case '"':
 			    sb.append('"');
 			    break;
@@ -3685,9 +3724,17 @@ public class JSUtilities {
 			}
 			break;
 		    case '"':
+			for (int i = 0; i < spcount; i++) {
+			    sb.append(' ');
+			}
+			spcount = 0;
 			nextChar();
 			return sb.toString();
 		    default:
+			for (int i = 0; i < spcount; i++) {
+			    sb.append(' ');
+			}
+			spcount = 0;
 			sb.append((char)b);
 		    }
 		    if (Character.isISOControl(b)) {
@@ -3711,23 +3758,37 @@ public class JSUtilities {
 	    protected String parseString1() throws IOException {
 		StringBuilder sb = new StringBuilder();
 		int nlcount = 0;
+		int spcount = 0;
 		nextChar();	// was looking at "'"
 		while (b != -1) {
 		    switch (b) {
+		    case ' ':
+			spcount++;
+			break;
 		    case '\'':
 			nextChar();
-			if (b == '\'') sb.append('\'');
+			if (b == '\'') {
+			    for (int i = 0; i < spcount; i++) {
+				sb.append(' ');
+			    }
+			    spcount = 0;
+			    sb.append('\'');
+			}
 			else return sb.toString();
 			break;
 		    case '\r':
 			nextChar();
-			if (b != -1 && b != '\n') {
-			    sb.append('\r');
-			    break;
+			if (!CRLS) {
+			    if (b != '\n') {
+				String msg = errorMsg("badNewLine");
+				throw new JSException(lineno, msg);
+			    }
+			    continue;
 			}
-			continue;
+			// fall through when CR ends a line
 		    case '\n':
 			nlcount = 0;
+			spcount = 0;
 			while (b != -1) {
 			    nextChar();
 			    while (Character.isWhitespace(b) && b != '\r'
@@ -3744,7 +3805,6 @@ public class JSUtilities {
 					    sb.append(LINE_SEPARATOR);
 					}
 				    }
-				    sb.append((char)b);
 				    break;
 				} else {
 				    nlcount++;
@@ -3759,7 +3819,6 @@ public class JSUtilities {
 					sb.append(LINE_SEPARATOR);
 				    }
 				}
-				sb.append((char)b);
 				break;
 			    }
 			}
@@ -3767,8 +3826,12 @@ public class JSUtilities {
 			    String msg = errorMsg("EOF");
 			    throw new JSException(lineno, msg);
 			}
-			break;
+			continue;
 		    default:
+			for (int i = 0; i < spcount; i++) {
+			    sb.append(' ');
+			}
+			spcount = 0;
 			sb.append((char)b);
 		    }
 		    nextChar();

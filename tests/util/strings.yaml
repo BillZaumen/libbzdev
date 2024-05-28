@@ -1,0 +1,26 @@
+%YAML 1.2
+---
+ - "hello ther\
+   e."
+ - 'hello ther\
+   e.'
+ - "hello    
+        there"
+ - 'goodbye  
+        now'
+
+ - "hello\nthere"
+ - 'hello\nthere'
+ - 'ab''s'
+ - '''hello'''
+ - "hello
+
+
+   goodbye"
+
+ - 'hello
+
+
+   goodbye'
+
+...
