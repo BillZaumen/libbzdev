@@ -773,9 +773,18 @@ public class JSUtilities {
 	    int pcind = -1;
 
 	    /**
+	     * Set the current column
+	     * This method is used in init3 only.
+	     * @param col the column number
+	     */
+	    protected void setColumn(int col) {
+		column = col;
+	    }
+
+	    /**
 	     * Push back an already-read character.
 	     * The pushback stack is finite (maximum of 512 characters).
-	     * THe characters are assumed to be on the same line.
+	     * The characters are assumed to be on the same line.
 	     * @param ch the character
 	     */
 	    protected void pushChar(int ch) {
@@ -787,6 +796,57 @@ public class JSUtilities {
 		if (pcind == -1) return;
 		b = prevchars[pcind--];
 		column++;
+	    }
+
+	    /**
+	     * Push back an already-read string.
+	     * The pushback stack is finite (maximum of 512 characters).
+	     * The characters are assumed to be on the same line.
+	     * The values pushed basck included delimiting double quotes
+	     * and some characters are escaped.
+	     * <P>
+	     * This methods is used by init3 in the YAML parser.
+	     * @param s the string to push back
+	     */
+	    protected void pushString(String s) {
+		char[] carray = s.toCharArray();
+		pushChar('"');
+		for (int i = carray.length-1; i >= 0; i--) {
+		    char ch = carray[i];
+		    switch(ch) {
+		    case '"':
+			pushChar('"');
+			pushChar('\\');
+			break;
+		    case '\n':
+			pushChar('n');
+			pushChar('\\');
+			break;
+		    case '\r':
+			pushChar('r');
+			pushChar('\\');
+			break;
+		    case '\f':
+			pushChar('f');
+			pushChar('\\');
+			break;
+		    case '\\':
+			pushChar('\\');
+			pushChar('\\');
+			break;
+		    case '\b':
+			pushChar('b');
+			pushChar('\\');
+			break;
+		    case '\t':
+			pushChar('t');
+			pushChar('\\');
+			break;
+		    default:
+			pushChar(ch);
+		    }
+		}
+		pushChar('"');
 	    }
 
 	    /**
@@ -847,9 +907,13 @@ public class JSUtilities {
 			if (sawCR) sb.append('\r');
 			sawCR = true;
 		    }
-		    b = r.read();
-		    if (b != -1 && column == -1) lineno++;
-		    column++;
+		    if (pcind != -1) {
+			popChar();
+		    } else {
+			b = r.read();
+			if (b != -1 && column == -1) lineno++;
+			column++;
+		    }
 		}
 		if (b == '\n') {
 		    column = -1;
@@ -1006,14 +1070,31 @@ public class JSUtilities {
 			break;
 		    case YAML:
 			if (b == '#') {
+			    if (pcind != -1) {
+				popChar();
+			    } else {
+				b = r.read();
+				column++;
+			    }
+			    /*
 			    b = r.read();
 			    // if (b != -1 && column == -1) lineno++;
 			    column++;
+			    */
 			    if (b == -1) break;
 			    while (b != -1 &&  b != '\n') {
+				if (pcind != -1) {
+				    popChar();
+				} else {
+				    b = r.read();
+				    if (b != -1 && column == -1) lineno++;
+				    column++;
+				}
+				/*
 				b = r.read();
 				// if (b != -1 && column == -1) lineno++;
 				column++;
+				*/
 			    }
 			    if (b == '\n') {
 				column = -1;
@@ -1023,7 +1104,12 @@ public class JSUtilities {
 			}
 			break;
 		    }
-		    b = r.read();
+		    if (pcind != -1) {
+			popChar();
+			column--;
+		    } else {
+			b = r.read();
+		    }
 		    if (b != -1 && column == -1) lineno++;
 		    column++;
 		    indentation = column;
@@ -1095,12 +1181,22 @@ public class JSUtilities {
 			break;
 		    case YAML:
 			if (b == '#') {
-			    b = r.read();
+			    if (pcind != -1) {
+				popChar();
+				column--;
+			    } else {
+				b = r.read();
+			    }
 			    if (b != -1 && column == -1) lineno++;
 			    column++;
 			    if (b == -1) break;
 			    while (b != -1 &&  b != '\n') {
-				b = r.read();
+				if (pcind != -1) {
+				    popChar();
+				    column--;
+				} else {
+				    b = r.read();
+				}
 				if (b != -1 && column == -1) lineno++;
 				column++;
 			    }
@@ -1115,7 +1211,12 @@ public class JSUtilities {
 		    if (!Character.isWhitespace(b)) {
 			return;
 		    }
-		    b = r.read();
+		    if (pcind != -1) {
+			popChar();
+			column--;
+		    } else {
+			b = r.read();
+		    }
 		    if (b != -1 && column == -1) lineno++;
 		    column++;
 		    indentation = column;
@@ -1252,6 +1353,7 @@ public class JSUtilities {
 	     * @exception IOException an error occurred
 	     */
 	    protected String parseString(boolean isIdent) throws IOException {
+		StringBuilder sb = new StringBuilder();
 		if (isIdent) {
 		    sb.setLength(0);
 		    sb.append((char) b);
@@ -2464,8 +2566,28 @@ public class JSUtilities {
 		    currentObject = super.parseValue(ydata);
 		    return;
 		case '"':
-		    // nextChar();
-		    currentObject = parseString();
+		    {
+			int ccol = getColumn();
+			// nextChar();
+			long lno = lineno;
+			String str = parseString();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			    pushChar(':');
+			    pushString(str);
+			    setColumn(ccol-1);
+			    nextChar();
+			    currentObject = tryParseObject(-1, 0, true);
+			} else {
+			    currentObject = str;
+			}
+		    }
 		    if (currentTag != null
 			&& currentObject != null
 			&& currentObject instanceof String) {
@@ -2478,7 +2600,29 @@ public class JSUtilities {
 		    return;
 		case '\'':
 		    // nextChar();
-		    currentObject = parseString1();
+		    // currentObject = parseString1();
+		    {
+			int ccol = getColumn();
+			long lno = lineno;
+			// nextChar();
+			String str = parseString1();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			    pushChar(':');
+			    pushString(str);
+			    setColumn(ccol-1);
+			    nextChar();
+			    currentObject = tryParseObject(-1, 0, true);
+			} else {
+			    currentObject = str;
+			}
+		    }
 		    if (currentTag != null
 			&& currentObject != null
 			&& currentObject instanceof String) {
@@ -2763,6 +2907,7 @@ public class JSUtilities {
 			    skipWhitespace();
 			    getTag(true);
 			    Object value = parseValue();
+
 			    if (currentTag != null && value != null
 				&& value instanceof String) {
 				value = toObject((String)value);
@@ -3036,7 +3181,22 @@ public class JSUtilities {
 			    }
 			}
 			sb.setLength(0);
-			if (b == '<') {
+			if (b == '"') {
+			    long lno = lineno;
+			    sb.append(parseString());
+			    // sb.append(sval);
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			} else if (b == '\'') {
+			    long lno = lineno;
+			    sb.append(parseString1());
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			} else if (b == '<') {
 			    sb.append((char)b);
 			    nextChar();
 			    if (b == '<') {
@@ -3121,6 +3281,7 @@ public class JSUtilities {
 			}
 		    }
 		}
+		int cloc = getColumn();
 		switch (b) {
 		case '*':
 		    StringBuilder asb = new StringBuilder();
@@ -3142,7 +3303,43 @@ public class JSUtilities {
 			String msg = errorMsg("missingAnchor", ref);
 			throw new JSException(lineno, msg);
 		    }
-		case '"': case '\'': case '|': case '>':
+		case '"':
+		    {
+			long lno = lineno;
+			String sval = parseString();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			    sb.append(sval);
+			    break;
+			} else {
+			    return sval;
+			}
+		    }
+		case '\'':
+		    {
+			long lno = lineno;
+			String sval = parseString1();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    if (lno != lineno) {
+				String msg = errorMsg("multiline");
+				throw new JSException(lineno, msg);
+			    }
+			    sb.append(sval);
+			    break;
+			} else {
+			    return sval;
+			}
+		    }
+		case '|': case '>':
 		    return parseValue(startCol, getColumn());
 		case '{': case '[':
 		    if (top) {
@@ -3150,8 +3347,41 @@ public class JSUtilities {
 		    } else {
 			return parseValue(startCol, getColumn());
 		    }
+		case '<':
+		    sb.append((char)b);
+		    nextChar();
+		    if (b == '<') {
+			sb.append((char) b);
+			nextChar();
+		    }
+		    break;
+		default:
+		    while (b  != -1) {
+			if (b == '.'
+			    || Character.isJavaIdentifierPart ((char)b)) {
+			    sb.append((char)b);
+			} else {
+			    break;
+			}
+			nextChar();
+		    }
+		    if (b == ' ') {
+			// Fix up spaces between a key and a colon
+			int spacecnt = 0;
+			while (b == ' ') {
+			    spacecnt++;
+			    nextChar();
+			}
+			if (b != ':') {
+			    pushChar(b);
+			    for (int isc = 0; isc < spacecnt; isc++) {
+				pushChar(' ');
+			    }
+			    nextChar();
+			}
+		    }
 		}
-		int cloc = getColumn();
+		/*
 		if (b == '<') {
 		    sb.append((char)b);
 		    nextChar();
@@ -3170,21 +3400,7 @@ public class JSUtilities {
 			nextChar();
 		    }
 		}
-		if (b == ' ') {
-		    // Fix up spaces between a key and a colon
-		    int spacecnt = 0;
-		    while (b == ' ') {
-			spacecnt++;
-			nextChar();
-		    }
-		    if (b != ':') {
-			pushChar(b);
-			for (int isc = 0; isc < spacecnt; isc++) {
-			    pushChar(' ');
-			}
-			nextChar();
-		    }
-		}
+		*/
 		if (b == ':') {
 		    locator.pushLevel();
 		    long ln = lineno;
@@ -3370,13 +3586,63 @@ public class JSUtilities {
 			throw new JSException(lineno, msg);
 		    }
 		case '"':
-		    return parseString();
+		    {
+			int ccol = getColumn();
+			// nextChar();
+			long lno = lineno;
+			String str = parseString();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    locator.pushLevel();
+			    locator.setKey(str);
+			    tagLocation();
+			    nextChar();
+			    JSObject obj = new JSObject();
+			    parse(obj, str, nextIndent, ccol);
+			    locator.popLevel();
+			    return obj;
+			} else {
+			    return  str;
+			}
+		    }
+		    /*
+		    String str = parseString();
+		    System.out.println("ccol = " + getColumn()
+				       + ", prevIndent = " + prevIndent
+				       +", nextIndent = " + nextIndent
+				       +", returning " + str);
+		    return str;
+		    */
+		    // return parseString();
 		case '[':
 		case '{':
 		    return super.parseValue(ydata);
 		case '\'':
 		    // nextChar();
-		    return parseString1();
+		    {
+			int ccol = getColumn();
+			// nextChar();
+			long lno = lineno;
+			String str = parseString1();
+			while (b == ' ') {
+			    nextChar();
+			}
+			if (b == ':') {
+			    locator.pushLevel();
+			    locator.setKey(str);
+			    tagLocation();
+			    nextChar();
+			    JSObject obj = new JSObject();
+			    parse(obj, str, nextIndent, ccol);
+			    locator.popLevel();
+			    return obj;
+			} else {
+			    return  str;
+			}
+		    }
+		    // return parseString1();
 		case '|':
 		    String s1 = readLine();
 		    setScalarOptions('|', s1);
@@ -3497,6 +3763,7 @@ public class JSUtilities {
 	     *        input stream being read
 	     */
 	    protected String parseString(boolean isIdent) throws IOException {
+		StringBuilder sb = new StringBuilder();
 		if (isIdent) {
 		    sb.setLength(0);
 		    sb.append((char) b);

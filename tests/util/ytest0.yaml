@@ -1,0 +1,8 @@
+%YAML 1.2
+---
+  "line1": "hello" 
+  'object':
+    'sub1': 'first'
+    "sub2": 'second'
+  'line2': "goodbye"
+...
