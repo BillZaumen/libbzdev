@@ -32,8 +32,9 @@ import org.bzdev.util.SafeFormatter;
  * Callers should used the methods {@link CertManager#newInstance()}
  * or {@link CertManager#newInstance(String)} to create an instance of
  * this class. When an argument is provided, it is either the fully-qualified
- * class name of the desired certificate manager or the string "default" for
- * a certificate manager that will provide a self-signed certificate.
+ * class name of the desired certificate manager, the string "default" for
+ * a certificate manager that will provide a self-signed certificate, or
+ * the string "external" if another process manages the keystore.
  * When {@link CertManager#newInstance()}, the first instance found using
  * the Java service loader  is returned and if there are no such instances,
  * an instance of the default certificate manager is returned.
@@ -253,6 +254,8 @@ public abstract class CertManager {
 	boolean status = false;
 	String ks = null;
         static final int validity = 90; // Certificates valid for 90 days
+	protected boolean externalKeystore = false;
+	private X509Certificate ourcert = null; // used with externalKeystore
 
 	private boolean handleCertificateRequest(boolean renew) {
 	    boolean status = false;
@@ -267,7 +270,8 @@ public abstract class CertManager {
 		Appendable tracer = getTracer();
 		if (tracer != null) {
 		    try {
-			tracer.append("Keytool store password missing\n");
+			String msg = errorMsg("keytoolPW");
+			tracer.append(msg + "\n");
 		    } catch (IOException eio) {}
 		}
 		return false;
@@ -275,7 +279,8 @@ public abstract class CertManager {
 	    if (getDomain() == null) {
 		if (tracer != null) {
 		    try {
-			tracer.append("Domain missing\n");
+			String msg = errorMsg("Domain");
+			tracer.append(msg + "\n");
 		    } catch (IOException eio) {}
 		}
 		return false;
@@ -285,7 +290,8 @@ public abstract class CertManager {
 		if (ks == null) {
 		    if (tracer != null) {
 			try {
-			    tracer.append("Keytool File missing\n");
+			    String msg = errorMsg("Keytool");
+			    tracer.append(msg + "\n");
 			} catch (IOException eio) {}
 		    }
 		    return false;
@@ -298,6 +304,14 @@ public abstract class CertManager {
 			    .getCertificate("servercert");
 			if (cert != null && cert instanceof X509Certificate) {
 			    X509Certificate xcert = (X509Certificate) cert;
+			    if (externalKeystore) {
+				if (ourcert == null) ourcert = xcert;
+				if (!alwaysCreate() && xcert == ourcert) {
+				    return !renew;
+				} else {
+				    return true;
+				}
+			    }
 			    long tdiff = xcert.getNotAfter().getTime()
 				- Instant.now().toEpochMilli();
 			    tdiff /= (DAY*1000);
@@ -327,18 +341,30 @@ public abstract class CertManager {
 				status = !renew;
 				return status;
 			    }
+			} else {
+			    if (cert != null) {
+				// This is a corner case that should never
+				// happen in practice: a cert manager should
+				// always create an X509 certificate and
+				// users are expected to create one as well.
+				if (tracer != null) {
+				    String msg = errorMsg("notX509");
+				    tracer.append(msg + "\n");
+				}
+				return false;
+			    }
 			}
 		    } catch (Exception ke) {
 			status = false;
 			Appendable tracer = getTracer();
 			if (tracer != null) {
-			    tracer.append("Cannot delete old certificate: "
-					  + ke.getMessage() + "\n");
+			    String msg = errorMsg("oldCert", ke.getMessage());
+			    tracer.append(msg + "\n");
 			}
 			return false;
 		    }
 		}
-
+		if (externalKeystore) return false;
 		ProcessBuilder pb2 = new
 		    ProcessBuilder(keytool,
 				   "-genkeypair",
@@ -360,8 +386,8 @@ public abstract class CertManager {
 		Appendable tracer = getTracer();
 		if (tracer != null) {
 		    try {
-			tracer.append("Cannot create new certificate: "
-				      + e.getMessage() + "\n");
+			String msg = errorMsg("newCert", e.getMessage());
+			tracer.append(msg + "\n");
 		    } catch (IOException eio) {}
 		}
 	    }
@@ -397,8 +423,8 @@ public abstract class CertManager {
 			Appendable tracer = getTracer();
 			if (tracer != null) {
 			    try {
-				tracer.append("... renewal request status = "
-					      + rstatus + "\n");
+				String msg = errorMsg("renewStatus", rstatus);
+				tracer.append(msg + "\n");
 			    } catch (IOException eio) {}
 			}
 		    }
@@ -413,6 +439,12 @@ public abstract class CertManager {
 	}
     }
 
+    private static class ExternalCertManager extends DefaultCertManager {
+	ExternalCertManager() {
+	    super();
+	    externalKeystore =  true;
+	}
+    }
 
     /**
      * Return a new instance of {@link CertManager}.
@@ -458,19 +490,25 @@ public abstract class CertManager {
 	    .collect(Collectors.toSet());
 	*/
 	result.add("default");
+	result.add("external");
 	return result;
     }
 
 
     /**
      * Return a new instance of a certificate manager given its name.
-     * @param providerName "default" for the default provider, the
+     * @param providerName "default" for the default provider, "external"
+     *        if another process manages certificats, or the
      *        fully qualified class name for the desired instance, a
-     *        a provider name; or null for the first one available.
+     *        a provider name; or null for the first one available,
+     *        excluding "default" and "external"
      */
     public static CertManager newInstance(String providerName) {
 	if (providerName.equals("default")) {
 	    return new DefaultCertManager();
+	}
+	if (providerName.equals("external")) {
+	    return new ExternalCertManager();
 	}
 	ServiceLoader<CertManager>loader = ServiceLoader
 	    .load(CertManager.class);
@@ -590,8 +628,8 @@ public abstract class CertManager {
      * name.  This method provides an alternate name.  It may not be
      * unique and may represent groups of providers.  Providers that
      * use certbot should override this method to return the string
-     * "certbot".  The name "default" is reserved and must not be
-     * used.
+     * "certbot".  The names "default" and "external" are  reserved
+     * and must not be used as new provider names.
      * @return the provider name; null if one is not explicitly provided
      */
     public String providerName() {
@@ -1106,7 +1144,8 @@ public abstract class CertManager {
 	} finally {
 	    if (tracer != null) {
 		try {
-		    tracer.append("Certificate found or created\n");
+		    String msg = errorMsg("hasCert");
+		    tracer.append(msg + "\n");
 		} catch (IOException eio) {}
 	    }
 	    traceCertificate();
@@ -1163,8 +1202,8 @@ public abstract class CertManager {
 	Thread certMonitor1 = new Thread(() -> {
 		if (tracer != null) {
 		    try {
-			tracer.append
-			    ("Certificate monitoring started\n");
+			String msg = errorMsg("monitoringStarted");
+			tracer.append(msg + "\n");
 		    } catch (IOException eio) {}
 		}
 		long wait = getInitialWaitMillis();
@@ -1180,8 +1219,8 @@ public abstract class CertManager {
 			wait += diff;
 			if (tracer != null) {
 			    try {
-				tracer.append
-				    ("Requested certificate renewal\n");
+				String msg = errorMsg("requestRenewal");
+				tracer.append(msg +"\n");
 			    } catch (IOException eio) {}
 			}
 			synchronized(ews) {
@@ -1197,8 +1236,8 @@ public abstract class CertManager {
 		    if (stopcount == 2) {
 			if (tracer != null) {
 			    try {
-				tracer.append("Certificate monitoring stopped"
-					      + "\n");
+				String msg = errorMsg("monitoringStopped");
+				tracer.append(msg + "\n");
 			    } catch (IOException eio) {}
 			}
 			stopcount = 0;
@@ -1214,7 +1253,8 @@ public abstract class CertManager {
 			if (status) {
 			    synchronized(ews) {
 				if (tracer != null) {
-				    tracer.append("Certificate renewed\n");
+				    String msg = errorMsg("renewed");
+				    tracer.append(msg + "\n");
 				}
 				traceCertificate();
 				ews.modifyServerSetup();
@@ -1230,8 +1270,8 @@ public abstract class CertManager {
 		    if (stopcount == 2) {
 			if (tracer != null) {
 			    try {
-				tracer.append("Certificate monitoring stopped"
-					      + "\n");
+				String msg = errorMsg("monitoringStopped");
+				tracer.append(msg + "\n");
 			    } catch (IOException eio) {}
 			}
 			stopcount = 0;
@@ -1239,8 +1279,9 @@ public abstract class CertManager {
 		} catch (Exception e) {
 		    if (tracer != null) {
 			try {
-			    tracer.append("Renewal request failed: "
-					  + e.getMessage() + "\n");
+			    String emsg = e.getMessage();
+			    String msg = errorMsg("renewalFailed", emsg);
+			    tracer.append(msg + "\n");
 			} catch (IOException eio) {}
 		    }
 		}

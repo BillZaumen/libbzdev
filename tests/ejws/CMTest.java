@@ -68,5 +68,33 @@ public class CMTest {
 	cm.alwaysCreate(true);
 	Thread.currentThread().sleep(150000);
 	cm.stopMonitoring();
+	ews.start();
+	ews.shutdown(0);
+
+	System.out.println("try 'external' cert manager");
+	cm = CertManager.newInstance("external")
+	    .setCertName("test")
+	    .setDomain("localhost")
+	    .setKeystoreFile(new File("cmkeystore.jks"))
+	    .setInterval(0)
+	    .setStopDelay(2)
+	    .setTracer(System.out)
+	    .setCertTrace(true)
+	    .setProtocol("TLS")
+	    .setMode(CertManager.Mode.TEST);
+
+	try {
+	    ews = new EmbeddedWebServer(8080);
+	} catch (Exception e) {
+	    Thread.currentThread().sleep(60000);
+	}
+
+	cm.getSetup();
+	cm.startMonitoring(ews);
+	Thread.currentThread().sleep(150000);
+	cm.alwaysCreate(true);
+	Thread.currentThread().sleep(150000);
+	cm.stopMonitoring();
+
     }
 }

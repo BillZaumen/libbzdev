@@ -674,6 +674,10 @@ public class EmbeddedWebServer {
     /**
      * Constructor for a wildcard IP address with a default backlog and
      * a default number of threads.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param sslSetup the configuration for an HTTPS server; null for HTTP
@@ -691,6 +695,10 @@ public class EmbeddedWebServer {
      * a default number of threads, using a certificate manager.
      * A {@link CertManager} is an alternative to {@link SSLSetup} that
      * allows certificates to be automatically obtained and renewed.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param certManager the {@link CertManager}.
@@ -706,6 +714,10 @@ public class EmbeddedWebServer {
     /**
      * Constructor for a wildcard IP address with a default backlog and
      * a default number of threads for HTTP servers.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @exception Exception an error occurred.
@@ -719,6 +731,10 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for a wildcard IP address with a default number of threads.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -736,7 +752,11 @@ public class EmbeddedWebServer {
      * using a certificate manager.
      * A {@link CertManager} is an alternative to {@link SSLSetup} that
      * allows certificates to be automatically obtained and renewed.
-   * @param port the TCP port number for a server; 0 for a system-allocated
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
+     * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
      * @param certManager the {@link CertManager}.
@@ -753,7 +773,11 @@ public class EmbeddedWebServer {
      * for HTTP servers.
      * A {@link CertManager} is an alternative to {@link SSLSetup} that
      * allows certificates to be automatically obtained and renewed.
-   * @param port the TCP port number for a server; 0 for a system-allocated
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
+     * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
      * @exception Exception an error occurred.
@@ -766,6 +790,10 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for a wildcard IP address.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -784,6 +812,10 @@ public class EmbeddedWebServer {
      * Constructor for a wildcard IP address using a certificate manager.
      * A {@link CertManager} is an alternative to {@link SSLSetup} that
      * allows certificates to be automatically obtained and renewed.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -800,6 +832,10 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for a wildcard IP address for HTTP servers.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -817,6 +853,10 @@ public class EmbeddedWebServer {
      * Constructor.
      * @param addr the Internet address for this server; null for the
      *        wildcard address
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param port the TCP port number for a server; 0 for a system-allocated
      *             port
      * @param backlog the TCP backlog (maximum number of pending connections)
@@ -847,6 +887,10 @@ public class EmbeddedWebServer {
      * Constructor using a {@link CertManager}.
      * A {@link CertManager} is an alternative to {@link SSLSetup} that
      * allows certificates to be automatically obtained and renewed.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param addr the Internet address for this server; null for the
      *        wildcard address
      * @param port the TCP port number for a server; 0 for a system-allocated
@@ -871,6 +915,10 @@ public class EmbeddedWebServer {
 
     /**
      * Constructor for HTTP servers.
+     * <P>
+     * Warning: this constructor will create a bound socket. For some
+     * JDK/JRE implementations, the binding cannot be removed unless the
+     * server is actually started.
      * @param addr the Internet address for this server; null for the
      *        wildcard address
      * @param port the TCP port number for a server; 0 for a system-allocated
@@ -1723,6 +1771,9 @@ public class EmbeddedWebServer {
      * A call to this method will block until the server stops and shuts down.
      * This differs from the method <code>stop</code> in that the server
      * cannot be restarted.
+     * <P>
+     * Warning: if a server was created but not started, some JDK/JRE
+     * implementations will keep the port bound after this method returns.
      * @param delay the delay in seconds before the server is stopped.
      */
     public void shutdown(int delay) {

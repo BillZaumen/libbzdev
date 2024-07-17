@@ -848,6 +848,16 @@ authtest3:
 	     -classpath ../../BUILD/libbzdev.jar:classes \
 	     AuthPaneTest https://$(HOST):8080/resources/glass.png
 
+systemlaf:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar UIProperties.java
+	$(JAVA) UIProperties system
+
+javalaf:
+	(cd ../.. ; make jars)
+	javac -d classes -classpath ../../BUILD/libbzdev.jar UIProperties.java
+	$(JAVA) UIProperties
+
 privateKey.pem.gpg: privateKey.pem
 	gpg -e privateKey.pem
 
