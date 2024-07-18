@@ -56,7 +56,8 @@ import org.bzdev.util.SafeFormatter;
  *   <LI><STRONG>{@link CertManager#setInterval(int)}</STRONG>.
  *       This provides an interval in days between certificate renewal
  *       attempts. A certificate will not be renewed if it is not close
- *       to expiring.
+ *       to expiring. If set to zero, the value will be treated as one
+ *       minute, which is useful for testing but not for actual use.
  *   <LI><STRONG>{@link CertManager#setStopDelay(int)}</STRONG>. This provides
  *       the time in seconds to wait before fully shutting down a server
  *       when necessary to renew certificates.
@@ -95,7 +96,7 @@ import org.bzdev.util.SafeFormatter;
  * that one can write code such as
  * <BLOCKQUOTE><PRE>
  * CertManager cm = CertManager.newInstance()
- *   .setInterval(5)
+ *   .setInterval(7)
  *   .setTimeOffset(4*3600)
  *   ...
  * </PRE></BLOCKQUOTE>
@@ -198,7 +199,9 @@ public abstract class CertManager {
      * Set this certificate manager's mode.
      * This method should be used only when debugging or during
      * preliminary testing.
-     * @param mode the mode
+     * <P>
+     * If not called, the default value is {@link Mode#NORMAL}.
+     * @param mode the mode; the default if null
      * @return this certificate manage
      * @see CertManager.Mode
      */
@@ -746,6 +749,8 @@ public abstract class CertManager {
      * renew certificates will be made.  Time is measured from
      * midnight using the server's time zone.  The number of days
      * between renewal attempts are set by {@link #setInterval(int)}.
+     * <P>
+     * If not called, the default value is 0.
      * @param offset the time offset in seconds
      * @return this {@link CertManager}
      */
@@ -767,6 +772,8 @@ public abstract class CertManager {
 
     /**
      * Set the number of days between attempts to renew certificates.
+     * <P>
+     * If not called, the default value is 7.
      * @param interval the interval in days.
      * @return this {@link CertManager}
      */
@@ -786,6 +793,8 @@ public abstract class CertManager {
      * When {@link EmbeddedWebServer#stop(int)} is called, new
      * requests are rejected immediately, and the delay indicates how
      * long to wait for existing requests to be processed.
+     * <P>
+     * If not called, the default value is 5.
      * @param stopDelay the delay in seconds
      * @return this {@link CertManager}
      */
@@ -811,6 +820,8 @@ public abstract class CertManager {
      * available time zone IDs.
      * If the time zone ID is not recognized, the time zone will be
      * set to GMT.
+     * <P>
+     * If not called, the default value is the system default time zone.
      * @param timezone the time zone ID (e.g, UTC or America/Los_Angeles);
      *       null or an empty string for the system default
      * @return this {@link CertManager}

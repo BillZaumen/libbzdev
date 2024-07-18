@@ -140,16 +140,20 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *     certificates.
  *   <LI><B>timezone</B>. The time zone ID (e.g., GMT or America/Los_Angeles)
  *      that the server will use in determining when to schedule certificate
- *      renewals provided that a certificate manager is used.
+ *      renewals provided that a certificate manager is used.  If not
+ *      provided or null, the system default timezone is used. An
+ *      unrecognized time zone currently defaults to GMT (this JDK/JRE
+ *      dependent).
  *   <LI><B>timeOffset</B>. The time offset in seconds from
  *     midnight, local time, at which a server should determine if
- *     a certificate should be renewed.
+ *     a certificate should be renewed. The default is 0.
  *   <LI><B>interval</B>.  The number of days between attempts to
- *     renew a certificate.
+ *     renew a certificate. The default is 7.
  *   <LI><B>stopDelay</B>. The time interval in seconds from a request
  *     to shutdown a server to when the server is actually shut down.
  *     This is used to give transactions being processed time to complete
- *     and will be used only when a new certificate is needed..
+ *     and will be used only when a new certificate is needed. The default
+ *     is 5.
  * </UL>
  * <P>
  * For <A ID="PARMS">server parameters</A>, the standard properties are
@@ -895,7 +899,7 @@ public class ConfigurableWS {
 	String domain = null;
 	String email = null;
 	int timeOffset = 0;
-	int interval = 90;
+	int interval = 7;
 	int stopDelay = 5;
 
 	// File cdir = new File(System.getProperty("user.dir"));
