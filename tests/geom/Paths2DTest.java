@@ -924,6 +924,14 @@ public class Paths2DTest {
 	spath.lineTo(400.0, 200.0);
 	spath.append(Paths2D.createArc(spath, 100.0, false, Math.PI/2), true);
 	Path2DInfo.printSegments(spath);
+	System.out.println("-----------------------");
+	System.out.println("clockwise arc test with kink");
+	spath = new BasicSplinePath2D();
+	spath.moveTo(0.0, 200.0);
+	spath.lineTo(400.0, 200.0);
+	spath.append(Paths2D.createArc(spath, 100.0, Math.PI/2, false,
+				       Math.PI/2), true);
+	Path2DInfo.printSegments(spath);
 
 	Graph graph = new Graph(1000,1000);
 	graph.setOffsets(0, 0);
@@ -1037,11 +1045,27 @@ public class Paths2DTest {
 	Point2D end = cpath3.getCurrentPoint();
 	cpath3.lineTo(end.getX() + 50.0, end.getY());
 
+	Path2D cpath3a = new Path2D.Double();
+	cpath3a.moveTo(425.0, 50.0);
+	cpath3a.lineTo(450.0, 50.0);
+	Path2D apatha = Paths2D.createArc(cpath3a, 100.0, Math.PI/2,
+					  true, Math.PI/2);
+	cpath3a.append(apatha, true);
+	apatha = Paths2D.createArc(cpath3a, 100.0, -Math.PI/2,
+				   false, Math.PI/2);
+	cpath3a.append(apatha, true);
+	end = cpath3a.getCurrentPoint();
+	cpath3a.lineTo(end.getX() + 50.0, end.getY());
+
+
 	g2d.setColor(Color.GREEN);
 	graph.draw(g2d, cpath2);
 	graph.draw(g2d, cpath3);
+	graph.draw(g2d, cpath3a);
+
 	graph2.draw(g2d2, cpath2);
 	graph2.draw(g2d2, cpath3);
+	graph2.draw(g2d2, cpath3a);
 	opath = Paths2D.offsetBy(cpath2, 20.0, 15.0, true);
 	g2d.setColor(Color.BLACK);
 	graph.draw(g2d, opath);

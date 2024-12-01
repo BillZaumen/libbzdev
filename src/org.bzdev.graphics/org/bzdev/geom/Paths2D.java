@@ -220,9 +220,42 @@ public class Paths2D {
     }
 
     /**
+     * Create an arc specifying a radius, a kink angle, a path whose
+     * final point and final tangent match the start of the arc, and
+     * the angular extent of the arc.
+     * @param spath the path before the start of the arc
+     * @param radius the radius of the arc
+     * @param kinkAngle an initial angular rotation (counterclockwise is
+     *        positive) in radians for the initial tangent of the arc
+     *        relative to the final tangent of the path
+     * @param counterClockwise true if the arc turns in the same angular
+     *        direction as a rotation from the positive X axis to the
+     *        positive Y axis; false if the arc turns in the same angular
+     *        direction as a rotation from the positive X axis to the
+     *        negative Y axis
+     * @param theta the angular extent of the arc (if negative, the arc
+     *        will form a cusp with the specified path)
+     * @return the arc
+     * @exception IllegalArgumentException an arc cannot be created
+     *            given the parameters
+     * @exception NullPointerException the path argument was null
+     */
+    public static Path2D createArc(Path2D spath, double radius,
+				   double kinkAngle,
+				   boolean counterClockwise, double theta)
+	throws IllegalArgumentException, NullPointerException
+
+    {
+	return createArc(spath, radius, kinkAngle, counterClockwise, theta,
+			 DEFAULT_MAX_DELTA);
+    }
+
+
+    /**
      * Create an arc specifying a radius, a path whose final point
-     * and final tangent match the start of the arc, and the angular
-     * extent of the arc.
+     * and final tangent match the start of the arc, the angular
+     * extent of the arc, and the maximum angle between
+     * cubic B&eacute;zier segments.
      * @param spath the path before the start of the arc
      * @param radius the radius of the arc
      * @param counterClockwise true if the arc turns in the same angular
@@ -246,7 +279,6 @@ public class Paths2D {
 	throws IllegalArgumentException, NullPointerException
 
     {
-	// do later.
 	double[] array = new double[2];
 	Path2DInfo.getNormal(spath, Path2DInfo.Location.END, array, 0);
 	Point2D p = spath.getCurrentPoint();
@@ -263,6 +295,62 @@ public class Paths2D {
 	    return createArc(xc, yc, x, y, -theta, maxDelta);
 	}
     }
+
+    /**
+     * Create an arc specifying a radius, a kink angle, a path whose
+     * final point and final tangent match the start of the arc,
+     * the angular extent of the arc, and the maximum angle between
+     * cubic B&eacute;zier segments.
+     * @param spath the path before the start of the arc
+     * @param radius the radius of the arc
+     * @param kinkAngle an initial angular rotation (counterclockwise is
+     *        positive) in radians for the initial tangent of the arc
+     *        relative to the final tangent of the path
+     * @param counterClockwise true if the arc turns in the same angular
+     *        direction as a rotation from the positive X axis to the
+     *        positive Y axis; false if the arc turns in the same angular
+     *        direction as a rotation from the positive X axis to the
+     *        negative Y axis
+     * @param theta the angular extent of the arc (if negative, the arc
+     *        will form a cusp with the specified path)
+     * @param maxDelta the maximum angular extent for each cubic B&eacute;zier
+     *        segment making up the arc, with values in the range
+     *        (0.0, 2&pi;/3]
+     * @return the arc
+     * @exception IllegalArgumentException an arc cannot be created
+     *            given the parameters
+     * @exception NullPointerException the path argument was null
+     */
+    public static Path2D createArc(Path2D spath, double radius,
+				   double kinkAngle,
+				   boolean counterClockwise, double theta,
+				   double maxDelta)
+	throws IllegalArgumentException, NullPointerException
+
+    {
+	double[] array = new double[2];
+	double cosKA = Math.cos(kinkAngle);
+	double sinKA = Math.sin(kinkAngle);
+	Path2DInfo.getNormal(spath, Path2DInfo.Location.END, array, 0);
+	double tmpx = array[0]*cosKA - array[1]*sinKA;
+	double tmpy = array[0]*sinKA + array[1]*cosKA;
+	array[0] = tmpx;
+	array[1] = tmpy;
+	Point2D p = spath.getCurrentPoint();
+	double x = p.getX();
+	double y = p.getY();
+	double xc, yc;
+	if (counterClockwise) {
+	    xc = x + radius*array[0];
+	    yc = y + radius*array[1];
+	    return createArc(xc, yc, x, y, theta, maxDelta);
+	} else {
+	    xc = x - radius*array[0];
+	    yc = y - radius*array[1];
+	    return createArc(xc, yc, x, y, -theta, maxDelta);
+	}
+    }
+
 
     /**
      * Create a circular arc given a starting path and a final point.
