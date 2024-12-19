@@ -908,10 +908,13 @@ public class SCRunnerCmd {
 	boolean autoStackTraceMode = false;
 	boolean autoPrintMode = false;
 	boolean unsetScriptingMode = false;
+	boolean justFilenameMode = false;
+	boolean anyBooleanMode = false;
 	if (argv[0].matches("-s[:,BDILNSERPTU\\s].*")) {
 	    shellExec = true;
 	    String spec = argv[0].substring(2);
 	    char ch = spec.charAt(0);
+	    justFilenameMode = true;
 	    /*
 	    if (ch != 'B' && ch != 'D' && ch != 'I' && ch != 'L'
 		&& ch != 'S' && ch != 'E' ) {
@@ -932,7 +935,7 @@ public class SCRunnerCmd {
 		String type = terms[i];
 		String variable = terms[i+1];
 		if (type.length() != 1) {
-		    if (!type.matches("[ENRPTU]+")) {
+		    if (!type.matches("[ENRPTUF]+")) {
 			System.err.println(errorMsg("badTypeField"));
 			System.exit(1);
 		    }
@@ -952,31 +955,37 @@ public class SCRunnerCmd {
 			if (variable.equalsIgnoreCase("true")) {
 			    autoExitMode = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    case 'N':
 			if (variable.equalsIgnoreCase("true")) {
 			    noAdditionalArgs = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    case 'P':
 			if (variable.equalsIgnoreCase("true")) {
 			    autoPrintMode = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    case 'R':
 			if (variable.equalsIgnoreCase("true")) {
 			    maxQualityMode = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    case 'T':
 			if (variable.equalsIgnoreCase("true")) {
 			    autoStackTraceMode = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    case 'U':
 			if (variable.equalsIgnoreCase("true")) {
 			    unsetScriptingMode = true;
 			}
+			anyBooleanMode = true;
 			break;
 		    default:
 			System.err.println(errorMsg("parmType", type));
@@ -1158,9 +1167,7 @@ public class SCRunnerCmd {
 	argList.add(sbcp.toString());
 	*/
 	index = (script == null)? 0: 1;
-	if (parmList.size() > 0 || autoExitMode
-	    || noAdditionalArgs || maxQualityMode
-	    || autoStackTraceMode || autoPrintMode || unsetScriptingMode) {
+	if (parmList.size() > 0 || anyBooleanMode) {
 	    // This detects a '-s' option, which has to be skipped
 	    // as it was already processed.
 	    index++;
@@ -1506,6 +1513,9 @@ public class SCRunnerCmd {
 	}
 	if (unsetScriptingMode) {
 	    argList.add("--unsetScripting");
+	}
+	if (justFilenameMode) {
+	    argList.add("--justFilename");
 	}
 
 	if (index + parmList.size() > argv.length) {

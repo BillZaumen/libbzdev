@@ -366,6 +366,14 @@ test1:
 	./run --stackTrace test1.esp
 	chmod u-x ./run
 
+throwtest:
+	(cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x throw
+	./throw
+	chmod u-x throw
+	chmod u-x ./run
+
 ecirc:
 	(cd ../.. ; make )
 	chmod u+x ./run

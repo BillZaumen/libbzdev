@@ -122,4 +122,4 @@ clean:
 		axistest2.png axistest2.ps axistest.ps axistest.png \
 		logabtest1.png testGraph.svg testImage.png \
 		testLogAxis.png testTC.png testTC.ps \
-		classes
+		radial.png classes

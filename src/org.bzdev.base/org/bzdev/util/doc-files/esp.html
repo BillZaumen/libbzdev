@@ -301,7 +301,9 @@ var obj = {
       <LI> The symbol <STRONG>`</STRONG>, followed by opening curly
 	bracket, a series of statements, and a closing curly bracket
 	represents a lambda expression with no arguments that is immediately
-	called and that always returns <STRONG>true</STRONG>.
+	called. If the backquote immediately follows the operators
+	<STRONG>&amp;&amp;</STRONG> or <STRONG>||</STRONG>, the expression
+	always returns <STRONG>true</STRONG>.
       <LI> The expression <STRONG>var.</STRONG><I>IDENTIFIER</I> tests
 	if a variable named <I>IDENTIFIER</I> exists.
       <LI> The keyword <STRONG>void</STRONG> can be used as the final
@@ -651,25 +653,48 @@ BLOCKED
     by using lambda expressions. For example,
     <BLOCKQUOTE><PRE>
 var a = ... ;
+var case = 0;
 var result = 0;
 (a &lt; 10)? function() {
+     case  = 1;
      result = a * a;
 }(): (a &lt; 20) function() {
+     case = 2;
      result = 2*a;
 }(): function() {
+     case = 3;
      result = a + 1;
 }();
     </PRE></BLOCKQUOTE>
     This can be shortened to
     <BLOCKQUOTE><PRE>
 var a = ... ;
+var case = 0;
 var result = 0;
 (a &lt; 10)? `{
+     case = 1;
      result = a * a;
 }: (a &lt; 20)? `{
+     case = 2;
      result = 2*a;
 }: `{
+     case = 3;
      result = a + 1;
+};
+    </PRE></BLOCKQUOTE>
+    or
+    <BLOCKQUOTE><PRE>
+var a = ... ;
+var case = 0;
+var result = (a &lt; 10)? `{
+     case = 1;
+     a * a;
+}: (a &lt; 20)? `{
+     case = 2;
+      2*a;
+}: `{
+     case = 3;
+     a + 1;
 };
     </PRE></BLOCKQUOTE>
   <P>
@@ -699,7 +724,8 @@ var y = 20;
     </PRE></BLOCKQUOTE>
   <P>
     because <CODE>`{x = x * y;}</CODE> evaluates to
-    <STRONG>true</STRONG>.
+    <STRONG>true</STRONG> when it immediately follows <STRONG>||</STRONG>
+    or <STRONG>&amp;&amp;</STRONG>.
     <H3><A ID="statements"></A>Statements</H3>
   <P>
     Statements are described by the following grammar:

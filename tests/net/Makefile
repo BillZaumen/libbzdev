@@ -93,4 +93,4 @@ sslutil: compile
 
 clean:
 	rm -rf classes testcal.ics eckey.pem public.pem public.der \
-		ecstore.pfx eccert.pem
+		ecstore.pfx eccert.pem  secbasic.p12

@@ -380,6 +380,8 @@ public class SCRunner {
 	}
     }
 
+    static boolean justFilename = false;
+
     public static void main(String argv[]) {
 	// forbid recursive calls (e.g. when SCRunner loads classes from a
 	// third party)
@@ -953,6 +955,10 @@ public class SCRunner {
 		} else {
 		    System.exit(1);
 		}
+	    } else if (argv[index].equals("--justFilename")) {
+		// private option to simplify error messages by not
+		// mentioning scrunner and excluding line numbers.
+		justFilename = true;
 	    }  else {
 		System.err.println(errorMsg("unknownOption", argv[index]));
 		/*
@@ -1188,33 +1194,53 @@ public class SCRunner {
 		    ScriptException se = (ScriptException)e;
 		    String fn = se.getFileName();
 		    int ln = se.getLineNumber();
-			String m = se.getMessage();
-			if (ln != -1) {
-			    // Some scripting-related exceptions tag
-			    // a string of the form (FILENAME#LINENO)
-			    // to the end of a message.  This is redundant
-			    // so we will eliminate it when it matches the
-			    // file name and line number we are printing.
-			    // The following lines contain all the 'cause'
-			    // messages anyway, so all the information is
-			    // available.  The lack of redundancy makes the
-			    // first message easier to read.
-			    String tail = String.format("(%s#%d)", fn, ln);
-			    if (m.endsWith(tail)) {
-				m = m.substring(0, m.lastIndexOf(tail));
-				m = m.stripTrailing();
+		    String m = se.getMessage();
+		    if (ln != -1) {
+			// Some scripting-related exceptions tag
+			// a string of the form (FILENAME#LINENO)
+			// to the end of a message.  This is redundant
+			// so we will eliminate it when it matches the
+			// file name and line number we are printing.
+			// The following lines contain all the 'cause'
+			// messages anyway, so all the information is
+			// available.  The lack of redundancy makes the
+			// first message easier to read.
+			String tail = String.format("(%s#%d)", fn, ln);
+			if (m.endsWith(tail)) {
+			    m = m.substring(0, m.lastIndexOf(tail));
+			    m = m.stripTrailing();
+			}
+		    }
+		    if (justFilename) {
+			String[] lines = m.split("\\R");
+			StringBuffer sb = new StringBuffer();
+			sb.append(lines[0]);
+			String lineSep = System.getProperty("line.separator");
+			for (int k = 1; k < lines.length - 2; k++) {
+			    sb.append(lineSep);
+			    sb.append(lines[k]);
+			}
+			for (int k = lines.length-2; k < lines.length; k++) {
+			    if (!lines[k].startsWith("### ")) {
+				sb.append(lineSep);
+				sb.append(lines[k]);
 			    }
 			}
-			if (ln == -1) {
-			    msg = errorMsg("unnumberedException", fn, m);
-			} else {
-			    msg = errorMsg("numberedException", fn, ln, m);
-			}
+			m = sb.toString();
+			msg = errorMsg("fnamedException", fn, m);
+		    } else if (ln == -1) {
+			msg = errorMsg("unnumberedException", fn, m);
+		    } else {
+			msg = errorMsg("numberedException", fn, ln, m);
+		    }
 		} else {
 		    String cn = e.getClass().getName();
 		    msg = errorMsg("exception2", cn, e.getMessage());
 		}
 		System.err.println(msg);
+		if (justFilename) {
+		    System.exit(1);
+		}
 		// System.err.println("scrunner: " + e.getMessage());
 		cause = e.getCause();
 		while (cause != null) {

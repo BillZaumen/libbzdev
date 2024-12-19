@@ -1,0 +1,38 @@
+var test = true && `{20};
+var normal = `{10};
+var result1 = true? `{1}: `{2};
+var result2 = false? `{1}: `{2};
+
+global.getWriter().print(test);
+global.getWriter().print(" ");
+global.getWriter().print(normal);
+global.getWriter().print(" ");
+global.getWriter().print(result1);
+global.getWriter().print(" ");
+global.getWriter().println(result2);
+
+var bool = true & true;
+global.getWriter().print("true & true = ");
+global.getWriter().println(bool);
+bool = true & false;
+global.getWriter().print("true & false = ");
+global.getWriter().println(bool);
+
+bool = true | true;
+global.getWriter().print("true | true = ");
+global.getWriter().println(bool);
+bool = true | false;
+global.getWriter().print("true | false = ");
+global.getWriter().println(bool);
+
+bool = true ^ true;
+global.getWriter().print("true ^ true = ");
+global.getWriter().println(bool);
+bool = true ^ false;
+global.getWriter().print("true ^ false =  ");
+global.getWriter().println(bool);
+
+bool = ~true;
+global.getWriter().print("~true =  ");
+global.getWriter().println(bool);
+

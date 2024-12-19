@@ -302,6 +302,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		     Operator.LOR, Operator.LAND, Operator.QMARK,
 		     Operator.COLON, Operator.SWAP);
 
+    private static final EnumSet<Operator> binaryLogicalOps
+	= EnumSet.of(Operator.LOR, Operator.LAND);
+
     // operators other than binaryOps that cannot appear before a
     // method reference
     private static final EnumSet<Operator> notBeforeMethodRef
@@ -3564,6 +3567,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	}
 
+	private Boolean not(Boolean b) {
+	    return b.equals(Boolean.FALSE);
+	}
+
 	private Number not(Number n) {
 	    if (n instanceof Integer) {
 		int iv = n.intValue();
@@ -3590,6 +3597,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		String msg = errorMsg("needInt", n);
 		throw new IllegalArgumentException(msg);
 	    }
+	}
+
+	private Boolean and(Boolean b1, Boolean b2) {
+	    return b1 & b2;
 	}
 
 	private Number and(Number n1, Number n2) {
@@ -3643,6 +3654,10 @@ public class ExpressionParser implements ObjectParser<Object>
 	    return Integer.valueOf(i1 & i2);
 	}
 
+	private Boolean or(Boolean b1, Boolean b2) {
+	    return b1 | b2;
+	}
+
 	private Number or(Number n1, Number n2) {
 	    int i1; int i2;
 	    if (n1 instanceof Integer) {
@@ -3692,6 +3707,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		throw new IllegalArgumentException(msg);
 	    }
 	    return Integer.valueOf(i1 | i2);
+	}
+
+	private Boolean xor(Boolean b1, Boolean b2) {
+	    return b1 ^ b2;
 	}
 
 	private Number xor(Number n1, Number n2) {
@@ -5436,8 +5455,14 @@ public class ExpressionParser implements ObjectParser<Object>
 		break;
 	    case NOT:
 		try {
-		    Number n = (Number) popValue();
-		    pushValue(not(n));
+		    Object o = popValue();
+		    if (o instanceof Boolean) {
+			Boolean b = (Boolean) o;
+			pushValue(not(b));
+		    } else {
+			Number n = (Number) o;
+			pushValue(not(n));
+		    }
 		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -5473,9 +5498,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 	    case AND:
 		try {
-		    Number n2 = (Number) popValue();
-		    Number n1 = (Number) popValue();
-		    pushValue(and(n1, n2));
+		    Object o1 = popValue();
+		    Object o2 = popValue();
+		    if (o1 instanceof Boolean && o2 instanceof Boolean) {
+			Boolean b1 = (Boolean) o1;
+			Boolean b2 = (Boolean) o2;
+			pushValue(and(b1, b2));
+		    } else {
+			Number n2 = (Number) o1;
+			Number n1 = (Number) o2;
+			pushValue(and(n1, n2));
+		    }
 		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -5485,9 +5518,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		break;
 	    case OR:
 		try {
-		    Number n2 = (Number) popValue();
-		    Number n1 = (Number) popValue();
-		    pushValue(or(n1, n2));
+		    Object o1 = popValue();
+		    Object o2 = popValue();
+		    if (o1 instanceof Boolean && o2 instanceof Boolean) {
+			Boolean b1 = (Boolean) o1;
+			Boolean b2 = (Boolean) o2;
+			pushValue(or(b1, b2));
+		    } else {
+			Number n2 = (Number) o1;
+			Number n1 = (Number) o2;
+			pushValue(or(n1, n2));
+		    }
 		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -5497,9 +5538,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		break;
 	    case XOR:
 		try {
-		    Number n2 = (Number) popValue();
-		    Number n1 = (Number) popValue();
-		    pushValue(xor(n1, n2));
+		    Object o1 = popValue();
+		    Object o2 = popValue();
+		    if (o1 instanceof Boolean && o2 instanceof Boolean) {
+			Boolean b1 = (Boolean) o1;
+			Boolean b2 = (Boolean) o2;
+			pushValue(xor(b1, b2));
+		    } else {
+			Number n2 = (Number) o1;
+			Number n1 = (Number) o2;
+			pushValue(xor(n1, n2));
+		    }
 		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -7409,6 +7458,13 @@ public class ExpressionParser implements ObjectParser<Object>
 	void setBackquoted() {backquoted = true;}
 	boolean backquoted() {return backquoted;}
 
+	// We suppress the final TRUE if a backquote is preceded
+	// by a '?' or a ':'
+	boolean trueMode = false;
+	void setTrueMode() {trueMode = true;}
+	boolean trueMode() {return trueMode;}
+
+
 	Token(Operator type, String s, int index, int level) {
 	    this.type = type;
 	    name = s;
@@ -8944,6 +9000,10 @@ public class ExpressionParser implements ObjectParser<Object>
 		level++; // so we have to decr after each operator
 		next = new Token(Operator.BACKQUOTE, "function",
 				 offset+i, level);
+		if (ptype != null && binaryLogicalOps.contains(ptype)) {
+		    System.out.println("true mode set");
+		    next.setTrueMode();
+		}
 		vset = new HashSet<String>();
 		vsetStack.push(vset);
 		tokens.add(next);
@@ -8985,6 +9045,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		if (ptype == Operator.BACKQUOTE) {
 		    prev.changeType(Operator.FUNCTION_KEYWORD);
 		    next.setBackquoted();
+		    if (prev.trueMode()) {
+			next.setTrueMode();
+		    }
 		}
 		if (bracePeer != null) {
 		    if (bracePeer.getType() == Operator.OBJOPENBRACE
@@ -9026,7 +9089,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		Operator bptype = bracePeer.getType();
 		level = bracePeer.getLevel();
 		if (bptype == Operator.OBRACE
-		    && bracePeer.backquoted()) {
+		    && bracePeer.backquoted()
+		    && bracePeer.trueMode()) {
 		    // Need to insert '; true'
 		    tokens.add(new Token(Operator.SEMICOLON, ";", offset+i,
 					 level + SEMICOLON_OFFSET));

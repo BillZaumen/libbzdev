@@ -134,6 +134,17 @@ not: compile
 	./scrun not2.esp
 	chmod u-x scrun
 
+backquote: compile
+	chmod u+x scrun
+	./scrun --stackTrace backquote.esp
+	chmod u-x scrun
+
+throw: compile
+	chmod u+x scrun
+	./scrun  throw.esp
+	chmod u-x scrun
+
+
 test7-sc: compile
 	chmod u+x scrun
 	@./scrun test7-sc.esp
@@ -308,7 +319,6 @@ etests: compile
 	@./scrun --stackTrace SciFormatterTest.esp
 	chmod u-x scrun
 
-
 etest: compile
 	@echo ----- ExpressionParser Test -------
 	@$(JAVA) ExpressionTest
@@ -462,5 +472,5 @@ clean:
 	(cd rv ; make clean)
 	(cd units ; make clean)
 	rm -f sequence.txt
-	rm -f test.html testPW.html test13.html test13a.html
+	rm -f test.html testPW.html test13.html test13a.html minfo.xml
 	@chmod u-x scrun

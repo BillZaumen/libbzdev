@@ -2364,7 +2364,28 @@ public class ExpressionTest {
 	    new Pair ("= 10 instanceof int", true),
 	    new Pair ("= 10.2 instanceof double", true),
 	    new Pair ("= 10.2 instanceof Double", true),
-	    new Pair ("= \"hello\" instanceof String", true)
+	    new Pair ("= \"hello\" instanceof String", true),
+	    new Pair ("= `{10}", 10),
+	    new Pair("= true && `{10}", true),
+	    new Pair("= false && `{10}", false),
+	    new Pair("= true || `{10}", true),
+	    new Pair("= false || `{10}", true),
+	    new Pair("= true? `{10}: `{20}", 10),
+	    new Pair("= false? `{10}: `{20}", 20),
+	    new Pair("= ~true", false),
+	    new Pair("= ~false", true),
+	    new Pair("= true & true", true),
+	    new Pair("= true & false", false),
+	    new Pair("= false & true", false),
+	    new Pair("= false & false", false),
+	    new Pair("= true | true", true),
+	    new Pair("= true | false", true),
+	    new Pair("= false | true", true),
+	    new Pair("= false | false", false),
+	    new Pair("= true ^ true", false),
+	    new Pair("= true ^ false", true),
+	    new Pair("= false ^ true", true),
+	    new Pair("= false ^ false", false)
 	};
 
 	for (Pair p: pairs) {
