@@ -369,9 +369,12 @@ test1:
 throwtest:
 	(cd ../.. ; make )
 	chmod u+x ./run
-	chmod u+x throw
-	./throw
-	chmod u-x throw
+	chmod u+x throw throw[123]
+	./throw || echo ...
+	./throw1 || echo ...
+	./throw2 || echo ...
+	./throw3 || echo -n
+	chmod u-x throw throw[123]
 	chmod u-x ./run
 
 ecirc:

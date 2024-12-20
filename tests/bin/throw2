@@ -1,0 +1,5 @@
+#!./run -sEUN:true
+
+function foo() {throw "hello"};
+
+foo();

@@ -768,14 +768,27 @@ public class ErrorMessage {
 					   msg));
 	} else if (useLocation) {
 	    sb.append(prefix);
-	    sb.append(MessageFormat.format(localeString("fnLineNoEMsg"),
-					   fn, lineNumber,
-					   e.getClass().getSimpleName(),
-					   msg));
+	    Class<?> clasz = e.getClass();
+	    if (clasz.isAnonymousClass()) {
+		sb.append(MessageFormat.format(localeString("fnLineNoEMsg2"),
+					       fn, lineNumber,
+					       msg));
+	    } else {
+		sb.append(MessageFormat.format(localeString("fnLineNoEMsg"),
+					       fn, lineNumber,
+					       clasz.getSimpleName(),
+					       msg));
+	    }
 	} else {
-	    sb.append(MessageFormat.format(localeString("exceptionMsg"),
-					   e.getClass().getSimpleName(),
-					   msg));
+	    Class<?> clasz = e.getClass();
+	    if (clasz.isAnonymousClass()) {
+		sb.append(MessageFormat.format(localeString("exceptionMsg2"),
+					       msg));
+	    } else {
+		sb.append(MessageFormat.format(localeString("exceptionMsg"),
+					       clasz.getSimpleName(),
+					       msg));
+	    }
 	}
 	sb.append(linesepStr);
 	sb.append(prefix);

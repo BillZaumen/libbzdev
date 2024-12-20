@@ -196,6 +196,17 @@ public interface ObjectParser<T> {
 						   input, offset,
 						   this, verbose, showLocation);
 	}
+
+	/**
+	 * Determine if the exception was due to an explicit throw.
+	 * ESP and ExpressionParser have 'throw' statement that will
+	 * generate an exception.
+	 * @return true if the exception was due to a throw statement,
+	 *         false otherwise
+	 */
+	public boolean wasThrown() {return false;}
+
+
     }
 
     /**

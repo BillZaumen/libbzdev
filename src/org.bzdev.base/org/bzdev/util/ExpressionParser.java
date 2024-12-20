@@ -5492,9 +5492,12 @@ public class ExpressionParser implements ObjectParser<Object>
 							 orig,
 							 opToken.getIndex());
 		    }
-		    throw new ObjectParser.Exception(msg, opToken.getFileName(),
+		    throw new ObjectParser.Exception(msg,
+						     opToken.getFileName(),
 						     orig,
-						     opToken.getIndex());
+						     opToken.getIndex()) {
+			public boolean wasThrown() {return true;}
+		    };
 		}
 	    case AND:
 		try {
@@ -6212,6 +6215,16 @@ public class ExpressionParser implements ObjectParser<Object>
 			    }
 			} else if (oper == Operator.CONSTRUCTOR) {
 			    pushValue(doConstr(fname, args));
+			}
+		    } catch (ObjectParser.Exception e) {
+			if (e.wasThrown()) {
+			    throw e;
+			} else {
+			    String msg =
+				errorMsg("fcallFailed", fname, args.length);
+			    throw new ObjectParser.Exception
+				(msg, e, opToken.getFileName(), orig,
+				 opToken.getIndex());
 			}
 		    } catch (java.lang.Exception e) {
 			String msg =
@@ -9001,7 +9014,6 @@ public class ExpressionParser implements ObjectParser<Object>
 		next = new Token(Operator.BACKQUOTE, "function",
 				 offset+i, level);
 		if (ptype != null && binaryLogicalOps.contains(ptype)) {
-		    System.out.println("true mode set");
 		    next.setTrueMode();
 		}
 		vset = new HashSet<String>();

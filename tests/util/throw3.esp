@@ -1,0 +1,7 @@
+
+var object = {
+    foo() {throw "hello"},
+    bar() {this.foo()}
+};
+
+object.bar();
