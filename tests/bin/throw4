@@ -1,0 +1,7 @@
+#!/usr/bin/scrunner -sEUN:true
+
+function foo() {throw "hello"}
+
+function bar() {foo()}
+
+bar();
