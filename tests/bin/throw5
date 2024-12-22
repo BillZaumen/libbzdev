@@ -1,4 +1,4 @@
-#!/usr/bin/scrunner -sEUN:true
+#!./run -sEUN:true
 
 function foo() {throw "hello"}
 

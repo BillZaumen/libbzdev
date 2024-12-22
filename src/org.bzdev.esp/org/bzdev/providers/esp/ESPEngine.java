@@ -56,10 +56,12 @@ public class ESPEngine extends AbstractScriptEngine
 	int lineNumber = loc[0];
 	int columnNumber = loc[1];
 	e.setPrefix("### ");
-	String msg = e.getMessage();
+	final String msg = e.getMessage();
 	ScriptException se = new ScriptException(msg, filename,
-						 lineNumber, columnNumber+1);
-	se.initCause(e.getCause());
+						 lineNumber, columnNumber+1) {
+		public String getMessage() {return msg;}
+	    };;
+	se.initCause(e);
 	se.setStackTrace(e.getStackTrace());
 	Throwable t = e.getCause();
 	while (t != null) {

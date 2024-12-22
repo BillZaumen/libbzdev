@@ -5767,6 +5767,10 @@ public class ExpressionParser implements ObjectParser<Object>
 				    }
 				    eval(ef.orig);
 				    return;
+				} catch (ObjectParser.Exception ope) {
+				    ope.addTrace(opToken.getFileName(),
+						 orig, opToken.getIndex());
+				    throw ope;
 				} finally {
 				    popBases();
 				    popArgMap();
@@ -5795,6 +5799,10 @@ public class ExpressionParser implements ObjectParser<Object>
 				}
 				eval(ef.orig);
 				return;
+			    } catch (ObjectParser.Exception ope) {
+				ope.addTrace(opToken.getFileName(),
+					     orig, opToken.getIndex());
+				throw ope;
 			    } finally {
 				popBases();
 				popArgMap();
@@ -6218,6 +6226,8 @@ public class ExpressionParser implements ObjectParser<Object>
 			}
 		    } catch (ObjectParser.Exception e) {
 			if (e.wasThrown()) {
+			    e.addTrace(opToken.getFileName(), orig,
+				       opToken.getIndex());
 			    throw e;
 			} else {
 			    String msg =

@@ -142,6 +142,7 @@ Specify arguments. This must be the first argument if it is provided. Each
 .I SOPTION
 contains, the letter
 .BR B ,
+.BR C ,
 .BR D ,
 .BR I ,
 .BR L ,
@@ -153,7 +154,9 @@ contains, the letter
 .BR T ,
 or
 .BR U ,
-followed by a colon and a name that is typically a variable name, except for
+followed by a colon and a name that is a variable name except for the
+letters
+.BR C ,
 .BR E ,
 .BR N ,
 .BR P ,
@@ -167,6 +170,7 @@ in which case the name should be the word
 .BR false ,
 which is the default).
 As a special case, any combination of
+.BR C ,
 .BR E ,
 .BR N ,
 .BR P ,
@@ -202,7 +206,15 @@ for String.
 .sp 1
 The corresponding variable names must start with a lower or upper case
 letter or an underscore, followed by any number of digits, lower or
-upper case letters, or underscores.  Otherwise the letter
+upper case letters, or underscores.  Otherwise, when the value is
+.BR true ,
+the letter
+.br
+.sp 1
+.B C
+indicates that the
+.B \-\-callTrace
+option should be automatically added
 .br
 .sp 1
 .B E
@@ -253,6 +265,7 @@ option must be a file name for a script (for executable scripts,
 this is handled automatically).  If there are N
 .I SOPTION
 arguments (with N larger than 0), excluding any whose type is
+.BR C ,
 .BR E ,
 .BR N ,
 .BR P ,
@@ -260,10 +273,10 @@ arguments (with N larger than 0), excluding any whose type is
 .BR T ,
 or
 .BR U ,
-the initial script argument must be followed by any other
+the initial script argument may be followed by any other
 .B scrunner
-options, in turn followed by the values for the variable names specified
-by the
+options, and in turn must be followed by the values for the variable
+names specified by the
 .B \-s
 option in the order in which they appear in the
 .B \-s
@@ -301,6 +314,14 @@ option is needed when there are no module dependencies that would make
 the specified modules accessible. An example is a module that is used
 in a script but that does not provide implementations of the class
 org.bzdev.obnaming.NamedObjectFactory.
+.TP
+.B \-\-callTrace
+Print a stack trace if an error occurs that includes only the
+scripting language statements being called.  This option is supported
+by ESP, but not necessarily by other scripting languages, and is
+necessary only when the
+.B \-s
+option is used (e.g., in executable scripts).
 .TP
 .BI \-\-classpathCodebase\  URLPATH
 .TQ

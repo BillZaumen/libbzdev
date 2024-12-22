@@ -906,6 +906,7 @@ public class SCRunnerCmd {
 	boolean noAdditionalArgs = false;
 	boolean maxQualityMode = false;
 	boolean autoStackTraceMode = false;
+	boolean autoCallTraceMode = false;
 	boolean autoPrintMode = false;
 	boolean unsetScriptingMode = false;
 	boolean justFilenameMode = false;
@@ -978,6 +979,12 @@ public class SCRunnerCmd {
 		    case 'T':
 			if (variable.equalsIgnoreCase("true")) {
 			    autoStackTraceMode = true;
+			}
+			anyBooleanMode = true;
+			break;
+		    case 'C':
+			if (variable.equalsIgnoreCase("true")) {
+			    autoCallTraceMode = true;
 			}
 			anyBooleanMode = true;
 			break;
@@ -1184,6 +1191,8 @@ public class SCRunnerCmd {
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {
 		sbcmd.add("--stackTrace");
+	    } else if (argv[index].equals("--callTrace")) {
+		sbcmd.add("--callTrace");
 	    } else if (argv[index].equals("--print")) {
 		sbcmd.add("--print");
 	    } else if (argv[index].equals("--")) {
@@ -1507,6 +1516,9 @@ public class SCRunnerCmd {
 	}
 	if (autoStackTraceMode) {
 	    argList.add("--stackTrace");
+	}
+	if (autoCallTraceMode) {
+	    argList.add("--callTrace");
 	}
 	if (autoPrintMode) {
 	    argList.add("--print");

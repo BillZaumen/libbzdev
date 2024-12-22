@@ -1,6 +1,7 @@
 package org.bzdev.util;
 import java.util.regex.*;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
 
 //@exbundle org.bzdev.util.lpack.ObjectParser
 
@@ -49,6 +50,10 @@ public interface ObjectParser<T> {
 	private String filename = null;
 	private int offset;
 
+	private ArrayList<String> inputList = new ArrayList<>();;
+	private ArrayList<String> filenameList = new ArrayList<>();;
+	private ArrayList<Integer> offsetList = new ArrayList<>();
+
 	/**
 	 * Constructor.
 	 * @param msg a message describing this exception
@@ -77,7 +82,6 @@ public interface ObjectParser<T> {
 	    this.input = input;
 	    this.offset = offset;
 	}
-
 
 	/**
 	 * Constructor with a cause.
@@ -111,6 +115,18 @@ public interface ObjectParser<T> {
 	    this.offset = offset;
 	}
 
+	/**
+	 * Add additional elements for a stack trace.
+	 * @param filename the name of the input
+	 * @param input the input string
+	 * @param offset an offset into the string indicating
+	 *        where an error occurred; -1 if there is no specific offset
+	 */
+	public void addTrace(String filename, String input, int offset) {
+	    filenameList.add(filename);
+	    inputList.add(input);
+	    offsetList.add(offset);
+	}
 
 	/**
 	 * Get the input string for which the error occurred.
@@ -151,6 +167,18 @@ public interface ObjectParser<T> {
 	    this.prefix = prefix;
 	}
 
+	/**
+	 * Get the prefix.
+	 * @return the prefix; null if it is not defined or if it is
+	 *         an empty string
+	 */
+	public String getPrefix() {
+	    return (prefix == null)? prefix:
+		(prefix.length() == 0)? null:
+		prefix;
+	}
+
+
 	boolean showLoc = false;
 	/**
 	 * Indicate if a line showing the location of an error message
@@ -173,8 +201,11 @@ public interface ObjectParser<T> {
 	 */
 	@Override
 	public String getMessage() {
-	    return ErrorMessage.getMultilineString(prefix, filename,
-						   input, offset,
+	    return ErrorMessage.getMultilineString(prefix,
+						   filename, input, offset,
+						   filenameList,
+						   inputList,
+						   offsetList,
 						   this, false, showLoc);
 	}
 
@@ -205,8 +236,6 @@ public interface ObjectParser<T> {
 	 *         false otherwise
 	 */
 	public boolean wasThrown() {return false;}
-
-
     }
 
     /**

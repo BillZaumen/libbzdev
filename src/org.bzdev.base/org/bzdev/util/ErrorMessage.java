@@ -750,10 +750,53 @@ public class ErrorMessage {
 					    boolean verbose,
 					    boolean useLocation)
     {
+	return getMultilineString(prefix, fn, input, index,
+				  null, null, null,
+				  e, verbose, useLocation);
+    }
+    /**
+     * Generate a multi-line string for an error message, based on an
+     * exception, with a line from some input.
+     * The default format in English shows the filename in quotes
+     * followed by the line number, the class for the exception, and
+     * the corresponding message. The next line contains a portion of
+     * the input, with a subsequent line including a caret indicating
+     * the point where the error occurred, followed by some information
+     * about the column number.
+     * <P>
+     * The ArrayList arguments are used to provide additional lines showing
+     * source-code locations to trace method and function calls.
+     * @param prefix a string that starts each line when verbose is true
+     *        and each line other than the first line when verbose is false
+     * @param fn a file name or other name for the input
+     * @param input the input being processed
+     * @param index a location in the input where an error occurred
+     * @param fnList a list of names for additional source-code locations
+     * @param inputList a list of inputs for additional souce-code inputs
+     * @param indexList a list of indices for additional input locations.
+     * @param e the exception that generated an error
+     * @param verbose true if a long format should be used
+     * @param useLocation true if the location should appended
+     * @return a string spaning multiple lines
+     */
+    public static String getMultilineString(String prefix,
+					    String fn, String input, int index,
+					    ArrayList<String>fnList,
+					    ArrayList<String>inputList,
+					    ArrayList<Integer> indexList,
+					    Exception e,
+					    boolean verbose,
+					    boolean useLocation)
+    {
 	int[] loc = getLineAndColumn(input, index);
 	int lineNumber = loc[0];
 	int columnNumber = loc[1];
 	int end = loc[2];
+	// showloc is provided for  ObjectParser.Exception, which uses
+	// fnList, inputList, and indexList. When verbose and useLocation
+	// are false, we'll add some text after the '^'.
+	boolean showLoc = fnList != null && inputList != null
+	    && indexList != null;
 	String sourceLine = input.substring(index - columnNumber, end)
 	    .stripTrailing().replace('\t', ' ');
 	StringBuilder sb = new StringBuilder();
@@ -809,6 +852,52 @@ public class ErrorMessage {
 	    }
 	} else {
 	    sb.append("^");
+	    if (showLoc) {
+		sb.append(' ');
+		sb.append(MessageFormat.format(localeString("location"),
+					       fn, lineNumber, columnNumber));
+	    }
+	}
+	if (fnList != null && inputList != null && indexList != null) {
+	    for (int i = 0; i < fnList.size(); i++) {
+		fn = fnList.get(i);
+		input = inputList.get(i);
+		index = indexList.get(i);
+		loc = getLineAndColumn(input, index);
+		lineNumber = loc[0];
+		columnNumber = loc[1];
+		end = loc[2];
+		sourceLine = input.substring(index - columnNumber, end)
+		    .stripTrailing().replace('\t', ' ');
+		sb.append(linesepStr);
+		sb.append(prefix);
+		sb.append(sourceLine);
+		sb.append(linesepStr);
+		sb.append(prefix);
+		for (int j = 0; j < columnNumber; j++) {
+		    sb.append(' ');
+		}
+		if (useLocation) {
+		    sb.append("^ ");
+		    if (verbose) {
+			sb.append(MessageFormat.format(localeString("column"),
+						       columnNumber+1));
+		    } else {
+			sb.append(MessageFormat
+				  .format(localeString("shortColumn"),
+					  columnNumber+1));
+		    }
+		} else {
+		    sb.append("^");
+		    if (showLoc) {
+			sb.append(' ');
+			sb.append(MessageFormat.format(localeString("location"),
+						       fn,
+						       lineNumber,
+						       columnNumber));
+		    }
+		}
+	    }
 	}
 	return sb.toString();
     }

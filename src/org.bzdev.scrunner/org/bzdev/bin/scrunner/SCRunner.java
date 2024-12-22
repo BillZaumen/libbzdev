@@ -51,7 +51,7 @@ public class SCRunner {
 			  .toURI())).getCanonicalFile()
 		.getParentFile().getCanonicalPath();
 	} catch (Exception e) {
-	    System.err.println("Could not find our own codebase");
+	    System.err.println(errorMsg("noCodebase"));
 	    System.exit(1);
 	}
     }
@@ -395,6 +395,7 @@ public class SCRunner {
 
 
 	boolean stackTrace = false;
+	boolean callTrace = false;
 	boolean noAdditionalArgs = false;
 	boolean printMode = false;
 	int trustLevel = 0;
@@ -428,6 +429,8 @@ public class SCRunner {
 		break;
 	    } else if (argv[index].equals("--stackTrace")) {
 		stackTrace = true;
+	    } else if (argv[index].equals("--callTrace")) {
+		callTrace = true;
 	    } else if (argv[index].equals("--noAdditionalArgs")) {
 		noAdditionalArgs = true;
 	    } else if (argv[index].equals("--print")) {
@@ -1150,7 +1153,7 @@ public class SCRunner {
 	try {
 	    handler.run();
 	} catch (Exception e) {
-	    if (stackTrace) {
+	    if (stackTrace || callTrace) {
 		if (e instanceof ScriptException) {
 		    ScriptException se = (ScriptException) e;
 		    String fn = se.getFileName();
@@ -1173,25 +1176,39 @@ public class SCRunner {
 		    System.err.println(e.getClass().getName() + ": "
 				       + e.getMessage());
 		}
-		printStackTrace(e, System.err);
-		Throwable cause = e.getCause();
-		while (cause != null) {
-		    System.err.println("---------");
-		    if (cause instanceof ObjectParser.Exception) {
-			System.err.println(cause.getMessage());
-		    } else {
-			System.err.println(cause.getClass().getName() + ": "
-					   + cause.getMessage());
+		if (stackTrace) {
+		    // ESPEngine sets the stack trace of the script
+		    // exception to the stacktrace of the script
+		    // exception's cause, so we test for that and
+		    // remove a stack trace if necessary.
+		    StackTraceElement[] st = e.getStackTrace();
+		    printStackTrace(e, System.err);
+		    Throwable cause = e.getCause();
+		    while (cause != null) {
+			if (!Arrays.equals(cause.getStackTrace(), st)) {
+			    System.err.println("---------");
+			    if (cause instanceof ObjectParser.Exception) {
+				System.err.println(cause.getMessage());
+			    } else {
+				System.err.println(cause.getClass().getName()
+						   + ": "
+						   + cause.getMessage());
+			    }
+			    printStackTrace(cause, System.err);
+			}
+			cause = cause.getCause();
 		    }
-		    printStackTrace(cause, System.err);
-		    cause = cause.getCause();
 		}
 	    } else {
 		Throwable cause = e.getCause();
-		Class<?> ec = e.getClass();
+		// Class<?> ec = e.getClass();
 		String msg;
 		if (e instanceof ScriptException) {
 		    ScriptException se = (ScriptException)e;
+		    String prefix = (cause != null &&
+				     cause instanceof ObjectParser.Exception)?
+			((ObjectParser.Exception) cause).getPrefix():
+			null;
 		    String fn = se.getFileName();
 		    int ln = se.getLineNumber();
 		    String m = se.getMessage();
@@ -1216,12 +1233,10 @@ public class SCRunner {
 			StringBuffer sb = new StringBuffer();
 			sb.append(lines[0]);
 			String lineSep = System.getProperty("line.separator");
-			for (int k = 1; k < lines.length - 2; k++) {
-			    sb.append(lineSep);
-			    sb.append(lines[k]);
-			}
-			for (int k = lines.length-2; k < lines.length; k++) {
-			    if (!lines[k].startsWith("### ")) {
+			for (int k = 1; k < lines.length; k++) {
+			    if (prefix != null && lines[k].startsWith(prefix)) {
+				break;
+			    } else {
 				sb.append(lineSep);
 				sb.append(lines[k]);
 			    }

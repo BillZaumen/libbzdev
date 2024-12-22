@@ -366,18 +366,42 @@ test1:
 	./run --stackTrace test1.esp
 	chmod u-x ./run
 
+throwTrace:
+	(cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x ./throw
+	./throw --stackTrace || echo -n
+	chmod u-x ./run
+	chmod u-x ./throw
+
 throwtest:
 	(cd ../.. ; make )
 	chmod u+x ./run
 	chmod u+x throw throw[12345]
 	./throw || echo ...
+	./throw --stackTrace || echo ...
 	./throw1 || echo ...
 	./throw2 || echo ...
 	./throw3 || echo ...
 	./throw4 || echo ...
-	./throw5 || echo -n
+	./throw5 || echo ...
+	./throw5 --stackTrace || echo -n
 	chmod u-x throw throw[12345]
 	chmod u-x ./run
+
+throwCall:
+	(cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x throw throw[12345]
+	./throw --callTrace || echo ...
+	./throw1 --callTrace || echo ...
+	./throw2 --callTrace || echo ...
+	./throw3 --callTrace|| echo ...
+	./throw4 --callTrace|| echo ...
+	./throw5 --callTrace || echo -n
+	chmod u-x throw throw[12345]
+	chmod u-x ./run
+
 
 ecirc:
 	(cd ../.. ; make )
