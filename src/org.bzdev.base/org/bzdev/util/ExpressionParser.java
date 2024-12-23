@@ -282,7 +282,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
 
     private static final EnumSet<Operator> notBeforeVars
-	= EnumSet.of(Operator.INSTANCEOF, Operator.THROW, Operator.CBRACE,
+	= EnumSet.of(Operator.INSTANCEOF, /*Operator.THROW,*/ Operator.CBRACE,
 		     Operator.OBJCLOSEBRACE, Operator.CBRACKET,Operator.NULL,
 		     Operator.VOID, Operator.CPAREN, Operator.NUMBER,
 		     Operator.CLASS, Operator.METHOD_REF,Operator.CONSTANT,
@@ -9856,7 +9856,7 @@ public class ExpressionParser implements ObjectParser<Object>
 					// || ptype == Operator.CONSTRUCTOR
 					|| ptype == Operator.CPAREN*/
 					notBeforeVars.contains(ptype)) {
-					String  msg = errorMsg("syntaxError");
+					String msg = errorMsg("syntaxError");
 					throw new ObjectParser.Exception
 					    (msg, filenameTL.get(), s, start);
 				    }
@@ -10457,7 +10457,8 @@ public class ExpressionParser implements ObjectParser<Object>
 			    next = new Token(Operator.CONSTRUCTOR, variable,
 					     offset+start, level);
 			} else {
-			    if (ptype!=null && notBeforeVars.contains(ptype)) {
+			    if (ptype!=null && notBeforeVars.contains(ptype)
+				|| (ptype == Operator.THROW && functParams)) {
 				String msg = errorMsg("syntaxError");
 				throw new ObjectParser.Exception
 				    (msg, filenameTL.get(), s, i);

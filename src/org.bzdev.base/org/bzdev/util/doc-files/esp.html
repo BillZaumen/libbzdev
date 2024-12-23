@@ -40,6 +40,7 @@
 	  <LI> <A HREF="#objects">Objects</A>
 	  <LI> <A HREF="#arrays">Arrays</A>
 	  <LI> <A HREF="#global">The global object</A>
+	  <LI> <A HREF="#throw">Throw statements</A>.
 	  <LI> <A HREF="#tracing">Tracing Options</A>
 	</UL>
       <LI><A HREF="#iteration">Iteration</A>.
@@ -1599,6 +1600,18 @@ array-elements:
 	expression-parser object, an expression-parser array, or a
 	Java array. An exception will be thrown otherwise.
     </UL>
+
+    <H3><A ID="throw"></A>Throw Statements</H3>
+  <P>
+    A <STRONG>throw</STRONG> statement consists of the keyword
+    <STRONG>throw</STRONG> followed by an expression whose value
+    must be a string.  There is no mechanism for catching an
+    exception that is thrown.  The intention is for a <CODE>throw</CODE>
+    statement to provide a concise way of terminating the script and
+    providing an error message to indicate why the script failed.
+  <P>
+    A <STRONG>throw</STRONG>statement is syntactically an expression,
+    although it never produces a value as the script stops running.
 
     <H3><A ID="tracing"></A>Directives for Tracing</H3>
   <P>

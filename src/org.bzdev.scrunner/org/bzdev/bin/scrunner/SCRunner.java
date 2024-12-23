@@ -1203,6 +1203,7 @@ public class SCRunner {
 		Throwable cause = e.getCause();
 		// Class<?> ec = e.getClass();
 		String msg;
+		String om = null;
 		if (e instanceof ScriptException) {
 		    ScriptException se = (ScriptException)e;
 		    String prefix = (cause != null &&
@@ -1211,7 +1212,8 @@ public class SCRunner {
 			null;
 		    String fn = se.getFileName();
 		    int ln = se.getLineNumber();
-		    String m = se.getMessage();
+		    om = se.getMessage();
+		    String m = om;
 		    if (ln != -1) {
 			// Some scripting-related exceptions tag
 			// a string of the form (FILENAME#LINENO)
@@ -1259,17 +1261,20 @@ public class SCRunner {
 		// System.err.println("scrunner: " + e.getMessage());
 		cause = e.getCause();
 		while (cause != null) {
-		    Class<?> clasz = cause.getClass();
-		    Class<?> target =
-			org.bzdev.obnaming.NamedObjectFactory
-			.ConfigException.class;
-		    String tn = errorMsg("configException");
-		    String cn =(clasz.equals(target))? tn: clasz.getName();
-		    if (clasz.equals(ObjectParser.Exception.class)) {
-			System.err.println(cause.getMessage());
-		    } else {
-			msg = errorMsg("continued", cn, cause.getMessage());
-			System.err.println("  ... " + msg);
+		    String cm = cause.getMessage();
+		    if (om == null || !om.equals(cm)) {
+			Class<?> clasz = cause.getClass();
+			Class<?> target =
+			    org.bzdev.obnaming.NamedObjectFactory
+			    .ConfigException.class;
+			String tn = errorMsg("configException");
+			String cn =(clasz.equals(target))? tn: clasz.getName();
+			if (clasz.equals(ObjectParser.Exception.class)) {
+			    System.err.println(cause.getMessage());
+			} else {
+			    msg = errorMsg("continued", cn+1, cm);
+			    System.err.println("  ... " + msg);
+			}
 		    }
 		    cause = cause.getCause();
 		}
