@@ -402,6 +402,14 @@ throwCall:
 	chmod u-x throw throw[12345]
 	chmod u-x ./run
 
+mtest:
+	(cd ../.. ; make )
+	chmod u+x ./run
+	chmod u+x missingQuotes
+	./missingQuotes 2024-06-11 7600 3800
+	chmod u-x missingQuotes
+	chmod u-x ./run
+
 
 ecirc:
 	(cd ../.. ; make )

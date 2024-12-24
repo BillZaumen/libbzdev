@@ -651,6 +651,9 @@ public class ErrorMessage {
 	    end -= linesep.length;
 	    if (!Character.isWhitespace(s.charAt(end))) end++;
 	}
+	// The addjust for the end does not quite work in the case
+	// of an empty line, so we'll fix that up as a special case.
+	if (end < index) end = index;
 	return new int[] {
 	    line, index - last, end
 	};

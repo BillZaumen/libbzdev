@@ -1,0 +1,6 @@
+#!./run -sENUP:true,S:start,S:annualMileage,I:serviceInterval
+function isInteger(string) {
+    string.matches(-?[0-9]+);
+}
+
+var x = 10;
