@@ -8297,7 +8297,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case ';':
 		mustSync = false; // Just in case.
 		if (bracePeer != null) {
-		    if (parenPeer.getType() == Operator.OBRACE) {
+		    if (parenPeer != null
+			&& parenPeer.getType() == Operator.OBRACE) {
 			// We are inside a lambda expression's body so
 			// a semicolon is OK - used to delimit statements.
 			level = bracePeer.getLevel();
@@ -9316,7 +9317,8 @@ public class ExpressionParser implements ObjectParser<Object>
 						     s, i);
 		}
 		boolean decr = false;
-		if (parenPeer == null) {
+		if (parenPeer == null
+		    || parenPeer.getType() != Operator.OPAREN) {
 		    String msg = errorMsg("unbalancedParens");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
