@@ -8555,12 +8555,14 @@ public class ExpressionParser implements ObjectParser<Object>
 		tokens.add (next);
 		break;
 	    case '?':
-		if (ptype == null || binaryOps.contains(ptype)) {
-		    String msg = errorMsg("syntaxError");
-		    throw new ObjectParser.Exception(msg, filenameTL.get(),
-						     s, i);
-		}
-		if (ptype == Operator.OPAREN) {
+		if (ptype == null || binaryOps.contains(ptype)
+		    || ptype == Operator.OPAREN
+		    || ptype == Operator.UNARY_MINUS
+		    || ptype == Operator.QMARK
+		    || ptype == Operator.COLON
+		    || ptype == Operator.OBRACE
+		    || ptype == Operator.OBRACKET
+		    ) {
 		    String msg = errorMsg("syntaxError");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
@@ -8580,7 +8582,13 @@ public class ExpressionParser implements ObjectParser<Object>
 		tokens.add(next);
 		break;
 	    case ':':
-		if (ptype == null || binaryOps.contains(ptype)) {
+		if (ptype == null || binaryOps.contains(ptype)
+		    || ptype == Operator.OPAREN
+		    || ptype == Operator.UNARY_MINUS
+		    || ptype == Operator.QMARK
+		    || ptype == Operator.COLON
+		    || ptype == Operator.OBRACE
+		    || ptype == Operator.OBRACKET) {
 		    String msg = errorMsg("syntaxError");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
@@ -8998,6 +9006,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		    String msg = errorMsg("unbalancedBrackets");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
+		} else if (condPeer != null &&
+			   condPeer.getIndex() > bracketPeer.getIndex()) {
+		    String msg = errorMsg("misplacedCBracket");
+		    throw new ObjectParser.Exception(msg, filenameTL.get(),
+						     s, i);
 		}
 		level = bracketPeer.getLevel();
 		funct = bracketPeer.getFunct();
@@ -9106,6 +9119,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 		if (bracePeer == null) {
 		    String msg = errorMsg("unbalancedBraces");
+		    throw new ObjectParser.Exception(msg, filenameTL.get(),
+						     s, i);
+		} else if (condPeer != null &&
+			   condPeer.getIndex() > bracePeer.getIndex()) {
+		    String msg = errorMsg("misplacedCBrace");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
 		}
@@ -9320,6 +9338,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		if (parenPeer == null
 		    || parenPeer.getType() != Operator.OPAREN) {
 		    String msg = errorMsg("unbalancedParens");
+		    throw new ObjectParser.Exception(msg, filenameTL.get(),
+						     s, i);
+		} else if (condPeer != null &&
+			   condPeer.getIndex() > parenPeer.getIndex()) {
+		    String msg = errorMsg("misplacedCParens");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
 		}

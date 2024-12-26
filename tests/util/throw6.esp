@@ -1,0 +1,5 @@
+var object = {
+    string(a,b) { "" + a + b;}
+};
+
+throw object.string("a", "b");

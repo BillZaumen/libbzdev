@@ -405,9 +405,12 @@ throwCall:
 mtest:
 	(cd ../.. ; make )
 	chmod u+x ./run
-	chmod u+x missingQuotes
-	./missingQuotes 2024-06-11 7600 3800
-	chmod u-x missingQuotes
+	chmod u+x missingQuotes missingQuotes[123]
+	./missingQuotes --callTrace 2024-06-11 7600 3800 || echo ...
+	./missingQuotes1 --callTrace 2024-06-11 7600 3800 || echo ...
+	./missingQuotes2 --callTrace 2024-06-11 7600 3800 || echo ...
+	./missingQuotes3 --callTrace 2024-06-11 7600 3800 || echo ...
+	chmod u-x  missingQuotes missingQuotes[123]
 	chmod u-x ./run
 
 
