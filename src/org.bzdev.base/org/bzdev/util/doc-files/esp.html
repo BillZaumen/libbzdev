@@ -21,12 +21,12 @@
     sections provide a description of the ESP scripting language
     and how it is configured:
     <UL>
-      <LI><A HREF="#overview">Overview</A>.
-      <LI><A HREF="#scriptEngine">Script Engines</A>.
-      <LI><A HREF="#constructors">Constructors</A>.
-      <LI><A HREF="#syntax">ESP Syntax</A>:
+      <LI><A HREF="#overview">Overview</A>
+      <LI><A HREF="#scriptEngine">Script Engines</A>
+      <LI><A HREF="#constructors">Constructors</A>
+      <LI><A HREF="#syntax">ESP Syntax</A>
 	<UL>
-	  <LI> <A HREF="#comments">Comments</A>.
+	  <LI> <A HREF="#comments">Comments</A>
 	  <LI> <A HREF="#primitiveValues">Primitive Values</A>
 	  <LI> <A HREF="#constants">Constants</A>
 	  <LI> <A HREF="#operators">Operators</A>
@@ -40,18 +40,18 @@
 	  <LI> <A HREF="#objects">Objects</A>
 	  <LI> <A HREF="#arrays">Arrays</A>
 	  <LI> <A HREF="#global">The global object</A>
-	  <LI> <A HREF="#throw">Throw statements</A>.
+	  <LI> <A HREF="#throw">Throw statements</A>
 	  <LI> <A HREF="#tracing">Tracing Options</A>
 	</UL>
-      <LI><A HREF="#iteration">Iteration</A>.
-      <LI><A HREF="#threading">Threading</A>.
-      <LI><A HREF="#bindings">Bindings</A>.
-      <LI><A HREF="#api">The ESP API</A>.
-      <LI><A HREF="#helpers">Helper Classes</A>.
-      <LI><A HREF="#examples">Examples</A>.
-      <LI><A HREF="#hints">Hints</A>.
-      <LI><A HREF="#security">Security</A>.
-      <LI><A HREF="#notes">Implementation Notes</A>.
+      <LI><A HREF="#iteration">Iteration</A>
+      <LI><A HREF="#threading">Threading</A>
+      <LI><A HREF="#bindings">Bindings</A>
+      <LI><A HREF="#api">The ESP API</A>
+      <LI><A HREF="#helpers">Helper Classes</A>
+      <LI><A HREF="#examples">Examples</A>
+      <LI><A HREF="#hints">Hints</A>
+      <LI><A HREF="#security">Security</A>
+      <LI><A HREF="#notes">Implementation Notes</A>
     </UL>
   <P>
     In the simplest use case, ESP provides a reasonable level of
@@ -1904,9 +1904,20 @@ var stroke = (new BasicStrokeBuilder())
 
     <H2><A ID="examples"></A>Examples</H2>
   <P>
-    The following examples illustrate how to use ESP.
+    The following examples:
+    <UL>
+      <LI><A HREF="#iterExample">Iteration Example</A>
+      <LI><A HREF="#typedNullExample">Typed-Null Example</A>
+      <LI><A HREF="#linExample">System-of-Linear-Equations Example</A>
+      <LI><A HREF="#exchangeOpExample">&lt;=&gt; Operator Example</A>
+      <LI><A HREF="#dramaSimExample">Drama-Simulation Example</A>
+      <LI><A HREF="#animationExample">AnimationExample</A>
+      <LI><A HREF="#lunarNYExample">Lunar-New-Year Example</A>
+      <LI><A HREF="#mileageExample">Estimated-Mileage Example</A>
+    </UL>
+    illustrate how to use ESP.
 
-    <H2>Iteration Example</H2>
+    <H2><A ID="iterExample"></A>Iteration Example</H2>
   <P>
     Iteration in ESP, as mentioned above, is based the Java package
     {@link java.util.stream}. The following example uses two
@@ -1951,7 +1962,7 @@ out.format("mean = %g, sdev=%g\n", stats.getMean(), stats.getSDev());
     The use of a method reference instead of a lambda expression will
     improve execution time by roughly a factor of 10 in this case.
 
-    <H2>Typed-Null example</H2>
+    <H2><A ID="typedNullExample"></A>Typed-Null Example</H2>
   <P>
     Suppose there is a Java class defined as follows
     <BLOCKQUOTE><PRE><CODE>
@@ -1994,7 +2005,7 @@ nt.set(NullTest.getNullString());
     <CODE>(Number::null == String::null)</CODE> has the value
     <CODE>true</CODE>.
 
-    <H2><A ID="solve"></A>System of Linear Equations</H2>
+    <H2><A ID="linExample"></A><A ID="solve"></A>System of Linear Equations</H2>
   <P>
     A system of linear equations can be written a Ax = y where
     A is a matrix and x and y are vectors. One can create the
@@ -2032,7 +2043,7 @@ function printArray(array) {
     The <CODE>printArray</CODE> function can be used when its argument
     is either an ESP array or a Java array.
 
-    <H2>Use of the &lt;=&gt; Operator</H2>
+    <H2><A ID="exchangeOpExample"></A>Use of the &lt;=&gt; Operator</H2>
   <P>
     If the following example is placed in an executable file
     named <CODE>ecirc</CODE> on a Linux system, the program
@@ -2066,7 +2077,7 @@ var &epsilon; = Math.sqrt(1.0 - (b*b)/(a*a));
     ESP allows the same characters to appear in identifiers as
     Java does.
 
-    <H2>Drama-Simulation Example</H2>
+    <H2><A ID="dramaSimExample"></A>Drama-Simulation Example</H2>
   <P>
     The file TestActor.java, which defines an actor, contains the following:
     <BLOCKQUOTE><PRE><CODE>
@@ -2195,7 +2206,7 @@ javac -d classes -classpath /usr/share/bzdev/libbzdev.jar -s tmpsrc *.java
 scrunner --classpathCodebase classes/ test.esp
     </CODE></PRE></BLOCKQUOTE>
 
-    <H2>Animation Example</H2>
+    <H2><A ID="animationExample"></A>Animation Example</H2>
   <P>
     The following example creates a simple animation.
     <BLOCKQUOTE><PRE><CODE>
@@ -2310,9 +2321,290 @@ a2d.run();
 	frames, provides an object (tmpdir) that provides access to a
 	temporary directory, schedules the frames, and finally runs the
 	animation to create the frames.
-   </UL>
+    </UL>
 
-    <H2><A ID="hints"></A>Hints</H2>
+    <H2><A ID="lunarNYExample"></A>Lunar-New-Year Example</H2>
+  <P>
+    Each year on the lunar new year calendar is associated with an
+    animal, and as a custom, people are associated with the animal for
+    the lunar year in which they were born.  The start of of a lunar
+    year, however, is offset from January 1 by an amount that varies
+    year to year.  The following example computes the animal for the
+    lunar year that starts in a given Gregorian year.  For a an
+    argument that is a date (i.e., YYYY-MM-DD or "now" for today), it
+    first determines the date of lunar new year and whether the given
+    date precedes lunar new year or not.  If the date precedes lunar
+    new year, the previous year is used.
+  <P>
+    Lunar New Year typically occurs on the 2nd new moon after the
+    winter solstice, but there is an obscure exception in which it can
+    occur on the third new moon. In addition, the moon&apos;s orbit is
+    slightly elliptical, the major axis of this ellipse precesses due
+    to the sun and other planets, the earth&apos;s axis of rotation also
+    precesses, and the rules for determining when lunar new year
+    occurs, at least those one can easily find via an internet search,
+    tend to be silent about which time zones to use.
+  <P>
+    The following code handles this by using a simple algorithm in
+    most cases with an exception table for the cases in which the
+    simple algorithm fails.  Failures occur about 1/4 of the time are
+    are mostly errors by 1 day, and rarely by closer to a month. In
+    all cases, however, lunar new year falls between January 21 and
+    February 21 inclusive. The exception table handles years from 1900
+    to 2100, which would cover the common cases. Outside of that range
+    a warning is tagged on to the result if the date is between January
+    21 and February 20 inclusive, the dates lunar new year can follow.
+  <P>
+    The default algorithm uses the mean time between new moons
+    (29.5305888531 days) with a reference date for one new moon at
+    2000-01-06T14:24:00Z. It then computes an offset from January 1,
+    and adds 29.5305888531 to the offset if that offset precedes
+    January 21. When the date precedes the reference date, the offset
+    is incremented by 1 day - empirically it was determined that this
+    produces fewer errors.
+  <P>
+    Because ESP accepts Unicode characters, the array providing animal
+    names includes their Chinese characters. The "%%" operator is used
+    to compute the date modulo 12, and works for both positive and
+    negative years.
+    <BLOCKQUOTE><PRE><CODE>
+#!/usr/bin/scrunner -sS:date,E:true,P:true
+
+import java.lang.Math;
+import org.bzdev.lang.MathOps;
+import java.time.temporal.ChronoUnit;
+import (java.time, [ZonedDateTime, ZoneId,
+                    LocalDate, LocalTime]);
+
+var year = null;
+var pattern =
+     "[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
+var zone = ZoneId.of("Asia/Shanghai");
+
+date.matches("[-]?[0-9]+")? `{
+    year = Integer.parseInt(date); date = null
+}: date.matches("now")? `{
+    date = ZonedDateTime.now(); year = date.getYear()
+}: date.matches(pattern)? `{
+    date = LocalDate.parse(date);
+    year = date.getYear();
+    date = ZonedDateTime.of(date, LocalTime.of(0, 0),
+                             zone)
+}: throw "illegal date "
+         + date
+         + " (expecting YYYY-MM-DD, now, or a year)";
+
+var status = "";
+
+// dates and LNY values where the default
+// algorithm fails.
+var exceptions =
+    [[1900, "1900-01-31"], [1901, "1901-02-19"],
+     [1902, "1902-02-08"], [1903, "1903-01-29"],
+     [1905, "1905-02-04"], [1910, "1910-02-10"],
+     [1916, "1916-02-03"], [1919, "1919-02-01"],
+     [1920, "1920-02-20"], [1925, "1925-01-24"],
+     [1928, "1928-01-23"], [1929, "1929-02-10"],
+     [1932, "1932-02-06"], [1935, "1935-02-04"],
+     [1941, "1941-01-27"], [1942, "1942-02-15"],
+     [1945, "1945-02-13"], [1955, "1955-01-24"],
+     [1956, "1956-02-12"], [1958, "1958-02-18"],
+     [1965, "1965-02-02"], [1966, "1966-01-21"],
+     [1967, "1967-02-09"], [1972, "1972-02-15"],
+     [1978, "1978-02-07"], [1981, "1981-02-05"],
+     [1987, "1987-01-29"], [1988, "1988-02-17"],
+     [1990, "1990-01-27"], [1991, "1991-02-15"],
+     [1994, "1994-02-10"], [2003, "2003-02-01"],
+     [2007, "2007-02-18"], [2012, "2012-01-23"],
+     [2017, "2017-01-28"], [2018, "2018-02-16"],
+     [2028, "2028-01-26"], [2029, "2029-02-13"],
+     [2034, "2034-02-19"], [2039, "2039-01-24"],
+     [2040, "2040-02-12"], [2042, "2042-01-22"],
+     [2043, "2043-02-10"], [2049, "2049-02-02"],
+     [2052, "2052-02-01"], [2053, "2053-02-19"],
+     [2054, "2054-02-08"], [2056, "2056-02-15"],
+     [2061, "2061-01-21"], [2065, "2065-02-05"],
+     [2074, "2074-01-27"], [2079, "2079-02-02"],
+     [2088, "2088-01-24"], [2090, "2090-01-30"],
+     [2092, "2092-02-07"], [2095, "2095-02-05"],
+     [2099, "2099-01-21"], [2100, "2100-02-09"]
+    ];
+
+// If we have a date instead of an integer-valued year,
+// we check whether we are before Lunar New Year and
+// if so, use the previous year.
+
+(date instanceof ZonedDateTime)
+    &amp;&amp; `{
+          exceptions.stream().filter(function(entry) {
+            (entry[0] == year) &amp;&amp; `{
+                var lny = ZonedDateTime
+                          .parse(entry[1]
+                                  + "T00:00:00+08:00");
+                date.isBefore(lny) &amp;&amp; `{year = year - 1}
+             }}).findFirst().isPresent() || `{
+                var refdate =  2451550.1;
+                var lmonth = 29.5305888531;
+                var lepoch = ZonedDateTime
+                             .parse("2000-01-06T14:24:00Z");
+                var ny = ZonedDateTime
+                         .of(year, 1, 1, 0, 0, 0, 0, zone);
+                var offset = lepoch.isAfter(ny)?
+                      1 + asDouble(ny.until(lepoch,
+                                            ChronoUnit.DAYS))
+                          % lmonth:
+                      lmonth - (asDouble(lepoch
+                                         .until(ny,
+                                                ChronoUnit
+                                                .DAYS))
+                                 % lmonth);
+                offset &lt;= 21 &amp;&amp; `{offset = offset + lmonth};
+                offset = floor(offset);
+                offset = asLong(offset);
+                var lny = ny.plusDays(offset);
+                date.isBefore(lny) &amp;&amp; `{year = year - 1};
+                (year &lt; 1900 || year &gt; 2100)
+                  &amp;&amp; (date.getDayOfYear() &gt;= 21)
+                  &amp;&amp; (date.getDayOfYear() &lt;= 51)
+                  &amp;&amp; `{status = " (please verify)"};
+            }
+    };
+
+// Uses negative numbers for BCE years, so that
+// -1 is 1 BCE, -2 // is 2 BCE, etc.  We then
+// have to add 1 to convert to extended CE years.
+
+year &lt; 0 &amp;&amp; `{year = year+1};
+
+// The %% operator always produces a non-negative
+// number, in this case from 0 to 11, so it can
+// be used as an index.
+["猴 monkey", "雞 rooster", "狗 dog", "豬 pig",
+ "鼠 rat", "牛 ox", "虎 tiger", "兔 rabbit",
+ "龍 dragon", "蛇 snake", "馬 horse", "羊 goat"
+][year %% 12] + status
+   </CODE></PRE></BLOCKQUOTE>
+
+
+    <H2><A ID="mileageExample"></A>Estimated-Mileage Example</H2>
+  <P>
+    After asking his insurance agent about surprising increases in
+    auto insurance rates, the author of this document found that, if
+    one&apos;s annual mileage is below a specific limit, one can get a
+    discount, saving perhaps $200 per year.  In addition, the
+    insurance company will drop anyone who has more than a single
+    accident in a three year period. Meanwhile the national average
+    for drivers is 1 accident every 18 years.  Accidents have a
+    Poisson distribution, and subsequent events are not affected by
+    previous events, so if one is in an accident, and one is an
+    typical driver, the chance of being declared uninsurable is simply
+    the probability of 1 or more accidents in a 3 year period. The
+    following program can this risk. The code is straightforward and
+    makes use of the Java streams packages for iteration:
+    <BLOCKQUOTE><PRE><CODE>
+#!/usr/bin/scrunner -sENU:true,D:tau
+
+import java.lang.Math;
+import java.lang.System;
+import org.bzdev.math.Functions;
+import org.bzdev.lang.MathOps;
+var out = global.getWriter();
+
+tau &lt;= 0.0 &amp;&amp; throw "argument out of range: " + tau;
+
+var years = 3.0;
+var lambda = years/tau;
+var n = 5;
+
+function poisson(lambda,k) {
+    MathOps.pow(lambda,k) * exp(-lambda) / factorial(k);
+}
+
+DoubleStream.iterate(1.0, function(y) {y+1.0}).limit(15)
+    .forEach(function(y) {
+        var lambda = y/tau;
+        var p = 1.0 - poisson(lambda, 0);
+        out.format("1 or more in %g years = 1 in %g\n",
+                   y, 1/p);
+    });
+});
+    </CODE></PRE></BLOCKQUOTE> The result is that, if you have a
+    single accident, your chance of having another accident in the
+    next 3 years is 1 in 6.5.  Your risk of being declared uninsurable
+    is a tad lower than the risk of losing a round of Russian
+    roulette. One might conclude that your insurance company, or at
+    least this one, is not your friend.
+  <P>
+    The following program is useful for staying within an annual
+    mileage limit in order to avoid paying one&apos;s insurance
+    company any more than necessary.. When run, it takes three
+    arguments&mdash;either
+    <OL>
+      <LI> a starting date: the string "now" or a date formatted as
+	YYYY-MM-DD.
+      <LI> the annual mileage constraint.
+      <LI> the mileage to reach at some future date, measured from the
+	starting date. This value must be a positive integer.
+    </OL>
+    or
+    <OL>
+      <LI>a starting date: the string "now" or a date formatted as
+	YYYY-MM-DD.
+      <LI> an ending date: the string "now" or a date formatted as
+	YYYY-MM-DD.
+      <LI> the mileage between the starting date and the ending date.
+	This value must be a positive integer.
+    </OL>
+    With the first set of arguments, the script will print the future
+    date.  With the second set of arguments, the script will print
+    an annual mileage estimate.
+    <BLOCKQUOTE><PRE><CODE>
+#!/usr/bin/scrunner -sENUP:true,S:start,S:endOrAnnual,I:serviceInterval
+import (java.lang,[Math, System]);
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+var pattern = "[0-9]{4}-(0[0-9]|1[0-2])"
+              + "-(0[1-9]|[12][0-9]|3[01])";
+
+function getDate(string) {
+    string == "now"? LocalDate.now():
+        string.matches(pattern)? LocalDate.parse(string):
+        throw string + " is not a valid date"
+              + " (expecting \"now\" or YYYY-MM-DD)";
+}
+
+function isInteger(string) {string.matches("-?[0-9]+")}
+
+function isDate(string) {
+    string == null? false:
+        string.equals("now")? true:
+        string.matches(pattern);
+}
+
+start = getDate(start);
+
+serviceInterval &lt;= 0
+ &amp;&amp; throw "third argument not positive";
+
+isInteger(endOrAnnual)? `{
+    endOrAnnual = Integer.parseInt(endOrAnnual);
+    endOrAnnual &lt;= 0
+      &amp;&amp; throw "mileage: annual mileage must be positive";
+    var interval = round(365*serviceInterval/endOrAnnual);
+    start.plus(interval, ChronoUnit.DAYS)
+}: isDate(endOrAnnual)? `{
+    var interval = start.until(getDate(endOrAnnual),
+                               ChronoUnit.DAYS) / 365;
+    interval &lt;= 0
+       &amp;&amp; throw "start date must precede end date";
+    round(serviceInterval/interval)
+}: throw "illegal format "
+    + "(not \"now\", integer, or YYYY-MM-DD) - "
+    + endOrAnnual;
+    </CODE></PRE></BLOCKQUOTE>
+
+    <H1><A ID="hints"></A>Hints</H1>
   <P>
     ESP is actually rather strict about what types it recognizes. As
     a result, when importing classes, it is usually necessary to import
@@ -2354,7 +2646,7 @@ a2d.run();
     to produce double-precision floating-point numbers. For simulations
     and animations there are methods such as
     {@link org.bzdev.devqsim.Simulation#run(long)} whose arguments are
-    long integers. When the value is a constant, an 'L' immediately
+    long integers. When the value is a constant, an &apos;L&apos; immediately
     after the number will create an integer with the desired type, but
     this is typically not necessary as ESP will convert integers to longs
     when a long integer is expected.
@@ -2367,7 +2659,7 @@ a2d.run();
     directives can produce significant amounts of output, one would typically
     use them for small portions of a script.
 
-    <H2><A ID="security"></A>Security</H2>
+    <H1><A ID="security"></A>Security</H1>
   <P>
     Originally, ESP was written under the assumption that the Java
     security manager could be used to prevent scripts from overwriting
@@ -2436,7 +2728,7 @@ global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
     and that class contains methods that can import classes and run
     scripts. Unless needed (for example, subclasses of
     {@link org.bzdev.devqsim.Simulation} have constructors that accept
-    a 'parent' and that parent may be a scripting context), it is
+    a &apos;parent&apos; and that parent may be a scripting context), it is
     safer to use the <STRONG>--unsetScripting</STRONG> options:
     computing a script to be executed is one way to obscure that code&apos;s
     intent.  Regardless, the constraints set by calling
@@ -2445,7 +2737,7 @@ global.blockMethod(Animation2D.class, "initFrames", String.class, String.class);
     <STRONG>global.blockImports</STRONG> will apply to the
     <STRONG>scripting</STRONG> methods that import classes.
 
-    <H2><A ID="notes"></A>Implementation Notes</H2>
+    <H1><A ID="notes"></A>Implementation Notes</H1>
   <P>
     ESP was designed to be a rudimentary scripting language, primarily
     intended for tasks such as setting up simulations, animations, or other
@@ -2618,7 +2910,7 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  setErrorWriter setReaderTL setWriterTL getReader
  -->
-<!--  LocalWords:  setErrorWriterTL getWriter getErrorWriter javax
+<!--  LocalWords:  setErrorWriterTL getWriter getErrorWriter javax nd
  -->
 <!--  LocalWords:  setGlobalBindings getGlobal defaultObject println
  -->
@@ -2644,11 +2936,13 @@ a2d.scheduleFrames(0, maxFrames);
  -->
 <!--  LocalWords:  newJavaArray clasz generateDocs PrintWriter enums
  -->
-<!--  LocalWords:  javadoc apos dereferenced whitespace runtime
+<!--  LocalWords:  javadoc apos dereferenced whitespace runtime YYYY
  -->
 <!--  LocalWords:  blockConstructor argumentClasses typeForArrayOf
  -->
 <!--  LocalWords:  blockImports blockMethod accessors unsetScripting
  -->
 <!--  LocalWords:  lexically Casted toStream IntStream DoubleStream
+ -->
+<!--  LocalWords:  backquote AnimationExample
  -->
