@@ -1,0 +1,23 @@
+#!./scrun -sENU:true
+
+var out = global.getWriter();
+
+var u = 5;
+var u;
+u;
+
+var w;
+global.set("w", 10);
+w;
+
+var z = 20;
+
+`{ var z; z = 30};
+
+var y;
+var y1 = var.y? y: function() {global.set("y",40); y}();
+var y2 = var.y? y: function() {global.set("y", 50); y}();
+
+out.println("u = " + u + ", w = " + w + ", z = " + z);
+out.println("y = " + y +", y1 = " + y1 +", y2 = " + y2);
+

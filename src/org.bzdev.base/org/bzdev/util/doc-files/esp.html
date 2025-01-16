@@ -1043,20 +1043,26 @@ function g(x) {
     a variable but does not provide a value for it. The syntax is
     <BLOCKQUOTE><PRE>
 var-declaration: &apos;var&apos; identifier
-    | var-declaration &apos;%apos; identifier
+    | var-declaration &apos;,&apos; identifier
     </PRE></BLOCKQUOTE>
     A variable that is declared may or may not exist, but existence
-    of a variable can be tested.  For example,
+    of a variable can be tested. For example,
     <BLOCKQUOTE><PRE><CODE>
 var foo;
 println(" foo exists = " + var.foo);
-    </CODE></PRE></BLOCKQUOTE>
-    will print "foo exists = false" unless <CODE>foo</CODE> is externally
-    defined, in which case the output will be "foo exists = true".
+    </CODE></PRE></BLOCKQUOTE> will print "foo exists = false"
+    unless <CODE>foo</CODE> is externally defined, in which case the
+    output will be "foo exists = true".  Variable declarations, like
+    variable definitions, are lexically scoped.  To use a declared
+    variable, including to assign a value to it directly, the variable
+    must either be defined or added to the program's bindings using
+    either a Java method or the <A HREF="#globalset">set</A> method
+    of the <A HREF="#global">global object</A>, in which case the
+    variable will be defined at the top level of the program.
+  <P>
     These declarations can be used when variables are created as a side
     effect of a function or method (an alternative is to use the
-    <CODE>###</CODE> syntax), or when a variable may be defined
-    externally (for example, via the scrunner command line).
+    <CODE>###</CODE> syntax).
 
     <H3><A ID="functdefs"></A>Function Definitions</H3>
   <P>
@@ -1590,7 +1596,7 @@ array-elements:
 	method&apos;s first argument to the value specified by this
 	method&apos;s second argument, and returns either the previous
 	value or null if there is no previous value.
-      <LI> <STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
+      <LI> <A ID="globalset"></A><STRONG>set(</STRONG><I>objectName</I><STRONG>,</STRONG><I>property</I><STRONG>,</STRONG><I>value</I><STRONG>)</STRONG>.
 	This method sets the property specified by this method&apos;s
 	second argument to the value specified by this method&apos;s third
 	argument for the object specified by this method&apos;s first argument
@@ -2462,12 +2468,19 @@ var exceptions =
                 offset = floor(offset);
                 offset = asLong(offset);
                 var lny = ny.plusDays(offset);
-                date.isBefore(lny) &amp;&amp; `{year = year - 1};
                 (year &lt; 1900 || year &gt; 2100)
                   &amp;&amp; (date.getDayOfYear() &gt;= 21)
                   &amp;&amp; (date.getDayOfYear() &lt;= 51)
-                  &amp;&amp; `{status = " (please verify)"};
-            }
+                  &amp;&amp; `{var delta = abs(date.getDayOfYear()
+                                                - lny.getDayOfYear());
+                               status = (delta < 2)?
+                               " (please verify - "
+                              + "25% chance of \u00B11 error)":
+                               " (please verify - small chance"
+                                 + " of \u00B30 error)";
+                               };
+                date.isBefore(lny) &amp;&amp; `{year = year - 1};
+           }
     };
 
 // Uses negative numbers for BCE years, so that

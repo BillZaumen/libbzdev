@@ -490,6 +490,20 @@ nulltest:
 	java -p ../../BUILD:`pwd`/docsig.jar \
 		-m org.bzdev.scrunner/org.bzdev.bin.scrunner.SCRunnerCmd \
 		--stackTrace  nulltest.esp
+
+vtest1:
+	(cd ../.. ; make jars)
+	chmod u+x scrun vtest1.esp
+	./vtest1.esp  --stackTrace
+	chmod u-x scrun vtest1.esp
+
+vtest2:
+	(cd ../.. ; make jars)
+	chmod u+x scrun vtest2.esp
+	./vtest2.esp  --stackTrace
+	chmod u-x scrun vtest2.esp
+
+
 ytest0: compile
 	@echo ---- YTest0 -----
 	@$(JAVA) YTest0

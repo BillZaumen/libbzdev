@@ -1,0 +1,27 @@
+#!./scrun -sENU:true
+
+var out = global.getWriter();
+
+var z;
+
+function bar() {
+    var w = 30;
+    `{
+	var w;
+	out.println("in bar, w = " + w);
+	out.print("in foo, ");
+	foo();
+    }
+}
+
+function foo() {
+    var w;
+    out.println("z = " + z + ", w = " + w);
+}
+
+`{
+    global.set("z", 10);
+    global.set("w", 20);
+    bar();
+    foo();
+};
