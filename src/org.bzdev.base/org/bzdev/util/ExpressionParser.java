@@ -123,6 +123,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	BINARY_MINUS,
 	TIMES,
 	DIVIDEBY,
+	IDIVIDEBY,
 	MOD,
 	MATH_MOD,
 	DOT,
@@ -275,7 +276,8 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private static final EnumSet<Operator> arithOps
 	= EnumSet.of(Operator.PLUS, Operator.UNARY_MINUS, Operator.BINARY_MINUS,
-		     Operator.TIMES, Operator.DIVIDEBY, Operator.DOT);
+		     Operator.TIMES, Operator.DIVIDEBY,
+		     Operator.IDIVIDEBY, Operator.DOT);
 
     private static final EnumSet<Operator> logicalOps
 	= EnumSet.of(Operator.NOT, Operator.AND, Operator.OR, Operator.XOR);
@@ -293,7 +295,8 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private static final EnumSet<Operator> binaryOps
 	= EnumSet.of(Operator.PLUS, Operator.BINARY_MINUS, Operator.TIMES,
-		     Operator.DIVIDEBY, Operator.MOD, Operator.MATH_MOD,
+		     Operator.DIVIDEBY, Operator.IDIVIDEBY,
+		     Operator.MOD, Operator.MATH_MOD,
 		     Operator.DOT,
 		     Operator.LSHIFT, Operator.RSHIFT, Operator.URSHIFT,
 		     Operator.AND, Operator.OR, Operator.XOR,
@@ -3845,6 +3848,42 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	}
 
+	private Number idiv(Number n1, Number n2) {
+	    double d1 = n1.doubleValue();
+	    double d2 = n2.doubleValue();
+	    long i2 = org.bzdev.lang.MathOps.asLong(d2);
+	    double result = d1/i2;
+	    if (d1 >= 0) {
+		if (i2 > 0) {
+		    result = Math.floor(result);
+		} else {
+		    result = Math.ceil(result);
+		}
+	    } else {
+		if (i2 > 0) {
+		    result = Math.ceil(result);
+		} else {
+		    result = Math.floor(result);
+		}
+	    }
+	    if (n1 instanceof Double) {
+		return Double.valueOf(result);
+	    } else {
+		long lresult = (long)result;
+		if ((double) lresult == result) {
+		    if (n1 instanceof Integer && n2 instanceof Integer
+			&& lresult <= Integer.MAX_VALUE
+			&& lresult >= Integer.MIN_VALUE) {
+			return Integer.valueOf((int)lresult);
+		    } else {
+			return lresult;
+		    }
+		} else {
+		    return Double.valueOf(result);
+		}
+	    }
+	}
+
 	private Number mod(Number n1, Number n2) {
 	    if (n1 instanceof Integer) {
 		int in1 = n1.intValue();
@@ -5386,6 +5425,23 @@ public class ExpressionParser implements ObjectParser<Object>
 		    Number n2 = (Number) popValue();
 		    Number n1 = (Number) popValue();
 		    pushValue(div(n1, n2));
+		} catch (java.lang.Exception e) {
+		    throw new ObjectParser.Exception(e.getMessage(), e,
+						     opToken.getFileName(),
+						     orig,
+						     opToken.getIndex());
+		}
+		break;
+	    case IDIVIDEBY:
+		try {
+		    Number n2 = (Number) popValue();
+		    Number n1 = (Number) popValue();
+		    if (n2 instanceof Double) {
+			// n2 must be an integer or long.
+			String msg = errorMsg("notInteger", n2.doubleValue());
+			throw new ArithmeticException(msg);
+		    }
+		    pushValue(idiv(n1, n2));
 		} catch (java.lang.Exception e) {
 		    throw new ObjectParser.Exception(e.getMessage(), e,
 						     opToken.getFileName(),
@@ -8692,7 +8748,9 @@ public class ExpressionParser implements ObjectParser<Object>
 							 s, i);
 		    }
 		    if (ptype == Operator.PLUS || ptype == Operator.TIMES
-			|| ptype == Operator.DIVIDEBY || ptype == Operator.NOT
+			|| ptype == Operator.DIVIDEBY
+			|| ptype == Operator.IDIVIDEBY
+			|| ptype == Operator.NOT
 			|| ptype == Operator.OR || ptype == Operator.XOR
 			|| ptype == Operator.MATH_MOD
 			|| ptype == Operator.MOD) {
@@ -8730,7 +8788,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		break;
 	    case '!':
 		if (ptype == Operator.PLUS || ptype == Operator.TIMES
-		    || ptype == Operator.DIVIDEBY || ptype == Operator.NOT
+		    || ptype == Operator.DIVIDEBY
+		    || ptype == Operator.IDIVIDEBY
+		    || ptype == Operator.NOT
 		    || ptype == Operator.OR || ptype == Operator.XOR
 		    || ptype == Operator.MATH_MOD
 		    || ptype == Operator.MOD) {
@@ -8886,7 +8946,13 @@ public class ExpressionParser implements ObjectParser<Object>
 						     filenameTL.get(), i);
 		}
 		*/
-		next = new Token(Operator.DIVIDEBY, "/", offset+i, level);
+		int idiv = i + 1;
+		if (idiv < len && s.charAt(idiv) == '%') {
+		    i = idiv;
+		    next = new Token(Operator.IDIVIDEBY, "/%", offset+i, level);
+		} else {
+		    next = new Token(Operator.DIVIDEBY, "/", offset+i, level);
+		}
 		level--;
 		tokens.add(next);
 		break;
@@ -9252,6 +9318,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		    case PLUS:
 		    case TIMES:
 		    case DIVIDEBY:
+		    case IDIVIDEBY:
 		    case MOD:
 		    case MATH_MOD:
 		    case LSHIFT:
@@ -10879,6 +10946,7 @@ public class ExpressionParser implements ObjectParser<Object>
 	    case PLUS:
 	    case TIMES:
 	    case DIVIDEBY:
+	    case IDIVIDEBY:
 	    case MOD:
 	    case MATH_MOD:
 	    case LSHIFT:

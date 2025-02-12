@@ -232,7 +232,16 @@ if (typeof(out) == "undefined") {
 	null.  Aside from an additional test, this operator behave the
 	same as the <STRONG>?=</STRONG> operator.
       <LI> The operator <STRONG>&lt;=&gt;</STRONG> may appear between
-	two variable names and swaps the values.
+	two variable names and swaps the values, always returning the value
+	<STRONG>true</STRONG>.
+      <LI> The operator <STRONG>%%</STRONG> takes integer arguments and
+	returns the value of its first argument modulo its second argument.
+	For example, both <STRONG>5%%3</STRONG> and
+	<STRONG>(-1)%%3</STRONG> have the value <STRONG>2</STRONG>.
+      <LI> The operator <STRONG>/%</STRONG> is an integer division operator
+	that rounds non integer values towards 0. It is also true that
+	<STRONG>(x /% n) + (x % n)</STRONG> is equal to <STRONG>x</STRONG>,
+	where n is a non-zero integer.
       <LI> Java method references may be used as method or function
 	arguments, and may be assigned to variables.
       <LI> A class name, followed by <STRONG>::</STRONG>;, followed by
@@ -586,12 +595,19 @@ BLOCKED
     in the following table:
     <TABLE BORDER=1><caption>&nbsp;</caption>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
-      <TR><TD>* / % %%</TD><TD> multiplication, division, mod, and
-	  mod as used in mathematics respectively</TD></TR>. The
-	  mathematical mod operator <STRONG>%%</STRONG> always produces
-	  a non-negative number.  i %% n is equivalent to (i &lt; 0)?
-	  n + (i % n): i % n, and an exception is thrown if i is not
-	  an integer and n is not a positive integer.
+      <TR><TD>* / /% % %%</TD><TD> multiplication, division, integer
+	  division, remainder, and mod respectively.  The mod
+	  operator <STRONG>%%</STRONG> always produces a non-negative
+	  number. The expression i %% n is equivalent to
+	  (i &lt; 0)?  n + (i % n): i % n, and an exception is thrown
+	  if i is not an integer and n is not a positive integer. The
+	  value of <STRONG>x /% n</STRONG> is the value of
+	  <STRONG>x / n</STRONG> rounded towards 0. Thus
+	  the <STRONG>/%</STRONG> operator always produces an
+	  integer-valued number, and its left operand must be a
+	  non-zero integer. It will always be true that
+	  <STRONG>(x /% m) + (x % m)</STRONG> is equal to
+	  <STRONG>x</STRONG>.</TD></TR>
       <TR><TD>+ -</TD><TD>addition, subtraction respectively, with
       &apos;+&apos; overloaded to handle string concatenation, in which case at
 	  least one argument must be a string.</TD></TR>
@@ -2473,7 +2489,7 @@ var exceptions =
                   &amp;&amp; (date.getDayOfYear() &lt;= 51)
                   &amp;&amp; `{var delta = abs(date.getDayOfYear()
                                                 - lny.getDayOfYear());
-                               status = (delta < 2)?
+                               status = (delta &lt; 2)?
                                " (please verify - "
                               + "25% chance of \u00B11 error)":
                                " (please verify - small chance"
