@@ -3867,7 +3867,20 @@ public class ExpressionParser implements ObjectParser<Object>
 		}
 	    }
 	    if (n1 instanceof Double) {
-		return Double.valueOf(result);
+		if (result <= Integer.MAX_VALUE
+		    && result >= Integer.MIN_VALUE) {
+		    try {
+			return org.bzdev.lang.MathOps.asInt(result);
+		    } catch(IllegalArgumentException e) {
+			try {
+			    return org.bzdev.lang.MathOps.asLong(result);
+			} catch (IllegalArgumentException ee) {
+			    return Double.valueOf(result);
+			}
+		    }
+		} else {
+		    return Double.valueOf(result);
+		}
 	    } else {
 		long lresult = (long)result;
 		if ((double) lresult == result) {

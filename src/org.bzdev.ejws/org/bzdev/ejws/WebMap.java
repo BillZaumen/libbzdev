@@ -195,6 +195,9 @@ abstract public class WebMap {
 	suffixToMTypeDefault.put("xhtm", "application/xhtml+xml");
 	suffixToMTypeDefault.put("xht", "application/xhtml+xml");
 	suffixToMTypeDefault.put("css", "text/css");
+	suffixToMTypeDefault.put("gif", "image/gif");
+	suffixToMTypeDefault.put("jpeg", "image/jpeg");
+	suffixToMTypeDefault.put("jpg", "image/jpeg");
 
 	suffixToMTypeDefault.put("js", "text/javascript");
 	suffixToMTypeDefault.put("txt", "text/plain");
@@ -204,7 +207,9 @@ abstract public class WebMap {
 	suffixToMTypeDefault.put("ps", "application/postscript");
 	suffixToMTypeDefault.put("jsp", "application/jsp");
 	suffixToMTypeDefault.put("svg", "image/svg+xml");
-	suffixToMTypeDefault.put("ogg", "application/ogg");
+	suffixToMTypeDefault.put("ogx", "application/ogg");
+	suffixToMTypeDefault.put("oga", "audio/ogg");
+	suffixToMTypeDefault.put("ogv", "video/ogg");
 	suffixToMTypeDefault.put("zip", "application/zip");
 
 	suffixToMTypeDefault.put("doc", "application/msword");
@@ -215,6 +220,13 @@ abstract public class WebMap {
 	    ("odg", "application/vnd.oasis.opendocument.graphics");
 	suffixToMTypeDefault.put
 	    ("odp", "application/vnd.oasis.opendocument.presentation");
+
+	suffixToMTypeDefault.put("mp4", "video/mp4");
+	suffixToMTypeDefault.put("m4a", "audio/mp4");
+	suffixToMTypeDefault.put("m4b", "audio/mp4");
+	suffixToMTypeDefault.put("mp3", "audio/mpeg");
+	suffixToMTypeDefault.put("mpeg", "video/mpeg");
+	suffixToMTypeDefault.put("webm", "video/webm");
 
 	// Add in image types recognized by Java on this computer
 	Iterator<ImageWriter>it;
@@ -2643,11 +2655,13 @@ abstract public class WebMap {
 //  LocalWords:  noSession headerops HeaderOps getFirst containsKey
 //  LocalWords:  containsValue entrySet hashCode isEmpty keySet www
 //  LocalWords:  putAll urlencoded addHeader HttpServerResponse getID
-//  LocalWords:  getEncoded getEncoding EjwsSession getAttribute
+//  LocalWords:  getEncoded getEncoding EjwsSession getAttribute jpeg
 //  LocalWords:  parseAll equalsIgnoreCase jsessionid ServerCookie
 //  LocalWords:  newInstance setVersion setHttpOnly getServer URL's
 //  LocalWords:  getAddress getHostString addToHeaders OurHeaderOps
 //  LocalWords:  handledResponse deconfigure EmbeddedWebServer param
-//  LocalWords:  isConfigured unvisited lightgray foregroundColor
-//  LocalWords:  backgroundColor getErrorForegroundColor
-//  LocalWords:  getErrorBackgroundColor
+//  LocalWords:  isConfigured unvisited lightgray foregroundColor jpg
+//  LocalWords:  backgroundColor getErrorForegroundColor ogx oga ogv
+//  LocalWords:  getErrorBackgroundColor IllegalArgumentException
+//  LocalWords:  mpeg webm servlets addErrorEntry runtimeException
+//  LocalWords:  addGzipSuffix mdash
