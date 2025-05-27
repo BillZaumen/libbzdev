@@ -21,15 +21,20 @@ import java.awt.geom.*;
  * is used, the starting point of the spline is the current point, which
  * is initially set using the Path2D
  * {@link java.awt.geom.Path2D#moveTo(double,double) moveTo} method.
- * The smooth curves created are cubic B&eacute;zier curve segments arranged so that
- * the first and second derivatives of their coordinates with respect to the
- * curves' parameters match (one curve at u = 1 and the other at u = 0). For
- * a call to {@link #splineTo(java.awt.geom.Point2D[], int) splineTo}, at the
- * end points, the tangent to the curve points towards its neighbor. As a
- * result, calling splineTo for points p1, p2, p3, p4, followed by a call
- * to splineTo for points p5, p6, p7, p8 is not equivalent to calling
- * splineTo once for points p1, p2, ..., p8: in the former case, the
- * tangent lines can differ on both sides of point p4.
+ * The smooth curves created are cubic B&eacute;zier curve segments
+ * arranged so that the first and second derivatives of their
+ * coordinates with respect to the curves' parameters match (one curve
+ * at u = 1 and the other at u = 0). This is equivalent to stating that
+ * for the composite curve, the second derivative exits at all points and
+ * is continuous.
+ * <P>
+ * For a call to {@link
+ * #splineTo(java.awt.geom.Point2D[], int) splineTo}, at the end
+ * points, the tangent to the curve points towards its neighbor. As a
+ * result, calling splineTo for points p1, p2, p3, p4, followed by a
+ * call to splineTo for points p5, p6, p7, p8 is not equivalent to
+ * calling splineTo once for points p1, p2, ..., p8: in the former
+ * case, the tangent lines can differ on both sides of point p4.
  * <P>
  * When {@link #addCycle(java.awt.geom.Point2D[], int) addCycle} is used,
  * there is an implicit call to moveTo for the first point in the array and
@@ -45,27 +50,39 @@ import java.awt.geom.*;
  * <a href="http://www.particleincell.com/blog/2012/bezier-splines/">
  * "Smooth B&eacute;zier Spline Through Prescribed Points"
  * </a>
- * and works by making the first and second derivatives of B&eacute;zier curves
- * (differentiating with respect to the parameter u) match at the given
- * points. Each segment is a B&eacute;zier curve given by
+ * Each segment is a B&eacute;zier curve given by
  * <P>
  * B(u) = (1-u)<sup>3</sup>P<sub>0</sub> + 3(1-u)<sup>2</sup>uP<sub>1</sub> + 3(1-u)u<sup>2</sup>P<sub>2</sub> + t<sup>3</sup>P<sub>3</sub>.
  * <P>
  * For n-1 cubic splines with control points $P<sub>0,i</sub>
  * P<sub>1,i</sub>, P<sub>1,2</sub> and P<sub>3,i</sub>, with i in the interval
- * [0, n-1], connecting the points  K<sub>0</sub> ... K<sub>n</sub> the
+ * [0, n-1], connecting the "knot" points  K<sub>0</sub> ... K<sub>n</sub>, the
  * P<sub>1</sub> control points satisfy the equations
  * <ul>
- *  <li> 2P<sub>1,0</sub> + P<sub>1,1</sub> = 4K<sub>0</sub> + 2K<sub>1</sub>
+ *  <li> 2P<sub>1,0</sub> + P<sub>1,1</sub> = K<sub>0</sub> + 2K<sub>1</sub>
  *  <li> P<sub>1,i-1</sub> + 4P<sub>1,i</sub> + P<sub>1,i+1</sub> = 4K<sub>i</sub> + 2K<sub>i+1</sub>  for i in [1, n-2]
- * <li> 2P<sub>i,n-2</sub> + 7P<sub>1,n-1</sub> = 8K<sub>n-1</sub> + K<sub>n</sub>.
+ * <li> 2P<sub>1,n-2</sub> + 7P<sub>1,n-1</sub> = 8K<sub>n-1</sub> + K<sub>n</sub>.
  * </ul>
+ * The first and last of these equations make the second derivative of
+ * the curve vanish at the end points, whereas the rest make the
+ * second derivative at u=1 for a segment match the second derivative
+ * at u=0 for the next segment.  Alternatively, the first and last
+ * equations can optionally be replaced by the equations
+ * <UL>
+ *  <LI> P<sub>1,0</sub> = C<sub>1</sub>
+ *  <LI> P<sub>1,n-2</sub> = 2C<sub>2</sub> - K<sub>n</sub>
+ * </UL>
+ * respectively in order to explicitly set the first and/or last
+ * intermediate control points to values matching C<sub>1</sub> and/or
+ * C<sub>2</sub>.
+ * <P>
  * The initial and final control points for each segment are given by
  * <ul>
  *  <li> P<sub>0,i</sub> = K<sub>i</sub>
  *  <li> P<sub>3,i</sub> = K<sub>i+1</sub>
  * </ul>
- * with both defined for i in the interval [0, n-1].
+ * with both defined for i in the interval [0, n-1], so that each segment
+ * starts and ends at a knot.
  * The P<sub>2</sub> control  point is given by the equations
  * <ul>
  *  <li> P<sub>2,i</sub> = 2K<sub>i+1</sub> - P<sub>1,i+1</sub> for i in
@@ -73,7 +90,7 @@ import java.awt.geom.*;
  *  <li> P<sub>2,n-1</sub> = (K<sub>n</sub> + P<sub>1,n-1</sub>)/2.
  * </ul>
  * There is a typo in the article cited above giving the wrong value for
- * the second control point.
+ * the second control point P<sub>2,i</sub> for i in [0,n-2].
  * <P>
  * For a closed paths, a case not covered in the article cited above,
  * the equation for P<sub>1</sub> are given by
@@ -98,9 +115,9 @@ public class SplinePath2D extends Path2D.Double {
 	return GeomErrorMsg.errorMsg(key, args);
     }
 
-    // public boolean debug = false;
-
-    private double[] createA(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createA(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
@@ -109,35 +126,57 @@ public class SplinePath2D extends Path2D.Double {
 	for (int i = 1; i < nm1; i++) {
 	    result[i] = 1.0;
 	}
-	result[nm1] = cyclic? 1.0: 2.0;
+	if (cpoint2 != null) {
+	    result[nm1] = 0.0;
+	} else {
+	    result[nm1] = cyclic? 1.0: 2.0;
+	}
 	return result;
     }
-    private double[] createB(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createB(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
 	int nm1 = n-1;
-	result[0] =cyclic? 4.0: 2.0;
+	if (cpoint1 != null) {
+	    result[0] = 1.0;
+	} else {
+	    result[0] =cyclic? 4.0: 2.0;
+	}
 	for (int i = 1; i < nm1; i++) {
 	    result[i] = 4.0;
 	}
-	result[nm1] = cyclic? 4.0: 7.0;
+	if (cpoint2 != null) {
+	    result[nm1] = 1.0;
+	} else {
+	    result[nm1] = cyclic? 4.0: 7.0;
+	}
 	return result;
     }
-    private double[] createC(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createC(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
 	int nm1 = n-1;
 	int maxi = cyclic? n: nm1;
-	for (int i = 0; i < maxi; i++) {
+	if (cpoint1 == null) {
+	    result[0] = 1.0;
+	} else {
+	    result[0] = 0.0;
+	}
+	for (int i = 1; i < maxi; i++) {
 	    result[i] = 1.0;
 	}
 	return result;
     }
 
     private double[] getw(double[] x, int n, boolean cyclic,
-			  boolean startsWithMoveTo, boolean isX)
+			  boolean startsWithMoveTo, boolean isX,
+			  Point2D cpoint1, Point2D cpoint2)
     {
 	if (startsWithMoveTo) {
 	    // x[0] represents the coordinate for an implied moveTo.
@@ -150,19 +189,23 @@ public class SplinePath2D extends Path2D.Double {
 		}
 		result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
 	    } else {
-		result[0] = x[0] + 2.0 * x[1];
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX(): cpoint1.getY();
+		} else {
+		    result[0] = x[0] + 2.0 * x[1];
+		}
 		for (int i = 1; i < nm1; i++) {
 		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
 		}       
-		result[nm1] =  8.0 * x[nm1] + x[n] ;
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX(): cpoint2.getY();
+		    result[nm1] = 2*p2nm1 -x[n];
+		} else {
+		    result[nm1] =  8.0 * x[nm1] + x[n];
+		}
 	    }
 	    return result;
 	} else {
-	    /*
-	    if (cyclic) 
-		throw new IllegalArgumentException
-		    ("startsWithMoveto == false implies cyclic == false");
-	    */
 	    if (cyclic) n++;
 	    double[] result = new double[n];
 	    int nm1 = n - 1;
@@ -179,11 +222,20 @@ public class SplinePath2D extends Path2D.Double {
 		}
 		result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
 	    } else {
-		result[0] = xval + 2.0 * x[0];
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX(): cpoint1.getY();
+		} else {
+		    result[0] = xval + 2.0 * x[0];
+		}
 		for (int i = 1; i < nm1; i++) {
 		    result[i] = 4.0 * x[i-1] + 2.0 * x[i];
 		}
-		result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX(): cpoint2.getY();
+		    result[nm1] = 2*p2nm1 -x[nm1];
+		} else {
+		    result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		}
 	    }
 	    return result;
 	}
@@ -271,6 +323,32 @@ public class SplinePath2D extends Path2D.Double {
 
     /**
      * Constructs a new SplinePath2D object from an array containing at least n
+     * points, given a default winding rule of
+     * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO}
+     * and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath2D(Point2D[]pk, int n, Point2D cpoint1, Point2D cpoint2)
+    {
+	super();
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[i].getX();
+	    tmpy[i] = pk[i].getY();
+	}
+	makeSpline(tmpx, tmpy, n, false, true, cpoint1, cpoint2);
+    }
+
+
+    /**
+     * Constructs a new SplinePath2D object from an array containing at least n
      * points, starting at an offset and given a default winding rule of
      * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO}.
      * The array specifies the "knots" of the spline - the points the
@@ -293,6 +371,33 @@ public class SplinePath2D extends Path2D.Double {
     }
 
     /**
+     * Constructs a new SplinePath2D object from an array containing at least n
+     * points, starting at an offset and given a default winding rule of
+     * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO} with two
+     * control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that contain the knots of a spline
+     * @param offset the offset into the array for the starting knot
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [offset, offset+n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath2D(Point2D[]pk, int offset, int n,
+			Point2D cpoint1, Point2D cpoint2)
+    {
+	super();
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[offset+i].getX();
+	    tmpy[i] = pk[offset+i].getY();
+	}
+	makeSpline(tmpx, tmpy, n, false, true, cpoint1, cpoint2);
+    }
+
+    /**
      * Constructs a new SplinePath2D object from an array of points, given
      * a default winding rule of
      * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO}.
@@ -304,6 +409,22 @@ public class SplinePath2D extends Path2D.Double {
      */
     public SplinePath2D(Point2D[]pk, boolean closed) {
 	this(pk, pk.length, closed);
+    }
+
+    /**
+     * Constructs a new SplinePath2D object from an array of points, given
+     * a default winding rule of
+     * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO} and initial
+     * and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath2D(Point2D[]pk, Point2D cpoint1, Point2D cpoint2) {
+	this(pk, pk.length, cpoint1, cpoint2);
     }
 
     /**
@@ -334,6 +455,36 @@ public class SplinePath2D extends Path2D.Double {
 
     /**
      * Constructs a new SplinePath2D object from an array containing at least n
+     * points, given a winding rule and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public SplinePath2D(int rule, Point2D[]pk, int n,
+			Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule);
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[i].getX();
+	    tmpy[i] = pk[i].getY();
+	}
+	makeSpline(tmpx, tmpy, n, false, true, cpoint1, cpoint2);
+    }
+
+
+    /**
+     * Constructs a new SplinePath2D object from an array containing at least n
      * points, given an offset into the array and given a winding rule.
      * The array specifies the "knots" of the spline - the points the
      * spline is constrained to pass through. When closed, the initial
@@ -361,6 +512,36 @@ public class SplinePath2D extends Path2D.Double {
 	makeSpline(tmpx, tmpy, n, closed, true);
     }
 
+    /**
+     * Constructs a new SplinePath2D object from an array containing at least n
+     * points, given an offset into the array and given a winding rule.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param pk the array of points that make up the knots of a spline
+     * @param offset the staring index int the array for the spline's knots
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [offset, offset+n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public SplinePath2D(int rule, Point2D[]pk, int offset, int n,
+			Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule);
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[offset+i].getX();
+	    tmpy[i] = pk[offset+i].getY();
+	}
+	makeSpline(tmpx, tmpy, n, false, true, cpoint1, cpoint2);
+    }
+
 
     /**
      * Constructs a new SplinePath2D object from an array of points, given
@@ -378,6 +559,26 @@ public class SplinePath2D extends Path2D.Double {
     public SplinePath2D(int rule, Point2D[]pk, boolean closed) {
 	this(rule, pk, pk.length, closed);
     }
+
+    /**
+     * Constructs a new SplinePath2D object from an array of points, given
+     * a winding rule and initial and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public SplinePath2D(int rule, Point2D[]pk, Point2D cpoint1, Point2D cpoint2)
+    {
+	this(rule, pk, pk.length, cpoint1, cpoint2);
+    }
+
     /**
      * Constructs a new SplinePath2D object from an array containing at least n
      * points, given a winding rule and initial capacity.
@@ -408,6 +609,38 @@ public class SplinePath2D extends Path2D.Double {
     }
 
     /**
+     * Constructs a new SplinePath2D object from an array containing at least n
+     * points, given a winding rule, initial capacity, and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param initialCapacity an estimate for the number of path segments in
+     *        the path
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public SplinePath2D(int rule, int initialCapacity,
+			Point2D[]pk, int n,
+			Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule, initialCapacity);
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[i].getX();
+	    tmpy[i] = pk[i].getY();
+	}
+	makeSpline(tmpx, tmpy, n, false, true, cpoint1, cpoint2);
+    }
+
+    /**
      * Constructs a new SplinePath2D object from an array of points, given
      * a winding rule and initial capacity.
      * The array specifies the "knots" of the spline - the points the
@@ -427,6 +660,29 @@ public class SplinePath2D extends Path2D.Double {
     {
 	this(rule, initialCapacity, pk, pk.length, closed);
     }
+
+    /**
+     * Constructs a new SplinePath2D object from an array of points, given
+     * a winding rule, initial capacity, and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param initialCapacity an estimate for the number of path segments in
+     *        the path
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public SplinePath2D(int rule, int initialCapacity,
+			Point2D[] pk, Point2D cpoint1, Point2D cpoint2)
+    {
+	this(rule, initialCapacity, pk, pk.length, cpoint1, cpoint2);
+    }
+
 
     /**
      * Constructs a new SplinePath2D object from arrays containing at least n
@@ -897,13 +1153,34 @@ public class SplinePath2D extends Path2D.Double {
      *        in the range [0, n)
      */
     public void splineTo(Point2D[] pk, int n) {
+	splineTo(pk, n, null, null);
+    }
+
+    /**
+     * Add a sequence of segments that form a spline, specified as an array
+     * of points, with initial and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot.
+     * The initial point is the one previously added to the path via
+     * some other method (e.g., moveTo, lineTo, etc.).
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(Point2D[] pk, int n, Point2D cpoint1, Point2D cpoint2)
+    {
 	double[] tmpx = new double[n];
 	double[] tmpy = new double[n];
 	for (int i = 0; i < n; i++) {
 	    tmpx[i] = pk[i].getX();
 	    tmpy[i] = pk[i].getY();
 	}
-	makeSpline(tmpx, tmpy, n, false, false);
+	makeSpline(tmpx, tmpy, n, false, false, cpoint1, cpoint2);
     }
 
     /**
@@ -922,13 +1199,35 @@ public class SplinePath2D extends Path2D.Double {
      *        in the range [0, n)
      */
     public void splineTo(Point2D[] pk, int offset, int n) {
+	splineTo(pk, offset, n, null, null);
+    }
+    /**
+     * Add a sequence of segments that form a spline, specified as an array
+     * of points with an offset.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot.
+     * The initial point is the one previously added to the path via
+     * some other method (e.g., moveTo, lineTo, etc.).
+     * @param pk the array of points that make up the knots of a spline
+     * @param offset the offset into the array for the starting point
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(Point2D[] pk, int offset, int n,
+			 Point2D cpoint1, Point2D cpoint2)
+    {
 	double[] tmpx = new double[n];
 	double[] tmpy = new double[n];
 	for (int i = 0; i < n; i++) {
 	    tmpx[i] = pk[i+offset].getX();
 	    tmpy[i] = pk[i+offset].getY();
 	}
-	makeSpline(tmpx, tmpy, n, false, false);
+	makeSpline(tmpx, tmpy, n, false, false, cpoint1, cpoint2);
     }
 
 
@@ -965,6 +1264,29 @@ public class SplinePath2D extends Path2D.Double {
     public void splineTo(double[] x, double[]y, int n) {
 	makeSpline(x, y, n, false, false);
     }
+
+    /**
+     * Add a sequence of segments that form a spline, specified as arrays
+     * of at least n x and y coordinates, with initial and final control
+     * points.
+     * The arrays specify the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot. The initial point is the one previously added to
+     * the path via some other method (e.g., moveTo, lineTo, etc.).
+     * @param x the x coordinates to use, one for each knot
+     * @param y the y coordinates to use, one for each knot
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(double[] x, double[]y, int n,
+			 Point2D cpoint1, Point2D cpoint2) {
+	makeSpline(x, y, n, false, false, cpoint1, cpoint2);
+    }
+
 
     /**
      * Add a sequence of segments that form a spline, specified as arrays
@@ -1310,8 +1632,23 @@ public class SplinePath2D extends Path2D.Double {
     }
 
     private void makeSpline(double[] x, double[] y, int n,
-			    boolean cyclic, boolean startsWithMoveTo) {
+			    boolean cyclic, boolean startsWithMoveTo)
+	throws IllegalArgumentException
+    {
+	makeSpline(x, y, n, cyclic, startsWithMoveTo, null, null);
+    }
+
+    private void makeSpline(double[] x, double[] y, int n,
+			    boolean cyclic, boolean startsWithMoveTo,
+			    Point2D cpoint1, Point2D cpoint2)
+	throws IllegalArgumentException
+    {
 	double finalX, finalY;
+
+	if (cyclic && (cpoint1 != null || cpoint2 != null)) {
+	    throw new IllegalArgumentException(errorMsg("cyclic"));
+	}
+
 	// For small values of n, the best we can do is to draw straight
 	// lines.
 	if (n == 2 && startsWithMoveTo) {
@@ -1339,43 +1676,15 @@ public class SplinePath2D extends Path2D.Double {
 	    return;
 	}
 
-	double[] a = createA(n, cyclic, startsWithMoveTo);
-	double[] b = createB(n, cyclic, startsWithMoveTo);
-	double[] c = createC(n, cyclic, startsWithMoveTo);
-	double[] wx = getw(x, n, cyclic, startsWithMoveTo, true);
-	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false);
+	double[] a = createA(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
+	double[] b = createB(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
+	double[] c = createC(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
+	double[] wx = getw(x, n, cyclic, startsWithMoveTo, true,
+			   cpoint1, cpoint2);
+	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false,
+			   cpoint1, cpoint2);
 
 	if (cyclic) {
-	    /*
-	    double wwx[] = new double[wx.length];
-	    double wwy[] = new double[wy.length];
-	    TridiagonalSolver.solveCyclic(wwx, a, b, c, wx, wx.length);
-	    TridiagonalSolver.solveCyclic(wwy, a, b, c, wy, wy.length);
-	    for (int i = wx.length-1; i >= 0; i--) {
-		double valx; double valy;
-		if (i == 0) {
-		    valx = b[0]*wwx[0] + c[0]*wwx[1]
-			+ a[wx.length-1]*wwx[wx.length-1];
-		    valy = b[0]*wwy[0] + c[0]*wwy[1]
-			+ a[wy.length-1]*wwy[wy.length-1];
-		} else if (i == wx.length-1) {
-		    valx = a[wx.length-1]*wwx[wx.length-2]
-			+ b[wx.length-1]*wwx[wx.length-1]
-			+ c[wx.length-1]*wwx[0];
-		    valy = a[wy.length-1]*wwy[wy.length-2]
-			+ b[wy.length-1]*wwy[wy.length-1]
-			+ c[wy.length-1]*wwy[0];
-		    
-		} else {
-		    valx = a[i]*wwx[i-1]+b[i]*wwx[i] + c[i]*wwx[i+1];
-		    valy = a[i]*wwy[i-1]+b[i]*wwy[i] + c[i]*wwy[i+1];
-		}
-		if (Math.abs(wx[i] - valx) > 1.0e-10 ||
-		    Math.abs(wy[i] - valy) > 1.0e-10)
-		    throw new RuntimeException("tridiagonal solution failed"
-					       + " (i = " + i + ")");
-	    }
-	    */
 	    TridiagonalSolver.solveCyclic(wx, a, b, c, wx, wx.length);
 	    TridiagonalSolver.solveCyclic(wy, a, b, c, wy, wy.length);
 	} else {
@@ -1433,4 +1742,4 @@ public class SplinePath2D extends Path2D.Double {
 //  LocalWords:  startsWithMoveto SplinePath initialCapacity indices
 //  LocalWords:  AffineTransform splineLengthsDiffer yf domainErr
 //  LocalWords:  numbSegsNotPos arrayLengths lineTo CubicSpline
-//  LocalWords:  cycleTo
+//  LocalWords:  cycleTo missingMOVETO cpoint spline's rescaled

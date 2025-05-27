@@ -37,7 +37,8 @@ import java.util.ArrayList;
  *    <li> The first point's type is either <code>MOVE_TO</code> or
  *         <code>MOVE_TO_NEXT</code>.
  *    <li> A segment containing only <code>CONTROL</code> points (0, 1,
- *         or 2) must end with a <CODE>SEG_END</CODE> point. These
+ *         or 2) must end with either a <CODE>SEG_END</CODE> or a
+ *         <CODE>CLOSE</CODE> point. These
  *         represent straight lines, quadratic B&eacute;zier curves, and
  *         cubic B&eacute;zier curves respectively. The control points
  *         must be preceded by a point whose type is <code>MOVE_TO</code>,
@@ -48,7 +49,11 @@ import java.util.ArrayList;
  *         with a point whose type is <code>SEG_END</code> or
  *         <code>SEG_END_PREV</code>, and contains points (at least one)
  *         whose types are either <code>SPLINE</code> or
- *         <code>SPLINE_FUNCTION</code>.
+ *         <code>SPLINE_FUNCTION</code>. The sequence of <CODE>SPLINE</CODE>
+ *         and/or <CODE>SPLINE_FUNCTION</CODE> points may be followed
+ *         by a <CODE>CONTROL</CODE>or preceded by a
+ *         <CODE>CONTROL</CODE> in order to set the first and last control
+ *         point on the segment to specific values.
  *    <li> A closed subpath is indicated by a point whose type is
  *         <code>CLOSE</code>.  If this point is preceded by a point of type
  *         <code>SEG_END</code> or <code>SEG_END_PREV</code>, a straight line
@@ -89,9 +94,12 @@ import java.util.ArrayList;
  * of objects that have the following attributes:
  * <UL>
  *   <LI><CODE>type</CODE>. This can be the string <CODE>"CLOSE"</CODE>,
- *       <CODE>"MOVE_TO"</CODE>, <CODE>"SEG_END"</CODE>,
- *       <CODE>"CONTROL"</CODE>, or<CODE>"SPLINE"</CODE>. Alternatively
- *       it can a constant whose type is {@link SplinePathBuilder.CPointType}.
+ *       <CODE>"MOVE_TO"</CODE>, <CODE>"MOVE_TO_NEXT"</CODE>,
+ *       <CODE>"SEG_END"</CODE>, <CODE>"SEG_END_PREV"</CODE>,
+ *       <CODE>"SEG_END_NEXT"</CODE>, <CODE>"CONTROL"</CODE>, or
+ *       <CODE>"SPLINE"</CODE>, <CODE>"SPLINE_FUNCTION"</CODE>.
+ *       Alternatively it can a constant whose type is
+ *       {@link SplinePathBuilder.CPointType}.
  *   <LI><CODE>x</CODE>. The X coordinate of a control point. This is
  *       ignored, and may be omitted, when the type is <CODE>CLOSE</CODE>.
  *   <LI><CODE>y</CODE>. The Y coordinate of a control point. This is
@@ -298,6 +306,16 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	public boolean deletePending() {return false;}
     }
 
+    /**
+     * Convert a RealFunctionOps to a NamedFunctionOps if necessary.
+     * @param f the function
+     * @return either f, when f is an instance of NamedFunctionOps, or
+     *         a newly created NamedFunctionOps implemented by f
+     */
+    public static  NamedFunctionOps asNamedFunctionOps(RealValuedFunctOps f) {
+	if (f instanceof NamedFunctionOps) return (NamedFunctionOps) f;
+	else return new NamedFunctionOpsAdapter(f);
+    }
 
 
     /**
@@ -371,37 +389,42 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 		      docResourceBundle = "*.lpack.SPBuilderCPntDocs")
     public static class CPoint {
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing a type.
 	 */
 	@PrimitiveParm("type") public CPointType type = null;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing an X coordinate.
 	 */
 	@PrimitiveParm("x") public double x = 0.0;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing a Y coordinate.
 	 */
 	@PrimitiveParm("y") public double y = 0.0;
 
 	// following used only for SPLINE_FUNCTION case
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing a function
+	 * whose value is an X coordinate.
 	 */
 	@PrimitiveParm("xf") public NamedFunctionOps xfOps = null;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing a function
+	 * whose value is a Y coordinate.
 	 */
 	@PrimitiveParm("yf") public NamedFunctionOps yfOps = null;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing  the minimum
+	 * value of a function's argument.
 	 */
 	@PrimitiveParm("t1") public double t1 = 0.0;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing the maximum value
+	 * of a function's argument.
 	 */
 	@PrimitiveParm("t2") public double t2 = 0.0;
 	/**
-	 * Field implementing a factory parameter.
+	 * Field implementing a factory parameter providing the number of
+	 * times a function will be evaluated to generate knots for a spline.
 	 */
 	@PrimitiveParm("n")  public int n = 0;
 
@@ -437,7 +460,7 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	 * NamedFunctionOps.
 	 * This constructor is provided for use by various subclasses
 	 * of {@link org.bzdev.obnaming.NamedObjectFactory} as the last
-	 * argument of a factory's set or add method  in most cases cannot be an
+	 * argument of a factory's set or add method in most cases cannot be an
 	 * an instance of {@link org.bzdev.math.RealValuedFunction}.
 	 * @param xfOps the object providing the function for the x coordinates
 	 * @param yfOps the object providing the function for the y coordinates
@@ -449,7 +472,7 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	 * @exception IllegalArgumentException a function was null or
 	 *            n was not positive
 	 */
-	public CPoint(NamedFunctionOps xfOps, NamedFunctionOps yfOps,
+	private CPoint(NamedFunctionOps xfOps, NamedFunctionOps yfOps,
 		      double t1, double t2, int n)
 	    throws IllegalArgumentException
 	{
@@ -470,6 +493,10 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 
 	/**
 	 * Constructor for the <CODE>SPINE_FUNCTION</CODE> case.
+	 * The functions will be converted to instances of NamedFunctionOps,
+	 * if necessary, for consistency with the use of this class by
+	 * {@link org.bzdev.obnaming.NamedObjectFactory named object factories}.
+	 * <P>
 	 * @param xf the function for the x coordinates
 	 * @param yf the function for the y coordinates
 	 * @param t1 an end for the range of values at which  the function
@@ -485,9 +512,7 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 		      double t1, double t2, int n)
 	    throws IllegalArgumentException
 	{
-	    this(new NamedFunctionOpsAdapter(xf),
-		 new NamedFunctionOpsAdapter(yf),
-		 t1, t2, n);
+	    this(asNamedFunctionOps(xf), asNamedFunctionOps(yf), t1, t2, n);
 	}
 
 	/**
@@ -537,8 +562,6 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	    }
 	    double[] matrix1 = new double[6];
 	    af.getMatrix(matrix1);
-	    // x = m00*cpoint.x + m01*cpoint.y + m02;
-	    // y = m10*cpoint.x + m11*cpoint.y + m03;
 	    this.x = matrix1[0]*x + matrix1[2]*y + matrix1[4];
 	    this.y = matrix1[1]*x + matrix1[3]*y + matrix1[5];
 	}
@@ -562,7 +585,7 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	 * @exception IllegalArgumentException a function was null or
 	 *            n was not positive
 	 */
-	public CPoint(NamedFunctionOps xfOps, NamedFunctionOps yfOps,
+	private CPoint(NamedFunctionOps xfOps, NamedFunctionOps yfOps,
 		      double t1, double t2, int n,
 		      AffineTransform af)
 	{
@@ -602,6 +625,9 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 	 * Constructor for the <CODE>SPINE_FUNCTION</CODE> case with
 	 * an affine transformation applies to values computed by the
 	 * functions.
+	 * The functions will be converted to instances of NamedFunctionOps,
+	 * if necessary, for consistency with the use of this class by
+	 * {@link org.bzdev.obnaming.NamedObjectFactory named object factories}.
 	 * @param xf the function for the x coordinates
 	 * @param yf the function for the y coordinates
 	 * @param t1 an end for the range of values at which  the function
@@ -619,9 +645,7 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 		      AffineTransform af)
 	    throws IllegalArgumentException
 	{
-	    this(new NamedFunctionOpsAdapter(xf),
-		 new NamedFunctionOpsAdapter(yf),
-		 t1, t2, n, af);
+	    this(asNamedFunctionOps(xf), asNamedFunctionOps(yf), t1, t2, n, af);
 	}
 
 
@@ -692,4 +716,5 @@ public class SplinePathBuilder extends AbstractSplinePathBuilder<SplinePath2D> {
 //  LocalWords:  IllegalArgumentException wrongType subclasses yfOps
 //  LocalWords:  nullNamedFunctionOps nNotPositive javadocs exbundle
 //  LocalWords:  superclass SplinePath IMG SRC li SEG eacute zier af
-//  LocalWords:   CPoint's affine cpoint
+//  LocalWords:   CPoint's affine cpoint imgBackground UML
+//  LocalWords:  RealFunctionOps

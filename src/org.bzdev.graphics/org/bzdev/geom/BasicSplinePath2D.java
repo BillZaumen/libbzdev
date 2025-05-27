@@ -132,6 +132,25 @@ public class BasicSplinePath2D extends SplinePath2D {
     }
 
     /**
+     * Constructs a new BasicSplinePath2D object from an array
+     * containing at least n points, given a default winding rule of
+     * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO}
+     * and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public BasicSplinePath2D(Point2D[]pk, int n,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
+	super(pk, n, cpoint1, cpoint2);
+    }
+
+    /**
      * Constructs a new BasicSplinePath2D object from an array of
      * points, given a default winding rule of
      * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO}.
@@ -142,6 +161,22 @@ public class BasicSplinePath2D extends SplinePath2D {
      */
     public BasicSplinePath2D(Point2D[]pk, boolean closed) {
 	super(pk, closed);
+    }
+
+    /**
+     * Constructs a new BasicSplinePath2D object from an array of
+     * points, given a default winding rule of
+     * {@link java.awt.geom.Path2D#WIND_NON_ZERO WIND_NON_ZERO} and initial
+     * and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public BasicSplinePath2D(Point2D[]pk, Point2D cpoint1, Point2D cpoint2)
+    {
+	super(pk, cpoint1, cpoint2);
     }
 
 
@@ -163,6 +198,28 @@ public class BasicSplinePath2D extends SplinePath2D {
 	super(rule, pk, n, closed);
     }
 
+    /**
+     * Constructs a new Basic SplinePath2D object from an array
+     * containing at least n points, given a winding rule and two
+     * control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public BasicSplinePath2D(int rule, Point2D[]pk, int n,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule, pk, n, cpoint1, cpoint2);
+    }
 
     /**
      * Constructs a new BasicSplinePath2D object from an array of
@@ -179,6 +236,27 @@ public class BasicSplinePath2D extends SplinePath2D {
     public BasicSplinePath2D(int rule, Point2D[]pk, boolean closed) {
 	super(rule, pk, closed);
     }
+
+    /**
+     * Constructs a new SplinePath2D object from an array of points, given
+     * a winding rule and initial and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public BasicSplinePath2D(int rule, Point2D[]pk,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule, pk, cpoint1, cpoint2);
+    }
+
     /**
      * Constructs a new BasicSplinePath2D object from an array
      * containing at least n points, given a winding rule and initial
@@ -202,6 +280,32 @@ public class BasicSplinePath2D extends SplinePath2D {
     }
 
     /**
+     * Constructs a new BasicSplinePath2D object from an array
+     * containing at least n points, given a winding rule, initial
+     * capacity, and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param initialCapacity an estimate for the number of path segments in
+     *        the path
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public BasicSplinePath2D(int rule, int initialCapacity,
+			Point2D[]pk, int n,
+			Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule, initialCapacity, pk, n, cpoint1, cpoint2);
+    }
+
+    /**
      * Constructs a new BasicSplinePath2D object from an array of
      * points, given a winding rule and initial capacity.
      * The array specifies the "knots" of the spline - the points the
@@ -221,6 +325,28 @@ public class BasicSplinePath2D extends SplinePath2D {
 	super(rule, initialCapacity, pk, closed);
     }
 
+    /**
+     * Constructs a new BasicSplinePath2D object from an array of
+     * points, given a winding rule, initial capacity, and two control
+     * points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param rule the winding rule ({@link Path2D#WIND_EVEN_ODD WIND_EVEN_ODD}
+     *        or {@link Path2D#WIND_NON_ZERO WIND_NON_ZERO})
+     * @param initialCapacity an estimate for the number of path segments in
+     *        the path
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     * @see java.awt.geom.Path2D#WIND_EVEN_ODD Path2D.WIND_EVEN_ODD
+     * @see java.awt.geom.Path2D#WIND_NON_ZERO Path2D.WIND_NON_ZERO
+     */
+    public BasicSplinePath2D(int rule, int initialCapacity, Point2D[] pk,
+			     Point2D cpoint1, Point2D cpoint2)
+    {
+	super(rule, initialCapacity, pk, cpoint1, cpoint2);
+    }
 
     /**
      * Constructs a new BasicSplinePath2D object from arrays
@@ -550,15 +676,6 @@ public class BasicSplinePath2D extends SplinePath2D {
     // private int lengthCount = 0;
     private double totalLength = 0.0;
 
-    /*
-    static class Entry {
-	int mode;
-	double x;
-	double y;
-	double[] coords = new double[6];
-	double length = -1;
-    }
-    */
 
     private Path2DInfo.Entry[] entries = null;
 
@@ -1300,26 +1417,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		t = 1.0;
 	    }
 	}
-	// double omt = 1.0 - t;
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.dxDu(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_CUBICTO:
-	    double omt2 = omt*omt;
-	    double t2 = t*t;
-	    return 3.0 *omt2*(entry.coords[0] - entry.x)
-		+ 6.0*omt2*t*(entry.coords[2] - entry.coords[0])
-		+ 3.0*t2*(entry.coords[4] - entry.coords[2]);
-	case PathIterator.SEG_LINETO:
-	    return entry.coords[0] - entry.x;
-	case PathIterator.SEG_QUADTO:
-	    return 2.0 *omt*(entry.coords[0] - entry.x)
-		+ 2.0*t*(entry.coords[2] - entry.coords[0]);
-	default:
-	    throw new Error(errorMsg("badSwitch"));
-	}
-	*/
     }
 
     /**
@@ -1363,23 +1462,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	// double omt = 1.0 - t;
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.dyDu(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_CUBICTO:
-	    double omt2 = omt*omt;
-	    double t2 = t*t;
-	    return 3.0 *omt2*(entry.coords[1] - entry.y)
-		+ 6.0*omt2*t*(entry.coords[3] - entry.coords[1])
-		+ 3.0*t2*(entry.coords[5] - entry.coords[3]);
-	case PathIterator.SEG_LINETO:
-	    return entry.coords[1] - entry.y;
-	case PathIterator.SEG_QUADTO:
-	    return 2.0 *omt*(entry.coords[1] - entry.y)
-		+ 2.0*t*(entry.coords[3] - entry.coords[1]);
-	default:
-	    throw new Error(errorMsg("badSwitch"));
-	}
-	*/
     }
 
 
@@ -1424,23 +1506,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	}
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.d2xDu2(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_CLOSE:
-	case PathIterator.SEG_LINETO:
-	    return 0.0;
-	case PathIterator.SEG_QUADTO:
-	    return 2.0 * (entry.x - entry.coords[0] + entry.coords[2]
-			  - entry.coords[0]);
-	case PathIterator.SEG_CUBICTO:
-	    double t1 = 1.0 - t;
-	    return 6.0 * (t1*(entry.x -2.0*entry.coords[0] + entry.coords[2])
-			  + t*(entry.coords[4] - 2.0*entry.coords[2]
-			       + entry.coords[0]));
-	default:
-	    throw new Error(errorMsg("badSwitch"));
-	}
-	*/
     }
 
     /**
@@ -1485,22 +1550,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	// double omt = 1.0 - t;
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.d2yDu2(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_LINETO:
-	    return 0.0;
-	case PathIterator.SEG_QUADTO:
-	    return 2.0 * (entry.y - entry.coords[1] + entry.coords[3]
-			  - entry.coords[1]);
-	case PathIterator.SEG_CUBICTO:
-	    double t1 = 1.0 - t;
-	    return 6.0 * (t1*(entry.y -2.0*entry.coords[1] + entry.coords[3])
-			  + t*(entry.coords[5] - 2.0*entry.coords[3]
-			       + entry.coords[1]));
-	default:
-	    throw new Error(errorMsg("badSwitch"));
-	}
-	*/
     }
 
     /**
@@ -1558,19 +1607,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	}
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.curvature(new Path2DInfo.UValues(t));
-	/*
-	double xp = Path2DInfo.dxDu(t, entry.x, entry.y, entry.type,
-				    entry.coords);
-	double yp = Path2DInfo.dyDu(t, entry.x, entry.y, entry.type,
-				    entry.coords);
-	double xpp = Path2DInfo.d2xDu2(t, entry.x, entry.y, entry.type,
-				       entry.coords);
-	double ypp = Path2DInfo.d2yDu2(t, entry.x, entry.y, entry.type,
-				       entry.coords);
-	double tmp = xp*xp + yp*yp;
-	tmp = tmp * Math.sqrt(tmp);
-	return (xp*ypp - yp *xpp)/tmp;
-	*/
     }
     private static final Path2DInfo.UValues uvOne = new Path2DInfo.UValues(1.0);
 
@@ -1720,22 +1756,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	}
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.getTangent(new Path2DInfo.UValues(t), array, offset);
-	/*
-	double xp = Path2DInfo.dxDu(t, entry.x, entry.y, entry.type,
-				    entry.coords);
-	double yp = Path2DInfo.dyDu(t, entry.x, entry.y, entry.type,
-				    entry.coords);
-
-	double tmp = Math.sqrt(xp*xp + yp*yp);
-	if (tmp == 0.0) {
-	    array[offset] = 0.0;
-	    array[offset+1] = 0.0;
-	    return false;
-	}
-	array[offset] = xp/tmp;
-	array[offset+1] = yp/tmp;
-	return true;
-	*/
     }
 
     /**
@@ -1840,42 +1860,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		t = 1.0;
 	    }
 	}
-	/*
-	double dxdu;
-	double dydu;
-	double omt = 1.0 - t;
-	*/
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.dsDu(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_LINETO:
-	    dxdu = entry.coords[0] - entry.x;
-	    dydu = entry.coords[1] - entry.y;
-	    break;
-	case PathIterator.SEG_QUADTO:
-	    dxdu = 2.0 * (omt*(entry.coords[0]-entry.x)
-			  + u*(entry.coords[2]-entry.coords[0]));
-	    dydu = 2.0 * (omt*(entry.coords[1]-entry.y)
-			  + u*(entry.coords[3]-entry.coords[1]));
-	    break;
-	case PathIterator.SEG_CUBICTO:
-	    double omt2 = omt*omt;
-	    double tomt2 = 2.0 * t * omt;
-	    double t2 = t*t;
-	    dxdu = 3.0 * (omt2*(entry.coords[0] - entry.x)
-			  + tomt2*(entry.coords[2] - entry.coords[0])
-			  + t2*(entry.coords[4] - entry.coords[2]));
-	    dydu = 3.0 * (omt2*(entry.coords[1] - entry.y)
-			  + tomt2*(entry.coords[3] - entry.coords[1])
-			  + t2*(entry.coords[5] - entry.coords[3]));
-	    break;
-	default:
-	    throw new Error(errorMsg("badSwitch"));
-	}
-	double dsduSquared = dxdu*dxdu + dydu*dydu;
-	return  Math.sqrt(dsduSquared);
-	*/
     }
 
     /**
@@ -1917,90 +1903,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		t = 1.0;
 	    }
 	}
-	/*
-	double dxdu;
-	double dydu;
-	double d2xdu2;
-	double d2ydu2;
-	double omt;
-	*/
 	Path2DInfo.Entry entry = entries[index];
 	return entry.data.d2sDu2(new Path2DInfo.UValues(t));
-	/*
-	switch (entry.type) {
-	case PathIterator.SEG_MOVETO:
-	    return 0.0;
-	case PathIterator.SEG_CLOSE:
-	case PathIterator.SEG_LINETO:
-	    return 0.0;
-	    // dxdu = coords[0] - x0;
-	    // dydu = coords[1] - y0;
-	    // break;
-	case PathIterator.SEG_QUADTO:
-	    omt =  1.0 - t;
-	    dxdu = 2.0 * (omt*(entry.coords[0]-entry.x)
-			  + t*(entry.coords[2]-entry.coords[0]));
-	    dydu = 2.0 * (omt*(entry.coords[1]-entry.y)
-			  + t*(entry.coords[3]-entry.coords[1]));
-	    d2xdu2 = 2.0 * (entry.x - entry.coords[0] + entry.coords[2]
-			    - entry.coords[0]);
-	    d2ydu2 = 2.0 * (entry.y - entry.coords[1] + entry.coords[3]
-			    - entry.coords[1]);
-	    break;
-	case PathIterator.SEG_CUBICTO:
-	    omt =  1.0 - t;
-	    dxdu = 3.0 * (omt*omt*(entry.coords[0] - entry.x)
-			  + 2.0*t*omt*(entry.coords[2] - entry.coords[0])
-			  + t*t*(entry.coords[4] - entry.coords[2]));
-	    dydu = 3.0 * (omt*omt*(entry.coords[1] - entry.y)
-			  + 2.0*t*omt*(entry.coords[3] - entry.coords[1])
-			  + t*t*(entry.coords[5] - entry.coords[3]));
-	    double u1u1deriv = -2.0 * (omt);
-	    double uuderiv = 2.0 * t;
-	    double uu1deriv = 1.0 - 2.0 * t;
-	    d2xdu2 = 3.0 * (u1u1deriv*(entry.coords[0] - entry.x)
-			  + 2.0*uu1deriv*(entry.coords[2] - entry.coords[0])
-			  + uuderiv*(entry.coords[4] - entry.coords[2]));
-	    d2ydu2 = 3.0 * (u1u1deriv*(entry.coords[1] - entry.y)
-			  + 2.0*uu1deriv*(entry.coords[3] - entry.coords[1])
-			  + uuderiv*(entry.coords[5] - entry.coords[3]));
-	    break;
-	default:
-	    throw new IllegalArgumentException(errorMsg("piUnknown"));
-	}
-	if (Math.abs(dxdu - dxDu(u)) > 1.e-10) {
-	    double d2 = (getX(u+0.0000001) - getX(u)) / 0.0000001;
-	    double d3 = entry.getData().dxDu(new Path2DInfo.UValues(t));
-	    throw new RuntimeException(entry +", u = " + u +", t = " + t
-				       +": " + dxdu + " != " + dxDu(u)
-				       +", expecting " + d2
-				       +" " + d3);
-	    // throw new RuntimeException(dxdu + " != " + dxDu(u));
-	}
-	if (Math.abs(dydu - dyDu(u)) > 1.e-10) {
-	    throw new RuntimeException(dydu + " != " + dyDu(u));
-	}
-
-	if (Math.abs(d2xdu2 - d2xDu2(u)) > 1.e-10) {
-	    throw new RuntimeException(d2xdu2 + " != " + d2xDu2(u));
-	}
-	if (Math.abs(d2ydu2 - d2yDu2(u)) > 1.e-10) {
-	    double d2 = (dyDu(u+0.000001) - dyDu(u)) / 0.000001;
-	    throw new RuntimeException(entry +", u = " + u +", t = " + t
-				       +": " + d2ydu2 + " != " + d2yDu2(u)
-				       +", expecting " + d2);
-	}
-
-
-	double dsduSquared = dxdu*dxdu + dydu*dydu;
-	if (dsduSquared == 0.0) {
-	    // Need the fully qualified class name because we are a
-	    // subclass of Path2D.Double.
-	    return java.lang.Double.NaN;
-	} else {
-	    return (dxdu*d2xdu2 + dydu*d2ydu2) / Math.sqrt(dsduSquared);
-	}
-	*/
     }
 
     private double inversionLimit = -1.0; // -1.0 => use the default
@@ -2071,17 +1975,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 	    Path2DInfo.SegmentData segdata =
 		new Path2DInfo.SegmentData(entry.type, entry.x, entry.y,
 					   entry.coords, null);
-	    // synchronized (glq4seglen) {
 		for (int i = 1; i < numberOfIntervals/*+1*/; i++) {
-		    // double t1 = ((double)(i-1))/numberOfIntervals;
 		    double t2 = ((double)(i))/numberOfIntervals;
-		    /*
-		    segindex = i;
-		    // svalues[i] = svalues[i-1] + glq.integrate(t1, t2);
-		    svalues[i] = svalues[i-1]
-			+ glq4seglen.integrateWithP(u4seglen[segindex],
-						    segdata);
-		    */
 		    svalues[i] = svalues[0] +
 			Path2DInfo.segmentLength(t2, entry.type,
 						 entry.x, entry.y,
@@ -2098,7 +1993,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 						     1.0/numberOfIntervals,
 						     CubicSpline.Mode.HERMITE,
 						     dvalues);
-	    // }
 	    if (inversionLimit >= 0.0) {
 		sublengths[index].setInversionLimit(inversionLimit);
 	    }
@@ -2133,12 +2027,14 @@ public class BasicSplinePath2D extends SplinePath2D {
      * control points for linear segments, three for quadratic B&eacute;zier
      * curve segments, and four for cubic B&eacute;zier curve segments.
      * Path iterators do not provide the 0<sup>th</sup> control point for
-     * these cases directly&mdash;instead the caller has to store the
-     * final control point obtained for the previous segment.
+     * these cases directly&mdash;instead the caller has to use the
+     * final control point obtained for the previous iteration.
      * @param i the segment index specified by an integer in the
      *        range [0, n) where n is the number of segments
-     * @param coords an array of at least 8 elements that will
-     *        contain the control points
+     * @param coords an array of at least 8 elements that will contain
+     *        the control points, each represented by two successive
+     *        array elements with the X coordinate appearing before
+     *        the Y coordinate
      * @return the mode for the segment
      *         ({@link PathIterator#SEG_LINETO},
      *         {@link PathIterator#SEG_QUADTO}, or
@@ -2174,76 +2070,6 @@ public class BasicSplinePath2D extends SplinePath2D {
     private double getSegmentLength(int i) {
 	if (entries == null) refresh();
 	final Path2DInfo.Entry entry = entries[i];
-	if (false /*entry.length < 0*/) {
-	    /*
-	    switch (entry.type) {
-	    case PathIterator.SEG_MOVETO:
-		entry.length = 0.0;
-		break;
-	    case PathIterator.SEG_CLOSE:
-	    case PathIterator.SEG_LINETO:
-		{
-		    double dx = entry.coords[0] - entry.x;
-		    double dy = entry.coords[1] - entry.y;
-		    if (dx == 0.0) {
-			if (dy == 0.0) entry.length = 0.0;
-			else entry.length = Math.abs(dy);
-		    } else if (dy == 0.0) {
-			entry.length =  Math.abs(dx);
-		    } else {
-			entry.length = Math.sqrt(dx*dx + dy*dy);
-		    }
-		}
-		break;
-	    default:
-		{
-		    double[] fcoords = new double[6];
-		    double delta;
-		    double dx = 0.0, dy = 0.0;
-		    if (entry.type == PathIterator.SEG_QUADTO) {
-			dx = entry.coords[2] - entry.x;
-			dy = entry.coords[3] - entry.y;
-		    } else if (entry.type == PathIterator.SEG_CUBICTO) {
-			dx = entry.coords[4] - entry.x;
-			dy = entry.coords[5] - entry.y;
-		    } else {
-			throw new RuntimeException
-			    ("type value not expected: " + entry.type);
-		    }
-		    delta = 0.05 * Math.sqrt(dx*dx + dy*dy);
-		    FlatteningPathIterator2D fpit
-			= new FlatteningPathIterator2D(entry.type,
-						       entry.x, entry.y,
-						       entry.coords, delta, 10);
-		    fpit.next();
-		    double xx0 = entry.x;
-		    double yy0 = entry.y;
-		    Adder adder2 = new Adder.Kahan();
-		    while (!fpit.isDone()) {
-			int fst = fpit.currentSegment(fcoords);
-			double flen =
-			    glq4len.integrateWithP(u4len,
-						   new Path2DInfo.SegmentData
-						   (fst, xx0, yy0,
-						    fcoords, null));
-			adder2.add(flen);
-			if (fst == PathIterator.SEG_QUADTO) {
-			    xx0 = fcoords[2];
-			    yy0 = fcoords[3];
-			} else {
-			    xx0 = fcoords[4];
-			    yy0 = fcoords[5];
-			}
-			fpit.next();
-		    }
-		    entry.length = adder2.getSum();
-		}
-	    }
-	    */
-	    // lengthCount++;
-	    // totalLength += entry.length;
-	}
-	// return entry.length;
 	return entry.getSegmentLength();
     }
 
@@ -2258,13 +2084,6 @@ public class BasicSplinePath2D extends SplinePath2D {
     {
 	if (entries == null) refresh();
 	initCumulativeLengths();
-	/*
-	if (lengthCount < entries.length) {
-	    for (int i = 0; i < entries.length; i++) {
-		getSegmentLength(i);
-	    }
-	}
-	*/
 	return totalLength;
     }
 
@@ -2293,7 +2112,7 @@ public class BasicSplinePath2D extends SplinePath2D {
     /**
      * Set the accuracy mode.
      * The accuracy mode determines how distances are computed from path
-     * parameters and how distances along a parh are converted to path
+     * parameters and how distances along a path are converted to path
      * parameters.  When the mode is set to true, a slower, but more
      * accurate computation is done.  When false, precomputed splines are
      * used. For typical animations, the value <CODE>false</CODE> is
@@ -2382,38 +2201,13 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    ind2 = ind2 % entries.length;
 		}
 		final Path2DInfo.Entry entry1 = entries[ind1];
-		/*
-		GLQuadrature glq = new GLQuadrature(16) {
-			protected double function(double u) {
-			    return Path2DInfo.dsDu(u, entry1.x, entry1.y, 
-						   entry1.mode, entry1.coords);
-			}
-		    };
-		*/
 		CubicSpline spline = getSublength(ind1);
 
 		if (n > 0) {
-		    /*
-		    System.out.println("adding total path length " + n
-				       + " times");
-		    */
-		    // sum += n * getPathLength();
 		    adder.add(n * getPathLength());
 		}
 		if (ind1 == ind2) {
-		    // sum += glq.integrate(t1, t2);
-		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
 		    if (enhancedAccuracy) {
-			/*
-			adder.add(Path2DInfo.segmentLength(t2, entry1.type,
-							   entry1.x,
-							   entry1.y,
-							   entry1.coords)
-				  - Path2DInfo.segmentLength(t1, entry1.type,
-							     entry1.x,
-							     entry1.y,
-							     entry1.coords));
-			*/
 			RealValuedFunctOps distf =
 			    entry1.getSegmentLengthFunction();
 			adder.add(distf.valueAt(t2) - distf.valueAt(t1));
@@ -2422,27 +2216,7 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    }
 		} else {
 		    if (ind1 != ind) {
-			// if ind1 == ind, the sum will be covered
-			// in the loop from 0 to m below.
-			/*
-			System.out.println("adding t = " + t1
-					   + " to 1.0 for ind1 = " + ind1);
-			*/
-			// sum += glq.integrate(t1, 1.0);
-			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
 			if (enhancedAccuracy) {
-			    /*
-			    adder.add(Path2DInfo
-				      .segmentLength(1.0, entry1.type,
-						     entry1.x,
-						     entry1.y,
-						     entry1.coords)
-				      - Path2DInfo
-				      .segmentLength(t1, entry1.type,
-						     entry1.x,
-						     entry1.y,
-						     entry1.coords));
-			    */
 			    RealValuedFunctOps distf = entry1.
 				getSegmentLengthFunction();
 			    adder.add(entry1.getSegmentLength()
@@ -2451,30 +2225,10 @@ public class BasicSplinePath2D extends SplinePath2D {
 			    adder.add(spline.valueAt(1.0) - spline.valueAt(t1));
 			}
 		    }
-		    // double psum1 = adder.getSum();
-		    /*
-		    for (int i = 0; i < m; i++) {
-			int ii = (ind + i) % entries.length;
-			// System.out.println("adding segment " + ii);
-			// sum += getSegmentLength(ii);
-			adder.add(getSegmentLength(ii));
-		    }
-		    */
-		    // double psum2 = adder.getSum();
 		    int k1 = ind;
 		    int k2 = (ind + m) % entries.length;
 		    double sum = 0.0;
 		    if (m > 0) {
-			/*
-			if (m == entries.length) {
-			    sum = totalLength;
-			} else if (k1 < k2) {
-			    sum = cumulativeLength[k2] - cumulativeLength[k1];
-			} else {
-			    sum = totalLength + cumulativeLength[k2]
-				- cumulativeLength[k1];
-			}
-			*/
 			if (m == entries.length) {
 			    adder.add(totalLength);
 			} else {
@@ -2485,48 +2239,11 @@ public class BasicSplinePath2D extends SplinePath2D {
 			    adder.add(-cumulativeLength[k1]);
 			};
 		    }
-		    /*
-		    if (Math.abs((sum ==0)? (psum2-psum1):
-				 (sum - (psum2 - psum1))/sum) > 1.e-12) {
-			System.out.println("u1 = " + u1 + "u2 = " + u2
-					   + ", entries.length = "
-					   + entries.length);
-			System.out.println("k1-1 = " + (k1) + ", k2 = " + k2
-					   +", m = " + m
-					   +", ind = " + ind);
-			System.out.format("sum error: %s  and %s\n",
-					  sum, (psum2 - psum1));
-			throw new RuntimeException("sum error");
-		    }
-		    */
 
 		    if (t2 > 0.0) {
 			final Path2DInfo.Entry entry2 = entries[ind2];
-			/*
-			glq = new GLQuadrature(16) {
-				protected double function(double u) {
-				    return Path2DInfo.dsDu(u, entry2.x,
-							   entry2.y, 
-							   entry2.mode,
-							   entry2.coords);
-				}
-			    };
-			*/
 			spline = getSublength(ind2);
-			/*
-			System.out.println("adding t = 0 to " + t2
-					   + " for ind2 = " + ind2);
-			*/
-			// sum += glq.integrate(0.0, t2);
-			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
 			if (enhancedAccuracy) {
-			    /*
-			    adder.add(Path2DInfo
-				      .segmentLength(t2, entry2.type,
-						     entry2.x,
-						     entry2.y,
-						     entry2.coords));
-			    */
 			    RealValuedFunctOps distf = entry2
 				.getSegmentLengthFunction();
 			    adder.add(distf.valueAt(t2));
@@ -2538,23 +2255,8 @@ public class BasicSplinePath2D extends SplinePath2D {
 		return adder.getSum();
 	    } else {
 		final Path2DInfo.Entry entry1 = entries[ind1];
-		/*
-		GLQuadrature glq = new GLQuadrature(16) {
-			protected double function(double u) {
-			    return Path2DInfo.dsDu(u, entry1.x, entry1.y, 
-						   entry1.mode,
-						   entry1.coords);
-			}
-		    };
-		*/
 		CubicSpline spline = getSublength(ind1);
 		if (ind1 == ind2) {
-		    /*
-		    System.out.println("adding " + t1 + " to " + t2
-				       + " for ind1, ind2 = " + ind1);
-		    */
-		    // sum += glq.integrate(t1, t2);
-		    // sum += spline.valueAt(t2) - spline.valueAt(t1);
 		    if (enhancedAccuracy) {
 			adder.add(Path2DInfo
 				  .segmentLength(t2, entry1.type,
@@ -2571,13 +2273,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    }
 		} else {
 		    if (ind != ind1) {
-			/*
-			System.out.println("adding " +t1
-					   + " to 1.0  for ind1 = "
-					   + ind1);
-			*/
-			// sum += glq.integrate(t1, 1.0);
-			// sum += spline.valueAt(1.0) - spline.valueAt(t1);
 			if (enhancedAccuracy) {
 			    adder.add(Path2DInfo
 				      .segmentLength(1.0, entry1.type,
@@ -2600,16 +2295,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    }
 		    if (t2 > 0.0) {
 			final Path2DInfo.Entry entry2 = entries[ind2];
-			/*
-			glq = new GLQuadrature(16) {
-				protected double function(double u) {
-				    return Path2DInfo.dsDu(u, entry2.x,
-							   entry2.y, 
-							   entry2.mode,
-							   entry2.coords);
-				}
-			    };
-			*/
 			spline = getSublength(ind2);
 			// sum += spline.valueAt(t2) - spline.valueAt(0.0);
 			if (enhancedAccuracy) {
@@ -2621,17 +2306,9 @@ public class BasicSplinePath2D extends SplinePath2D {
 			} else {
 			    adder.add(spline.valueAt(t2) - spline.valueAt(0.0));
 			}
-			/*
-			System.out.println("adding 0.0 to " + t2
-					   + " for ind2 = " + ind2);
-			*/
-			// sum += glq.integrate(0.0, t2);
 		    }
 		}
 		double sum = adder.getSum();
-		// allow for errors due to the use of a spline.
-		// if (sum < 0.0) sum = 0.0;
-		// if (sum > getPathLength()) sum = getPathLength();
 		return adder.getSum();
 	    }
 	    // return sum;
@@ -2660,13 +2337,9 @@ public class BasicSplinePath2D extends SplinePath2D {
     private void initCumulativeLengths() {
 	if (cumulativeLength != null) return;
 	cumulativeLength = new double[entries.length];
-	// double cl = 0.0;
 	Adder adder = new Adder.Kahan();
 	for (int i = 0; i < entries.length; i++) {
-	    //cumulativeLength[i] = cl;
 	    cumulativeLength[i] = adder.getSum();
-	    // cl += entries[i].length;
-	    // cl += getSegmentLength(i);
 	    adder.add(getSegmentLength(i));
 	}
 	totalLength = adder.getSum();
@@ -2718,12 +2391,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 				.getSegmentLengthFunction();
 			    RootFinder nf = RootFinder.Newton
 				.newInstance((t) -> {
-					/*
-					return Path2DInfo
-					    .segmentLength(t, entry.type,
-							   entry.x, entry.y,
-							   entry.coords);
-					*/
 					return distf.valueAt(t);
 				    }, (t) -> {
 					return Path2DInfo
@@ -2794,12 +2461,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 				.getSegmentLengthFunction();
 			    RootFinder nf = RootFinder.Newton
 				.newInstance((t) -> {
-					/*
-					return Path2DInfo
-					    .segmentLength(t, entry.type,
-							   entry.x, entry.y,
-							   entry.coords);
-					*/
 					return distf.valueAt(t);
 				    }, (t) -> {
 					return Path2DInfo
@@ -2930,24 +2591,10 @@ public class BasicSplinePath2D extends SplinePath2D {
 	int mtcount = 0; // count number of extra initial SEG_MOVETO entries
 	pit.next();
 	while (!pit.isDone()) {
-	    /*
-	    Entry entry = new Entry();
-	    entry.x = x;
-	    entry.y = y;
-	    entry.mode = pit.currentSegment(entry.coords);
-	    */
 	    int type = pit.currentSegment(coords);
 	    switch(/*entry.mode*/type) {
 	    case PathIterator.SEG_CLOSE:
 		cyclic = true;
-		/*
-		if (x != x0 && y != y0) {
-		    entry.mode = PathIterator.SEG_LINETO;
-		    entry.x = x0;
-		    entry.y = y0;
-		    entries.add(entry);
-		}
-		*/
 		float fmaxX = (float)Math.max(Math.abs(x), Math.abs(x0));
 		float fmaxY = (float)Math.max(Math.abs(y), Math.abs(y0));
 		if ((Math.abs(x - x0) > Math.ulp(fmaxX)) ||
@@ -2960,11 +2607,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    throw new IllegalStateException
 			(errorMsg("segsAfterClose"));
 		}
-		/*
-		x = entry.coords[4];
-		y = entry.coords[5];
-		entries.add(entry);
-		*/
 		x = coords[4];
 		y = coords[5];
 		break;
@@ -2973,11 +2615,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    throw new IllegalStateException
 			(errorMsg("segsAfterClose"));
 		}
-		/*
-		x = entry.coords[0];
-		y = entry.coords[1];
-		entries.add(entry);
-		*/
 		x = coords[0];
 		y = coords[1];
 		break;
@@ -2985,12 +2622,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		if (mode == PathIterator.SEG_MOVETO) {
 		    // multiple moveTo operations at the start
 		    // are harmless---just use the most recent one.
-		    /*
-		    x = entry.coords[0];
-		    y = entry.coords[1];
-		    x0 = x;
-		    y0 = y;
-		    */
 		    x0 = coords[0];
 		    y0 = coords[1];
 		    mtcount++;
@@ -3004,11 +2635,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 		    throw new IllegalStateException
 			(errorMsg("segsAfterClose"));
 		}
-		/*
-		x = entry.coords[2];
-		y = entry.coords[3];
-		entries.add(entry);
-		*/
 		x = coords[2];
 		y = coords[3];
 		break;
@@ -3016,9 +2642,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 	    mode = /*entry.mode*/ type;
 	    pit.next();
 	}
-	// this.entries = new Entry[entries.size()];
-	// this.entries = entries.toArray(this.entries);
-	// lengthCount = 0;
 	totalLength = 0.0;
 	this.cyclic = cyclic;
 	entries =
@@ -3176,5 +2799,6 @@ public class BasicSplinePath2D extends SplinePath2D {
 //  LocalWords:  subpath lt GLQuadrature dsDu getPathLength valueAt
 //  LocalWords:  psum binarySearch sd du ul getY sDu isClosed boolean
 //  LocalWords:  getDistance curveTo lineTo moveTo quadTo closePath
-//  LocalWords:  reinitializes emptyPath ArrayList piSEGMOVETO
-//  LocalWords:  segsAfterClose
+//  LocalWords:  reinitializes emptyPath ArrayList piSEGMOVETO cpoint
+//  LocalWords:  segsAfterClose segmentIndex precomputed
+//  LocalWords:  setAccuracyMode segmentLength

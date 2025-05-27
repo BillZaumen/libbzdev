@@ -59,15 +59,29 @@ one wishes to create a shape with a hole in it.
 		} else if (spec[i].type == "MOVE_TO" || spec[i].type
 			   == pb.constantMOVE_TO()){
 		    pb.append(pb.createCPointMoveTo(spec[i].x, spec[i].y));
+		} else if (spec[i].type == "MOVE_TO_NEXT" || spec[i].type
+			   == pb.constantMOVE_TO_NEXT) {
+		    pb.append(pb.createCPointMOVE_TO_NEXT());
 		} else if (spec[i].type == "SEG_END" || spec[i].type
 			   == pb.constantSEG_END()){
 		    pb.append(pb.createCPointSegEnd(spec[i].x, spec[i].y));
+		} else if (spec[i].type == "SEG_END_PREV" || spec[i].type
+			   == pb.constantSEG_ENDPREV()){
+		    pb.append(pb.createCPointSegEndPrev());
+		} else if (spec[i].type == "SEG_END_NEXT" || spec[i].type
+			   == pb.constantSEG_END_NEXT()){
+		    pb.append(pb.createCPointSegEndNext());
 		} else if (spec.type == "CONTROL" || spec[i].type
 			   == pb.constantCONTROL()){
 		    pb.append(pb.createCPointControl(spec[i].x, spec[i].y));
 		} else if (spec.type == "SPLINE" || spec[i].type
 			   == pb.constantSPLINE()) {
 		    pb.append(pb.createCPointSpline(spec[i].x, spec[i].y));
+		} else if (spec.type == "SPLINE_FUNCTION" || spec[i].type
+			   == pb.constantSPLINE_FUNCTION()) {
+		    pb.append(pb.createCPointSplineFunction
+			      ((spec[i].xf, spec[i].yf,
+			        spec[i].t1, spec[i].t2], spec[i].n));
 		} else {
 		    throw "bad type: " + spec.type + " at index " +i;
 		}
@@ -109,16 +123,27 @@ import (org.bzdev.geom.SplinePathBuilder.CPointType);
 		    this.configurePathBuilderAux(pb, elem):
 		    function (e, ind) {
 			var etype = e["type"];
-			(etype == "CLOSE" || etype == pb.constantCLOSE())?
+			(etype == "CLOSE" || etype == CLOSE)?
 			    pb.append(pb.createCPointClose()):
-			(etype == "MOVE_TO" || etype == pb.constantMOVE_TO())?
+			(etype == "MOVE_TO" || etype == MOVE_TO)?
 			    pb.append(pb.createCPointMoveTo(e["x"], e["y"])):
-			(etype == "SEG_END" || etype == pb.constantSEG_END())?
+			(etype == "MOVE_TO_NEXT" || etype == MOVE_TO_NEXT)?
+			    pb.append(pb.createCPointMoveToNext()):
+			(etype == "SEG_END" || etype == SEG_END)?
 			    pb.append(pb.createCPointSegEnd(e["x"], e["y"])):
-			(etype == "CONTROL" || etype == pb.constantCONTROL())?
-			    pb.append(pb.createCpointControl(e["x"], e["y"])):
-			(etype == "SPLINE" || etype == pb.constantSPLINE())?
+			(etype == "SEG_END_PREV" || etype == SEG_END_PREV)?
+			    pb.append(pb.createCPointSegEndPrev()):
+			(etype == "SEG_END_NEXT" || etype == SEG_END_NEXT)?
+			    pb.append(pb.createCPointSegEndNext()):
+			(etype == "CONTROL" || etype == CONTROL)?
+			    pb.append(pb.createCPointControl(e["x"], e["y"])):
+			(etype == "SPLINE" || etype == SPLINE)?
 			    pb.append(pb.createCpointSpline(e["x"], e["y"])):
+			    (etype == "SPLINE_FUNCTION" ||
+			     etype == SPLINE_FUNCTION)?
+			    pb.append(pb.createCPointSplineFunction
+				      (e["xf"], e["yf"],
+				       e["t1"], e["t2"], e["n"])):
 			    throw "bad type: " +  etype + "at index" + ind;
 			void
 		    }(elem, i);
@@ -153,12 +178,20 @@ class ___Config_SplinePathBuilder_For_BZDev_Org:
                 pb.append(pb.createCPointClose())
             elif element["type"] == "MOVE_TO" or element[type] == pb.constantMOVE_TO():
                 pb.append(pb.createCPointMoveTo(element["x"], element["y"]))
+	    elif element["type] == "MOVE_TO_NEXT" or element[type] == pb.constantMOVE_TO_NEXT):
+	        pb.append(pb.createCPointMoveToNext())
             elif element["type"] == "SEG_END" or element[type] == pb.constantSEG_END():
                 pb.append(pb.createCPointSegEnd(element["x"], element["y"]))
+            elif element["type"] == "SEG_END_PREV" or element[type] == pb.constantSEG_END_PREV():
+                pb.append(pb.createCPointSegEndPrev())
+            elif element["type"] == "SEG_END_PREV_NEXT" or element[type] == pb.constantSEG_END_NEXT():
+                pb.append(pb.createCPointSegEndNext())
             elif element["type"] == "CONTROL" or element[type] == pb.constantCONTROL():
                 pb.append(pb.createCPointControl(element["x"], element["y"]))
             elif element["type"] == "SPLINE" or element[type] == pb.constantSPLINE():
                 pb.append(pb.createCPointSpline(element["x"], element["y"]))
+            elif element["type"] == "SPLINE_FUNCTION" or element[type] == pb.constantSPLINE_FUNCTION():
+                pb.append(pb.createCPointSplineFunction(element["xf"], element["yf"], element["t1"], element["t2"], element["n"]))
             else:
 		raise Exception("bad type: "+ element["type"])
     def configPathBuilder(self, pb, windingRule, spec):

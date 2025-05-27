@@ -24,10 +24,11 @@ import org.bzdev.scripting.ScriptingContext;
  *         <code>MOVE_TO_NEXT</code>. Only a single point of this type
  *         is allowed.
  *    <li> A segment containing only <code>CONTROL</code> points (0, 1,
- *         or 2) must end with a <CODE>SEG_END</CODE> point. These
- *         represent straight lines, quadratic B&eacute;zier curves, and
- *         cubic B&eacute;zier curves respectively. The control points
- *         must be preceded by a point whose type is <code>MOVETO</code>,
+ *         or 2) must end with a <CODE>SEG_END</CODE> point or a
+ *         <CODE>CLOSE</CODE> point. These represent straight lines,
+ *         quadratic B&eacute;zier curves, and cubic B&eacute;zier
+ *         curves respectively. The control points must be preceded by
+ *         a point whose type is <code>MOVETO</code>,
  *         <code>SEG_END</code> or <code>SEG_END_PREV</code>.
  *     <li> An open spline segment starts with either the end of another
  *          segment or a point whose type is either <code>MOVE_TO</code>
@@ -35,7 +36,11 @@ import org.bzdev.scripting.ScriptingContext;
  *         with a point whose type is <code>SEG_END</code> or
  *         <code>SEG_END_PREV</code>, and contains points (at least one)
  *         whose types are either <code>SPLINE</code> or
- *         <code>SPLINE_FUNCTION</code>.
+ *         <code>SPLINE_FUNCTION</code>.  The sequence of <CODE>SPLINE</CODE>
+ *         and/or <CODE>SPLINE_FUNCTION</CODE> points may be followed
+ *         by a <CODE>CONTROL</CODE>or preceded by a
+ *         <CODE>CONTROL</CODE> in order to set the first and last control
+ *         point on the segment to specific values.
  *    <li> A closed subpath is indicated by a point whose type is
  *         <code>CLOSE</code>. A <code>BasicSplinePathBUilder</code>
  *         allows at most one of these points, and no point may follow
@@ -89,9 +94,11 @@ import org.bzdev.scripting.ScriptingContext;
  * depth-first order. The sequence of objects that appear must match
  * the constraints shown in the figure above.
  * <P>
- * For example, with ECMAScript, <CODE>scrunner</CODE>  the following
+ * For example, with ESP, implemented by <CODE>scrunner</CODE>,  the following
  * statements can be used to configure a  path:
  * <BLOCKQUOTE><PRE><CODE>
+ *    import (org.bzdev.geom.SplinePathBuilder);
+
  *     var path1 = [
  *        {type: "MOVE_TO", x: 20.0, y: 30.0},
  *        {type: "SEG_END", x: 50.0, y: 60.0}];
@@ -102,9 +109,8 @@ import org.bzdev.scripting.ScriptingContext;
  *
  *     var pathspec = [path1, path2];
  *
- *     org.bzdev.geom.SplinePathBuilder pb =
- *        new org.bzdev.geom.SplinePathBuilder(scripting);
- *
+ *     var pb = new SplinePathBuilder(scripting);
+
  *     pb.configure("WIND_EVEN_ODD", pathspec);
  *     var path = pb.getPath();
  * </CODE></PRE></BLOCKQUOTE>
@@ -159,6 +165,7 @@ public class BasicSplinePathBuilder
 }
 
 //  LocalWords:  BasicSplinePath IMG SRC li SEG eacute zier MOVETO pb
-//  LocalWords:  PREV subpath BasicSplinePathBUilder scrunner PRE
+//  LocalWords:  PREV subpath BasicSplinePathBUilder scrunner PRE UML
 //  LocalWords:  SplinePathBuilder WindingRule CPointType sublists
-//  LocalWords:  BLOCKQUOTE pathspec getPath epts
+//  LocalWords:  BLOCKQUOTE pathspec getPath epts imgBackground
+//  LocalWords:  javadocs superclass

@@ -28,6 +28,14 @@ all:
 	@$(JAVA) BuilderTest3
 	@echo ------- BuilderTest4 ----------
 	@$(JAVA) BuilderTest4
+	@echo ------- BuilderTest5 ----------
+	@$(JAVA) BuilderTest5 false
+	@$(JAVA) BuilderTest5 true
+	@echo ------- BuilderTest6 ----------
+	@$(JAVA) BuilderTest6
+	@echo ------- BuilderTest7 ----------
+	@$(JAVA) BuilderTest7
+	@$(JAVA) BuilderTest8
 	@echo --------- scripting path-builder tests
 	@$(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
@@ -196,6 +204,48 @@ btest4:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@echo ------- BuilderTest4 ----------
 	$(JAVA) BuilderTest4
+
+btest5a:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest5 ----------
+	$(JAVA) BuilderTest5 false
+
+btest5b:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest5 ----------
+	$(JAVA) BuilderTest5  true
+
+# set CTL to true or false, and I and J to 0 ... 5
+# to reduce the output for debugging.
+btest6:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest6 $(CTL) $(I) $(J) ----------
+	$(JAVA) BuilderTest6 $(CTL) $(I) $(J)
+
+# set CTL to true or false, END to true or false, and I and J to 0 ... 5
+# to reduce the output for debugging.
+btest7:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest7 $(CTL) $(I) $(J) ----------
+	$(JAVA) BuilderTest7 $(CTL) $(END) $(I) $(J)
+
+# set CTL to true or false, and I and J to 0 ... 5
+# to reduce the output for debugging.
+btest8:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest8 $(CTL) $(I) $(J) ----------
+	$(JAVA) BuilderTest8 $(CTL) $(I) $(J)
+
 
 btest3d:
 	(cd ../.. ; make jars)
@@ -867,6 +917,26 @@ pbtest-esp:
 	@java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
 		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace pbtest.esp
+
+
+
+cycloid-esp:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@java -classpath \
+		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
+		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace cycloid.esp
+
+cycloid2-esp:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@java -classpath \
+		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
+		org.bzdev.bin.scrunner.SCRunnerCmd --stackTrace cycloid2.esp
+
+
 cwrtest-esp:
 	(cd ../.. ; make jars)
 	mkdir -p classes

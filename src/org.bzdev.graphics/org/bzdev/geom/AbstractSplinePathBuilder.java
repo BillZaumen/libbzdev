@@ -7,6 +7,7 @@ import org.bzdev.geom.SplinePathBuilder.CPoint;
 // import org.bzdev.obnaming.annotations.PrimitiveParm;
 // import org.bzdev.obnaming.annotations.CompoundParmType;
 import org.bzdev.lang.UnexpectedExceptionError;
+import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.scripting.ScriptingContext;
 
 import java.awt.geom.AffineTransform;
@@ -25,18 +26,20 @@ import javax.script.ScriptException;
  * via a table - an array of entries, each of which specifies a point
  * along the path (including control points) and the type of line segment.
  * <P>
- * This class is not public. Its documentation is inherited by its
- * superclasses, which is why there are javadoc comments.  The class
- * hierarchy is somewhat unusual because AbstractSplinePathBuilder's
- * two subclassses differ in the type of the objects they create, and
- * those objects are created and initialized the same way.
+
+ * This class is not intended for public use. Its documentation is
+ * inherited by its superclasses, which is why there are javadoc
+ * comments.  The class hierarchy is somewhat unusual because
+ * AbstractSplinePathBuilder's two subclassses differ in the type of
+ * the objects they create, and those objects are created and
+ * initialized the same way.
  * <P>
  * Note: this class is declared to be public even though no classes
  * outside this package create subclasses of it. The reason is that
  * scripting languages (both ESP and Nashorn) will generate errors
  * if the class is not public due to the behavior of the Java reflection
  * API.  In particular, if this class is not public, those scripting-language
- * implementations cannot find public methods such constantWIND_NON_ZERO()
+ * implementations cannot find public methods such as constantWIND_NON_ZERO()
  * when given an instance of a subclass.
  */
 public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
@@ -54,7 +57,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 
     /**
      * Constructor given a parent.
-     * @param parent the parant scripting context.
+     * @param parent the parent scripting context.
      */
     protected AbstractSplinePathBuilder(ScriptingContext parent) {
 	super(parent);
@@ -206,7 +209,6 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * Also create a new path.
      */
     public void initPath() {
-	//path = new SplinePath2D();
 	path = newSplinePath2D();
 	cplist.clear();
     }
@@ -392,7 +394,6 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 				   int offset, int n)
 	throws IllegalArgumentException
     {
-	// cplist.toArray(result);
 	if (reversed) {
 	    boolean closed = (result[offset+n-1].type == CPointType.CLOSE);
 	    // just leave the closed CPoint in place.
@@ -423,7 +424,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    (errorMsg("intermediateClose"));
 	    }
 	    boolean splineMode = true;
-	    boolean stndMode = true; // just SEG_END, CONTROL, & MOVETO
+	    boolean stndMode = true; // just SEG_END, CONTROL, & MOVE_TO
 	    for (int i = 0; i < nm1; i++) {
 		if (result[offset+i].type != CPointType.SPLINE) {
 		    CPoint cpnt = result[offset+i];
@@ -449,11 +450,6 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	    }
 	    if (closed && splineMode) {
 		// Try to keep the same starting point.
-		/*
-		CPoint tmp = result[offset];
-		result[offset] = result[offset+nm1];
-		result[offset+nm1] = tmp;
-		*/
 		CPoint tmp = result[offset + nm1];
 		for (int i = nm1; i > 0; i--) {
 		    result[offset+i] = result[offset +i - 1];
@@ -642,6 +638,8 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	if (path == null) initPath();
 	Point2D cpt = path.getCurrentPoint();
 	CPointType lastType = CPointType.MOVE_TO;
+	Point2D cpoint1 = null;
+	Point2D cpoint2 = null;
 	int lastMoveToIndex = -1;
 	int i = 0;
 	int j = 0;
@@ -650,22 +648,30 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	int n;
 	int m;
 	if (cpt == null) {
+	    int delta = 0;
 	    if (cpoints[0].type == CPointType.MOVE_TO_NEXT
-		&& cpoints.length > 1
-		&& cpoints[1].type == CPointType.SPLINE_FUNCTION) {
-		lastMoveToX = cpoints[1].xfOps.valueAt(cpoints[1].t1);
-		lastMoveToY = cpoints[1].yfOps.valueAt(cpoints[1].t1);
-		path.moveTo(lastMoveToX, lastMoveToY);
-		offset = 1;
-		lastMoveToIndex = 0;
-	    } else if (cpoints[0].type == CPointType.MOVE_TO_NEXT
-		      && cpoints.length > 1
-		      && cpoints[1].type == CPointType.SPLINE) {
-		lastMoveToX = cpoints[1].x;
-		lastMoveToY = cpoints[1].y;
-		path.moveTo(lastMoveToX, lastMoveToY);
-		offset = 1;
-		lastMoveToIndex = 0;
+		&& cpoints.length > 1) {
+		if (cpoints[1].type == CPointType.CONTROL) {
+		    delta = 1;
+		    cpoint1 = new Point2D.Double(cpoints[1].x, cpoints[1].y);
+		}
+		if (cpoints.length > 1 + delta) {
+		    if (cpoints[1+delta].type == CPointType.SPLINE_FUNCTION) {
+			lastMoveToX = cpoints[1+delta].xfOps
+			    .valueAt(cpoints[1].t1);
+			lastMoveToY = cpoints[1+delta].yfOps
+			    .valueAt(cpoints[1].t1);
+			path.moveTo(lastMoveToX, lastMoveToY);
+			offset = 1;
+			lastMoveToIndex = 0;
+		} else if (cpoints[1+delta].type == CPointType.SPLINE) {
+			lastMoveToX = cpoints[1+delta].x;
+			lastMoveToY = cpoints[1+delta].y;
+			path.moveTo(lastMoveToX, lastMoveToY);
+			offset = 1;
+			lastMoveToIndex = 0;
+		    }
+		}
 	    } else if (cpoints[0].type != CPointType.MOVE_TO) {
 		throw new IllegalArgumentException(errorMsg("missingMOVETO"));
 	    } else {
@@ -675,6 +681,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		lastMoveToIndex = 0;
 	    }
 	    i++;
+	    i += delta;
 	}
 	// count segments, but a sequence that make up a spline
 	// is counted just once.
@@ -691,19 +698,29 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		if (currentType != CPointType.SPLINE
 		    && currentType != CPointType.SPLINE_FUNCTION) {
 		    throw new IllegalArgumentException
-			(errorMsg("afterSEGENDNEXT"));
+			(errorMsg("afterSEGENDNEXT", i));
 		}
 	    case MOVE_TO:
 	    case SEG_END:
+		if (currentType == CPointType.CONTROL
+		    && i+1 < cpoints.length
+		    && (cpoints[i+1].type == CPointType.SPLINE
+			|| cpoints[i+1].type == CPointType.SPLINE_FUNCTION)) {
+		    cpoint1 = new Point2D.Double(cpoints[i].x, cpoints[i].y);
+		    i++;
+		    continue;
+		}
 	    case CLOSE:
 		if (basicMode) {
 		    if (closeCount > 0) {
 			throw new
-			    IllegalArgumentException(errorMsg("segAfterClose"));
+			    IllegalArgumentException
+			    (errorMsg("segAfterClose", i));
 		    }
 		}
 		switch(currentType) {
 		case MOVE_TO:
+		    cpoint1 = null; cpoint2 = null;
 		    simpleloop = true;
 		    closeUsed = false;
 		    lastMoveToX = cpoints[i].x;
@@ -731,13 +748,14 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    }
 		    if (cpoints[j].type != CPointType.SEG_END
 			&& cpoints[j].type != CPointType.SEG_END_NEXT
-			&& cpoints[j].type != CPointType.CLOSE)
+			&& cpoints[j].type != CPointType.CLOSE) {
 			throw new IllegalArgumentException
-			    (errorMsg("cpsNeedsSEGEND"));
+			    (errorMsg("cpsNeedsSEGEND", i));
+		    }
 		    if (cpoints[j].type == CPointType.SEG_END_NEXT) {
 			if (j+1 == cpoints.length) {
 			    throw new IllegalArgumentException
-				(errorMsg("termSEGENDNEXT"));
+				(errorMsg("termSEGENDNEXT", j));
 			}
 			if (cpoints[j+1].type == CPointType.SPLINE_FUNCTION) {
 			    nextx = cpoints[j+1].xfOps.valueAt(cpoints[j+1].t1);
@@ -747,7 +765,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			    nexty = cpoints[j+1].y;
 			} else {
 			    throw new IllegalArgumentException
-				(errorMsg("afterSEGENDNEXT"));
+				(errorMsg("afterSEGENDNEXT", j+1));
 			}
 			offset = 1;
 		    } else if (cpoints[j].type == CPointType.CLOSE) {
@@ -790,15 +808,28 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    if (cpoints.length > i+1) {
 			// previous point's type is not CONTROL, SPLINE or
 			// SPLINE_FUNCTION - that is handled elsewhere.
-			if (cpoints[i+1].type == CPointType.SPLINE_FUNCTION) {
-			    nextx = cpoints[i+1].xfOps.valueAt(cpoints[i+1].t1);
-			    nexty = cpoints[i+1].yfOps.valueAt(cpoints[i+1].t1);
-			} else if (cpoints[i+1].type == CPointType.SPLINE) {
-			    nextx = cpoints[i+1].x;
-			    nexty = cpoints[i+1].y;
+			int delta = 0;
+			if (cpoints[i+1].type == CPointType.CONTROL &&
+			    cpoints.length > i+2) {
+			    nextx = cpoints[i].x;
+			    nexty = cpoints[i].y;
+			    cpoint2 = new Point2D.Double(nextx, nexty);
+			    simpleloop = false;
+			    delta = 1;
+			}
+			if (cpoints[i+1+delta].type
+			    == CPointType.SPLINE_FUNCTION) {
+			    nextx = cpoints[i+1+delta].xfOps
+				.valueAt(cpoints[i+1+delta].t1);
+			    nexty = cpoints[i+1+delta].yfOps
+				.valueAt(cpoints[i+1+delta].t1);
+			} else if (cpoints[i+1+delta].type
+				   == CPointType.SPLINE) {
+			    nextx = cpoints[i+1+delta].x;
+			    nexty = cpoints[i+1+delta].y;
 			} else {
 			    throw new IllegalArgumentException
-				(errorMsg("afterSEGENDNEXT"));
+				(errorMsg("afterSEGENDNEXT", i+1+delta));
 			}
 			path.lineTo(nextx, nexty);
 			lastType = CPointType.SEG_END;
@@ -806,24 +837,38 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			offset = 1;
 		    } else {
 			throw new IllegalArgumentException
-			    (errorMsg("afterSEGENDNEXT"));
+			    (errorMsg("afterSEGENDNEXT", i+1));
 		    }
 		    break;
 		case MOVE_TO_NEXT:
 		    simpleloop = true;
 		    closeUsed = false;
+		    cpoint1 = null; cpoint2 = null;
+		    int mtndelta = 0;
 		    if (cpoints.length > i+1) {
-			if (cpoints[i+1].type == CPointType.SPLINE_FUNCTION) {
+			if (cpoints[i+1].type == CPointType.CONTROL) {
+			    mtndelta = 1;
+			    cpoint1 = new Point2D
+				.Double(cpoints[i+1].x, cpoints[1+1].y);
+			}
+		    }
+		    if (cpoints.length > i + 1 + mtndelta) {
+			if (cpoints[i+1+mtndelta].type
+			    == CPointType.SPLINE_FUNCTION) {
 			    lastMoveToX =
-				cpoints[i+1].xfOps.valueAt(cpoints[i+1].t1);
+				cpoints[i+1+mtndelta].xfOps
+				.valueAt(cpoints[i+1+mtndelta].t1);
 			    lastMoveToY =
-				cpoints[i+1].yfOps.valueAt(cpoints[i+1].t1);
+				cpoints[i+1+mtndelta].yfOps
+				.valueAt(cpoints[i+1+mtndelta].t1);
 			    path.moveTo(lastMoveToX, lastMoveToY);
 			    offset = 1;
-			} else if (cpoints[i+1].type == CPointType.SPLINE
-				   || cpoints[i+1].type == CPointType.SEG_END) {
-			    lastMoveToX = cpoints[i+1].x;
-			    lastMoveToY = cpoints[i+1].y;
+			} else if (cpoints[i+1+mtndelta].type
+				   == CPointType.SPLINE
+				   || cpoints[i+1+mtndelta].type
+				   == CPointType.SEG_END) {
+			    lastMoveToX = cpoints[i+1+mtndelta].x;
+			    lastMoveToY = cpoints[i+1+mtndelta].y;
 			    path.moveTo(lastMoveToX, lastMoveToY);
 			    offset = 1;
 			} else {
@@ -836,6 +881,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    }
 		    lastType = CPointType.MOVE_TO;
 		    i++;
+		    i += mtndelta;
 		    lastMoveToIndex = i;
 		    break;
 		case SEG_END_PREV:
@@ -859,33 +905,53 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			throw new IllegalArgumentException
 			    (errorMsg("cpsNotTerm"));
 		    }
+		    int delta = 0;
+		    if (cpoints[j].type == CPointType.CONTROL) {
+			if (j+1 < cpoints.length &&
+			    (cpoints[j+1].type == CPointType.SEG_END
+			     || cpoints[j+1].type == CPointType.SEG_END_PREV
+			     || cpoints[j+1].type == CPointType.CLOSE)) {
+			    cpoint2 = new Point2D.Double(cpoints[j].x,
+							 cpoints[j].y);
+			    simpleloop = false;
+			    delta = 1;
+			}
+		    }
 		    boolean segEndNextSeen = false;
-		    if (cpoints[j].type == CPointType.CLOSE) {
+		    if (cpoints[j+delta].type == CPointType.CLOSE) {
 			n = j - i;
 			if (!simpleloop) n++;
-		    } else if (cpoints[j].type == CPointType.SEG_END) {
+		    } else if (cpoints[j+delta].type == CPointType.SEG_END) {
 			simpleloop = false;
 			n = j + 1 - i;
-		    } else if (cpoints[j].type == CPointType.SEG_END_NEXT) {
+		    } else if (cpoints[j+delta].type
+			       == CPointType.SEG_END_NEXT) {
 			simpleloop = false;
 			n = j + 1 - i;
-			if (j+1 == cpoints.length) {
+			if (j+1+delta == cpoints.length) {
 			    throw new IllegalArgumentException
-				(errorMsg("termSEGENDNEXT"));
+				(errorMsg("termSEGENDNEXT", j+delta));
 			}
-			if (cpoints[j+1].type == CPointType.SPLINE_FUNCTION) {
-			    nextx = cpoints[j+1].xfOps.valueAt(cpoints[j+1].t1);
-			    nexty = cpoints[j+1].yfOps.valueAt(cpoints[j+1].t1);
-			} else if (cpoints[j+1].type == CPointType.SPLINE) {
-			    nextx = cpoints[j+1].x;
-			    nexty = cpoints[j+1].y;
+			if (cpoints[j+delta+1].type
+			    == CPointType.SPLINE_FUNCTION) {
+			    nextx =
+				cpoints[j+delta+1].xfOps
+				.valueAt(cpoints[j+delta+1].t1);
+			    nexty =
+				cpoints[j+delta+1].yfOps
+				.valueAt(cpoints[j+delta+1].t1);
+			} else if (cpoints[j+delta+1].type
+				   == CPointType.SPLINE) {
+			    nextx = cpoints[j+delta+1].x;
+			    nexty = cpoints[j+delta+1].y;
 			}
 			segEndNextSeen = true;
-		    } else if (cpoints[j].type == CPointType.SEG_END_PREV) {
+		    } else if (cpoints[j+delta].type
+			       == CPointType.SEG_END_PREV) {
 			n = j - i;
 		    } else {
 			throw new IllegalArgumentException
-			    (errorMsg("spsNotTerm"));
+			    (errorMsg("spsNotTerm", j+delta));
 		    }
 		    int npmmo = n+m-offset;
 		    int nmin1 = n - 1;
@@ -896,6 +962,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    int index1 = 0;
 		    for (int k = 0; k < n; k++) {
 			int ipk = i+k;
+			if (cpoints[ipk].type == CPointType.CONTROL) ipk++;
 			if (cpoints[ipk].type == CPointType.SPLINE_FUNCTION) {
 			    int lim = cpoints[ipk].getN();
 			    double t1 = cpoints[ipk].t1;
@@ -919,7 +986,6 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			    }
 			} else if (simpleloop == false &&
 				   cpoints[ipk].type == CPointType.CLOSE) {
-			    //
 			    closeUsed = true;
 			    if (k < offset) continue;
 			    xs[index] = lastMoveToX;
@@ -973,7 +1039,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			}
 		    }
 		    CPointType prevLastType = lastType;
-		    lastType = cpoints[j].type;
+		    lastType = cpoints[j+delta].type;
 		    if (closeUsed || lastType == CPointType.SEG_END
 			|| lastType == CPointType.SEG_END_PREV
 			|| lastType == CPointType.SEG_END_NEXT) {
@@ -990,7 +1056,8 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 				index--;
 			    }
 			}
-			path.splineTo(xs, ys, index);
+			path.splineTo(xs, ys, index, cpoint1, cpoint2);
+			cpoint1 = null; cpoint2 = null;
 			if (closeUsed) {
 			    path.closePath();
 			}
@@ -998,14 +1065,15 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    } else {
 			if (prevLastType != CPointType.MOVE_TO ||
 			    (i != lastMoveToIndex && i-1 != lastMoveToIndex)) {
-			    path.splineTo(xs, ys, index);
+			    path.splineTo(xs, ys, index, cpoint1, cpoint2);
+			    cpoint1 = null; cpoint2 = null;
 			    path.closePath();
 			    closeCount++;
 			    count++;
 			} else  {
 			    if (basicMode) {
 				if (count > 0) {
-				    String msg = errorMsg("illPlacedClose");
+				    String msg = errorMsg("illPlacedClose", i);
 				    throw new IllegalArgumentException(msg);
 				}
 			    }
@@ -1013,7 +1081,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			    count++;
 			}
 		    }
-		    i = j;
+		    i = j + delta;
 		    if (lastType == CPointType.SEG_END_PREV ||
 			lastType == CPointType.SEG_END_NEXT) {
 			lastType = CPointType.SEG_END;
@@ -1050,10 +1118,10 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * <P>
      * This is a convenience method used for scripting.
      * It is not final because adding a final declaration confuses
-     * the Nashorn javascript engine.
+     * the Nashorn JavaScript engine.
      * @return the enum constant
      */
-    public final CPointType constantCLOSE() {return CPointType.CLOSE;}
+    public CPointType constantCLOSE() {return CPointType.CLOSE;}
 
     /**
      * Create a {@link CPoint} whose type is {@link CPointType#CLOSE}.
@@ -1061,7 +1129,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * This is a convenience method used for scripting.
      * @return the {@link CPoint}
      */
-    public final CPoint createCPointClose() {
+    public CPoint createCPointClose() {
 	return new CPoint(CPointType.CLOSE);
     }
 
@@ -1070,10 +1138,10 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * <P>
      * This is a convenience method used for scripting.
      * It is not final because adding a final declaration confuses
-     * the Nashorn javascript engine.
+     * the Nashorn JavaScript engine.
      * @return the enum constant
      */
-    public final CPointType constantMOVE_TO() {return CPointType.MOVE_TO;}
+    public CPointType constantMOVE_TO() {return CPointType.MOVE_TO;}
 
     /**
      * Create a {@link CPoint} whose type is {@link CPointType#MOVE_TO}.
@@ -1083,8 +1151,24 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * @param y the Y coordinate
      * @return the {@link CPoint}
      */
-    public final CPoint createCPointMoveTo(double x, double y) {
+    public CPoint createCPointMoveTo(double x, double y) {
 	return new CPoint(CPointType.MOVE_TO, x, y);
+    }
+
+    /**
+     * Get the enum constant {@link CPointType#MOVE_TO_NEXT}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * It is not final because adding a final declaration confuses
+     * the Nashorn JavaScript engine.
+     * @return the enum constant
+     */
+    public CPointType constantMOVE_TO_NEXT() {
+	return CPointType.MOVE_TO_NEXT;
+    }
+
+    public CPoint createCPointMoveToNext() {
+	return new CPoint(CPointType.MOVE_TO_NEXT);
     }
 
     /**
@@ -1092,10 +1176,11 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * <P>
      * This is a convenience method used for scripting.
      * It is not final because adding a final declaration confuses
-     * the Nashorn javascript engine.
+     * the Nashorn JavaScript engine.
      * @return the enum constant
      */
-    public final CPointType constantSEG_END() {return CPointType.SEG_END;}
+    public CPointType constantSEG_END() {return CPointType.SEG_END;}
+
 
     /**
      * Create a {@link CPoint} whose type is {@link CPointType#SEG_END}.
@@ -1110,14 +1195,58 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
     }
 
     /**
+     * Get the enum constant {@link CPointType#SEG_END_NEXT}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * It is not final because adding a final declaration confuses
+     * the Nashorn JavaScript engine.
+     * @return the enum constant
+     */
+    public CPointType constantSEG_END_NEXT() {
+	return CPointType.SEG_END_NEXT;
+    }
+
+    /**
+     * Create a {@link CPoint} whose type is {@link CPointType#SEG_END_NEXT}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * @return the {@link CPoint}
+     */
+    public CPoint createCPointSegEndNext() {
+	return new CPoint(CPointType.SEG_END_NEXT);
+    }
+
+    /**
+     * Get the enum constant {@link CPointType#SEG_END_PREV}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * It is not final because adding a final declaration confuses
+     * the Nashorn JavaScript engine.
+     * @return the enum constant
+     */
+    public CPointType constantSEG_END_PREV() {
+	return CPointType.SEG_END_NEXT;
+    }
+
+    /**
+     * Create a {@link CPoint} whose type is {@link CPointType#SEG_END_PREV}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * @return the {@link CPoint}
+     */
+    public CPoint createCPointSegEndPrev() {
+	return new CPoint(CPointType.SEG_END_PREV);
+    }
+
+    /**
      * Get the enum constant {@link CPointType#CONTROL}.
      * <P>
      * This is a convenience method used for scripting.
      * It is not final because adding a final declaration confuses
-     * the Nashorn javascript engine.
+     * the Nashorn JavaScript engine.
      * @return the enum constant
      */
-    public final CPointType constantCONTROL() {return CPointType.CONTROL;}
+    public CPointType constantCONTROL() {return CPointType.CONTROL;}
 
     /**
      * Create a {@link CPoint} whose type is {@link CPointType#CONTROL}.
@@ -1127,7 +1256,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * @param y the Y coordinate
      * @return the {@link CPoint}
      */
-    public final CPoint createCPointControl(double x, double y) {
+    public CPoint createCPointControl(double x, double y) {
 	return new CPoint(CPointType.CONTROL, x, y);
     }
 
@@ -1136,10 +1265,10 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * <P>
      * This is a convenience method used for scripting.
      * It is not final because adding a final declaration confuses
-     * the Nashorn javascript engine.
+     * the Nashorn JavaScript engine.
      * @return the enum constant
      */
-    public final CPointType constantSPLINE() {return CPointType.SPLINE;}
+    public CPointType constantSPLINE() {return CPointType.SPLINE;}
 
     /**
      * Create a {@link CPoint} whose type is {@link CPointType#SPLINE}.
@@ -1149,18 +1278,57 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
      * @param y the Y coordinate
      * @return the {@link CPoint}
      */
-    public final CPoint createCPointSpline(double x, double y) {
+    public CPoint createCPointSpline(double x, double y) {
 	return new CPoint(CPointType.SPLINE, x, y);
     }
+
+    /**
+     * Get the enum constant {@link CPointType#SPLINE_FUNCTION}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * It is not final because adding a final declaration confuses
+     * the Nashorn JavaScript engine.
+     * @return the enum constant
+     */
+    public CPointType constantSPLINE_FUNCTION() {
+	return CPointType.SPLINE_FUNCTION;
+    }
+
+    /**
+     * Create a {@link CPoint} whose type is {@link CPointType#SPLINE_FUNCTION}.
+     * <P>
+     * This is a convenience method used for scripting.
+     * @param xfunct the X coordinate function
+     * @param yfunct the Y coordinate function
+     * @return the {@link CPoint}
+     * @param t1 an end for the range of values at which  the function
+     *        will be evaluated
+     * @param t2 an end for the range of values at which  the function
+     *        will be evaluated
+     * @param n the number of segments
+     * @exception IllegalArgumentException a function was null or
+     *            n was not positive
+     */
+    public CPoint
+	createCPointSplineFunction(RealValuedFunctOps xfunct,
+			   RealValuedFunctOps yfunct,
+			   double t1, double t2, int n)
+    {
+	return new CPoint(xfunct, yfunct, t1, t2, n);
+    }
+
+
 }
 
 //  LocalWords:  exbundle SplinePath superclasses javadoc subclassses
 //  LocalWords:  AbstractSplinePathBuilder's subclasses windingRule
-//  LocalWords:  UnsupportedOperationException noResource cpoints
+//  LocalWords:  UnsupportedOperationException noResource cpoints af
 //  LocalWords:  IllegalArgumentException configurePathBuilder cpoint
 //  LocalWords:  illformedConfig getPath lessThanZero missingMOVETO
 //  LocalWords:  setNumericalLimit cycleTo segAfterClose cpsNotTerm
 //  LocalWords:  cpsNeedsSEGEND termSEGENDNEXT afterSEGENDNEXT nextx
 //  LocalWords:  cpsTooLong beforeSEGENDNEXT afterMOVETONEXT nexty
-//  LocalWords:  badSEGENDPREV spsNotTerm segEndNextSeen
-//  LocalWords:  maxval
+//  LocalWords:  badSEGENDPREV spsNotTerm segEndNextSeen Nashorn enum
+//  LocalWords:  maxval constantWIND SplinePathBuilder CPointType
+//  LocalWords:  affine IllegalStateException intermediateClose PREV
+//  LocalWords:  cporder illPlacedClose xfunct yfunct

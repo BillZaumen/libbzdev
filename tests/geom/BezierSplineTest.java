@@ -296,6 +296,259 @@ public class BezierSplineTest {
 	    System.out.println("cpath4 length = " + length
 			       + ", should be " + 2 * Math.PI * r);
 
+	    System.out.println();
+	    System.out.println("spline with control points");
+	    Point2D knots[] = {
+		new Point2D.Double(0.0, 0.0),
+		new Point2D.Double(1.0, 1.0),
+		new Point2D.Double(2.0, 4.0),
+		new Point2D.Double(3.0, 9.0),
+		new Point2D.Double(4.0, 16.0),
+		new Point2D.Double(5.0, 25.0)
+	    };
+	    SplinePath2D splinePath1 = new
+		SplinePath2D(knots, knots.length, false);
+	    Point2D cpoint1;
+	    Point2D cpoint2;
+	    java.util.List<Path2DInfo.Entry> cplist =
+		Path2DInfo.getEntries(splinePath1);
+	    Path2DInfo.Entry[] cparray = new Path2DInfo.Entry[cplist.size()];
+	    cplist.toArray(cparray);
+	    double[] scoords = cparray[1].getCoords();
+	    cpoint1 = new Point2D.Double(scoords[0], scoords[1]);
+	    scoords = cparray[cparray.length-1].getCoords();
+	    cpoint2 = new Point2D.Double(scoords[2], scoords[3]);
+	    SplinePath2D splinePath2 = new
+		SplinePath2D(knots, knots.length, cpoint1, cpoint2);
+
+	    PathIterator pit1 = splinePath1.getPathIterator(null);
+	    PathIterator pit2 = splinePath2.getPathIterator(null);
+	    double[] scoords1 = new double[6];
+	    double[] scoords2 = new double[6];
+	    while (!pit1.isDone()) {
+		if (pit2.isDone()) throw new Exception("path iterator");
+		int type1 = pit1.currentSegment(scoords1);
+		int type2 = pit2.currentSegment(scoords2);
+		System.out.println("checking segment with type " + type1);
+		if (type1 != type2) throw new Exception("type");
+		int scind;
+		switch(type1) {
+		case PathIterator.SEG_CUBICTO:
+		    if (Math.abs(scoords1[4] - scoords2[4]) > 1.e-10) {
+			scind = 4;
+			System.out.format("%d: %s: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c4");
+		    }
+		    if (Math.abs(scoords1[5] - scoords2[5]) > 1.e-10) {
+			scind = 5;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c5");
+		    }
+		case PathIterator.SEG_QUADTO:
+		    if (Math.abs(scoords1[2] - scoords2[2]) > 1.e-10) {
+			scind = 2;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			// throw new Exception("c2");
+		    }
+		    if (Math.abs(scoords1[3] - scoords2[3]) > 1.e-10) {
+			scind = 3;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c3");
+		    }
+		case PathIterator.SEG_MOVETO:
+		case PathIterator.SEG_LINETO:
+		    if (Math.abs(scoords1[0] - scoords2[0]) > 1.e-10) {
+			scind = 0;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			// throw new Exception("c0");
+		    }
+		    if (Math.abs(scoords1[1] - scoords2[1]) > 1.e-10) {
+			scind = 1;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c1");
+		    }
+		    break;
+		case PathIterator.SEG_CLOSE:
+		    throw new Exception("close");
+		}
+
+		pit1.next();
+		pit2.next();
+	    }
+	    if (!pit2.isDone()) throw new Exception("path iterator");
+
+	    System.out.println("...");
+
+	    splinePath1 = new SplinePath2D();
+	    splinePath1.moveTo(0.0, 0.0);
+	    splinePath1.splineTo(knots, 1, knots.length-1);
+	    splinePath2 = new SplinePath2D();
+	    splinePath2.moveTo(0.0, 0.0);
+	    splinePath2.splineTo(knots, 1, knots.length-1, cpoint1, cpoint2);
+
+	    while (!pit1.isDone()) {
+		if (pit2.isDone()) throw new Exception("path iterator");
+		int type1 = pit1.currentSegment(scoords1);
+		int type2 = pit2.currentSegment(scoords2);
+		System.out.println("checking segment with type " + type1);
+		if (type1 != type2) throw new Exception("type");
+		int scind;
+		switch(type1) {
+		case PathIterator.SEG_CUBICTO:
+		    if (Math.abs(scoords1[4] - scoords2[4]) > 1.e-10) {
+			scind = 4;
+			System.out.format("%d: %s: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c4");
+		    }
+		    if (Math.abs(scoords1[5] - scoords2[5]) > 1.e-10) {
+			scind = 5;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c5");
+		    }
+		case PathIterator.SEG_QUADTO:
+		    if (Math.abs(scoords1[2] - scoords2[2]) > 1.e-10) {
+			scind = 2;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c2");
+		    }
+		    if (Math.abs(scoords1[3] - scoords2[3]) > 1.e-10) {
+			scind = 3;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c3");
+		    }
+		case PathIterator.SEG_MOVETO:
+		case PathIterator.SEG_LINETO:
+		    if (Math.abs(scoords1[0] - scoords2[0]) > 1.e-10) {
+			scind = 0;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c0");
+		    }
+		    if (Math.abs(scoords1[1] - scoords2[1]) > 1.e-10) {
+			scind = 1;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c1");
+		    }
+		    break;
+		case PathIterator.SEG_CLOSE:
+		    throw new Exception("close");
+		}
+
+		pit1.next();
+		pit2.next();
+	    }
+	    if (!pit2.isDone()) throw new Exception("path iterator");
+
+
+	    System.out.println("...");
+	    splinePath1 = new SplinePath2D();
+	    splinePath1.moveTo(-1.0, 0.0);
+	    splinePath1.lineTo(0.0, 0.0);
+	    splinePath1.splineTo(knots, 1, knots.length-1);
+	    splinePath2 = new SplinePath2D();
+	    splinePath2.moveTo(-1.0, 0.0);
+	    splinePath2.lineTo(0.0, 0.0);
+	    splinePath2.splineTo(knots, 1, knots.length-1, cpoint1, cpoint2);
+	    pit1 = splinePath1.getPathIterator(null);
+	    pit2 = splinePath2.getPathIterator(null);
+	    while (!pit1.isDone()) {
+		if (pit2.isDone()) throw new Exception("path iterator");
+		int type1 = pit1.currentSegment(scoords1);
+		int type2 = pit2.currentSegment(scoords2);
+		System.out.println("checking segment with type " + type1);
+		if (type1 != type2) throw new Exception("type");
+		int scind;
+		switch(type1) {
+		case PathIterator.SEG_CUBICTO:
+		    if (Math.abs(scoords1[4] - scoords2[4]) > 1.e-10) {
+			scind = 4;
+			System.out.format("%d: %s: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c4");
+		    }
+		    if (Math.abs(scoords1[5] - scoords2[5]) > 1.e-10) {
+			scind = 5;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c5");
+		    }
+		case PathIterator.SEG_QUADTO:
+		    if (Math.abs(scoords1[2] - scoords2[2]) > 1.e-10) {
+			scind = 2;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c2");
+		    }
+		    if (Math.abs(scoords1[3] - scoords2[3]) > 1.e-10) {
+			scind = 3;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c3");
+		    }
+		case PathIterator.SEG_MOVETO:
+		case PathIterator.SEG_LINETO:
+		    if (Math.abs(scoords1[0] - scoords2[0]) > 1.e-10) {
+			scind = 0;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c0");
+		    }
+		    if (Math.abs(scoords1[1] - scoords2[1]) > 1.e-10) {
+			scind = 1;
+			System.out.format("%d: %s != %s\n", scind,
+					  scoords1[scind], scoords2[scind]);
+			throw new Exception("c1");
+		    }
+		    break;
+		case PathIterator.SEG_CLOSE:
+		    throw new Exception("close");
+		}
+
+		pit1.next();
+		pit2.next();
+	    }
+	    if (!pit2.isDone()) throw new Exception("path iterator");
+
+
+
+
+
+	    BasicSplinePath2D splinePath3 = new BasicSplinePath2D();
+	    splinePath3.moveTo(-1.0, 0.0);
+	    splinePath3.lineTo(0.0, 0.0);
+	    cpoint1.setLocation(cpoint1.getX(), 0.0);
+	    System.out.println("cpoint1 = " + cpoint1);
+	    splinePath3.splineTo(knots, 1, knots.length-1, cpoint1, cpoint2);
+	    Graph bezier4 = new Graph();
+	    bezier4.setOffsets(25,25);
+	    bezier4.setRanges(0.0, 6.0, -1.0, 26.0);
+	    bezier4.setBackgroundColor(Color.WHITE);
+	    bezier4.clear();
+	    g2d = bezier4.createGraphics();
+	    g2d.setColor(Color.BLACK);
+	    bezier4.draw(g2d, splinePath3);
+	    bezier4.write("png", "bezier4.png");
+
+	    System.out.println("splinePath3:");
+	    splinePath3.printTable();
+	    double[] tangent = new double[2];
+	    splinePath3.getTangent(1.0, tangent);
+	    System.out.format("tangent at 1.0 = [%s, %s]\n",
+			      tangent[0], tangent[1]);
+	    splinePath3.getTangent(1.1, tangent);
+	    System.out.format("tangent at 1.1 = [%s, %s]\n",
+			      tangent[0], tangent[1]);
 
 	} catch (Exception e) {
 	    e.printStackTrace();

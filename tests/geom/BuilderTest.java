@@ -1657,6 +1657,22 @@ public class BuilderTest {
 
 	graph.write("png", new File("bldtest15.png"));
 
+	System.out.println(".... case 15 ....");
+
+	SplinePathBuilder.CPoint cpoints15[] = {
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.MOVE_TO, 10.0, 20.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.CONTROL, -50.0, 50.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.CONTROL, -50.0, 5.0),
+	    new SplinePathBuilder.CPoint(SplinePathBuilder.CPointType.CLOSE)
+	};
+	spb = new SplinePathBuilder();
+	spb.append(cpoints15);
+	path = spb.getPath();
+	Path2DInfo.printSegments(path);
+
 	System.exit(0);
     }
 }
