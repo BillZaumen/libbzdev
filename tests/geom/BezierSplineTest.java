@@ -550,6 +550,33 @@ public class BezierSplineTest {
 	    System.out.format("tangent at 1.1 = [%s, %s]\n",
 			      tangent[0], tangent[1]);
 
+	    Point2D knots2[] = {
+		new Point2D.Double(30.0, 50.0),
+		new Point2D.Double(0.0, 0.0)
+	    };
+	    System.out.println("splinePath4a ...");
+	    BasicSplinePath2D  splinePath4 = new BasicSplinePath2D();
+	    splinePath4.moveTo(0.0, 0.0);
+	    cpoint1.setLocation(5.0, 10.0);
+	    System.out.println("cpoint1 = " + cpoint1);
+	    splinePath4.splineTo(knots2, knots2.length, cpoint1, null);
+	    Path2DInfo.printSegments(splinePath4);
+
+	    System.out.println("splinePath4b ...");
+	      splinePath4 = new BasicSplinePath2D();
+	    splinePath4.moveTo(0.0, 0.0);
+	    cpoint2.setLocation(15.0, 30.0);
+	    System.out.println("cpoint2 = " + cpoint2);
+	    splinePath4.splineTo(knots2, knots2.length, cpoint1, cpoint2);
+	    Path2DInfo.printSegments(splinePath4);
+
+	    System.out.println("splinePath4c ...");
+	    splinePath4 = new BasicSplinePath2D();
+	    splinePath4.moveTo(0.0, 0.0);
+	    cpoint2.setLocation(15.0, 30.0);
+	    splinePath4.splineTo(knots2, knots2.length, null, cpoint2);
+	    Path2DInfo.printSegments(splinePath4);
+
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    System.exit(1);

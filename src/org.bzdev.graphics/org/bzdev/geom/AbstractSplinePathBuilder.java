@@ -647,6 +647,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	int offset = 0;
 	int n;
 	int m;
+	boolean simpleloop = true;
 	if (cpt == null) {
 	    int delta = 0;
 	    if (cpoints[0].type == CPointType.MOVE_TO_NEXT
@@ -654,6 +655,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		if (cpoints[1].type == CPointType.CONTROL) {
 		    delta = 1;
 		    cpoint1 = new Point2D.Double(cpoints[1].x, cpoints[1].y);
+		    simpleloop = false;
 		}
 		if (cpoints.length > 1 + delta) {
 		    if (cpoints[1+delta].type == CPointType.SPLINE_FUNCTION) {
@@ -689,7 +691,6 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 	// count number of times a path is closed, either explicitly
 	// or implicitly by using cycleTo.
 	int closeCount = 0;
-	boolean simpleloop = true;
 	boolean closeUsed = false;
 	while (i < cpoints.length) {
 	    CPointType currentType = cpoints[i].type;
@@ -707,6 +708,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 		    && (cpoints[i+1].type == CPointType.SPLINE
 			|| cpoints[i+1].type == CPointType.SPLINE_FUNCTION)) {
 		    cpoint1 = new Point2D.Double(cpoints[i].x, cpoints[i].y);
+		    simpleloop = false;
 		    i++;
 		    continue;
 		}
@@ -850,6 +852,7 @@ public abstract class AbstractSplinePathBuilder<T extends SplinePath2D>
 			    mtndelta = 1;
 			    cpoint1 = new Point2D
 				.Double(cpoints[i+1].x, cpoints[1+1].y);
+			    simpleloop = false;
 			}
 		    }
 		    if (cpoints.length > i + 1 + mtndelta) {

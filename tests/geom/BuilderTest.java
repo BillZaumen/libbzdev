@@ -1712,7 +1712,7 @@ public class BuilderTest {
 	path = bspb.getPath();
 	Path2DInfo.printSegments(path);
 
-	System.out.println("---- cpoints 18a (basic) ----");
+	System.out.println("---- cpoints 18 (basic) ----");
 	SplinePathBuilder.CPoint cpoints18[] = {
 	    new SplinePathBuilder.CPoint
 	    (SplinePathBuilder.CPointType.MOVE_TO, 10.0, 20.0),
@@ -1726,6 +1726,53 @@ public class BuilderTest {
 	};
 	bspb = new BasicSplinePathBuilder();
 	bspb.append(cpoints18);
+	path = bspb.getPath();
+	Path2DInfo.printSegments(path);
+
+	System.out.println("---- cpoints 19 (basic) ----");
+	SplinePathBuilder.CPoint cpoints19[] = {
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.MOVE_TO, 10.0, 20.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.CONTROL, -30.0, 10.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SPLINE, -50.0, 50.0),
+	    new SplinePathBuilder.CPoint(SplinePathBuilder.CPointType.CLOSE)
+	};
+	bspb = new BasicSplinePathBuilder();
+	bspb.append(cpoints19);
+	path = bspb.getPath();
+	Path2DInfo.printSegments(path);
+
+	System.out.println("---- cpoints 20 (basic) ----");
+	SplinePathBuilder.CPoint cpoints20[] = {
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.MOVE_TO, 10.0, 20.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.CONTROL, -30.0, 10.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SPLINE, -50.0, 50.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SPLINE, -40.0, 40.0),
+	    new SplinePathBuilder.CPoint(SplinePathBuilder.CPointType.CLOSE)
+	};
+	bspb = new BasicSplinePathBuilder();
+	bspb.append(cpoints20);
+	path = bspb.getPath();
+	Path2DInfo.printSegments(path);
+
+	System.out.println("---- cpoints 21 (basic) ----");
+	SplinePathBuilder.CPoint cpoints21[] = {
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.MOVE_TO, 10.0, 20.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SEG_END, -30.0, 10.0),
+	    new SplinePathBuilder.CPoint
+	    (SplinePathBuilder.CPointType.SEG_END, -50.0, 50.0),
+	    new SplinePathBuilder.CPoint(SplinePathBuilder.CPointType.CLOSE)
+	};
+	bspb = new BasicSplinePathBuilder();
+	bspb.append(cpoints21);
 	path = bspb.getPath();
 	Path2DInfo.printSegments(path);
 
