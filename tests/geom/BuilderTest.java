@@ -1670,7 +1670,7 @@ public class BuilderTest {
 	};
 	spb = new SplinePathBuilder();
 	spb.append(cpoints15);
-	path = bspb.getPath();
+	path = spb.getPath();
 	Path2DInfo.printSegments(path);
 
 	// check termination for BasicSplinePathBuilder with CLOSE

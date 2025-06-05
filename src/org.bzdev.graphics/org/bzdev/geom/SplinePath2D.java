@@ -28,13 +28,14 @@ import java.awt.geom.*;
  * for the composite curve, the second derivative exits at all points and
  * is continuous.
  * <P>
- * For a call to {@link
- * #splineTo(java.awt.geom.Point2D[], int) splineTo}, at the end
- * points, the tangent to the curve points towards its neighbor. As a
- * result, calling splineTo for points p1, p2, p3, p4, followed by a
- * call to splineTo for points p5, p6, p7, p8 is not equivalent to
- * calling splineTo once for points p1, p2, ..., p8: in the former
- * case, the tangent lines can differ on both sides of point p4.
+ * For a call to {@link #splineTo(java.awt.geom.Point2D[], int) splineTo},
+ * at the end points, the tangent to the curve points towards its
+ * neighbor. As a result, calling splineTo for points p1, p2, p3, p4,
+ * followed by a call to splineTo for points p5, p6, p7, p8 is not
+ * equivalent to calling splineTo once for points p1, p2, ..., p8: in
+ * the former case, the tangent lines can differ on both sides of
+ * point p4.
+
  * <P>
  * When {@link #addCycle(java.awt.geom.Point2D[], int) addCycle} is used,
  * there is an implicit call to moveTo for the first point in the array and
@@ -70,11 +71,11 @@ import java.awt.geom.*;
  * equations can optionally be replaced by the equations
  * <UL>
  *  <LI> P<sub>1,0</sub> = C<sub>1</sub>
- *  <LI> P<sub>1,n-2</sub> = 2C<sub>2</sub> - K<sub>n</sub>
+ *  <LI> P<sub>1,n-1</sub> = 2C<sub>2</sub> - K<sub>n</sub>
  * </UL>
  * respectively in order to explicitly set the first and/or last
  * intermediate control points to values matching C<sub>1</sub> and/or
- * C<sub>2</sub>.
+ * C<sub>2</sub>.  The treatment at the end points differs slightly.
  * <P>
  * The initial and final control points for each segment are given by
  * <ul>
