@@ -75,7 +75,10 @@ import java.awt.geom.*;
  * </UL>
  * respectively in order to explicitly set the first and/or last
  * intermediate control points to values matching C<sub>1</sub> and/or
- * C<sub>2</sub>.  The treatment at the end points differs slightly.
+ * C<sub>2</sub>. When both C<sub>1</sub> and C<sub>2</sub> are provided,
+ * splines for each are computed and their control points are averaged
+ * using a weighted average based on the how close a knot is to each of
+ * the control points.
  * <P>
  * The initial and final control points for each segment are given by
  * <ul>
@@ -117,7 +120,7 @@ public class SplinePath2D extends Path2D.Double {
     }
 
     private double[] createA(int n, boolean cyclic, boolean startsWithMoveTo,
-			     Point2D cpoint1, Point2D cpoint2)
+			     Point2D cpoint1/*, Point2D cpoint2*/)
     {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
@@ -127,15 +130,18 @@ public class SplinePath2D extends Path2D.Double {
 	for (int i = 1; i < nm1; i++) {
 	    result[i] = 1.0;
 	}
+	/*
 	if (cpoint2 != null) {
 	    result[nm1] = 0.0;
 	} else {
 	    result[nm1] = cyclic? 1.0: 2.0;
 	}
+	*/
+	result[nm1] = cyclic? 1.0: 2.0;
 	return result;
     }
     private double[] createB(int n, boolean cyclic, boolean startsWithMoveTo,
-			     Point2D cpoint1, Point2D cpoint2)
+			     Point2D cpoint1/*, Point2D cpoint2*/)
     {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
@@ -149,15 +155,18 @@ public class SplinePath2D extends Path2D.Double {
 	for (int i = 1; i < nm1; i++) {
 	    result[i] = 4.0;
 	}
+	/*
 	if (cpoint2 != null) {
 	    result[nm1] = 1.0;
 	} else {
 	    result[nm1] = cyclic? 4.0: 7.0;
 	}
+	*/
+	result[nm1] = cyclic? 4.0: 7.0;
 	return result;
     }
     private double[] createC(int n, boolean cyclic, boolean startsWithMoveTo,
-			     Point2D cpoint1, Point2D cpoint2)
+			     Point2D cpoint1/*, Point2D cpoint2*/)
     {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
@@ -241,6 +250,81 @@ public class SplinePath2D extends Path2D.Double {
 	    return result;
 	}
     }
+
+    private double[] getw(double[] x, int n, boolean cyclic,
+			  boolean startsWithMoveTo, boolean isX,
+			  Point2D cpoint, boolean reverse)
+    {
+	if (startsWithMoveTo) {
+	    // x[0] represents the coordinate for an implied moveTo.
+	    if (!cyclic) n--;
+	    int nm1 = n-1;
+	    double[] result = new double[n];
+	    if (cyclic) {
+		for (int i = 0; i < nm1; i++) {
+		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
+	    } else {
+		int nm2 = n-2;
+		if (cpoint != null) {
+		    result[0] = isX? cpoint.getX(): cpoint.getY();
+		} else {
+		    int index0 = reverse? n: 0;
+		    int index1 = reverse? nm1: 1;
+		    result[0] = x[index0] + 2.0 * x[index1];
+		}
+		for (int i = 1; i < nm1; i++) {
+		    int indexI = reverse? n-i: i;
+		    int indexIp1 = reverse? indexI-1: i+1;
+		    result[i] = 4.0 * x[indexI] + 2.0 * x[indexIp1];
+		}
+		int index1 = reverse? 1: nm1;
+		int index2 = reverse? 0: n;
+		result[nm1] =  8.0 * x[index1] + x[index2];
+	    }
+	    return result;
+	} else {
+	    if (cyclic) n++;
+	    double[] result = new double[n];
+	    int nm1 = n - 1;
+	    int nm2 = n - 2;
+	    Point2D start = getCurrentPoint();
+	    if (start == null) {
+		throw new IllegalStateException(errorMsg("missingMOVETO"));
+	    }
+	    double xval = isX? start.getX(): start.getY();
+	    if (cyclic) {
+		result[0] = 4.0 * xval + 2.0 * x[0];
+		for (int i = 0; i < nm2; i++) {
+		    result[i+1] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
+	    } else {
+		if (cpoint != null) {
+		    result[0] = isX? cpoint.getX(): cpoint.getY();
+		} else {
+		    if (reverse) {
+			result[0] = x[nm1] + 2* x[nm2];
+		    } else {
+			result[0] = xval + 2.0 * x[0];
+		    }
+		}
+		for (int i = 1; i < nm1; i++) {
+		    int indexI = reverse? nm2 - i: i;
+		    int indexIm1 = reverse?indexI+1 :i-1;
+		    result[i] = 4.0 * x[indexIm1] + 2.0 * x[indexI];
+		}
+		if (reverse) {
+		    result[nm1] = 8.0*x[0] + xval;
+		} else {
+		    result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		}
+	    }
+	    return result;
+	}
+    }
+
 
     /**
      * Constructs a new empty SplinePath2D object with a default
@@ -1639,16 +1723,44 @@ public class SplinePath2D extends Path2D.Double {
 	makeSpline(x, y, n, cyclic, startsWithMoveTo, null, null);
     }
 
+    private enum EndMode {
+	NONE,
+	START,
+	END,
+	BOTH
+    }
+
+    private static void reverse(double[] array) {
+	reverse(array, array.length);
+    }
+
+    private static void reverse(double[] array, int n) {
+	int n2 = n/2;
+	int j = n-1;
+	for (int i = 0; i < n2; i++, j--) {
+	    double tmp = array[i];
+	    array[i] = array[j];
+	    array[j] = tmp;
+	}
+    }
+
+
     private void makeSpline(double[] x, double[] y, int n,
 			    boolean cyclic, boolean startsWithMoveTo,
 			    Point2D cpoint1, Point2D cpoint2)
 	throws IllegalArgumentException
     {
-	double finalX, finalY;
+	double finalX = java.lang.Double.NaN;
+	double finalY = java.lang.Double.NaN;
 
 	if (cyclic && (cpoint1 != null || cpoint2 != null)) {
 	    throw new IllegalArgumentException(errorMsg("cyclic"));
 	}
+
+	EndMode endMode = (cpoint1 == null && cpoint2 == null)? EndMode.NONE:
+	    (cpoint1 != null && cpoint2 == null)? EndMode.START:
+	    (cpoint1 == null && cpoint2 != null)? EndMode.END:
+	    EndMode.BOTH;
 
 	// For small values of n, the best we can do is to draw straight
 	// lines.
@@ -1677,13 +1789,36 @@ public class SplinePath2D extends Path2D.Double {
 	    return;
 	}
 
-	double[] a = createA(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
-	double[] b = createB(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
-	double[] c = createC(n, cyclic, startsWithMoveTo, cpoint1, cpoint2);
+	Point2D cpoint = null;
+	boolean reverse = false;
+	boolean merge = false;
+	int  oldN = n;
+	switch (endMode) {
+	case START:
+	    reverse = false;
+	    cpoint = cpoint1;
+	    break;
+	case END:
+	    reverse = true;
+	    cpoint = cpoint2;
+	    break;
+	case BOTH:
+	    merge = true;
+	    reverse = true;
+	    cpoint = cpoint2;
+	    break;
+	default:
+	    break;
+	}
+
+	double[] a = createA(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
+	double[] b = createB(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
+	double[] c = createC(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
 	double[] wx = getw(x, n, cyclic, startsWithMoveTo, true,
-			   cpoint1, cpoint2);
+			   cpoint/*1, cpoint2*/, reverse);
 	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false,
-			   cpoint1, cpoint2);
+			   cpoint/*1, cpoint2*/, reverse);
+	System.out.println("wy.length = " + wy.length);
 
 	if (cyclic) {
 	    TridiagonalSolver.solveCyclic(wx, a, b, c, wx, wx.length);
@@ -1692,47 +1827,171 @@ public class SplinePath2D extends Path2D.Double {
 	    TridiagonalSolver.solve(wx, a, b, c, wx);
 	    TridiagonalSolver.solve(wy, a, b, c, wy);
 	}
+
+
+	// int m = x.length;
+	// int mm1 = m-1;
+
 	n = wx.length;
 	int nm1 = n-1;
 	int nm2 = n-2;
 
+	double wx1[] = null;
+	double wy1[] = null;
+	double wx2[] = null;
+	double wy2[] = null;
 	int offset = 0;
+	if (reverse) {
+	    wx1 = new double[wx.length];
+	    wy1 = new double[wy.length];
+	    reverse(x);
+	    reverse(y);
+	    for (int i = 0; i < nm1; i++) {
+		wx1[i] = 2*x[i+1] - wx[i+1];
+		wy1[i] = 2*y[i+1] - wy[i+1];
+	    }
+	    if (startsWithMoveTo) {
+		wx1[nm1] = (x[n] + wx[nm1])/2.0;
+		wy1[nm1] = (y[n] + wy[nm1])/2.0;
+	    } else {
+		Point2D cpnt = getCurrentPoint();
+		wx1[nm1] = (cpnt.getX() + wx[nm1])/2.0;
+		wy1[nm1] = (cpnt.getY() + wy[nm1])/2.0;
+	    }
+	    reverse(x);
+	    reverse(y);
+	    reverse(wx1);
+	    reverse(wy1);
+	    reverse(wx);
+	    reverse(wy);
+	    wx2 = wx;
+	    wy2 = wy;
+	}
+	if (merge) {
+	    wx = getw(x, oldN, cyclic, startsWithMoveTo, true,
+		      cpoint1/*1, cpoint2*/, false);
+	    wy = getw(y, oldN, cyclic, startsWithMoveTo, false,
+		      cpoint1/*1, cpoint2*/, false);
+	    TridiagonalSolver.solve(wx, a, b, c, wx);
+	    TridiagonalSolver.solve(wy, a, b, c, wy);
+	}
+
+	/*
+	System.out.print("wx: ");
+	for (int k = 0; k < wx.length; k++) {
+	    System.out.format("%g ", wx[k]);
+	}
+	System.out.println();
+	System.out.print("wy: ");
+	for (int k = 0; k < wx.length; k++) {
+	    System.out.format("%g ", wy[k]);
+	}
+	System.out.println();
+	*/
+	double p1x, p1y, p2x, p2y, p3x, p3y;
+	offset = 0;
 	if (startsWithMoveTo) {
-	    moveTo(x[0], y[0]);
-	    finalX = x[0];
-	    finalY = y[0];
+	    // n is x.length - 1
+	    if (reverse) {
+		offset = 0; // change?
+		moveTo(x[0], y[0]);
+	    } else {
+		moveTo(x[0], y[0]);
+		finalX = x[0];
+		finalY = y[0];
+	    }
 	} else {
-	    offset = -1;
+	    if (reverse) {
+		offset = -1; // change?
+	    } else {
+		offset = -1;
+	    }
 	    Point2D cpnt = getCurrentPoint();
 	    finalX = cpnt.getX();
 	    finalY = cpnt.getY();
 	    if (cyclic) moveTo(finalX, finalY);
 	}
+	// System.out.format("(wx[0], wy[0]) = (%g,%g)\n", wx[0], wy[0]);
+        double u = 0;
+        double up = 1;
+	double v = u, vp = up;
 	for (int i = 0; i < nm1; i++) {
-	    double p1x = wx[i];
-	    double p1y = wy[i];
-	    double p2x = 2.0 * x[i+1 + offset] - wx[i+1];
-	    double p2y = 2.0 * y[i+1 + offset] - wy[i+1];
-	    double p3x = x[i+1 + offset];
-	    double p3y = y[i+1 + offset];
+	    v = u;
+	    vp = up;
+	    u = ((double)(i+1))/n;
+	    up = 1-u;
+	    if (merge) {
+		double p1x1 = wx1[i];
+		double p1y1 = wy1[i];
+		double p2x1 = wx2[i];
+		double p2y1 = wy2[i];
+		double p1x2 = wx[i];
+		double p1y2 = wy[i];
+		double p2x2 = 2.0 * x[i+1 + offset] - wx[i+1];
+		double p2y2 = 2.0 * y[i+1 + offset] - wy[i+1];
+		/*
+		p1x = (i == 0)? p1x2: (p1x1 + p1x2)/2.0;
+		p1y = (i == 0)? p1y2: (p1y1 + p1y2)/2.0;
+		p2x = (p2x1 + p2x2)/2.0;
+		p2y = (p2y1 + p2y2)/2.0;
+		*/
+		p1x = v*p1x1 + vp*p1x2;
+		p1y = v*p1y1 + vp*p1y2;
+		p2x = u*p2x1 + up*p2x2;
+		p2y = u*p2y1 + up*p2y2;
+	    } else if (reverse) {
+		p1x = wx1[i];
+		p1y = wy1[i];
+		p2x = wx[i];
+		p2y = wy[i];
+	    } else {
+		p1x = wx[i];
+		p1y = wy[i];
+		p2x = 2.0 * x[i+1 + offset] - wx[i+1];
+		p2y = 2.0 * y[i+1 + offset] - wy[i+1];
+		// p3x = x[i+1 + offset];
+		// p3y = y[i+1 + offset];
+	    }
+	    p3x = x[i+1 + offset];
+	    p3y = y[i+1 + offset];
 	    curveTo(p1x, p1y, p2x, p2y, p3x, p3y);
 	}
 	if (cyclic) {
-	    double p1x = wx[nm1];
-	    double p1y = wy[nm1];
-	    double p2x = 2.0 * /*x[0]*/finalX - wx[0];
-	    double p2y = 2.0 * /*y[0]*/finalY - wy[0];
-	    double p3x = /*x[0]*/ finalX;
-	    double p3y = /*y[0]*/ finalY;
+	    p1x = wx[nm1];
+	    p1y = wy[nm1];
+	    p2x = 2.0 * /*x[0]*/finalX - wx[0];
+	    p2y = 2.0 * /*y[0]*/finalY - wy[0];
+	    p3x = /*x[0]*/ finalX;
+	    p3y = /*y[0]*/ finalY;
 	    curveTo(p1x, p1y, p2x, p2y, p3x, p3y);
 	    closePath();
 	} else {
-	    double p1x = wx[nm1];
-	    double p1y = wy[nm1];
-	    double p2x = (x[n + offset] + p1x)/2.0;
-	    double p2y = (y[n + offset] + p1y)/2.0;
-	    double p3x = x[n + offset];
-	    double p3y = y[n + offset];
+	    if (merge) {
+		double p1x1 = wx1[nm1];
+		double p1y1 = wy1[nm1];
+		p2x = wx2[nm1];
+		p2y = wy2[nm1];
+		double p1x2 = wx[nm1];
+		double p1y2 = wy[nm1];
+		/*
+		p1x = (p1x1 + p1x2)/2;
+		p1y = (p1y1 + p1y2)/2;
+		*/
+		p1x = v*p1x1 + vp*p1x2;
+		p1y = v*p1y1 + vp*p1y2;
+	    } else if (reverse) {
+		p1x = wx1[nm1];
+		p1y = wy1[nm1];
+		p2x = wx[nm1];
+		p2y = wy[nm1];
+	    } else {
+		p1x = wx[nm1];
+		p1y = wy[nm1];
+		p2x = (x[n + offset] + p1x)/2.0;
+		p2y = (y[n + offset] + p1y)/2.0;
+	    }
+	    p3x = x[n + offset];
+	    p3y = y[n + offset];
 	    curveTo(p1x, p1y, p2x, p2y, p3x, p3y);
 	}
     }

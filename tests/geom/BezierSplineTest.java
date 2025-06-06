@@ -9,8 +9,390 @@ public class BezierSplineTest {
 	return Math.sin(u);
     }
 
+
+    // copied from SplinePath2D, with mods, for testing.
+    // This checks a getw function to make sure the version
+    // that can reverse the path works correctly. It was added
+    // primarily for debugging.
+
+    private static String errorMsg(String msg) {return msg;}
+
+    private static double[] getw(double[] x, int n, boolean cyclic,
+				 Point2D start, boolean isX,
+				 Point2D cpoint1, Point2D cpoint2)
+    {
+	boolean startsWithMoveTo = (start == null);
+
+	if (startsWithMoveTo) {
+	    // x[0] represents the coordinate for an implied moveTo.
+	    if (!cyclic) n--;
+	    int nm1 = n-1;
+	    double[] result = new double[n];
+	    if (cyclic) {
+		for (int i = 0; i < nm1; i++) {
+		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
+	    } else {
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX(): cpoint1.getY();
+		} else {
+		    result[0] = x[0] + 2.0 * x[1];
+		}
+		for (int i = 1; i < nm1; i++) {
+		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX(): cpoint2.getY();
+		    result[nm1] = 2*p2nm1 -x[n];
+		} else {
+		    result[nm1] =  8.0 * x[nm1] + x[n];
+		}
+	    }
+	    return result;
+	} else {
+	    if (cyclic) n++;
+	    double[] result = new double[n];
+	    int nm1 = n - 1;
+	    int nm2 = n - 2;
+	    // Point2D start = getCurrentPoint();
+	    if (start == null) {
+		throw new IllegalStateException(errorMsg("missingMOVETO"));
+	    }
+	    double xval = isX? start.getX(): start.getY();
+	    if (cyclic) {
+		result[0] = 4.0 * xval + 2.0 * x[0];
+		for (int i = 0; i < nm2; i++) {
+		    result[i+1] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
+	    } else {
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX(): cpoint1.getY();
+		} else {
+		    result[0] = xval + 2.0 * x[0];
+		}
+		for (int i = 1; i < nm1; i++) {
+		    result[i] = 4.0 * x[i-1] + 2.0 * x[i];
+		}
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX(): cpoint2.getY();
+		    result[nm1] = 2*p2nm1 -x[nm1];
+		} else {
+		    result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		}
+	    }
+	    return result;
+	}
+    }
+
+
+
+    private static double[] getw(double[] x, int n, boolean cyclic,
+				 Point2D start, boolean isX,
+				 Point2D cpoint, boolean reverse)
+    {
+	boolean startsWithMoveTo = (start == null);
+
+	if (startsWithMoveTo) {
+	    // x[0] represents the coordinate for an implied moveTo.
+	    if (!cyclic) n--;
+	    int nm1 = n-1;
+	    double[] result = new double[n];
+	    if (cyclic) {
+		for (int i = 0; i < nm1; i++) {
+		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
+	    } else {
+		int nm2 = n-2;
+		if (cpoint != null) {
+		    result[0] = isX? cpoint.getX(): cpoint.getY();
+		} else {
+		    int index0 = reverse? n: 0;
+		    int index1 = reverse? nm1: 1;
+		    result[0] = x[index0] + 2.0 * x[index1];
+		}
+		for (int i = 1; i < nm1; i++) {
+		    int indexI = reverse? n-i: i;
+		    int indexIp1 = reverse? indexI-1: i+1;
+		    result[i] = 4.0 * x[indexI] + 2.0 * x[indexIp1];
+		}
+		int index1 = reverse? 1: nm1;
+		int index2 = reverse? 0: n;
+		result[nm1] =  8.0 * x[index1] + x[index2];
+	    }
+	    return result;
+	} else {
+	    if (cyclic) n++;
+	    double[] result = new double[n];
+	    int nm1 = n - 1;
+	    int nm2 = n - 2;
+	    // Point2D start = getCurrentPoint();
+	    if (start == null) {
+		throw new IllegalStateException(errorMsg("missingMOVETO"));
+	    }
+	    double xval = isX? start.getX(): start.getY();
+	    if (cyclic) {
+		result[0] = 4.0 * xval + 2.0 * x[0];
+		for (int i = 0; i < nm2; i++) {
+		    result[i+1] = 4.0 * x[i] + 2.0 * x[i+1];
+		}
+		result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
+	    } else {
+		if (cpoint != null) {
+		    result[0] = isX? cpoint.getX(): cpoint.getY();
+		} else {
+		    if (reverse) {
+			result[0] = x[nm1] + 2* x[nm2];
+		    } else {
+			result[0] = xval + 2.0 * x[0];
+		    }
+		}
+		for (int i = 1; i < nm1; i++) {
+		    int indexI = reverse? nm2 - i: i;
+		    int indexIm1 = reverse?indexI+1 :i-1;
+		    result[i] = 4.0 * x[indexIm1] + 2.0 * x[indexI];
+		}
+		if (reverse) {
+		    result[nm1] = 8.0*x[0] + xval;
+		} else {
+		    result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		}
+	    }
+	    return result;
+	}
+    }
+
+    private static void reverse(double[] array) {
+	reverse(array, array.length);
+    }
+
+    private static void reverse(double[] array, int n) {
+	int n2 = n/2;
+	int j = n-1;
+	for (int i = 0; i < n2; i++, j--) {
+	    double tmp = array[i];
+	    array[i] = array[j];
+	    array[j] = tmp;
+	}
+    }
+
+
+    private static void initialTest() throws Exception {
+	// check getw for reversal.
+	double x[] = {1.0, 4.0, 9.0, 16.0, 25.0};
+
+	double[] w1 = getw(x, x.length, false, null, true, null, null);
+	double[] w2 = getw(x, x.length, false, null, true, null, false);
+	reverse(x);
+	double[] w3 = getw(x, x.length, false, null, true, null, true);
+	reverse(x);
+	if (w1.length != w2.length) throw new Exception();
+	for (int i = 0; i < w1.length; i++) {
+	    if (w1[i] != w2[i] || w1[i] != w3[i]) {
+		for (int j = 0; j < w1.length; j++) {
+		    System.out.format("i = %d, w1[i] = %s, w2[i] = %s"
+				      + "w3[i] = %s\n",
+				      j, w1[j], w2[j], w3[j]);
+		}
+		throw new Exception();
+	    }
+	}
+
+	Point2D cpoint = new Point2D.Double(2.0, 0.0);
+	w1 = getw(x, x.length, false, null, true, cpoint, null);
+	w2 = getw(x, x.length, false, null, true, cpoint, false);
+	reverse(x);
+	w3 = getw(x, x.length, false, null, true, cpoint, true);
+	reverse(x);
+	if (w1.length != w2.length) throw new Exception();
+	for (int i = 0; i < w1.length; i++) {
+	    if (w1[i] != w2[i] || w1[i] != w3[i]) {
+		for (int j = 0; j < w1.length; j++) {
+		    System.out.format("i = %d, w1[i] = %s, w2[i] = %s"
+				      + "w3[i] = %s\n",
+				      j, w1[j], w2[j], w3[j]);
+		}
+		throw new Exception();
+	    }
+	}
+
+	Point2D start1 = new Point2D.Double(1.0, 0.0);
+	double xp1[] = {4.0, 9.0, 16.0, 25.0};
+	Point2D start2 = new Point2D.Double(25.0, 0.0);
+	double xp2[] = {16.0, 9.0, 4.0, 1.0};
+
+	w1 = getw(xp1, xp1.length, false, start1, true, null, null);
+	w2 = getw(xp1, xp1.length, false, start1, true, null, false);
+	w3 = getw(xp2, xp2.length, false, start2, true, null, true);
+	if (w1.length != w2.length) throw new Exception();
+	for (int i = 0; i < w1.length; i++) {
+	    if (w1[i] != w2[i] || w1[i] != w3[i]) {
+		for (int j = 0; j < w1.length; j++) {
+		    System.out.format("i = %d, w1[i] = %s, w2[i] = %s"
+				      + "w3[i] = %s\n",
+				      j, w1[j], w2[j], w3[j]);
+		}
+		throw new Exception();
+	    }
+	}
+
+	w1 = getw(xp1, xp1.length, false, start1, true, cpoint, null);
+	w2 = getw(xp1, xp1.length, false, start1, true, cpoint, false);
+	w3 = getw(xp2, xp2.length, false, start2, true, cpoint, true);
+	if (w1.length != w2.length) throw new Exception();
+	for (int i = 0; i < w1.length; i++) {
+	    if (w1[i] != w2[i] || w1[i] != w3[i]) {
+		for (int j = 0; j < w1.length; j++) {
+		    System.out.format("i = %d, w1[i] = %s, w2[i] = %s"
+				      + "w3[i] = %s\n",
+				      j, w1[j], w2[j], w3[j]);
+		}
+		throw new Exception();
+	    }
+	}
+
+
+    }
+
+    private static void testSymmetric() throws Exception {
+	    // try a symmetric case
+	    Point2D knots3[] = {
+		new Point2D.Double(0.0, 0.0),
+		new Point2D.Double(1.0, 1.0),
+		new Point2D.Double(2.0, 4.0),
+		new Point2D.Double(3.0, 9.0),
+		new Point2D.Double(4.0, 4.0),
+		new Point2D.Double(5.0, 1.0),
+		new Point2D.Double(6.0, 0.0)
+	    };
+	    Point2D cpoint3a = new Point2D.Double(1.0/3.0, 0.0);
+	    Point2D cpoint3b = new Point2D.Double(5.0 + 2.0/3.0, 0.0);
+
+	    System.out.println("symmetric case");
+
+	    SplinePath2D spath3 = new
+		SplinePath2D(knots3, knots3.length, null, null);
+	    SplinePath2D spath3a = new
+		SplinePath2D(knots3, knots3.length, cpoint3a, null);
+	    SplinePath2D spath3b = new
+		SplinePath2D(knots3, knots3.length, null, cpoint3b);
+	    SplinePath2D spath3c = new
+		SplinePath2D(knots3, knots3.length, cpoint3a, cpoint3b);
+
+	    System.out.println("no control points");
+	    Path2DInfo.printSegments(spath3);
+	    System.out.println("control points at start");
+	    Path2DInfo.printSegments(spath3a);
+	    System.out.println("control points at end");
+	    Path2DInfo.printSegments(spath3b);
+
+	    System.out.println("control points at both ends");
+	    Path2DInfo.printSegments(spath3c);
+
+	    Point2D start = new Point2D.Double(0.0, 0.0);
+
+	    Point2D knots4[] = {
+		new Point2D.Double(1.0, 1.0),
+		new Point2D.Double(2.0, 4.0),
+		new Point2D.Double(3.0, 9.0),
+		new Point2D.Double(4.0, 4.0),
+		new Point2D.Double(5.0, 1.0),
+		new Point2D.Double(6.0, 0.0)
+	    };
+
+	    SplinePath2D spath4 = new SplinePath2D();
+	    spath4.moveTo(0.0, 0.0);
+	    spath4.splineTo(knots4, knots4.length, null, null);
+
+	    double coords1[] = new double[6];
+	    double coords2[] = new double[6];
+
+	    PathIterator pi1 = spath3.getPathIterator(null);
+	    PathIterator pi2 = spath4.getPathIterator(null);
+	    while (!pi1.isDone() && !pi2.isDone()) {
+		int type1 = pi1.currentSegment(coords1);
+		int type2 = pi2.currentSegment(coords2);
+		if (type1 != type2) throw new Exception();
+		for (int i = 0; i < 6; i++) {
+		    if (coords1[i] != coords2[i]) throw new Exception();
+		}
+		coords1 = new double[6];
+		coords2 = new double[6];
+		pi1.next(); pi2.next();
+	    }
+	    if (pi1.isDone() != pi2.isDone()) throw new Exception();
+
+	    SplinePath2D spath4a = new SplinePath2D();
+	    spath4a.moveTo(0.0, 0.0);
+	    spath4a.splineTo(knots4, knots4.length, cpoint3a, null);
+
+	    coords1 = new double[6];
+	    coords2 = new double[6];
+
+	    pi1 = spath3a.getPathIterator(null);
+	    pi2 = spath4a.getPathIterator(null);
+	    while (!pi1.isDone() && !pi2.isDone()) {
+		int type1 = pi1.currentSegment(coords1);
+		int type2 = pi2.currentSegment(coords2);
+		if (type1 != type2) throw new Exception();
+		for (int i = 0; i < 6; i++) {
+		    if (coords1[i] != coords2[i]) throw new Exception();
+		}
+		coords1 = new double[6];
+		coords2 = new double[6];
+		pi1.next(); pi2.next();
+	    }
+	    if (pi1.isDone() != pi2.isDone()) throw new Exception();
+
+	    SplinePath2D spath4b = new SplinePath2D();
+	    spath4b.moveTo(0.0, 0.0);
+	    spath4b.splineTo(knots4, knots4.length, null, cpoint3b);
+
+	    coords1 = new double[6];
+	    coords2 = new double[6];
+
+	    pi1 = spath3b.getPathIterator(null);
+	    pi2 = spath4b.getPathIterator(null);
+	    while (!pi1.isDone() && !pi2.isDone()) {
+		int type1 = pi1.currentSegment(coords1);
+		int type2 = pi2.currentSegment(coords2);
+		if (type1 != type2) throw new Exception();
+		for (int i = 0; i < 6; i++) {
+		    if (coords1[i] != coords2[i]) throw new Exception();
+		}
+		coords1 = new double[6];
+		coords2 = new double[6];
+		pi1.next(); pi2.next();
+	    }
+	    if (pi1.isDone() != pi2.isDone()) throw new Exception();
+
+	    SplinePath2D spath4c = new SplinePath2D();
+	    spath4c.moveTo(0.0, 0.0);
+	    spath4c.splineTo(knots4, knots4.length, cpoint3a, cpoint3b);
+
+	    pi1 = spath3c.getPathIterator(null);
+	    pi2 = spath4c.getPathIterator(null);
+	    while (!pi1.isDone() && !pi2.isDone()) {
+		int type1 = pi1.currentSegment(coords1);
+		int type2 = pi2.currentSegment(coords2);
+		if (type1 != type2) throw new Exception();
+		for (int i = 0; i < 6; i++) {
+		    if (coords1[i] != coords2[i]) throw new Exception();
+		}
+		coords1 = new double[6];
+		coords2 = new double[6];
+		pi1.next(); pi2.next();
+	    }
+	    if (pi1.isDone() != pi2.isDone()) throw new Exception();
+    }
+
+
     public static void main(String argv[]) {
 	try {
+	    initialTest();
+	    testSymmetric();
 	    double xp[] = new double[37];
 	    double yp[] = new double[37];
 	    Path2D path = new Path2D.Double();
@@ -529,6 +911,7 @@ public class BezierSplineTest {
 	    splinePath3.lineTo(0.0, 0.0);
 	    cpoint1.setLocation(cpoint1.getX(), 0.0);
 	    System.out.println("cpoint1 = " + cpoint1);
+	    System.out.println("cpoint2 = " + cpoint2);
 	    splinePath3.splineTo(knots, 1, knots.length-1, cpoint1, cpoint2);
 	    Graph bezier4 = new Graph();
 	    bezier4.setOffsets(25,25);
@@ -576,6 +959,7 @@ public class BezierSplineTest {
 	    cpoint2.setLocation(15.0, 30.0);
 	    splinePath4.splineTo(knots2, knots2.length, null, cpoint2);
 	    Path2DInfo.printSegments(splinePath4);
+
 
 	} catch (Exception e) {
 	    e.printStackTrace();
