@@ -1818,8 +1818,6 @@ public class SplinePath2D extends Path2D.Double {
 			   cpoint/*1, cpoint2*/, reverse);
 	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false,
 			   cpoint/*1, cpoint2*/, reverse);
-	System.out.println("wy.length = " + wy.length);
-
 	if (cyclic) {
 	    TridiagonalSolver.solveCyclic(wx, a, b, c, wx, wx.length);
 	    TridiagonalSolver.solveCyclic(wy, a, b, c, wy, wy.length);

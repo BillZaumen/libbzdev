@@ -246,6 +246,14 @@ btest8:
 	@echo ------- BuilderTest8 $(CTL) $(I) $(J) ----------
 	$(JAVA) BuilderTest8 $(CTL) $(I) $(J)
 
+btest9:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest9  ----------
+	$(JAVA) BuilderTest9
+
+
 btest3d:
 	(cd ../.. ; make jars)
 	mkdir -p classes
