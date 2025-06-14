@@ -1975,8 +1975,10 @@ public class SplinePath2D extends Path2D.Double {
 		p1x = (p1x1 + p1x2)/2;
 		p1y = (p1y1 + p1y2)/2;
 		*/
-		p1x = v*p1x1 + vp*p1x2;
-		p1y = v*p1y1 + vp*p1y2;
+		// p1x = v*p1x1 + vp*p1x2;
+		// p1y = v*p1y1 + vp*p1y2;
+		p1x = u*p1x1 + up*p1x2;
+		p1y = u*p1y1 + up*p1y2;
 	    } else if (reverse) {
 		p1x = wx1[nm1];
 		p1y = wy1[nm1];
