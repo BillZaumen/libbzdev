@@ -15,7 +15,7 @@ public class BezierSplineTest {
     // that can reverse the path works correctly. It was added
     // primarily for debugging.
 
-    private static String errorMsg(String msg) {return msg;}
+    private static String errormsg(String msg) {return msg;}
 
     private static double[] getw(double[] x, int n, boolean cyclic,
 				 Point2D start, boolean isX,
@@ -57,7 +57,7 @@ public class BezierSplineTest {
 	    int nm2 = n - 2;
 	    // Point2D start = getCurrentPoint();
 	    if (start == null) {
-		throw new IllegalStateException(errorMsg("missingMOVETO"));
+		throw new IllegalStateException(errormsg("missingMOVETO"));
 	    }
 	    double xval = isX? start.getX(): start.getY();
 	    if (cyclic) {
@@ -130,7 +130,7 @@ public class BezierSplineTest {
 	    int nm2 = n - 2;
 	    // Point2D start = getCurrentPoint();
 	    if (start == null) {
-		throw new IllegalStateException(errorMsg("missingMOVETO"));
+		throw new IllegalStateException(errormsg("missingMOVETO"));
 	    }
 	    double xval = isX? start.getX(): start.getY();
 	    if (cyclic) {

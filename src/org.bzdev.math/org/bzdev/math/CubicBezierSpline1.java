@@ -7,6 +7,16 @@ import org.bzdev.lang.CallableArgsReturns;
 /**
  * Class providing a cubic spline for an evenly spaced set of values,
  * with each segment using a Bernstein Polynomial basis.
+ * <script>
+ * MathJax = {
+ *	  tex: {
+ *	      inlineMath: [['$', '$'], ['\\(', '\\)']],
+ *	      displayMath: [['$$', '$$'], ['\\[', '\\]']]}
+ * };
+ * </script>
+ * <script id="MathJax-script" async
+ *	    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+ * </script>
  * This class provides the same functionality as the class
  * {@link CubicSpline1}: the difference is in its internal
  * representation. The method

@@ -1634,7 +1634,7 @@ public class Functions {
 	 * <P>
 	 * The indices generated, for a give value of n and m are not
 	 * contiguous but are ordered. These indices can also be easily
-	 * converted to a factor containing the &lambda;'s.
+	 * converted to a factor containing the &lambda;s.
 	 * @param n the maximum value of a component of &lambda; (inclusive)
 	 * @param len the number of &lambda; components (m in the description
 	 *        above)

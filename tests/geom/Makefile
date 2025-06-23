@@ -41,6 +41,8 @@ all:
 	@$(JAVA) BuilderTest9
 	@echo ------- BuilderTest10 ----------
 	@$(JAVA) BuilderTest10
+	@echo ------- BuilderTest11 ----------
+	@$(JAVA) BuilderTest11
 	@echo --------- scripting path-builder tests
 	@$(HAS_JS) && java -classpath \
 		../../BUILD/libbzdev.jar:../../BUILD/scrunner.jar \
@@ -257,6 +259,7 @@ btest9:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@echo ------- BuilderTest9  ----------
 	$(JAVA) BuilderTest9
+
 btest10:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -264,6 +267,12 @@ btest10:
 	@echo ------- BuilderTest10  ----------
 	$(JAVA) BuilderTest10
 
+btest11:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- BuilderTest11  ----------
+	$(JAVA) BuilderTest11
 
 btest3d:
 	(cd ../.. ; make jars)

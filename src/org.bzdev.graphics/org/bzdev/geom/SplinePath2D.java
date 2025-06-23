@@ -1,5 +1,6 @@
 package org.bzdev.geom;
 import org.bzdev.math.TridiagonalSolver;
+import org.bzdev.math.CubicBezierSpline1;
 import org.bzdev.math.RealValuedFunction;
 import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.math.CubicSpline;
@@ -1804,11 +1805,56 @@ public class SplinePath2D extends Path2D.Double {
 	    break;
 	case BOTH:
 	    merge = true;
-	    reverse = true;
-	    cpoint = cpoint2;
 	    break;
 	default:
 	    break;
+	}
+
+	if (merge) {
+	    // Handle as a special case using CubicBezierSpline1.
+	    double[] tmp = null;
+	    n = oldN;
+	    if (!startsWithMoveTo) {
+		tmp = new double[n+1];
+		tmp[0] = getCurrentPoint().getX();
+		System.arraycopy(x, 0, tmp, 1, n);
+	    } else {
+		tmp = new double[n];
+		System.arraycopy(x, 0, tmp, 0, n);
+	    }
+
+	    double deriv1 = 3.0*(cpoint1.getX() - tmp[0]);
+	    double deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getX());
+
+	    CubicBezierSpline1 xspline =
+		new CubicBezierSpline1(tmp, 0.0, 1.0,
+				       CubicSpline.Mode.CLAMPED,
+				       deriv1, deriv2);
+	    if (!startsWithMoveTo) {
+		tmp[0] = getCurrentPoint().getX();
+		System.arraycopy(y, 0, tmp, 1, n);
+	    } else {
+		System.arraycopy(y, 0, tmp, 0, n);
+	    }
+	    deriv1 = 3.0*(cpoint1.getY() - tmp[0]);
+	    deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getY());
+	    CubicBezierSpline1 yspline =
+		new CubicBezierSpline1(tmp, 0.0, 1.0,
+				       CubicSpline.Mode.CLAMPED,
+				       deriv1, deriv2);
+	    double[] xcoeff = xspline.getBernsteinCoefficients();
+	    double[] ycoeff = yspline.getBernsteinCoefficients();
+	    if (startsWithMoveTo) {
+		moveTo(xcoeff[0], ycoeff[0]);
+	    }
+	    for (int i = 1; i < xcoeff.length; i+=3) {
+		int ip1 = i+1;
+		int ip2 = i+2;
+		curveTo(xcoeff[i], ycoeff[i],
+			xcoeff[ip1], ycoeff[ip1],
+			xcoeff[ip2], ycoeff[ip2]);
+	    }
+	    return;
 	}
 
 	double[] a = createA(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
@@ -1865,15 +1911,6 @@ public class SplinePath2D extends Path2D.Double {
 	    wx2 = wx;
 	    wy2 = wy;
 	}
-	if (merge) {
-	    wx = getw(x, oldN, cyclic, startsWithMoveTo, true,
-		      cpoint1/*1, cpoint2*/, false);
-	    wy = getw(y, oldN, cyclic, startsWithMoveTo, false,
-		      cpoint1/*1, cpoint2*/, false);
-	    TridiagonalSolver.solve(wx, a, b, c, wx);
-	    TridiagonalSolver.solve(wy, a, b, c, wy);
-	}
-
 	/*
 	System.out.print("wx: ");
 	for (int k = 0; k < wx.length; k++) {
@@ -1918,26 +1955,7 @@ public class SplinePath2D extends Path2D.Double {
 	    vp = up;
 	    u = ((double)(i+1))/n;
 	    up = 1-u;
-	    if (merge) {
-		double p1x1 = wx1[i];
-		double p1y1 = wy1[i];
-		double p2x1 = wx2[i];
-		double p2y1 = wy2[i];
-		double p1x2 = wx[i];
-		double p1y2 = wy[i];
-		double p2x2 = 2.0 * x[i+1 + offset] - wx[i+1];
-		double p2y2 = 2.0 * y[i+1 + offset] - wy[i+1];
-		/*
-		p1x = (i == 0)? p1x2: (p1x1 + p1x2)/2.0;
-		p1y = (i == 0)? p1y2: (p1y1 + p1y2)/2.0;
-		p2x = (p2x1 + p2x2)/2.0;
-		p2y = (p2y1 + p2y2)/2.0;
-		*/
-		p1x = v*p1x1 + vp*p1x2;
-		p1y = v*p1y1 + vp*p1y2;
-		p2x = u*p2x1 + up*p2x2;
-		p2y = u*p2y1 + up*p2y2;
-	    } else if (reverse) {
+	    if (reverse) {
 		p1x = wx1[i];
 		p1y = wy1[i];
 		p2x = wx[i];
@@ -1964,22 +1982,7 @@ public class SplinePath2D extends Path2D.Double {
 	    curveTo(p1x, p1y, p2x, p2y, p3x, p3y);
 	    closePath();
 	} else {
-	    if (merge) {
-		double p1x1 = wx1[nm1];
-		double p1y1 = wy1[nm1];
-		p2x = wx2[nm1];
-		p2y = wy2[nm1];
-		double p1x2 = wx[nm1];
-		double p1y2 = wy[nm1];
-		/*
-		p1x = (p1x1 + p1x2)/2;
-		p1y = (p1y1 + p1y2)/2;
-		*/
-		// p1x = v*p1x1 + vp*p1x2;
-		// p1y = v*p1y1 + vp*p1y2;
-		p1x = u*p1x1 + up*p1x2;
-		p1y = u*p1y1 + up*p1y2;
-	    } else if (reverse) {
+	    if (reverse) {
 		p1x = wx1[nm1];
 		p1y = wy1[nm1];
 		p2x = wx[nm1];
