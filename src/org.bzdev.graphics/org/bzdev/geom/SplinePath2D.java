@@ -76,10 +76,10 @@ import java.awt.geom.*;
  * </UL>
  * respectively in order to explicitly set the first and/or last
  * intermediate control points to values matching C<sub>1</sub> and/or
- * C<sub>2</sub>. When both C<sub>1</sub> and C<sub>2</sub> are provided,
- * splines for each are computed and their control points are averaged
- * using a weighted average based on the how close a knot is to each of
- * the control points.
+ * C<sub>2</sub>. When two control points are provided, the spline is
+ * computed using the class {@link org.bzdev.math.CubicBezierSpline1}
+ * to compute the X and Y values of the intermediate control points
+ * for each segment.
  * <P>
  * The initial and final control points for each segment are given by
  * <ul>
