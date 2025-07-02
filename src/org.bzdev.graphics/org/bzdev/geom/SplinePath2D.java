@@ -1839,9 +1839,11 @@ public class SplinePath2D extends Path2D.Double {
 	    deriv1 = 3.0*(cpoint1.getY() - tmp[0]);
 	    deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getY());
 	    CubicBezierSpline1 yspline =
+		/*
 		new CubicBezierSpline1(tmp, 0.0, 1.0,
 				       CubicSpline.Mode.CLAMPED,
-				       deriv1, deriv2);
+				       deriv1, deriv2);*/
+		new CubicBezierSpline1(xspline, tmp, deriv1, deriv2);
 	    double[] xcoeff = xspline.getBernsteinCoefficients();
 	    double[] ycoeff = yspline.getBernsteinCoefficients();
 	    if (startsWithMoveTo) {

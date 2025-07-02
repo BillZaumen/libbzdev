@@ -131,6 +131,10 @@ public class CubicBezierSpline1 extends CubicSpline {
     double yPn = 0.0; // y' at the end of the spline.
     double yP[] = null;		// array of first derivatives
 
+    double[] a;
+    double[] b;
+    double[] c;
+
     private double[] createA(int n) {
 	int nm1 = n-1;
 	int nm2 = n-2;
@@ -712,6 +716,102 @@ public class CubicBezierSpline1 extends CubicSpline {
 	cubicSpline(y, y.length, x0, deltax, mode, yp);
     }
 
+    CubicBezierSpline1 templateSpline = null;
+
+    /**
+     * Constructor given a template and no derivatives.
+     * The indices used to compute the spline are in the range [0,n).
+     * for an index i, the corresponding value of x is x0 + i*deltax
+     * and y[i] will be equal to f(x).
+     * @param y the values at equally spaced points
+     */
+    public CubicBezierSpline1(CubicBezierSpline1 template, double[] y)
+    {
+	super();
+	templateSpline = template;
+	cubicSpline(y, template.n, template.x0, template.delta,
+		    template.mode);
+    }
+
+
+    /**
+     * Constructor given a template and one derivative.
+     * The indices used to compute the spline are in the range [0,n),
+     * where n is the number of values provided to the template, so that
+     * for an index i, the corresponding value of x is x0 + i*delta, with
+     * delta provided by the template, and y[i] will be equal to f(x).
+     * <P>
+     * This constructor is provided for a special case in which a series
+     * of splines will be created, and avoids the need to recompute several
+     * arrays.
+     * @param template a previously created spline determining the mode and
+     *        the number of points
+     * @param y the values at equally spaced points
+     * @param deriv the derivative at the start or end of the spline,
+     *        depending on the mode
+     */
+    public CubicBezierSpline1(CubicBezierSpline1 template, double[] y,
+			      double deriv)
+    {
+	super();
+	templateSpline = template;
+	cubicSpline(y, template.n, template.x0, template.delta,
+		    template.mode, deriv);
+    }
+
+    /**
+     * Constructor given a template and two derivatives.
+     * The indices used to compute the spline are in the range [0,n),
+     * where n is the number of values provided to the template, so that
+     * for an index i, the corresponding value of x is x0 + i*delta, with
+     * delta provided by the template, and y[i] will be equal to f(x).
+     * <P>
+     * This constructor is provided for a special case in which a series
+     * of splines will be created, and avoids the need to recompute several
+     * arrays.
+     * @param template a previously created spline determining the mode and
+     *        the number of points
+     * @param y the values at equally spaced points
+     * @param deriv1 the derivative at the start of the spline
+     * @param deriv2 the derivative at the end of the spline
+     */
+    public CubicBezierSpline1(CubicBezierSpline1 template, double[] y,
+			      double deriv1, double deriv2)
+    {
+	super();
+	templateSpline = template;
+	cubicSpline(y, template.n, template.x0, template.delta,
+		    template.mode, deriv1, deriv2);
+    }
+
+
+    /**
+     * Constructor given a template and an array of derivatives.
+     * The indices used to compute the spline are in the range [0,n),
+     * where n is the number of values provided to the template, so that
+     * for an index i, the corresponding value of x is x0 + i*delta, with
+     * delta provided by the template, and y[i] will be equal to f(x).
+     * <P>
+     * This constructor is provided for a special case in which a series
+     * of splines will be created, and avoids the need to recompute several
+     * arrays.
+     * @param template a previously created spline determining the mode and
+     *        the number of points
+     * @param y the values at equally spaced points
+     * @param yp the derivatives corresponding to each element of y
+     *        for the fully clamped case and the appropriate number
+     *        of derivatives otherwise
+     */
+    public CubicBezierSpline1(CubicBezierSpline1 template, double[] y,
+			      double[] yp)
+    {
+	super();
+	templateSpline = template;
+	cubicSpline(y, template.n, template.x0, template.delta,
+		    template.mode, yp);
+    }
+
+
     private void cubicSpline(double[] y, int n, double x0, double deltax,
 			     CubicSpline.Mode mode, double... args)
     {
@@ -752,6 +852,7 @@ public class CubicBezierSpline1 extends CubicSpline {
 
 	this.x0 = x0;
 	this.delta = deltax;
+	this.mode = mode;
 	switch (mode) {
 	case QUAD_FIT:
 	    quadFit = true;
@@ -864,10 +965,15 @@ public class CubicBezierSpline1 extends CubicSpline {
 		throw new Error("how did we get here (n = " + n + " )?");
 	    }
 	}
-	double[] a = hermite? null: createA(n);
-	double[] b = hermite? null: createB(n);
-	double[] c = hermite? null: createC(n);
+	double[] a = hermite? null:
+	    (templateSpline != null)? templateSpline.a: createA(n);
+	double[] b = hermite? null:
+	    (templateSpline != null)? templateSpline.b: createB(n);
+	double[] c = hermite? null:
+	    (templateSpline != null)? templateSpline.c: createC(n);
 	double[] wy = hermite? null: getw(y, n, delta);
+
+	this.a = a; this.b = b; this.c = c;
 
 	if (!hermite) {
 	    TridiagonalSolver.solve(wy, a, b, c, wy);
@@ -1574,5 +1680,7 @@ public class CubicBezierSpline1 extends CubicSpline {
 //  LocalWords:  yP ip bezier wy nterms bc nbc RuntimeException yPn
 //  LocalWords:  BicubicInterpolator cpoints argOutOfRangeD errorMsg
 //  LocalWords:  inversionLimit argNonNegative noInverse RootFinder
-//  LocalWords:  solveQuadratic noUniqInverse notStrictlyMono
-//  LocalWords:  solveCubic noInverseFor noUniqInverseFor
+//  LocalWords:  solveQuadratic noUniqInverse notStrictlyMono MathJax
+//  LocalWords:  solveCubic noInverseFor noUniqInverseFor tex async
+//  LocalWords:  inlineMath displayMath src deriv testSearch
+//  LocalWords:  isStrictlyMonotonic strictlyIncreasing

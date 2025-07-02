@@ -580,6 +580,8 @@ public class BezierSplineTest {
 	    sinvals[i] = Math.sin(theta);
 	}
 	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0));
+	CubicBezierSpline1 spline2
+	    = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals);
 
 	double error = 1.e-4;
 	for (int i = 30; i < 300; i++) {
@@ -587,6 +589,9 @@ public class BezierSplineTest {
 	    if (Math.abs(spline.valueAt(theta) - Math.sin(theta)) > error) {
 		System.out.println("bad value for sinvals test");
 		errcount++;
+	    }
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
 	    }
 	    if (Math.abs(spline.derivAt(theta) - Math.cos(theta)) > error) {
 		System.out.println("bad deriv for sinvals test");
@@ -600,6 +605,95 @@ public class BezierSplineTest {
 		errcount++;
 	    }
 	}
+
+	double darray0[] = new double[0];
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.NATURAL,
+					darray0);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					darray0);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED_START,
+					1.0);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					 1.0);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	double darray1[] = {1.0};
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED_START,
+					darray1);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					darray1);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED_END,
+					2.0);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					  2.0);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	double darray2[] = {2.0};
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED_START,
+					darray2);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					darray2);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED,
+					1.0, 2.0);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					 1.0, 2.0);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
+	double darray3[] = {1.0, 2.0};
+	spline = new CubicBezierSpline1(sinvals, 0.0, Math.toRadians(10.0),
+					CubicSpline.Mode.CLAMPED,
+					darray3);
+	spline2 = new CubicBezierSpline1((CubicBezierSpline1) spline, sinvals,
+					darray3);
+	for (int i = 30; i < 300; i++) {
+	    double theta = Math.toRadians((double)i);
+	    if (spline.valueAt(theta) != spline2.valueAt(theta)) {
+		throw new Exception("spline != spline1");
+	    }
+	}
+
 
 	if (errcount > 0) {
 	    System.out.println("... failed");

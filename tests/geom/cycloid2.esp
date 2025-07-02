@@ -1,0 +1,51 @@
+#!/usr/bin/scrunner -sEN:true
+import (org.bzdev.geom, [SplinePath2D,
+			 SplinePathBuilder,
+			 SplinePathBuilder.CPointType,
+			 SplinePathBuilder.CPoint,
+			 Path2DInfo]);
+import org.bzdev.obnaming.misc.BasicStrokeBuilder;
+import (org.bzdev.gio, [OutputStreamGraphics, ImageOrientation]);
+
+import org.bzdev.graphs.Graph;
+import java.lang.Math;
+import (java.io, [OutputStream, FileOutputStream]);
+import (java.awt, [Color, Graphics, Graphics2D]);
+
+var r = 50;
+
+function x(t) {
+    r*(t - sin(t));
+}
+
+function y(t) {
+    r *(1 - cos(t));
+}
+
+var spec = [
+    {type: MOVE_TO_NEXT},
+    {type: SPLINE_FUNCTION, xf: x, yf: y,
+     t1: 0.0, t2: 4*PI, n: 32},
+    {type: SEG_END_PREV}
+];
+
+var spb = new SplinePathBuilder(scripting);
+spb.configure(spec);
+var path = spb.getPath();
+
+var os = new FileOutputStream("cycloid.ps");
+var osg = OutputStreamGraphics.newInstance(os, 800, 200,
+					   COUNTERCLOCKWISE90, "ps");
+var graph = new Graph(osg);
+graph.setOffsets(25, 25);
+var sf = (750/2.0)/(2*PI*r);
+graph.setRanges(0.0, 0.0, 0.0, 0.0, sf, sf);
+graph.setBackgroundColor(Color.WHITE);
+graph.clear();
+
+var g2d = graph.createGraphics();
+g2d.setColor(Color.BLACK);
+g2d.setStroke(new BasicStrokeBuilder().setWidth(2.0).createStroke());
+
+graph.draw(g2d, path);
+graph.write();
