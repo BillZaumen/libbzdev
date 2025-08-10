@@ -828,6 +828,10 @@ public class SBL {
 	    }
 	}
 
+	if (GraphicsEnvironment.isHeadless()) {
+	    System.err.println("sbl: " + errorMsg("headless"));
+	    System.exit(1);
+	}
 
 	SwingUtilities.invokeLater(() -> {
 		boolean loadedAtStart = false;

@@ -222,6 +222,9 @@ patest: compile
 jstest: compile
 	@$(JAVA) JSTest
 
+jstest1: compile
+	@$(JAVA) JSTest1
+
 ytest: compile
 	@echo ---- YTest -----
 	@$(JAVA) YTest
