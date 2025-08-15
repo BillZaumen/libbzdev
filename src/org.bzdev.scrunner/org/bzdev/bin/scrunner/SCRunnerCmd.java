@@ -82,6 +82,9 @@ public class SCRunnerCmd {
     }
 
     private static String getExtension(String pathname) throws Exception {
+	if (pathname.startsWith("module:")) {
+	    return "esp";
+	}
 	File file = new File(pathname);
 	if (!file.isFile()) {
 	    throw new Exception("\"" + pathname  + "\" - not a normal file");
@@ -1127,6 +1130,7 @@ public class SCRunnerCmd {
 
 	// need to skip over the arguments that represent values
 	index += parmList.size();
+
 	if (languageName == null) {
 	    String extension = null;
 	    while (index < argv.length && extension == null) {

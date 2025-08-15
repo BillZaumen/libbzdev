@@ -27,8 +27,24 @@ application, typically a simulation or animation. For the first form
 of the command, each input file
 .I IFILE
 is the name of a file containing a script, with a file name of "\fB\-\fR"
-denoting standard input.
-.B Scrunner
+denoting standard input. If a file name starts with
+.BR module: ,
+followed by the name of a Java module, the module's JAR file is searched
+for a resource names
+.B META\-INF/startup.esp
+and that resource (if it exists) is extracted and used as a
+script. This JAR file must be accessible via the module path.  One is
+built into the module
+.BR org.bzdev.rdanim ,
+imports some classes, and defines two functions: one for creating an
+animation and the other for running it.  For any module that provides
+a
+.B startup.eps
+resource, the module description should provide documentation for this
+file.
+.PP
+For normal files,
+.B scrunner
 will try to guess the scripting language from the file extension, but
 the language can be set by using the
 .B \-L

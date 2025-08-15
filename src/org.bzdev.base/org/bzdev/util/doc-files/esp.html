@@ -315,7 +315,8 @@ var obj = {
 	<STRONG>&amp;&amp;</STRONG> or <STRONG>||</STRONG>, the expression
 	always returns <STRONG>true</STRONG>.
       <LI> The expression <STRONG>var.</STRONG><I>IDENTIFIER</I> tests
-	if a variable named <I>IDENTIFIER</I> exists.
+	if a variable named <I>IDENTIFIER</I> exists,rather than merely
+	being neither defined nor declared.
       <LI> The keyword <STRONG>void</STRONG> can be used as the final
 	expression in a function&apos;s body.  This is equivalent to
 	<STRONG>null</STRONG> but indicates that the function may not
@@ -482,6 +483,13 @@ var obj = {
       <LI><B>function</B>. This keyword is used for lambda expressions
 	and function definitions.  It may be used in fully qualified names
 	but should not be used as an identifier.
+      <LI><B>new</B>. This keyword represents an operator that indicates
+	that a new Java object is being created, and must be followed by
+	a class name, an opening parenthesis, an argument list, and a closing
+	parenthesis: the same syntax used by Java.  For a constructor to
+	be recognized by ESP, its class and the classes of its arguments
+	must be imported. A few classes such as <CODE>String</CODE> are
+	built in and thus do not have to be declared.
       <LI><B>null</B>. This is a constant listed below, but may
 	appear in some <A HREF="#import">import statements</A>.
       <LI><B>this</B>. This keyword is used in methods.
@@ -595,6 +603,12 @@ BLOCKED
     in the following table:
     <TABLE BORDER=1><caption>&nbsp;</caption>
       <TR> <TH>Operator(s)</TH><TH>Description</TH></TR>
+      <TR><TD>new</TD><TD>create a new instance of a Java class by
+	  calling one of its constructors.  With the exception of a
+	  few built-in classes, the class, and the classes of a
+	  contructor's arguments, must be imported: otherwise ESP will
+	  not recognize the constructor.
+      </TD></TR>
       <TR><TD>* / /% % %%</TD><TD> multiplication, division, integer
 	  division, remainder, and mod respectively.  The mod
 	  operator <STRONG>%%</STRONG> always produces a non-negative
@@ -913,13 +927,13 @@ term: value
     | &apos;-&apos; term
 	
 <A ID="value"></A>value: number
-    | true
-    | false
-    | null
-    | void
+    | &apos;true&apos;
+    | &apos;false&apos;
+    | &apos;null&apos;
+    | &apos;void&apos;
     | string
     | variable
-    | var &apos;.&apos; identifier
+    | &apos;var&apos; &apos;.&apos; identifier
     | qualified-name
     | qualified-name &apos;.&apos; &apos;class&apos;
     | function-call
@@ -968,7 +982,7 @@ qualified-name:  identifier
 method-reference:  qualified-name &apos;::&apos; identifier
 
 class: class-name &apos;.&apos; &apos;class&apos;
-    | class &apos;[&pos; &apos;]&pos;
+    | class &apos;[&apos; &apos;]&apos;
 
 class-name: qualified-name
 
@@ -998,10 +1012,10 @@ var-definition : &apos;var&apos; identifier &apos;=&apos; expression
     of the variable is the value of the expression when the variable
     either does not exist or has a null value, and is the
     variable&apos;s existing value otherwise.  The <STRONG>?=</STRONG> and
-    <STRONG>?=</STRONG> cases are provided so that variables can have
+    <STRONG>??=</STRONG> cases are provided so that variables can have
     default values. For the <STRONG>?=</STRONG> case, if the variable
     already exists, the expression will not be evaluated.  For the
-    <STRONG>?=</STRONG> case, if the variable already exists and has a
+    <STRONG>??=</STRONG> case, if the variable already exists and has a
     non-null value, the expression will not be evaluated.  In either
     case, the value of the statement is the value assigned to the
     variable, whether a new value or an existing value. While not

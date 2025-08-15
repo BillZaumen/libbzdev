@@ -254,6 +254,9 @@ public class SCRunner {
 
 
     static String getExtension(String pathname) throws Exception {
+	if (pathname.startsWith("module:")) {
+	    return "esp";
+	}
 	File file = new File(pathname);
 	if (!file.isFile()) {
 	    throw new Exception(errorMsg("notNormalFile", pathname));
@@ -276,6 +279,7 @@ public class SCRunner {
 	    ScriptingContext context;
 	    String filename;
 	    DelayedFileInputStream dfis;
+	    InputStream startupInputStream = null;
 	    boolean useStdin = false;
 	    Info(ScriptingContext context, String filename)
 		throws FileNotFoundException
@@ -284,6 +288,8 @@ public class SCRunner {
 		this.filename = filename;
 		if (filename.equals("-")) {
 		    useStdin = true;
+		} else if (filename.startsWith("module:")) {
+		    filename = filename.trim().substring(7);
 		} else {
 		    dfis = new DelayedFileInputStream(filename);
 		}
@@ -347,11 +353,41 @@ public class SCRunner {
 
 	PrintWriter handlerWriter = null;
 
+	InputStream getStartupIS(String fileName)
+	    throws FileNotFoundException
+	{
+	    if (fileName.startsWith("module:")) {
+		fileName = fileName.substring(7);
+	    }
+	    InputStream[] isarray = new InputStream[1];
+	    final String moduleName = fileName;
+
+	    ModuleLayer.boot().modules().stream()
+		.filter(module -> module.getName().equals(moduleName))
+		.findFirst().
+		ifPresent((m) -> {
+			try {
+			    isarray[0] = m
+				.getResourceAsStream("META-INF/startup.esp");
+			} catch (Exception e) {
+			    isarray[0] = null;
+			}
+		    });
+	    InputStream result = isarray[0];
+	    if (result == null) {
+		String msg = errorMsg("noStartup", moduleName);
+		throw new FileNotFoundException(msg);
+	    }
+	    return result;
+	}
+
 	public void run() throws ScriptException {
 	    for (Info info: queue) {
 		try {
 		    Reader reader = new
 			InputStreamReader(info.useStdin? System.in:
+					  (info.dfis == null)?
+					  getStartupIS(info.filename):
 					  info.dfis.open());
 		    if (handlerWriter != null) {
 		       Object obj = info.context.evalScript(info.filename,
