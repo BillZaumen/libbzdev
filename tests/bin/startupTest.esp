@@ -1,11 +1,12 @@
+import (org.bzdev.util.units.MKS);
 
 var a2d = createAnimation({
     frameWidth: 800,
     frameHeight: 600,
     ticksPerSecond: 1000.0,
     ticksPerFrame: 40,
-    imageSpaceDistance: 100,
-    gcsDistance: 5,
+    imageSpaceDistance: 200,
+    gcsDistance: feet(12),
     xgcs: 0.0,
     ygcs: 0.0,
     xf: 0.0,

@@ -487,6 +487,7 @@ ANIM2D_JFILES2 = $(wildcard $(ANIM2D_DIR)/$(BZDEV)/providers/anim2d/*.java) \
 
 ANIM2D_RESOURCES1 = $(ANIM2D_DIR)/META-INF/services/$(NOF_SERVICE) \
 	$(ANIM2D_DIR)/META-INF/services/$(ONL_SERVICE) \
+	$(ANIM2D_DIR)/META-INF/startup.esp \
 	$(wildcard $(ANIM2D_DIR)/$(BZDEV)/providers/anim2d/lpack/*.properties) \
 	$(wildcard $(ANIM2D_DIR)/$(BZDEV)/anim2d/lpack/*.properties) \
 	$(wildcard $(ANIM2D_DIR)/$(BZDEV)/anim2d/Animation2DLauncher.yaml)

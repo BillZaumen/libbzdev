@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<HTML lang="en">
+  <HEAD>
+    <META HTTP-EQUIV="content-type" content="text/html; charset=UTF-8">
+    <TITLE>Startup.esp Documentation</TITLE>
+    <link rel="stylesheet" type="text/css" href="{@docRoot}/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="{@docRoot}/description.css">
+  </HEAD>
+  <BODY>
+    <DIV style="margin-left: 2em">
+    <H1>Startup.esp Documentation</H1>
+    <P>
+      The resource META-INF/startup.esp can be loaded by
+      <STRONG>scrunner</STRONG> by adding the file name
+      <STRONG>module:org.bzdev.anim2d</STRONG> to
+      the <STRONG>scrunner</STRONG> command line.  This will import a
+      number of classes:
+      <UL>
+	<LI> {@link org.bzdev.anim2d.Animation2D Animation2D},
+	  {@link org.bzdev.anim2d.AnimationLayer2D AnimationLayer2D},
+	  {@link org.bzdev.anim2d.AnimationLayer2DFactory AnimationLayer2DFactory},
+	  {@link org.bzdev.anim2d.AnimationLayer2D.Type AnimationLayer2D.Type},
+	  {@link org.bzdev.anim2d.AnimationPath2D AnimationPath2D},
+	 {@link org.bzdev.anim2d.AnimationPath2DFactory AnimationPath2DFactory},
+	  {@link org.bzdev.anim2d.ConnectingLine2D ConnectingLine2D},
+	 {@link org.bzdev.anim2d.ConnectingLine2DFactory ConnectingLine2DFactory},
+	 {@link org.bzdev.anim2d.GraphView GraphView},
+	 {@link org.bzdev.anim2d.GraphViewFactory GraphViewFactory},
+	 {@link org.bzdev.anim2d.GraphView.ZoomMode GraphView.ZoomMode},
+	 {@link org.bzdev.anim2d.KinematicOps2D KinematicOps2D},
+	 {@link org.bzdev.anim2d.PlacedAnimationObject2D PlacedAnimationObject2D},
+	  {@link org.bzdev.anim2d.PlacedObject2DFactory  PlacedObject2DFactory},
+	  and
+	  {@link org.bzdev.anim2d.PlacedObject2DFactory.RefPointMode PlacedObject2DFactory.RefPointMode}
+	  from the package org.bzdev.anim2d.
+	<LI> {@link org.bzdev.geom.BasicSplinePath2D BasicSplinePath2D}
+	  from the package org.bzdev.geom.
+	<LI> {@link org.bzdev.swing.AnimatedPanelGraphics AnimatedPanelGraphics}
+	  from the package org.bzdev.swing.
+      </UL>
+      It will also define two functions:
+      <UL>
+	<LI><STRONG>createAnimation</STRONG>. There is single argument is an
+	  ESP object with the following properties:
+	  <UL>
+            <LI><STRONG>frameWidth</STRONG>. The value of this property is
+              the width of the animation frame in units of points.
+            <LI><STRONG>frameHeight</STRONG>. The value of this property is
+              the height of the animation frame in units of points.
+            <LI><STRONG>ticksPerSecond</STRONG>. The value of this property is
+              the number of simulation ticks per second.
+            <LI><STRONG>ticksPerFrame</STRONG>. The value of this property is
+              the number of simulation ticks until another animation frame
+              is to be created.
+            <LI><STRONG>imageSpaceDistance</STRONG>. The value of this
+              property is a measured distance in units of points.
+            <LI><STRONG>gcsDistance</STRONG>. The value of this property is
+              the GCS distance in meters that
+              <STRONG>imageSpaceDistance</STRONG> represents.
+            <LI><STRONG>xgcs</STRONG>. The value of this property is
+              the X coordinate in GCS coordinates for a reference point
+              (the default value is 0.0).
+            <LI><STRONG>ygcs</STRONG>. The value of this property is
+              the Y coordinate in GCS coordinates for a reference point
+              (the default value is 0.0).
+            <LI><STRONG>xf</STRONG>. The value of this property is
+              the fraction of the distance along the animation frame
+              (left = 0.0, right = 1.0) for the X coordinate of the reference
+              point (the default value is 0.0).
+            <LI><STRONG>yf</STRONG>. The value of this property is
+              the fraction of the distance along the animation frame
+              (bottom = 0.0, top = 1.0) for the Y coordinate of the reference
+              point (the default value is 0.0).
+	  </UL>
+	  This function will create an animation, configure it, and
+	  return it.
+	<LI><STRONG>runAnimation</STRONG>. This function takes four arguments:
+	  <OL>
+            <LI><STRONG>a2d</STRONG>. The animation (e.g., an animation
+              created by calling createAnimation).
+            <LI><STRONG>title</STRONG>. The title to use for a window
+              when a built-in viewer is used.
+            <LI><STRONG>da</STRONG>. A directory accessor (typically provided
+              by the scrunner -d option) for a temporary directory used
+              to hold a sequence of images that will be used by a program
+              such as ffmpeg to create the final animation.
+            <LI><STRONG>tend</STRONG>. The time (in seconds) at which the
+              animation ends.
+	  </OL>
+	  This function will run the animation and
+	  returns <STRONG>void</STRONG>.
+      </UL>
+    <P>
+      For example,<BLOCKQUOTE><PRE><CODE>import (org.bzdev.util.units.MKS);
+var a2d = createAnimation({
+    frameWidth: 800,
+    frameHeight: 600,
+    ticksPerSecond: 1000.0,
+    ticksPerFrame: 40,
+    imageSpaceDistance: 200,
+    gcsDistance: feet(12)
+  });
+...
+runAnimation(a2d, "Example", null, 30.0);
+</CODE></PRE></BLOCKQUOTE>
+  </DIV>
+  </BODY>
+</HTML>
+
+<!--  LocalWords:  scrunner AnimationLayer AnimationLayerFactory GCS
+ -->
+<!--  LocalWords:  AnimationPath DFactory ConnectingLine GraphView xf
+ -->
+<!--  LocalWords:  GraphviewFactory Graphview ZoomMode KinematicOps
+ -->
+<!--  LocalWords:  PlacedAnimationObject PlacedObject dFactory xgcs
+ -->
+<!--  LocalWords:  RefPointMode BasicSplinePath MathOps CarFactory yf
+ -->
+<!--  LocalWords:  BicycleFactory PedestrianFactory createAnimation
+ -->
+<!--  LocalWords:  AnimatedPanelGraphics frameWidth frameHeight ygcs
+ -->
+<!--  LocalWords:  ticksPerSecond ticksPerFrame imageSpaceDistance da
+ -->
+<!--  LocalWords:  gcsDistance runAnimation accessor ffmpeg
+ -->

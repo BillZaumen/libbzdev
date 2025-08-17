@@ -10029,6 +10029,7 @@ public class ExpressionParser implements ObjectParser<Object>
 			level++; // so we have to decr after each operator
 			next = new Token(Operator.FUNCTION_KEYWORD, variable,
 					 offset+start, level);
+			Set<String> oldvset = vset;
 			vset = new HashSet<String>();
 			vsetStack.push(vset);
 			functkwSeen = true;
@@ -10054,6 +10055,13 @@ public class ExpressionParser implements ObjectParser<Object>
 				    if (functNames.contains(fName)) {
 					String msg =
 					    errorMsg("fnameInUse", fName);
+					throw new ObjectParser.Exception
+					    (msg, filenameTL.get(), s, i);
+				    }
+				    if (exists(fName)
+					|| oldvset.contains(fName)) {
+					String msg =
+					    errorMsg("fnameMatchesVar", fName);
 					throw new ObjectParser.Exception
 					    (msg, filenameTL.get(), s, i);
 				    }

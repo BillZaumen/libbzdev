@@ -1,4 +1,4 @@
-GHAS_JS_TEST = \
+HAS_JS_TEST = \
 	`java -Dscrunner.usrconf=test.conf -p ../../BUILD \
 		-m org.bzdev.scrunner \
 		--supportsLanguage ECMAScript`
@@ -533,8 +533,8 @@ sbl-publickey:
 
 startup:
 	( cd ../.. ; make )
-	java -p ../../BUILD:$(MODULEDIR) -m org.bzdev.scrunner \
-		module:org.bzdev.rdanim startupTest.esp
+	java -p ../../BUILD -m org.bzdev.scrunner \
+		module:org.bzdev.anim2d startupTest.esp
 
 clean:
 	rm -fr junk raf tmp.png

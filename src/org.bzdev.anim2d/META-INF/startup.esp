@@ -1,0 +1,68 @@
+import (org.bzdev.anim2d, [
+    Animation2D, KinematicOps2D,
+    AnimationLayer2D, AnimationLayer2DFactory,
+    AnimationPath2D, AnimationPath2DFactory,
+    AnimationLayer2D.Type,
+    ConnectingLine2D, ConnectingLine2DFactory,
+    GraphView, GraphViewFactory,
+    GraphView.ZoomMode,
+    PlacedAnimationObject2D, PlacedObject2DFactory,
+    PlacedObject2DFactory.RefPointMode
+]);
+import (org.bzdev.geom.BasicSplinePath2D);
+import (org.bzdev.swing.AnimatedPanelGraphics);
+
+function createAnimation(spec) {
+    var frameWidth = spec["frameWidth"];
+    var frameHeight = spec["frameHeight"];
+    var ticksPerSecond = spec["ticksPerSecond"];
+    var ticksPerFrame = spec["ticksPerFrame"];
+    var idist = spec["imageSpaceDistance"];
+    var dist = spec["gcsDistance"];
+    var xgcs = spec["xgcs"];
+    var ygcs = spec["ygcs"];
+    var xf = spec["xf"];
+    var yf = spec["yf"];
+
+    frameWidth == null && throw "createAnimation:"
+	+ org.bzdev.anim2d.StartupErrors.missingFrameWidth();
+    frameHeight == null && throw "createAnimation: "
+	+ org.bzdev.anim2d.StartupErrors.missingFrameHeight(); 
+    ticksPerSecond == null && throw "createAnimation: "
+	+ org.bzdev.anim2d.StartupErrors.missingTicksPerSecond(); 
+    ticksPerFrame == null && throw "createAnimation: "
+	+ org.bzdev.anim2d.StartupErrors.missingTicksPerFrame();
+    idist == null && throw "createAnimation: "
+	+ org.bzdev.anim2d.StartupErrors.missingImageSpaceDistance();
+    dist == null && throw "createAnimation: "
+	+ org.bzdev.anim2d.StartupErrors.missingGCSDistance();
+
+    xgcs = (xgcs == null)? 0.0: xgcs;
+    ygcs = (ygcs == null)? 0.0: ygcs;
+    xf = (xf == null)? 0.0: xf;
+    yf = (yf == null)? 0.0: yf;
+    
+    var scalef = idist/dist;
+
+    var a2d = new Animation2D(scripting, frameWidth, frameHeight,
+			      ticksPerSecond, ticksPerFrame);
+    a2d.setRanges(xgcs, ygcs, xf, yf, scalef, scalef);
+    a2d
+}
+
+function runAnimation(a2d, title, da, tend) {
+    var maxframes = a2d.estimateFrameCount(tend);
+    var apg = (da != null)? null:
+	AnimatedPanelGraphics.newFramedInstance(a2d, title, true, true, null);
+    (da != null)? `{
+	da.list().forEach(function (name) {
+	    da.isDirectory(name) || da.delete(name); void
+	});
+	a2d.initFrames(maxframes, "img", "jpeg", da);
+    }: a2d.initFrames(maxframes, apg);
+
+    a2d.scheduleFrames(0, maxframes);
+    a2d.run();
+    (apg == null) || `{apg.close();};
+    void
+}

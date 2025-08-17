@@ -12,6 +12,13 @@
  * <B>Please see
  * <A HREF="org/bzdev/anim2d/doc-files/description.html"> the org.bzdev.anim2d description</A>
  * for a description of how to use this module.</B>
+ * <P>
+ * This module also contains an
+ * <A HREF="doc-files/startup.html"><B>ESP startup resource</B></A> for use
+ * with the <STRONG>scrunner</STRONG> command. As the <STRONG>scrunner</STRONG>
+ * manual page indicates, you can add the argument
+ * <STRONG>module:org.bzdev.anim2d</STRONG> to the <STRONG>scrunner</STRONG>
+ * command line.
  */
 module org.bzdev.anim2d {
     exports org.bzdev.anim2d;
@@ -37,4 +44,4 @@ module org.bzdev.anim2d {
 
 }
 
-//  LocalWords:  HREF
+//  LocalWords:  HREF scrunner
