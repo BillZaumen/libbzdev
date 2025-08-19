@@ -533,8 +533,14 @@ sbl-publickey:
 
 startup:
 	( cd ../.. ; make )
-	java -p ../../BUILD -m org.bzdev.scrunner \
-		module:org.bzdev.anim2d startupTest.esp
+	java -p ../../BUILD -m org.bzdev.scrunner startupTest.esp
+
+MODULEDIR=
+
+startup2:
+	( cd ../.. ; make )
+	java -p ../../BUILD:$(MODULEDIR) -m org.bzdev.scrunner startupTest2.esp
+
 
 clean:
 	rm -fr junk raf tmp.png

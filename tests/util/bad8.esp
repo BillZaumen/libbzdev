@@ -1,0 +1,4 @@
+var x = 10;
+### module/org.bzdev.anim2d
+global.getWriter().println(x);
+

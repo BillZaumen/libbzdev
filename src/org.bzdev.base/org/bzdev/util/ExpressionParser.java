@@ -1,4 +1,5 @@
 package org.bzdev.util;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.InputStreamReader;
@@ -7556,6 +7557,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	void setTrueMode() {trueMode = true;}
 	boolean trueMode() {return trueMode;}
 
+	boolean conditionalFunction = false;
+
 
 	Token(Operator type, String s, int index, int level) {
 	    this.type = type;
@@ -7895,6 +7898,29 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
     }
 
+    // used to find the start of module:MODULE
+    private static int skipWhitespaceOnLine(String s, int i, int len) {
+	if (i == len) return i;
+	char ch = s.charAt(i);
+	while (ch == ' ' || ch == '\t') {
+	    i++;
+	    if (i == len) return i;
+	    ch = s.charAt(i);
+	}
+	return i;
+    }
+
+    private static int findWhitespace(String s, int i, int len) {
+	if (i == len) return i;
+	int j = i;
+	char ch = s.charAt(j);
+	while (!Character.isWhitespace(ch)) {
+	    j++;
+	    if (j == len) return j;
+	    ch = s.charAt(j);
+	}
+	return j;
+    }
 
     // returns the new index.
     private static int skipWhitespace(String s, int i, boolean noterm)
@@ -7994,6 +8020,33 @@ public class ExpressionParser implements ObjectParser<Object>
 	return s.substring(i, end);
     }
 
+    static InputStream getStartupIS(String fileName)
+	    throws FileNotFoundException
+    {
+	if (fileName.startsWith("module:")) {
+	    fileName = fileName.substring(7);
+	}
+	InputStream[] isarray = new InputStream[1];
+	final String moduleName = fileName;
+
+	ModuleLayer.boot().modules().stream()
+	    .filter(module -> module.getName().equals(moduleName))
+	    .findFirst().
+	    ifPresent((m) -> {
+		    try {
+			isarray[0] = m
+			    .getResourceAsStream("META-INF/startup.esp");
+		    } catch (java.lang.Exception e) {
+			isarray[0] = null;
+		    }
+		});
+	InputStream result = isarray[0];
+	if (result == null) {
+	    String msg = errorMsg("noStartup", moduleName);
+	    throw new FileNotFoundException(msg);
+	}
+	return result;
+    }
 
     private LinkedList<Token>
 	tokenize(String s, int offset, ArrayList<LinkedList<Token>> tarray)
@@ -8285,6 +8338,17 @@ public class ExpressionParser implements ObjectParser<Object>
 			    continue;
 			} else if (s.charAt(i+1)=='#' && s.charAt(i+2)=='#') {
 			    i += 3;
+			    i = skipWhitespaceOnLine(s, i, len);
+			    int j = findWhitespace(s, i, len);
+			    String module = (i==j)? null: s.substring(i, j);
+			    i = j;
+			    if (module != null) {
+				if (!module.startsWith("module:")) {
+				    String msg = errorMsg("notModule", module);
+				    throw new ObjectParser.Exception
+					(msg, filenameTL.get(), s, i);
+				}
+			    }
 			    i = skipWhitespace(s, i, len, false);
 			    if (i == len) {
 				i--;
@@ -8338,6 +8402,42 @@ public class ExpressionParser implements ObjectParser<Object>
 				    processor.eval(s);
 				    processor.getResult();
 				    processor.clear();
+				}
+				if (module != null) {
+				    String savedFN =
+					filenameTL.get();
+				    filenameTL.set(module);
+				    try {
+					InputStream is = getStartupIS(module);
+					String sForMod = new
+					    String(is.readAllBytes(), "UTF-8");
+				       LinkedList<Token> tokensForMod
+					   = tokenize(sForMod, 0, null);
+				       Token first = tokens.peek();
+				       if (first != null) {
+					   if (first.getType()
+					       == Operator.PLUS) {
+					       tokens.poll();
+					   }
+				       }
+				       parseExpression(tokensForMod, sForMod);
+				       processor.eval(sForMod);
+				       processor.getResult();
+				       processor.clear();
+				    } catch (FileNotFoundException e) {
+					throw new ObjectParser.Exception
+					    (e.getMessage(),
+					     filenameTL.get(), s, i);
+				    } catch(ObjectParser.Exception e) {
+					throw e;
+				    } catch (java.lang.Exception e) {
+					String msg =
+					    errorMsg("noStartup1", module);
+					throw new ObjectParser.Exception
+					    (msg, filenameTL.get(), s, i);
+				    } finally {
+					filenameTL.set(savedFN);
+				    }
 				}
 				// reinitialize and continue
 				vsetStack = new Stack<Set<String>>();
@@ -10042,6 +10142,13 @@ public class ExpressionParser implements ObjectParser<Object>
 			    // we found a top-level function definition.
 			    i = skipWhitespace(s, i, len, true);
 			    ch = s.charAt(i);
+			    boolean conditionalFunction = false;
+			    if (ch == '?') {
+				conditionalFunction = true;
+				i++;
+				i = skipWhitespace(s, i, len, true);
+				ch = s.charAt(i);
+			    }
 			    if (Character.isJavaIdentifierStart(ch)) {
 				// function definition, not lambda expression.
 				if (Character.isJavaIdentifierStart(ch)) {
@@ -10052,21 +10159,32 @@ public class ExpressionParser implements ObjectParser<Object>
 					ch = s.charAt(i);
 				    }
 				    String fName = s.substring(start2,i);
-				    if (functNames.contains(fName)) {
-					String msg =
-					    errorMsg("fnameInUse", fName);
-					throw new ObjectParser.Exception
-					    (msg, filenameTL.get(), s, i);
-				    }
-				    if (exists(fName)
-					|| oldvset.contains(fName)) {
-					String msg =
-					    errorMsg("fnameMatchesVar", fName);
-					throw new ObjectParser.Exception
-					    (msg, filenameTL.get(), s, i);
+				    if (conditionalFunction == false) {
+					if (functNames.contains(fName)) {
+					    String msg =
+						errorMsg("fnameInUse", fName);
+					    throw new ObjectParser.Exception
+						(msg, filenameTL.get(), s, i);
+					}
+					if (exists(fName)
+					    || oldvset.contains(fName)) {
+					    String msg =
+					     errorMsg("fnameMatchesVar", fName);
+					    throw new ObjectParser.Exception
+						(msg, filenameTL.get(), s, i);
+					    }
+				    } else {
+					if (oldvset.contains(fName)) {
+					    String msg =
+					     errorMsg("fnameMatchesVar", fName);
+					    throw new ObjectParser.Exception
+						(msg, filenameTL.get(), s, i);
+					}
 				    }
 				    functNames.add(fName);
 				    next.setValue(fName);
+				    next.conditionalFunction
+					= conditionalFunction;
 				} else {
 				    // error
 				    String tmp = s.substring(i, i+1);
@@ -10858,6 +10976,7 @@ public class ExpressionParser implements ObjectParser<Object>
 		if (iter.hasNext()) {
 		    boolean forMethod = token.forMethod();
 		    String functName = (String)token.getValue();
+		    boolean conditionalFunction = token.conditionalFunction;
 		    boolean willSync = token.willSync();
 		    token = iter.next();
 		    if (token.getType() != Operator.OPAREN) {
@@ -10940,7 +11059,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		    if (functName != null) {
 			// top-level function name - so just insert the
 			// function into the table.
-			vmap.get().put(functName, lambda);
+			if (conditionalFunction) {
+			    // for function? definitions, only insert the
+			    // function if one with that name is not already
+			    // there.
+			    Map<String,Object>vm = vmap.get();
+			    if (!vm.containsKey(functName)) {
+				vm.put(functName, lambda);
+			    }
+			} else {
+			    vmap.get().put(functName, lambda);
+			}
 		    } else {
 			if (forMethod) lambda.setAsMethod();
 			processor.pushValue(lambda);

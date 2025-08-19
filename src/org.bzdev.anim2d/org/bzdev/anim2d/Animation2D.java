@@ -72,7 +72,6 @@ import java.util.zip.*;
  * add can multiple, independent animations to the same simulation if
  * desired.
  * <P>
-
  * The method {@link #setImageType(Graph.ImageType)} can be used to
  * change the image type of the animation's graph's buffered image.
  * The default should be changed if the animation is to have a transparent
@@ -82,8 +81,13 @@ import java.util.zip.*;
  * instance of {@link ISWriterOps}. While not applicable to the
  * file-based class {@link ImageSequenceWriter}, it is appropriate for
  * instances of {@link ISWriterOps} associated with graphics displays.
+ * <P>
+ * When ESP scripts are used, there is a module startup script that
+ * will define two functions and import some classes, as described
+ * in the {@link org.bzdev.anim2d/ org.bzdev.anim2d module documentation}.
  *
  * @see org.bzdev.devqsim.Simulation
+ * @see org.bzdev.anim2d/
  */
 public class Animation2D extends Simulation
     implements ISWriterOps.AnimationParameters, GraphCreator

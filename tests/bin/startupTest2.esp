@@ -1,4 +1,4 @@
-### module:org.bzdev.anim2d
+### module:org.bzdev.rdanim
 
 import (org.bzdev.util.units.MKS);
 

@@ -195,7 +195,16 @@
     <STRONG>var . </STRONG><EM>IDENTIFIER</EM>, which tests if the
     identifier <EM>IDENTIFIER</EM> exists, and the <STRONG>###</STRONG>
     delimiter, which results in previous statements being immediately
-    executed.
+    executed. When the the <STRONG>###</STRONG> is followed
+    by <STRONG>module:</STRONG><EM>JAVA_MODULE_NAME</EM> on the same
+    line, a startup script associated with that Java module will be
+    read. The module description in the API documentation should indicate
+    if a module contains startup scripts.  The modules
+    <STRONG>org.bzdev.anim2d</STRONG> and
+    <STRONG>org.bzdev.rdanim</STRONG> are examples of modules that
+    contain these scripts: these provide some import statements and
+    also define functions named <CODE>createAnimation</CODE> and
+    <CODE>runAnimation</CODE>.
     <P>
     The following provides an overview of the differences.
     <UL>
@@ -763,8 +772,10 @@ var y = 20;
     <BLOCKQUOTE><PRE>
 statements: statement
     | statements &apos;;&apos; statement
-    | statements &apos;###&apos; statement
-    | statements &apos;;&apos; &apos;###&apos; statement
+    | statements &apos;###&apos; newline statement
+    | statements &apos;;&apos; &apos;###&apos; newline statement
+    | statements &apos;###&apos; moduleReference newline statement
+    | statements &apos;;&apos; &apos;###&apos; moduleReference newline statement
 
 statement: <A HREF="#expressions">expression</A>
     | <A HREF="#vardefs">var-definition</A>
@@ -780,11 +791,17 @@ statement: <A HREF="#expressions">expression</A>
     final semicolon is ignored (it is easy to type a final semicolon,
     when alternating between Java, ECMAScript, and ESP).
   <P>
-    The token &apos;###&apos; is allowed only in scripting mode and cannot
-    appear within an expression, object, or function definition. It
-    causes the preceding statements to be evaluated before parsing
-    continues. It is provided to handle cases in which variables are
-    defined via side effects: for example, the following script
+    The token &apos;###&apos; is allowed only in scripting mode.  When
+    followed by a moduleReference (the fully qualified name of a Java
+    module, preceded by the string <CODE>module:</CODE>), this
+    directive will behave as two &apos;###&apos; lines with the Java
+    modules startup script inserted in between.  Otherwise it must be
+    followed by a new line (possibly preceded by whitespace) and
+    cannot appear within an expression, object, or function
+    definition. It causes the preceding statements to be evaluated
+    before parsing continues. It is provided to handle cases in which
+    variables are defined via side effects: for example, the following
+    script
     <BLOCKQUOTE><PRE><CODE>
 import(org.bzdev.anim2d, [Animation2D,
 			  AnimationLayer2DFactory,
@@ -829,7 +846,7 @@ out.println(alf);
     will function as desired because the &apos;###&apos; line causes the
     previous statements to be evaluated, which will result in a
     variable named &apos;alf&apos; being defined.  While not a requirement, as a
-    stylistic hint, the &apos;###&apos; token should be placed on its own line
+    stylistic hint, the &apos;###&apos; token should start on its own line
     (to improve readability). One of the use cases for ESP involves
     configuring simulations (see {@link org.bzdev.devqsim.Simulation}
     and its subclasses).  The run time for simulations can be lengthy,
@@ -1101,7 +1118,10 @@ println(" foo exists = " + var.foo);
     followed by a parameter list delimited by parentheses, and
     finally a sequence of statements delimited by curly braces.
     There is not a <STRONG>return</STRONG> statement. Instead, the
-    last file is the value of the final statement.
+    last file is the value of the final statement. In addition, functions
+    and variables are in the same name space and, unlike Java, functions
+    can not be overloaded: once a function is defined, it cannot be
+    redefined.
   <P>
     The syntax for a function definition is as follows:
     <BLOCKQUOTE><PRE>
@@ -1109,6 +1129,13 @@ function-definition: &apos;function&apos; identifier &apos;(&apos; parameter-lis
                      &apos;{&apos; function-statements &apos;}&apos;
     | &apos;synchronized&apos; &apos;function&apos; identifier &apos;(&apos; parameter-list &apos;)&apos;
                      &apos;{&apos; function-statements &apos;}&apos;
+    | &apos;function&apos; &apos;?&apos; identifier &apos;(&apos; parameter-list &apos;)&apos;
+                     &apos;{&apos; function-statements &apos;}&apos;
+    | &apos;synchronized&apos; &apos;function&apos;  &apos;?&apos; identifier &apos;(&apos; parameter-list &apos;)&apos;
+                     &apos;{&apos; function-statements &apos;}&apos;
+
+parameter-list: identifier
+    | parameter-list &apos;,&apos; identifier
 
 function-statements: function-statement
     | function-statements &apos;;&apos; function-statement
@@ -1117,6 +1144,20 @@ function-statement: expression
     | var-definition
     | assignment-statement
     </PRE></BLOCKQUOTE>
+  <P>
+    When a quotation mark follows the keyword <STRONG>function</STRONG>,
+    the function definition will be ignored if there is an existing
+    function with the same name. This feature was added to make
+    module startup scripts easier to reference in scripts. For example,
+    if a script starts with
+    <BLOCKQUOTE><PRE><CODE>
+### module:org.bzdev.anim2d
+### module:org.bzdev.rdanim
+    </CODE></PRE></BLOCKQUOTE>
+    the script referenced by <CODE>module:org.bzdev.anim2d</CODE> will
+    be loaded twice, once explicitly and then by the other startup
+    script. Adding a quotation mark after the keyword
+    <CODE>function</CODE> suppresses an error.
   <P>
     When the keyword <STRONG> synchronized</STRONG> is present, the
     function call will be synchronized on the expression parser
@@ -2988,4 +3029,6 @@ a2d.scheduleFrames(0, maxFrames);
 <!--  LocalWords:  lexically Casted toStream IntStream DoubleStream
  -->
 <!--  LocalWords:  backquote AnimationExample precesses uninsurable
+ -->
+<!--  LocalWords:  moduleReference
  -->

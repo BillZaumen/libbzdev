@@ -1,0 +1,29 @@
+
+var out = global.getWriter();
+
+function foo() {
+    out.println("first foo");
+}
+
+
+function? bar(x, y) {
+    out.println("first bar");
+}
+
+function? foo() {
+    out.println("second foo");
+}
+
+function? bar(x, y) {
+    out.println("second bar");
+}
+
+foo();
+bar(1, 2);
+
+
+function foobar() {
+    out.println("foobar");
+}
+
+foobar();

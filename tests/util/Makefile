@@ -99,6 +99,7 @@ all: compile
 	@$(JAVA) ExprScriptTest15
 	@echo - ExpressionParser Test '( .foreach())' -
 	@$(JAVA) ExprScriptTest16
+	./scrun funct.esp
 	@echo ---- try some ESP runtime errors
 	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
@@ -107,8 +108,11 @@ all: compile
 	./scrun bad4.esp || echo EXCEPTION EXPECTED
 	./scrun bad5.esp || echo EXCEPTION EXPECTED
 	./scrun bad6.esp || echo EXCEPTION EXPECTED
+	./scrun bad7.esp || echo EXCEPTION EXPECTED
+	./scrun bad8.esp || echo EXCEPTION EXPECTED
 	./scrun nulltest.esp
 	./scrun not.esp
+	./scrun -vD:foobar:20.0 funct.esp || echo EXCEPTION EXPECTED
 	@echo --- docsig test ---
 	./scrun --codebase docsig.jar --exit docsig.esp
 	./scrun -p docsig.jar --exit docsig.esp
@@ -132,6 +136,12 @@ not: compile
 	chmod u+x scrun
 	./scrun not.esp
 	./scrun not2.esp
+	chmod u-x scrun
+
+funct: compile
+	chmod u+x scrun
+	./scrun --stackTrace  funct.esp
+	./scrun -vD:foobar:20.0 funct.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
 
 backquote: compile
@@ -182,6 +192,12 @@ compile:
 	mkdir -p classes
 	javac -d classes -p ../../BUILD  --add-modules org.bzdev *.java
 
+module:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun module.esp
+	chmod u-x scrun
+
 badesp:
 	(cd ../.. ; make jars)
 	chmod u+x scrun
@@ -192,6 +208,7 @@ badesp:
 	./scrun  bad5.esp || echo EXCEPTION EXPECTED
 	./scrun  bad6.esp || echo EXCEPTION EXPECTED
 	./scrun bad7.esp || echo EXCEPTION EXPECTED
+	./scrun bad8.esp || echo EXCEPTION EXPECTED
 	./scrun  espResource.esp || echo EXCEPTION EXPECTED
 	chmod u-x scrun
 

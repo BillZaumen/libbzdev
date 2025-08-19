@@ -1,4 +1,5 @@
 import (org.bzdev.anim2d, [
+    StartupErrors,
     Animation2D, KinematicOps2D,
     AnimationLayer2D, AnimationLayer2DFactory,
     AnimationPath2D, AnimationPath2DFactory,
@@ -12,7 +13,7 @@ import (org.bzdev.anim2d, [
 import (org.bzdev.geom.BasicSplinePath2D);
 import (org.bzdev.swing.AnimatedPanelGraphics);
 
-function createAnimation(spec) {
+function? createAnimation(spec) {
     var frameWidth = spec["frameWidth"];
     var frameHeight = spec["frameHeight"];
     var ticksPerSecond = spec["ticksPerSecond"];
@@ -24,7 +25,7 @@ function createAnimation(spec) {
     var xf = spec["xf"];
     var yf = spec["yf"];
 
-    frameWidth == null && throw "createAnimation:"
+    frameWidth == null && throw "createAnimation: "
 	+ org.bzdev.anim2d.StartupErrors.missingFrameWidth();
     frameHeight == null && throw "createAnimation: "
 	+ org.bzdev.anim2d.StartupErrors.missingFrameHeight(); 
@@ -50,7 +51,7 @@ function createAnimation(spec) {
     a2d
 }
 
-function runAnimation(a2d, title, da, tend) {
+function? runAnimation(a2d, title, da, tend) {
     var maxframes = a2d.estimateFrameCount(tend);
     var apg = (da != null)? null:
 	AnimatedPanelGraphics.newFramedInstance(a2d, title, true, true, null);
