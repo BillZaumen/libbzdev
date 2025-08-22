@@ -1,0 +1,31 @@
+import (org.bzdev.anim2d, [Animation2D, ConnectingLine2D,
+			   ConnectingLine2DFactory]);
+
+var a2d = new Animation2D(scripting, 800, 600, 1000.0, 40);
+
+a2d.createFactories("org.bzdev.anim2d", {
+    clf: "ConnectingLine2DFactory"
+});
+
+###
+
+var YELLOW = {red: 255, green: 255, blue: 0};
+
+var cl = clf.createObject("line", [
+    {zorder: 20, u1: 0.1, u2: 0.9, visible: false},
+    {withPrefix: "color", config: YELLOW},
+    {withPrefix: "stroke", config: {
+	width: 2.0, dashIncrement: 10.0, dashPattern: "- "}}
+]);
+
+cl.configure(function() {10}, function() {20},
+	      function() {30}, function() {40});
+
+cl.configure(function() {10}(), function() {20}(),
+	      function() {30}, function() {40});
+
+cl.configure(function() {10}, function() {20},
+	     function() {30}(), function() {40}());
+
+cl.configure(function() {10}(), function() {20}(),
+	     function() {30}(), function() {40}());

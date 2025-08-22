@@ -422,6 +422,25 @@ Table styles
 .contentContainer ul li table td.colOne, .classUseContainer ul li table td.colOne {
     padding-right:3pt;
 }
+// To fix first page
+.overviewSummary caption, .packageSummary caption, .contentContainer ul.blockList li.blockList caption, .summary caption, .classUseContainer caption, .constantValuesContainer caption {
+    position:relative;
+    text-align:left;
+    background-repeat:no-repeat;
+    color:#FFFFFF;
+    font-weight:bold;
+    clear:none;
+    overflow:hidden;
+    padding-top:0pt;
+    padding-left:0pt;
+    padding-right:0pt;
+    padding-bottom:10pt;
+    margin:0pt;
+}
+.overviewSummary caption span.activeTableTab span, .typeSummary caption span.activeTableTab span {
+    background-color:#A44C0F;
+}
+// end fix
 .overviewSummary caption, .packageSummary caption, .contentContainer ul.blockList li.blockList caption, .summary caption, .classUseContainer caption, .constantValuesContainer caption {
     position:relative;
     text-align:left;

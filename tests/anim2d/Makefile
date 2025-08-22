@@ -1,6 +1,6 @@
 JAVA = java  -classpath ../../BUILD/libbzdev.jar:classes
 
-SCRUN = java -classpath ../../BUILD/scrunner.jar \
+SCRUN = java -classpath ../../BUILD/scrunner.jar: \
      org.bzdev.bin.scrunner.SCRunnerCmd "$$@"
 
 HAS_JS = java -p ../../BUILD -m org.bzdev.scrunner --supportsLanguage ECMAScript
@@ -238,6 +238,13 @@ eptest2:
 	mkdir -p classes
 	@echo ----- Starting Script Factory Test with EP script ----
 	$(SCRUN) --resourcePath images scriptTest2.esp
+
+cltest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	@echo ----- Checking ConnectingLine2D from script ----
+	$(SCRUN) scriptTest3.esp
+
 cltest:
 	(cd ../.. ; make jars)
 	mkdir -p classes

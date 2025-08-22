@@ -66,6 +66,31 @@ public class CLTest {
 
 	cl2.configure(0.2, 0.5);
 
+	ConnectingLine2D cl3 = clf.createObject("cl3");
+	cl3.setColor(Color.GREEN);
+	cl3.setStroke(new BasicStroke(2.0F));
+	cl3.setVisible(true);
+
+	cl3.configure(25.0*(index3++) / 160.0,
+		      10.0,
+		      () -> {
+			  return 25.0*(index4++) / 160.0;
+		      }, () -> {
+			  return -10.0;
+		      });
+
+	ConnectingLine2D cl4 = clf.createObject("cl4");
+	cl4.setColor(Color.YELLOW);
+	cl4.setStroke(new BasicStroke(2.0F));
+	cl4.setVisible(true);
+
+	cl4.configure(() -> {
+		return 5 + 25.0*(index3++) / 160.0;
+	    }, () -> {
+		return 10.0;
+	    }, 5 + 25.0*(index4++) / 160.0, -10.0);
+
+
 	a2d.initFrames(maxframes, apg);
 	a2d.scheduleFrames(0, maxframes);
 	a2d.run();

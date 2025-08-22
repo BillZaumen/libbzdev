@@ -50,13 +50,13 @@ public class ConnectingLine2D extends AnimationObject2D  {
     /**
      * Configure the line's end points.
      * @param getX1 the supplier that provides the X coordinate of
-     *              the first end point.
+     *              the first end point
      * @param getY1 the supplier that provides the Y coordinate of
-     *              the first end point.
+     *              the first end point
      * @param getX2 the supplier that provides the X coordinate of
-     *              the second end point.
+     *              the second end point
      * @param getY2 the supplier that provides the Y coordinate of
-     *              the second end point.
+     *              the second end point
      * @return this object
      */
     public ConnectingLine2D configure(DoubleSupplier getX1,
@@ -70,6 +70,81 @@ public class ConnectingLine2D extends AnimationObject2D  {
 	fy2 = getY2;
 	return this;
     }
+
+    /**
+     * Configure the line's end points with the first endpoint fixed.
+     * @param x the X coordinate of the first end point
+     * @param y the Y coordinate of the first end point
+     * @param getX2 the supplier that provides the X coordinate of
+     *              the second end point
+     * @param getY2 the supplier that provides the Y coordinate of
+     *              the second end point
+     * @return this object
+     */
+    public ConnectingLine2D configure(double x,
+				      double y,
+				      DoubleSupplier getX2,
+				      DoubleSupplier getY2)
+    {
+	DoubleSupplier getX1 = new DoubleSupplier() {
+		public double getAsDouble() {return x;}
+	    };
+	DoubleSupplier getY1 = new DoubleSupplier() {
+		public double getAsDouble() {return y;}
+	    };
+	return configure(getX1, getY1, getX2, getY2);
+    }
+
+    /**
+     * Configure the line's end points with the second endpoint fixed.
+     * @param getX1 the supplier that provides the X coordinate of
+     *              the first end point
+     * @param getY1 the supplier that provides the Y coordinate of
+     *              the first end point
+     * @param x the X coordinate of the second end point
+     * @param y the Y coordinate of the second end point
+     * @return this object
+     */
+    public ConnectingLine2D configure(DoubleSupplier getX1,
+				      DoubleSupplier getY1,
+				      double x,
+				      double y)
+    {
+	DoubleSupplier getX2 = new DoubleSupplier() {
+		public double getAsDouble() {return x;}
+	    };
+	DoubleSupplier getY2 = new DoubleSupplier() {
+		public double getAsDouble() {return y;}
+	    };
+	return configure(getX1, getY1, getX2, getY2);
+    }
+
+    /**
+     * Configure the line's end points with the both endpoints fixed.
+     * @param x1 the X coordinate of the first end point
+     * @param y1 the Y coordinate of the first end point
+     * @param x2 the X coordinate of the second end point
+     * @param y2 the Y coordinate of the second end point
+     * @return this object
+     */
+    public ConnectingLine2D configure(double x1, double y1,
+				      double x2, double y2)
+    {
+	DoubleSupplier getX1 = new DoubleSupplier() {
+		public double getAsDouble() {return x1;}
+	    };
+	DoubleSupplier getY1 = new DoubleSupplier() {
+		public double getAsDouble() {return y1;}
+	    };
+	DoubleSupplier getX2 = new DoubleSupplier() {
+		public double getAsDouble() {return x2;}
+	    };
+	DoubleSupplier getY2 = new DoubleSupplier() {
+		public double getAsDouble() {return y2;}
+	    };
+	return configure(getX1, getY1, getX2, getY2);
+    }
+
 
     /**
      * Configure path parameters for a line's end points.
