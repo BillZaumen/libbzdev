@@ -37,13 +37,13 @@ import org.bzdev.util.SafeFormatter;
  * 1 in device space, but for hardware-based devices (e.g., printers), this
  * may not be the case.  Typical computer monitors have 72 pixels per inch,
  * so for this case device space and user space are identical.  Both spaces
- * use a convention where increasing x coordinates point right and increasing
- * y coordinates point down.
+ * use a convention where increasing X coordinates point right and increasing
+ * Y coordinates point down.
  * <p>
  * The Graph class introduces a third space called graph coordinate
  * space in which the coordinates are in the units being plotted, and
  * in which increasing values are oriented as specified by the user
- * (generally 'left' for the x direction 'up' for the 'y' direction).
+ * (generally 'left' for the X direction 'up' for the Y direction).
  * (the normal convention when drawing graphs) rather than down. The
  * use of graph coordinate space simplifies drawing graphs as scaling
  * and translations are handled automatically.
@@ -79,7 +79,7 @@ import org.bzdev.util.SafeFormatter;
  * these offsets.  The height, width,and four offsets are specified
  * in user space.  The method
  * {@link Graph#setRanges(double,double,double,double) setRanges} provides
- * the upper and lower x and y coordinates in graph coordinate space
+ * the upper and lower X and Y coordinates in graph coordinate space
  * of the inner rectangle.  When a graph is created, the constructor
  * will call set all the offsets to 0 and then call
  * <code>setRanges(0.0, getWidth(), 0.0, getHeight())</code>,
@@ -104,7 +104,7 @@ import org.bzdev.util.SafeFormatter;
  *  <li> <A ID="drawImg"></A>drawImage.  There are several variants,
  *       some of which allow the image to be rotated, scaled, or
  *       flipped.  Arguments common to all are a graphics context, an
- *       image, and the x and y coordinate in graph-coordinate
+ *       image, and the X and Y coordinate in graph-coordinate
  *       space. Optional arguments (those that are present appear in the
  *       order shown below) include the following:
  *       <ul>
@@ -1024,9 +1024,9 @@ import org.bzdev.util.SafeFormatter;
       * positive X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the x coordinate in graph coordinate space for the image's
+      * @param x the X coordinate in graph coordinate space for the image's
       *        reference point
-      * @param y the coordinate in graph coordinate space for the image's
+      * @param y the Y coordinate in graph coordinate space for the image's
       *        reference point
       * @exception IOException the image could not be loaded
       */
@@ -1065,9 +1065,9 @@ import org.bzdev.util.SafeFormatter;
       * of the image will be parallel to the X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the x coordinate in graph coordinate space for the image's
+      * @param x the X coordinate in graph coordinate space for the image's
       *        reference point
-      * @param y the coordinate in graph coordinate space for the image's
+      * @param y the Y coordinate in graph coordinate space for the image's
       *        reference point
       * @param imageInGCS true if the image pixel size is a unit in
       *        graph coordinate space; false if the image pixel size
@@ -1107,8 +1107,8 @@ import org.bzdev.util.SafeFormatter;
       * relative to the positive X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @exception IOException the image could not be loaded
       */
@@ -1147,8 +1147,8 @@ import org.bzdev.util.SafeFormatter;
       * of the image will be parallel to the X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param imageInGCS true if the image pixel size is a unit in
       *        graph coordinate space; false if the image pixel size
@@ -1189,8 +1189,8 @@ import org.bzdev.util.SafeFormatter;
       * in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the
       *        image
       * @param angle an angle, in radians and in graph coordinate
@@ -1240,8 +1240,8 @@ import org.bzdev.util.SafeFormatter;
       * axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the
       *        image
       * @param angle an angle, in radians and in user space, by which
@@ -1288,8 +1288,8 @@ import org.bzdev.util.SafeFormatter;
       * linear if the scale factors in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param angle an angle, in radians and in graph coordinate
       *        space, by which the image will be rotated in the
@@ -1341,8 +1341,8 @@ import org.bzdev.util.SafeFormatter;
       * axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param angle an angle, in radians and in user space, by which
       *        the image will be rotated in the counter clockwise
@@ -1400,8 +1400,8 @@ import org.bzdev.util.SafeFormatter;
       * linear if the scale factors in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param angle an angle, in radians and in user space, by which
       *        the image will be rotated in the counter clockwise
@@ -1429,7 +1429,7 @@ import org.bzdev.util.SafeFormatter;
 
      // the value returned is in image-pixel-based units, assuming a
      // refpoint of (0.0, 0.0) is the upper-left corner of an image,
-     // with the image's x coordinate going from left to right and the
+     // with the image's X coordinate going from left to right and the
      // image's y coordinate going from top to bottom.
      private static Point2D getRefpoint(Image img, RefPointName name)
 	 throws IOException
@@ -1508,8 +1508,8 @@ import org.bzdev.util.SafeFormatter;
       * of the image will be parallel to the X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param angle an angle, in radians and in user space, by which
       *        the image will be rotated in the counter clockwise
@@ -1574,8 +1574,8 @@ import org.bzdev.util.SafeFormatter;
       * will take up one unit in user space. The lower and upper edges
       * of the image will be parallel to the X axis in user space.
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpointName the name of the reference point of the image
       * @param angle an angle, in radians and in user space, by which
       *        the image will be rotated in the counter clockwise
@@ -1624,8 +1624,8 @@ import org.bzdev.util.SafeFormatter;
       * relative to the positive X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1664,8 +1664,8 @@ import org.bzdev.util.SafeFormatter;
       * of the image will be parallel to the X axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1704,8 +1704,8 @@ import org.bzdev.util.SafeFormatter;
       * in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1752,8 +1752,8 @@ import org.bzdev.util.SafeFormatter;
       * axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1797,8 +1797,8 @@ import org.bzdev.util.SafeFormatter;
       * linear if the scale factors in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1850,8 +1850,8 @@ import org.bzdev.util.SafeFormatter;
       * axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1910,8 +1910,8 @@ import org.bzdev.util.SafeFormatter;
       * linear if the scale factors in the X and Y directions differ.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -1977,8 +1977,8 @@ import org.bzdev.util.SafeFormatter;
       * axis in user space.
       * @param g2d a graphics context on which to draw
       * @param img the image to draw
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -2089,8 +2089,8 @@ import org.bzdev.util.SafeFormatter;
       * between the X and Y directions and any graph rotation that might have
       * been configured.
       * @param img the image
-      * @param x the image's x coordinate in graph coordinate space
-      * @param y the image's y coordinate in graph coordinate space
+      * @param x the image's X coordinate in graph coordinate space
+      * @param y the image's Y coordinate in graph coordinate space
       * @param refpoint a reference point in the image's coordinate system
       *        that indicates the point on the image that will be placed at
       *        the point (x, y) in graph coordinate space
@@ -2758,9 +2758,9 @@ import org.bzdev.util.SafeFormatter;
       * be moved to (x, y) in graph coordinate space and everything
       * drawn will be translated by the same amount as well.
       * @param g the graphic to add to this graph
-      * @param x the x coordinate in graph-coordinate space at which
+      * @param x the X coordinate in graph-coordinate space at which
       *        the object should be placed
-      * @param y the y coordinate in graph-coordinate space at which
+      * @param y the Y coordinate in graph-coordinate space at which
       *        the object should be placed
       */
      public void add(Graphic g, double x, double y) {
@@ -2811,9 +2811,9 @@ import org.bzdev.util.SafeFormatter;
       * assumed to have a reference point at location (0.0, 0.0) in
       * user space.
       * @param g the graphic to add to this graph
-      * @param x the x coordinate in graph-coordinate space at which
+      * @param x the X coordinate in graph-coordinate space at which
       *        the object should be placed
-      * @param y the y coordinate in graph-coordinate space at which
+      * @param y the Y coordinate in graph-coordinate space at which
       *        the object should be placed
       */
      public void add(UserGraphic g, double x, double y) {
@@ -2842,9 +2842,9 @@ import org.bzdev.util.SafeFormatter;
       * @param g a graphics context that was obtained by calling the
       *        graph's {@link #createGraphics()} method
       * @param graphic the UserGraphic to draw
-      * @param x the x coordinate in graph-coordinate space at which
+      * @param x the X coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
-      * @param y the y coordinate in graph-coordinate space at which
+      * @param y the Y coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
       */
      public void add(Graphics2D g, UserGraphic graphic,
@@ -2963,9 +2963,9 @@ import org.bzdev.util.SafeFormatter;
       * @param g a graphics context that was obtained by calling the
       *        graph's {@link #createGraphics()} method
       * @param drawable the UserDrawable to draw
-      * @param x the x coordinate in graph-coordinate space at which
+      * @param x the X coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
-      * @param y the y coordinate in graph-coordinate space at which
+      * @param y the Y coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
       */
      public void draw(Graphics2D g, UserDrawable drawable,
@@ -3024,9 +3024,9 @@ import org.bzdev.util.SafeFormatter;
       * @param g a graphics context that was obtained by calling the
       *        graph's {@link #createGraphics()} method
       * @param drawable the UserDrawable to fill
-      * @param x the x coordinate in graph-coordinate space at which
+      * @param x the X coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
-      * @param y the y coordinate in graph-coordinate space at which
+      * @param y the Y coordinate in graph-coordinate space at which
       *        the object's reference point should be placed
       */
      public void fill(Graphics2D g, UserDrawable drawable,
@@ -3184,10 +3184,10 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Convert x-y coordinates as floats from graph coordinate space
+      * Convert X-Y coordinates as floats from graph coordinate space
       * to user space.
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @return the corresponding point in user space
       */
      public Point2D coordTransform(float x, float y) {
@@ -3196,10 +3196,10 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Convert x-y coordinates as doubles from graph coordinate space
+      * Convert X-Y coordinates as doubles from graph coordinate space
       * to user space.
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @return the corresponding point in user space
       */
      public Point2D coordTransform(double x, double y) {
@@ -3229,10 +3229,10 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Convert the x-y coordinates, as doubles, in user space to a
+      * Convert the X-Y coordinates, as doubles, in user space to a
       * point in graph coordinate space.
-      * @param x the x coordinate
-      * @param y the y coordinate
+      * @param x the X coordinate
+      * @param y the Y coordinate
       * @return the corresponding point in graph-coordinate space
       */
      public Point2D invCoordTransform(double x, double y)
@@ -3243,10 +3243,10 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Convert the x-y coordinates, as floats, in user space to a
+      * Convert the X-Y coordinates, as floats, in user space to a
       * point in graph coordinate space.
-      * @param x the x coordinate
-      * @param y the y coordinate
+      * @param x the X coordinate
+      * @param y the Y coordinate
       * @return the corresponding point in graph-coordinate space
       */
      public Point2D invCoordTransform(float x, float y)
@@ -3666,9 +3666,9 @@ import org.bzdev.util.SafeFormatter;
       * side of the axis. The possible locations of tick marks are defined
       * by arguments given to the constructor:
       * <ul>
-      *  <li> <code>tickBase</code> gives the x or y coordinate in graph
+      *  <li> <code>tickBase</code> gives the X or Y coordinate in graph
       *       coordinate space to begin counting possible tick
-      *       locations. The choice between an x or y coordinate is determined
+      *       locations. The choice between an X or Y coordinate is determined
       *       by the direction of the axis.
       *  <li> <code>tickIncr</code> is the increment in graph coordinate space
       *        between possible tick locations. This is always a
@@ -3759,22 +3759,22 @@ import org.bzdev.util.SafeFormatter;
 	 public static enum Dir {
 	     /**
 	      * An axis pointing vertically in the direction of an increasing
-	      * y coordinate.
+	      * Y coordinate.
 	      */
 	     VERTICAL_INCREASING,
 	     /**
 	      * An axis pointing vertically in the direction of a decreasing
-	      * y coordinate.
+	      * Y coordinate.
 	      */
 	     VERTICAL_DECREASING,
 	     /**
 	      * An axis pointing horizontally in the direction of a decreasing
-	      * x coordinate.
+	      * X coordinate.
 	      */
 	     HORIZONTAL_DECREASING,
 	     /**
 	      * An axis pointing horizontally in the direction of an increasing
-	      * x coordinate.
+	      * X coordinate.
 	      */
 	     HORIZONTAL_INCREASING};
 
@@ -4007,10 +4007,10 @@ import org.bzdev.util.SafeFormatter;
 	 }
 
 	 /**
-	  * Constructor given a starting point's x and y coordinates.
-	  * @param startX the x coordinate of the axis' starting point in
+	  * Constructor given a starting point's X and Y coordinates.
+	  * @param startX the X coordinate of the axis' starting point in
 	  *        graph coordinate space
-	  * @param startY the y coordinate of the axis' starting point in
+	  * @param startY the Y coordinate of the axis' starting point in
 	  *        graph coordinate space
 	  * @param dir the direction of the graph
 	  * @param length the length of the axis in graph coordinate space
@@ -4261,7 +4261,7 @@ import org.bzdev.util.SafeFormatter;
 	 /**
 	  * Get the coordinate value for a point on an axis for which there
 	  * may be a tick.
-	  * This will determine the x or y coordinate at which a tick mark
+	  * This will determine the X or Y coordinate at which a tick mark
 	  * may appear.
 	  * @param ind the index
 	  * @return the value in graph coordinate space corresponding
@@ -4289,7 +4289,7 @@ import org.bzdev.util.SafeFormatter;
       * Class to provide a logarithmic axis.
       * To produce logarithmic plots, the logarithm to base 10 of
       * values must be used as the graph coordinate space coordinates.
-      * This can be done for the x coordinate, the y coordinate, or
+      * This can be done for the X coordinate, the Y coordinate, or
       * both.  Thus, the coordinates for the values 1, 10.0, and 100.0
       * are 0.0, 1.0, and 2.0 respectively.
       * <P>
@@ -4829,26 +4829,26 @@ import org.bzdev.util.SafeFormatter;
      double yUpper;
 
      /**
-      * Get the x coordinate for the lower end of the graph's range.
-      * @return the x coordinate lower end of the graph's range in
+      * Get the X coordinate for the lower end of the graph's range.
+      * @return the X coordinate lower end of the graph's range in
       *         graph coordinate space
       */
      public double getXLower() {return xLower;}
      /**
-      * Get the y coordinate for the lower end of the graph's range.
-      * @return the y coordinate lower end of the graph's range in
+      * Get the Y coordinate for the lower end of the graph's range.
+      * @return the Y coordinate lower end of the graph's range in
       *         graph coordinate space
       */
      public double getYLower() {return yLower;}
      /**
-      * Get the x coordinate for the upper end of the graph's range.
-      * @return the x coordinate upper end of the graph's range in
+      * Get the X coordinate for the upper end of the graph's range.
+      * @return the X coordinate upper end of the graph's range in
       *         graph coordinate space
       */
      public double getXUpper() {return xUpper;}
      /**
-      * Get the y coordinate for the upper end of the graph's range.
-      * @return the y coordinate upper end of the graph's range in
+      * Get the Y coordinate for the upper end of the graph's range.
+      * @return the Y coordinate upper end of the graph's range in
       *         graph coordinate space
       */
      public double getYUpper() {return yUpper;}
@@ -4916,12 +4916,12 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Set the x and y ranges.
+      * Set the X and Y ranges.
       * All values are in graph coordinate space.
-      * @param xLower the lower value of the range in the x direction
-      * @param xUpper the upper value of the range in the x direction
-      * @param yLower the lower value of the range in the y direction
-      * @param yUpper the upper value of the range in the y direction
+      * @param xLower the lower value of the range in the X direction
+      * @param xUpper the upper value of the range in the X direction
+      * @param yLower the lower value of the range in the Y direction
+      * @param yUpper the upper value of the range in the Y direction
       */
      public void setRanges(double xLower, double xUpper,
 			   double yLower, double yUpper)
@@ -4949,10 +4949,10 @@ import org.bzdev.util.SafeFormatter;
       * Note: if {@link #setOffsets(int,int)} or
       * {@link #setOffsets(int,int,int,int)} will be called,
       * these methods should be called before this method is called.
-      * @param xgcs the x coordinate of a point in graph coordinate
+      * @param xgcs the X coordinate of a point in graph coordinate
       *        space that will be positioned at a specified location on
       *        the graph
-      * @param ygcs the y coordinate of a point in graph coordinate
+      * @param ygcs the Y coordinate of a point in graph coordinate
       *        space  that will be positioned at a specified location on
       *        the graph
       * @param xf the fractional distance from the graph's left offset to its
@@ -4982,9 +4982,9 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the x coordinate for the lower end of the graph's range given
+      * Get the X coordinate for the lower end of the graph's range given
       * specific parameters.
-      * @param xgcs the x coordinate of a point in graph coordinate
+      * @param xgcs the X coordinate of a point in graph coordinate
       *        space that will be positioned at a specified location on
       *        the graph
       * @param xf the fractional distance from the graph's left offset to its
@@ -4993,7 +4993,7 @@ import org.bzdev.util.SafeFormatter;
       * @param scaleFactorX the scale factor for the X direction (multiplying
       *        a distance in graph coordinate space by a scale factor yields
       *        the corresponding distance in user space)
-      * @return the lower value of the x coordinate in graph coordinate space
+      * @return the lower value of the X coordinate in graph coordinate space
       *         of the graph's range
       */
      public double getXLower(double xgcs, double xf, double scaleFactorX)
@@ -5004,9 +5004,9 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the x coordinate for the upper end of the graph's range given
+      * Get the X coordinate for the upper end of the graph's range given
       * specific parameters.
-      * @param xgcs the x coordinate of a point in graph coordinate
+      * @param xgcs the X coordinate of a point in graph coordinate
       *        space that will be positioned at a specified location on
       *        the graph
       * @param xf the fractional distance from the graph's left offset to its
@@ -5015,7 +5015,7 @@ import org.bzdev.util.SafeFormatter;
       * @param scaleFactorX the scale factor for the X direction (multiplying
       *        a distance in graph coordinate space by a scale factor yields
       *        the corresponding distance in user space)
-      * @return the upper value of the x coordinate in graph coordinate space
+      * @return the upper value of the X coordinate in graph coordinate space
       *         of the graph's range
       */
      public double getXUpper(double xgcs, double xf, double scaleFactorX) {
@@ -5025,9 +5025,9 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the y coordinate for the lower end of the graph's range given
+      * Get the Y coordinate for the lower end of the graph's range given
       * specific parameters.
-      * @param ygcs the y coordinate of a point in graph coordinate
+      * @param ygcs the Y coordinate of a point in graph coordinate
       *        space  that will be positioned at a specified location on
       *        the graph
       * @param yf the fractional distance from the graph's lower offset to its
@@ -5036,7 +5036,7 @@ import org.bzdev.util.SafeFormatter;
       * @param scaleFactorY the scale factor for the Y direction (multiplying
       *        a distance in graph coordinate space by a scale factor yields
       *        the corresponding distance in user space)
-      * @return the lower value of the y coordinate in graph coordinate space
+      * @return the lower value of the Y coordinate in graph coordinate space
       *         of the graph's range
       */
      public double getYLower(double ygcs, double yf, double scaleFactorY) {
@@ -5046,9 +5046,9 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the y coordinate for the upper end of the graph's range given
+      * Get the Y coordinate for the upper end of the graph's range given
       * specific parameters.
-      * @param ygcs the y coordinate of a point in graph coordinate
+      * @param ygcs the Y coordinate of a point in graph coordinate
       *        space  that will be positioned at a specified location on
       *        the graph
       * @param yf the fractional distance from the graph's lower offset to its
@@ -5057,7 +5057,7 @@ import org.bzdev.util.SafeFormatter;
       * @param scaleFactorY the scale factor for the Y direction (multiplying
       *        a distance in graph coordinate space by a scale factor yields
       *        the corresponding distance in user space)
-      * @return the upper value of the y coordinate in graph coordinate space
+      * @return the upper value of the Y coordinate in graph coordinate space
       *         of the graph's range
       */
      public double getYUpper(double ygcs, double yf, double scaleFactorY) {
@@ -5067,12 +5067,12 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the x coordinate for the lower end of the graph's range given
+      * Get the X coordinate for the lower end of the graph's range given
       * specific parameters and graph dimensions.
       * This method is useful for applications that have to determine
       * the lower X value before the graph is actually created.
       * @param width the width of the graph
-      * @param xgcs the x coordinate of a point in graph coordinate
+      * @param xgcs the X coordinate of a point in graph coordinate
       *        space that will be positioned at a specified location on
       *        the graph
       * @param xf the fractional distance from the graph's left offset to its
@@ -5083,7 +5083,7 @@ import org.bzdev.util.SafeFormatter;
       *        the corresponding distance in user space)
       * @param xLowerOffset the X offset for the left edge of the graph
       * @param xUpperOffset the X offset for the right edge of the graph
-      * @return the lower value of the x coordinate in graph coordinate space
+      * @return the lower value of the X coordinate in graph coordinate space
       *         of the graph's range
       */
      public static double getXLower(double width,
@@ -5097,12 +5097,12 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the x coordinate for the upper end of the graph's range given
+      * Get the X coordinate for the upper end of the graph's range given
       * specific parameters and graph dimensions.
       * This method is useful for applications that have to determine
       * the upper X value before the graph is actually created.
       * @param width the width of the graph
-      * @param xgcs the x coordinate of a point in graph coordinate
+      * @param xgcs the X coordinate of a point in graph coordinate
       *        space that will be positioned at a specified location on
       *        the graph
       * @param xf the fractional distance from the graph's left offset to its
@@ -5113,7 +5113,7 @@ import org.bzdev.util.SafeFormatter;
       *        the corresponding distance in user space)
       * @param xLowerOffset the X offset for the left edge of the graph
       * @param xUpperOffset the X offset for the right edge of the graph
-      * @return the upper value of the x coordinate in graph coordinate space
+      * @return the upper value of the X coordinate in graph coordinate space
       *         of the graph's range
       */
      public static double getXUpper(double width,
@@ -5127,12 +5127,31 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the y coordinate for the lower end of the graph's range given
+      * Get the scale factor (X or Y).  The scale factor is defined
+      * so that multiplying a distance in graph coordinate space give
+      * @param edgeLen the width or height of the graph
+      * @param xyOffsetL the X or Y lower offset
+      * @param xyOffsetU the X or Y upper offset
+      * @param xyUpper the X or Y coordinate of the upper or rightmost edge
+      *                in GCS units
+      * @param xyLower the X or Y coordinate of the lower or leftmost edge
+      *                in GCS units
+      * @return the scale factor
+      */
+     public static double getXYScale(double edgeLen, double xyOffsetL,
+				     double xyOffsetU,
+				     double xyLower, double xyUpper) {
+	 return (edgeLen - (xyOffsetL + xyOffsetU))
+	     / Math.abs(xyUpper - xyLower);
+     }
+
+     /**
+      * Get the Y coordinate for the lower end of the graph's range given
       * specific parameters and graph dimensions.
       * This method is useful for applications that have to determine
       * the lower Y value before the graph is actually created.
       * @param height the height of the graph
-      * @param ygcs the y coordinate of a point in graph coordinate
+      * @param ygcs the Y coordinate of a point in graph coordinate
       *        space  that will be positioned at a specified location on
       *        the graph
       * @param yf the fractional distance from the graph's lower offset to its
@@ -5143,7 +5162,7 @@ import org.bzdev.util.SafeFormatter;
       *        the corresponding distance in user space)
       * @param yLowerOffset the Y offset for the lower edge of the graph
       * @param yUpperOffset the Y offset for the upper edge of the graph
-      * @return the lower value of the y coordinate in graph coordinate space
+      * @return the lower value of the Y coordinate in graph coordinate space
       *         of the graph's range
       */
      public static double getYLower(double height,
@@ -5157,12 +5176,12 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the y coordinate for the upper end of the graph's range given
+      * Get the Y coordinate for the upper end of the graph's range given
       * specific parameters and graph dimensions.
       * This method is useful for applications that have to determine
       * the upper Y value before the graph is actually created.
       * @param height the height of the graph
-      * @param ygcs the y coordinate of a point in graph coordinate
+      * @param ygcs the Y coordinate of a point in graph coordinate
       *        space  that will be positioned at a specified location on
       *        the graph
       * @param yf the fractional distance from the graph's lower offset to its
@@ -5173,7 +5192,7 @@ import org.bzdev.util.SafeFormatter;
       *        the corresponding distance in user space)
       * @param yLowerOffset the Y offset for the lower edge of the graph
       * @param yUpperOffset the Y offset for the upper edge of the graph
-      * @return the upper value of the y coordinate in graph coordinate space
+      * @return the upper value of the Y coordinate in graph coordinate space
       *         of the graph's range
       */
      public static double getYUpper(double height,
@@ -5195,7 +5214,7 @@ import org.bzdev.util.SafeFormatter;
       * Specify how to rotate a graph about an anchor point expressed
       * in graph coordinate space.
       * This method sets parameters for a rotation.
-      * After scaling in the x and y directions, the rotation will keep
+      * After scaling in the X and Y directions, the rotation will keep
       * the anchor point at the same position and rotate the graph
       * about that point.  Typically the anchor point will be a point
       * that is visible on the graph.  A positive value of the angle
@@ -5223,8 +5242,8 @@ import org.bzdev.util.SafeFormatter;
      private double xscale, yscale;
 
      /**
-      * Get the scale factor in the x direction.
-      * The scale factor is multiplied by a difference of x coordinates
+      * Get the scale factor in the X direction.
+      * The scale factor is multiplied by a difference of X coordinates
       * in graph coordinate space to obtain the difference in user space.
       * The value returned is unsigned (i.e., always non-negative).
       * To determine the sign, use the method {@link #xAxisPointsRight()},
@@ -5238,8 +5257,8 @@ import org.bzdev.util.SafeFormatter;
      }
 
      /**
-      * Get the scale factor in the y direction.
-      * The scale factor is multiplied by a difference of y coordinates
+      * Get the scale factor in the Y direction.
+      * The scale factor is multiplied by a difference of Y coordinates
       * in graph coordinate space to obtain the difference in user space.
       * The value returned is unsigned (i.e., always non-negative).
       * To determine the sign, use the method {@link #yAxisPointsDown()},
@@ -5942,8 +5961,8 @@ import org.bzdev.util.SafeFormatter;
      /**
       * Draw a symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       */
      public void draw(Symbol symbol, double x, double y) {
 	 drawEXY(symbol, x, y, 0.0, 0.0, 0.0, 0.0);
@@ -5954,8 +5973,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param error distance in graph coordinate space from
       *        the point (x, y) to the edge of an error bar
       */
@@ -5970,8 +5989,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param elow distance in graph coordinate space from
       *        the point (x, y) to the edge of an error bar
       *        with the lowest value of x
@@ -5990,8 +6009,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param error distance in graph coordinate space from
       *        the point (x, y) to the edge of an error bar
       */
@@ -6006,8 +6025,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param elow distance in graph coordinate space from
       *        the point (x, y) to the edge of an error bar
       *        with the lowest value of y
@@ -6026,8 +6045,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param errorX distance in the X direction in graph coordinate
       *        space from the point (x, y) to the edge of an error bar
       * @param errorY distance in the Y direction in graph coordinate
@@ -6044,8 +6063,8 @@ import org.bzdev.util.SafeFormatter;
       * An error bar will not be displayed if it does not extend
       * past the symbol.
       * @param symbol the symbol
-      * @param x the x coordinate in graph coordinate space
-      * @param y the y coordinate in graph coordinate space
+      * @param x the X coordinate in graph coordinate space
+      * @param y the Y coordinate in graph coordinate space
       * @param elowX distance in graph coordinate space from
       *        the point (x, y) to the edge of an error bar
       *        with the lowest value of x

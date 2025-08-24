@@ -16,13 +16,36 @@ public class ATest {
 	double upperX = a2d.getXUpper();
 	double upperY = a2d.getYUpper();
 
+	double xscale = a2d.getXScale();
+	double yscale = a2d.getYScale();
+
+	Animation2D a2d2= new Animation2D(1000, 800);
+	a2d2.setOffsets(10, 50, 5, 55);
+	a2d2.setRanges(lowerX, upperX, lowerY, upperY);
+
+	if ((lowerX != a2d2.getXLower() || upperX != a2d2.getXUpper())) {
+	    throw new Exception("a2d2 configured differently than a2d [1]");
+	}
+	if ((lowerY != a2d2.getYLower() || upperY != a2d2.getYUpper())) {
+	    throw new Exception("a2d2 configured differently than a2d [2]");
+	}
+	if ((xscale != a2d2.getXScale() || yscale != a2d2.getYScale())) {
+	    System.out.println("xscale " + xscale);
+	    System.out.println("yscale " + yscale);
+	    System.out.println("a2d2 xscale " + a2d2.getXScale());
+	    System.out.println("a2d2 yscale " + a2d2.getYScale());
+	    throw new Exception("a2d2 configured differently than a2d [3]");
+	}
+
 	System.out.format("offsets: %d, %d, %d, %d\n",
 			  offLX, offUX, offLY, offUY);
 	System.out.format("ranges: %g, %g, %g, %g\n",
 			  lowerX, upperX, lowerY, upperY);
 
-	System.out.println("scaleX: " +((1000-60)/(upperX-lowerX)));
-	System.out.println("scaleY: " +((800-60)/(upperY - lowerY)));
+	System.out.println("scaleX: " + xscale + ", expecting "
+			   +((1000-60)/(upperX-lowerX)));
+	System.out.println("scaleY: " + yscale + ", expecting "
+			   +((800-60)/(upperY - lowerY)));
 
 	// used only to create a graph; will not run the animation
 	a2d.initFrames(25, "tmp/col-", "png");

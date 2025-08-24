@@ -996,6 +996,57 @@ public class Animation2D extends Simulation
 	}
     }
 
+     /**
+      * Get the scale factor in the X direction.
+      * The scale factor is multiplied by a difference of X coordinates
+      * in graph coordinate space to obtain the difference in user space.
+      * The value returned is unsigned (i.e., always non-negative).
+      * @return the scale factor
+      * @exception IllegalStateException the method
+      *            {@link #setRanges(double,double,double,double)} or
+      *            {@link #setRanges(double,double,double,double,double,double)}
+      *            has not been called
+      */
+    public double getXScale() {
+	if (graph == null) {
+	    if (setRanges4Delayed) {
+		return Graph.getXYScale(graphWidth, initXL, initXU,
+					initXLower, initXUpper);
+	    } else if (setRanges6Delayed) {
+		return initScaleFactorX;
+	    } else {
+		throw new IllegalStateException(errorMsg("noSetRanges"));
+	    }
+	} else {
+	    return graph.getXScale();
+	}
+    }
+
+     /**
+      * Get the scale factor in the Y direction.
+      * The scale factor is multiplied by a difference of Y coordinates
+      * in graph coordinate space to obtain the difference in user space.
+      * The value returned is unsigned (i.e., always non-negative).
+      * @return the scale factor
+      * @exception IllegalStateException the method
+      *            {@link #setRanges(double,double,double,double)} or
+      *            {@link #setRanges(double,double,double,double,double,double)}
+      *            has not been called
+      */
+    public double getYScale() {
+	if (graph == null) {
+	    if (setRanges4Delayed) {
+		return Graph.getXYScale(graphHeight, initYL, initYU,
+					initYLower, initYUpper);
+	    } else if (setRanges6Delayed) {
+		return initScaleFactorY;
+	    } else {
+		throw new IllegalStateException(errorMsg("noSetRanges"));
+	    }
+	} else {
+	    return graph.getYScale();
+	}
+    }
 
     /**
      * Set the color to use when clearing the animation's graph.
@@ -1398,8 +1449,8 @@ public class Animation2D extends Simulation
     private double initYgcs = 0.0;
     private double initXf = 0.0;
     private double initYf = 0.0;
-    private double initScaleFactorX = 0.0;
-    private double initScaleFactorY = 0.0;
+    private double initScaleFactorX = 1.0;
+    private double initScaleFactorY = 1.0;
 
     private boolean setBackgroundColorDelayed = false;
     private Color initBackgroundColor = null;
