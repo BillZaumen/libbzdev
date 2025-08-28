@@ -4,6 +4,10 @@
  * This module provides IO classes, dynamic methods, mathematical
  * functions, basic statistical analysis, special-purpose protocols,
  * random variables, scripting support, and various utility classes.
+ * <P>
+ * The documentation includes a description of
+ * <A HREF="org/bzdev/util/doc-files/esp.html">the ESP scripting language<A>,
+ * which is implemented using {@link org.bzdev.util.ExpressionParser}.
  */
 module org.bzdev.base {
     exports org.bzdev.io;
@@ -34,4 +38,4 @@ module org.bzdev.base {
     requires java.xml;
 }
 
-//  LocalWords:  BZDev
+//  LocalWords:  BZDev HREF
