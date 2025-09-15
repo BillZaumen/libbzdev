@@ -158,6 +158,54 @@ public class BasicSplinePath3D extends SplinePath3D {
 	super(initialCapacity, pk, closed);
     }
 
+    /**
+     * Constructs a new BasicSplinePath3D object from an array containing
+     * at least n knots and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public BasicSplinePath3D(Point3D[]pk, int n,
+			     Point3D cpoint1, Point3D cpoint2)
+    {
+	super(pk, n, cpoint1, cpoint2);
+    }
+
+   /**
+    * Constructs a new BasicSplinePath3D object from an array containing
+    * at least n knots, starting at an offset, with two control points.
+    * The array specifies the "knots" of the spline - the points the
+    * spline is constrained to pass through.
+    * @param pk the array of points that contain the knots of a spline
+    * @param offset the offset into the array for the starting knot
+    * @param n the number of points in the array to use, with valid indices
+    *        in the range [offset, offset+n)
+    * @param cpoint1 the control point just after the start of the path
+    * @param cpoint2 the control point just before the end of the path
+    */
+    public BasicSplinePath3D(Point3D[]pk, int offset, int n,
+                       Point3D cpoint1, Point3D cpoint2)
+    {
+	super(pk, offset, n, cpoint1, cpoint2);
+    }
+
+    /**
+     * Constructs a new BasicSplinePath3D object from an array of knots
+     * and initial and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public BasicSplinePath3D(Point3D[]pk, Point3D cpoint1, Point3D cpoint2) {
+	super(pk, cpoint1, cpoint2);
+    }
 
     /**
      * Constructs a new BasicSplinePath3D object from arrays

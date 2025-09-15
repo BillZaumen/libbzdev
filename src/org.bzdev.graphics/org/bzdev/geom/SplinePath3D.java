@@ -3,6 +3,8 @@ import org.bzdev.math.TridiagonalSolver;
 import org.bzdev.math.RealValuedFunction;
 import org.bzdev.math.RealValuedFunctOps;
 import org.bzdev.math.CubicSpline;
+import org.bzdev.math.CubicBezierSpline1;
+import org.bzdev.math.TridiagonalSolver;
 
 // import java.awt.Shape;
 // import java.awt.geom.*;
@@ -22,16 +24,21 @@ import org.bzdev.math.CubicSpline;
  * is used, the starting point of the spline is the current point, which
  * is initially set using the Path3D
  * {@link Path3D#moveTo(double,double,double) moveTo} method.
+ * <P>
  * The smooth curves created are cubic B&eacute;zier curve segments
  * arranged so that the first and second derivatives of their
  * coordinates with respect to the curves' parameters match (one curve
- * at u = 1 and the other at u = 0). For
- * a call to {@link #splineTo(Point3D[], int) splineTo}, at the
- * end points, the tangent to the curve points towards its neighbor. As a
- * result, calling splineTo for points p1, p2, p3, p4, followed by a call
- * to splineTo for points p5, p6, p7, p8 is not equivalent to calling
- * splineTo once for points p1, p2, ..., p8: in the former case, the
- * tangent lines can differ on both sides of point p4.
+ * at u = 1 and the other at u = 0). This is equivalent to stating that
+ * for the composite curve, the second derivative exits at all points and
+ * is continuous.
+ * <P>
+ * For a call to {@link #splineTo(java.awt.geom.Point3D[], int) splineTo},
+ * at the end points, the tangent to the curve points towards its
+ * neighbor. As a result, calling splineTo for points p1, p2, p3, p4,
+ * followed by a call to splineTo for points p5, p6, p7, p8 is not
+ * equivalent to calling splineTo once for points p1, p2, ..., p8: in
+ * the former case, the tangent lines can differ on both sides of
+ * point p4.
  * <P>
  * When {@link #addCycle(Point3D[], int) addCycle} is used,
  * there is an implicit call to moveTo for the first point in the array and
@@ -46,27 +53,42 @@ import org.bzdev.math.CubicSpline;
  * <a href="http://www.particleincell.com/blog/2012/bezier-splines/">
  * "Smooth B&eacute;zier Spline Through Prescribed Points"
  * </a>
- * and works by making the first and second derivatives of B&eacute;zier curves
- * (differentiating with respect to the parameter u) match at the given
- * points. Each segment is a B&eacute;zier curve given by
+ * Each segment is a B&eacute;zier curve given by
  * <P>
  * B(u) = (1-u)<sup>3</sup>P<sub>0</sub> + 3(1-u)<sup>2</sup>uP<sub>1</sub> + 3(1-u)u<sup>2</sup>P<sub>2</sub> + t<sup>3</sup>P<sub>3</sub>.
  * <P>
  * For n-1 cubic splines with control points $P<sub>0,i</sub>
  * P<sub>1,i</sub>, P<sub>1,2</sub> and P<sub>3,i</sub>, with i in the interval
- * [0, n-1], connecting the points  K<sub>0</sub> ... K<sub>n</sub> the
+ * [0, n-1], connecting the knot points  K<sub>0</sub> ... K<sub>n</sub>, the
  * P<sub>1</sub> control points satisfy the equations
  * <ul>
- *  <li> 2P<sub>1,0</sub> + P<sub>1,1</sub> = 4K<sub>0</sub> + 2K<sub>1</sub>
+ *  <li> 2P<sub>1,0</sub> + P<sub>1,1</sub> = K<sub>0</sub> + 2K<sub>1</sub>
  *  <li> P<sub>1,i-1</sub> + 4P<sub>1,i</sub> + P<sub>1,i+1</sub> = 4K<sub>i</sub> + 2K<sub>i+1</sub>  for i in [1, n-2]
- * <li> 2P<sub>i,n-2</sub> + 7P<sub>1,n-1</sub> = 8K<sub>n-1</sub> + K<sub>n</sub>.
+ * <li> 2P<sub>1,n-2</sub> + 7P<sub>1,n-1</sub> = 8K<sub>n-1</sub> + K<sub>n</sub>.
  * </ul>
+ * The first and last of these equations make the second derivative of
+ * the curve vanish at the end points, whereas the rest make the
+ * second derivative at u=1 for a segment match the second derivative
+ * at u=0 for the next segment.  Alternatively, the first and last
+ * equations can optionally be replaced by the equations
+ * <UL>
+ *  <LI> P<sub>1,0</sub> = C<sub>1</sub>
+ *  <LI> P<sub>1,n-1</sub> = 2C<sub>2</sub> - K<sub>n</sub>
+ * </UL>
+ * respectively in order to explicitly set the first and/or last
+ * intermediate control points to values matching C<sub>1</sub> and/or
+ * C<sub>2</sub>. When two control points are provided, the spline is
+ * computed using the class {@link org.bzdev.math.CubicBezierSpline1}
+ * to compute the X and Y values of the intermediate control points
+ * for each segment.
+ * <P>
  * The initial and final control points for each segment are given by
  * <ul>
  *  <li> P<sub>0,i</sub> = K<sub>i</sub>
  *  <li> P<sub>3,i</sub> = K<sub>i+1</sub>
  * </ul>
- * with both defined for i in the interval [0, n-1].
+ * with both defined for i in the interval [0, n-1], so that each segment
+ * starts and ends at a knot.
  * The P<sub>2</sub> control  point is given by the equations
  * <ul>
  *  <li> P<sub>2,i</sub> = 2K<sub>i+1</sub> - P<sub>1,i+1</sub> for i in
@@ -74,7 +96,7 @@ import org.bzdev.math.CubicSpline;
  *  <li> P<sub>2,n-1</sub> = (K<sub>n</sub> + P<sub>1,n-1</sub>)/2.
  * </ul>
  * There is a typo in the article cited above giving the wrong value for
- * the second control point.
+ * the second control point P<sub>2,i</sub> for i in [0,n-2].
  * <P>
  * For a closed paths, a case not covered in the article cited above,
  * the equation for P<sub>1</sub> are given by
@@ -99,9 +121,8 @@ public class SplinePath3D extends Path3D.Double {
 	return GeomErrorMsg.errorMsg(key, args);
     }
 
-    // public boolean debug = false;
-
-    private double[] createA(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createA(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point3D cpoint1) {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
@@ -113,33 +134,46 @@ public class SplinePath3D extends Path3D.Double {
 	result[nm1] = cyclic? 1.0: 2.0;
 	return result;
     }
-    private double[] createB(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createB(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point3D cpoint1) {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
 	int nm1 = n-1;
-	result[0] =cyclic? 4.0: 2.0;
+	if (cpoint1 != null) {
+	    result[0] = 1.0;
+	} else {
+	    result[0] = cyclic? 4.0: 2.0;
+	}
 	for (int i = 1; i < nm1; i++) {
 	    result[i] = 4.0;
 	}
 	result[nm1] = cyclic? 4.0: 7.0;
 	return result;
     }
-    private double[] createC(int n, boolean cyclic, boolean startsWithMoveTo) {
+    private double[] createC(int n, boolean cyclic, boolean startsWithMoveTo,
+			     Point3D cpoint1)
+    {
 	if (!startsWithMoveTo) n++;
 	if (!cyclic) n--;
 	double[] result = new double[n];
 	int nm1 = n-1;
 	int maxi = cyclic? n: nm1;
-	for (int i = 0; i < maxi; i++) {
+	if (cpoint1 == null) {
+	    result[0] = 1.0;
+	} else {
+	    result[0] = 0.0;
+	}
+	for (int i = 1; i < maxi; i++) {
 	    result[i] = 1.0;
 	}
 	return result;
     }
 
     private double[] getw(double[] x, int n, boolean cyclic,
-			  boolean startsWithMoveTo, boolean isX,
-			  boolean isY)
+			  boolean startsWithMoveTo,
+			  boolean isX, boolean isY,
+			  Point3D cpoint1, Point3D cpoint2)
     {
 	if (startsWithMoveTo) {
 	    // x[0] represents the coordinate for an implied moveTo.
@@ -152,19 +186,27 @@ public class SplinePath3D extends Path3D.Double {
 		}
 		result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
 	    } else {
-		result[0] = x[0] + 2.0 * x[1];
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX():
+			isY? cpoint1.getY():
+			cpoint1.getZ();
+		} else {
+		    result[0] = x[0] + 2.0 * x[1];
+		}
 		for (int i = 1; i < nm1; i++) {
 		    result[i] = 4.0 * x[i] + 2.0 * x[i+1];
 		}       
-		result[nm1] =  8.0 * x[nm1] + x[n] ;
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX():
+			isY? cpoint2.getY():
+			cpoint2.getZ();
+		    result[nm1] = 2*p2nm1 - x[n];
+		} else {
+		    result[nm1] =  8.0 * x[nm1] + x[n];
+		}
 	    }
 	    return result;
 	} else {
-	    /*
-	    if (cyclic) 
-		throw new IllegalArgumentException
-		    ("startsWithMoveto == false implies cyclic == false");
-	    */
 	    if (cyclic) n++;
 	    double[] result = new double[n];
 	    int nm1 = n - 1;
@@ -181,14 +223,107 @@ public class SplinePath3D extends Path3D.Double {
 		}
 		result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
 	    } else {
-		result[0] = xval + 2.0 * x[0];
+		if (cpoint1 != null) {
+		    result[0] = isX? cpoint1.getX():
+			isY? cpoint1.getY():
+			cpoint1.getZ();
+		} else {
+		    result[0] = xval + 2.0 * x[0];
+		}
 		for (int i = 1; i < nm1; i++) {
 		    result[i] = 4.0 * x[i-1] + 2.0 * x[i];
 		}
-		result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+		if (cpoint2 != null) {
+		    double p2nm1 = isX? cpoint2.getX():
+			isY? cpoint2.getY():
+			cpoint2.getZ();
+		    result[nm1] = 2*p2nm1 - x[nm1];
+		} else {
+		    result[nm1] =  8.0 * x[nm2] + x[nm1];
+		}
 	    }
 	    return result;
 	}
+    }
+
+    private double[] getw(double[] x, int n, boolean cyclic,
+			  boolean startsWithMoveTo,
+			  boolean isX, boolean isY,
+			  Point3D cpoint, boolean reverse)
+    {
+       if (startsWithMoveTo) {
+           // x[0] represents the coordinate for an implied moveTo.
+           if (!cyclic) n--;
+           int nm1 = n-1;
+           double[] result = new double[n];
+           if (cyclic) {
+               for (int i = 0; i < nm1; i++) {
+                   result[i] = 4.0 * x[i] + 2.0 * x[i+1];
+               }
+               result[nm1] = 4.0 * x[nm1] + 2.0 * x[0];
+           } else {
+               int nm2 = n-2;
+               if (cpoint != null) {
+                   result[0] = isX? cpoint.getX():
+		       isY? cpoint.getY():
+		       cpoint.getZ();
+               } else {
+                   int index0 = reverse? n: 0;
+                   int index1 = reverse? nm1: 1;
+                   result[0] = x[index0] + 2.0 * x[index1];
+               }
+               for (int i = 1; i < nm1; i++) {
+                   int indexI = reverse? n-i: i;
+                   int indexIp1 = reverse? indexI-1: i+1;
+                   result[i] = 4.0 * x[indexI] + 2.0 * x[indexIp1];
+               }
+               int index1 = reverse? 1: nm1;
+               int index2 = reverse? 0: n;
+               result[nm1] =  8.0 * x[index1] + x[index2];
+           }
+           return result;
+       } else {
+           if (cyclic) n++;
+           double[] result = new double[n];
+           int nm1 = n - 1;
+           int nm2 = n - 2;
+           Point3D start = getCurrentPoint();
+           if (start == null) {
+               throw new IllegalStateException(errorMsg("missingMOVETO"));
+           }
+           double xval = isX? start.getX():
+	       isY? start.getY():
+	       start.getZ();
+           if (cyclic) {
+               result[0] = 4.0 * xval + 2.0 * x[0];
+               for (int i = 0; i < nm2; i++) {
+                   result[i+1] = 4.0 * x[i] + 2.0 * x[i+1];
+               }
+               result[nm1] = 4.0 * x[nm2] + 2.0 * xval;
+           } else {
+               if (cpoint != null) {
+                   result[0] = isX? cpoint.getX():
+		       isY? cpoint.getY(): cpoint.getZ();
+               } else {
+                   if (reverse) {
+                       result[0] = x[nm1] + 2* x[nm2];
+                   } else {
+                       result[0] = xval + 2.0 * x[0];
+                   }
+               }
+               for (int i = 1; i < nm1; i++) {
+                   int indexI = reverse? nm2 - i: i;
+                   int indexIm1 = reverse?indexI+1 :i-1;
+                   result[i] = 4.0 * x[indexIm1] + 2.0 * x[indexI];
+               }
+               if (reverse) {
+                   result[nm1] = 8.0*x[0] + xval;
+               } else {
+                   result[nm1] =  8.0 * x[nm2] + x[nm1] ;
+               }
+           }
+           return result;
+       }
     }
 
     /**
@@ -335,6 +470,74 @@ public class SplinePath3D extends Path3D.Double {
     {
 	this(initialCapacity, pk, pk.length, closed);
     }
+
+    /**
+     * Constructs a new SplinePath3D object from an array containing at least n
+     * knots and two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath3D(Point3D[]pk, int n, Point3D cpoint1, Point3D cpoint2)
+    {
+       super();
+       double[] tmpx = new double[n];
+       double[] tmpy = new double[n];
+       double[] tmpz = new double[n];
+       for (int i = 0; i < n; i++) {
+           tmpx[i] = pk[i].getX();
+           tmpy[i] = pk[i].getY();
+	   tmpz[i] = pk[i].getZ();
+       }
+       makeSpline(tmpx, tmpy, tmpz, n, false, true, cpoint1, cpoint2);
+    }
+
+    /**
+     * Constructs a new SplinePath3D object from an array containing at least n
+     * knots, starting at an offset, with two control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through.
+     * @param pk the array of points that contain the knots of a spline
+     * @param offset the offset into the array for the starting knot
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [offset, offset+n)
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath3D(Point3D[]pk, int offset, int n,
+                       Point3D cpoint1, Point3D cpoint2)
+    {
+       super();
+       double[] tmpx = new double[n];
+       double[] tmpy = new double[n];
+       double[] tmpz = new double[n];
+       for (int i = 0; i < n; i++) {
+           tmpx[i] = pk[offset+i].getX();
+           tmpy[i] = pk[offset+i].getY();
+           tmpz[i] = pk[offset+i].getZ();
+       }
+       makeSpline(tmpx, tmpy, tmpz, n, false, true, cpoint1, cpoint2);
+    }
+
+    /**
+     * Constructs a new SplinePath3D object from an array of knots and initial
+     * and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through. When closed, the initial
+     * point should not be repeated by the final point.
+     * @param pk the array of points that make up the knots of a spline
+     * @param cpoint1 the control point just after the start of the path
+     * @param cpoint2 the control point just before the end of the path
+     */
+    public SplinePath3D(Point3D[]pk, Point3D cpoint1, Point3D cpoint2) {
+       this(pk, pk.length, cpoint1, cpoint2);
+    }
+
+
 
     /**
      * Constructs a new SplinePath3D object from arrays containing at least n
@@ -691,6 +894,35 @@ public class SplinePath3D extends Path3D.Double {
 
     /**
      * Add a sequence of segments that form a spline, specified as an array
+     * of points, with initial and final control points.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot.
+     * The initial point is the one previously added to the path via
+     * some other method (e.g., moveTo, lineTo, etc.).
+     * @param pk the array of points that make up the knots of a spline
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(Point3D[] pk, int n, Point3D cpoint1, Point3D cpoint2)
+    {
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	double[] tmpz = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[i].getX();
+	    tmpy[i] = pk[i].getY();
+	    tmpz[i] = pk[i].getZ();
+	}
+	makeSpline(tmpx, tmpy, tmpz,  n, false, false, cpoint1, cpoint2);
+    }
+
+    /**
+     * Add a sequence of segments that form a spline, specified as an array
      * of points with an offset.
      * The array specifies the "knots" of the spline - the points the
      * spline is constrained to pass through - and the spline will have
@@ -714,6 +946,37 @@ public class SplinePath3D extends Path3D.Double {
 	    tmpz[i] = pk[i+offset].getZ();
 	}
 	makeSpline(tmpx, tmpy, tmpz, n, false, false);
+    }
+
+   /**
+     * Add a sequence of segments that form a spline, specified as an array
+     * of points with an offset.
+     * The array specifies the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot.
+     * The initial point is the one previously added to the path via
+     * some other method (e.g., moveTo, lineTo, etc.).
+     * @param pk the array of points that make up the knots of a spline
+     * @param offset the offset into the array for the starting point
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(Point3D[] pk, int offset, int n,
+			 Point3D cpoint1, Point3D cpoint2)
+    {
+	double[] tmpx = new double[n];
+	double[] tmpy = new double[n];
+	double[] tmpz = new double[n];
+	for (int i = 0; i < n; i++) {
+	    tmpx[i] = pk[i+offset].getX();
+	    tmpy[i] = pk[i+offset].getY();
+	    tmpz[i] = pk[i+offset].getZ();
+	}
+	makeSpline(tmpx, tmpy, tmpz, n, false, false, cpoint1, cpoint2);
     }
 
 
@@ -751,6 +1014,30 @@ public class SplinePath3D extends Path3D.Double {
     public void splineTo(double[] x, double[]y, double[] z, int n) {
 	makeSpline(x, y, z, n, false, false);
     }
+
+    /**
+     * Add a sequence of segments that form a spline, specified as arrays
+     * of at least n x and y coordinates, with initial and final control
+     * points.
+     * The arrays specify the "knots" of the spline - the points the
+     * spline is constrained to pass through - and the spline will have
+     * matching first and second derivatives at intermediate points. At
+     * the end points, the direction of the tangent line points towards the
+     * adjacent knot. The initial point is the one previously added to
+     * the path via some other method (e.g., moveTo, lineTo, etc.).
+     * @param x the x coordinates to use, one for each knot
+     * @param y the y coordinates to use, one for each knot
+     * @param z the z coordinates to use, one for each knot
+     * @param n the number of points in the array to use, with valid indices
+     *        in the range [0, n)
+     * @param cpoint1 the control point just after the start of the spline
+     * @param cpoint2 the control point just before the end of the spline
+     */
+    public void splineTo(double[] x, double[]y, double[]z, int n,
+			 Point3D cpoint1, Point3D cpoint2) {
+	makeSpline(x, y, z, n, false, false, cpoint1, cpoint2);
+    }
+
 
     /**
      * Add a sequence of segments that form a spline, specified as arrays
@@ -1121,7 +1408,50 @@ public class SplinePath3D extends Path3D.Double {
 
     private void makeSpline(double[] x, double[] y, double[] z, int n,
 			    boolean cyclic, boolean startsWithMoveTo) {
-	double finalX, finalY, finalZ;
+	makeSpline(x, y, z, n, cyclic, startsWithMoveTo, null, null);
+    }
+
+
+    private enum EndMode {
+       NONE,
+       START,
+       END,
+       BOTH
+    }
+
+    private static void reverse(double[] array) {
+       reverse(array, array.length);
+    }
+
+    private static void reverse(double[] array, int n) {
+       int n2 = n/2;
+       int j = n-1;
+       for (int i = 0; i < n2; i++, j--) {
+           double tmp = array[i];
+           array[i] = array[j];
+           array[j] = tmp;
+       }
+    }
+
+
+    private void makeSpline(double[] x, double[] y, double[] z, int n,
+			    boolean cyclic, boolean startsWithMoveTo,
+			    Point3D cpoint1, Point3D cpoint2)
+	throws IllegalArgumentException
+    {
+	double finalX = java.lang.Double.NaN;
+	double finalY = java.lang.Double.NaN;
+	double finalZ = java.lang.Double.NaN;
+       if (cyclic && (cpoint1 != null || cpoint2 != null)) {
+           throw new IllegalArgumentException(errorMsg("cyclic"));
+       }
+
+       EndMode endMode = (cpoint1 == null && cpoint2 == null)? EndMode.NONE:
+           (cpoint1 != null && cpoint2 == null)? EndMode.START:
+           (cpoint1 == null && cpoint2 != null)? EndMode.END:
+           EndMode.BOTH;
+
+
 	// For small values of n, the best we can do is to draw straight
 	// lines.
 	if (n == 2 && startsWithMoveTo) {
@@ -1150,44 +1480,99 @@ public class SplinePath3D extends Path3D.Double {
 	    return;
 	}
 
-	double[] a = createA(n, cyclic, startsWithMoveTo);
-	double[] b = createB(n, cyclic, startsWithMoveTo);
-	double[] c = createC(n, cyclic, startsWithMoveTo);
-	double[] wx = getw(x, n, cyclic, startsWithMoveTo, true, false);
-	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false, true);
-	double[] wz = getw(z, n, cyclic, startsWithMoveTo, false, false);
+	// double[] a = createA(n, cyclic, startsWithMoveTo);
+	// double[] b = createB(n, cyclic, startsWithMoveTo);
+	// double[] c = createC(n, cyclic, startsWithMoveTo);
+	// double[] wx = getw(x, n, cyclic, startsWithMoveTo, true, false);
+	// double[] wy = getw(y, n, cyclic, startsWithMoveTo, false, true);
+	// double[] wz = getw(z, n, cyclic, startsWithMoveTo, false, false);
+	Point3D cpoint = null;
+	boolean reverse = false;
+	boolean merge = false;
+	int  oldN = n;
+	switch (endMode) {
+	case START:
+	    reverse = false;
+	    cpoint = cpoint1;
+	    break;
+	case END:
+	    reverse = true;
+	    cpoint = cpoint2;
+	    break;
+	case BOTH:
+	    merge = true;
+	    break;
+	default:
+	    break;
+	}
+
+	if (merge) {
+	    // Handle as a special case using CubicBezierSpline1.
+	    double[] tmp = null;
+	    n = oldN;
+	    if (!startsWithMoveTo) {
+		tmp = new double[n+1];
+		tmp[0] = getCurrentPoint().getX();
+		System.arraycopy(x, 0, tmp, 1, n);
+	    } else {
+		tmp = new double[n];
+		System.arraycopy(x, 0, tmp, 0, n);
+	    }
+
+	    double deriv1 = 3.0*(cpoint1.getX() - tmp[0]);
+	    double deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getX());
+
+	    CubicBezierSpline1 xspline =
+		new CubicBezierSpline1(tmp, 0.0, 1.0,
+				       CubicSpline.Mode.CLAMPED,
+				       deriv1, deriv2);
+	    if (!startsWithMoveTo) {
+		tmp[0] = getCurrentPoint().getY();
+		System.arraycopy(y, 0, tmp, 1, n);
+	    } else {
+		System.arraycopy(y, 0, tmp, 0, n);
+	    }
+	    deriv1 = 3.0*(cpoint1.getY() - tmp[0]);
+	    deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getY());
+	    CubicBezierSpline1 yspline =
+		new CubicBezierSpline1(xspline, tmp, deriv1, deriv2);
+	    if (!startsWithMoveTo) {
+		tmp[0] = getCurrentPoint().getZ();
+		System.arraycopy(z, 0, tmp, 1, n);
+	    } else {
+		System.arraycopy(z, 0, tmp, 0, n);
+	    }
+	    deriv1 = 3.0*(cpoint1.getY() - tmp[0]);
+	    deriv2 = 3.0*(tmp[tmp.length-1] - cpoint2.getY());
+	    CubicBezierSpline1 zspline =
+		new CubicBezierSpline1(xspline, tmp, deriv1, deriv2);
+
+	    double[] xcoeff = xspline.getBernsteinCoefficients();
+	    double[] ycoeff = yspline.getBernsteinCoefficients();
+	    double[] zcoeff = zspline.getBernsteinCoefficients();
+	    if (startsWithMoveTo) {
+		moveTo(xcoeff[0], ycoeff[0], zcoeff[0]);
+	    }
+	    for (int i = 1; i < xcoeff.length; i+=3) {
+		int ip1 = i+1;
+		int ip2 = i+2;
+		curveTo(xcoeff[i], ycoeff[i], zcoeff[i],
+			xcoeff[ip1], ycoeff[ip1], zcoeff[ip1],
+			xcoeff[ip2], ycoeff[ip2], zcoeff[ip2]);
+	    }
+	    return;
+	}
+	double[] a = createA(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
+	double[] b = createB(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
+	double[] c = createC(n, cyclic, startsWithMoveTo, cpoint/*1, cpoint2*/);
+	double[] wx = getw(x, n, cyclic, startsWithMoveTo, true, false,
+			   cpoint/*1, cpoint2*/, reverse);
+	double[] wy = getw(y, n, cyclic, startsWithMoveTo, false, true,
+			   cpoint/*1, cpoint2*/, reverse);
+	double[] wz = getw(z, n, cyclic, startsWithMoveTo, false, false,
+			   cpoint/*1, cpoint2*/, reverse);
 
 	if (cyclic) {
-	    /*
-	    double wwx[] = new double[wx.length];
-	    double wwy[] = new double[wy.length];
-	    TridiagonalSolver.solveCyclic(wwx, a, b, c, wx, wx.length);
-	    TridiagonalSolver.solveCyclic(wwy, a, b, c, wy, wy.length);
-	    for (int i = wx.length-1; i >= 0; i--) {
-		double valx; double valy;
-		if (i == 0) {
-		    valx = b[0]*wwx[0] + c[0]*wwx[1]
-			+ a[wx.length-1]*wwx[wx.length-1];
-		    valy = b[0]*wwy[0] + c[0]*wwy[1]
-			+ a[wy.length-1]*wwy[wy.length-1];
-		} else if (i == wx.length-1) {
-		    valx = a[wx.length-1]*wwx[wx.length-2]
-			+ b[wx.length-1]*wwx[wx.length-1]
-			+ c[wx.length-1]*wwx[0];
-		    valy = a[wy.length-1]*wwy[wy.length-2]
-			+ b[wy.length-1]*wwy[wy.length-1]
-			+ c[wy.length-1]*wwy[0];
-		    
-		} else {
-		    valx = a[i]*wwx[i-1]+b[i]*wwx[i] + c[i]*wwx[i+1];
-		    valy = a[i]*wwy[i-1]+b[i]*wwy[i] + c[i]*wwy[i+1];
-		}
-		if (Math.abs(wx[i] - valx) > 1.0e-10 ||
-		    Math.abs(wy[i] - valy) > 1.0e-10)
-		    throw new RuntimeException("tridiagonal solution failed"
-					       + " (i = " + i + ")");
-	    }
-	    */
 	    TridiagonalSolver.solveCyclic(wx, a, b, c, wx, wx.length);
 	    TridiagonalSolver.solveCyclic(wy, a, b, c, wy, wy.length);
 	    TridiagonalSolver.solveCyclic(wz, a, b, c, wz, wz.length);
@@ -1196,25 +1581,90 @@ public class SplinePath3D extends Path3D.Double {
 	    TridiagonalSolver.solve(wy, a, b, c, wy);
 	    TridiagonalSolver.solve(wz, a, b, c, wz);
 	}
+
 	n = wx.length;
 	int nm1 = n-1;
 	int nm2 = n-2;
 
-	int offset = 0;
+	double wx1[] = null;
+	double wy1[] = null;
+	double wz1[] = null;
+	double wx2[] = null;
+	double wy2[] = null;
+	double wz2[] = null;
+       int offset = 0;
+       if (reverse) {
+           wx1 = new double[wx.length];
+           wy1 = new double[wy.length];
+	   wz1 = new double[wz.length];
+           reverse(x);
+           reverse(y);
+	   reverse(z);
+           for (int i = 0; i < nm1; i++) {
+               wx1[i] = 2*x[i+1] - wx[i+1];
+               wy1[i] = 2*y[i+1] - wy[i+1];
+	       wz1[i] = 2*z[i+1] - wz[i+1];
+           }
+           if (startsWithMoveTo) {
+               wx1[nm1] = (x[n] + wx[nm1])/2.0;
+               wy1[nm1] = (y[n] + wy[nm1])/2.0;
+	       wz1[nm1] = (z[n] = wz[nm1])/2.0;
+           } else {
+               Point3D cpnt = getCurrentPoint();
+               wx1[nm1] = (cpnt.getX() + wx[nm1])/2.0;
+               wy1[nm1] = (cpnt.getY() + wy[nm1])/2.0;
+	       wz1[nm1] = (cpnt.getZ() + wz[nm1])/2.0;
+           }
+           reverse(x);
+           reverse(y);
+	   reverse(z);
+           reverse(wx1);
+           reverse(wy1);
+	   reverse(wz1);
+           reverse(wx);
+           reverse(wy);
+	   reverse(wz);
+           wx2 = wx;
+           wy2 = wy;
+	   wz2 = wz;
+       }
+
+       double p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
+       offset = 0;
+
 	if (startsWithMoveTo) {
-	    moveTo(x[0], y[0], z[0]);
-	    finalX = x[0];
-	    finalY = y[0];
-	    finalZ = z[0];
+	    // moveTo(x[0], y[0], z[0]);
+	    // finalX = x[0];
+	    // finalY = y[0];
+	    // finalZ = z[0];
+           if (reverse) {
+               offset = 0; // change?
+               moveTo(x[0], y[0], z[0]);
+           } else {
+               moveTo(x[0], y[0], z[0]);
+               finalX = x[0];
+               finalY = y[0];
+	       finalZ = z[0];
+           }
+
 	} else {
 	    offset = -1;
+           if (reverse) {
+               offset = -1; // change?
+           } else {
+               offset = -1;
+           }
 	    Point3D cpnt = getCurrentPoint();
 	    finalX = cpnt.getX();
 	    finalY = cpnt.getY();
 	    finalZ = cpnt.getZ();
 	    if (cyclic) moveTo(finalX, finalY, finalZ);
 	}
-	for (int i = 0; i < nm1; i++) {
+        double u = 0;
+        double up = 1;
+       double v = u, vp = up;
+       for (int i = 0; i < nm1; i++) {
+	   /*
 	    double p1x = wx[i];
 	    double p1y = wy[i];
 	    double p1z = wz[i];
@@ -1224,21 +1674,58 @@ public class SplinePath3D extends Path3D.Double {
 	    double p3x = x[i+1 + offset];
 	    double p3y = y[i+1 + offset];
 	    double p3z = z[i+1 + offset];
-	    curveTo(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z);
+	   */
+           v = u;
+           vp = up;
+           u = ((double)(i+1))/n;
+           up = 1-u;
+           if (reverse) {
+               p1x = wx1[i];
+               p1y = wy1[i];
+	       p1z = wz1[i];
+               p2x = wx[i];
+               p2y = wy[i];
+	       p2z = wz[i];
+           } else {
+               p1x = wx[i];
+               p1y = wy[i];
+	       p1z = wz[i];
+               p2x = 2.0 * x[i+1 + offset] - wx[i+1];
+               p2y = 2.0 * y[i+1 + offset] - wy[i+1];
+	       p2z = 2.0 * z[i+1 + offset] - wz[i+1];
+               // p3x = x[i+1 + offset];
+               // p3y = y[i+1 + offset];
+           }
+           p3x = x[i+1 + offset];
+           p3y = y[i+1 + offset];
+           p3z = z[i+1 + offset];
+	   curveTo(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z);
 	}
 	if (cyclic) {
-	    double p1x = wx[nm1];
-	    double p1y = wy[nm1];
-	    double p1z = wz[nm1];
-	    double p2x = 2.0 * /*x[0]*/finalX - wx[0];
-	    double p2y = 2.0 * /*y[0]*/finalY - wy[0];
-	    double p2z = 2.0 * /*y[0]*/finalZ - wz[0];
-	    double p3x = /*x[0]*/ finalX;
-	    double p3y = /*y[0]*/ finalY;
-	    double p3z = /*y[0]*/ finalZ;
+
+	    // double p1x = wx[nm1];
+	    // double p1y = wy[nm1];
+	    // double p1z = wz[nm1];
+	    // double p2x = 2.0 * /*x[0]*/finalX - wx[0];
+	    // double p2y = 2.0 * /*y[0]*/finalY - wy[0];
+	    // double p2z = 2.0 * /*y[0]*/finalZ - wz[0];
+	    // double p3x = /*x[0]*/ finalX;
+	    // double p3y = /*y[0]*/ finalY;
+	    // double p3z = /*y[0]*/ finalZ;
+
+	    p1x = wx[nm1];
+	    p1y = wy[nm1];
+	    p1z = wz[nm1];
+	    p2x = 2.0 * /*x[0]*/finalX - wx[0];
+	    p2y = 2.0 * /*y[0]*/finalY - wy[0];
+	    p2z = 2.0 * finalZ - wz[0];
+	    p3x = /*x[0]*/ finalX;
+	    p3y = /*y[0]*/ finalY;
+	    p3z = finalZ;
 	    curveTo(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z);
 	    closePath();
 	} else {
+	    /*
 	    double p1x = wx[nm1];
 	    double p1y = wy[nm1];
 	    double p1z = wz[nm1];
@@ -1248,6 +1735,31 @@ public class SplinePath3D extends Path3D.Double {
 	    double p3x = x[n + offset];
 	    double p3y = y[n + offset];
 	    double p3z = z[n + offset];
+	    p1x = wx[nm1];
+	    p1y = wy[nm1];
+	    */
+	    // p2x = 2.0 * /*x[0]*/finalX - wx[0];
+	    // p2y = 2.0 * /*y[0]*/finalY - wy[0];
+	    // p3x = /*x[0]*/ finalX;
+	    // p3y = /*y[0]*/ finalY;
+	    if (reverse) {
+		p1x = wx1[nm1];
+		p1y = wy1[nm1];
+		p1z = wz1[nm1];
+		p2x = wx[nm1];
+		p2y = wy[nm1];
+		p2z = wz[nm1];
+	    } else {
+		p1x = wx[nm1];
+		p1y = wy[nm1];
+		p1z = wz[nm1];
+		p2x = (x[n + offset] + p1x)/2.0;
+		p2y = (y[n + offset] + p1y)/2.0;
+		p2z = (z[n + offset] + p1z)/2.0;
+	    }
+	    p3x = x[n + offset];
+	    p3y = y[n + offset];
+	    p3z = z[n + offset];
 	    curveTo(p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z);
 	}
     }

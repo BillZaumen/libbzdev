@@ -1287,6 +1287,7 @@ public class SplinePath2D extends Path2D.Double {
     public void splineTo(Point2D[] pk, int offset, int n) {
 	splineTo(pk, offset, n, null, null);
     }
+
     /**
      * Add a sequence of segments that form a spline, specified as an array
      * of points with an offset.
@@ -1831,7 +1832,8 @@ public class SplinePath2D extends Path2D.Double {
 				       CubicSpline.Mode.CLAMPED,
 				       deriv1, deriv2);
 	    if (!startsWithMoveTo) {
-		tmp[0] = getCurrentPoint().getX();
+		// tmp[0] = getCurrentPoint().getX();
+		tmp[0] = getCurrentPoint().getY();
 		System.arraycopy(y, 0, tmp, 1, n);
 	    } else {
 		System.arraycopy(y, 0, tmp, 0, n);

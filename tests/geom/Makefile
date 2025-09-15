@@ -323,6 +323,14 @@ sphere:
 	@echo ------- Sphere ----------
 	$(JAVA) Sphere
 
+spheretwo:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo ------- SphereTw2 ----------
+	$(JAVA) SphereTwo
+
+
 bgsphere1:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -1053,6 +1061,12 @@ bezierbox:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	@$(JAVA) BezierBox
 	@$(JAVA) BezierBox2
+
+splinedb:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) Spline3DCmp
 
 hextest:
 	(cd ../.. ; make jars)
