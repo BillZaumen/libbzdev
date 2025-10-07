@@ -1200,8 +1200,6 @@ abstract public class Path3D implements Cloneable {
     public abstract Point3D getStart();
 
     /**
-     *
-    /**
      * Get the last point on a path.
      * @return the last point; null if the path is empty or closed
      *         at its end

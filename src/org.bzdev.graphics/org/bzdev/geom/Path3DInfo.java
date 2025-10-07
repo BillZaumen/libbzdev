@@ -47,7 +47,7 @@ public class Path3DInfo {
      * initial point in that order.
      * @param u the path parameter for the end of the subpath which
      *        includes all points on the path whose path parameters
-     *        are in the range [0, u]
+     *        are in the range [0, 1.0]
      * @param type either {@link PathIterator3D#SEG_MOVETO}
      *        {@link PathIterator3D#SEG_LINETO},
      *        {@link PathIterator3D#SEG_QUADTO},

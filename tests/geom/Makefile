@@ -1072,7 +1072,14 @@ hextest:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
-	@$(JAVA) Path2DHexTest.java
+	@$(JAVA) Path2DHexTest
+
+gfholder:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@$(JAVA) GFHolder
+
 
 clean:
 	rm -rf classes

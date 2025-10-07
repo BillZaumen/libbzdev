@@ -59,7 +59,7 @@ public class Path2DInfo {
      * initial point in that order.
      * @param u the path parameter for the end of the subpath which
      *        includes all points on the path whose path parameters
-     *        are in the range [0, u]
+     *        are in the range [0, 1.0]
      * @param type either {@link PathIterator#SEG_MOVETO}
      *        {@link PathIterator#SEG_LINETO},
      *        {@link PathIterator#SEG_QUADTO},

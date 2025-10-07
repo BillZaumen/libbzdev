@@ -6,8 +6,14 @@ import java.util.function.Function;
  * Functional interface for mapping one point in a two or three dimensional
  * space to another object when creating a sequence of objects distinguished
  * by an index.
+ * <P>
+ * For {@link Path3D.Double} or {@link Path3D.Float}, constructors that
+ * use this interface will expect the mapper to return instances of
+ * {@link Point3D}.
  * @param <R> the type of the objects returned with this mapper is applied
  * @see BezierGrid
+ * @see Path3D.Double
+ * @see Path3D.Float
  */
 @FunctionalInterface
 public interface Point3DMapper<R> {
