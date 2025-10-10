@@ -831,10 +831,16 @@ public class BezierGrid implements Shape3D {
      * counterclockwise rotation about the Z axis, then the surface's
      * orientation will be correct. Othewise the surface willhave to
      * be flipped.
+     * <P>
+     * When the argument mapper is an instance of {@link BezierGrid.Mapper},
+     * the region will change as one moves along the U direction when
+     * the 'wire' used to create the mapper has a linear segment or
+     * when the normal vector is not continuous.
      * @param path the path
      * @param mapper the object that maps 2D points to 3D points
      * @param n the number of points along the U axis.
      * @param uclosed true if the U direction is closed, false otherwise
+     * @see getMapper(Path3D, double[])
      */
     public BezierGrid(Path2D path, Point3DMapper<Point3D> mapper,
 		      int n, boolean uclosed)
@@ -1123,7 +1129,11 @@ public class BezierGrid implements Shape3D {
 	double startx = 0.0, starty = 0.0, startz = 0.0;
 	double lastx = 0.0, lasty = 0.0, lastz = 0.0;
 	double[] tangent0 = new double[3];
+	// normal0 and normal1 used to see if we need a new region.
+	boolean hasNormal0 = false;
 	double[] normal0  = new double[3];
+	boolean hasNormal1 = false;
+	double[] normal1 = new double[3];
 	double[] cp = new double[3];
 	int index = -1;
 	boolean needLast = true;
@@ -1167,6 +1177,8 @@ public class BezierGrid implements Shape3D {
 		lasty = coords[1];
 		lastz = coords[2];
 		regionCode++;
+		hasNormal0 = false;
+		hasNormal1 = false;
 		break;
 	    case PathIterator3D.SEG_QUADTO:
 		if (Path3DInfo.getTangent(0.0, tangent0, 0, lastx, lasty, lastz,
@@ -1179,6 +1191,22 @@ public class BezierGrid implements Shape3D {
 			throw new IllegalStateException(msg);
 		    }
 		}
+		hasNormal0 = Path3DInfo.getNormal(0.0, normal0, 0,
+						  lastx, lasty, lastz,
+						  PathIterator3D.SEG_QUADTO,
+						  coords);
+		if (hasNormal1) {
+		    VectorOps.crossProduct(cp, normal0, normal1);
+		    if (Math.abs(cp[0]) > .01
+			|| Math.abs(cp[1]) > .01
+			|| Math.abs(cp[2]) > .01) {
+			regionCode++;
+		    }
+		}
+		hasNormal1 = Path3DInfo.getNormal(1.0, normal1, 0,
+						  lastx, lasty, lastz,
+						  PathIterator3D.SEG_QUADTO,
+						  coords);
 		lastInfo = new WireInfo(lastx, lasty, lastz);
 		lastInfo.regionCode = regionCode;
 		VectorOps.crossProduct(tmpv, normal, tangent0);
@@ -1207,6 +1235,22 @@ public class BezierGrid implements Shape3D {
 		    }
 		    System.arraycopy(tangent0, 0, tangent, 0, 3);
 		}
+		hasNormal0 = Path3DInfo.getNormal(0.0, normal0, 0,
+						  lastx, lasty, lastz,
+						  PathIterator3D.SEG_CUBICTO,
+						  coords);
+		if (hasNormal1) {
+		    VectorOps.crossProduct(cp, normal0, normal1);
+		    if (Math.abs(cp[0]) > .01
+			|| Math.abs(cp[1]) > .01
+			|| Math.abs(cp[2]) > .01) {
+			regionCode++;
+		    }
+		}
+		hasNormal1 = Path3DInfo.getNormal(1.0, normal1, 0,
+						  lastx, lasty, lastz,
+						  PathIterator3D.SEG_CUBICTO,
+						  coords);
 		lastInfo = new WireInfo(lastx, lasty, lastz);
 		lastInfo.regionCode = regionCode;
 		VectorOps.crossProduct(tmpv, normal, tangent0);
