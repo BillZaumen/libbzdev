@@ -169,6 +169,8 @@ all:
 	$(JAVA) BGPathTest
 	$(JAVA) BGPathTest2
 	$(JAVA) BGPathTest3
+	$(JAVA) BGPathTest4
+	$(JAVA) BGPathTest5
 	@echo ------- BezierMapperTest ----------
 	$(JAVA) BezierMapperTest
 	@echo -------- PathIntegralTest --------
@@ -438,6 +440,18 @@ bgpath3:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) BGPathTest3
+
+bgpath4:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) BGPathTest4
+
+bgpath5:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) BGPathTest5
 
 
 bgcycloid:
