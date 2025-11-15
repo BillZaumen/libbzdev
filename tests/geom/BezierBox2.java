@@ -30,6 +30,9 @@ public class BezierBox2 {
 	for (int i = 0; i < 6; i++) {
 	    for (int j = 0; j < 4; j++) {
 		bg.setRegion(i, j, region++);
+		if (bg.getRegion(i,j) != region-1) {
+		    throw new Exception("getRegion failed");
+		}
 	    }
 	}
 

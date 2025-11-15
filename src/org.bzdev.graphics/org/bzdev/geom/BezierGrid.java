@@ -3894,6 +3894,31 @@ public class BezierGrid implements Shape3D {
     }
 
     /**
+     * Get a region ID.
+     * Regions represent collections of points whose boundaries
+     * terminate the implicitly generated splines so that the
+     * curves at the border of a region may not have continuous derivatives.
+     * A region is represented by an integer ID.  Implicitly generated
+     * splines have constant indices in either the U or V directions,
+     * but not both.  As the varying index increases, a spline terminates
+     * either when the maximum index is reached or at the first index for
+     * which the region ID changes. That index is also the one for the
+     * start of the next spline.
+     * All grid points are initialized to be in Region 0.
+     * @param i the index for the U direction
+     * @param j the index for the V direction
+     * @return the region ID for the grid point at indices (i,j)
+     * @exception IllegalArgumentException the arguments are out of range
+     */
+    public int getRegion(int i, int j) {
+	if (i < 0 || j < 0 || i >= nu || j >= nv) {
+	    String msg = errorMsg("argOutOfRange2ii", i, j);
+	    throw new IllegalArgumentException(msg);
+	}
+	return array[i][j].region;
+    }
+
+    /**
      * Set a region ID for a rectangle of grid points.
      * Regions represent collections of points whose boundaries
      * terminate the implicitly generated splines so that the
