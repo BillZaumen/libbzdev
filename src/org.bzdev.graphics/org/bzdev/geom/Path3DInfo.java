@@ -54,12 +54,12 @@ public class Path3DInfo {
      *        {@link PathIterator3D#SEG_CUBICTO}, or
      *        {@link PathIterator3D#SEG_CLOSE}
      * @param x0 the X coordinate at the start of the segment
-     * @param y0 the Y cooredinate at the start of the segment
-     * @param z0 the X cooredinate at the start of the segment
+     * @param y0 the Y coordinate at the start of the segment
+     * @param z0 the X coordinate at the start of the segment
      * @param coords the remaining control points, with the X coordinate
      *        followed immediately by the Y coordinate and then the Z
      *        coordinate for each
-     * @return the path-sgement length
+     * @return the path-segment length
      * @throws IllegalArgumentException if the type argument is not
      *         recognized or if the fifth argument is null or is too short
      */
@@ -122,8 +122,8 @@ public class Path3DInfo {
      *        {@link PathIterator3D#SEG_CUBICTO}, or
      *        {@link PathIterator3D#SEG_CLOSE}
      * @param x0 the X coordinate at the start of the segment
-     * @param y0 the Y cooredinate at the start of the segment
-     * @param z0 the X cooredinate at the start of the segment
+     * @param y0 the Y coordinate at the start of the segment
+     * @param z0 the X coordinate at the start of the segment
      * @param coords the remaining control points, with the X coordinate
      *        followed immediately by the Y coordinate and then the Z
      *        coordinate for each
@@ -204,7 +204,7 @@ public class Path3DInfo {
      * @param z0 the Z coordinate of the first control point
      * @param coords the remaining control points in order, with each
      *        control point represented by 3 consecutive elements
-     *        contining a control point's X coordinate, Y coordinate,
+     *        containing a control point's X coordinate, Y coordinate,
      *        and Z coordinate respectively (only the first 6 indices
      *         will be used)
      * @return the path length from u = 0 to the given value of u.
@@ -250,7 +250,7 @@ public class Path3DInfo {
      * @param z0 the Z coordinate of the first control point
      * @param coords the remaining control points in order, with each
      *        control point represented by 3 consecutive elements
-     *        contining a control point's X coordinate, Y coordinate,
+     *        containing a control point's X coordinate, Y coordinate,
      *        and Z coordinate respectively (only the first 6 indices
      *         will be used)
      * @return a function of the path parameter providing the length of
@@ -297,7 +297,7 @@ public class Path3DInfo {
      * @param z0 the Z coordinate of the first control point
      * @param coords the remaining control points in order, with each
      *        control point represented by 3 consecutive elements
-     *        contining a control point's X coordinate, Y coordinate,
+     *        containing a control point's X coordinate, Y coordinate,
      *        and Z coordinate respectively (only the first 9 indices
      *        will be used)
      * @return the path length from u = 0 to the given value of u.
@@ -350,7 +350,7 @@ public class Path3DInfo {
 	double[] marray = Polynomials.fromBezier(null,
 						  pxd.getCoefficientsArray(),
 						 0, 2);
-	// Fix up any roundoff errors where the value should be zero.
+	// Fix up any round-off errors where the value should be zero.
 	double max = 0.0;
 	for (double v: marray) {
 	    max = Math.max(max, Math.abs(v));
@@ -642,7 +642,7 @@ public class Path3DInfo {
 		if (cnt == 2) {
 		    // double root, so the square root is constant
 		    // and with two roots, the absolute value is
-		    // just the polynomial sqaured.
+		    // just the polynomial squared.
 		    double scale = Math.sqrt(scaleX*scaleX
 					     + scaleY*scaleY
 					     + scaleZ*scaleZ);
@@ -758,7 +758,7 @@ public class Path3DInfo {
      * @param z0 the Z coordinate of the first control point
      * @param coords the remaining control points in order, with each
      *        control point represented by 3 consecutive elements
-     *        contining a control point's X coordinate, Y coordinate,
+     *        containing a control point's X coordinate, Y coordinate,
      *        and Z coordinate respectively (only the first 9 indices
      *        will be used)
      * @return a function of the path parameter that computes the length
@@ -1074,7 +1074,7 @@ public class Path3DInfo {
 		if (cnt == 2) {
 		    // double root, so the square root is constant
 		    // and with two roots, the absolute value is
-		    // just the polynomial sqaured.
+		    // just the polynomial squared.
 		    final double scale = Math.sqrt(scaleX*scaleX
 					     + scaleY*scaleY
 					     + scaleZ*scaleZ);
@@ -1243,33 +1243,83 @@ public class Path3DInfo {
 
     /**
      * List the control points of a path.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
      * @param path the path
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
      *        included
-     * @return an array containing the countrol points, each as
+     * @return an array containing the control points, each as
      *         a triplet of values where each triplet consists of
      *         a control point's X coordinate, followed by its Y
      *         coordinate, followed by its Z coordinate
      */
     public static double[] getControlPoints(Path3D path, boolean all)
     {
-	return getControlPoints(path.getPathIterator(null), all);
+	return getControlPoints(path.getPathIterator(null), all, false);
     }
 
-    /**
-     * List the control points of a path provided by a path iterator
+     /**
+     * List the control points of a path, optionally treating each
+     * segment of the path as a cubic segment.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
+     * @param path the path
+     * @param all true if all control points are included; false if
+     *        only the control points starting or ending a segment are
+     *        included
+     * @param asCubic true if each linear or quadratic segment is elevated
+     *        to be a cubic B&eacute;zier segment; false otherwise
+     * @return an array containing the control points, each as
+     *         a pair of values
+     */
+    public static double[] getControlPoints(Path3D path,
+					    boolean all,
+					    boolean asCubic)
+    {
+	return getControlPoints(path.getPathIterator(null), all, asCubic);
+    }
+
+     /**
+     * List the control points of a path specified by a path iterator.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
      * @param pit the path iterator providing the control points
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
      *        included
-     * @return an array containing the countrol points, each as
+     * @return an array containing the control points, each as
+     *         a pair of values
+     */
+    public static double[] getControlPoints(PathIterator3D pit,
+					    boolean all)
+    {
+	return getControlPoints(pit, all, false);
+    }
+
+  /**
+     * List the control points of a path provided by a path iterator,
+     * optionally treating each segment of the path as a cubic segment.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
+     * @param pit the path iterator providing the control points
+     * @param all true if all control points are included; false if
+     *        only the control points starting or ending a segment are
+     *        included
+     * @param asCubic true if each linear or quadratic segment is elevated
+     *        to be a cubic B&eacute;zier segment; false otherwise
+    * @return an array containing the control points, each as
      *         a triplet of values where each triplet consists of
      *         a control point's X coordinate, followed by its Y
      *         coordinate, followed by its Z coordinate
      */
     public static double[] getControlPoints(PathIterator3D pit,
-					    boolean all)
+					    boolean all,
+					    boolean asCubic)
     {
 	ArrayList<Double> list = new ArrayList<>();
 	double[] coords = new double[9];
@@ -1282,7 +1332,23 @@ public class Path3DInfo {
 		startx = coords[0];
 		starty = coords[1];
 		startz = coords[2];
+		lastx = coords[0];
+		lasty = coords[1];
+		lastz = coords[2];
+		sawClose = false;
+		list.add(coords[0]);
+		list.add(coords[1]);
+		list.add(coords[2]);
+		break;
 	    case PathIterator3D.SEG_LINETO:
+		if (all && asCubic) {
+		    list.add((2*lastx + coords[0])/3.0);
+		    list.add((2*lasty + coords[1])/3.0);
+		    list.add((2*lastz + coords[2])/3.0);
+		    list.add((lastx + 2*coords[0])/3.0);
+		    list.add((lasty + 2*coords[1])/3.0);
+		    list.add((lastz + 2*coords[2])/3.0);
+		}
 		list.add(coords[0]);
 		list.add(coords[1]);
 		list.add(coords[2]);
@@ -1293,9 +1359,21 @@ public class Path3DInfo {
 		break;
 	    case PathIterator3D.SEG_QUADTO:
 		if (all) {
-		    list.add(coords[0]);
-		    list.add(coords[1]);
-		    list.add(coords[2]);
+		    if (asCubic) {
+			double[] tmp = new double[9 + 12];
+			tmp[0] = lastx;
+			tmp[1] = lasty;
+			tmp[2] = lastz;
+			System.arraycopy(coords, 0, tmp, 3, 6);
+			elevateDegree(2, tmp, 9, tmp, 0);
+			for (int i = 12; i < 18; i++) {
+			    list.add(tmp[i]);
+			}
+		    } else {
+			list.add(coords[0]);
+			list.add(coords[1]);
+			list.add(coords[2]);
+		    }
 		}
 		list.add(coords[3]);
 		list.add(coords[4]);
@@ -3508,7 +3586,7 @@ public class Path3DInfo {
 	 * from the start of of the segment to a point specified by the
 	 * segment's path parameter.
 	 * <P>
-	 * In some unsual cases, a function is not available due to
+	 * In some unusual cases, a function is not available due to
 	 * numerical accuracy issues, in which case numerical integration
 	 * may be used.
 	 * @return a function that computes the subsegment length given
@@ -4235,9 +4313,10 @@ public class Path3DInfo {
      * @param x the X coordinate of a point on the path
      * @param y the Y coordinate of a point on the path
      * @param z the Z coordinate of a point on the path
-     * @return the patch component going through (x, y, z), with its
-     *         segments shifted cyclically so that the returned path
-     *         starts at the point (x, y, z).
+     * @return the path component with a segment starting or ending at
+     *         (x, y, z), with its segments shifted cyclically so that
+     *         the returned path starts at the point (x, y, z); null
+     *         if no segment starts or ends with the point (x, y, z).
      * @exception IllegalArgumentException an argument was illegal
      */
     public static Path3D shiftClosedPath(Path3D path,
@@ -4653,8 +4732,9 @@ public class Path3DInfo {
 //  LocalWords:  OutOfRange piUnknown NaN blockquote pre sqrt DInfo
 //  LocalWords:  getEntries getSegmentLength lt glq len th lastX dP
 //  LocalWords:  integrateWithP segNumbOutOfRange lastMoveToX lastY
-//  LocalWords:  lastMoveToY illFormedPath tradeoff lengthOrig dT
+//  LocalWords:  lastMoveToY illFormedPath tradeoff lengthOrig dT Px
 //  LocalWords:  appendable Appendable startingX startingY startingZ
 //  LocalWords:  endingX endingY endingZ badSegClose shiftClosedPath
 //  LocalWords:  PathSplitter binormal Drawable IllegalStateException
-//  LocalWords:  expectingMoveTo
+//  LocalWords:  expectingMoveTo printArray Py Pz integrateAbsPRootQ
+//  LocalWords:  getCoefficientsArray asCubic

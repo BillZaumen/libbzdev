@@ -6465,6 +6465,115 @@ public class Path2DInfoTest {
 	}
 	System.out.println("... OK");
 
+	tpath = new Path2D.Double();
+	tpath.moveTo(1.0, 2.0);
+	tpath.lineTo(2.0, 3.0);
+	tpath.quadTo(3.0, 5.0, 4.0, 10.0);
+	tpath.curveTo(5.0, 11.0, 12.0, 12.0, 14.0, 12.0);
+	double expected[] = {1.0, 2.0, 2.0, 3.0,
+	    3.0, 5.0, 4.0, 10.0, 5.0, 11.0, 12.0, 12.0, 14.0, 12.0};
+	double eknots[] = {1.0, 2.0, 2.0, 3.0, 4.0, 10.0, 14.0, 12.0};
+	double knots[] = Path2DInfo.getControlPoints(tpath, false);
+	if (knots.length != eknots.length) throw new Exception();
+	for (int i = 0; i < eknots.length; i++) {
+	    if (knots[i] != eknots[i]) throw new Exception();
+	}
+	double[] array1 = Path2DInfo.getControlPoints(tpath, true);
+	if (expected.length != array1.length) throw new Exception();
+	for (int i = 0; i < expected.length; i++) {
+	    if (expected[i] != array1[i]) throw new Exception();
+	}
+	double[] array2 = Path2DInfo.getControlPoints(tpath, true, true);
+	for (int i = 0; i < knots.length/2; i++) {
+	    int j1 = 2*i;
+	    int j2 = j1+1;
+	    int k1 = 6*i;
+	    int k2 = k1 + 1;
+	    System.out.format("expecting (%g, %g) = (%g, %g)\n",
+			      knots[j1], knots[j2], array2[k1], array2[k2]);
+	    if (knots[j1] != array2[k1]) throw new Exception();
+	    if (knots[j2] != array2[k2]) throw new Exception();
+	}
+	Path2D tpath2 = new Path2D.Double();
+	tpath2.moveTo(array2[0], array2[1]);
+	int a2len = array2.length;
+	for (int i = 0; i < a2len-2; i += 6) {
+	    tpath2.curveTo(array2[i+2], array2[i+3], array2[i+4], array2[i+5],
+			   array2[i+6], array2[i+7]);
+	}
+	PathIterator pi1 = tpath.getPathIterator(null);
+	pi2 = tpath2.getPathIterator(null);
+
+	double lastx = 0.0, lasty = 0.0;
+	while (!pi1.isDone()) {
+	    if (pi2.isDone()) throw new Exception();
+	    Arrays.fill(coords, 0.0);
+	    Arrays.fill(coords2, 0.0);
+	    int type1 = pi1.currentSegment(coords);
+	    int type2 = pi2.currentSegment(coords2);
+	    if (type1 == PathIterator.SEG_MOVETO) {
+		lastx = coords[0];
+		lasty = coords[1];
+		if (lastx != coords2[0] || lasty != coords2[1]) {
+		    throw new Exception();
+		}
+	    } else {
+		for (int k = 0; k <= 9; k++) {
+		    double u = k / 10.0;
+		    double x1 = Path2DInfo.getX(u, lastx, lasty, type1, coords);
+		    double x2 = Path2DInfo.getX(u, lastx, lasty,
+						type2, coords2);
+		    double y1 = Path2DInfo.getY(u, lastx, lasty, type1, coords);
+		    double y2 = Path2DInfo.getY(u, lastx, lasty,
+						type2, coords2);
+		    if (Math.abs(x1 - x2) > 1.e-10) {
+			System.out.format("type1 = %d, type2 = %d, u = %g\n",
+					  type1, type2, u);
+			System.out.format("x1 = %s, x2 = %s\n", x1, x2);
+			System.out.format("    %g\t%g\n", lastx, lastx);
+			System.out.println("    coords\tcoords2");
+			for (int kk = 0; kk < 6; kk++) {
+			    System.out.format("    %g\t%g\n",
+					      coords[kk], coords2[kk]);
+			}
+			throw new Exception();
+		    }
+		    if (Math.abs(y1 - y2) > 1.e-10) {
+			System.out.format("type1 = %d, type2 = %d)\n",
+					  type1, type2);
+			System.out.format("y1 = %s, y2 = %s\n", y1, y2);
+			throw new Exception();
+		    }
+		}
+		switch(type1) {
+		case PathIterator.SEG_LINETO:
+		    lastx = coords[0];
+		    lasty = coords[1];
+		    if (lastx != coords2[4] || lasty != coords2[5]) {
+			throw new Exception();
+		    }
+		    break;
+		case PathIterator.SEG_QUADTO:
+		    lastx = coords[2];
+		    lasty = coords[3];
+		    if (lastx != coords2[4] || lasty != coords2[5]) {
+			throw new Exception();
+		    }
+		    break;
+		case PathIterator.SEG_CUBICTO:
+		    lastx = coords[4];
+		    lasty = coords[5];
+		    if (lastx != coords2[4] || lasty != coords2[5]) {
+			throw new Exception();
+		    }
+		    break;
+		}
+	    }
+	    pi1.next();
+	    pi2.next();
+	}
+	if (!pi2.isDone()) throw new Exception();
+
 	System.exit(0);
     }
 }

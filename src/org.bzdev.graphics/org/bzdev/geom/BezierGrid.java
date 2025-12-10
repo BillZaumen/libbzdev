@@ -2243,7 +2243,7 @@ public class BezierGrid implements Shape3D {
      * status is set to filled.
      * @param i the U index
      * @param j the V index
-     * @param coords the control points.
+     * @param coords the 48 control points of a patch
      * @see #getPatch(int,int,double[])
      */
     public void setPatchCorners(int i, int j, double[] coords)

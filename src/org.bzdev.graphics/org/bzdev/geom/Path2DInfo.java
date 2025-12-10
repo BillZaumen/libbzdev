@@ -66,10 +66,10 @@ public class Path2DInfo {
      *        {@link PathIterator#SEG_CUBICTO}, or
      *        {@link PathIterator#SEG_CLOSE}
      * @param x0 the X coordinate at the start of the segment
-     * @param y0 the Y cooredinate at the start of the segment
+     * @param y0 the Y coordinate at the start of the segment
      * @param coords the remaining control points, with the X coordinate
      *        followed immediately by the Y coordinate for each
-     * @return the path-sgement length
+     * @return the path-segment length
      * @throws IllegalArgumentException if the type argument is not
      *         recognized or if the fifth argument is null or is too short
      */
@@ -128,7 +128,7 @@ public class Path2DInfo {
      *        {@link PathIterator#SEG_CUBICTO}, or
      *        {@link PathIterator#SEG_CLOSE}
      * @param x0 the X coordinate at the start of the segment
-     * @param y0 the Y cooredinate at the start of the segment
+     * @param y0 the Y coordinate at the start of the segment
      * @param coords the remaining control points, with the X coordinate
      *        followed immediately by the Y coordinate for each
      * @return a function that computes the length of a subpath from path
@@ -1581,6 +1581,9 @@ public class Path2DInfo {
 
     /**
      * List the control points of a path.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
      * @param path the path
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
@@ -1590,12 +1593,36 @@ public class Path2DInfo {
      */
     public static double[] getControlPoints(Path2D path, boolean all)
     {
-	return getControlPoints(path.getPathIterator(null), all);
+	return getControlPoints(path.getPathIterator(null), all, false);
     }
 
+    /**
+     * List the control points of a path, optionally treating each
+     * segment of the path as a cubic segment.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
+     * @param path the path
+     * @param all true if all control points are included; false if
+     *        only the control points starting or ending a segment are
+     *        included
+     * @param asCubic true if each linear or quadratic segment is elevated
+     *        to be a cubic B&eacute;zier segment; false otherwise
+     * @return an array containing the control points, each as
+     *         a pair of values
+     */
+    public static double[] getControlPoints(Path2D path,
+					    boolean all,
+					    boolean asCubic)
+    {
+	return getControlPoints(path.getPathIterator(null), all, asCubic);
+    }
 
     /**
      * List the control points of a path specified by a path iterator.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
      * @param pit the path iterator providing the control points
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
@@ -1605,6 +1632,29 @@ public class Path2DInfo {
      */
     public static double[] getControlPoints(PathIterator pit,
 					    boolean all)
+    {
+	return getControlPoints(pit, all, false);
+    }
+    /**
+     * List the control points of a path specified by a path iterator,
+     * optionally treating each segment of the path as a cubic segment.
+     * If a path is closed and the last control point before a
+     * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
+     * that control point is not included in the list.
+     * @param pit the path iterator providing the control points
+     * @param all true if all control points are included; false if
+     *        only the control points starting or ending a segment are
+     *        included
+     * @param asCubic true if each linear or quadratic segment is elevated
+     *        to be a cubic B&eacute;zier segment; false otherwise
+     * @return an array containing the control points, each as
+     *         a pair of values where each pair consists of a
+     *         control point's X coordinate followed by its Y
+     *         coordinate
+     */
+    public static double[] getControlPoints(PathIterator pit,
+					    boolean all,
+					    boolean asCubic)
     {
 	ArrayList<Double> list = new ArrayList<>();
 	double[] coords = new double[6];
@@ -1616,7 +1666,19 @@ public class Path2DInfo {
 	    case PathIterator.SEG_MOVETO:
 		startx = coords[0];
 		starty = coords[1];
+		list.add(coords[0]);
+		list.add(coords[1]);
+		lastx = coords[0];
+		lasty = coords[1];
+		sawClose = false;
+		break;
 	    case PathIterator.SEG_LINETO:
+		if (all && asCubic) {
+		    list.add((2*lastx + coords[0])/3.0);
+		    list.add((2*lasty + coords[1])/3.0);
+		    list.add((lastx + 2*coords[0])/3.0);
+		    list.add((lasty + 2*coords[1])/3.0);
+		}
 		list.add(coords[0]);
 		list.add(coords[1]);
 		lastx = coords[0];
@@ -1625,8 +1687,19 @@ public class Path2DInfo {
 		break;
 	    case PathIterator.SEG_QUADTO:
 		if (all) {
-		    list.add(coords[0]);
-		    list.add(coords[1]);
+		    if (asCubic) {
+			double[] tmp = new double[6+8];
+			tmp[0] = lastx;
+			tmp[1] = lasty;
+			System.arraycopy(coords, 0, tmp, 2, 4);
+			elevateDegree(2, tmp, 6, tmp, 0);
+			for (int i = 8; i < 12; i++) {
+			    list.add(tmp[i]);
+			}
+		    } else {
+			list.add(coords[0]);
+			list.add(coords[1]);
+		    }
 		}
 		list.add(coords[2]);
 		list.add(coords[3]);
@@ -5116,7 +5189,7 @@ public class Path2DInfo {
 	 * from the start of of the segment to a point specified by the
 	 * segment's path parameter.
 	 * <P>
-	 * In some unsual cases, a function is not available due to
+	 * In some unusual cases, a function is not available due to
 	 * numerical accuracy issues, in which case numerical integration
 	 * may be used.
 	 * @return a function that computes the subsegment length given
@@ -7940,7 +8013,7 @@ public class Path2DInfo {
      * Note: the path integrals of the forms (x/2)dy-(y/2)ydx, xdy, and -ydx
      * produce the same values when evaluated exactly. The values may,
      * however, differ due to floating point accuracy. Using this method
-     * twice, with different values of the argumnet xdy, provides a rough
+     * twice, with different values of the argument xdy, provides a rough
      * estimate of numerical accuracy. The execution time for this method
      * is slightly faster than that provided by
      * {@link #areaOf(PathIterator)}.
@@ -8284,9 +8357,10 @@ public class Path2DInfo {
      * @param path the path
      * @param x the X coordinate of a point on the path
      * @param y the Y coordinate of a point on the path
-     * @return the patch component going through (x, y), with its
-     *         segments shifted cyclically so that the returned path
-     *         starts at the point (x, y).
+     * @return the path component with a segment starting or ending at (x, y),
+     *         with its segments shifted cyclically so that the returned path
+     *         starts at the point (x, y); null if no segment starts or ends
+     *         with the point (x, y).
      * @exception IllegalArgumentException the path contains a control
      *            point other than {@link PathIterator#SEG_MOVETO}
      *            immediately after {@link PathIterator#SEG_CLOSE}
@@ -8760,9 +8834,12 @@ public class Path2DInfo {
 //  LocalWords:  psuedocode fourthArgNeg argarray shiftClosedPath ty
 //  LocalWords:  PathSplitter getDegree getCoefficientsArray nroots
 //  LocalWords:  umin minValue roundoff xydx yc xydy glqy xDy xc Ay
-//  LocalWords:  clastX clastY yx dA xydA yy momentsOf pmatrix zz
-//  LocalWords:  principalMoments signedArea xyMoment SurfaceOps
-//  LocalWords:  principalAxes numberOfSegments getPathIterator
-//  LocalWords:  isDone Drawable IllegalStateException badMoments
-//  LocalWords:  expectingMoveTo drawable missingSEGMOVETO
+//  LocalWords:  clastX clastY yx dA xydA yy momentsOf pmatrix zz tex
+//  LocalWords:  principalMoments signedArea xyMoment SurfaceOps src
+//  LocalWords:  principalAxes numberOfSegments getPathIterator async
+//  LocalWords:  isDone Drawable IllegalStateException badMoments ccc
+//  LocalWords:  expectingMoveTo drawable missingSEGMOVETO MathJax
 //  LocalWords:  noSegsBeforeClose unknownSegmentType endingMOVETO
+//  LocalWords:  inlineMath displayMath argarraylength monomial frac
+//  LocalWords:  ArithmeticException asCubic subsegment NOSCRIPT
+//  LocalWords:  areaOf
