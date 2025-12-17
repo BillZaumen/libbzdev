@@ -99,9 +99,9 @@ all: compile
 	@$(JAVA) ExprScriptTest15
 	@echo - ExpressionParser Test '( .foreach())' -
 	@$(JAVA) ExprScriptTest16
+	chmod u+x scrun
 	./scrun funct.esp
 	@echo ---- try some ESP runtime errors
-	chmod u+x scrun
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
 	./scrun bad2.esp || echo EXCEPTION EXPECTED
 	./scrun bad3.esp || echo EXCEPTION EXPECTED
@@ -110,6 +110,8 @@ all: compile
 	./scrun bad6.esp || echo EXCEPTION EXPECTED
 	./scrun bad7.esp || echo EXCEPTION EXPECTED
 	./scrun bad8.esp || echo EXCEPTION EXPECTED
+	./scrun bad9.esp || echo EXCEPTION EXPECTED
+	./scrun bad10.esp || echo EXCEPTION EXPECTED
 	./scrun nulltest.esp
 	./scrun not.esp
 	./scrun -vD:foobar:20.0 funct.esp || echo EXCEPTION EXPECTED
@@ -229,6 +231,19 @@ bad5:
 	chmod u+x scrun
 	./scrun --stackTrace bad5.esp
 	chmod u-x scrun
+
+bad9:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun --stackTrace bad9.esp
+	chmod u-x scrun || echo EXCEPTION EXPECTED
+
+bad10:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun bad10.esp
+	chmod u-x scrun || echo EXCEPTION EXPECTED
+
 
 ctest: compile
 	@$(JAVA) ClassTest

@@ -336,14 +336,18 @@ public class ExpressionParser implements ObjectParser<Object>
 
     private static final EnumSet<Operator> notBeforeOBRACKET
 	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
-		     Operator.CLASS, Operator.SWAP);
+		     Operator.CLASS, Operator.SWAP,
+		     Operator.STRING, Operator.NUMBER, Operator.BOOLEAN,
+		     Operator.CLASS);
 
     private static final EnumSet<Operator> notBeforeOBRACE
 	= EnumSet.of(Operator.DOT, Operator.INSTANCEOF,
 		     Operator.CLASS, Operator.SWAP, Operator.CBRACE,
 		     Operator.CBRACKET, Operator.OBJCLOSEBRACE,
 		     Operator.NEW, Operator.THROW, Operator.VARIABLE_NAME,
-		     Operator.EXIST_TEST);
+		     Operator.EXIST_TEST,
+		     Operator.STRING, Operator.NUMBER, Operator.BOOLEAN,
+		     Operator.CLASS);
 
 
     // for these tokens, when tracing, display the value as well as the name

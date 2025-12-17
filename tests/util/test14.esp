@@ -12,9 +12,9 @@ function foof() {(true == true) || (false == false)}
 out.println(foof());
 out.flush();
 
-function foo(x) {x};
+function foo2(x) {x};
 
-foo(true==true);
+foo2(true==true);
 
 
 function tst(x,y){x == y}

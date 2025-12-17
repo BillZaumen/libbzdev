@@ -1602,6 +1602,10 @@ public class Path2DInfo {
      * If a path is closed and the last control point before a
      * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
      * that control point is not included in the list.
+     * <P>
+     * The third argument <CODE>asCubic</CODE> has no effect on the
+     * results when the second argument <CODE>all</CODE> has the
+     * value <CODE>false</CODE>.
      * @param path the path
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
@@ -1641,6 +1645,10 @@ public class Path2DInfo {
      * If a path is closed and the last control point before a
      * SEG_CLOSE segment matches the preceding SEG_MOVE segment,
      * that control point is not included in the list.
+     * <P>
+     * The third argument <CODE>asCubic</CODE> has no effect on the
+     * results when the second argument <CODE>all</CODE> has the
+     * value <CODE>false</CODE>.
      * @param pit the path iterator providing the control points
      * @param all true if all control points are included; false if
      *        only the control points starting or ending a segment are
