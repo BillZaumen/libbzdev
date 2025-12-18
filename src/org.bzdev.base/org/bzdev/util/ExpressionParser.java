@@ -9105,7 +9105,9 @@ public class ExpressionParser implements ObjectParser<Object>
 		tokens.add(next);
 		break;
 	    case ',':
-		if (ptype == null || binaryOps.contains(ptype)) {
+		if (ptype == null || binaryOps.contains(ptype)
+		    || ptype == Operator.OBRACKET
+		    || ptype == Operator.OBRACE) {
 		    String msg = errorMsg("syntaxError");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
@@ -9192,6 +9194,18 @@ public class ExpressionParser implements ObjectParser<Object>
 		} else if (condPeer != null &&
 			   condPeer.getIndex() > bracketPeer.getIndex()) {
 		    String msg = errorMsg("misplacedCBracket");
+		    throw new ObjectParser.Exception(msg, filenameTL.get(),
+						     s, i);
+		}
+		if (binaryOps.contains(ptype)
+		    || ptype == Operator.COMMA
+		    || ptype == Operator.ACTIVE_COMMA
+		    || ptype == Operator.UNARY_MINUS
+		    || ptype == Operator.INSTANCEOF
+		    || ptype == Operator.SEMICOLON
+		    || ptype == Operator.BACKQUOTE
+		    || ptype == Operator.FUNCTION_KEYWORD) {
+		    String msg = errorMsg("badCBracket");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
 		}
@@ -9307,6 +9321,17 @@ public class ExpressionParser implements ObjectParser<Object>
 		} else if (condPeer != null &&
 			   condPeer.getIndex() > bracePeer.getIndex()) {
 		    String msg = errorMsg("misplacedCBrace");
+		    throw new ObjectParser.Exception(msg, filenameTL.get(),
+						     s, i);
+		}
+		if (binaryOps.contains(ptype)
+		    || ptype == Operator.COMMA
+		    || ptype == Operator.ACTIVE_COMMA
+		    || ptype == Operator.UNARY_MINUS
+		    || ptype == Operator.INSTANCEOF
+		    || ptype == Operator.BACKQUOTE
+		    || ptype == Operator.FUNCTION_KEYWORD) {
+		    String msg = errorMsg("badCBrace");
 		    throw new ObjectParser.Exception(msg, filenameTL.get(),
 						     s, i);
 		}

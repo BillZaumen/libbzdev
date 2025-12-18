@@ -112,6 +112,10 @@ all: compile
 	./scrun bad8.esp || echo EXCEPTION EXPECTED
 	./scrun bad9.esp || echo EXCEPTION EXPECTED
 	./scrun bad10.esp || echo EXCEPTION EXPECTED
+	./scrun bad11.esp || echo EXCEPTION EXPECTED
+	./scrun bad12.esp || echo EXCEPTION EXPECTED
+	./scrun bad13.esp || echo EXCEPTION EXPECTED
+	./scrun bad14.esp || echo EXCEPTION EXPECTED
 	./scrun nulltest.esp
 	./scrun not.esp
 	./scrun -vD:foobar:20.0 funct.esp || echo EXCEPTION EXPECTED
@@ -229,19 +233,43 @@ bad6:
 bad5:
 	(cd ../.. ; make jars)
 	chmod u+x scrun
-	./scrun --stackTrace bad5.esp
+	./scrun --stackTrace bad5.esp  || echo EXCEPTION EXPECTED
 	chmod u-x scrun
 
 bad9:
 	(cd ../.. ; make jars)
-	chmod u+x scrun
+	chmod u+x scrun || echo EXCEPTION EXPECTED
 	./scrun --stackTrace bad9.esp
-	chmod u-x scrun || echo EXCEPTION EXPECTED
+	chmod u-x scrun
 
 bad10:
 	(cd ../.. ; make jars)
 	chmod u+x scrun
-	./scrun bad10.esp
+	./scrun bad10.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+bad11:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun bad11.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+bad12:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun bad12.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+bad13:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun bad13.esp || echo EXCEPTION EXPECTED
+	chmod u-x scrun
+
+bad14:
+	(cd ../.. ; make jars)
+	chmod u+x scrun
+	./scrun bad14.esp
 	chmod u-x scrun || echo EXCEPTION EXPECTED
 
 
