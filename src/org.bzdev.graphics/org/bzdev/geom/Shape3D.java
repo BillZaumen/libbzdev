@@ -41,9 +41,11 @@ public interface Shape3D {
 
     /**
      * Get a surface iterator for this Shape3D.
-     * The surface iterator will represent the shape as a
-     * sequence of B&eacute;zier patches and B&eacute;zier
-     * triangles, with the order of the sequence arbitrary.
+
+     * The surface iterator will represent the shape as a sequence of
+     * B&eacute;zier patches, B&eacute;zier triangles, and/or planar
+     * triangles with the order of the sequence arbitrary.
+
      * <P>
      * Unless the transform is an affine transform, the
      * transformation is not exact.  In this case, the patches
@@ -68,6 +70,14 @@ public interface Shape3D {
      * and triangles that constitute the surface after each is subdivided
      * should be small enough that the transform can be approximated by an
      * affine transform over the region containing the control points.
+     * <P>
+     * If the iterator returned is an instance of {@link SubdivisionIterator},
+     * the method {@link SubdivisionIterator#currentSourceID()} can be used
+     * to find the number of times next() must be called for an iterator
+     * created by {@link Shape3D#getSurfaceIterator(Transform3D} (or
+     * {@link Shape3D#getSurfaceIterator(Transform3D,int)} with its second
+     * argument set to zero) in order to find the corresponding patch or
+     * triangle. This can be useful for debugging.
      * @param tform a transform to apply to each control point; null
      *        for the identity transform
      * @param level the number of levels of partitioning (each additional

@@ -1404,6 +1404,69 @@ public class BezierGrid implements Shape3D {
 	this(template, mapper, mapper.getN(), mapper.isClosed());
     }
 
+    private  BezierGrid(Path3D pathU0, Path3D pathU1, int nv) {
+	this(Path3DInfo.getControlPoints(pathU0, false).length/3,
+	     true, nv, false);
+	// pathU1 = Paths3D.alignClosedPaths(pathU0, pathU1);
+	double[] array0 = Path3DInfo.getControlPoints(pathU0, true, true);
+	double[] array1 = Path3DInfo.getControlPoints(pathU1, true, true);
+	int j = nv - 1;
+	double[] coords = new double[6];
+	for (int i = 0; i < getUArrayLength(); i++) {
+	    int ii = i*9;
+	    setPoint(i, 0, array0[ii], array0[ii+1], array0[ii+2]);
+	    setPoint(i, j, array1[ii], array1[ii+1], array1[ii+2]);
+	}
+	for (int i = 0; i < getUArrayLength(); i++) {
+	    int ii = i*9;
+	    System.arraycopy(array0, ii+3, coords, 0, 6);
+	    setSplineU(i, 0, coords);
+	    System.arraycopy(array1, ii+3, coords, 0, 6);
+	    setSplineU(i, j, coords);
+	}
+    }
+
+    /**
+     * Create a BezierGrid connecting two paths so that corresponding
+     * vertices are connected by straight lines.
+     * Both paths must be closed and must have the same number of
+     * segments.
+     * @param pathU0 a path used for edges where v = 0
+     * @param pathU1 a path used for edges where v = 1;
+     */
+    public BezierGrid(Path3D pathU0, Path3D pathU1) {
+	this(pathU0, Paths3D.alignClosedPaths(pathU0, pathU1), 2);
+	int imax = getUArrayLength();
+	for (int i = 0; i < imax; i++) {
+	    setLinearV(i, 0);
+	}
+	frozenU = true;
+	frozenV = true;
+	frozen = true;
+    }
+
+
+    public BezierGrid(Path3D pathU0, Path3D pathU1, Path2D template) {
+	this(pathU0, Paths3D.alignClosedPaths(pathU0, pathU1),
+	     Path2DInfo.getControlPoints(template, false).length/2);
+	double[] varray = Path2DInfo.getControlPoints(template, true, true);
+	int imax = getUArrayLength();
+	int jmax = getVArrayLength()-1;
+	frozen = true;
+	double[] coords1 = new double[9];
+	double[] coords2 = new double[9];
+
+	for (int i = 0; i < imax; i++) {
+	    Point3D p1 = getPoint(i, 0);
+	    Point3D p2 = getPoint(i, jmax);
+	    getSplineU(i, 0, coords1);
+	    getSplineU(i, jmax, coords2);
+	    for (int j = 0; j < jmax; j++) {
+		// ...
+	    }
+	}
+    }
+
     /**
      * Transpose a BezierGrid.
      * This method returns a new grid with the U and V coordinates
@@ -6920,7 +6983,7 @@ public class BezierGrid implements Shape3D {
 		double ourX = sv.p.getX();
 		double ourY = sv.p.getY();
 		double ourZ = sv.p.getZ();
-		path = Path3DInfo.shiftClosedPath(path, ourX, ourY, ourZ);
+		path = Paths3D.shiftClosedPath(path, ourX, ourY, ourZ);
 	    }
 	    rpath.append(path, false);
 	}

@@ -218,6 +218,18 @@ public class SubdivisionIterator implements SurfaceIterator {
 	return src.currentColor();
     }
 
+    long csid = 0;
+    /**
+     * Return the current ID for this iterator's source.
+     * IDs are incremented from 0 whenever the source provided in
+     * the constructor provides a new patch or triangle.
+     * @return an ID ; -1 if the iteration has finished
+     */
+    public long currentSourceID() {
+	return isDone()? -1L: csid;
+    }
+
+
     @Override
     public boolean isDone() {
 	if (depth > 0) return false;
@@ -232,6 +244,7 @@ public class SubdivisionIterator implements SurfaceIterator {
 	    }
 	    if (limit == 0) {
 		src.next();
+		csid++;
 		int mode = src.currentSegment(workspace);
 		currentMode[0] = mode;
 		return;
@@ -243,6 +256,7 @@ public class SubdivisionIterator implements SurfaceIterator {
 		next();
 	    } else {
 		src.next();
+		csid++;
 		if (src.isDone()) return;
 		splitCount[0] = 0;
 		int mode = src.currentSegment(workspace);

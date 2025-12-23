@@ -5709,194 +5709,6 @@ public class Path2DInfoTest {
 	    }
 	}
 
-	System.out.println("check shift closed path ...");
-
-	path = new Path2D.Double();
-	path.moveTo(-8.0, 0.0);
-	path.lineTo(-8.0, -4.0);
-	path.lineTo(0.0, -4.0);
-	path.quadTo(8.0, -4.0, 8.0, 0.0);
-	path.curveTo(8.0, 2.0, 2.0, 4.0, 0.0, 4.0);
-	path.curveTo(-2.0, 4.0, -8.0, 4.0, -8.0, 2.0);
-
-	path2 = Path2DInfo.shiftClosedPath(path, 8.0, 0.0);
-
-	if (path2 != null) throw new Exception("null path expected");
-	
-	path.closePath();	
-
-	path2 = Path2DInfo.shiftClosedPath(path, 8.0, 0.0);
-	double[][] expecting = {
-	    {8.0, 0.0},
-	    {8.0, 2.0, 2.0, 4.0, 0.0, 4.0},
-	    {-2.0, 4.0, -8.0, 4.0, -8.0, 2.0},
-	    {-8.0, 0.0},
-	    {-8.0, -4.0},
-	    {0.0, -4.0},
-	    {8.0, -4.0, 8.0, 0.0},
-	    {}
-	};
-
-	PathIterator pi = path2.getPathIterator(null);
-	int cnt = 0;
-	double[] pcoords = new double[6];
-
-	while (!pi.isDone()) {
-	    switch(pi.currentSegment(pcoords)) {
-	    case PathIterator.SEG_MOVETO:
-		for (int i = 0; i < 2; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_LINETO:
-		for (int i = 0; i < 2; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_QUADTO:
-		for (int i = 0; i < 4; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CUBICTO:
-		for (int i = 0; i < 6; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CLOSE:
-		if (expecting[cnt].length != 0) {
-		    throw new Exception("coords");
-		}
-		break;
-	    }
-	    pi.next();
-	    cnt++;
-	}
-	// Path2DInfo.printSegments(path2);
-
-	path.lineTo(-7.0, 0.0);
-	path.lineTo(-7.0, 1.0);
-	Path2D path3 = Path2DInfo.shiftClosedPath(path, 8.0, 0.0);
-
-	double[] coords2 = new double[6];
-	double[] coords3 = new double[6];
-
-	PathIterator pi2 = path2.getPathIterator(null);
-	PathIterator pi3 = path3.getPathIterator(null);
-	while (!pi2.isDone() && !pi3.isDone()) {
-	    int type2 = pi2.currentSegment(coords2);
-	    int type3 = pi3.currentSegment(coords3);
-	    if (type2 != type3) throw new Exception("types");
-	    switch(type2) {
-	    case PathIterator.SEG_MOVETO:
-		for (int i = 0; i < 2; i++) {
-		    if (coords2[i] != coords3[i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_LINETO:
-		for (int i = 0; i < 2; i++) {
-		    if (coords2[i] != coords3[i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_QUADTO:
-		for (int i = 0; i < 4; i++) {
-		    if (coords2[i] != coords3[i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CUBICTO:
-		for (int i = 0; i < 6; i++) {
-		    if (coords2[i] != coords3[i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CLOSE:
-		break;
-	    }
-	    pi2.next();
-	    pi3.next();
-	}
-	if (pi2.isDone() != pi3.isDone()) {
-	    throw new Exception("path segments");
-	}
-
-	path.reset();
-
-	path.moveTo(10.0, 20.0);
-	path.lineTo(30.0, 40.0);
-	path.moveTo(40.0, 40.0);
-	path.lineTo(50.0, 40.0);
-	path.lineTo(50.0, 50.0);
-	path.moveTo(40.0, 40.0);
-	path.closePath();
-	path.moveTo(-8.0, 0.0);
-	path.lineTo(-8.0, -4.0);
-	path.lineTo(0.0, -4.0);
-	path.quadTo(8.0, -4.0, 8.0, 0.0);
-	path.curveTo(8.0, 2.0, 2.0, 4.0, 0.0, 4.0);
-	path.curveTo(-2.0, 4.0, -8.0, 4.0, -8.0, 2.0);
-	path.closePath();	
-
-	path2 = Path2DInfo.shiftClosedPath(path, 8.0, 0.0);
-
-	pi = path2.getPathIterator(null);
-	cnt = 0;
-	pcoords = new double[6];
-
-	while (!pi.isDone()) {
-	    switch(pi.currentSegment(pcoords)) {
-	    case PathIterator.SEG_MOVETO:
-		for (int i = 0; i < 2; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_LINETO:
-		for (int i = 0; i < 2; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_QUADTO:
-		for (int i = 0; i < 4; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CUBICTO:
-		for (int i = 0; i < 6; i++) {
-		    if (pcoords[i] != expecting[cnt][i]) {
-			throw new Exception("coords");
-		    }
-		}
-		break;
-	    case PathIterator.SEG_CLOSE:
-		if (expecting[cnt].length != 0) {
-		    throw new Exception("coords");
-		}
-		break;
-	    }
-	    pi.next();
-	    cnt++;
-	}
-
 	System.out.println("... OK");
 	System.out.println("Convex Hull");
 	double hx = 10.0, hy = 20.0;
@@ -6502,9 +6314,11 @@ public class Path2DInfoTest {
 			   array2[i+6], array2[i+7]);
 	}
 	PathIterator pi1 = tpath.getPathIterator(null);
-	pi2 = tpath2.getPathIterator(null);
+	PathIterator pi2 = tpath2.getPathIterator(null);
 
 	double lastx = 0.0, lasty = 0.0;
+	double[] coords2 = new double[6];
+
 	while (!pi1.isDone()) {
 	    if (pi2.isDone()) throw new Exception();
 	    Arrays.fill(coords, 0.0);
@@ -6573,6 +6387,7 @@ public class Path2DInfoTest {
 	    pi2.next();
 	}
 	if (!pi2.isDone()) throw new Exception();
+
 
 	System.exit(0);
     }

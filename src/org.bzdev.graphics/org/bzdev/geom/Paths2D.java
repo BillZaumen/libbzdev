@@ -3739,6 +3739,116 @@ public class Paths2D {
 	}
 	return path;
     }
+    /**
+     * Find the first closed component of a path that goes through a point
+     * (x, y) and shift that path component so it starts at (x, y).
+     * The point (x, y) must be the last point in a segment (including
+     * a MOVE_TO segment).
+     * @param path the path
+     * @param x the X coordinate of a point on the path
+     * @param y the Y coordinate of a point on the path
+     * @return the path component with a segment starting or ending at (x, y),
+     *         with its segments shifted cyclically so that the returned path
+     *         starts at the point (x, y); null if no segment starts or ends
+     *         with the point (x, y).
+     * @exception IllegalArgumentException the path contains a control
+     *            point other than {@link PathIterator#SEG_MOVETO}
+     *            immediately after {@link PathIterator#SEG_CLOSE}
+     */
+    public static Path2D shiftClosedPath(Path2D path, double x, double y) {
+	// round to nearest float to limit numerical accuracy issues
+	x = (double)(float)x;
+	y = (double)(float)y;
+	Path2D path1 = (path instanceof Path2D.Float)?
+	    new Path2D.Float(): new Path2D.Double();
+	Path2D path2 = (path instanceof Path2D.Float)?
+	    new Path2D.Float(): new Path2D.Double();
+	PathIterator pi = path.getPathIterator(null);
+	double[] coords = new double[6];
+	path = null;		// in case pi doesn't start with SEG_MOVETO
+	double lastx = 0.0, lasty = 0.0;
+	double xx = 0.0, yy = 0.0;
+	double xxf = 0.0, yyf = 0.0;
+	boolean closed = false;
+	while (!pi.isDone()) {
+	    switch(pi.currentSegment(coords)) {
+	    case PathIterator.SEG_MOVETO:
+		path1.reset();
+		path2.reset();
+		path = path1;
+		closed = false;
+		xx = lastx = coords[0];
+		yy = lasty = coords[1];
+		xxf = (double)(float)xx;
+		yyf = (double)(float)yy;
+		if (xxf == x && yyf == y) {
+		    path = path2;
+		}
+		path.moveTo(lastx, lasty);
+		break;
+	    case PathIterator.SEG_LINETO:
+		if (closed) {
+		    throw new IllegalArgumentException(errorMsg("badSegClose"));
+		}
+		xx = coords[0];
+		yy = coords[1];
+		xxf = (double)(float)xx;
+		yyf = (double)(float)yy;
+		path.lineTo(coords[0],coords[1]);
+		if (path != path2 && xxf == x && yyf == y) {
+		    path = path2;
+		    path.moveTo(xx, yy);
+		}
+		break;
+	    case PathIterator.SEG_QUADTO:
+		if (closed) {
+		    throw new IllegalArgumentException(errorMsg("badSegClose"));
+		}
+		xx = coords[2];
+		yy = coords[3];
+		xxf = (double)(float)xx;
+		yyf = (double)(float)yy;
+		path.quadTo(coords[0], coords[1], coords[2], coords[3]);
+		if (path != path2 && xxf == x && yyf == y) {
+		    path = path2;
+		    path.moveTo(xx, yy);
+		}
+		break;
+	    case PathIterator.SEG_CUBICTO:
+		if (closed) {
+		    throw new IllegalArgumentException(errorMsg("badSegClose"));
+		}
+		xx = coords[4];
+		yy = coords[5];
+		xxf = (double)(float)xx;
+		yyf = (double)(float)yy;
+		path.curveTo(coords[0], coords[1], coords[2], coords[3],
+			     coords[4], coords[5]);
+		if (path != path2 && xxf == x && yyf == y) {
+		    path = path2;
+		    path.moveTo(xx, yy);
+		}
+		break;
+	    case PathIterator.SEG_CLOSE:
+		if (closed) break;
+		if (xx != lastx || yy != lasty) {
+		    path.lineTo(lastx, lasty);
+		}
+		if (path == path2) {
+		    path.append(path1, true);
+		    path.closePath();
+		    return path;
+		}
+		closed = true;
+		xx = lastx;
+		yy = lasty;
+		break;
+	    }
+	    pi.next();
+	}
+	// We didn't find a match to (x, y)
+	return null;
+    }
 }
 
 //  LocalWords:  exbundle xc yc Bezier Aleksas Riskus Giedrfia Liekus

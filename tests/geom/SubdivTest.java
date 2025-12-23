@@ -1039,7 +1039,9 @@ public class SubdivTest {
 	}
 
 	si = surface.getSurfaceIterator(null, level);
+	long maxid = -1;
 	while (!si.isDone()) {
+	    maxid = ((SubdivisionIterator)si).currentSourceID();
 	    int n = 0;
 	    switch (si.currentSegment(cpcoordsR)) {
 	    case SurfaceIterator.CUBIC_PATCH:
@@ -1063,7 +1065,11 @@ public class SubdivTest {
 	    }
 	    si.next();
 	}
-
+	if (maxid != surface.size() - 1) {
+	    throw new
+		Exception("maxid = " + maxid + ", size = "
+			   + surface.size());
+	}
 	double limit = 0.1/MathOps.pow(2.0, level);
 	Point3D last = null;
 	for (Point3D p: points) {

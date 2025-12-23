@@ -31,11 +31,6 @@ import org.bzdev.math.VectorOps;
 /**
  * Class providing static methods to obtain information about paths
  * defined by java.awt.geom.Path3D.
- * <P>
- * The method {@link Path3DInfo#shiftClosedPath(Path3D,double,double,double)}
- * returns a modified path (the same path as its argument but with its
- * starting point shifted).  The class {@link PathSplitter} will
- * allow various paths to be constructed.
  */
 public class Path3DInfo {
 
@@ -4312,115 +4307,6 @@ public class Path3DInfo {
 	out.flush();
     }
 
-    /**
-     * Find the first closed component of a path that goes through a point
-     * (x, y, z) and shift that path component so it starts at (x, y, z);
-     * The point (x, y, z) must be the last point in a segment (including
-     * a MOVE_TO segment).
-     * @param path the path
-     * @param x the X coordinate of a point on the path
-     * @param y the Y coordinate of a point on the path
-     * @param z the Z coordinate of a point on the path
-     * @return the path component with a segment starting or ending at
-     *         (x, y, z), with its segments shifted cyclically so that
-     *         the returned path starts at the point (x, y, z); null
-     *         if no segment starts or ends with the point (x, y, z).
-     * @exception IllegalArgumentException an argument was illegal
-     */
-    public static Path3D shiftClosedPath(Path3D path,
-					 double x, double y, double z)
-    {
-	x = (double)(float)x;
-	y = (double)(float)y;
-	z = (double)(float)z;
-	Path3D path1 = (path instanceof Path3D.Float)?
-	    new Path3D.Float(): new Path3D.Double();
-	Path3D path2 = (path instanceof Path3D.Float)?
-	    new Path3D.Float(): new Path3D.Double();
-	PathIterator3D pi = path.getPathIterator(null);
-	double[] coords = new double[9];
-	path = null;		// in case pi doesn't start with SEG_MOVETO
-	double lastx = 0.0, lasty = 0.0, lastz = 0.0;
-	double xx = 0.0, yy = 0.0, zz = 0.0;
-	boolean closed = false;
-	while (!pi.isDone()) {
-	    switch(pi.currentSegment(coords)) {
-	    case PathIterator3D.SEG_MOVETO:
-		path1.reset();
-		path2.reset();
-		path = path1;
-		closed = false;
-		xx = lastx = coords[0];
-		yy = lasty = coords[1];
-		zz = lastz = coords[2];
-		if (xx == x && yy == y && zz == z) {
-		    path = path2;
-		}
-		path.moveTo(lastx, lasty, lastz);
-		break;
-	    case PathIterator3D.SEG_LINETO:
-		if (closed) {
-		    throw new IllegalArgumentException(errorMsg("badSegClose"));
-		}
-		xx = coords[0];
-		yy = coords[1];
-		zz = coords[2];
-		path.lineTo(coords[0],coords[1], coords[2]);
-		if (path != path2 && xx == x && yy == y && zz == z) {
-		    path = path2;
-		    path.moveTo(x, y, z);
-		}
-		break;
-	    case PathIterator3D.SEG_QUADTO:
-		if (closed) {
-		    throw new IllegalArgumentException(errorMsg("badSegClose"));
-		}
-		xx = coords[3];
-		yy = coords[4];
-		zz = coords[5];
-		path.quadTo(coords[0], coords[1], coords[2],
-			    coords[3], coords[4], coords[5]);
-		if (path != path2 && xx == x && yy == y && zz == z) {
-		    path = path2;
-		    path.moveTo(x, y, z);
-		}
-		break;
-	    case PathIterator3D.SEG_CUBICTO:
-		if (closed) {
-		    throw new IllegalArgumentException(errorMsg("badSegClose"));
-		}
-		xx = coords[6];
-		yy = coords[7];
-		zz = coords[8];
-		path.curveTo(coords[0], coords[1], coords[2],
-			     coords[3], coords[4], coords[5],
-			     coords[6], coords[7], coords[8]);
-		if (path != path2 && xx == x && yy == y && zz == z) {
-		    path = path2;
-		    path.moveTo(x, y, z);
-		}
-		break;
-	    case PathIterator3D.SEG_CLOSE:
-		if (closed) break;
-		if (xx != lastx || yy != lasty || zz != lastz) {
-		    path.lineTo(lastx, lasty, lastz);
-		}
-		if (path == path2) {
-		    path.append(path1, true);
-		    path.closePath();
-		    return path;
-		}
-		closed = true;
-		xx = lastx;
-		yy = lasty;
-		zz = lastz;
-		break;
-	    }
-	    pi.next();
-	}
-	// We didn't find a match to (x, y)
-	return null;
-    }
 
     /**
      * Count the number of segments in the  first continuous portion of a
@@ -4505,7 +4391,7 @@ public class Path3DInfo {
      * @param path the path
      * @return true if the path is closed; false otherwise
      */
-    public static boolean isClosed(Path3D  path) {
+    public static boolean isClosed(Path3D path) {
 	PathIterator3D pi = path.getPathIterator(null);
 
 	boolean sawMove = false;
@@ -4742,7 +4628,7 @@ public class Path3DInfo {
 //  LocalWords:  integrateWithP segNumbOutOfRange lastMoveToX lastY
 //  LocalWords:  lastMoveToY illFormedPath tradeoff lengthOrig dT Px
 //  LocalWords:  appendable Appendable startingX startingY startingZ
-//  LocalWords:  endingX endingY endingZ badSegClose shiftClosedPath
+//  LocalWords:  endingX endingY endingZ badSegClose
 //  LocalWords:  PathSplitter binormal Drawable IllegalStateException
 //  LocalWords:  expectingMoveTo printArray Py Pz integrateAbsPRootQ
 //  LocalWords:  getCoefficientsArray asCubic

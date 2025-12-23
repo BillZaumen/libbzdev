@@ -4631,7 +4631,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	cubics.computeBoundary(null, true);
 	Path3D path = cubics.getBoundary();
 	if (path == null) {
-	    throw new TessellationException(errorMsg("notWellFormed"));
+	    throw new TessellationException(errorMsg("notWellFormedCB"));
 	}
 	PathIterator3D pit = path.getPathIterator(null);
 	double[] pcoords = new double[9];
@@ -4884,37 +4884,45 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 					v1[i] = scoords[45+i] - scoords[i];
 					v2[i] = scoords[36+i] - scoords[45+i];
 				    }
-				    VectorOps.normalize(v1);
-				    VectorOps.normalize(v2);
-				    VectorOps.crossProduct(v3, v1, v2);
-				    VectorOps.normalize(v3);
+				    try {
+					VectorOps.normalize(v1);
+					VectorOps.normalize(v2);
+					VectorOps.crossProduct(v3, v1, v2);
+					VectorOps.normalize(v3);
+				    } catch (IllegalArgumentException iao){}
 				    for (int i = 0; i < 3; i++) {
 					v1[i] = scoords[9+i] - scoords[i];
 					v2[i] = scoords[45+i] - scoords[9+i];
 				    }
-				    VectorOps.normalize(v1);
-				    VectorOps.normalize(v2);
-				    VectorOps.crossProduct(v4, v1, v2);
-				    VectorOps.normalize(v4);
+				    try {
+					VectorOps.normalize(v1);
+					VectorOps.normalize(v2);
+					VectorOps.crossProduct(v4, v1, v2);
+					VectorOps.normalize(v4);
+				    } catch (IllegalArgumentException iao){}
 				    VectorOps.crossProduct(v1, v3, v4);
 				    double test1 = VectorOps.norm(v1);
 				    for (int i = 0; i < 3; i++) {
 					v1[i] = scoords[9+i] - scoords[i];
 					v2[i] = scoords[36+i] - scoords[9+i];
 				    }
-				    VectorOps.normalize(v1);
-				    VectorOps.normalize(v2);
-				    VectorOps.crossProduct(v3, v1, v2);
-				    VectorOps.normalize(v3);
+				    try {
+					VectorOps.normalize(v1);
+					VectorOps.normalize(v2);
+					VectorOps.crossProduct(v3, v1, v2);
+					VectorOps.normalize(v3);
+				    } catch (IllegalArgumentException iao){}
 				    for (int i = 0; i < 3; i++) {
 					v1[i] = scoords[45+i] - scoords[9+i];
 					v2[i] = scoords[36+i] - scoords[45+i];
 				    }
-				    VectorOps.normalize(v1);
-				    VectorOps.normalize(v2);
-				    VectorOps.crossProduct(v4, v1, v2);
-				    VectorOps.normalize(v4);
-				    VectorOps.crossProduct(v1, v3, v4);
+				    try {
+					VectorOps.normalize(v1);
+					VectorOps.normalize(v2);
+					VectorOps.crossProduct(v4, v1, v2);
+					VectorOps.normalize(v4);
+					VectorOps.crossProduct(v1, v3, v4);
+				    } catch (IllegalArgumentException iao){}
 				    double test2 = VectorOps.norm(v1);
 				    flipDiagonal = (test1 <= test2);
 				    if (flipDiagonal) {
