@@ -74,7 +74,7 @@ public interface Shape3D {
      * If the iterator returned is an instance of {@link SubdivisionIterator},
      * the method {@link SubdivisionIterator#currentSourceID()} can be used
      * to find the number of times next() must be called for an iterator
-     * created by {@link Shape3D#getSurfaceIterator(Transform3D} (or
+     * created by {@link Shape3D#getSurfaceIterator(Transform3D)} (or
      * {@link Shape3D#getSurfaceIterator(Transform3D,int)} with its second
      * argument set to zero) in order to find the corresponding patch or
      * triangle. This can be useful for debugging.
@@ -84,7 +84,19 @@ public interface Shape3D {
      *        level splits the previous level into quarters)
      * @return a surface iterator
      */
-    SurfaceIterator getSurfaceIterator(Transform3D tform, int level);
+    default SubdivisionIterator
+	getSurfaceIterator(Transform3D tform, int level)
+    {
+	if (tform == null) {
+	    return new SubdivisionIterator(getSurfaceIterator(null), level);
+	} else if (tform instanceof AffineTransform3D) {
+	    return new SubdivisionIterator(getSurfaceIterator(tform), level);
+	} else {
+	    return new SubdivisionIterator(getSurfaceIterator(null),
+					   tform,
+					   level);
+	}
+    }
 
     /**
      * Determine if a surface is oriented.

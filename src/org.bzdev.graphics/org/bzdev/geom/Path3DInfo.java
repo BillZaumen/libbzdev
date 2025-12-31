@@ -1357,7 +1357,7 @@ public class Path3DInfo {
 		list.add(coords[2]);
 		lastx = coords[0];
 		lasty = coords[1];
-		lastz = coords[3];
+		lastz = coords[2];
 		sawClose = false;
 		break;
 	    case PathIterator3D.SEG_QUADTO:
@@ -3361,9 +3361,9 @@ public class Path3DInfo {
      *        and PathIterator3D.SEG_CLOSE)
      * @param coords the coordinates array as defined by
      *        {@link java.awt.geom.PathIterator PathIterator}, but with
-     *        coords[0] and coords[1] set to the X and Y coordinates
-     *        respectively for the last MOVETO operation when the type
-     *        is PathIterator3D.SEG_CLOSE
+     *        coords[0], coords[1], and coords[2]  set to the X, Y, and Z
+     *        coordinates respectively for the last MOVETO operation when
+     *        the type is PathIterator3D.SEG_CLOSE
      * @return true if the tangent vector exists; false if the tangent
      *         vector does not exist
      */

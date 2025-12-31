@@ -234,10 +234,11 @@ public class Paths3D {
      * reversing <CODE>path</CODE> or the shifted <CODE>path</CODE>
      * will be returned.
      * <P>
-     * To determine if the returned path was reversed, the dot product
-     * of the normalized tangent vectors at the start of the target path
-     * and the given path is computed.  If the absolute value of this
-     * dotproduct is less than <CODE>0.0</CODE>, the path is reversed.
+     * To determine if the returned path is reversed, the normalized tangent
+     * vectors at the start of the target path is compared to the
+     * normalized tangent vector of the shifted path and its reversed path
+     * by computing their dot products.  The one with the largest dot
+     * product is chosen.
      * @param target the target path
      * @param path the path to shift
      * @return the path if its starting point is the closest one to
@@ -262,16 +263,20 @@ public class Paths3D {
      * reversing <CODE>path</CODE> or the shifted <CODE>path</CODE>
      * will be returned.
      * <P>
-     * To determine if the returned path was reversed, the dot product
-     * of the normalized tangent vectors at the start of the target path
-     * and the given path is computed.  If the absolute value of this
-     * dot product is less than or equal to -<CODE>limit</CODE>, the
-     * path is reversed.
+     * <P>
+     * To determine if the returned path is reversed, the normalized tangent
+     * vectors at the start of the target path is compared to the
+     * normalized tangent vector of the shifted path and its reversed path
+     * by computing their dot products.  The one with the largest dot
+     * product is chosen.  If the absolute value of the difference in dot
+     * products is less than the limit, an exception is thrown.
      * @param target the target path
      * @param path the path to shift
-     * @param limit a value in the range [0.0, 1.0] for the dot product
-     *        test of the normalized tangents at the start of the paths after
-     *        <CODE>path</CODE> was aligned.
+     * @param limit a non-negative limit on the absolute value of the
+     *        difference in dot products of the normalized starting
+     *        tangent vector of the target path with the normalized
+     *        start tangent vector of the shifted path and the reverse
+     *        of the shifted path
      * @return the path if its starting point is the closest one to
      *         the start of the target path; a new path otherwise
      * @exception IllegalArgumentException if either path is not closed,
@@ -284,15 +289,17 @@ public class Paths3D {
 	throws IllegalArgumentException, IllegalStateException
     {
 	if (limit > 1.0 || limit < 0.0) {
-	    throw new IllegalArgumentException();
+	    String msg = errorMsg("thirdArgNegative", limit);
+	    throw new IllegalArgumentException(msg);
 	}
 	if (!Path3DInfo.isClosed(target) || !Path3DInfo.isClosed(path)) {
-	    throw new IllegalArgumentException();
+	    throw new IllegalArgumentException(errorMsg("pathNotClosed"));
 	}
 	double cp1[] = Path3DInfo.getControlPoints(target, false);
 	double cp2[] = Path3DInfo.getControlPoints(path, false);
 	if (cp1.length != cp2.length) {
-	    throw new IllegalArgumentException();
+	    String msg  = errorMsg("argOutOfRange1i", 3, limit);
+	    throw new IllegalArgumentException(msg);
 	}
 
 	double dminsq = VectorOps
@@ -319,18 +326,24 @@ public class Paths3D {
 	}
 	double[] t1 = new double[3];
 	double[] t2 = new double[3];
+	double[] t3 = new double[3];
+	Path3D reversed = reverse(result);
+
 	if (Path3DInfo.getStartingTangent(target, t1) == false
-	    || Path3DInfo.getStartingTangent(result, t2) == false) {
-	    throw new IllegalArgumentException();
+	    || Path3DInfo.getStartingTangent(result, t2) == false
+	    || Path3DInfo.getStartingTangent(reversed, t3) == false) {
+	    throw new IllegalArgumentException(errorMsg("badTangent"));
 	}
 	t1 = VectorOps.normalize(t1);
 	t2 = VectorOps.normalize(t2);
+	t3 = VectorOps.normalize(t3);
 	double dprod = VectorOps.dotProduct(t1, t2);
+	double rdprod = VectorOps.dotProduct(t1, t3);
 
-	if (dprod <= -limit && dprod != 0.0) {
+	if (Math.abs(dprod - rdprod) < limit) {
+	    throw new IllegalStateException(errorMsg("pathDirection"));
+	} else if (dprod < rdprod) {
 	    result = reverse(result);
-	} else if (Math.abs(dprod) < limit) {
-	    throw new IllegalStateException();
 	}
 	return result;
     }

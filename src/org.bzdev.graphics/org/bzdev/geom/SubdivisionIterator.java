@@ -67,10 +67,15 @@ public class SubdivisionIterator implements SurfaceIterator {
 			       Transform3D transform,
 			       int limit)
     {
+	this(src, limit);
+	/*
 	this.src = src;
 	this.limit = limit;
 	workspace = new double[3*48*(limit + 1)];
 	splitCount = new int[3*(limit+1)];
+	currentMode = new int[3*(limit+1)];
+	currentMode[0] = -1;
+	*/
 	this.transform = transform;
     }
 
@@ -218,7 +223,9 @@ public class SubdivisionIterator implements SurfaceIterator {
 	return src.currentColor();
     }
 
-    long csid = 0;
+    long csid = 0; // current source ID
+    long eid = 0; // entry ID (reset when csid changes)
+
     /**
      * Return the current ID for this iterator's source.
      * IDs are incremented from 0 whenever the source provided in
@@ -227,6 +234,17 @@ public class SubdivisionIterator implements SurfaceIterator {
      */
     public long currentSourceID() {
 	return isDone()? -1L: csid;
+    }
+
+    /**
+     * Return the current entry ID for this iterator's source.
+     * Entry IDs are incremented from 0 whenever the source provided in
+     * the constructor provides a new patch or triangle, but is reset
+     * to zero when the current source ID changes
+     * @return an ID ; -1 if the iteration has finished
+     */
+    public long currentEntryID() {
+	return isDone()? -1L: eid;
     }
 
 
@@ -240,11 +258,13 @@ public class SubdivisionIterator implements SurfaceIterator {
     public void next() {
 	if (depth == 0) {
 	    if (src.isDone()) {
+		eid = -1;
 		return;
 	    }
 	    if (limit == 0) {
 		src.next();
 		csid++;
+		eid = 0;
 		int mode = src.currentSegment(workspace);
 		currentMode[0] = mode;
 		return;
@@ -257,6 +277,7 @@ public class SubdivisionIterator implements SurfaceIterator {
 	    } else {
 		src.next();
 		csid++;
+		eid = 0;
 		if (src.isDone()) return;
 		splitCount[0] = 0;
 		int mode = src.currentSegment(workspace);
@@ -264,6 +285,7 @@ public class SubdivisionIterator implements SurfaceIterator {
 		partition();
 	    }
 	} else {
+	    eid++;
 	    depth--;
 	    partition();
 	}

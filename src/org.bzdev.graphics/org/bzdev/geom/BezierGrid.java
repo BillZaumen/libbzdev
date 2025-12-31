@@ -6,6 +6,7 @@ import org.bzdev.math.VectorOps;
 import org.bzdev.util.Cloner;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
@@ -1404,9 +1405,17 @@ public class BezierGrid implements Shape3D {
 	this(template, mapper, mapper.getN(), mapper.isClosed());
     }
 
-    private  BezierGrid(Path3D pathU0, Path3D pathU1, int nv) {
+    private  BezierGrid(Path3D pathU0, Path3D pathU1, int nv)
+	throws IllegalArgumentException
+    {
 	this(Path3DInfo.getControlPoints(pathU0, false).length/3,
 	     true, nv, false);
+	if (!Path3DInfo.isClosed(pathU0)) {
+	    throw new IllegalArgumentException("ArgNotClosedPath");
+	}
+	if (!Path3DInfo.isClosed(pathU1)) {
+	    throw new IllegalArgumentException("ArgNotClosedPath");
+	}
 	// pathU1 = Paths3D.alignClosedPaths(pathU0, pathU1);
 	double[] array0 = Path3DInfo.getControlPoints(pathU0, true, true);
 	double[] array1 = Path3DInfo.getControlPoints(pathU1, true, true);
@@ -1432,9 +1441,12 @@ public class BezierGrid implements Shape3D {
      * Both paths must be closed and must have the same number of
      * segments.
      * @param pathU0 a path used for edges where v = 0
-     * @param pathU1 a path used for edges where v = 1;
+     * @param pathU1 a path used for edges where v = 1
+     * @throws IllegalArgumentException if PathU0 or PathU1 is not closed
      */
-    public BezierGrid(Path3D pathU0, Path3D pathU1) {
+    public BezierGrid(Path3D pathU0, Path3D pathU1)
+	throws IllegalArgumentException
+    {
 	this(pathU0, Paths3D.alignClosedPaths(pathU0, pathU1), 2);
 	int imax = getUArrayLength();
 	for (int i = 0; i < imax; i++) {
@@ -1445,26 +1457,152 @@ public class BezierGrid implements Shape3D {
 	frozen = true;
     }
 
+    /**
+     * Constructor given two closed 3Dpaths and a 2D path used as a template
+     * <P>
+     * The closed paths are expected to be roughly parallel with no sharp
+     * bends in a direction roughly perpendicular to the planes defined by
+     * the closed-paths tangents and the line connecting corresponding points.
+     * Both closed paths are expected to have the same number of segments.
+     * The template will be scaled, translated, and rotated so it
+     * connects points with indices (i, 0) to points with indices (i,
+     * nv-1), where nv is the number of points in the V direction for
+     * a given U-direction index.  The template must not be a closed
+     * path.
+     * <P>
+     * When this constructor is used, the methods
+     * {@link #setPoint(int,int,Point3D)} and
+     * {@link #setPoint(int,int,double,double,double)} will throw an exception.
+     * The methods
+     * {@link #setSplineU(int,int,double[])}, and
+     * {@link setSplineV(int,int,double[])} will have no effect and return
+     * <CODE>false</CODE>.  The method
+     * {@link #setRemainingControlPoints(int,int,double[])}, however, may
+     * be used.
+     * <P>
+     * It is possible to create surfaces that are ill formed: for example,
+     * surfaces that intersect themselves.
+     * @param pathU0 a path used for edges where j = 0
+     * @param pathU1 a path used for edges where j has its maximum value
+     * @param template a path used to determine the edges of the remaining
+     *        patches
+     * @throws IllegalArgumentException if PathU0 or PathU1 is not closed
+     *         or template was closed
+     */
 
-    public BezierGrid(Path3D pathU0, Path3D pathU1, Path2D template) {
+    public BezierGrid(Path3D pathU0, Path3D pathU1, Path2D template,
+		      boolean tflip)
+	throws IllegalArgumentException
+    {
 	this(pathU0, Paths3D.alignClosedPaths(pathU0, pathU1),
 	     Path2DInfo.getControlPoints(template, false).length/2);
+	if (Path2DInfo.isClosed(template)) {
+	    throw new IllegalArgumentException(errorMsg("ArgWasClosedPath3"));
+	}
 	double[] varray = Path2DInfo.getControlPoints(template, true, true);
-	int imax = getUArrayLength();
-	int jmax = getVArrayLength()-1;
-	frozen = true;
-	double[] coords1 = new double[9];
-	double[] coords2 = new double[9];
+	double[] tvector = {
+	    varray[varray.length-2] - varray[0],
+	    varray[varray.length-1] - varray[1]
+	};
+	double tscale = 1.0/VectorOps.norm(tvector);
+	double tangle = Math.atan2(tvector[1],tvector[0]);
+	AffineTransform tvtform = AffineTransform.getRotateInstance(-tangle,
+								    0.0, 0.0);
+	tvtform.scale(tscale,tscale);
+	tvtform.translate(-varray[0], -varray[1]);
+	if (tflip) {
+	    tvtform.preConcatenate(AffineTransform.getScaleInstance(1.0, -1.0));
+	}
+	tvtform.transform(varray, 0, varray, 0, varray.length/2);
+	// in case of round-off errors
+	varray[0] = 0.0;
+	varray[1] = 0.0;
+	varray[varray.length-2] = 1.0;
+	varray[varray.length-1] = 0.0;
 
+	double[] varray3 = new double[varray.length + varray.length/2];
+	double[] varray3p = new double[varray3.length];
+	int valend2 = varray.length/2;
+	for (int i = 0; i < valend2; i++) {
+	    int ii = i*2;
+	    int ii3 = i*3;
+	    varray3[ii3] = varray[ii];
+	    varray3[ii3+1] = varray[ii+1];
+	}
+	int imax = getUArrayLength();
+	int imaxm1 = imax-1;
+	int jmax = getVArrayLength();
+	int jmaxm1 = jmax-1;
+	double[] coords1 = new double[12];
+	double[] coords2 = new double[12];
+	double[] tangent1 = new double[3];
+	double[] tangent2 = new double[3];
+	double[] normal1 = new double[3];
+	double[] normal2 = new double[3];
 	for (int i = 0; i < imax; i++) {
 	    Point3D p1 = getPoint(i, 0);
-	    Point3D p2 = getPoint(i, jmax);
+	    Point3D p1e = getPoint(i+1, 0);
+	    Point3D p2 = getPoint(i, jmaxm1);
+	    Point3D p2e = getPoint(i+1, jmaxm1);
 	    getSplineU(i, 0, coords1);
-	    getSplineU(i, jmax, coords2);
-	    for (int j = 0; j < jmax; j++) {
-		// ...
+	    coords1[9] = p1e.getX();
+	    coords1[10] = p1e.getY();
+	    coords1[11] = p1e.getZ();
+	    getSplineU(i, jmaxm1, coords2);
+	    coords2[9] = p2e.getX();
+	    coords2[10] = p2e.getY();
+	    coords2[11] = p2e.getZ();
+	    boolean hasTangent1 = Path3DInfo
+		.getTangent(0.0, tangent1, 0,
+			    p1.getX(), p1.getY(), p1.getZ(),
+			    PathIterator3D.SEG_CUBICTO,
+			    coords1);
+	    boolean hasTangent2 = Path3DInfo
+		.getTangent(0.0, tangent2, 0,
+			    p2.getX(), p2.getY(), p2.getZ(),
+			    PathIterator3D.SEG_CUBICTO,
+			    coords2);
+	    if (hasTangent1 == false || hasTangent2 == false) {
+		throw new IllegalArgumentException(errorMsg("badTangent"));
+	    }
+	    double xhat[] = {
+		p2.getX() - p1.getX(),
+		p2.getY() - p1.getY(),
+		p2.getZ() - p1.getZ()
+	    };
+	    double scalef = VectorOps.norm(xhat);
+	    VectorOps.normalize(xhat);
+	    double[] yhat = VectorOps.crossProduct(tangent1, xhat);
+	    double[] yhat2 = VectorOps.crossProduct(tangent2, xhat);
+	    VectorOps.add(yhat, yhat, yhat2);
+	    VectorOps.multiply(yhat, 0.5, yhat);
+	    VectorOps.normalize(yhat);
+	    // xhat and yhat are now perpendicular unit-length vectors.
+	    double oxhat[] = {1.0, 0.0, 0.0};
+	    double oyhat[] = {0.0, 1.0, 0.0};
+	    Point3D op = new Point3D.Double(0.0, 0.0, 0.0);
+	    AffineTransform3D tform = AffineTransform3D
+		.getMapInstance(op, oxhat, oyhat, p1, xhat, yhat, 0.0);
+	    tform.scale(scalef, scalef, 0.0);
+	    tform.transform(varray3, 0, varray3p, 0, varray3.length/3);
+	    double[] vcoords = new double[6];
+	    System.arraycopy(varray3p, 3, vcoords, 0, 6);
+	    setSplineV(i, 0, vcoords);
+	    for (int j = 1; j < jmaxm1; j++) {
+		int jj = j*9;
+		frozen = false;
+		setPoint(i, j, varray3p[jj], varray3p[jj+1], varray3p[jj+2]);
+		System.arraycopy(varray3p, jj+3, vcoords, 0, 6);
+		setSplineV(i, j, vcoords);
 	    }
 	}
+	frozen = false;
+	frozenV = true;
+	frozenVEnds1 = true;
+	frozenVEnds2 = true;
+	createSplines();
+	frozen = true;
+	frozenU = true;
     }
 
     /**
@@ -2143,11 +2281,17 @@ public class BezierGrid implements Shape3D {
 
     /**
      * Get the current value of a point on the grid.
+     * If the U direction is closed, i is treated as 0 when its value
+     * is {@link #getUArrayLength()}.
+     * If the V direction is closed, j is treated as 0 when its value
+     * is {@link #getVArrayLength()}.
      * @param i the U index
      * @param j the V index
      * @return the corresponding point; null if there is none
      */
     public Point3D getPoint(int i, int j) {
+	if (uclosed && i == nu) i = 0;
+	if (vclosed && j == nv) j = 0;
 	Vertex vertex = array[i][j];
 	if (vertex == null) return null;
 	return vertex.p;
@@ -2693,7 +2837,7 @@ public class BezierGrid implements Shape3D {
 	if (n == 0) return;
 	int next = cj + n;
 	if (next < 0 || next >= nv) {
-	    String msg = errorMsg("argOutOfRange1i", n);
+	    String msg = errorMsg("argOutOfRange1i", 1,  n);
 	    throw new IllegalArgumentException(msg);
 	}
 	int incr = (n < 0)? -1: 1;
@@ -2727,7 +2871,7 @@ public class BezierGrid implements Shape3D {
 	if (n == 0) return;
 	int next = ci + n;
 	if (next < 0 || next >= nu) {
-	    String msg = errorMsg("argOutOfRange1i", n);
+	    String msg = errorMsg("argOutOfRange1i", 1, n);
 	    throw new IllegalArgumentException(msg);
 	}
 	int incr = (n < 0)? -1: 1;
@@ -4555,7 +4699,7 @@ public class BezierGrid implements Shape3D {
 
 
     @Override
-    public SurfaceIterator getSurfaceIterator(Transform3D tform) {
+    public synchronized SurfaceIterator getSurfaceIterator(Transform3D tform) {
 	createSplines();
 	if (tform == null) {
 	    return new Iterator1();
@@ -4564,6 +4708,7 @@ public class BezierGrid implements Shape3D {
 	}
     }
 
+    /*
     @Override
     public final synchronized
     SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
@@ -4590,7 +4735,7 @@ public class BezierGrid implements Shape3D {
 	    }
 	}
     }
-
+    */
     Shape3D[] components = null;
 
     @Override

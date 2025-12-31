@@ -14,6 +14,9 @@ public interface SurfaceIterator
      * A segment of a surface is a cubic B&eacute;zier patch.
      * For this type of segment, there are 16 control points for a
      * total of 48 double- or single-precision values.
+     * <P>
+     * The order of the control points is specified in the documentation
+     * for {@link Surface3D#addCubicPatch(double[])}.
      */
     static int CUBIC_PATCH = 0;
 
@@ -21,6 +24,8 @@ public interface SurfaceIterator
      * A segment of a surface is a cubic B&eacute;zier triangle
      * For this type of segment, there are 10 control points for a
      * total of 30 double- or single-precision values.
+     * The order of the control points is specified in the documentation
+     * for {@link Surface3D#addCubicTriangle(double[])}.
      */
     static int CUBIC_TRIANGLE = 1;
 
@@ -28,9 +33,10 @@ public interface SurfaceIterator
      * A segment of a surface is a planar triangle
      * For this type of segment, there are 3 control points for a
      * total of 9 double- or single-precision values.
-     */
+     * The order of the control points is specified in the documentation
+     * for {@link Surface3D#addPlanarTriangle(double[])}.
+    */
     static int PLANAR_TRIANGLE = 2;
-
 
     /**
      * A segment of a surface is a cubic-vertex triangle.
@@ -40,6 +46,8 @@ public interface SurfaceIterator
      * the last control points defines a vertex.  The surface
      * segment consists of all points on the B&eacute;zier curve
      * connected to the vertex by straight-line segments.
+     * The order of the control points is specified in the documentation
+     * for {@link Surface3D#addCubicVertex(double[])}.
      */
     static int CUBIC_VERTEX = 3;
 

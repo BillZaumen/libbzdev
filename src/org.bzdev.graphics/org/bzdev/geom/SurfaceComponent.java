@@ -276,6 +276,7 @@ class SurfaceComponent implements Shape3D, SurfaceOps {
 	    }
     }
 
+    /*
     @Override
     public SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
 	if (tform == null) {
@@ -300,6 +301,7 @@ class SurfaceComponent implements Shape3D, SurfaceOps {
 	    }
 	}
     }
+    */
 
     @Override
     public Path3D getBoundary() {

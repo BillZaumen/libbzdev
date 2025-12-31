@@ -235,8 +235,9 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 				 + "width=%g, height=%g, depth=%g}",
 				 xmin, ymin, zmin, width, height, depth);
 	}
+	/*
 	@Override
-	public SurfaceIterator getSurfaceIterator(Transform3D tform,
+	public SubdivisionIterator getSurfaceIterator(Transform3D tform,
 						  int level)
 	{
 	    if (tform == null) {
@@ -262,6 +263,7 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 		}
 	    }
 	}
+	*/
     }
 
     /**
@@ -906,8 +908,9 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	return new SI(segments, color, tag);
     }
 
+    /*
     @Override
-    public SurfaceIterator getSurfaceIterator(Transform3D tform, int level)
+    public SubdivisionIterator getSurfaceIterator(Transform3D tform, int level)
     {
 	if (tform == null) {
 	    if (level == 0) {
@@ -932,6 +935,7 @@ public abstract class Rectangle3D implements Shape3D, Cloneable {
 	    }
 	}
     }
+    */
 
     /**
      * Set the configuration of this object given explicit coordinates

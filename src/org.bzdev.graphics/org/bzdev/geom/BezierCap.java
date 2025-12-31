@@ -1357,6 +1357,7 @@ public class BezierCap implements Shape3D {
 	}
     }
 
+    /*
     @Override
     public final synchronized
     SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
@@ -1374,7 +1375,7 @@ public class BezierCap implements Shape3D {
 	    }
 	}
     }
-
+    */
     Rectangle3D brect = null;
 
     boolean bpathSet = false;

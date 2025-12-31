@@ -2219,6 +2219,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    }
 	}
 
+	/*
 	@Override
 	public final synchronized
 	SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
@@ -2244,6 +2245,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 		}
 	    }
 	}
+	*/
 
 	@Override
 	public final synchronized
@@ -4013,6 +4015,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 	    }
 	}
 
+	/*
 	@Override
 	public final synchronized
 	SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
@@ -4038,7 +4041,7 @@ public abstract class Surface3D implements Shape3D, SurfaceOps {
 		}
 	    }
 	}
-
+	*/
 	/*
 	@Override
 	public final synchronized void addCubicPatch(double[] controlPoints) {

@@ -383,6 +383,13 @@ bgtest:
 	@echo -------- BGTest --------
 	$(JAVA) BGTest
 
+bgtest1:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	@echo -------- BGTest1 --------
+	$(JAVA) BGTest1
+
 bgtest2:
 	(cd ../.. ; make jars)
 	mkdir -p classes

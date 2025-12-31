@@ -960,6 +960,7 @@ DIAGRAMS = $(ANIM2D_DIR)/org/bzdev/anim2d/doc-files/anim2d.png \
 	$(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/example.png \
 	$(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/factory.png \
 	$(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/obnaming.png \
+	$(P3D_DIR)/org/bzdev/p3d/doc-files/sgbtest.png \
 	$(P3D_DIR)/org/bzdev/p3d/doc-files/sgexample.png \
 	$(P3D_DIR)/org/bzdev/p3d/doc-files/sgbuilder.png \
 	$(P3D_DIR)/org/bzdev/p3d/doc-files/sgbuilder2.png \
@@ -1249,6 +1250,11 @@ $(OBNAMING_DIR)/org/bzdev/obnaming/doc-files/factory.png: \
 $(P3D_DIR)/org/bzdev/p3d/doc-files/sgexample.png: diagrams/p3d/sgexample.png
 	mkdir -p  $(P3D_DIR)/org/bzdev/p3d/doc-files
 	cp $< $@
+
+$(P3D_DIR)/org/bzdev/p3d/doc-files/sgbtest.png: diagrams/p3d/sgbtest.png
+	mkdir -p  $(P3D_DIR)/org/bzdev/p3d/doc-files
+	cp $< $@
+
 
 $(P3D_DIR)/org/bzdev/p3d/doc-files/sgbuilder.png: diagrams/p3d/sgbuilder.png
 	mkdir -p  $(P3D_DIR)/org/bzdev/p3d/doc-files

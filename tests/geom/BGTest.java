@@ -1,5 +1,6 @@
 import org.bzdev.geom.*;
 import org.bzdev.p3d.*;
+import java.awt.geom.Path2D;
 import java.io.*;
 
 public class BGTest {
@@ -407,5 +408,90 @@ public class BGTest {
 	*/
 	m3d.writeSTL("test cylinder with caps", "cappedCylinder.stl");
 
+	Path2D bulge = Paths2D.createArc(0.0, 0.0, -1.0, 1.0, Math.PI/2,
+					 Math.PI/8);
+
+	BezierGrid drum = new BezierGrid(arc1, arc2, bulge, true);
+	/*
+	System.out.println("uclosed = " + drum.isUClosed()
+			   + ", vclosed = " + drum.isVClosed());
+	System.out.println("i = 0");
+	for(int j = 0; j < drum.getVArrayLength(); j++) {
+	    Point3D pt = drum.getPoint(0, j);
+	    System.out.format("(%g, %g, %g)\n",
+			      pt.getX(), pt.getY(), pt.getZ());
+	    if (drum.getSplineV(0, j, pcoords)) {
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[0], pcoords[1], pcoords[2]);
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[3], pcoords[4], pcoords[5]);
+	    }
+	}
+	System.out.println("i = 1");
+	for(int j = 0; j < drum.getVArrayLength(); j++) {
+	    Point3D pt = drum.getPoint(1, j);
+	    System.out.format("(%g, %g, %g)\n",
+			      pt.getX(), pt.getY(), pt.getZ());
+	    if (drum.getSplineV(1, j, pcoords)) {
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[0], pcoords[1], pcoords[2]);
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[3], pcoords[4], pcoords[5]);
+	    }
+	}
+
+	int ind = drum.getUArrayLength()-1;
+	System.out.println("i = " + ind);
+	for(int j = 0; j < drum.getVArrayLength(); j++) {
+
+	    Point3D pt = drum.getPoint(ind, j);
+	    System.out.format("(%g, %g, %g)\n",
+			      pt.getX(), pt.getY(), pt.getZ());
+	    if (drum.getSplineV(ind, j, pcoords)) {
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[0], pcoords[1], pcoords[2]);
+		System.out.format("    (%g, %g, %g)\n",
+				  pcoords[3], pcoords[4], pcoords[5]);
+	    }
+	}
+	*/
+	m3d = new Model3D();
+	m3d.append(drum);
+	m3d.append(cap1);
+	m3d.append(cap2);
+	m3d.setTessellationLevel(2);
+	/*
+	m3d.createImageSequence(new FileOutputStream("cylinder.isq"),
+				"png", 8, 4);
+	*/
+	m3d.writeSTL("test drum with caps", "drum.stl");
+
+	m3d = new Model3D();
+	P3d.Rectangle.addFlippedH(m3d, 0.0, 0.0, 0.0, 100.0, 100.0);
+	P3d.Rectangle.addV(m3d, 0.0, 0.0, 0.0, 100.0, 0.0, 10.0);
+	P3d.Rectangle.addV(m3d, 100.0, 0.0, 0.0, 100.0, 100.0, 10.0);
+	P3d.Rectangle.addV(m3d, 100.0, 100.0, 0.0, 0.0, 100.0, 10.0);
+	P3d.Rectangle.addV(m3d, 0.0, 100.0, 0.0, 0.0, 0.0, 10.0);
+	P3d.Rectangle.addH(m3d, 10.0, 10.0, 10.0, 90.0, 90.0);
+
+	Path3D path1 = m3d.getBoundary(new Point3D.Double(0.0, 0.0, 10.0),
+				       null, false);
+	Path3D path2 = m3d.getBoundary(new Point3D.Double(10.0, 10.0, 10.0),
+				      null, false);
+	// path2 = Paths3D.reverse(Paths3D.alignClosedPaths(path1, path2));
+
+	System.out.println("path1 = " + path1);
+	Path3DInfo.printSegments(path1);
+	System.out.println("path2 = " + path2);
+	Path3DInfo.printSegments(path2);
+
+	BezierGrid rgrid = new BezierGrid(path1, path2, bulge, true);
+	m3d.append(rgrid);
+
+	/*
+	m3d.createImageSequence(new FileOutputStream("ridge.isq"),
+				"png", 8, 4);
+	*/
+	m3d.writeSTL("rectangle with ridge", "ridge.stl");
     }
 }

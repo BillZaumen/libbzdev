@@ -522,6 +522,7 @@ public class BezierVertex implements Shape3D {
 	}
     }
 
+    /*
     @Override
     public final synchronized
     SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
@@ -539,6 +540,7 @@ public class BezierVertex implements Shape3D {
 	    }
 	}
     }
+    */
 
     Rectangle3D brect = null;
 

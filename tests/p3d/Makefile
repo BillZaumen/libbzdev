@@ -84,6 +84,8 @@ all:
 	@$(JAVA) SGTest12b
 	@echo ------ SGTest12c ------
 	@$(JAVA) SGTest12c
+	@echo ------ SGBTest ------
+	@$(JAVA) SGBTest
 	@echo ------ SGBTest1 ------
 	@$(JAVA) SGBTest1
 	@echo ------ SGBTest2 ------
@@ -529,6 +531,8 @@ sgbtest:
 	(cd ../.. ; make jars)
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	@echo ----- SGBTest --------
+	@$(JAVA) SGBTest
 	@echo ------ SGBTest1 ------
 	@$(JAVA) SGBTest1
 	@echo ------ SGBTest2 ------

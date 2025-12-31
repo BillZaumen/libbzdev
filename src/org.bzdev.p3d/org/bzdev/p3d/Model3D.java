@@ -4405,10 +4405,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	    return sit;
 	}
     }
+    /*
     @Override
     public SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
 	return new SubdivisionIterator(getSurfaceIterator(tform), level);
     }
+    */
 
     @Override
     public boolean isOriented() {return true;}
@@ -4511,13 +4513,103 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * a model.
      */
     public static class TessellationException extends RuntimeException {
-
+	private long index = -1;
+	private long entry = -1;
+	private Surface3D shape = null;
+	private int type = -1;
+	private double[] coords = null;
+	/**
+	 * Constructor.
+	 */
 	TessellationException() {
 	    super();
 	}
 
+	/**
+	 * Constructor with a message.
+	 * @param msg the message
+	 */
 	TessellationException(String msg) {
 	    super(msg);
+	}
+	/**
+	 * Constructor with a message, index, entry, shape, type, and
+	 * coordinates.
+	 * @param msg the message
+	 * @param shape the shape over which an iteration occurred
+	 * @param index the index ID
+	 * @param entry the entry ID
+	 */
+	TessellationException(String msg,  Surface3D shape,
+			      long index, long entry,
+			      int type, double[] coords) {
+	    super(msg);
+	    this.index = index;
+	    this.shape = shape;
+	    this.entry = entry;
+	    this.type = type;
+	    int npoints = 0;
+	    switch(type) {
+	    case SurfaceIterator.CUBIC_PATCH:
+		npoints = 16;
+		break;
+	    case SurfaceIterator.CUBIC_TRIANGLE:
+		npoints = 10;
+		break;
+	    case SurfaceIterator.PLANAR_TRIANGLE:
+		npoints = 3;
+		break;
+	    case SurfaceIterator.CUBIC_VERTEX:
+		npoints = 5;
+		break;
+	    default:
+		npoints = 0;
+	    }
+	    npoints *= 3;
+	    if (npoints > 0) {
+		this.coords = new double[npoints];
+		System.arraycopy(coords, 0, this.coords, 0, npoints);
+	    }
+	}
+
+	/**
+	 * Find the surface segment, if any, that caused a tessellation
+	 * falure.
+	 * @param coords an array of length 48 to hold the values provided
+	 *         by {@link org.bzdev.geom.SurfaceIterator#currentSegment(double[])}
+	 * @return -1 if there is no surface segment associated with this
+	 *         exception; otherwise the value returned by
+	 *         {@link org.bzdev.geom.SurfaceIterator#currentSegment(double[])}
+	 */
+	public int failedSegment(double[] coords) {
+	    if (index == -1) return -1;
+	    if (entry == -1) return -1;
+	    SurfaceIterator sit = shape.getSurfaceIterator(null);
+	    int type = sit.currentSegment(coords);
+	    int ind = -1;
+	    while (!sit.isDone()) {
+		ind++;
+		if (ind == index) {
+		    return sit.currentSegment(coords);
+		}
+		sit.next();
+	    }
+	    return -1;
+	}
+
+	/**
+	 * Find the partitioned surface segment, if any that caused a
+	 * tessellation failure.
+	 * @param coords an array of length 48 to hold the values
+	 * @return -1 if there is no surface segment associated with this
+	 *         exception; otherwise a value defined by the return value
+	 *         for
+	 *         {@link org.bzdev.geom.SurfaceIterator#currentSegment(double[])}
+	 */
+	public int failedEntry(double[] coords) {
+	    if (coords == null) return -1;
+	    System.arraycopy(this.coords, 0, coords, 0, this.coords.length);
+	    return type;
 	}
     }
 
@@ -4603,21 +4695,71 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * Get an iterator that will return a sequence of triangles after
      * tessellation using the preset tessellation level
      * @return an iterator
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
+     * @exception IllegalArgumentException the tessellation level was
+     *            negative
+     * @exception TessellationException if tessellation failed
      * @see #setTessellationLevel(int)
      */
-    public Iterator<Triangle> tessellate() {
+    public Iterator<Triangle> tessellate()
+	throws IllegalArgumentException, TessellationException
+    {
 	return tessellate(tlevel);
+    }
+
+    /**
+     * Check tessellation using the default tessellation level.
+     * The default tessellation level can be set by calling
+     * {@link #setTessellationLevel(int)} and is initially 0.
+     * If there is a tessellation error, the output will include
+     * the type of a surface segment and the corresponding control points
+     * listed one per line.
+     * For
+     * <UL>
+     *   <LI>{@link SurfaceIterator#CUBIC_PATCH}, the control points
+     *      are described in the documentation for
+     *      {@link Surface3D#addCubicPatch(double[])},
+     *   <LI>{@link SurfaceIterator#CUBIC_TRIANGLE}, the control points
+     *     are described in the documentation for
+     *     {@link Surface3D#addCubicTriangle(double[])},
+     *   <LI>{@link SurfaceIterator#PLANAR_TRIANGLE}, the control points
+     *     are described in the documentation for
+           {@link Surface3D#addPlanarTriangle(double[])}
+     *   <LI>{@link SurfaceIterator#CUBIC_VERTEX}, the control points
+     *     are described in the documentation for
+     *     {@link Surface3D#addCubicVertex(double[])}.
+     * </UL>
+     * If an entry is shown, only the control points for a vertex or
+     * corner of the subdivided patch or triangle are shown. The order is
+     * the same as described above but without intermediate control ponts.
+     * @param out the output stream for error messages
+     * boolean verbose true if control points are to be printed with
+     *         high precision; false for the default precision
+     * @return true on success; false on failure
+     */
+    public boolean checkTessellation(PrintStream out, boolean verbose) {
+	return checkTessellation(out, verbose, tlevel);
     }
 
     /**
      * Get an iterator that will return a sequence of triangles after
      * tessellation.
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param level the tessellation level
      * @return an iterator
      * @exception IllegalArgumentException the tessellation level was
      *            negative
+     * @exception TessellationException if tessellation failed
      */
-    public Iterator<Triangle> tessellate(int level) {
+    public Iterator<Triangle> tessellate(int level)
+	throws IllegalArgumentException, TessellationException
+    {
 	if (level < 0) {
 	    String msg = errorMsg("negativeTessellation");
 	    throw new IllegalArgumentException(msg);
@@ -4688,7 +4830,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	return new Iterator<Triangle>() {
 	    double[] scoords = new double[48];
 	    long npartitions = MathOps.lPow(2,level);
-	    SurfaceIterator sit = cubics.getSurfaceIterator(null, level);
+	    SubdivisionIterator sit = cubics.getSurfaceIterator(null, level);
 	    // cvsit does not subdivide its elements because we will do
 	    // that below so that straight edges will not be subdivided
 	    // unless necessary.
@@ -4712,14 +4854,25 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 		    return !currentTriangleList.isEmpty();
 		}
 	    }
-	    int sitind = -1;
-	    int cvind = -1;
+	    long sitind = -1;
+	    long cvind = -1;
+	    long origInd = -1;
 	    public Triangle next() {
 		if (sit != null) {
 		    if (sit.isDone()) {
 			sit = null;
 		    } else {
-			 sitind++;
+			/*
+			long newInd = sit.currentSourceID();
+			if (origInd != newInd) {
+			    sitind = -1;
+			}
+			sitind++;
+			origInd = newInd;
+			*/
+			origInd = sit.currentSourceID();
+			sitind = sit.currentEntryID();
+
 			int type = sit.currentSegment(scoords);
 			Color color = sit.currentColor();
 			Object tag = sit.currentTag();
@@ -4749,8 +4902,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				&& scoords[11] == scoords[47]) {
 				if (vertexpair != -1) {
 				    String msg =
-					errorMsg("ZLE", sitind, 1);
-				    throw new TessellationException(msg);
+					errorMsg("ZLE", origInd, sitind, 1);
+				    throw new TessellationException(msg,
+								    cubics,
+								    origInd,
+								    sitind,
+								    type,
+								    scoords);
 				}
 				    vertexpair = 9;
 			    }
@@ -4759,8 +4917,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				&& scoords[47] == scoords[38]) {
 				if (vertexpair != -1) {
 				    String msg =
-					errorMsg("ZLE", sitind, 2);
-				    throw new TessellationException(msg);
+					errorMsg("ZLE", origInd, sitind, 2);
+				    throw new TessellationException(msg,
+								    cubics,
+								    origInd,
+								    sitind,
+								    type,
+								    scoords);
 				}
 				vertexpair = 45;
 			    }
@@ -4769,8 +4932,13 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				&& scoords[38] == scoords[2]) {
 				if (vertexpair != -1) {
 				    String msg =
-					errorMsg("ZLE", sitind, 3);
-				    throw new TessellationException(msg);
+					errorMsg("ZLE", origInd, sitind, 3);
+				    throw new TessellationException(msg,
+								    cubics,
+								    origInd,
+								    sitind,
+								    type,
+								    scoords);
 				}
 				vertexpair = 36;
 			    }
@@ -4889,7 +5057,18 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 					VectorOps.normalize(v2);
 					VectorOps.crossProduct(v3, v1, v2);
 					VectorOps.normalize(v3);
-				    } catch (IllegalArgumentException iao){}
+				    } catch (IllegalArgumentException iao){
+					String msg =
+					    errorMsg("LT", origInd, sitind);
+					int etype = SurfaceIterator.CUBIC_PATCH;
+					throw new
+					    TessellationException(msg,
+								  cubics,
+								  origInd,
+								  sitind,
+								  type,
+								  scoords);
+				    }
 				    for (int i = 0; i < 3; i++) {
 					v1[i] = scoords[9+i] - scoords[i];
 					v2[i] = scoords[45+i] - scoords[9+i];
@@ -4899,7 +5078,18 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 					VectorOps.normalize(v2);
 					VectorOps.crossProduct(v4, v1, v2);
 					VectorOps.normalize(v4);
-				    } catch (IllegalArgumentException iao){}
+				    } catch (IllegalArgumentException iao){
+					String msg =
+					    errorMsg("LT", origInd, sitind);
+					int etype = SurfaceIterator.CUBIC_PATCH;
+					throw new
+					    TessellationException(msg,
+								  cubics,
+								  origInd,
+								  sitind,
+								  etype,
+								  scoords);
+				    }
 				    VectorOps.crossProduct(v1, v3, v4);
 				    double test1 = VectorOps.norm(v1);
 				    for (int i = 0; i < 3; i++) {
@@ -4911,7 +5101,18 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 					VectorOps.normalize(v2);
 					VectorOps.crossProduct(v3, v1, v2);
 					VectorOps.normalize(v3);
-				    } catch (IllegalArgumentException iao){}
+				    } catch (IllegalArgumentException iao){
+					String msg =
+					    errorMsg("LT", origInd, sitind);
+					int etype = SurfaceIterator.CUBIC_PATCH;
+					throw new
+					    TessellationException(msg,
+								  cubics,
+								  origInd,
+								  sitind,
+								  etype,
+								  scoords);
+				    }
 				    for (int i = 0; i < 3; i++) {
 					v1[i] = scoords[45+i] - scoords[9+i];
 					v2[i] = scoords[36+i] - scoords[45+i];
@@ -4922,7 +5123,18 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 					VectorOps.crossProduct(v4, v1, v2);
 					VectorOps.normalize(v4);
 					VectorOps.crossProduct(v1, v3, v4);
-				    } catch (IllegalArgumentException iao){}
+				    } catch (IllegalArgumentException iao){
+					String msg =
+					    errorMsg("LT", origInd, sitind);
+					int etype = SurfaceIterator.CUBIC_PATCH;
+					throw new
+					    TessellationException(msg,
+								  cubics,
+								  origInd,
+								  sitind,
+								  etype,
+								  scoords);
+				    }
 				    double test2 = VectorOps.norm(v1);
 				    flipDiagonal = (test1 <= test2);
 				    if (flipDiagonal) {
@@ -4979,6 +5191,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 		    double[] cvcoords = new double[15];
 		    LinkedList<Triangle> cvtlist = new LinkedList<>();
 		    while (!cvsit.isDone()) {
+			cvind++;
 			cvsit.currentSegment(cvcoords);
 			if (((cvcoords[0] == cvcoords[9])
 			     && (cvcoords[1] == cvcoords[10])
@@ -4990,7 +5203,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				&& (cvcoords[10] == cvcoords[13])
 				&& (cvcoords[11] == cvcoords[14]))) {
 			    String msg = errorMsg("ZLECV", cvind);
-			    throw new IllegalArgumentException(msg);
+			    throw new TessellationException(msg,
+							    cubicVertices,
+							    cvind, -1,
+							    -1, null);
 			}
 			double[] lpath = Path3D.setupCubic(cvcoords[0],
 							   cvcoords[1],
@@ -5005,28 +5221,6 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				break;
 			    }
 			}
-			/*
-			VectorOps.sub(cvcoords, 15, cvcoords, 3, cvcoords, 0,
-				      3);
-			VectorOps.sub(cvcoords, 18, cvcoords, 6, cvcoords, 0,
-				      3);
-			VectorOps.sub(cvcoords, 21, cvcoords, 9, cvcoords, 0,
-				      3);
-			double scale = VectorOps.normSquared(cvcoords, 15, 9);
-			if (scale == 0.0) {
-			    String msg = errorMsg("ZLECV", cvind);
-			    throw new IllegalArgumentException(msg);
-			}
-			VectorOps.crossProduct(cvcoords, 24,
-					       cvcoords, 15, cvcoords, 21);
-			boolean linear = (VectorOps.normSquared(cvcoords, 24, 3)
-					  / scale) < 1.e-8;
-			VectorOps.crossProduct(cvcoords, 24,
-					       cvcoords, 15, cvcoords, 21);
-			linear = linear
-			    && (VectorOps.normSquared(cvcoords, 24, 3)
-				/ scale) < 1.e-8;
-			*/
 			if (!linear && level > 0) {
 			    LinkedList<double[]> list = new LinkedList<>();
 			    list.add(cvcoords);
@@ -5046,39 +5240,6 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				}
 				list = nlist;
 			    }
-			    /*
-			    double[] splitcoords = new double[18];
-			    PathSplitter.split(PathIterator3D.SEG_CUBICTO,
-					       cvcoords[0], cvcoords[1],
-					       cvcoords[2], cvcoords, 3,
-					       splitcoords, 0, 0.5);
-			    double[] tmp = new double[12];
-			    LinkedList<double[]> list = new LinkedList<>();
-			    System.arraycopy(cvcoords, 0, tmp, 0, 3);
-			    System.arraycopy(splitcoords, 0, tmp, 3, 9);
-			    list.add(tmp);
-			    tmp = new double[12];
-			    System.arraycopy(splitcoords, 6, tmp, 0, 12);
-			    list.add(tmp);
-			    for (int i = 1; i < level; i++) {
-				LinkedList<double[]> nlist = new LinkedList<>();
-				for (double[] carray: list) {
-				    PathSplitter.split
-					(PathIterator3D.SEG_CUBICTO,
-					 carray[0], carray[1], carray[2],
-					 carray, 3, splitcoords, 0, 0.5);
-				    tmp = new double[12];
-				    System.arraycopy(carray, 0, tmp, 0, 3);
-				    System.arraycopy(splitcoords, 0, tmp, 3, 9);
-				    nlist.add(tmp);
-				    tmp = new double[12];
-				    System.arraycopy(splitcoords, 6,
-						     tmp, 0, 12);
-				    nlist.add(tmp);
-				}
-				list = nlist;
-			    }
-			    */
 			    for (double[] pcoords: list) {
 				double x1 = pcoords[0];
 				double y1 = pcoords[1];
@@ -5090,16 +5251,6 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 				double y3 = cvcoords[13];
 				double z3 = cvcoords[14];
 
-				/*
-				if (z3 > 0.0) {
-				    System.out.format("(%g, %g, %g)"
-						      + "-(%g, %g, %g)"
-						      + "-(%g, %g, %g)\n",
-						      x1, y1, z1,
-						      x2, y2, z2,
-						      x3, y3, z3);
-				}
-				*/
 				Triangle t = new
 				    Triangle(bestCoord(xvalueSet, x1),
 					     bestCoord(yvalueSet, y1),
@@ -5268,7 +5419,200 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 	};
     }
 
-    
+    private static int cpindices[] = {
+	0, 3, 12, 15
+    };
+    private static int ctindices[] = {
+	0, 3, 9
+    };
+    private static int ptindices[] = {
+	0, 3, 6
+    };
+    private int cvindices[] = {
+	0, 3, 4
+    };
+
+
+    /**
+     * Check tessellation.
+     * If there is a tessellation error, the output will include
+     * the type of a surface segment and the corresponding control points
+     * listed one per line.
+     * For
+     * <UL>
+     *   <LI>{@link SurfaceIterator#CUBIC_PATCH}, the control points
+     *      are described in the documentation for
+     *      {@link Surface3D#addCubicPatch(double[])},
+     *   <LI>{@link SurfaceIterator#CUBIC_TRIANGLE}, the control points
+     *     are described in the documentation for
+     *     {@link Surface3D#addCubicTriangle(double[])},
+     *   <LI>{@link SurfaceIterator#PLANAR_TRIANGLE}, the control points
+     *     are described in the documentation for
+           {@link Surface3D#addPlanarTriangle(double[])}
+     *   <LI>{@link SurfaceIterator#CUBIC_VERTEX}, the control points
+     *     are described in the documentation for
+     *     {@link Surface3D#addCubicVertex(double[])}.
+     * </UL>
+     * If an entry is shown, only the control points for a vertex or
+     * corner of the subdivided patch or triangle are shown. The order is
+     * the same as described above but without intermediate control ponts.
+     * @param out the output stream for error messages
+     * boolean verbose true if control points are to be printed with
+     *         high precision; false for the default precision
+     * @param level the tesselation level to check.
+     * @return true on success; false on failure
+     */
+    public boolean checkTessellation(PrintStream out,
+				     boolean verbose,
+				     int level)
+    {
+	Iterator<Triangle> it = tessellate(level);
+	int[] indices = null;
+	try {
+	    while (it.hasNext()) it.next();
+	    return true;
+	} catch (TessellationException et) {
+	    out.println(et.getMessage());
+	    if (verbose) {
+		double[] coords = new double[48];
+		int npoints = 0;
+		String type = errorMsg("UNKNOWN");
+		switch(et.failedSegment(coords)) {
+		case SurfaceIterator.CUBIC_PATCH:
+		    npoints = 16;
+		    type = errorMsg("CUBIC_PATCH");
+		    break;
+		case SurfaceIterator.CUBIC_TRIANGLE:
+		    npoints = 10;
+		    type = errorMsg("CUBIC_TRIANGLE");
+		    break;
+		case SurfaceIterator.PLANAR_TRIANGLE:
+		    npoints = 3;
+		    type = errorMsg("PLANAR_TRIANGLE");
+		    break;
+		case SurfaceIterator.CUBIC_VERTEX:
+		    npoints = 5;
+		    type = errorMsg("CUBIC_VERTEX");
+		    break;
+		}
+		out.println(errorMsg("ControlPoints", type));
+		for (int i = 0; i < npoints; i++) {
+		    int ii = i*3;
+		    out.format("(%s, %s, %s)\n",
+			       coords[ii], coords[ii+1], coords[ii+2]);
+		}
+		switch(et.failedEntry(coords)) {
+		case SurfaceIterator.CUBIC_PATCH:
+		    npoints = 16;
+		    indices = cpindices;
+		    type = errorMsg("CUBIC_PATCH");
+		    break;
+		case SurfaceIterator.CUBIC_TRIANGLE:
+		    npoints = 10;
+		    indices = ctindices;
+		    type = errorMsg("CUBIC_TRIANGLE");
+		    break;
+		case SurfaceIterator.PLANAR_TRIANGLE:
+		    npoints = 3;
+		    indices = ptindices;
+		    type = errorMsg("PLANAR_TRIANGLE");
+		    break;
+		case SurfaceIterator.CUBIC_VERTEX:
+		    npoints = 5;
+		    indices = cvindices;
+		    type = errorMsg("CUBIC_VERTEX");
+		    break;
+		default:
+		    return false;
+		}
+		out.println(errorMsg("EntryControlPoints", type));
+		for (int i = 0; i < indices.length; i++) {
+		    int ii = indices[i]*3;
+		    out.format("(%s, %s, %s)\n",
+			       coords[ii], coords[ii+1], coords[ii+2]);
+		}
+	    } else {
+		double[] coords1 = new double[48];
+		int npoints1 = 0;
+		String type1 = errorMsg("UNKNOWN");
+		switch(et.failedSegment(coords1)) {
+		case SurfaceIterator.CUBIC_PATCH:
+		    npoints1 = 16;
+		    type1 = errorMsg("CUBIC_PATCH");
+		    break;
+		case SurfaceIterator.CUBIC_TRIANGLE:
+		    npoints1 = 10;
+		    type1 = errorMsg("CUBIC_TRIANGLE");
+		    break;
+		case SurfaceIterator.PLANAR_TRIANGLE:
+		    npoints1 = 3;
+		    type1 = errorMsg("PLANAR_TRIANGLE");
+		    break;
+		case SurfaceIterator.CUBIC_VERTEX:
+		    npoints1 = 5;
+		    type1 = errorMsg("CUBIC_VERTEX");
+		    break;
+		default:
+		    npoints1 = 0;
+		}
+		double[] coords2 = new double[48];
+		int npoints2 = 0;
+		String type2 = errorMsg("UNKNOWN");
+		switch(et.failedEntry(coords2)) {
+		case SurfaceIterator.CUBIC_PATCH:
+		    npoints2 = 16;
+		    indices = cpindices;
+		    type2 = errorMsg("CUBIC_PATCH");
+		    break;
+		case SurfaceIterator.CUBIC_TRIANGLE:
+		    npoints2 = 10;
+		    indices = ctindices;
+		    type2 = errorMsg("CUBIC_TRIANGLE");
+		    break;
+		case SurfaceIterator.PLANAR_TRIANGLE:
+		    npoints2 = 3;
+		    indices = ptindices;
+		    type2 = errorMsg("PLANAR_TRIANGLE");
+		    break;
+		case SurfaceIterator.CUBIC_VERTEX:
+		    npoints2 = 5;
+		    indices = cvindices;
+		    type2 = errorMsg("CUBIC_VERTEX");
+		    break;
+		default:
+		    npoints2 = 0;
+		    type2 = errorMsg("NONE");
+		}
+		int npoints = (npoints1 < npoints2)? npoints2: npoints1;
+		out.println(errorMsg("TL_HEADING", type1, type2));
+		for (int i = 0; i < npoints; i++) {
+		    int ii = i*3;
+		    if (i < npoints1 && i < indices.length) {
+			int jj = indices[i]*3;
+			out.format("(%g, %g, %g)"
+				   + "         "
+				   + "(%g, %g, %g)\n",
+				   coords1[ii], coords1[ii+1], coords1[ii+2],
+				   coords2[jj], coords2[jj+1], coords2[jj+2]);
+		    } else if (i < npoints1) {
+			out.format("(%g, %g, %g)\n",
+				   coords1[ii], coords1[ii+1], coords1[ii+2]);
+
+		    } else if (i < indices.length) {
+			int jj = indices[i]*3;
+			out.format("                         "
+				   + "         "
+				   + "(%g, %g, %g)\n",
+				   coords2[jj], coords2[jj+1], coords2[jj+2]);
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	    out.println(e.getMessage());
+	}
+	return false;
+    }
+
 
     /**
      * Return the number of triangles and cubic patches in a model.
@@ -5770,6 +6114,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * fee will be discarded after printing, and do not need as high a
      * level of tessellation as other parts.
      * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
+     * <P>
      * Note: if an isolated component consists of planar triangles,
      * including ones created by using classes such as
      * {@link SteppedGrid}, the method {@link #tessellate()} will not
@@ -5777,8 +6125,11 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @param m3d the model to add
      * @param tessellate true of the model being added should be
      *        tessellated; false otherwise
+     * @exception TessellationException if tessellation failed
      */
-    public void addModel(Model3D m3d, boolean tessellate) {
+    public void addModel(Model3D m3d, boolean tessellate)
+	throws TessellationException
+    {
 	if (m3d == this) {
 	    throw new IllegalArgumentException(errorMsg("addToSelf"));
 	}
@@ -7246,7 +7597,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * right border. If yfract is 0, the minimum value of y for any object
      * will appear at the bottom border.  If yfract is 1.0, the maximum
      * value of y for any object will appear at the top border.
-     *
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param id image data to read and modify
      * @param border the minimum distance in user space from the edges of
      *        an image to the object(s) being displayed; -1 for a default
@@ -7259,12 +7613,14 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *        in the range [0.0, 1.0]
      * @param changeScale true if the scale should be changed; false if not
      * @return the image parameters
+     * @exception TessellationException if tessellation failed
      */
     public ImageParams
 	setImageParameters(Model3D.ImageData id, double border,
 			   double magnification,
 			   double xfract, double yfract,
 			   boolean changeScale)
+	throws TessellationException
     {
 	ImageParams result = new ImageParams();
 	ImageDataImpl idata = id.getImageData();
@@ -7595,14 +7951,20 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     /**
      * Render a model given a graphics context and translations.
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param id the image data for rendered model
      * @param g2d the graphics context to use
      * @param keep true if the render list should be preserved; false if not.
      * @param tx the x coordinate of the new origin's location
      * @param ty the y coordinate of the new origin's location
+     * @exception TessellationException if tessellation failed
      */
     public void render(Model3D.ImageData id, Graphics2D g2d,
 		       boolean keep, double tx, double ty)
+	throws TessellationException
     {
 	ImageDataImpl idata = id.getImageData();
 	AffineTransform at = g2d.getTransform();
@@ -8075,10 +8437,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *            computed.
      */
     public boolean verifyNesting(Appendable out) throws ManifoldException{
-	boolean needTesselation =
+	boolean needTessellation =
 	    (cubics.size() > 0) || (cubicVertices.size() > 0);
 	ManifoldComponents mc;
-	if (needTesselation) {
+	if (needTessellation) {
 	    mc = new ManifoldComponents(this, strict, true);
 	} else {
 	    if (manifoldComponents == null) {
@@ -8809,7 +9171,11 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * given a profile specification and an output stream.
      * The first three parameters are strings used in meta data.
      * <P>
-     * If compressed, the output stream will be automatically closed
+     * If compressed, the output stream will be automatically closed.
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param title the title of the file; null for a default
      * @param description a description of the file; null for a default
      * @param creator the file's author; null for a default
@@ -8820,10 +9186,11 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *        XML alone
      * @exception IOException an IO error occurred
      * @exception UnsupportedOperationException binary encoding is not supported
+     * @exception TessellationException if tessellation failed
      */
     public void writeX3D(String title, String description, String creator,
 			 boolean full, OutputStream os, boolean compress)
-	throws IOException
+	throws IOException, TessellationException
     {
 	if (os == null) {
 	    throw new NullPointerException(errorMsg("nullOutputStream"));
@@ -8998,11 +9365,18 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 
     /**
      * Create an STL file from the model, given a writable byte channel.
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param id the STL file's ID string (limited to 80 7-bit ASCII characters)
      * @param c the output channel
      * @exception IOException an error occurred when writing to the channel
+     * @exception TessellationException if tessellation failed
      */
-    public void writeSTL(String id, WritableByteChannel c) throws IOException {
+    public void writeSTL(String id, WritableByteChannel c)
+	throws IOException, TessellationException
+    {
 	int i;
 	setSTLBaseIfNeeded();
 	ByteBuffer buffer = ByteBuffer.allocate(126);
@@ -9291,6 +9665,10 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      *   alt="3D model that looks like a lock">
      * <P>
      * thus providing a visual representation of the error.
+     * <P>
+     * If this method throws a {@link TessellationException}, methods
+     * for that exception can be used to determine the source of the
+     * error.
      * @param graph the graph
      * @param xp the X coordinate of the designated point on the plane
      * @param yp the Y coordinate of the designated point on the plane
@@ -9299,10 +9677,12 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
      * @exception IllegalArgumentException if the graph or normal vector
      *            are null, if the graph's size is less than 200&times;200,
      *            of if the normal vector's norm is 0
+     * @exception TessellationException if tessellation failed
      */
     public void createCrossSection(Graph graph,
 				   double xp, double yp, double zp,
 				   double[] normal)
+	throws IllegalArgumentException, TessellationException
     {
 	if (graph == null) {
 	    throw new NullPointerException(errorMsg("nullGraph"));

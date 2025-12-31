@@ -219,11 +219,13 @@ public class SteppedGrid  implements Shape3D {
 	return sgm3d.getSurfaceIterator(tform);
     }
 
+    /*
     @Override
     public SurfaceIterator getSurfaceIterator(Transform3D tform, int level) {
 	if (!done) throw new IllegalStateException(errorMsg("notDone"));
 	return sgm3d.getSurfaceIterator(tform, level);
     }
+    */
 
     boolean closedManifold = false;
     @Override
@@ -1555,6 +1557,7 @@ public class SteppedGrid  implements Shape3D {
 	    return new OurSurfaceIterator(tform);
 	}
 
+	/*
 	public SurfaceIterator getSurfaceIterator(Transform3D tform, int limit)
 	{
 	    if (tform instanceof AffineTransform3D) {
@@ -1565,7 +1568,7 @@ public class SteppedGrid  implements Shape3D {
 					       tform, limit);
 	    }
 	}
-
+	*/
 	boolean isClosedM = false;
 	Path3D bpath = null;
 
@@ -2663,7 +2666,7 @@ public class SteppedGrid  implements Shape3D {
 	}
     }
 
-      /**
+    /**
      * Build a SteppedGrid specified by a set of rectangles and half
      * rectangles.
      * This class is provided to simplify the creation of a
@@ -2687,7 +2690,26 @@ public class SteppedGrid  implements Shape3D {
      * closed grids consist of two grids, which will be connected
      * where appropriate with vertical surfaces. For a closed grid,
      * rectangles denoted as placeholders are left blank and are to be
-     * filled in by the caller.
+     * filled in by the caller, whereas removing a rectangle creates a
+     * hole with vertical sides filled in.  FOr example,
+     * <BLOCKQUOTE><PRE><CODE>
+     * Model3D m3d = new Model3D(false);
+     * SteppedGrid.Builder sgb = new SteppedGrid.Builder(m3d, 10.0, -10.0);
+     * sgb.addRectangles(0.0, 0.0, 100.0, 100.0, 0.0, 0.0);
+     * sgb.addRectangles(10.0, 50.0, 80.0, 40.0, 0.0, 0.0, true, false);
+     * sgb.removeRectangles(10.0, 10.0, 80.0, 30.0);
+     * SteppedGrid sg = sgb.create();
+     * </CODE></PRE></BLOCKQUOTE>
+     * will create the following object:
+     * <P style="text-align: center">
+     * <img src="doc-files/sgbtest.png" alt="SteppedGrid.Bulder example">
+     * <P>
+     * The red areas in the image represent the inside of a surface, which is
+     * visible because the model is not yet complete. By contrast, the
+     * rectangle that was removed resulted in a hole with vertical sides
+     * added. Note that the call to <CODE>create()</CODE> appends a stepped
+     * grid to <CODE>m3d</CODE> so <CODE>m3d.append(sg)</CODE> should not
+     * be called.
      * <P>
      * The methods used depend on whether the SteppedGrid that will be
      * created is open or closed (open grids contain a single grid whereas
