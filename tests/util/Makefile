@@ -515,6 +515,15 @@ supplier: compile
 	@echo ---- Supplier Test ----
 	@$(JAVA) SupplierTest
 
+astar1: compile
+	@echo ---- AStar1 ----
+	@$(JAVA) AStar1
+
+astar2: compile
+	@echo ---- AStar2 ----
+	@$(JAVA) AStar2
+
+
 blockTest:
 	@ (cd ../.. ; make jars)
 	@ chmod u+x scrun
@@ -570,6 +579,10 @@ vtest2:
 ytest0: compile
 	@echo ---- YTest0 -----
 	@$(JAVA) YTest0
+
+heap: compile
+	@echo ---- CSHTest ---
+	@$(JAVA) CSHTest
 
 clean:
 	rm -rf classes

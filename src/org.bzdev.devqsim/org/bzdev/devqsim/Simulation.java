@@ -379,6 +379,21 @@ public class Simulation extends SimulationHelper
     }
 
     /**
+     * Merge events on the event queue.
+     * This method will modify the event queue so that new entries
+     * can be added quickly.  It is useful in special cases where a
+     * potentially large number of new events will be scheduled in
+     * order of increasing time and before the simulation starts
+     * running. It has no effect if a scheduled event has just started
+     * and there are no new entries on the event queue. It also has no
+     * effect immediately after an event is canceled.
+     */
+    public final void mergeQueuedEvents() {
+	state.pq.merge();
+    }
+
+
+    /**
      * Get the interval to the next scheduled event.
      * The value returned is that maximum interval given the current
      * state of the simulation by which the current simulation time
@@ -2544,7 +2559,7 @@ public class Simulation extends SimulationHelper
 //  LocalWords:  SimObjectCallable noScriptEngine onExecutionStarting
 //  LocalWords:  onExecutionEnding scriptObject Callable's getOurId
 //  LocalWords:  schedPaused sched taskThread SimObjectRunnable sor
-//  LocalWords:  pauseTask scheduleScript pauseWrongContext li pre
+//  LocalWords:  pauseTask scheduleScript pauseWrongContext li pre sm
 //  LocalWords:  scheduleCallObject scheduleTask startImmediateErr
 //  LocalWords:  ScriptEngine getScriptEngine IllegalStateException
 //  LocalWords:  setBindings ScriptContext simRunning ECMAScript msg
@@ -2563,7 +2578,10 @@ public class Simulation extends SimulationHelper
 //  LocalWords:  taskQueueResume serverSelected serverInteraction
 //  LocalWords:  serverCallable serverRunnable serverTask instanceof
 //  LocalWords:  serverInteractionSimObject serverCallableSimObject
-//  LocalWords:  serverRunnableSimObject serverTaskSimObject
+//  LocalWords:  serverRunnableSimObject serverTaskSimObject Nashorn
 //  LocalWords:  evalScript ScriptException createAdapterFailed
 //  LocalWords:  IllegalArgumentException NullPointerException
-//  LocalWords:  UnsupportedOperationException appendable
+//  LocalWords:  UnsupportedOperationException appendable Subclasses
+//  LocalWords:  SecurityManager getSecurityManager checkPermission
+//  LocalWords:  StackTraceModePermission allowSSTMode Runnable
+//  LocalWords:  doScriptPrivileged runnable simLoop subclasses
