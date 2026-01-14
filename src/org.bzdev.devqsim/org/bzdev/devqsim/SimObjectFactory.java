@@ -486,6 +486,15 @@ public abstract class SimObjectFactory<
 		    }
 		}, itime));
 	}
+	// The next events added are in most cases going to be in order
+	// of time, so calling mergeQueueEvents() will help ensure that
+	// the event queue will nearly always have a cache. Then the
+	// subsidieary skew heap will effectively be a linked list as
+	// the 'right' pointer will be null. While a merge automatically
+	// occurs if an event is polled or removed, objects are typically
+	// created by factories before a simulation is run, so polling or
+	// removing objects is unlikely in this case.
+	sim.mergeQueuedEvents();
 	for (TimedCallListEntry ctle: ctlist) {
 	    sim.scheduleCall(ctle.c, ctle.time);
 	}

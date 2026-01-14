@@ -152,7 +152,7 @@ public class TraceTest {
 	tsim.allowSetStackTraceMode(true, true);
 
 	try {
-	    System.setSecurityManager(new SecurityManager());
+	    // System.setSecurityManager(new SecurityManager());
 
 	    // verify that we do not throw a security exception
 	    tsim.setStackTraceMode(true);

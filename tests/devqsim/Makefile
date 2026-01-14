@@ -32,8 +32,11 @@ all:
 	$(JAVA) ParentTest
 	@echo '***** ' Trying QCompare:
 	$(JAVA) QCompare
-	@echo '***** ' Trying QScript:
-	$(JAVA) QScript
+	@if $(HAS_JS_TEST) ; then \
+	   echo '***** ' Trying QScript: ; \
+	   $(JAVA) QScript ; fi
+	@echo '***** ' Trying QScriptESP:
+	$(JAVA) QScriptESP
 	@echo '***** ' Trying STraceTest:
 	$(JAVA) STraceTest
 	@echo '***** ' Trying Wait-Queue Test:
@@ -44,8 +47,9 @@ all:
 	$(JAVA) SQTest
 	@echo '***** ' Trying Tick Test:
 	$(JAVA) TickTest
-	@echo '***** ' Trying ScriptTest
-	$(JAVA) ScriptTest
+	@if $(HAS_JS_TEST) ; then \
+	  echo '***** ' Trying ScriptTest ; \
+	  $(JAVA) ScriptTest; fi
 	@echo '***** ' Trying ScriptTestESP
 	$(JAVA) ScriptTestESP
 	@echo '***** ' Trying SimFunctionTest
@@ -136,6 +140,12 @@ testsim2:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) TestSim2
+
+qsesp:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) QScriptESP
 
 clean:
 	rm -rf classes

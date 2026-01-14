@@ -7780,6 +7780,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
 
     private int nextIdentIndex(String s, int i, int len) {
+	if (i == len) return len;
 	int start = i;
 	char ch = s.charAt(i);
 	char sch = ch;
@@ -11555,11 +11556,16 @@ public class ExpressionParser implements ObjectParser<Object>
 	} finally {
 	    vmap.set(null);
 	    if (processor.epSingleton != null) {
+		// We don't remove the bindings for global if we
+		// don't originally have one because doing that
+		// interacts badly with some multithreaded code
+		// such as a simulation where a thread is suspended
+		// and then restarted.
 		if (hasGlobal) {
 		    bindings.put("global", global);
-		} else {
+		} /*else {
 		    bindings.remove("global");
-		}
+		    }*/
 	    }
 	}
     }

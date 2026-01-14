@@ -82,29 +82,33 @@ public class AStarSearch<Node> {
      * node. When h is null, a default heuristic that produces the same
      * results as Dijkstra's shortest path algorithm is used.
      * <P>
-     * Each node n<sub>i</sub> keeps track of two distances:
-     * g<sub>i</sub> and h<sub>i</sub>. For the initial node n<sub>s</sub>,
-     * g<sub>s</sub> = 0 and h<sub>s</sub> = h(n<sub>s</sub>, n<sub>f</sub>)
-     * where n<sub>f</sub> is the final node (or "goal"). A priority queue
-     * that initial contains just n<sub>s</sub> determines the order in which
-     * nodes are processed. At each step, a node n<sub>i</sub>
-     * with the minimum value of g<sub>i</sub> + h<sub>i</sub> is removed
-     * from the priority queue. For neighbors of n<sub>i</sub> that have
+     * Each node n<SUB>i</SUB> keeps track of two distances:
+     * g<SUB>i</SUB> and h<SUB>i</SUB>. For the initial node n<SUB>s</SUB>,
+     * g<SUB>s</SUB> = 0 and h<SUB>s</SUB> = h(n<SUB>s</SUB>, n<SUB>g</SUB>)
+     * where n<SUB>g</SUB> is the final node (or "goal"). A priority queue
+     * that initial contains just n<SUB>s</SUB> determines the order in which
+     * nodes are processed. At each step, a node n<SUB>i</SUB>
+     * with the minimum value of g<SUB>i</SUB> + h<SUB>i</SUB> is removed
+     * from the priority queue. For neighbors of n<SUB>i</SUB> that have
      * not been previously removed from the priority queue, there are
      * two cases:
      * <UL>
-     *   <LI> For a neighbor n<sub>j</sub> that has never been on the
+     *   <LI> For a neighbor n<SUB>j</SUB> that has never been on the
      *        priority queue,
-     *        g<sub>j</sub> = g<sub>i</sub> + g(n<sub>i</sub>,n<sub>j</sub>)
+     *        g<SUB>j</SUB> = g<SUB>i</SUB> + g(n<SUB>i</SUB>,n<SUB>j</SUB>)
      *        and
-     *        h<sub>j</sub> = h(n_sub>j</sub>, n<sub>f</sub>) 
-     *   <LI> For a neighbor n<sub>j</sub> that is on the priority queue,
-     *        g<sub>j</sub> is set to
-     *         g<sub>i</sub> + g(n<sub>i</sub>,n<sub>j</sub>) if this would
-     *        decrease the value of g<sub>j</sub>.
+     *        h<SUB>j</SUB> = h(n<SUB>j</SUB>, n<SUB>g</SUB>)
+     *   <LI> For a neighbor n<SUB>j</SUB> that is on the priority queue,
+     *        g<SUB>j</SUB> is set to
+     *         g<SUB>i</SUB> + g(n<SUB>i</SUB>,n<SUB>j</SUB>) if this would
+     *        decrease the value of g<SUB>j</SUB>.
      * </UL>
      * When the final node is reached, a list of nodes  from the starting node
      * to the final node is returned.
+     * <P>
+     * Note: The function h(n,m) should be idempotent: it will be called
+     *       when an event-queue entry is created and its value will then
+     *       be cached.
      * @param getNeighbors a function that returns a {@link Stream stream}
      *         of neighboring nodes for node supplied as its argument
      * @param g a function that returns the distance from the node given

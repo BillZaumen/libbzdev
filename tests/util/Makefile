@@ -399,6 +399,8 @@ etests: compile
 	@$(JAVA) ExprScriptTest17
 	@echo - ExpressionParser Test '( ` operator)' -
 	@$(JAVA) ExprScriptTest18
+	@echo - ExpressionParser Test 'one-line import with no new line' - -
+	@$(JAVA) ExprScriptTest19
 	chmod u+x scrun
 	@$(HAS_JS) && ./scrun SciFormatterTest.js || echo -n
 	@./scrun SciFormatterTest.esp
@@ -502,6 +504,10 @@ estest17: compile
 estest18: compile
 	@echo - ExpressionParser Test '( ` operator)' -
 	@$(JAVA) ExprScriptTest18
+
+estest19: compile
+	@echo - ExpressionParser Test 'one-line import with no new line' - -
+	@$(JAVA) ExprScriptTest19
 
 unitree: compile
 	@echo ----- UniTreeNode Test -------
