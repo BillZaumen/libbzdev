@@ -621,27 +621,13 @@ public class ExpressionParser implements ObjectParser<Object>
 		argmap.put(args[i], fargs[i]);
 	    }
 
-	    // Setup global if necessary for the case were a function
-	    // was invoked outside of parsing a script.
-	    Object ourGlobal = vmap.get().get("global");
-	    if (processor.epSingleton != null
-		&& ourGlobal != processor.epSingleton) {
-		vmap.get().put("global", processor.epSingleton);
-	    }
-	    try {
-		if (willSync) {
-		    Object syncObject =  ExpressionParser.this;
-		    synchronized (syncObject) {
-			return invokeAux(argmap);
-		    }
-		} else {
+	    if (willSync) {
+		Object syncObject =  ExpressionParser.this;
+		synchronized (syncObject) {
 		    return invokeAux(argmap);
 		}
-	    } finally {
-		if (processor.epSingleton != null
-		    && ourGlobal != processor.epSingleton) {
-		    vmap.get().put("global", ourGlobal);
-		}
+	    } else {
+		return invokeAux(argmap);
 	    }
 	}
 
@@ -2247,7 +2233,6 @@ public class ExpressionParser implements ObjectParser<Object>
 			    (errorMsg("globalModeTooLate"));
 	    if (epSingleton == null) {
 		epSingleton = new ESP();
-		vmap.get().put("global", epSingleton);
 	    }
 	}
 
@@ -5247,7 +5232,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		if (hasAmap()) {
 		    putInAmap(varname, object);
 		} else {
-		    vmap.get().put(varname, object);
+		    // vmap.get().put(varname, object);
+		    opToken.putInMap(varname, object);
 		}
 		break;
 	    case SWAP:
@@ -5257,7 +5243,8 @@ public class ExpressionParser implements ObjectParser<Object>
 		    boolean hasAmap = hasAmap();
 		    Object o1;
 		    Object o2;
-		    Map<String,Object> vm = vmap.get();
+		    // Map<String,Object> vm = vmap.get();
+		    Map<String,Object> vm = opToken.map;
 		    if (hasAmap && amapContains(name1)) {
 			o1 = getFromAmap(name1);
 		    } else if (vm.containsKey(name1)) {
@@ -7474,7 +7461,12 @@ public class ExpressionParser implements ObjectParser<Object>
 	}
 
 	Object get(String name) {
-	    // return getFromMap(map, name);
+	    // special case: if are configured to recoginize "global",
+	    // then epSingleton will be non-null and is the appropriate
+	    // value.
+	    if (processor.epSingleton != null && name.equals("global")) {
+		return processor.epSingleton;
+	    }
 	    if (!processor.hasAmap()) {
 		return map.get(name);
 	    } else {
@@ -7601,27 +7593,18 @@ public class ExpressionParser implements ObjectParser<Object>
 	public Map<String,Object> get() {return map;}
 
 	public void set (Map<String,Object> map) {
-	    this.map = map;
+	    this.map = Collections.synchronizedMap(map);
 	}
     }
 
     VMapBinding vmapBinding = new VMapBinding();
 
 
-    /*
-    private Map<String,Object> vmap =
-	Collections.synchronizedMap(new HashMap<String,Object>());
-    */
-
     private ThreadLocal<Set<String>> vsetThreadLocal = new ThreadLocal<>() {
 	    @Override protected Set<String> initialValue() {
 		return new HashSet<String>();
 	    }
 	};
-    /*
-    private Set<String> vset =
-	Collections.synchronizedSet(new HashSet<String>());
-    */
 
     // Function names.  These must be defined at the top level of
     // scripts and a name cannot be overridden once defined.
@@ -7679,23 +7662,6 @@ public class ExpressionParser implements ObjectParser<Object>
 	    }
 	}
     }
-
-    // used by Token so we can change bindings. In a function or method,
-    // the lookup for a variable's value occurs after the function or method
-    // was defined.
-    /*
-    Object getFromMap(Map<String,Object> map, String name) {
-	if (!processor.hasAmap()) {
-	    return map.get(name);
-	} else {
-	    if (processor.amapContains(name)) {
-		return processor.getFromAmap(name);
-	    } else {
-		return map.get(name);
-	    }
-	}
-    }
-    */
 
     /**
      * Determine if a variable or function exists.
@@ -8194,6 +8160,13 @@ public class ExpressionParser implements ObjectParser<Object>
 	    } else if (ch == '>') {
 		if (ptype == Operator.LE) {
 		    if (ltPrevToken != null) {
+			if (processor.epSingleton != null
+			    && ltPrevToken.getName().equals("global")) {
+			    String msg = errorMsg("globalSwap");
+			    throw new ObjectParser.Exception(msg,
+							     filenameTL.get(),
+							     s, i);
+			}
 			ltPrevToken.changeType(Operator.VARIABLE_NAME);
 			prev.changeType(Operator.SWAP);
 			prev.setName("<=>");
@@ -10077,8 +10050,10 @@ public class ExpressionParser implements ObjectParser<Object>
 			}
 			boolean test1 =
 			    usesMethods && !simpleClassNames.contains(v);
-			boolean test2 =  exists(v) || /*vset.contains(v)*/
-			    searchVsets(vsetStack, v)
+			boolean test2 =  exists(v)
+			    || (processor.epSingleton != null
+				&& v.equals("global"))
+			    || searchVsets(vsetStack, v)
 			    || isParam(v, params, paramsStack);
 			if (test1 || test2) {
 			    if (test2) {
@@ -10729,7 +10704,22 @@ public class ExpressionParser implements ObjectParser<Object>
 					      Operator.VARIABLE),
 					     variable, offset+start, level);
 			    if (ptype == Operator.SWAP) {
+				if (processor.epSingleton != null
+				    && next.equals("global")) {
+				    String msg = errorMsg("globalSwap");
+				    throw new ObjectParser
+					.Exception(msg, filenameTL.get(),
+						   s, i);
+
+				}
 				next.changeType(Operator.VARIABLE_NAME);
+			    }
+			    if (processor.epSingleton != null
+				&& variable.equals("global")) {
+				String msg = errorMsg("globalReserved");
+				throw new ObjectParser
+				    .Exception(msg, filenameTL.get(),
+					       s, i);
 			    }
 			    if (functkwSeen) {
 				params.add(variable);
@@ -11093,11 +11083,13 @@ public class ExpressionParser implements ObjectParser<Object>
 			    // for function? definitions, only insert the
 			    // function if one with that name is not already
 			    // there.
+			    // vmap OK - used with current bindings.
 			    Map<String,Object>vm = vmap.get();
 			    if (!vm.containsKey(functName)) {
 				vm.put(functName, lambda);
 			    }
 			} else {
+			    // vmap OK - used with current bindings.
 			    vmap.get().put(functName, lambda);
 			}
 		    } else {
@@ -11429,21 +11421,11 @@ public class ExpressionParser implements ObjectParser<Object>
     
     @Override
     public boolean matches(String s) {
-	Object ourGlobal = vmap.get().get("global");
-	if (processor.epSingleton != null
-	    && ourGlobal != processor.epSingleton) {
-	    vmap.get().put("global", processor.epSingleton);
-	}
 	try {
 	    parse(s, true);
 	    return true;
 	} catch (Exception e) {
 	    return false;
-	} finally {
-	    if (processor.epSingleton != null
-		&& ourGlobal != processor.epSingleton) {
-		vmap.get().put("global", ourGlobal);
-	    }
 	}
     }
 
@@ -11456,7 +11438,9 @@ public class ExpressionParser implements ObjectParser<Object>
      * @param bindings the binding
      */
     public void setBindings(Map<String,Object>bindings) {
+	vmap.set(null);		// so vmap.get() picks up the new bindings
 	vmapBinding.set(bindings);
+
     }
 
     /**
@@ -11470,19 +11454,7 @@ public class ExpressionParser implements ObjectParser<Object>
 
     @Override
     public Object parse(String s) throws Exception {
-	Object ourGlobal = vmap.get().get("global");
-	if (processor.epSingleton != null
-	    && ourGlobal != processor.epSingleton) {
-	    vmap.get().put("global", processor.epSingleton);
-	}
-	try {
-	    return parse(s, false);
-	} finally {
-	    if (processor.epSingleton != null
-		&& ourGlobal != processor.epSingleton) {
-		vmap.get().put("global", ourGlobal);
-	    }
-	}
+	return parse(s, false);
     }
 
     /**
@@ -11544,17 +11516,23 @@ public class ExpressionParser implements ObjectParser<Object>
 	if (bindings == null) {
 	    throw new NullPointerException(errorMsg("noBindings"));
 	}
-	Object global = null;
-	boolean hasGlobal = false;
+	// Object global = null;
+	// boolean hasGlobal = false;
+	Map<String,Object> savedBindings = null;
 	try {
+	    savedBindings = vmap.get();
 	    vmap.set(bindings);
+	    /*
 	    if (processor.epSingleton != null) {
 		hasGlobal = bindings.containsKey("global");
 		global = bindings.put("global", processor.epSingleton);
 	    }
+	    */
 	    return parse(s);
 	} finally {
-	    vmap.set(null);
+	    // vmap.set(null);
+	    vmap.set(savedBindings);
+	    /*
 	    if (processor.epSingleton != null) {
 		// We don't remove the bindings for global if we
 		// don't originally have one because doing that
@@ -11563,10 +11541,11 @@ public class ExpressionParser implements ObjectParser<Object>
 		// and then restarted.
 		if (hasGlobal) {
 		    bindings.put("global", global);
-		} /*else {
+		} else {
 		    bindings.remove("global");
-		    }*/
+		}
 	    }
+	    */
 	}
     }
 

@@ -99,8 +99,17 @@ all: compile
 	@$(JAVA) ExprScriptTest15
 	@echo - ExpressionParser Test '( .foreach())' -
 	@$(JAVA) ExprScriptTest16
+	@echo - ExpressionParser Test '( <=> operator)' -
+	@$(JAVA) ExprScriptTest17
+	@echo - ExpressionParser Test '( ` operator)' -
+	@$(JAVA) ExprScriptTest18
+	@echo - ExpressionParser Test 'one-line import with no new line' - -
+	@$(JAVA) ExprScriptTest19
+	@echo - ExpressionParserS Test 'only binding switches'
+	@$(JAVA) ExprScriptTestS
 	chmod u+x scrun
 	./scrun funct.esp
+	./scrun --stackTrace backquote.esp
 	@echo ---- try some ESP runtime errors
 	./scrun bad1.esp || echo EXCEPTION EXPECTED
 	./scrun bad2.esp || echo EXCEPTION EXPECTED
@@ -118,6 +127,8 @@ all: compile
 	./scrun bad14.esp || echo EXCEPTION EXPECTED
 	./scrun nulltest.esp
 	./scrun not.esp
+	./scrun test7-sc.esp
+	./scrun --stackTrace SciFormatterTest.esp
 	./scrun -vD:foobar:20.0 funct.esp || echo EXCEPTION EXPECTED
 	@echo --- docsig test ---
 	./scrun --codebase docsig.jar --exit docsig.esp
@@ -418,6 +429,10 @@ etest: compile
 estest: compile
 	@echo ----- ExpressionParser Test '(script)' -------
 	@$(JAVA) ExprScriptTest
+
+estestS: compile
+	@echo ----- ExpressionParserS Test -------
+	@$(JAVA) ExprScriptTestS
 
 estestE: compile
 	@echo ----- ExprScriptTestE  -------
