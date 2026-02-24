@@ -91,6 +91,9 @@ public class SSLUtilTest {
 	     factory.createSocket(host, port)) {
 	    SSLSession session = socket.getSession();
 	    Certificate[] chain = session.getPeerCertificates();
+	    System.out.println("localhost: provided a certificate chain "
+			       + "of length " + ((chain == null)? 0:
+						 chain.length));
 	    cert =  (chain == null || chain.length == 0)? null:
 		chain[0];
 	} catch (Exception e) {

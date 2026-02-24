@@ -9,12 +9,12 @@ public class ATest {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	EjwsBasicAuthenticator auth =
-	    new EjwsBasicAuthenticator(realm);
-	auth.add("foo", "foo");
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
+	EjwsBasicAuthenticator auth =
+	    new EjwsBasicAuthenticator(ews, realm);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
+	auth.add("foo", "foo");
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html");
 	handler.setLogoutAlias("logout.html",

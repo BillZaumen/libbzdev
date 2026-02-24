@@ -174,6 +174,228 @@ abstract public class WebMap {
 	displayDir = value;
     }
 
+    FileHandler fileHandler = null;
+
+    /**
+     * Set the FileHandler
+     * This method is used by a file handler's constructor when the
+     * file handler creates this WebMap.
+     * @param handler the FileHandler
+     */
+    void setFileHandler(FileHandler handler) {
+	fileHandler = handler;
+    }
+
+    /**
+     * Set the login-alias string.
+     * This string is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, that URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @return this webmap
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/"
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public WebMap setLoginAlias(String alias)
+	throws IllegalArgumentException, NullPointerException
+    {
+	fileHandler.setLoginAlias(alias);
+	return this;
+    }
+
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a relative path.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @return this webmap
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the second argument starts with a "/"
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public WebMap setLoginAlias(String alias, String target)
+	throws IllegalArgumentException, NullPointerException
+    {
+	fileHandler.setLoginAlias(alias, target);
+	return this;
+    }
+
+    /**
+    * Set the login-alias string with a location to visit when the
+     * login is successful, with the location represented as a
+     * relative path, and with a flag indicating if a login is
+     * required.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the context path.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * <P>
+     * When a login is required, an authenticaor that supports this
+     * behavior will reject all authorization requests from a user
+     * until the user is authorized by visiting the login-alias page.
+     * A logout will restore this behavior.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @param required true if a login is required; false (the default)
+     *        otherwise
+     * @return this webmap
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the second argument starts with a "/"
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+      */
+    public WebMap setLoginAlias(String alias, String target, boolean required)
+	throws IllegalArgumentException, NullPointerException
+    {
+	fileHandler.setLoginAlias(alias, target, required);
+	return this;
+    }
+
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a URL.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @return this webmap
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @throws MalformedURLException if the second argument could not be
+     *         converted to a URL
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public WebMap setLoginAlias(String alias, URI target)
+	throws IllegalArgumentException, MalformedURLException,
+	       NullPointerException
+    {
+	fileHandler.setLoginAlias(alias, target);
+	return this;
+    }
+
+    /**
+     * Set the login-alias string with a location to visit when the login is
+     * successful, with the location represented as a URL, and with a flag
+     * indicating if a login is required.
+     * The login alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the login-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the login URL may be
+     * treated specially by authenticators.
+     * <P>
+     * When a login is required, an authenticaor that supports this
+     * behavior will reject all authorization requests from a user
+     * until the user is authorized by visiting the login-alias page.
+     * A logout will restore this behavior.
+     * @param alias the alias string; null to remove it
+     * @param target the relative path from this handler's context to
+     *        the page that should be visited after a successful login.
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @param required true if a login is required; false (the default)
+     *        otherwise
+     * @return this webmap
+     * @throws MalformedURLException if the second argument could not be
+     *         converted to a URL
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth#setLoginFunction
+     * @see EjwsSecureBasicAuth#setLogoutFunction
+     * @see EjwsBasicAuthenticator#setLoginFunction
+     * @see EjwsBasicAuthenticator#setLogoutFunction
+     */
+    public WebMap setLoginAlias(String alias, URI target, boolean required)
+	throws IllegalArgumentException, MalformedURLException,
+	       NullPointerException
+    {
+	fileHandler.setLoginAlias(alias, target,required);
+	return this;
+    }
+
+
+    /**
+     * Set the logout-alias string with a location to visit when the logout is
+     * successful, with the location represented as a URL.
+     * The logout alias is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the logout-alias, that URL will be redirected to a location
+     * specified by the target.  In addition, the logout URL may be
+     * treated specially by authenticators.
+     * <P>
+     * The URI provided by the second argument must not be one that
+     * will be authenticated by this handler's context's authenticator.
+     * The test for this is more precise when the web server is created
+     * by an instance of {@link EmbeddedWebServer} because
+     * {@link EmbeddedWebServer} allows one to find all the context paths.
+     * Otherwise a simple test using this handler's context path is used:
+     * For the current server, if the URI's path starts with the context
+     * path, the logout URI is rejected.
+     * @param alias the alias string; null to remove it
+     * @param target the URI for the page that should be visited after
+     *        a successful logout.
+     * @return this webmap
+     * @throws IllegalArgumentException if the first argument contains
+     *        a "/" or the URI provided by the second argument is not
+     *        absolute
+     * @throws UnknownHostException if the host component of a URI
+     *         passed as this method's second argument is not recognized
+     *         by a name server
+     * @throws NullPointerException if this webmap was not created by
+     *         a FileHandler
+     * @see EjwsSecureBasicAuth
+     * @see EjwsBasicAuthenticator
+     */
+    public WebMap setLogoutAlias(String alias, URI target)
+	throws IllegalArgumentException, UnknownHostException,
+	       NullPointerException
+    {
+	fileHandler.setLogoutAlias(alias, target);
+	return this;
+    }
+
+
 
     File root = null;
     URI rootURI = null;
@@ -2251,10 +2473,11 @@ abstract public class WebMap {
      * should not contain a "/" if the welcome page contains
      * relative links.
      * @param path the path to add
+     * @return this WebMap
      */
-    public void addWelcome(String path) {
+    public WebMap addWelcome(String path) {
 	welcomeList.add(path);
-
+	return this;
     }
 
     private boolean isGZipped(String path) {
@@ -2343,24 +2566,34 @@ abstract public class WebMap {
      * period will be removed.
      * @param suffix the file name or path suffix
      * @param mtype the corresponding MIME type
+     * @return this WebMap
      */
-    public void addMapping(String suffix, String mtype) {
+    public WebMap addMapping(String suffix, String mtype) {
 	if (suffix.charAt(0) == '.') suffix = suffix.substring(1);
 	suffixToMimeType.put(suffix, mtype);
+	return this;
     }
 
     /**
      * Add a file-name/path suffix that indicates the use of gzip compression.
+     * When there is a file or resource does not exist and there is another
+     * whose name is the origial name, followed by a period, followed by a
+     * suffix indicating gzip compression, the resource will be transmitted
+     * in compressed form and automatically uncompressed when received. This
+     * method adds additional suffixes besides "gz" indicating GZIP
+     * compression.
      * <P>
      * The suffix should not start with a period&mdash;if it does, the
      * period will be removed.
      * @param suffix the suffix
+     * @return this WebMap
      */
-    public void addGzipSuffix(String suffix) {
+    public WebMap addGzipSuffix(String suffix) {
 	if (suffix.charAt(0) == '.') suffix = suffix.substring(1);
 	if (!suffixForGZipDefault.contains(suffix)) {
 	    suffixForGZip.add(suffix);
 	}
+	return this;
     }
 
     /**

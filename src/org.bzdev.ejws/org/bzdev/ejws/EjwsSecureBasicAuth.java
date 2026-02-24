@@ -2,17 +2,33 @@ package org.bzdev.ejws;
 
 import com.sun.net.httpserver.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import javax.net.ssl.SSLSession;
+import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.net.WebDecoder;
 import org.bzdev.util.SafeFormatter;
+import org.bzdev.util.ConfigPropUtilities;
+import org.bzdev.util.ConfigProperties;
 
 //@exbundle org.bzdev.ejws.lpack.SecureBasicAuth
 
@@ -91,18 +107,18 @@ is
  * file is to be compatible with openssl.
  * @see SecureBasicUtilities
  */
-public class EjwsSecureBasicAuth extends BasicAuthenticator {
+public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 
-    private Appendable tracer = null;
+    // private Appendable tracer = null;
 
-    /**
+    /*
      * Set an Appendable for tracing.
      * This method should be used only for debugging.
      * @param tracer the Appendable for tracing requests and responses
-     */
     public void setTracer(Appendable tracer) {
 	this.tracer = tracer;
     }
+     */
 
     private static ResourceBundle exbundle = ResourceBundle.getBundle
 	("org.bzdev.ejws.lpack.SecureBasicAuth");
@@ -112,6 +128,18 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    .toString();
     }
 
+    private static SecureBasicUtilities.Mode
+	proposedMode(EmbeddedWebServer ews)
+    {
+	Certificate[][] certs = ews.getCertificates();
+
+	SecureBasicUtilities.Mode proposed =
+	    (!ews.usesHTTPS())? SecureBasicUtilities.Mode.DIGEST:
+	    (certs == null || certs.length == 0)?
+	    SecureBasicUtilities.Mode.SIGNATURE_WITHOUT_CERT:
+	    SecureBasicUtilities.Mode.SIGNATURE_WITH_CERT;
+	return proposed;
+    }
 
     /**
      * User entry.
@@ -119,52 +147,75 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * operations.
      * @see org.bzdev.net.SecureBasicUtilities
      */
-   public static class Entry {
-	String pw;
-	Set<String> roles;
-	SecureBasicUtilities keyops;
-	
-	/**
-	 * Constructor.
-	 * @param pw a password for a user
-	 * @param roles a set of roles that a user may have
-	 */
-	public Entry(String pw, Set<String>roles) {
-	    this.pw = pw; this.roles = roles;
-	    this.keyops = new SecureBasicUtilities();
-	}
-
-	/**
-	 * Constructor with a PEM-encoded public-key.
-	 * @param pem the PEM encoded public key or a certificate
-	 *        containing that public key.
-	 * @param pw a password for a user
-	 * @param roles a set of roles that a user may have
-	 */
-	public Entry(String pem, String pw, Set<String>roles) {
-	    this.pw = pw; this.roles = roles;
-	    try {
-		this.keyops = new SecureBasicUtilities(pem);
-	    } catch (IOException eio) {
-		String msg = "PEM";
-		throw new IllegalArgumentException(msg, eio);
-	    } catch (GeneralSecurityException e) {
-		String msg = "PEM";
-		throw new IllegalArgumentException(msg, e);
-	    }
-	}
+   public static class Entry extends EjwsBasicAuthenticator.Entry {
+       // pw and roles defined by superclasses.
+       SecureBasicUtilities keyops;
+       boolean sblCompressed = false;
+       byte[] sbldata;
 	
        /**
-	 * Get the password stored in this entry.
-	 * @return the password
-	 */
-	public String getPassword() {return pw;}
+	* Constructor.
+	* @param pw a password for a user
+	* @param roles a set of roles that a user may have
+	*/
+       public Entry(String pw, Set<String>roles) {
+	   super(pw, roles);
+	   this.keyops = new SecureBasicUtilities();
+       }
 
-	/**
-	 * Get the roles stored in this entry.
-	 * @return a set of roles; null if not applicable
-	 */
-	public Set<String> getRoles(){return roles;}
+       /**
+	* Constructor with a PEM-encoded public-key.
+	* @param pem the PEM encoded public key or a certificate
+	*        containing that public key.
+	* @param pw a password for a user
+	* @param roles a set of roles that a user may have
+	*/
+       public Entry(String pem, String pw, Set<String>roles) {
+	   super (pw, roles);
+	   try {
+	       this.keyops = new SecureBasicUtilities(pem);
+	   } catch (IOException eio) {
+	       String msg = "PEM";
+	       throw new IllegalArgumentException(msg, eio);
+	   } catch (GeneralSecurityException e) {
+	       String msg = "PEM";
+	       throw new IllegalArgumentException(msg, e);
+	   }
+       }
+	
+       /**
+	* Constructor with a PEM-encoded public-key and SBL data.
+	* The term SBL refers to the file created with the program
+	* <STRONG>sbl</STRONG>.
+	* @param pem the PEM encoded public key or a certificate
+	*        containing that public key.
+	* @param pw a password for a user
+	* @param roles a set of roles that a user may have
+	* @param sblCompressed true if the sbldata is compressed,
+	*        false otherwise
+	* @param sbldata the SBL file as a byte array, possibly
+	*        compressed
+	*/
+       public Entry(String pem, String pw, Set<String>roles,
+		    boolean sblCompressed, byte[] sbldata)
+       {
+	   this(pem, pw, roles);
+	   this.sblCompressed = sblCompressed;
+	   this.sbldata = sbldata;
+       }
+
+
+       /**
+	* Get the password stored in this entry.
+	* @return the password
+	*/
+       public String getPassword() {return pw;}
+
+       /**
+	* Get the roles stored in this entry.
+	* @return a set of roles; null if not applicable
+	*/
+       public Set<String> getRoles(){return roles;}
 
        /**
 	* Get an instance of an object that provides secure basic
@@ -175,12 +226,39 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
        public SecureBasicUtilities getSecureBasicUtilities() {
 	   return  keyops;
        }
+
    }
 
     Map<String,Entry>map = null;
 
-    Certificate[] certificates;
+
+    /**
+     * {@inheritDoc}
+     */
+    public byte[] getSBL(String user) {
+	Entry entry = map.get(user);
+	if (entry == null) return null;
+	return entry.getSBL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSBLCompressed(String user) {
+	Entry entry = map.get(user);
+	if (entry == null) return false;
+	return entry.isSBLCompressed();
+    }
+
+
+    // Certificate[] certificates;
     SecureBasicUtilities.Mode mode;
+
+    ThreadLocal<Certificate[]> certchain = new ThreadLocal<>() {
+	    @Override protected Certificate[] initialValue() {
+		return null;
+	    }
+	};
 
     /**
      * Get the mode.
@@ -222,10 +300,12 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * @param upperTimeDiffLimit the upper limit for the time difference
      *        in seconds (the default is 150 seconds)
      * @param passphraseTimeout the time interval in seconds for which a
-     *        password is valid (the default is 1200)
+     *        password is valid (the default is 1200); 0 to disable this
+     *        timeout
      * @throws IllegalArgumentException if the first argument is larger
      *         than zero, if the second argument is less than zero,
-     *         or if the third argument is less than the second argument
+     *         or if the third argument, when not zero, is less than
+     *         the second argument
      */
     public void setTimeLimits(int lowerTimeDiffLimit,
 			      int upperTimeDiffLimit,
@@ -240,7 +320,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    String msg = errorMsg("negativeUpperTDL", upperTimeDiffLimit);
 	    throw new IllegalArgumentException(msg);
 	}
-	if (passphraseTimeout < upperTimeDiffLimit) {
+	if (passphraseTimeout != 0 && passphraseTimeout < upperTimeDiffLimit) {
 	    int uTDL = upperTimeDiffLimit;
 	    String msg =
 		errorMsg("passphraseTimeout", passphraseTimeout, uTDL);
@@ -253,10 +333,13 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 
     /**
      * Constructor for {@link SecureBasicUtilities.Mode#DIGEST} mode.
+     * @param ews the {@link EmbeddedWebServer} to which this authenticator
+     *        will be added
      * @param realm the HTTP realm
      */
-    public EjwsSecureBasicAuth(String realm) {
-	this(realm, new ConcurrentHashMap<String,Entry>());
+    public EjwsSecureBasicAuth(EmbeddedWebServer ews, String realm) {
+	this(ews, realm, proposedMode(ews),
+	     new ConcurrentHashMap<String,Entry>());
     }
 
     /**
@@ -273,28 +356,60 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      *        a password, roles, and optionally a public key and related
      *        data
      */
-    public EjwsSecureBasicAuth(String realm, Map<String,Entry> map) {
+    public EjwsSecureBasicAuth(EmbeddedWebServer ews,
+			       String realm,
+			       Map<String,Entry> map)
+    {
+	this(ews, realm, proposedMode(ews), map);
+	/*
 	super(SecureBasicUtilities
-	      .encodeRealm(realm, SecureBasicUtilities.Mode.DIGEST));
+	      .encodeRealm(realm, proposedMode(ews)));
 	unencodedRealm = realm;
-	mode = SecureBasicUtilities.Mode.DIGEST;
+	// mode = SecureBasicUtilities.Mode.DIGEST;
 	this.map = map;
+	*/
     }
 
+    /*
     private static SecureBasicUtilities.Mode getMode(Certificate cert) {
 	if (cert == null)
 	    return SecureBasicUtilities.Mode.SIGNATURE_WITHOUT_CERT;
 	return SecureBasicUtilities.Mode.SIGNATURE_WITH_CERT;
     }
+    */
 
-    private static SecureBasicUtilities.Mode getMode(Certificate[] certs) {
-	if (certs == null)
+    /**
+     * Get the {@link SecureBasicUtilities.Mode} appropriate the use
+     * of digital signatures.
+     * @param certs a certificate chain; null or an array of length 0 if
+     *        there are no certificates
+     * @return SecureBasicUtilities.Mode.SIGNATURE_WITHOUT_CERT if the
+     *         argument is null or an array of length 0;
+     *         SecureBasicUtilities.Mode.SIGNATURE_WITH_CERT otherwise
+     *@throws IllegalArgumentException if one certificate chain's length
+     *        is zero and another's length is not zero
+     */
+    public static SecureBasicUtilities.Mode getMode(Certificate[][] certs)
+	throws IllegalArgumentException
+    {
+	if (certs == null || certs.length == 0)
 	    return SecureBasicUtilities.Mode.SIGNATURE_WITHOUT_CERT;
-	int cnt = 0;
+	int firstcnt = 0;
+	boolean hasCount = false;
+
 	for (int i = 0; i < certs.length; i++) {
-	    if (certs[i] != null) cnt++;
+	    Certificate[] cert = certs[i];
+	    if (hasCount == false) {
+		firstcnt = cert.length;
+		hasCount = true;
+	    } else {
+		if ((firstcnt == 0 && cert.length != 0)
+		    || (firstcnt > 0 && cert.length == 0)) {
+		    throw new IllegalArgumentException(errorMsg("certlength"));
+		}
+	    }
 	}
-	return getMode(cnt);
+	return getMode(firstcnt);
     }
 
     private static SecureBasicUtilities.Mode getMode(int cnt) {
@@ -312,11 +427,17 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * the mode is {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT};
      * otherwise the mode is
      * {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT}
-     * @param certs the server certificates.
+     * @param mode {@link SecureBasicUtilities.Mode#PASSWORD PASSWORD},
+     *        {@link SecureBasicUtilities.Mode#DIGEST DIGEST},
+     *        {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT SIGNATURE_WITH_CERT},
+     *        {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT SIGNATURE_WITHOUT_CERT}
      * @param realm the HTTP realm
      */
-    public EjwsSecureBasicAuth(String realm, Certificate[] certs) {
-	this(realm, certs, new ConcurrentHashMap<String,Entry>());
+    public EjwsSecureBasicAuth(EmbeddedWebServer ews,
+			       String realm,
+			       SecureBasicUtilities.Mode mode)
+    {
+	this(ews, realm, mode, new ConcurrentHashMap<String,Entry>());
     }
 
     /**
@@ -335,39 +456,76 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * storage. If entries can be added while a server using this
      * authenticator is running, the map should have a thread-safe
      * implementation.
-     * @param certs the server certificates.
      * @param realm the HTTP realm
+     * @param mode {@link SecureBasicUtilities.Mode#PASSWORD PASSWORD},
+     *        {@link SecureBasicUtilities.Mode#DIGEST DIGEST},
+     *        {@link SecureBasicUtilities.Mode#SIGNATURE_WITH_CERT SIGNATURE_WITH_CERT},
+     *        {@link SecureBasicUtilities.Mode#SIGNATURE_WITHOUT_CERT SIGNATURE_WITHOUT_CERT}
      * @param map a map associating user names with entries containing
      *        a password, roles, and optionally a public key and related
      *        data
      */
-    public EjwsSecureBasicAuth(String realm,
-			       Certificate[] certs,
+    public EjwsSecureBasicAuth(EmbeddedWebServer ews,
+			       String realm,
+			       SecureBasicUtilities.Mode mode,
 			       Map<String,Entry> map)
     {
-	super(SecureBasicUtilities.encodeRealm(realm, getMode(certs)));
+	super(ews, SecureBasicUtilities.encodeRealm(realm, mode));
 	unencodedRealm = realm;
 	this.map = map;
-	if (certs != null) {
-	    int cnt = 0;
-	    for (int i = 0; i < certs.length; i++) {
-		if (certs[i] != null) {
-		    cnt++;
-		}
-	    }
-	    if (cnt != 0) {
-		int j = 0;
-		certificates = new Certificate[cnt];
-		for (int i = 0; i < certs.length; i++) {
-		    Certificate cert = certs[i];
-		    if (cert != null) {
-			certificates[j++] = cert;
-		    }
-		}
-	    }
-	    mode = getMode(cnt);
-	} else {
-	    mode = getMode(0);
+	this.mode = mode;
+    }
+
+    private Certificate[] defaultCertChain = null;
+
+    /**
+     * Set a default certificate chain.
+     * This method allows passwords to be checked or generated when a
+     * reverse proxy provides SSL encryption.  When HTTPS is used and
+     * this method is called with a non-null argument, that
+     * certificate chain will override the certificate provided by an
+     * SSL connection.
+     * @param chain the certificate chain
+     * @return this authenticator
+     */
+    public EjwsSecureBasicAuth setCertificateChain(Certificate[] chain) {
+	defaultCertChain = chain;
+	return this;
+    }
+
+
+    /**
+     * Set a default certificate chain given a keystore and alias.
+     * This method allows passwords to be checked or generated when a
+     * reverse proxy provides SSL encryption.  When HTTPS is used and
+     * this method is called with a non-null argument, that
+     * certificate chain will override the certificate provided by an
+     * SSL connection.
+     * @param ksis the input stream used to read a Java key store
+     * @param password the store password for the keystore
+     * @param alias the alias used to find the certificate chain
+     * @return this authenticator
+     * @throws KeyStoreException if a keystore exception occurred
+     * @throws IOException if an IO error occurred while reading the
+     *         input stream
+     * @throws CertificateException if a certificate chain could not
+     *         be created
+     * @see KeyStore
+     */
+    public EjwsSecureBasicAuth setCertificateChain(InputStream ksis,
+						   char[] password,
+						   String alias)
+	throws KeyStoreException, IOException, CertificateException
+    {
+	try {
+	    KeyStore ks = KeyStore.getInstance("JKS");
+	    if (password == null) password = "changeit".toCharArray();
+	    ks.load(ksis, password);
+	    defaultCertChain = ks.getCertificateChain(alias);
+	    return this;
+	} catch (NoSuchAlgorithmException e) {
+	    // should not occcur.
+	    throw new UnexpectedExceptionError(e);
 	}
     }
 
@@ -448,22 +606,36 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	map.put(username, new Entry(pem, password, roles));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected void add(EjwsAuthenticator.UserInfo info) {
+	String username = info.getUserName();
+	Entry entry = new Entry(info.getPublicKey(),
+				info.getPassword(),
+				info.getRoles());
+	entry.setSBLCompressed(info.isSBLCompressed());
+	entry.setSBL(info.getSBL());
+	map.put(username, entry);
+    }
+
+
     private String loginPath = null;
     private boolean loginPathUsed = true;
     private boolean loginRequired = false;
-    private BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
+    // private BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
     private ThreadLocal<Boolean> foundLoginTL = new ThreadLocal<>();
     private ThreadLocal<Integer> flCode = new ThreadLocal<>();
 
     private String logoutPath = null;
     private boolean logoutPathUsed = true;
-    private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
+    // private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
     private ThreadLocal<Boolean> foundLogoutTL = new ThreadLocal<>();
     private ThreadLocal<String> usernameTL = new ThreadLocal<>();
 
-    private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
+    // private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
 
-    /**
+    /*
      * Set the login function.
      * This function will be called using the current HttpExchange
      * when a login is (a) successful and (b) the function is not null.
@@ -479,14 +651,14 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * @see FileHandler#setLoginAlias(String)
      * @see FileHandler#setLoginAlias(String,String)
      * @see FileHandler#setLoginAlias(String,URI)
-     */
     public void setLoginFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	loginFunction = function;
     }
+     */
 
-    /**
+    /*
      * Set the authorized function.
      * This function will be called when a request is authorized.
      * Its arguments are a principal and the HTTP exchange. The
@@ -494,14 +666,14 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
      * @param function the 'authorized' function.
-     */
     public void setAuthorizedFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	authFunction = function;
     }
+     */
 
-    /**
+    /*
      * Set the logout function.
      * This function will be called using the current HttpExchange
      * when a logout is (a) successful and (b) the function is not null.
@@ -516,12 +688,12 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      * authorized functions will be called.
      * @param function the function; null to disable
      * @see FileHandler#setLogoutAlias(String,URI)
-     */
     public void setLogoutFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	logoutFunction = function;
     }
+     */
 
 
     ThreadLocal<Integer> utdl = new ThreadLocal<>();
@@ -544,6 +716,16 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 			      + t.getRequestURI().toString() + "\n");
 	    } catch (IOException e) {}
 	}
+	if (defaultCertChain != null) {
+	    certchain.set(defaultCertChain);
+	} else if (t instanceof HttpsExchange) {
+	    HttpsExchange st = (HttpsExchange) t;
+	    SSLSession session = st.getSSLSession();
+	    certchain.set(session.getLocalCertificates());
+	} else {
+	    certchain.set(null);
+	}
+
 	if (loginPathUsed && loginPath == null) {
 	    HttpHandler handler = t.getHttpContext().getHandler();
 	    if (handler instanceof FileHandler) {
@@ -563,9 +745,42 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    }
 	}
 	boolean foundLogin = false;
-	if (loginPathUsed
-	    && t.getRequestURI().getPath().equals(loginPath)) {
-	    foundLogin = true;
+	if (loginPathUsed) {
+	    URI requestURI = t.getRequestURI();
+	    if (requestURI.getPath().equals(loginPath)) {
+		String query = requestURI.getRawQuery();
+		if (query != null  && map.size() > 0) {
+		    String username =
+			WebDecoder.formDecode(query, false).get("user");
+		    if (username != null) {
+			byte[] array = getSBL(username);
+			if (array != null) {
+			    boolean isGZIP = isSBLCompressed(username);
+			    Headers rheaders = t.getResponseHeaders();
+			    rheaders.set("Content-Type",
+					 "application/vnd.bzdev.sblauncher");
+			    rheaders.set("Cache-Control", "no-cache");
+			    if (isGZIP) {
+				rheaders.set("Content-Encoding", "gzip");
+			    }
+			    try {
+				t.sendResponseHeaders(200, array.length);
+				OutputStream os = t.getResponseBody();
+				os.write(array);
+				os.flush();
+				os.close();
+				// sent a response containing the SBL file.
+				// If we return null, the Auth filter will not
+				// continue along the filter chain, but this is
+				// not documented.
+			    } catch (IOException eio) {}
+				return null;
+			}
+			// otherwise just continue as normal
+		    }
+		}
+		foundLogin = true;
+	    }
 	}
 	if (loginRequired) {
 	    foundLoginTL.set(foundLogin);
@@ -726,12 +941,13 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 
     private Map<PWInfoKey,PWInfo> pwmap = new ConcurrentHashMap<>();
 
-    private long TOFFSET = 30;
+    private long TOFFSET = 30*60;
 
     /**
      * Remove cached passwords whose timeout has expired.
      * The method can be called periodically to eliminate passwords
-     * when a user has not explicitly logged out.
+     * when a user has not explicitly logged out and has not sent
+     * any HTTP requests for some time.
      */
     public void prune() {
 	long now = Instant.now().getEpochSecond();
@@ -760,6 +976,8 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
      */
     @Override
     public boolean checkCredentials(String username, String password) {
+	Certificate[] certificates = certchain.get();
+
 	// use a cache so we don't have to check a digital signature or
 	// message digest.
 	long now = Instant.now().getEpochSecond();
@@ -776,9 +994,10 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    System.out.println("pwinfo.expires - now = "
 			       +(pwinfo.expires - now));
 	    */
-	    if ((pwinfo.expires - now) >= 0) {
+	    if (passphraseTimeout == 0 || (pwinfo.expires - now) >= 0) {
 		if (pwinfo.password.equals(password)) {
-		    pwinfo.expires = passphraseTimeout + now;
+		    pwinfo.expires = ((passphraseTimeout == 0)?
+				      TOFFSET: passphraseTimeout) + now;
 		    if (tracer != null) {
 			String ct = "" + Thread.currentThread().getId();
 			try {
@@ -800,7 +1019,7 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 		    }
 		    if (loginRequired) {
 			// the login timed out, so send the user
-			// to the login page.
+			// to the logout page.
 			flCode.set(307);
 			usernameTL.set(username);
 		    }
@@ -816,8 +1035,10 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    }
 	}
 	Entry entry = map.get(username);
+	// System.out.println("entry = " + entry);
 	if (entry == null) return false;
 	SecureBasicUtilities ops = entry.keyops;
+	// System.out.println("ops = " + ops);
 	byte[] sigarray = SecureBasicUtilities.decodePassword(password);
 	if (sigarray == null) return false;
 	int timediff = SecureBasicUtilities.getTimeDiff(sigarray);
@@ -832,43 +1053,49 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 	    return false;
 	}
 	try {
-	    if (certificates == null) {
-		if (ops.checkPassword(sigarray, null, entry.pw)) {
- 		    pwmap.put(key,
-			      new PWInfo(now+passphraseTimeout,
-					 password));
-		    if (tracer != null) {
-			String ct = "" + Thread.currentThread().getId();
-			try {
-			    tracer.append("(" + ct + ") ... authentication "
-					  + "OK (no certificates to check)\n");
-			} catch (IOException eio){}
-		    }
-		    return true;
+	    if (ops.checkPassword(sigarray, certificates,
+				  entry.getPassword())) {
+		pwmap.put(key,
+			  new PWInfo(now + ((passphraseTimeout == 0)?
+					    TOFFSET: passphraseTimeout),
+				     password));
+		if (tracer != null) {
+		    String ct = "" + Thread.currentThread().getId();
+		    try {
+			String msgtail = (certificates == null)?
+			    "OK (no certificates to check)":
+			    "OK (found a matching certificate)";
+
+			tracer.append("(" + ct + ") ... authentication "
+				      + msgtail + "\n");
+		    } catch (IOException eio){}
 		}
-	    } else {
-		for (int i = 0; i < certificates.length; i++) {
-		    if (ops.checkPassword(sigarray,
-					  certificates[i],
-					  entry.pw)) {
-			pwmap.put(key,
-				  new PWInfo(now+passphraseTimeout,
-					     password));
-			if (tracer != null) {
-			    String ct = "" + Thread.currentThread().getId();
-			    try {
-				tracer.append("(" + ct + ") ... authentication "
-					      + "OK (found a matching "
-					      + "certificate)\n");
-			    } catch (IOException eio) {}
-			}
-			return true;
-		    }
-		}
-		return false;
+		return true;
 	    }
+	    if (tracer != null) {
+		String ct = "" + Thread.currentThread().getId();
+		try {
+		    String msgtail = " FAILED (full password check";
+		    tracer.append("(" + ct + ") ... authentication "
+				  + msgtail + "\n");
+		} catch (IOException eio){}
+	    }
+
 	} catch (GeneralSecurityException e) {
+	    if (tracer != null) {
+		String ct = "" + Thread.currentThread().getId();
+		try {
+		    tracer.append("(" + ct + ") ... SECURITY EXCEPTION\n");
+		} catch (IOException eio){}
+	    }
 	    return false;
+	} catch (Exception e) {
+	    if (tracer != null) {
+		try {
+		    String ct = "" + Thread.currentThread().getId();
+		    tracer.append("(" + ct + ") ... EXCEPTION\n");
+		} catch (IOException eio){}
+	    }
 	}
 	return false;
     }
@@ -884,6 +1111,12 @@ public class EjwsSecureBasicAuth extends BasicAuthenticator {
 //  LocalWords:  IllegalArgumentException negativeUpperTDL hdr addr
 //  LocalWords:  authenticator's Authenticator HttpExchange getClass
 //  LocalWords:  instanceof InetAddress iaddr pwinfo pw authenticator
-//  LocalWords:  UnsupportedOperationException wrongMode URI
-//  LocalWords:  EjwsPrincipal FileHandler setLoginAlias toString
-//  LocalWords:  setLogoutAlias
+//  LocalWords:  UnsupportedOperationException wrongMode URI SBL ews
+//  LocalWords:  EjwsPrincipal FileHandler setLoginAlias toString JKS
+//  LocalWords:  setLogoutAlias setTracer superclasses sblCompressed
+//  LocalWords:  sbldata EmbeddedWebServer encodeRealm proposedMode
+//  LocalWords:  unencodedRealm getMode another's certlength HTTPS
+//  LocalWords:  ksis KeyStoreException IOException KeyStore changeit
+//  LocalWords:  CertificateException occcur BiConsumer loginFunction
+//  LocalWords:  logoutFunction authFunction setLoginFunction
+//  LocalWords:  setAuthorizedFunction setLogoutFunction

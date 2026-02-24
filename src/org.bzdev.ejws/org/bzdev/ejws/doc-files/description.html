@@ -9,76 +9,586 @@
 <BODY>
     <div style="margin-left: 2em">
 <H1>The org.bzdev.ejws package</H1>
+<P>
+  The {@link org.bzdev.ejws} package provides a class for
+  configuring instances of {@link com.sun.net.httpserver.HttpServer}
+  or {@link com.sun.net.httpserver.HttpsServer}, and several classes
+  that are useful for implementing an embedded web server.
+  The following sections describe how this package is used:
+  <UL>
+    <LI> <A HREF="#constructors">Constructors</A>.
+    <LI> <A HREF="#auth">Authenticators</A>.
+    <LI> <A HREF="#addingContexts">Adding Contexts</A>.
+    <LI> <A HREF="#webmaps">Built-in WebMap subclasses</A>.
+    <LI> <A HREF="#certm">Certificate managers and SSLSetup</A>.
+    <LI> <A HREF="#certgen">Certificate creation</A>.
+    <LI> <A HREF="#example">Coding example</A>.
+  </UL>
+  <H2><A ID="constructors"></A>Constructors</H2>
+<P>
+  The class {@link org.bzdev.ejws.EmbeddedWebServer} will
+  configure an HttpServer or HttpsServer, including setting up a
+  thread pool.  Its Constructors use various combinations of the
+  following arguments:
+  <UL>
+    <LI><STRONG>addr</STRONG>. The internet address (some constructors
+      do not provide this explicitly, in which case the wildcard address
+      is used).
+    <LI><STRONG>port</STRONG>. The TCP port to use.
+    <LI><STRONG>backlog</STRONG>. The TCP backlog.
+    <LI><STRONG>nthreads</STRONG>. The number of threads the server uses.
+    <LI><STRONG>sslSetup</STRONG>. An object whose type
+      is {@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup}
+      used to configure SSL for HTTPS.
+    <LI><STRONG>certManager</STRONG>.  An object whose type
+      is {@link org.bzdev.ejws.CertManager} used to configure SSL
+      for HTTPS.
+  </UL>
+  The <STRONG>certManager</STRONG> and <STRONG>sslSetup</STRONG> arguments
+  are mutually exclusive.  They provide the same functionality, except
+  that {@link org.bzdev.ejws.CertManager} can be used to automatically
+  renew SSL certificates if an appropriate provider is available.
+  Examples:
+  <BLOCKQUOTE><PRE><CODE>EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 8);</CODE></PRE></BLOCKQUOTE>
+  and for the SSL case,
+  <BLOCKQUOTE><PRE><CODE>EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 8,
+                          new EmbeddedWebServer.SSLSetup("TLS")
+                          .keystore(new FileInputStream("ks.jks"));</CODE></PRE></BLOCKQUOTE>
 
-The {@link org.bzdev.ejws} package provides a class for
-configuring instances of {@link com.sun.net.httpserver.HttpServer}
-or {@link com.sun.net.httpserver.HttpsServer}, and several classes
-that are useful for implementing an embedded web server:
-<ul>
-  <li> The class {@link org.bzdev.ejws.EmbeddedWebServer} will
-    configure an HttpServer or HttpsServer, including setting up a
-    thread pool. One can add instances of
-    {@link com.sun.net.httpserver.HttpHandler} using methods
-    that bind a prefix (the initial part of a URL&apos;s path) to a
-    context, which contains an instance of {@link
-    com.sun.net.httpserver.HttpHandler}, which in turn handles an HTTP
-    request.  These methods are
-    <ul>
-      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,Class,Object,com.sun.net.httpserver.Authenticator,boolean,boolean,boolean)},
-        which creates an instance of {@link org.bzdev.ejws.FileHandler},
-        specifying a subclass of {@link org.bzdev.ejws.WebMap}
-        by class.
-      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,com.sun.net.httpserver.HttpHandler,com.sun.net.httpserver.Authenticator)},
-	whose arguments contain an instance of
-	{@link com.sun.net.httpserver.HttpHandler}.
-      <li>{@link org.bzdev.ejws.EmbeddedWebServer#add(String,String,Object,com.sun.net.httpserver.Authenticator,boolean,boolean,boolean)},
-        which creates an instance of {@link org.bzdev.ejws.FileHandler},
-        specifying a subclass of {@link org.bzdev.ejws.WebMap} by name.
-    </ul>
-  <li> The class {@link org.bzdev.ejws.FileHandler}, a subclass of
-    {@link com.sun.net.httpserver.HttpHandler}, contains constructors that
-    provide the the class or class name for a subclass of
-    WebMap, an argument for that WebMap&apos;s constructor, several
-    boolean flags, and a string giving the protocol (HTTP or
-    HTTPS) for use in error pages.  The FileHandler class will
-    handle errors, check the HTTP ACCEPT header, etc.
-  <li> The class {@link org.bzdev.ejws.WebMap} is used by
-    {@link org.bzdev.ejws.FileHandler} to determine how the file
-    handler maps paths to resources. A WebMap is usually not
-    created directly: instead a FileHandler calls
-    WebMap.newInstance, which creates the appropriate subclass.
-  <li> The subclass of {@link org.bzdev.ejws.WebMap} helps process
-    HTTP or HTTPS requests by returning an instance of
-    {@link org.bzdev.ejws.WebMap.Info}, which provides a stream
-    for the content of the resource and some additional information.
-</ul>
+  <H2><A ID="auth"></A>Authenticators</H2>
 <P>
-This package also includes partial support for WAR (Web ARchive)
-files and JSP (Java Server Pages).  For WAR files, the
-WEB-INF/web.xml file is processed to find encodings for pages,
-media-types (MIME types) for file-name extensions, error pages for
-particular error codes or exceptions, and a welcome-file list.  The
-use of the web.xml file is describe in the documentation for
-{@link org.bzdev.ejws.WebMap}. JSP support is really minimal and is
-restricted to processing error messages.  This is also describe in
-the documentation for {@link org.bzdev.ejws.WebMap}.
+  Two authenticators are provided by EJWS:
+  <UL>
+    <LI>{@link org.bzdev.ejws.EjwsBasicAuthenticator}. This is an
+      abstract class with a single method to implement: {@link
+      org.bzdev.ejws.EjwsBasicAuthenticator#checkCredentials(String,String)
+      checkCredentials}, which checks that a given password is the one
+      provided for a given user name. The simplest implementations use a
+      {@link java.util.Map Map} to look up the password for a user and
+      compares that to the given one.
+    <LI>{@link org.bzdev.ejws.EjwsSecureBasicAuth}. This class implements
+      secure basic authentication, which uses public-key encryption to
+      generate a one-time password that is resistant to man in the middle
+      attacks.
+  </UL>
+  Both authenticators allow one to specify three
+  {@link java.util.function.BiConsumer} objects whose "accept" methods
+  are called
+  <UL>
+    <LI> when a login request succeeds.
+    <LI> when an an authentication request has succeeded while already
+      logged in.
+    <LI> when a logout request is seen.
+  </UL>
+  Each {@link java.util.function.BiConsumer} has two type parameter:
+  <UL>
+    <LI> {@link org.bzdev.ejws.EjwsPrincipal EjwsPrincipal}. This is
+      the type of the {link java.util.function.BiConsumer BiConsumer}'s
+      {@link java.util.function.BiConsumer#accept} method's first argument.
+    <LI> {@link com.sun.net.httpserver.HttpExchange HttpExchange}. This is
+      the type of the {@link java.util.function.BiConsumer BiConsumer}'s
+      {@link java.util.function.BiConsumer#accept} method's second argument.
+  </UL>
+  At most one of these {@link java.util.function.BiConsumer#accept}
+  methods will be called in each HTTP/HTTPS transaction.  Typically,
+  authenticators should be created before prefixes and contexts are
+  added.  Examples:
+  <BLOCKQUOTE><PRE><CODE>EjwsBasicAuthenticator auth =
+     new EjwsBasicAuthenticator("realm");
+auth.add("user", "password");</CODE></PRE></BLOCKQUOTE>
+  and
+  <BLOCKQUOTE><PRE><CODE>EjwsBasicAuthenticator auth =
+    new EjwsSecureBasicAuthenticator("realm"
+                                     ews.getCertificates());
+// These strings can be created using the program sbl.
+String user = "user"
+String publicKey = [user's public key in PEM format]
+String password = "password",
+auth.add(user, publicKey, password);</CODE></PRE></BLOCKQUOTE>
 <P>
-For a simple coding example based on code in the EPTS program,
-consider the case of a web server embedded in an application for
-providing on-line help.  The first step is to create an embedded web
-server:
-<BLOCkQUOTE><PRE><CODE>
-        EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, false);
+  One can also add functions to call at a login, logout, or
+  when authentication is successful:
+  <BLOCKQUOTE><PRE><CODE>auth.setLoginFunction((p,t) -&gt; {
+    System.out.println(p.getName() + " logged in");
+};
+auth.setLogoutFunction((p,t) -&gt; {
+    System.out.println(p.getName() + " logged out");
+};
+auth.setAuthorizedFunction((p,t) -&gt; {
+    System.out.println(p.getName() + " authorized");
+	};
 </CODE></PRE></BLOCKQUOTE>
+  <H2><A ID="addingContexts"></A>Adding contexts</H2>
+<P>
+  After a server is created one will create instances of
+  {@link com.sun.net.httpserver.HttpHandler} and associate each with
+  with a prefix (the initial portion of a URL's path). These methods
+  are named "add", where
+  <UL>
+    <LI> the method's first argument is the prefix.
+    <LI> the method's second argument is either an {@link
+      com.sun.net.httpserver.HttpHandler}, a {@link java.lang.String}
+      naming a subclass of {@link org.bzdev.ejws.WebMap}, or the class
+      of a subclass of {@link org.bzdev.ejws.WebMap}. In the latter
+      two cases, the third argument is an object that will be passed
+      to a WebMap's constructor, and the "add" method will return the
+      WebMap that was just created. The package
+      {@link org.bzdev.ejws.maps} contain several subclasses of
+      {@link org.bzdev.ejws.WebMap} covering common cases. These are
+      described <A HREF="#webmaps">below</A>.  An
+      {@link com.sun.net.httpserver.HttpHandler HttpHandler} will also be
+      created&emdash;an instance of {@link org.bzdev.ejws.FileHandler}.
+    <LI> the method's third argument, or forth argument when the third
+      argument is used to initialize a WebMap, is an instance of
+      {@link com.sun.net.httpserver.Authenticator} or null if
+      authentication is not needed.
+  </UL>
+  There may be additional arguments as well, depending on the method's
+  signature. Subclasses of {@link org.bzdev.ejws.WebMap} provide
+  operations that map URLs to resources such as files in a file
+  system, entries in a ZIP file, or a light-weight servlet
+  implementation. The class {@link org.bzdev.ejws.WebMap WebMap}
+  contains several methods that return their instance so that methods
+  can be chained together for convenience. These are
+  <UL>
+    <LI> {@link org.bzdev.ejws.WebMap#setLoginAlias(String,String,boolean)
+      setLoginAlias(String alias, String target, boolean required)},
+      {@link org.bzdev.ejws.WebMap#setLoginAlias(String,java.net.URI,boolean)
+      setLoginAlias(String alias, URI target, boolean required)}, and
+      several variants with fewer arguments that provide defaults.
+      The arguments are
+      <UL>
+	<LI><STRONG>alias</STRONG>&mdash;a relative, non-hierarchical
+	  path from the WebMap's context indicating that a login is
+	  requested. There may be no corresponding resource.
+	<LI><STRONG>target</STRONG>&mdash;a relative path from the
+	  WebMap's context to the page that should be visited after a
+	  successful login
+	<LI><STRONG>required</STRONG>&mdash;true if all logins must start
+	  by visiting the page indicated by the alias.
+      </UL>
+    <LI> {@link org.bzdev.ejws.WebMap#setLogoutAlias(String alias, java.net.URI target)
+      setLogoutAlias(String alias, URI target)}. The arguments are
+      <UL>
+	<LI><STRONG>alias</STRONG>&mdash;a relative, non-hierarchical
+	  path from the WebMap's context indicating that a logout is
+	  requested. There may be no corresponding resource.
+	<LI><STRONG>target</STRONG>&mdash;a relative path from the
+	  WebMap's context to the page that should be visited after a
+	  logout.
+      </UL>
+    <LI> {@link org.bzdev.ejws.WebMap#addWelcome(String)
+      addWelcome(String path)}&mdash;add a "welcome" page. The argument is
+      a path starting from the base URL for the WebMap
+      to a welcome page. Multiple welcome pages can be added.
+    <LI> {@link org.bzdev.ejws.WebMap#addMapping(String,String)
+      addMapping(String suffix, String mtype)}&mdash;associate a media
+      type with a file-name suffix or extension. The first argument is
+      the file-name extension (an initial period will be ignored), and
+      the second argument is the media type (MIME type).
+    <LI> {@link org.bzdev.ejws.WebMap#addGzipSuffix(String)
+      addGzipSuffix(String suffix)}&mdash;indicate that a suffix implies
+      the use of GZIP compression. The argument, <STRONG>suffix</STRONG>
+      is a suffix indicating that a file was compressed using GZIP.
+      if a resource does not exist and adding such a suffix will match
+      a resource that does exist, then that compressed version is sent and
+      the headers are set to indicate that the recipient should automatically
+      decompress the resource.  The standard suffix is "gz" but it may
+      be desirable in some cases to add additional ones (e.g., "gzip").
+      This allows compressed text files to be stored on a server and
+      transferred while still compressed, and then automatically
+      decompressed by a client's HTTP implementation.
+  </UL>
+  For example:
+  <BLOCKQUOTE><PRE><CODE>ews.add("/", DirWebMap.class, new File("api"), auth, true, true, true);
+    .setLoginAlias("login.html", "index.html", true)
+    .setLogoutAlias("logout.html", "http://example.com")
+    .addMapping("sbl", "application/vnd.bzdev.sblauncher")
+    .addWelcome("index.html")
+    .addGZipSuffix("gzip");</CODE></PRE></BLOCKQUOTE>
+The class {@link org.bzdev.ejws.EmbeddedWebServer} also includes
+partial support for WAR (Web ARchive) files and JSP (Java Server
+Pages).  For WAR files, the WEB-INF/web.xml file is processed to find
+encodings for pages, media-types (MIME types) for file-name
+extensions, error pages for particular error codes or exceptions, and
+a welcome-file list.  The use of the web.xml file is describe in the
+documentation for {@link org.bzdev.ejws.WebMap}. JSP support is really
+minimal and is restricted to processing error messages.  This is also
+describe in the documentation for {@link org.bzdev.ejws.WebMap}.
+
+<H2><A ID="webmaps"></A>Built-in WebMap subclasses</H2>
+<P>
+  <UL>
+    <LI>{@link org.bzdev.ejws.maps.DirWebMap DirWebMap}. This WebMap
+      associates paths in a URL with files in a directory and its
+      subdirectories. The constructor's argument is either an instance
+      of {@link java.io.File} for a directory or an instance of {@link
+      org.bzdev.ejws.maps.DirWebMap.Config}, whose constructor's
+      arguments include a {@link java.io.File} and some strings
+      representing various colors used when directories are displayed.
+    <LI>{@link org.bzdev.ejws.maps.PropertiesWebMap
+      PropertiesWebMap}. This WebMap associates paths in a URL with
+      resources stored in a {@link java.util.Properties} instance.
+      The constructor's argument is either a {@link
+      java.util.Properties} instance or an instance of {@link
+      org.bzdev.ejws.maps.PropertiesWebMap.Config}, whose
+      constructor's arguments include an instance of {@link
+      java.util.Properties} and some strings representing various
+      colors used when directories are displayed.
+    <LI>{@link org.bzdev.ejws.maps.RedirectWebMap
+      RedirectWebMap}. This WebMap will redirect its base path to URL
+      representing another base path.
+    <LI>{@link org.bzdev.ejws.maps.ResourceWebMap ResourceWebMap}.This
+      WebMap provides access to resources on an applications class
+      path. The base path will be mapped to the initial portion of a
+      resource's path, and the remainder of the path provided in a URL
+      will be appended. The constructor's argument is either this path
+      prefix or an instance of {@link
+      org.bzdev.ejws.maps.ResourceWebMap.Config}, which provides that
+      path and a series of colors.
+    <LI>{@link org.bzdev.ejws.maps.ServletWebMap}. This
+      WebMap configures a light-weight Servlet&mdash; an instance of
+      {@link org.bzdev.net.ServletAdapter}.  The
+      {@link org.bzdev.net.ServletAdapter} class
+      is more or less a simplified Servlet implementation, providing
+      the methods needed for the simplest cases. The
+      {@link org.bzdev.ejws.maps.ServletWebMap} constructor's argument
+      is an instance of {@link org.bzdev.ejws.maps.ServletWebMap.Config},
+      whose arguments include an instance of
+      {@link org.bzdev.net.ServletAdapter}, a {@link java.util.Map}
+      providing initialization parameters, a boolean flag indicating
+      if the {@link org.bzdev.net.ServletAdapter} can process HTTP
+      queries, and the HTTP methods the {@link org.bzdev.net.ServletAdapter}
+      can process.
+    <LI>{@link org.bzdev.ejws.maps.URLWebMap URLWebMap}. This WebMap
+      will obtain a resource by fetching it from another server.  The
+      constructor's argument is either a URL or an instance of {@link
+      org.bzdev.ejws.maps.URLWebMap.Params}, which provides a base URL
+      and indicates if HTTPS requests should not be verified. The
+      portion of a path following the context path is appended to the
+      base URL. Then the corresponding object is downloaded by this
+      server and sent to the requester.
+    <LI>{@link org.bzdev.ejws.maps.ZipWebMap ZipWebMap}. This WebMap
+      associates paths in a URL with entries in a ZIP file. The
+      constructor's argument is either a String naming a ZIP file, a
+      {@link java.io.File} referencing a ZIP file, or an instance of
+      {@link org.bzdev.ejws.maps.ZipWebMap.Config}, which provides the
+      ZIP file and some colors used when displaying directories.
+  </UL>
+
+  <H2><A ID="certm"></A>Certificate Managers and SSLSetup</H2>
+<P>
+  Both {@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup} and
+  {@link org.bzdev.ejws.CertManager} configure SSL by providing
+  a keystore, truststore, and the corresponding passwords. They
+  can also set a
+  {@link org.bzdev.ejws.EmbeddedWebServer.Configurator Configurator}
+  for applying additional SSL configuration options. If it necessary
+  to modify a server's certificate, the method
+  {@link org.bzdev.ejws.EmbeddedWebServer#modifyServerSetup(org.bzdev.ejws.EmbeddedWebServer.SSLSetup) modifyServerSetup(SSLSetup)}
+  should be called before the server is stopped. A similar method
+  will typically be called by a certificate manager automatically.
+<P>
+  Instances of {@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup SSLSetup} are
+  created by calling its constructor:
+  <UL>
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#SSLSetup()}.
+      This will create an instance of SSLSetup using TLS.
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#SSLSetup(String)}.
+      This will create an instance of SSLSetup using a secure-socket protocol.
+      The argument should be either "SSL", "TLS", or a protocol listed in the
+      <A HREF="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms">Java API documentation</A>.
+  </UL>
+  Methods used to configure instances of
+  {@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup SSLSetup} include
+  <UL>
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#keystore(java.io.InputStream) keystore(InputStream)}.
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#keystorePassword(char[]) keystorePassword(char[])}.
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#keyPassword(char[]) keyPassword(char[])}.
+    <LI>{@link org.bzdev.ejws.EmbeddedWebServer.SSLSetup#configurator(org.bzdev.ejws.EmbeddedWebServer.Configurator) configurator(Configurator)}.
+  </UL>
+  Additional methods can configure a trust store, if desired. If a
+  server needs a trust store to open connections to a server,
+  use the methods in {@link org.bzdev.net.SSLUtilities}.
+<P>
+  Certificate managers are created by calling either
+  {@link org.bzdev.ejws.CertManager#newInstance()} or
+  {@link org.bzdev.ejws.CertManager#newInstance(String)}, whose argument
+  is a provider name.  Each instance will use a keystore that is expected
+  to contain an entry using the alias <STRONG>servercert</STRONG>.
+  There are two default providers
+  <UL>
+    <LI><STRONG>default</STRONG>. This provider creates a
+      self-signed certificate, replacing it when the certificate is close
+      to expiring. The keystore entry whose alias is <STRONG>servercert</STRONG>
+      will be created or modified when close to expiring.
+    <LI><STRONG>external</STRONG>. This provider reloads the keystore
+      when its <STRONG>servercert</STRONG> certificate is close to
+      expiring, but does not modify the keystore.
+  </UL>
+<P>
+  The methods used to configure a CertManager return the certificate
+  manager itself so that the methods can be chained together for
+  programming convenience.  The methods used to configure how certificates
+  are renewed and how to find certificates are
+  <UL>
+    <LI>{@link org.bzdev.ejws.CertManager#setTimeOffset(int) setTimeOffset(int)}.
+      This method provides a time offset in seconds from midnight and is used
+      to schedule checks for expired certificates at a time at which the
+      server is not likely to be busy: the server has to be stopped
+      temporarily to install new certificates.
+    <LI>{@link org.bzdev.ejws.CertManager#setInterval(int) setInterval(int)}.
+      This method provides the interval in days between certificate renewal
+      attempts. A certificate will not be renewed if it is not close
+      to expiring. If set to zero, the value will be treated as one
+      minute, which is useful for testing but not for actual use.
+    <LI>{@link org.bzdev.ejws.CertManager#setStopDelay(int) setStopDelay(int)}.
+      This method provides the time in seconds to wait before fully
+      shutting down a server when necessary to renew certificates.
+    <LI>{@link org.bzdev.ejws.CertManager#setTimeZone(String) setTimeZone(String)} or
+      {@link org.bzdev.ejws.CertManager#setTimeZone(java.util.TimeZone) setTimeZone(TimeZone)}.
+      These methods provide the time zone for the server.
+    <LI>{@link org.bzdev.ejws.CertManager#setProtocol(String)}.
+      This method provides the HTTPS protocol to use ("SSL" or "TLS").
+    <LI>{@link org.bzdev.ejws.CertManager#setKeystoreFile(java.io.File) setKeystoreFile(File)}.
+      This method provides the {@link java.io.File File} the contains the
+      keystore.
+     <LI>{@link org.bzdev.ejws.CertManager#setKeystorePW(char[]) setKeystorePW(char[])}.
+       This method provides the 'store' password used to access entries
+       in a keystore (public keys and certificates). The default is
+       <STRONG>changeit</STRONG>.
+    <LI>{@link org.bzdev.ejws.CertManager#setKeyPW(char[]) setKeyPW(char[])}.
+      This method provides the password used to access the private keys in
+      a keystore. The default is <STRONG>changeit</STRONG>.
+    <LI>{@link org.bzdev.ejws.CertManager#setConfigurator(org.bzdev.ejws.EmbeddedWebServer.Configurator) setConfigurator(EmbeddedWebServer.Configurator)}.
+      This method provides a functional interface that has a 'configure'
+      method whose first argument is an instance of
+      {@link javax.net.ssl.SSLContext SSLContext} and whose second
+      argument is an instance of
+      {@link com.sun.net.httpserver.HttpsParameters}.
+  </UL>
+<P>
+  The methods used to create (or renew) certificates are
+  <UL>
+    <LI>{@link org.bzdev.ejws.CertManager#setCertName(String) setCertName(String)}.
+      This method provides an identifier to name a certificate, which is needed
+      by some implementations.
+    <LI> {@link org.bzdev.ejws.CertManager#setAlias(String) setAlias(String)}.
+      This method provides a user-specified name for an alias. Some
+      certificate managers may not support this method and will throw an
+      exception if it is used.
+    <LI>{@link org.bzdev.ejws.CertManager#setDomain(String) setDomain(String)}.
+      This method provides the domain name used in a certificate.
+    <LI>{@link org.bzdev.ejws.CertManager#setEmail(String) setEmail(String)}.
+      This method provides an email address used to contact a user for
+      administrative purposes (e.g., if a certificate is about to expire).
+    <LI>{@link org.bzdev.ejws.CertManager#setHelper(org.bzdev.ejws.EmbeddedWebServer) setHelper(EmbeddedWebServer)}.
+      This method provides a 'helper' web server that some certificate
+      managers require to automatically manage certificates. a 'helper'
+      can be created when needed, but one might prefer that the helper is
+      always running, in which case this method should be used. A 'helper'
+      typically runs HTTP instead of HTTPS. The documentation for a
+      certificate manager that needs a helper should describe how to create
+      it.
+  </UL>
+  Occasionally one might want to include a trust store, in which case
+  the following methods can be used:
+  <UL>
+    <LI>{@link org.bzdev.ejws.CertManager#setTrustManagers(java.net.ssl.TrustManger[]) setTrustManagers(TrustManager[])} or
+      {@link org.bzdev.ejws.CertManager#setTruststoreFile(java.io.File) setTruststoreFile(File)}.
+      These methods are mutually exclusive and provide either trust
+      managers to use or the file containing a trust store created
+      using keytool. They are not needed when the server's certificate
+      was signed by a certificate authority listed in Java's cacerts file
+      (e.g., /user/lib/jvm/.../lib/security/cacerts).
+    <LI>{@link org.bzdev.ejws.CertManager#setTruststorePW(char[]) setTruststorePW(char[])}.
+      This method provides the 'store' password used to access a trust store.
+  </UL>
+<P>
+  Several configuration methods, mostly used for testing or debugging,
+  are not described:
+  {@link org.bzdev.ejws.CertManager#alwaysCreate(boolean) alwaysCreate}
+   and {@link org.bzdev.ejws.CertManager#setMode setMode}.
+
+<H2><A ID="certgen"></A>Certificate creation</H2>
+<P>
+  Creating and signing certificates using the Java program keytool
+  is somewhat of a black art, particularly when generating certificates
+  for testing. The cases shown below use elliptic-curve cryptography
+  to generate public and private keys.
+<P>
+  In the following,
+  <UL>
+    <LI><STRONG>KS</STRONG> should be replaced with the file name of a
+      keystore, excluding a ".jks" file-name suffix. This file is needed
+      to configure a server.
+    <LI><STRONG>TS</STRONG> should be replaced with the file name of a
+      truststore, excluding a ".jks" file-name suffix. This is needed to
+      configure applications so that they will accept a certificate chain
+      whose root does not appear in the standard Java cacerts file.
+    <LI><STRONG>ALIAS</STRONG> should be replaced with an alias for a
+      server private key and certificate.
+    <LI><STRONG>HOST</STRONG> should replaced with the server's host name.
+      In many caaes, this should be a fully qualified name.
+    <LI><STRONG>ROOT_ALIAS</STRONG> should be replaced with an alias for
+      a root certificate when added to a Java cacerts file.
+  </UL>
+
+  <H3>Stand-alone certificates</H3>
+<P>
+  The simplest case is a stand-alone certificate.  The following
+  example creates one using elliptic curves, and placing it in a keystore
+  named KS.jks with a 'store' and 'key' password "changeit":
+  <BLOCKQUOTE><PRE><CODE>keytool -genkey -keyalg EC -groupname secp256r1 \
+	-sigalg SHA256withECDSA -keystore KS.jks \
+	-keypass changeit -storepass changeit \
+	-dname CN=HOST -alias ALIAS -validity 90</CODE></PRE></BLOCKQUOTE>
+<P>
+  HOST should be the host name for a server and ALIAS should be whatever
+  alias is used to name the keystore entry. This certificate can
+  also be copied to a trust store, although in this simple case, one
+  can use the same keystore for both.:
+  <BLOCKQUOTE><PRE><CODE>keytool -importkeystore -srckeystore KS.jks \
+	-destkeystore TS.jks -srcalias ALIAS -destalias ALIAS \
+	-srcstorepass changeit -deststorepass changeit \
+	-srckeypass changeit -destkeypass changeit</CODE></PRE></BLOCKQUOTE>
+<P>
+  or
+  <BLOCKQUOTE><PRE><CODE>keytool -keystore KS.jks -alias ALIAS -exportcert \
+	-storepass changeit -rfc \
+  | keytool -importcert -alias ALIAS  -keystore TS.jks \
+	-keypass changeit -storepass changeit -noprompt</CODE></PRE></BLOCKQUOTE>
+  <H3>Two-level certificate chain</H3>
+<P>
+  The following generates a certificate for a certificate authority:
+  <BLOCKQUOTE><PRE><CODE>keytool -genkey -keyalg EC -groupname secp256r1 \
+	-sigalg SHA256withECDSA -keystore KS.jks \
+	-keypass changeit -storepass changeit \
+	-ext bc=ca:true	-dname CN=ca -alias ca -validity 365</CODE></PRE></BLOCKQUOTE>
+<P>
+  The argument "-ext bc=ca:true" is a Basic Constraints X509 extension
+  that indicates that this is a CA (Certificate Authority) certificate.
+  It was created in the same keystore as the previous self-signed
+  certificate.  If it is in a different keystore, the process will fail:
+  this certificate is being used as a certificate authority but is not
+  in the CA file
+  (e.g., /usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts), and if
+  the root certificate is not there, everything must be done in the same
+  keystore.
+<P>
+  The next step is to generate a certificate request and process that
+  by generating a certificate:
+  <BLOCKQUOTE><PRE><CODE>keytool -keystore KS.jks -alias ALIAS \
+	-certreq -storepass changeit -keypass changeit | \
+	keytool -keystore KS.jks  -storepass changeit \
+	 -alias ca -gencert  -ext san=dns:HOST | \
+	keytool -keystore KS.jks  -storepass changeit \
+	  -alias ALIAS -importcert</CODE></PRE></BLOCKQUOTE>
+<P>
+  The extension "san=dns:HOST" indicates that HOST will be a subject
+  alternate name for the signed certificate. There are three programs
+  in the pipeline. The first generates a certificate request, the
+  second processes that request to generate a signed certificate, and
+  the third imports the signed certificate.
+<P>
+  Finally, one can move the CA certificate and its private key to
+  a trust store and delete it from the keystore
+  <BLOCKQUOTE><PRE><CODE>keytool -importkeystore -srckeystore KS.jks \
+	-destkeystore TS.jks -srcalias ca -destalias ca \
+	-srcstorepass changeit -deststorepass changeit \
+	-srckeypass changeit -destkeypass changeit
+keytool -delete -alias ca -keystore KS.jks -storepass changeit</CODE></PRE></BLOCKQUOTE>
+<P>
+  At this point, there is a single entry in the keystore with
+  a certificate chain whose length is 2. A program such as SBL
+  will have to include a trust store and its password, but not
+  the keystore.
+
+  <H3>Three-level certificate</H3>
+<P>
+  To create the root certificate authority and its private key, run
+  the commands
+  <BLOCKQUOTE><PRE><CODE>keytool -genkey -keyalg EC -groupname secp256r1 \
+	-sigalg SHA256withECDSA -keystore root.jks \
+	-keypass changeit -storepass changeit \
+	-ext bc=ca:true	-dname CN=root -alias root -validity 365
+keytool -keystore root.jks -alias root -exportcert -rfc \
+	-storepass changeit -keypass changeit > root.pem
+keytool -keystore TS.jks -alias root -importcert  -file root.pem \
+	-storepass changeit -keypass changeit -noprompt</CODE></PRE></BLOCKQUOTE>
+<P>
+  This places the root certificate and its private key in root.jks,
+  and places the root certificate without its private key in TS.jks.
+  It also stores the certificate in a file root.pem for later use.
+  To import the root certificate into the standard Java cacerts file,
+  use
+  <BLOCKQUOTE><PRE><CODE>keytool -keystore $JAVA_HOME/jre/lib/security/cacerts -file root.pem \
+    -alias ROOT_ALIAS -importcert -storepass changeit -keypass changeit \
+    -trustcacerts</CODE></PRE></BLOCKQUOTE>
+<P>
+where ROOT_ALIAS does not conflict with entries already in cacerts.
+<P>
+  To create an intermediate certificate authority, run the commands
+  <BLOCKQUOTE><PRE><CODE>keytool -genkey -keyalg EC -groupname secp256r1 \
+	-sigalg SHA256withECDSA -keystore ca.jks \
+	-keypass changeit -storepass changeit \
+	-ext bc=ca:true	-dname CN=ca -alias ca -validity 365
+keytool -storepass changeit  -keypass changeit -keystore ca.jks \
+	-certreq -alias ca |
+    keytool -storepass changeit -keypass changeit -keystore root.jks \
+    -gencert -alias root -ext BC=0 -rfc > ca.pem
+keytool -keystore ca.jks -importcert -alias ca -file ca.pem \
+	    -keypass changeit -storepass changeit</CODE></PRE></BLOCKQUOTE>
+<P>
+  This creates the intermediate certificate ca, stores that certificate
+  and its private key in ca.jks, and provides a file ca.pem containing
+  this certificate for later use.
+<P>
+  To create a server certificate and private key in a keystore KS.jks,
+  run the commands
+  <BLOCKQUOTE><PRE><CODE>keytool -genkey -keyalg EC -groupname secp256r1 \
+	-sigalg SHA256withECDSA -keystore KS.jks \
+	-keypass changeit -storepass changeit \
+	-dname CN=HOST -alias servercert -validity 90
+keytool -storepass changeit -keypass changeit -keystore server.jks \
+	-certreq -alias servercert |
+    keytool -storepass changeit -keypass changeit -keystore ca.jks\
+	    -gencert -alias ca \
+    -ext san=dns:wtz-thelio -ext ku:c=dig,kE -rfc > server.pem</CODE></PRE></BLOCKQUOTE>
+<P>
+  This will store the server certificate in the file server.pem.
+<P>
+  The final step is to add the server certificate to the keystore.
+  containing the server's private key.
+  <BLOCKQUOTE><PRE><CODE>cat root.pem ca.pem server.pem |
+    keytool -keystore KS.jks -importcert -alias servercert \
+	    -storepass changeit -keypass changeit -noprompt</CODE></PRE></BLOCKQUOTE>
+  The procedure above is based on an example in the keytool manual
+  page (under "GENERATING CERTIFICATES FOR AN SSL SERVER"), and
+  some examples from
+  <A HREF="https://www.pixelstech.net/article/1450354633-Using-keytool-to-create-certificate-chain">Using Keytool to create certificate chain</A>.
+  This code will work if the commands are entered in a terminal
+  window or a script, but the keytool commands with the option
+  <CODE>-importcert</CODE> will print an error message and return a
+  non-zero exit code, although the operation actually completed.
+  This will cause a failure if the commands are used in a Makefile.
+  A fix is to add "|| true" to
+
+<H2><A ID="example"></A>Coding Example</H2>
+<P>
+  For a simple coding example based on code in the EPTS program,
+  consider the case of a web server embedded in an application for
+  providing on-line help.  The first step is to create an embedded web
+  server:
+  <BLOCkQUOTE><PRE><CODE>EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2, false);</CODE></PRE></BLOCKQUOTE>
 The argument 8080 is the TCP port number to use, 48 is the TCP backlog,
 2 is the number of threads the server uses, and 'false' indicates that
 HTTP is used rather than HTTPS.  The next step is to map a path to
 some service.
 
-<BLOCkQUOTE><PRE><CODE>
-        ews.add("/", ResourceWebMap.class, "org/bzdev/epts/manual/",
-                null, true, false, true);
-</CODE></PRE></BLOCKQUOTE>
+<BLOCkQUOTE><PRE><CODE>ews.add("/", ResourceWebMap.class, "org/bzdev/epts/manual/",
+        null, true, false, true);</CODE></PRE></BLOCKQUOTE>
+<P>
 For these arguments, <CODE>"/"</CODE> indicates the common portion of
 the URL paths for the resources being added,
 <CODE>{@link org.bzdev.ejws.maps.ResourceWebMap ResourceWebMap}.class</CODE>
@@ -93,20 +603,18 @@ final <CODE>true</CODE> indicates that any WEB-INF directory should
 not be visible.
 <P>
 The sequence of statements 
-<BLOCkQUOTE><PRE><CODE>
-        WebMap wmap = epts.getWebMap("/");
-        wmap.addWelcome("index.html");
-	webmap.addMapping("html", "text/html; charset=utf-8");
-</CODE></PRE></BLOCKQUOTE>
+<BLOCkQUOTE><PRE><CODE>WebMap wmap = epts.getWebMap("/");
+wmap.addWelcome("index.html");
+webmap.addMapping("html", "text/html; charset=utf-8");</CODE></PRE></BLOCKQUOTE>
+<P>
 looks up a web map for the context "<CODE>/</CODE>", configures the
 web map so that "index.html" is the 'welcome' page, and configures the
 web map so that files ending in the suffix "html" will have a media type
 of "text/html; charset=utf-8".
 <P>
 Finally
-<BLOCkQUOTE><PRE><CODE>
-        ews.start();
-</CODE></PRE></BLOCKQUOTE>
+<BLOCkQUOTE><PRE><CODE>ews.start();</CODE></PRE></BLOCKQUOTE>
+<P>
 will start the web server. The URL <CODE>http://localhost:8080/</CODE>
 can be typed into a browser to view this web page on the same computer
 as the server.
@@ -119,4 +627,40 @@ as the server.
 <!--  LocalWords:  WebMap's FileHandler newInstance ARchive JSP xml
  -->
 <!--  LocalWords:  encodings EPTS TCP authenticator html charset utf
+ -->
+<!--  LocalWords:  Authenticators subclasses SSLSetup addr nthreads
+ -->
+<!--  LocalWords:  sslSetup SSL certManager authenticators EJWS URI
+ -->
+<!--  LocalWords:  checkCredentials BiConsumer EjwsPrincipal servlet
+ -->
+<!--  LocalWords:  BiConsumer's HttpExchange HttpHandler addWelcome
+ -->
+<!--  LocalWords:  setLoginAlias setLogoutAlias addMapping mtype GZIP
+ -->
+<!--  LocalWords:  addGzipSuffix gz gzip DirWebMap subdirectories TLS
+ -->
+<!--  LocalWords:  PropertiesWebMap RedirectWebMap ResourceWebMap jks
+ -->
+<!--  LocalWords:  ServletWebMap ServletAdapter ServletWebMap's bc
+ -->
+<!--  LocalWords:  URLWebMap ZipWebMap keystore truststore servercert
+ -->
+<!--  LocalWords:  Configurator modifyServerSetup InputStream keytool
+ -->
+<!--  LocalWords:  keystorePassword keyPassword configurator TimeZone
+ -->
+<!--  LocalWords:  setTimeOffset setInterval setStopDelay setTimeZone
+ -->
+<!--  LocalWords:  setProtocol setKeystoreFile setKeystorePW changeit
+ -->
+<!--  LocalWords:  setKeyPW setConfigurator EmbeddedWebServer cacerts
+ -->
+<!--  LocalWords:  SSLContext setCertName setAlias setDomain setEmail
+ -->
+<!--  LocalWords:  setHelper setTrustManagers TrustManager setMode
+ -->
+<!--  LocalWords:  setTruststoreFile setTruststorePW alwaysCreate san
+ -->
+<!--  LocalWords:  dns SBL pem Makefile
  -->

@@ -258,6 +258,17 @@ public class ACMatcher  {
 	return patterns;
     }
 
+    private static <T> String[]
+	createPatterns(Function<T,String> f, ArrayList<T> specs)
+    {
+	int len = specs.size();
+	String[] patterns = new String[len];
+	for (int i = 0; i < len; i++) {
+	    patterns[i] = f.apply(specs.get(i));
+	}
+	return patterns;
+    }
+
 
     /**
      * Constructor using an array of pattern specifications.
@@ -289,7 +300,7 @@ public class ACMatcher  {
      *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
      *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
      *       int index = mr.getIndex();
-     *       switch (spec[index].type) {
+     *       switch (specs[index].type) {
      *       case TYPE1:
      *          ...
      *       }
@@ -299,8 +310,51 @@ public class ACMatcher  {
      * @param specs an array containing pattern specifications
      * @param <T> the type of the objects used as a pattern specifications
      */
-
     public <T> ACMatcher(Function<T,String> f, T[] specs) {
+	this(false, createPatterns(f, specs));
+    }
+
+
+    /**
+     * Constructor using an array list of pattern specifications.
+     * A function maps each pattern specification to the corresponding
+     * pattern. This can be used to associate each pattern with a
+     * enumeration, which can make the use of a <CODE>switch</CODE>
+     * statement more reliable when new cases are added.  For
+     * example,
+     * <BLOCKQUOTE><PRE><CODE>
+     * static enum SpecType {
+     *      TYPE1,
+     *      TYPE2,
+     *      ...
+     * }
+     * static class Spec {
+     *   SpecType type
+     *   String pattern;
+     *   public Spec(specType type, string pattern) {
+     *       this.type = type;
+     *       this.pattern = pattern;
+     * }
+     * ...
+     *   ArrayList&lt;Spec&gt; specs = new ArrayList&lt;&gt;();
+     *   specs.append(new Spec(SpecType.TYPE1, "foo"));
+     *   spec.append(new Spec(SpecType.TYPE2, "bar"));
+     * ...
+     *   ACMatcher matcher = new
+     *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
+     *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
+     *       int index = mr.getIndex();
+     *       switch (specs.get(index).type) {
+     *       case TYPE1:
+     *          ...
+     *       }
+     *   }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param f a function that maps a pattern specification to a pattern
+     * @param specs an array list containing pattern specifications
+     * @param <T> the type of the objects used as a pattern specifications
+     */
+    public <T> ACMatcher(Function<T,String> f, ArrayList<T> specs) {
 	this(false, createPatterns(f, specs));
     }
 
@@ -335,7 +389,7 @@ public class ACMatcher  {
      *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
      *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
      *       int index = mr.getIndex();
-     *       switch (spec[index].type) {
+     *       switch (specs[index].type) {
      *       case TYPE1:
      *          ...
      *       }
@@ -354,6 +408,54 @@ public class ACMatcher  {
 	this(ignoreCase, createPatterns(f, specs));
     }
 
+    /**
+     * Constructor using an array list of pattern specifications and specifying
+     * if the matcher is case sensitive.
+     * A function maps each pattern specification to the corresponding
+     * pattern. This can be used to associate each pattern with a
+     * enumeration, which can make the use of a <CODE>switch</CODE>
+     * statement more reliable when new cases are added.  For
+     * example,
+     * <BLOCKQUOTE><PRE><CODE>
+     * static enum SpecType {
+     *      TYPE1,
+     *      TYPE2,
+     *      ...
+     * }
+     * static class Spec {
+     *   SpecType type
+     *   String pattern;
+     *   public Spec(specType type, string pattern) {
+     *       this.type = type;
+     *       this.pattern = pattern;
+     * }
+     * ...
+     *   ArrayList&lt;Spec&gt; specs = new ArrayList&lt;&gt;();
+     *   specs.append(new Spec(SpecType.TYPE1, "foo"));
+     *   spec.append(new Spec(SpecType.TYPE2, "bar"));
+     * ...
+     *   ACMatcher matcher = new
+     *     ACMatcher((spec) -&gt; {return spec.pattern;}, specs);
+     *   for (ACMatcher.MatchResult mr: matcher.interatorOver(text)) {
+     *       int index = mr.getIndex();
+     *       switch (specs.get(index).type) {
+     *       case TYPE1:
+     *          ...
+     *       }
+     *   }
+     * </CODE></PRE></BLOCKQUOTE>
+     * @param ignoreCase true if the search is case insensitive; false
+     *        if the search is case sensitive
+     * @param f a function that maps a pattern specification to a pattern
+     * @param specs an array containing pattern specifications
+     * @param <T> the type of the objects used as a pattern specifications
+     */
+
+    public <T> ACMatcher(boolean ignoreCase,
+			 Function<T,String> f, ArrayList<T> specs)
+    {
+	this(ignoreCase, createPatterns(f, specs));
+    }
 
     /**
      * Get the patterns (search strings) for this matcher.

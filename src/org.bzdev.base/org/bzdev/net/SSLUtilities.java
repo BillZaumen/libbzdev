@@ -53,84 +53,6 @@ public class SSLUtilities {
 	return NetErrorMsg.errorMsg(key);
     }
 
-    /*
-    private static final char[] EMPTY_CHAR_ARRAY = new char[0];
-
-    private static char[] decryptToCharArray(String value, char[] gpgpw)
-	throws GeneralSecurityException
-    {
-	if (value == null || gpgpw == null) return EMPTY_CHAR_ARRAY;
-	byte[] data = Base64.getDecoder().decode(value);
-	ByteArrayInputStream is = new ByteArrayInputStream(data);
-
-	try {
-	    // Need to use --batch, etc. because when this runs in
-	    // a dialog box, we don't have access to a terminal and
-	    // GPG agent won't ask for a passphrase.
-	    ProcessBuilder pb = new ProcessBuilder("gpg",
-						   "--pinentry-mode",
-						   "loopback",
-						   "--passphrase-fd", "0",
-						   "--batch", "-d");
-	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
-	    ByteArrayOutputStream baos = new
-		ByteArrayOutputStream(data.length);
-	    Process p = pb.start();
-	    Thread thread1 = new Thread(()->{
-		    try {
-			OutputStream os = p.getOutputStream();
-			OutputStreamWriter w = new OutputStreamWriter(os);
-			w.write(gpgpw, 0, gpgpw.length);
-			w.write(System.getProperty("line.separator"));
-			w.flush();
-			is.transferTo(os);
-			w.close();
-			os.close();
-		    } catch(Exception e) {
-			System.err.println(e.getMessage());
-		    }
-	    });
-	    Thread thread2 = new Thread(()->{
-		    try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			InputStream is1 = p.getInputStream();
-			is1.transferTo(baos);
-		    } catch(Exception e) {
-			System.err.println(e.getMessage());
-		    }
-	    });
-	    thread2.start();
-	    thread1.start();
-	    thread1.join();
-	    thread2.join();
-	    p.waitFor();
-	    if (p.exitValue() != 0) {
-		String msg = errorMsg("gpgFailed", p.exitValue());
-		throw new GeneralSecurityException(msg);
-	    }
-	    return (Charset.forName("utf-8")
-		    .decode(ByteBuffer.wrap(baos.toByteArray())))
-		.array();
-	} catch (Exception e) {
-	    String msg = errorMsg("decryption", e.getMessage());
-	    throw new GeneralSecurityException(msg, e);
-	}
-    }
-
-    private static Supplier<char[]> defaultPassphraseSupplier = () -> {
-	Console console = System.console();
-	if (console != null) {
-	    char[] password = console
-		.readPassword(localeString("enterPW2") + ":");
-	    if (password == null || password.length == 0) {
-		password = null;
-	    }
-	    return password;
-	} else {
-	    return null;
-	}
-    };
-    */
 
     /**
      * Configure SSL using data stored in an SBL file.
@@ -140,8 +62,8 @@ public class SSLUtilities {
      * @param type the type for an {@link SSLContext} (e.g., SSL or TLS)
      * @param sblFile a file in SBL format
      * @param passphraseSupplier a {@link Supplier} that will provide a
-     *        GPG pass phrase; null for a default
-     * @see org.bzdev.swing.ConfigPropertyEditor#gpgPassphraseSupplier
+     *        GPG passphrase or a symmetric-cipher password; null for a default
+     * @see org.bzdev.swing.ConfigPropertyEditor#passphraseSupplier
      */
     public static void
 	configureUsingSBL(String type,
@@ -167,14 +89,8 @@ public class SSLUtilities {
 	boolean allowLoopback = s.trim().toLowerCase().equals("true");
 
 	if (trustKeyStore != null) {
-	    /*
-	    if (passphraseSupplier == null) {
-		passphraseSupplier = defaultPassphraseSupplier;
-	    }
-	    char[] gpgpw = passphraseSupplier.get();
-	    */
 	    char[] gpgpw = ConfigPropUtilities
-		.getGPGPassphrase(passphraseSupplier);
+		.getPassphrase(passphraseSupplier);
 
 	    // String epw = props.getProperty("ebase64.trustStore.password");
 	    char[] trustpw = ConfigPropUtilities
@@ -210,13 +126,19 @@ public class SSLUtilities {
      * should be accepted and false if it should not be accepted.
      * An implementation of this functional interface may provide a dialog
      * box to query the user and may cache values.
+     * <P>
+     * The implementation creates a TrustManagerFactory, specifying the
+     * default algorithm, and then finds an X509TrustManager, ignoring
+     * the keystore. It then creates a second one using the keystore.
+     * A custom trust manager then combines both of these.
      * @param type the type for an {@link SSLContext} (e.g., SSL or TLS)
      * @param trustKeyStore the file for a custom trust key store; null if
      *        there is none
      * @param password the password for the trust key store
      * @param acceptSelfSigned a function that determines if a self-signed
      *        certificate should be accepted
-     * @see javax.net.ssl.SSLContext#getInstance(String)
+     * @return an array containing the trust manager used to configure SSL
+ * @see javax.net.ssl.SSLContext#getInstance(String)
      */
     public static TrustManager[]
 	installTrustManager(String type,

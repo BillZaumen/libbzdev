@@ -65,19 +65,26 @@ public class ConfigTestPW {
 	System.out.println("... requestPassphrase(null, true)");
 	editor.requestPassphrase(null, true);
 	editor.clearPassphrase();
-	System.out.println("... requestGPGPassphrase (null, false)");
-	char[] pw = ConfigPropertyEditor.requestGPGPassphrase(null, false);
+	System.out.println("... requestPassphrase (null, true, false)");
+	char[] pw = ConfigPropertyEditor.requestPassphrase(null, true, false);
 	System.out.println(new String(pw));
-	System.out.println("... requestGPGPassphrase (null, true)");
-	pw = ConfigPropertyEditor.requestGPGPassphrase(null, true);
+	System.out.println("... requestPassphrase (null, true, true)");
+	pw = ConfigPropertyEditor.requestPassphrase(null, true, true);
 	System.out.println(new String(pw));
 	System.out.println("(test) printing to stdout");
 	Supplier<char[]> supplier = ConfigPropertyEditor
-	    .gpgPassphraseSupplier(null, false);
+	    .passphraseSupplier(null, true, false);
 	System.out.println(supplier.get());
 	supplier = ConfigPropertyEditor
-	    .gpgPassphraseSupplier(null, true);
+	    .passphraseSupplier(null, true, true);
 	System.out.println(supplier.get());
+	supplier = ConfigPropertyEditor
+	    .passphraseSupplier(null, false, false);
+	System.out.println(supplier.get());
+	supplier = ConfigPropertyEditor
+	    .passphraseSupplier(null, false, true);
+	System.out.println(supplier.get());
+
 	System.exit(0);
     }
 }

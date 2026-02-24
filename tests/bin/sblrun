@@ -4,4 +4,4 @@
 #     -Dscrunner.usrconf=test.conf \
 #     org.bzdev.bin.scrunner.SCRunnerCmd "$@"
 
-java -Dsbl.config.dir=`pwd`/sblconf -p ../../BUILD -m org.bzdev.sbl "$@"
+java -Dsbl.config.dir=`pwd`/sblconf/ -p ../../BUILD -m org.bzdev.sbl "$@"

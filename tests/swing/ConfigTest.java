@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.*;
 import java.util.Properties;
 import javax.swing.*;
 
@@ -43,7 +43,57 @@ public class ConfigTest {
 	protected String extension() {return "foo";}
     }
 
+    private static final int ONEKEYID = 0;
+    private static final int NOKEYIDS = 1;
+    private static final int MULTIPLEKEYIDS = 2;
+    private static String gpgdir = null;
+
+    private static int gpgHasKey(String keyid, boolean publicKey) {
+	String arg = publicKey? "-k": "-K";
+	ProcessBuilder pb = (gpgdir == null)?
+	    new ProcessBuilder("gpg", "--with-colons", arg, keyid):
+	    new ProcessBuilder("gpg", "--homedir", gpgdir, "--with-colons",
+			       arg, keyid);
+	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	String start = publicKey? "pub:": "sec:";
+	try {
+	    Process p = pb.start();
+	    LineNumberReader r = new LineNumberReader
+		(new InputStreamReader(p.getInputStream()));
+	    String line;
+	    int cnt = 0;
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith(start)) {
+		    cnt++;
+		}
+	    }
+	    int status = p.waitFor();
+	    if (status == 0) {
+		if (cnt == 0) {
+		    return NOKEYIDS;
+		} else if (cnt == 1) {
+		    return ONEKEYID;
+		} else {
+		    return MULTIPLEKEYIDS;
+		}
+	    } else {
+		return NOKEYIDS;
+	    }
+	} catch (IOException e) {
+	    return NOKEYIDS;
+	} catch (InterruptedException e) {
+	    return NOKEYIDS;
+	}
+    }
+
+
     public static void main(String argv[]) throws Exception {
+
+	System.out.println(gpgHasKey("wtz-email", false));
+	System.out.println(gpgHasKey("wtz-email", true));
+	System.out.println(gpgHasKey("wtz-backup", false));
+	System.out.println(gpgHasKey("wtz-backup", true));
+
 
 	boolean systemUI = argv.length > 0 && argv[0].equals("--systemUI");
 	if (systemUI) {
@@ -103,13 +153,20 @@ public class ConfigTest {
 	editor.edit(null, ConfigPropertyEditor.Mode.MODAL, null,
 		    ConfigPropertyEditor.CloseMode.BOTH);
 
-	System.out.println("getting config");
+	System.out.println("-----------------");
+	editor.clearPassphrase();
+	System.out.println("JSON: " + editor.toJSON());
+	System.out.println("-----------------");
+	System.out.println("Base64: " + editor.toBase64());
+	System.out.println("-----------------");
+
+
+	System.out.println("getting config:");
 	Properties config = editor.getDecodedProperties();
 	if (config == null) {
 	    System.out.println("no config");
 	    System.exit(1);
 	}
-	System.out.println("-----------------");
 	for (String key: config.stringPropertyNames()) {
 	    System.out.println(key + ": " + config.getProperty(key));
 	    if (key.startsWith("ebase64")) {

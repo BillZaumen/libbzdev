@@ -67,6 +67,8 @@ import org.bzdev.util.SafeFormatter;
  *       This provides a keystore file that will be used
  *       to store certificates using the alias "servercert".  If the
  *       file does not exist, a new one will be created with a certificate.
+ *   <LI><STRONG>{@link CertManager#setTrustManagers(TrustManager[])}</STRONG>
+ *       This provides trust managers.
  *   <LI><STRONG>{@link CertManager#setTruststoreFile(File)}</STRONG>.
  *       This provides a trust store file to allow the user to specify
  *       additional root certificates. It may be null if no trust store
@@ -247,6 +249,33 @@ public abstract class CertManager {
 	alwaysCreate = mode;
 	return this;
     }
+
+    private String alias = "servercert";
+
+    /**
+     * Set the alias used to store a server's private key and certificate.
+     * An alias is used to specify entries in a Java key store. The
+     * default is "servercert", but this may be changed if desired.
+     * @param alias the alias; null for the default
+     * @return this certificate manager
+     * @throws UnsupportedOperationException if this certificate manager
+     *         does not allow the alias to be changed from its default.
+     */
+    public CertManager setAlias(String alias)
+	throws UnsupportedOperationException
+    {
+	this.alias = (alias == null)? "servercert": alias;
+	return this;
+    }
+
+    /**
+     * Get the alias used to store a server's private key and certificate.
+     * @return the alias
+     */
+    public String getAlias() {
+	return alias;
+    }
+
 
 
     // By default, if a keystore does not exist, it will
@@ -881,6 +910,20 @@ public abstract class CertManager {
 
     }
 
+    Runnable runWhileStopped = null;
+
+    /**
+     * Provide a {@link Runnable} to run if the server is
+     * being stopped and restarted.
+     * This method is provided so that additional tasks can be
+     * handled while a server is stopped.
+     * @param r the runnable
+     */
+    public CertManager setRunWhileStopped(Runnable r) {
+	runWhileStopped = r;
+	return this;
+    }
+
     boolean certTrace = false;
 
     /**
@@ -948,7 +991,7 @@ public abstract class CertManager {
 
     /**
      * Provide trust managers.
-     * @param tms the trust managers; null too cancel
+     * @param tms the trust managers; null to cancel
      * @return this object
      * @throws IllegalStateException if a {#link #t\setTrusstoreFile} was
      *         called with a non-null value
@@ -1271,6 +1314,9 @@ public abstract class CertManager {
 				ews.modifyServerSetup();
 				if (ews.serverRunning()) {
 				    ews.stop(stopDelay);
+				    if (runWhileStopped != null) {
+					runWhileStopped.run();
+				    }
 				    ews.start();
 				}
 			    }
@@ -1363,9 +1409,6 @@ public abstract class CertManager {
 	}
     }
 }
-
-
-
 
 //  LocalWords:  exbundle EmbeddedWebServer SSLSetup HTTPS setDomain
 //  LocalWords:  CertManager newInstance setCertName setEmail SSL TLS

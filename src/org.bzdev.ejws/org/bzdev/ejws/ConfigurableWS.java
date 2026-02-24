@@ -877,7 +877,7 @@ public class ConfigurableWS {
 	    allowedNames.addAll(additionalPropertyNames);
 	}
 
-	TreeSet allowedKeys =new TreeSet<>(standardKeys);
+	TreeSet<String> allowedKeys =new TreeSet<>(standardKeys);
 	if (additionalKeys != null) {
 	    allowedKeys.addAll(additionalKeys);
 	}

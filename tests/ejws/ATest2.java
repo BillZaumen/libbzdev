@@ -9,14 +9,14 @@ public class ATest2 {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	EjwsSecureBasicAuth auth =
-	    new EjwsSecureBasicAuth(realm);
-	System.out.println("auth mode = " + auth.getMode());
-	auth.add("foo", "foo");
-	auth.setTimeLimits(-2, 30, 45);
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
+	EjwsSecureBasicAuth auth =
+	    new EjwsSecureBasicAuth(ews, realm);
+	System.out.println("auth mode = " + auth.getMode());
+	auth.setTimeLimits(-2, 30, 45);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
+	auth.add("foo", "foo");
 	ews.add("/top/", DirWebMap.class,
 		new File("../../BUILD/api/factories-api/"), null,
 		true, true, true);

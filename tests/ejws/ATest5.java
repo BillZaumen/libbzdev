@@ -9,14 +9,14 @@ public class ATest5 {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	EjwsBasicAuthenticator auth =
-	    new EjwsBasicAuthenticator(realm);
-	auth.add("foo", "foo");
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
+	EjwsBasicAuthenticator auth =
+	    new EjwsBasicAuthenticator(ews, realm);
 	ews.add("/",
 		RedirectWebMap.class, new URL("https://www.sfgate.com"),
 		auth,
 		true, true, true);
+	auth.add("foo", "foo");
 	ews.setTracer("/", System.out);
 	ews.start();
     }

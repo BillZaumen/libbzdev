@@ -74,6 +74,10 @@ public class FileHandler implements HttpHandler {
 
     // public  WebMap getMap() {return map;}
 
+    // Used by a couple of EmbeddedWebServer methods.
+    WebMap getWebMap(){return map;}
+
+
     static int indexcntr = 0;
     static class MIMEAcceptor {
 	static String errorMsg(String key, Object... args) {
@@ -612,7 +616,7 @@ public class FileHandler implements HttpHandler {
 
     /**
      * Constructor specifying a WebMap's class and using defaults for flags.
-     * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
+     * @param protocol the protocol used by the HTTP server - http or https
      * @param root argument used to initialize an instance of
      *        <code>clasz</code>.
      * @param clasz the subclass of WebMap to use for locating resources
@@ -630,7 +634,7 @@ public class FileHandler implements HttpHandler {
 
     /**
      * Constructor specifying a WebMap's class.
-     * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
+     * @param protocol the protocol used by the HTTP server - http or https
      * @param root argument used to initialize an instance of
      *        <code>clasz</code>.
      * @param clasz the subclass of WebMap to use for locating resources
@@ -677,14 +681,14 @@ public class FileHandler implements HttpHandler {
 	    } catch (ParserConfigurationException pce) {
 		throw new UnexpectedExceptionError(pce);
 	    }
-
 	}
+	map.setFileHandler(this);
     }
 
     /**
      * Constructor specifying a WebMap's class name and using defaults for
      * flags.
-     * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
+     * @param protocol the protocol used by the HTTP server - http or https
      * @param root argument used to initialize an instance of
      *        <code>clasz</code>.
      * @param className the name of a subclass of WebMap, an instance of
@@ -703,7 +707,7 @@ public class FileHandler implements HttpHandler {
 
     /**
      * Constructor specifying a WebMap's class name.
-     * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
+     * @param protocol the protocol used by the HTTP server - http or https
      * @param root argument used to initialize an instance of
      *        <code>clasz</code>.
      * @param className the name of a subclass of WebMap, an instance of
@@ -751,13 +755,14 @@ public class FileHandler implements HttpHandler {
 		throw new UnexpectedExceptionError(pce);
 	    }
 	}
+	map.setFileHandler(this);
     }
 
     /**
      * Constructor using a previously created WebMap.
      * The WebMap provided will not be cloned, and may be modified, so
-     * it should not be used with another FileHandler constructor.
-     * @param protocol the protocol used by the HTTP server - HTTP or HTTPS
+     * it should not be used with another FileHandler's constructor.
+     * @param protocol the protocol used by the HTTP server - http or https
      * @param webmap a subclass of WebMap, which will be used to map
      *        paths to resources.
      * @param nowebxml true if a web.xml file should be ignored;
@@ -798,6 +803,7 @@ public class FileHandler implements HttpHandler {
 	if (info != null) {
 	    parser.parse(is, location, map);
 	}
+	map.setFileHandler(this);
     }
 
     int pendingCount = 0;
@@ -1031,10 +1037,9 @@ public class FileHandler implements HttpHandler {
 		adjustPendingCount(1);
 		String query = uri.getRawQuery();
 		if (query == null || map.allowsQuery()) {
-		    // System.out.println("query null or allowed");
 		    String base = /*"/"*/t.getHttpContext().getPath();
 		    String base1 = (base.endsWith("/"))? base: (base + "/");
-
+		    // System.out.println("query null or allowed");
 		    if (loginAlias != null && path.equals(base1 + loginAlias)) {
 			String location = (loginTarget != null)?
 			    uri.resolve(base1 + loginTarget).toString():

@@ -29,63 +29,66 @@ public class SecureBasicTest {
 	Certificate kcert = ks.getCertificate("key");
 	PublicKey key2 = kcert.getPublicKey();
 	System.out.println("key2.getAlgorithm() = " + key2.getAlgorithm());
+	Certificate[] chain = ks.getCertificateChain("key");
+	System.out.println("chain.length = " + chain.length);
     }
 
     public static void initialTest() throws Exception {
 
 	SecureBasicUtilities ops = new SecureBasicUtilities();
 	String thepw = "testPassword";
+	Certificate[] nullcert = null;
 
-	char[] password = ops.createPassword(null, thepw.toCharArray());
+	char[] password = ops.createPassword(nullcert, thepw.toCharArray());
 	byte[] sigarray = ops.decodePassword(password);
 
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 	String passwordStr = new String(password);
 	sigarray = ops.decodePassword(passwordStr);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 
 	byte[] pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 
 	// passwordStr = ":foo:" + passwordStr;
 	sigarray = ops.decodePassword(passwordStr);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 	// if (ops.isLogout(passwordStr)) throw new Exception();
 
 	password = passwordStr.toCharArray();
 	sigarray = ops.decodePassword(password);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 
 	pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 
 	sigarray = ops.decodePassword(passwordStr);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 	password = passwordStr.toCharArray();
 	sigarray = ops.decodePassword(password);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
 
 	pwBytes = passwordStr.getBytes("utf-8");
 	sigarray = ops.decodePassword(pwBytes);
-	if (!ops.checkPassword(sigarray, null, thepw)) {
+	if (!ops.checkPassword(sigarray, nullcert, thepw)) {
 	    throw new Exception();
 	}
     }
@@ -313,8 +316,8 @@ public class SecureBasicTest {
 	URLConnection urlc = url.openConnection();
 	urlc.connect();
 	if (urlc instanceof HttpsURLConnection) {
-	    Certificate cert = ((HttpsURLConnection) urlc)
-		.getServerCertificates()[0];
+	    Certificate[] cert = ((HttpsURLConnection) urlc)
+		.getServerCertificates();
 	    String  password = new
 		String(ops1.createPassword(cert, "password".toCharArray()));
 	    System.out.println("password = " + password);
@@ -323,6 +326,14 @@ public class SecureBasicTest {
 	    int tdiff = SecureBasicUtilities.getTimeDiff(sigbytes);
 	    boolean status = ops2.checkPassword(sigbytes, cert, "password");
 	    System.out.println("tdiff = " + tdiff +",  status = " + status);
+	    Certificate[] certs = ((HttpsURLConnection) urlc)
+		.getServerCertificates();
+	    password = new
+		String(ops1.createPassword(certs, "password".toCharArray()));
+	    sigbytes = SecureBasicUtilities.decodePassword(password);
+	    status = ops2.checkPassword(sigbytes, certs, "password");
+	    System.out.println("status = " + status);
+
 	}
     }
 }

@@ -30,10 +30,12 @@ public class ATest7 {
 			      .truststore(new FileInputStream
 					  ("thelio-ts.jks")));
 
-	    Certificate[] certs = ews.getCertificates();
-	    System.out.println("Number of certificates = " + certs.length);
+	    Certificate[] certs[] = ews.getCertificates();
+	    System.out.println("Number of certificates = " + certs[0].length);
 
-	    EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm, certs);
+	    EjwsSecureBasicAuth auth = new
+		EjwsSecureBasicAuth(ews, realm,
+				    EjwsSecureBasicAuth.getMode(certs));
 
 	    File dir = new File(argv[0]);
 
@@ -60,6 +62,7 @@ public class ATest7 {
 		};
 
 	    cpe.loadFile(sblFile);
+	    ews.add("/", DirWebMap.class, dir, auth, true, true, true);
 	    Properties props = cpe.getDecodedProperties();
 	    String user = props.getProperty(key + ".user");
 	    String password = props.getProperty(key + ".password");
@@ -67,7 +70,6 @@ public class ATest7 {
 	    auth.add(user, publicKeyPem, password);
 	    // auth.setTracer(System.out);
 
-	    ews.add("/", DirWebMap.class, dir, auth, true, true, true);
 	WebMap webmap = ews.getWebMap("/");
 	webmap.addWelcome("/index.html");
 

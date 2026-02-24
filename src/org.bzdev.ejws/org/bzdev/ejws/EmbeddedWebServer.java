@@ -52,8 +52,9 @@ import org.xml.sax.SAXException;
  * be started, stopped, or shut down.  The EmbeddedWebServer
  * constructors provide
  * <UL>
- *  <LI> an optional IP address (the default is the wildcard address)
- *  <LI> a TCP port number.
+ *  <LI> an optional IP address (the default is the wildcard address).
+ *  <LI> a TCP port number (for example, 80 or 8080 for HTTP, and
+ *       443 or 8443 for HTTPS).
  *  <LI> a TCP backlog.
  *  <LI> the number of threads the server may use to handle requests. The
  *       server uses a fixed thread pool because embedded web servers are
@@ -84,6 +85,16 @@ import org.xml.sax.SAXException;
  *       keystore and a trust store (which is not needed if the
  *       certificate was signed by a certificate authority).
  * </UL>
+ * <P>
+ *  An example of a constructor for HTTPS is
+ *       <BLOCKQUOTE><PRE><CODE>
+ *  InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8443);
+ *  EmbeddedWebServer ews = new
+ *      EmbeddedWebServer(saddr.getAddress(), 8443, 48, 10,
+ *                        new EmbeddedWebServer.SSLSetup("TLS")
+ *                        .keystore(new FileInputStream("ks.jks"))
+ *                        .truststore(new FileInputStream("ts.jks")));
+ *       </CODE></PRE></BLOCKQUOTE>
  * <P>
  * After an EmbeddedWebServer is constructed, handlers for HTTP
  * requests have to be added to the server.  This is done by creating
@@ -123,7 +134,6 @@ import org.xml.sax.SAXException;
  * type of WebMap.  For those in the BZDev package, these arguments are as
  * follows:
  * <UL>
-
  *   <LI>for the class <code>org.bzdev.ejws.maps.DirWebMap</code>, the
  *       argument used to create the web map is a {@link java.io.File}
  *       representing a directory.  The file handler will look for a
@@ -318,7 +328,21 @@ public class EmbeddedWebServer {
      * {@link HttpsConfigurator} and this interface can be used to
      * implement its {@link HttpsConfigurator#configure(HttpsParameters)}
      * method.
+     * <P>
+     * Typically, an implementation of the {@link Configurator#configure}
+     * method  will contain the statement
+     * <BLOCKQUOTE><PRE><CODE>
+     * SSLParameters sslparam = context.getDefaultSSLParameters();
+     * </CODE></PRE></BLOCKQUOTE>
+     * The SSL parameters <CODE>sslparam</CODE>will be modified as desired
+     * and finally the method will call
+     * <BLOCKQUOTE><PRE><CODE>
+     * params.setSSLParameters(sslparam)
+     * </CODE></PRE></BLOCKQUOTE>
+     * The configuration can be changed for individual clients.
+     * <P>
      * @see EmbeddedWebServer.SSLSetup
+     * @see com.sun.net.httpserver.HttpsConfigurator
      */
     @FunctionalInterface
     public static interface Configurator {
@@ -350,7 +374,7 @@ public class EmbeddedWebServer {
      */
     public static class SSLSetup {
 	private static final char[] defaultpw = "changeit".toCharArray();
-	String protocol = "SSL";
+	String protocol = "TLS";
 	InputStream ksis = null;
 	char[] kspw = defaultpw;
 	char[] kepw = defaultpw;
@@ -360,12 +384,16 @@ public class EmbeddedWebServer {
 	Configurator configurator = (sslContext, HttpsParams) ->{};
 
 	/**
-	 * Constructor using a default protocol.
+	 * Constructor using a default protocol (TLS).
 	 */
 	public SSLSetup() {}
 
 	/**
-	 * Constructor
+	 * Constructor.
+	 * Possible secure-socket protocols are currently SSL,
+	 * SSLv2, SSLv3, TLS, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3,
+	 * DTLS, DTLSv1.0, or DTLSv1.2 as described in the
+	 * <A HREF="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms">Java API documentation</A>.
 	 * @param protocol the secure-socket protocol (for example,
 	 *        "SSL" or "TSL")
 	 */
@@ -403,7 +431,7 @@ public class EmbeddedWebServer {
 	 * Provide trust managers.
 	 * @param tms the trust managers; null too cancel
 	 * @return this object
-	 * @throws IllegalStateException if a {#link #trusstore} was
+	 * @throws IllegalStateException if {@link #truststore} was
 	 *         called with a non-null value
 	 * @see #truststore(InputStream)
 	 */
@@ -417,31 +445,34 @@ public class EmbeddedWebServer {
 
 	/**
 	 * Provide a password for modifying/reading a keystore
-	 * @param pw the password (as a char array)
+	 * @param pw the password (as a char array); null for the
+	 *        default ("changeit");
 	 * @return this object
 	 */
 	public SSLSetup keystorePassword(char[] pw) {
-	    this.kspw = pw;
+	    this.kspw = (pw == null)? defaultpw: pw;
 	    return this;
 	}
 
 	/**
 	 * Provide a password for using a key in the keystore
-	 * @param pw the password (as a char array)
+	 * @param pw the password (as a char array); null for the
+	 *        default ("changeit");
 	 * @return this object
 	 */
 	public SSLSetup keyPassword(char[] pw) {
-	    this.kepw  = pw;
+	    this.kepw  = (pw == null)? defaultpw: pw;
 	    return this;
 	}
 
 	/**
 	 * Provide a password for modifying/reading a truststore
-	 * @param pw the password (as a char array)
+	 * @param pw the password (as a char array); null for the
+	 *        default ("changeit");
 	 * @return this object
 	 */
 	public SSLSetup truststorePassword(char[] pw) {
-	    this.tspw = pw;
+	    this.tspw = (pw == null)? defaultpw: pw;
 	    return this;
 	}
 
@@ -469,39 +500,60 @@ public class EmbeddedWebServer {
 
     KeyStore ksForCerts = null;
 
-    private Certificate[] getCertificatesAux()
+    /**
+     * Get the aliases for this server's keystore.
+     * A null value indicates either a misconfiguration or that
+     * the server does not use SSL.
+     * @return the aliases; null if a keystore does not exist
+     * @throws KeyStoreException if a keystore error occurred
+     */
+    public Set<String> getAliases() throws KeyStoreException {
+	if (ksForCerts == null) {
+	    return null;
+	}
+	Set<String>result = new TreeSet<>();
+	Iterator<String> aliases = ksForCerts.aliases().asIterator();
+	while (aliases.hasNext()) {
+	    String alias = aliases.next();
+	    if (ksForCerts.isKeyEntry(alias)) {
+		result.add(alias);
+	    }
+	}
+	return result;
+    }
+
+    private Certificate[][] getCertificatesAux()
 	throws KeyStoreException
     {
 	Iterator<String> aliases = ksForCerts.aliases().asIterator();
-	ArrayList<Certificate> alist = new ArrayList<>();
+	ArrayList<Certificate[]> alist = new ArrayList<>();
 	while (aliases.hasNext()) {
 	    String alias = aliases.next();
 	    try {
 		if (ksForCerts.isKeyEntry(alias)) {
-		    Certificate cert = ksForCerts.getCertificate(alias);
+		    Certificate[] cert = ksForCerts.getCertificateChain(alias);
 		    if (cert != null) {
 			alist.add(cert);
 		    }
 		}
 	    } catch (Exception e) {}
 	}
-	Certificate[] certificates = new Certificate[alist.size()];
+	Certificate[][] certificates = new Certificate[alist.size()][];
 	alist.toArray(certificates);
 	return certificates;
     }
 
     /**
-     * Get Certificates.
+     * Get Certificate chains.
      * This will return null for an HTTP server and an array of
-     * certificates for HTTPS.  The certificates returned will be
-     * those with private keys and any such key is assumed to be
+     * certificates for HTTPS.  The certificate chains returned will be
+     * those with private keys and any such cases are assumed to be
      * possibly used as a server certificate.
      * @param aliases the names of the aliases; no arguments for all
      *        certificates
-     * @return an array containing certificates; null if not applicable
-
+     * @return an array containing certificate chains; null if not applicable
      */
-    public Certificate[] getCertificates(String... aliases) {
+    public Certificate[][] getCertificates(String...  aliases) {
 	if (ksForCerts == null) return null;
 	if (aliases.length == 0) {
 	    try {
@@ -510,10 +562,11 @@ public class EmbeddedWebServer {
 		return null;
 	    }
 	} else {
-	    Certificate[] certificates = new Certificate[aliases.length];
+	    Certificate[][] certificates = new Certificate[aliases.length][];
 	    for (int i = 0; i < aliases.length; i++) {
 		try {
-		    certificates[i] = ksForCerts.getCertificate(aliases[i]);
+		    certificates[i] = ksForCerts
+			.getCertificateChain(aliases[i]);
 		} catch (Exception e) {
 		    certificates[i] = null;
 		}
@@ -564,7 +617,8 @@ public class EmbeddedWebServer {
 	    httpsConfigurator = new HttpsConfigurator(sslContext) {
 			public void configure(HttpsParameters params) {
 			    if (conf != null) {
-				conf.configure(sslContext, params);
+				SSLContext c = getSSLContext();
+				conf.configure(c, params);
 			    } else {
 				super.configure(params);
 			    }
@@ -898,7 +952,7 @@ public class EmbeddedWebServer {
      * @param backlog the TCP backlog (maximum number of pending connections)
      * @param nthreads the number of threads the server will use
      * @param certManager the {@link CertManager}.
-     * @throws IOException an IO Exception occurred when accessing a
+     * @throws IOException if an IO Exception occurred when accessing a
      *         key store.
      *
      */
@@ -1134,6 +1188,7 @@ public class EmbeddedWebServer {
      *                possible; false otherwise
      * @param hideWebInf true if the WEB-INF directory should be hidden;
      *                   false if it should be visible
+     * @return the WebMap that was created
      * @exception IllegalArgumentException the path is invalid or the path
      *            was already added.
      * @exception IllegalStateException the server has been shut down
@@ -1143,7 +1198,7 @@ public class EmbeddedWebServer {
      * @see WebMap
      */
 
-    public void add(String p, String className, Object arg,
+    public WebMap add(String p, String className, Object arg,
 		    com.sun.net.httpserver.Authenticator authenticator,
 		    boolean nowebxml, boolean displayDir, boolean hideWebInf)
 	throws IllegalArgumentException, IllegalStateException, IOException,
@@ -1164,6 +1219,7 @@ public class EmbeddedWebServer {
 					 arg, className, nowebxml, displayDir,
 					 hideWebInf);
 	add(p, fh, authenticator);
+	return fh.getWebMap();
 
     }
 
@@ -1194,6 +1250,7 @@ public class EmbeddedWebServer {
      *                possible; false otherwise
      * @param hideWebInf true if the WEB-INF directory should be hidden;
      *                   false if it should be visible
+     * @return the WebMap that was created
      * @exception IllegalArgumentException the path is invalid or the path
      *            was already added.
      * @exception IllegalStateException the server has been shut down
@@ -1202,7 +1259,7 @@ public class EmbeddedWebServer {
      * @exception SAXException an error occurred while parsing a web.xml file
      * @see WebMap
      */
-    public void add(String p, Class<? extends WebMap> clazz, Object arg,
+    public WebMap add(String p, Class<? extends WebMap> clazz, Object arg,
 		    com.sun.net.httpserver.Authenticator authenticator,
 		    boolean nowebxml, boolean displayDir, boolean hideWebInf)
 	throws IllegalArgumentException, IllegalStateException, IOException,
@@ -1222,6 +1279,7 @@ public class EmbeddedWebServer {
 	    FileHandler((useHTTPS?"https":"http"),
 			arg, clazz, nowebxml, displayDir, hideWebInf);
 	add(p, fh, authenticator);
+	return fh.getWebMap();
     }
 
     /**
@@ -1259,6 +1317,14 @@ public class EmbeddedWebServer {
 	} else {
 	    p = "/";
 	}
+	// This lets the subclasses of EjwsAuthenticator find its
+	// prefix and server.
+	if (authenticator != null &&
+	    authenticator instanceof EjwsAuthenticator) {
+	    EjwsAuthenticator auth = (EjwsAuthenticator)authenticator;
+	    auth.setEWSPrefix(this, p);
+	}
+
 	if (p.equals("/") && addedRootImplicitly) {
 	    server.removeContext(p);
 	    addedRootImplicitly = false;

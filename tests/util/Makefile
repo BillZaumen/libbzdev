@@ -557,11 +557,11 @@ smi: compile
 
 
 configProp: compile ../swing/config.foo
-	$(JAVA) ConfigPropTest
+	$(JAVA) ConfigPropTest $(GPGKEY)
 
 ../swing/config.foo:
 	@echo Save a configuration in the file config.foo
-	@echo (this is run in ../swing).  You will need a
+	@echo "("this is run in ../swing")".  You will need a
 	@echo GPG key.
 	(cd ../swing; make config)
 
@@ -604,6 +604,10 @@ ytest0: compile
 heap: compile
 	@echo ---- CSHTest ---
 	@$(JAVA) CSHTest
+
+cipher: compile
+	@echo ---- CipherTest ---
+	@$(JAVA) CipherTest
 
 clean:
 	rm -rf classes

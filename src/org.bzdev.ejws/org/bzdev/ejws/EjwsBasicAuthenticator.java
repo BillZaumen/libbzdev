@@ -1,31 +1,61 @@
 package org.bzdev.ejws;
 
+import java.net.InetAddress;
+import java.time.Instant;
 import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
+import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.util.SafeFormatter;
+
+
+//@exbundle org.bzdev.ejws.lpack.SecureBasicAuth
+
+
 /**
  * Implementation of BasicAuthenticator using either an in-memory table
  * of user names and passwords or a user-supplied table.
  */
-public class EjwsBasicAuthenticator extends BasicAuthenticator {
+public class EjwsBasicAuthenticator extends EjwsAuthenticator {
+
+    private static ResourceBundle exbundle = ResourceBundle.getBundle
+	("org.bzdev.ejws.lpack.SecureBasicAuth");
+
+    static String errorMsg(String key, Object... args) {
+	return (new SafeFormatter()).format(exbundle.getString(key), args)
+	    .toString();
+    }
+
+
     /**
      * User entry.
      * This object contains a user's password and roles.
      */
-    public static class Entry {
-	String pw;
-	Set<String> roles;
+    public static class Entry extends EjwsAuthenticator.Entry {
+	// roles defined by superclass
+	protected String pw;
 
 	/**
 	 * Constructor.
 	 * @param pw a password for a user
+	 */
+	public Entry(String pw) {
+	    super();
+	    this.pw = pw;
+	}
+
+
+	/**
+	 * Constructor with roles.
+	 * @param pw a password for a user
 	 * @param roles a set of roles that a user may have
 	 */
-	public Entry(String pw, Set<String>roles) {
-	    this.pw = pw; this.roles = roles;
+	public Entry(String pw, Set<String> roles) {
+	    super(roles);
+	    this.pw = pw;
 	}
 
 	/**
@@ -34,39 +64,41 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	 */
 	public String getPassword() {return pw;}
 
-	/**
-	 * Get the roles stored in this entry
-	 * @return a set of roles; null if not applicable
-	 */
-	public Set<String> getRoles(){return roles;}
-
     }
 
-    private Appendable tracer = null;
+    // private Appendable tracer = null;
 
-    /**
+    /*
      * Set an Appendable for tracing.
      * This method should be used only for debugging.
      * @param tracer the Appendable for tracing requests and responses
-     */
     public void setTracer(Appendable tracer) {
 	this.tracer = tracer;
     }
+     */
 
     private String loginPath = null;
     private boolean loginPathUsed = true;
-    BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
+    private boolean loginRequired = false;
+    // BiConsumer<EjwsPrincipal,HttpExchange> loginFunction = null;
 
 
 
     private String logoutPath = null;
     private boolean logoutPathUsed = true;
-    private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
+    // private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
 
-    private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
+    // private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
+
+    ThreadLocal<InetAddress> addr = new ThreadLocal<>();
+    // used when loginRequired is true
+    private ThreadLocal<Boolean> foundLoginTL = new ThreadLocal<>();
+    private ThreadLocal<Integer> flCode = new ThreadLocal<>();
+    private ThreadLocal<Boolean> foundLogoutTL = new ThreadLocal<>();
+    private ThreadLocal<String> usernameTL = new ThreadLocal<>();
 
 
-    /**
+    /*
      * Set the login function.
      * This function will be called using the current HttpExchange
      * when a login is (a) successful and (b) the function is not null.
@@ -82,14 +114,14 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      * @see FileHandler#setLoginAlias(String)
      * @see FileHandler#setLoginAlias(String,String)
      * @see FileHandler#setLoginAlias(String,URI)
-     */
     public void setLoginFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	loginFunction = function;
     }
+     */
 
-    /**
+    /*
      * Set the authorized function.
      * This function will be called when a request is authorized.
      * Its arguments are a principal and the HTTP exchange. The
@@ -97,14 +129,14 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
      * @param function the 'authorized' function.
-     */
     public void setAuthorizedFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	authFunction = function;
     }
+     */
 
-    /**
+    /*
      * Set the logout function.
      * This function will be called using the current HttpExchange
      * when a logout is (a) successful and (b) the function is not null.
@@ -119,21 +151,62 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      * authorized functions will be called.
      * @param function the function; null to disable
      * @see FileHandler#setLogoutAlias(String,URI)
-     */
     public void setLogoutFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	logoutFunction = function;
     }
+     */
 
-    Map<String,Entry>map = null;
+    private Map<String,Entry> map = null;
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public byte[] getSBL(String user) {
+	Entry entry = map.get(user);
+	if (entry == null) return null;
+	return entry.getSBL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSBLCompressed(String user) {
+	Entry entry = map.get(user);
+	if (entry == null) return false;
+	return entry.isSBLCompressed();
+    }
+
+    // How long to use a verified password
+    private int passphraseTimeout = 1200;
+    /**
+     * Set the time limit for a passphrase/password.
+     * <P>
+     * @param passphraseTimeout the time interval in seconds for which a
+     *        password is valid (the default is 1200); 0 to disable the
+     *        timeout
+     * @throws IllegalArgumentException if the argument is less than
+     *         zero.
+     */
+    public void setTimeLimit(int passphraseTimeout)
+	throws IllegalArgumentException
+    {
+	if (passphraseTimeout < 0) {
+	    String msg =
+		errorMsg("negativePassphraseTimeout", passphraseTimeout);
+	    throw new IllegalArgumentException(msg);
+	}
+	this.passphraseTimeout = passphraseTimeout;
+    }
 
     /**
      * Constructor.
      * @param realm the HTTP realm
      */
-    public EjwsBasicAuthenticator(String realm) {
-	this(realm, new ConcurrentHashMap<String,Entry>());
+    public EjwsBasicAuthenticator(EmbeddedWebServer ews, String realm) {
+	this(ews, realm, new ConcurrentHashMap<String,Entry>());
     }
 
     /**
@@ -146,9 +219,11 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      * @param realm the HTTP realm
      * @param map a map associating a user name with a table entry.
      */
-    public EjwsBasicAuthenticator(String realm, Map<String,Entry> map)
+    public EjwsBasicAuthenticator(EmbeddedWebServer ews,
+				  String realm,
+				  Map<String,Entry> map)
     {
-	super(realm);
+	super(ews, realm);
 	this.map = map;
     }
 
@@ -182,6 +257,17 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	map.put(username, new Entry(password, roles));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected void add (EjwsAuthenticator.UserInfo info) {
+	Entry entry = new Entry(info.getPassword(), info.getRoles());
+	entry.setSBLCompressed(info.isSBLCompressed());
+	entry.setSBL(info.getSBL());
+	map.put(info.getUserName(), entry);
+    }
+
+
     FileHandler fileHandler = null;
 
     @Override
@@ -209,6 +295,7 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 		    String root = t.getHttpContext().getPath();
 		    if (!root.endsWith("/")) root = root + "/";
 		    loginPath = root + alias;
+		    loginRequired = fileHandler.isLoginRequired();
 		} else {
 		    loginPathUsed = false;
 		}
@@ -220,6 +307,10 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	if (loginPathUsed
 	    && t.getRequestURI().getPath().equals(loginPath)) {
 	    foundLogin = true;
+	}
+	if (loginRequired) {
+	    foundLoginTL.set(foundLogin);
+	    flCode.set(0);
 	}
 
 	if (logoutPathUsed && logoutPath == null) {
@@ -242,6 +333,10 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	if (logoutPathUsed
 	    && t.getRequestURI().getPath().equals(logoutPath)) {
 	    foundLogout = true;
+	}
+
+	if (loginRequired) {
+	    foundLogoutTL.set(foundLogout);
 	}
 
 	/*
@@ -269,6 +364,8 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	    System.out.println("--------------------");
 	}
 	*/
+	InetAddress iaddr = t.getRemoteAddress().getAddress();
+	addr.set(iaddr);
 	Authenticator.Result result = super.authenticate(t);
 	if (result instanceof Authenticator.Success) {
 	    HttpPrincipal p = ((Authenticator.Success)result).getPrincipal();
@@ -283,8 +380,12 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	    p = new EjwsPrincipal(p, map.get(un).roles);
 	    if (foundLogin && loginFunction != null) {
 		loginFunction.accept((EjwsPrincipal)p, t);
-	    } else if (foundLogout && logoutFunction != null) {
-		logoutFunction.accept((EjwsPrincipal)p, t);
+	    } else if (foundLogout) {
+		if (logoutFunction != null) {
+		    logoutFunction.accept((EjwsPrincipal)p, t);
+		}
+		PWInfoKey key = new PWInfoKey(un, iaddr);
+		pwmap.remove(key);
 	    } else if (!foundLogin && !foundLogout && authFunction != null) {
 		authFunction.accept((EjwsPrincipal)p, t);
 	    }
@@ -296,7 +397,112 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 		    tracer.append("(" + ct + ") authentication failed\n");
 		} catch (IOException e) {}
 	    }
+	    if (loginRequired) {
+		int code = flCode.get();
+		if (code != 0) {
+		    if (code == 307) {
+			String proto = t.getProtocol().toUpperCase();
+			code = ((proto.startsWith("HTTP") &&
+				 proto.endsWith("/1.0")))?
+			    302: 307;
+			t.getResponseHeaders().set("Location",
+						   fileHandler.getLogoutURI()
+						   .toASCIIString());
+			String un = usernameTL.get();
+			EjwsPrincipal p = new EjwsPrincipal(un,
+							    realm,
+							    map.get(un).roles);
+			if (logoutFunction != null) {
+			    logoutFunction.accept(p, null);
+			}
+		    }
+		    return new Authenticator.Failure(code);
+		}
+	    }
 	    return result;
+	}
+    }
+
+    private static class PWInfoKey
+    {
+	String username;
+	InetAddress address; // user's IP address
+	public PWInfoKey(String username, InetAddress address) {
+	    this.username = username;
+	    this.address = address;
+	}
+	@Override
+	public boolean equals(Object o) {
+	    if (o instanceof PWInfoKey) {
+		PWInfoKey obj = (PWInfoKey)o;
+		return username.equals(obj.username)
+		    && address.equals(obj.address);
+	    }
+	    return false;
+	}
+
+	@Override
+	public int hashCode() {
+	    int hashcode = 1;
+	    hashcode = 127*hashcode +
+		((username == null)? 0: username.hashCode());
+	    hashcode = 127*hashcode
+		+ ((address == null)? 0: address.hashCode());
+	    return hashcode;
+	}
+    }
+
+
+    private static class PWInfo {
+	long expires;
+	// InetAddress addr;		// client IP address
+	String password;
+	public PWInfo(long time, /*InetAddress addr,*/ String pw) {
+	    expires = time;
+	    password = pw;
+	    // this.addr = addr;
+	}
+    }
+
+    private Map<PWInfoKey,PWInfo> pwmap = new ConcurrentHashMap<>();
+
+    private long TOFFSET = 30*60;
+
+
+    /**
+     * Get the mode.
+     * @return SecureBasicUtilities.Mode.PASSWORD
+     */
+    public SecureBasicUtilities.Mode getMode() {
+	return SecureBasicUtilities.Mode.PASSWORD;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void proposeMode(EmbeddedWebServer server)
+	throws IllegalStateException
+    {}
+
+    /**
+     * Remove cached passwords whose timeout has expired.
+     * The method can be called periodically to eliminate passwords
+     * when a user has not explicitly logged out.
+     */
+    public void prune() {
+	long now = Instant.now().getEpochSecond();
+	Iterator<Map.Entry<PWInfoKey,PWInfo>> it = pwmap.entrySet().iterator();
+	while (it.hasNext()) {
+	    Map.Entry<PWInfoKey,PWInfo> info = it.next();
+	    if (info.getValue().expires < now - TOFFSET) {
+		String un = info.getKey().username;
+		it.remove();
+		EjwsPrincipal p = new EjwsPrincipal(un, realm,
+						    map.get(un).roles);
+		if (logoutFunction != null) {
+		    logoutFunction.accept(p, null);
+		}
+	    }
 	}
     }
 
@@ -309,6 +515,51 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
      */
     @Override
     public boolean checkCredentials(String username, String password) {
+	long now = Instant.now().getEpochSecond();
+	InetAddress iaddr = addr.get();
+	PWInfoKey key = new PWInfoKey(username, iaddr);
+	PWInfo pwinfo = pwmap.get(key);
+	// pwinfo is always null when passphraseTimeout is zero
+	if (pwinfo != null) {
+	    if ((pwinfo.expires - now) >= 0) {
+		if (pwinfo.password.equals(password)) {
+		    pwinfo.expires = passphraseTimeout + now;
+		    if (tracer != null) {
+			String ct = "" + Thread.currentThread().getId();
+			try {
+			    tracer.append("(" + ct + ") ... authentication "
+					  + "cache hit found\n");
+			} catch (IOException e){}
+		    }
+		    return true;
+		}
+	    } else {
+		if (pwinfo.password.equals(password)) {
+		    pwmap.remove(key);
+		    if (tracer != null) {
+			String ct = "" + Thread.currentThread().getId();
+			try {
+			    tracer.append("(" + ct + ") ... authentication "
+					  + "extended timeout expired\n");
+			} catch (IOException e){}
+		    }
+		    if (loginRequired) {
+			// the login timed out, so send the user
+			// to the login page.
+			flCode.set(307);
+			usernameTL.set(username);
+		    }
+		    return false;
+		}
+	    }
+	} else if (loginRequired) {
+	    boolean foundLogin = foundLoginTL.get();
+	    boolean foundLogout = foundLogoutTL.get();
+	    if (!foundLogin && !foundLogout) {
+		flCode.set(403);
+		return false;
+	    }
+	}
 	Entry entry = map.get(username);
 	if (entry == null) {
 	    if (tracer != null) {
@@ -320,12 +571,22 @@ public class EjwsBasicAuthenticator extends BasicAuthenticator {
 	    }
 	    return false;
 	}
-	return password.equals(entry.pw);
+	boolean result = password.equals(entry.pw);
+	if (result == true && passphraseTimeout > 0) {
+	    pwmap.put(key, new PWInfo(now + passphraseTimeout,
+				      password));
+	}
+	return result;
     }
 }
 
 //  LocalWords:  BasicAuthenticator username Appendable getFirst UTF
 //  LocalWords:  authenticator's getRequestHeaders hdr keySet pw URI
 //  LocalWords:  HttpExchange EjwsPrincipal FileHandler setLoginAlias
-//  LocalWords:  setLogoutAlias authenticator
-//  LocalWords:  UnsupportedOperationException
+//  LocalWords:  setLogoutAlias authenticator exbundle superclass
+//  LocalWords:  UnsupportedOperationException setTracer BiConsumer
+//  LocalWords:  loginFunction logoutFunction authFunction addr
+//  LocalWords:  loginRequired setLoginFunction setAuthorizedFunction
+//  LocalWords:  setLogoutFunction passphraseTimeout InetAddress
+//  LocalWords:  IllegalArgumentException negativePassphraseTimeout
+//  LocalWords:  pwinfo

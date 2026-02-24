@@ -188,6 +188,10 @@ public class ACTest {
 
 
 	patterns = new String[] {"foo", "fo"};
+	ArrayList<String> alist = new ArrayList<>();
+	alist.add("foo");
+	alist.add("fo");
+
 	test(patterns, "");
 	test(patterns, "fo");
 	test(patterns, "foo");
@@ -198,6 +202,8 @@ public class ACTest {
 	test(patterns, "x");
 	test(patterns, "xxx");
 	test(patterns, "xxxx");
+
+
 
 	matcher = new ACMatcher("foo", "fo");
 	test(matcher, "");
@@ -212,6 +218,18 @@ public class ACTest {
 	test(matcher, "xxxx");
 
 	matcher = new ACMatcher((s) -> {return s;}, patterns);
+	test(matcher, "");
+	test(matcher, "fo");
+	test(matcher, "foo");
+	test(matcher, "foob");
+	test(matcher, "fobo");
+	test(matcher, "xfoo");
+	test(matcher, "xfo");
+	test(matcher, "x");
+	test(matcher, "xxx");
+	test(matcher, "xxxx");
+
+	matcher = new ACMatcher((s) -> {return s;}, alist);
 	test(matcher, "");
 	test(matcher, "fo");
 	test(matcher, "foo");

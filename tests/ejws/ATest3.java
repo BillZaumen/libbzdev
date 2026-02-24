@@ -11,15 +11,15 @@ public class ATest3 {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm);
-	System.out.println("auth mode = " + auth.getMode());
 	String publicKeyPem = Files.readString(Paths.get(argv[0]));
 	System.out.println(publicKeyPem);
-
-	auth.add("foo", publicKeyPem, "foo");
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
+	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, realm);
+	System.out.println("auth mode = " + auth.getMode());
+
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
+	auth.add("foo", publicKeyPem, "foo");
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html"/*, 10*/);
 	handler.setLogoutAlias("logout.html",

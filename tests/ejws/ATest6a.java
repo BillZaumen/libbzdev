@@ -29,43 +29,43 @@ public class ATest6a {
 			      .truststore(new FileInputStream
 					  ("thelio-ts2.jks")));
 
-	    Certificate[] certs = ews.getCertificates();
-	    System.out.println("Number of certificates = " + certs.length);
+	Certificate[][] certs = ews.getCertificates();
+	System.out.println("Number of certificates = " + certs[0].length);
 
-	    EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm, certs);
+	EjwsSecureBasicAuth auth = new
+	    EjwsSecureBasicAuth(ews, realm,
+				EjwsSecureBasicAuth.getMode(certs));
 
 	    // We want to make it easy for the time limit to expire
-	    auth.setTimeLimits(-2 , 30, 45);
-	    System.out.println("auth mode = " + auth.getMode());
+	auth.setTimeLimits(-2 , 30, 45);
+	System.out.println("auth mode = " + auth.getMode());
 
-	    ConfigPropertyEditor cpe = new ConfigPropertyEditor() {
-		    @Override
-		    protected String errorTitle()
-		    {return "";}
-		    @Override
-		    protected String configTitle() {return "";}
-		    @Override
-		    protected String mediaType() {
-			return "application/vnd.bzdev.sblauncher";
-		    }
-		    @Override
-		    protected String extensionFilterTitle() {
-			return ("extensionFilterTitle");
-		    }
-		    @Override
-		    protected String extension() {return "sbl";}
-		};
-
-	    cpe.loadFile(sblFile);
-	    Properties props = cpe.getDecodedProperties();
-	    String user = props.getProperty(key + ".user");
-	    String password = props.getProperty(key + ".password");
-	    String publicKeyPem = props.getProperty("keypair.publicKey");
-	    auth.add(user, publicKeyPem, password);
-	    auth.setTracer(System.out);
-
+	ConfigPropertyEditor cpe = new ConfigPropertyEditor() {
+		@Override
+		protected String errorTitle()
+		{return "";}
+		@Override
+		protected String configTitle() {return "";}
+		@Override
+		protected String mediaType() {
+		    return "application/vnd.bzdev.sblauncher";
+		}
+		@Override
+		protected String extensionFilterTitle() {
+		    return ("extensionFilterTitle");
+		}
+		@Override
+		protected String extension() {return "sbl";}
+	    };
+	cpe.loadFile(sblFile);
+	Properties props = cpe.getDecodedProperties();
+	String user = props.getProperty(key + ".user");
+	String password = props.getProperty(key + ".password");
+	String publicKeyPem = props.getProperty("keypair.publicKey");
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
+	auth.add(user, publicKeyPem, password);
+	auth.setTracer(System.out);
 
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html", "", true);

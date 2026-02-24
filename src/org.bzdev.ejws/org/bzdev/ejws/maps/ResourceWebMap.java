@@ -33,9 +33,9 @@ public class ResourceWebMap extends WebMap implements WebMap.ColorSpec {
     }
 
     /**
-     * DirWebMap configurator.
+     * ResourceWebMap configurator.
      * An instance of this object can be used as the argument
-     * for a {@link DirWebMap}'s constructor.
+     * for a {@link ResourceWebMap}'s constructor.
      */
     public static class Config {
 	String root;

@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.filechooser.*;
-import org.bzdev.net.SSLUtilities;
+import java.security.SecureRandom;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.HashSet;
@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.net.SSLUtilities;
 import org.bzdev.swing.ConfigPropertyEditor;
 import org.bzdev.swing.DarkmodeMonitor;
 import org.bzdev.swing.FileNameCellEditor;
 import org.bzdev.swing.SimpleConsole;
 import org.bzdev.swing.SwingErrorMessage;
+import org.bzdev.util.ConfigPropUtilities;
 import org.bzdev.util.SafeFormatter;
 
 //@exbundle org.bzdev.bin.sbl.lpack.SBL
@@ -140,20 +142,38 @@ public class SBL {
 	}
     }
 
+    static SecureRandom random = new SecureRandom();
+    static String genpw() {
+	char[] pw = new char[16];
+	for (int i = 0; i < 16; i++) {
+	    char ch = (char)(random.nextInt(127 - 33) + 33);
+	    pw[i] = ch;
+	}
+	return new String(pw);
+    }
+
 
     static class ConfigEditor extends ConfigPropertyEditor {
 	public ConfigEditor() {
 	    super();
 	    addReservedKeys("title",
+			    "recipients",
 			    "base64.keypair.publicKey",
 			    "ebase64.keypair.privateKey",
 			    "trustStore.file",
 			    "ebase64.trustStore.password",
 			    "trust.selfsigned",
 			    "trust.allow.loopback");
+	    setUseGPGOnLoad("ebase64.keypair.privateKey");
 	    setDefaultProperty("trust.selfsigned", "false");
 	    setDefaultProperty("trust.allow.loopback", "false");
-	    
+	    setRecipientsKey("recipients");
+
+	    addRE("recipients", new ConfigPropertyEditor
+		  .DescribingRenderer((object) -> {
+			  return localeString("recipients");
+		  }, false),
+		  null);
 	    addRE("publicKey", new ConfigPropertyEditor
 		  .DescribingRenderer((object) -> {
 			  return localeString("aPublicKey");
@@ -213,7 +233,7 @@ public class SBL {
 	protected boolean prohibitEditing(int row, int col) {
 	    // Users should not be able to edit the public or private
 	    // keys.
-	    return col == 1 && (row == 1 || row == 2);
+	    return col == 1 && (row == 2 || row == 3);
 	}
 
     }
@@ -246,9 +266,10 @@ public class SBL {
 
     private static class Entry extends JPanel {
 	JTextField description = new JTextField(48);
+	JTextField base = new JTextField(48);
 	JTextField  uri = new JTextField(48);
 	JTextField user = new JTextField(32);
-	JTextField password = new JTextField(32);
+	// JTextField password = new JTextField(32);
 	JComboBox<String> modeCB = new JComboBox<>(modeNames);
 	public Entry() {
 	    super();
@@ -264,6 +285,17 @@ public class SBL {
 	    c.anchor = GridBagConstraints.LINE_START;
 	    gb.setConstraints(description, c);
 	    add(description);
+
+	    label = new JLabel(localeString("base") + ":");
+	    c.gridwidth = 1;
+	    c.anchor = GridBagConstraints.LINE_END;
+	    gb.setConstraints(label, c);
+	    add(label);
+	    c.gridwidth = GridBagConstraints.REMAINDER;
+	    c.anchor = GridBagConstraints.LINE_START;
+	    gb.setConstraints(base, c);
+	    add(base);
+
 	    label = new JLabel(localeString("uri") + ":");
 	    c.gridwidth = 1;
 	    c.anchor = GridBagConstraints.LINE_END;
@@ -273,6 +305,7 @@ public class SBL {
 	    c.anchor = GridBagConstraints.LINE_START;
 	    gb.setConstraints(uri, c);
 	    add(uri);
+
 	    label = new JLabel(localeString("user") + ":");
 	    c.gridwidth = 1;
 	    c.anchor = GridBagConstraints.LINE_END;
@@ -282,6 +315,7 @@ public class SBL {
 	    c.anchor = GridBagConstraints.LINE_START;
 	    gb.setConstraints(user, c);
 	    add(user);
+	    /*
 	    label = new JLabel(localeString("password") + ":");
 	    c.gridwidth = 1;
 	    c.anchor = GridBagConstraints.LINE_END;
@@ -291,6 +325,7 @@ public class SBL {
 	    c.anchor = GridBagConstraints.LINE_START;
 	    gb.setConstraints(password, c);
 	    add(password);
+	    */
 	    label = new JLabel(localeString("mode") + ":");
 	    c.gridwidth = 1;
 	    c.anchor = GridBagConstraints.LINE_END;
@@ -367,10 +402,11 @@ public class SBL {
 		    cpe.setRecipients(frame);
 		} else {
 		    cpe.setRecipients(rlist);
-		    // If we fail, ask explicitly.
+		    cpe.set(frame, "recipients",
+			    ConfigPropUtilities.encodeRecipients(rlist));
+		    // If we fail somewhere below, ask explicitly.
 		    rlist.clear();
 		}
-
 		if (cpe.set(frame, "ebase64.keypair.privateKey", keypair[0])
 		    && cpe.set(frame, "base64.keypair.publicKey",
 			       keypair[1])) {
@@ -379,6 +415,7 @@ public class SBL {
 		String s1 = errorMsg("encryptFailed");
 		String s2 = errorMsg("encryptFailedTitle");
 
+		System.out.println("sbl: got here 1");
 		int status = JOptionPane
 		    .showConfirmDialog(frame, s1, s2,
 				       JOptionPane.YES_NO_OPTION);
@@ -424,49 +461,114 @@ public class SBL {
 	    } catch (IOException eio) {
 		// System.err.println(eio.getMessage());
 		SwingErrorMessage.format("%s",eio.getMessage());
+		SwingErrorMessage.displayConsoleIfNeeded();
+		return null;
 	    } catch (GeneralSecurityException egs) {
 		// System.err.println(egs.getMessage());
 		SwingErrorMessage.format("%s",egs.getMessage());
+		SwingErrorMessage.displayConsoleIfNeeded();
+		return null;
 	    }
 	}
-	Properties props = cpe.getEncodedProperties();
-	char[]  password = props.getProperty(name + ".password")
-	    .toCharArray();
-	String uriString = props.getProperty(name + ".uri");
-	SecureBasicUtilities.Mode mode;
+	Properties props = cpe.getDecodedProperties();
+	boolean nullResult = false;
+	char[]  password = null;
+	try {
+	    Object val = props.get("ebase64." + name + ".password");
+	    if (val == null) {
+		val = props.get(name + ".password");
+	    }
+	    password = (val instanceof String)?
+		((String) val).toCharArray():
+		(char[]) val;
+	    if (password == null) {
+		SwingErrorMessage
+		    .format(errorMsg("noPassword", name + ".password"));
+		nullResult = true;
+	    }
+	} catch (Exception epw) {
+	    SwingErrorMessage.format("%s: %s", epw.getMessage(),
+				     name + ".password");
+	    nullResult = true;
+	    // SwingErrorMessage.displayConsoleIfNeeded();
+	    // return null;
+	}
+	String uriString = null;
+	try {
+	    uriString = props.getProperty(name + ".uri");
+	} catch (Exception euri) {
+	    SwingErrorMessage.format("%s: %s", euri.getMessage(),
+				     name + ".uri");
+	    nullResult = true;
+	    // SwingErrorMessage.displayConsoleIfNeeded();
+	    // return null;
+	}
+	SecureBasicUtilities.Mode mode = null;
 	try {
 	    mode = modes[Integer.valueOf(props.getProperty(name + ".mode"))];
 	} catch (Exception em) {
 	    // System.err.println(em.getMessage());
-	    SwingErrorMessage.format("%s", em.getMessage());
-	    return null;
+	    SwingErrorMessage.format("%s: %s", em.getMessage(),
+				     name + ".mode");
+	    nullResult = true;
+	    // SwingErrorMessage.displayConsoleIfNeeded();
+	    // return null;
 	}
 	URI uri = null;
+	boolean uriException = false;
 	try {
 	    uri = new URI(uriString);
 	} catch (Exception e) {
 	    // System.err.println(e.getMessage());
-	    SwingErrorMessage.format("%s", e.getMessage());
-	    return null;
+	    SwingErrorMessage.format("%s: %s", e.getMessage(),
+				     uriString);
+	    uriException = true;
+	    nullResult = true;
+	    // SwingErrorMessage.displayConsoleIfNeeded();
+	    // return null;
 	}
-	String scheme = uri.getScheme().toLowerCase();
-	String host = uri.getHost();
+	String scheme = uriException? null: uri.getScheme().toLowerCase();
+	String host = uriException? null: uri.getHost();
+	if (scheme == null || scheme.trim().length() == 0) {
+	    if (!uriException) {
+		SwingErrorMessage.format(errorMsg("noScheme"));
+		nullResult = true;
+	    }
+	}
+	if (host == null || host.trim().length() == 0) {
+	    if (!uriException) {
+		SwingErrorMessage.format(errorMsg("noHost"));
+		nullResult = true;
+	    }
+	}
 	int port = uri.getPort();
 	if (port < 0) {
-	    if (scheme.equals("http")) port = 80;
-	    else if (scheme.equals("https")) port = 443;
-	    else return null;
+	    if (scheme.equalsIgnoreCase("http")) port = 80;
+	    else if (scheme.equalsIgnoreCase("https")) port = 443;
+	    else {
+		SwingErrorMessage.format(errorMsg("unsupportedScheme", scheme));
+		nullResult = true;
+	    }
+	} else if (!(scheme.equalsIgnoreCase("http")
+		     || scheme.equalsIgnoreCase("https"))) {
+		SwingErrorMessage.format(errorMsg("unsupportedScheme", scheme));
+		nullResult = true;
 	}
 	Certificate cert = null;
+	Certificate[] chain = null;
 	if (scheme.equals("https")) {
 	    SSLSocketFactory factory = (SSLSocketFactory)
 		SSLSocketFactory.getDefault();
 	    try (SSLSocket socket = (SSLSocket)
 		 factory.createSocket(host, port)) {
 		SSLSession session = socket.getSession();
-	        Certificate[] chain = session.getPeerCertificates();
+	        chain = session.getPeerCertificates();
 	        cert =  (chain == null || chain.length == 0)? null:
 		    chain[0];
+		if (cert == null)  {
+		    nullResult = true; // SSL: must have a certificate chain
+		    SwingErrorMessage.format(errorMsg("nocert", host, port));
+		}
 	    } catch (Exception e) {
 		// System.err.println(e.getMessage());
 		SwingErrorMessage.format("%s", e.getMessage());
@@ -475,17 +577,22 @@ public class SBL {
 		    // System.err.println(ee.getMessage());
 		    SwingErrorMessage.format("... %s", ee.getMessage());
 		}
+		nullResult = true; // if SSL, there must be a certificate chain
 		cert = null;
 	    }
+	}
+	if (nullResult) {
+	    SwingErrorMessage.displayConsoleIfNeeded();
+	    return null;
 	}
 	try {
 	    // System.out.println("mode = " + mode);
 	    switch(mode) {
 	    case DIGEST:
-		password = dops.createPassword(null, password);
+		password = dops.createPassword((Certificate[])null, password);
 		break;
 	    case SIGNATURE_WITHOUT_CERT:
-		password = ops.createPassword(null, password);
+		password = ops.createPassword((Certificate[])null, password);
 		break;
 	    case SIGNATURE_WITH_CERT:
 		if (cert == null) {
@@ -494,7 +601,7 @@ public class SBL {
 		    SwingErrorMessage.displayConsoleIfNeeded();
 		    return null;
 		}
-		password = ops.createPassword(cert, password);
+		password = ops.createPassword(chain, password);
 		break;
 	    case PASSWORD:
 		return password;
@@ -504,6 +611,9 @@ public class SBL {
 	    // System.err.println(e.getMessage());
 	    SwingErrorMessage.format("%s", e.getMessage());
 	    SwingErrorMessage.displayConsoleIfNeeded();
+	    if (stacktrace) {
+		e.printStackTrace();
+	    }
 	    return null;
 	}
     }
@@ -598,6 +708,9 @@ public class SBL {
 	    // System.err.println(e.getMessage());
 	    SwingErrorMessage.format("%s", e.getMessage());
 	    SwingErrorMessage.displayConsoleIfNeeded();
+	    if (stacktrace) {
+		e.printStackTrace();
+	    }
 	    return;
 	}
     }
@@ -662,12 +775,13 @@ public class SBL {
 	}
     }
 
-
+    private static  boolean stacktrace = false;
 
     public static void main(String argv[]) throws Exception {
 
 	configDir.mkdirs();
 	System.setProperty("user.dir", configDir.getCanonicalPath());
+	System.setProperty("user.home", configDir.getCanonicalPath());
 
 	DarkmodeMonitor.setSystemPLAF();
 	DarkmodeMonitor.init();
@@ -689,20 +803,68 @@ public class SBL {
 	boolean printPublicKey = false;
 	boolean printList = false;
 	String nm = null;
+	boolean create = false;
+	String usr = null;
+	String uriS = null;
+	String baseS = null;
 	List<String> rlist = new LinkedList<String>();
+
 
 	while (indx < argv.length) {
 	    if (argv[indx].equals("--")) {
 		indx++;
 		break;
+	    } else if (argv[indx].equals("-c")
+		       || argv[indx].equals("--create")) {
+		create = true;
+	    } else if(argv[indx].equals("--user")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--user");
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		usr = argv[indx];
+	    } else if (argv[indx].equals("--uri")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--uri");
+			System.err.println("sbl: " + msg);;
+			System.exit(1);
+		}
+		uriS = argv[indx];
+	    } else if (argv[indx].equals("--base")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--base");
+			System.err.println("sbl: " + msg);;
+			System.exit(1);
+		}
+		baseS = argv[indx];
 	    } else if (argv[indx].equals("-r")) {
 		indx++;
+		if (indx == argv.length) {
+		    System.err.println("sbl: " + errorMsg("missingArg", "-r"));
+		    System.exit(1);
+		}
 		rlist.add(argv[indx]);
 	    } else if (argv[indx].equals("-f")) {
 		checkConfig = false;
 	    } else if (argv[indx].equals("-n")) {
 		indx++;
+		if (indx == argv.length) {
+		    System.err.println("sbl: " + errorMsg("missingArg", "-n"));
+		    System.exit(1);
+		}
 		nm = argv[indx];
+	    } else if (argv[indx].equals("--gpgdir")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--gpgdir");
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		cpe.setGPGDir(argv[indx]);
 	    } else if (argv[indx].equals("--print")) {
 		if (print == true) {
 		    System.err.println("sbl: " + errorMsg("multiplePrints"));
@@ -710,6 +872,11 @@ public class SBL {
 		}
 		print = true;
 		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--print");
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
 		if (argv[indx].equals("user")) {
 		    printUser = true;
 		} else if (argv[indx].equals("uri")) {
@@ -729,6 +896,8 @@ public class SBL {
 		    System.err.println("sbl: " + errorMsg("printerr", arg));
 		    System.exit(1);
 		}
+	    } else if (argv[indx].equals("--stacktrace")) {
+		stacktrace = true;
 	    } else if (argv[indx].startsWith("-")) {
 		System.err.println("sbl: " + errorMsg("badOption", argv[indx]));
 		System.exit(1);
@@ -737,23 +906,104 @@ public class SBL {
 	    }
 	    indx++;
 	}
-	/*
-	final boolean selfSigned = allowSelfSigned;
+	configFile = (argv.length-indx == 1)? new
+	    File(configDir, argv[indx]): null;
 
-	if (addTrustStore) {
-	    SSLUtilities.installTrustManager("TLS",
-					     trustStore, trustStorePW,
-					     (cert) -> {return selfSigned;});
+	if (create) {
+	    File configFile1 = (argv.length-indx == 2)?
+		new File(argv[indx]): null;
+	    File configFile2 = (argv.length-indx == 2)?
+		new File(argv[indx+1]): null;
+	    boolean json = false;
+
+	    if (configFile1 == null && configFile2 == null) {
+		json = true;
+	    } else {
+		if (configFile1 == null || configFile2 == null) {
+		    System.err.println("sbl: " + errorMsg("noConfigFile"));
+		    System.exit(1);
+		}
+		if (configFile1.exists()) {
+		    String msg =  errorMsg("existingConfigFile", argv[indx]);
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		if (configFile2.exists()) {
+		    String msg =  errorMsg("existingConfigFile", argv[indx+1]);
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+	    }
+	    boolean failed = false;
+	    if (rlist.size() == 0) {
+		System.err.println("sbl: " + errorMsg("rlistEmpty"));
+		failed = true;
+	    }
+	    if (usr == null) {
+		System.err.println("sbl: " + errorMsg("noUser"));
+		failed = true;
+	    }
+	    if (uriS == null) {
+		System.err.println("sbl: " + errorMsg("noURI"));
+		failed = true;
+	    }
+	    if (baseS == null) {
+		System.err.println("sbl: " + errorMsg("noBASE"));
+		failed = true;
+	    }
+	    String name = (nm == null)? "user": nm;
+	    int i = 0;
+	    for (char ch: name.toCharArray()) {
+		if (!((i++ == 0)?
+		      Character.isJavaIdentifierStart(ch):
+		      Character.isJavaIdentifierPart(ch))) {
+		    System.err.println("sbl: " + errorMsg("badName", name));
+		    failed = true;
+		    break;
+		}
+	    }
+	    if (failed) {
+		System.exit(1);
+	    }
+
+	    ConfigEditor cpe2  = new ConfigEditor();
+
+	    String[] keypair =
+		SecureBasicUtilities.createPEMPair(null,null);
+	    cpe2.setRecipients(rlist);
+	    cpe.set(null, "title", json? name: configFile1.getName());
+	    cpe2.set(null, "title", json? name: configFile2.getName());
+	    cpe.set(null, "base64.keypair.publicKey", keypair[1]);
+	    cpe2.set(null, "ebase64.keypair.privateKey", keypair[0]);
+	    cpe.set(null, name +".user", usr);
+	    cpe.set(null, name +".mode", "2");
+	    String pw = genpw();
+	    cpe.set(null, "base64." + name +".password", pw);
+	    cpe.set(null, name +".base", baseS);
+	    cpe.set(null, name +".uri", uriS);
+	    cpe.set(null, name +".description", "login data");
+	    cpe2.set(null, name +".user", usr);
+	    cpe2.set(null, name +".mode", "2");
+	    cpe2.set(null, "ebase64." + name +".password", pw);
+	    cpe2.set(null, name +".base", baseS);
+	    cpe2.set(null, name +".uri", uriS);
+	    cpe2.set(null, name +".description", "login data");
+
+	    if (json) {
+		System.out
+		    .format("{\"serverInfo\": %s, \"clientInfo\": \"%s\"}\n",
+			    cpe.toJSON(), cpe2.toBase64());
+	    } else {
+		cpe.save(configFile1);
+		cpe2.save(configFile2);
+	    }
+	    System.exit(0);
 	}
-	if (allowLoopback) {
-	    SSLUtilities.allowLoopbackHostname();
-	}
-	*/
-	configFile = (argv.length-indx == 1)? new File(argv[indx]): null;
 
 	if (print) {
 	    if (configFile == null) {
 		System.err.println("sbl: " + errorMsg("noConfigFile"));
+		System.exit(1);
 	    }
 	    try {
 		cpe.loadFile(configFile);
@@ -761,12 +1011,17 @@ public class SBL {
 		if (printPassword) {
 		    if (nm == null) {
 			System.err.println("sbl: " + errorMsg("noName"));
+			System.exit(1);
 		    }
-		    System.out.println(props.getProperty(nm + ".password"));
+		    Object val = props.getProperty(nm + ".password");
+		    val = (val instanceof String)? val:
+			new String((char[]) val);
+		    System.out.println(val);
 		}
 		if (printUser) {
 		    if (nm == null) {
 			System.err.println("sbl: " + errorMsg("noName"));
+			System.exit(1);
 		    }
 		    System.out.println(props.getProperty(nm + ".user"));
 		}
@@ -779,6 +1034,7 @@ public class SBL {
 		if (printDescription) {
 		    if (nm == null) {
 			System.err.println("sbl: " + errorMsg("noName"));
+			System.exit(1);
 		    }
 		    System.out.println(props
 				       .getProperty(nm + ".description"));
@@ -786,6 +1042,7 @@ public class SBL {
 		if (printMode) {
 		    if (nm == null) {
 			System.err.println("sbl: " + errorMsg("noName"));
+			System.exit(1);
 		    }
 		    int imd = Integer.valueOf(props.getProperty(nm + ".mode"));
 		    System.out.println(modes[imd] + " ("
@@ -807,6 +1064,9 @@ public class SBL {
 		System.exit(0);
 	    } catch (Exception e) {
 		System.err.println("sbl: " + e.getMessage());
+		if (stacktrace) {
+		    e.printStackTrace();
+		}
 		System.exit(1);
 	    }
 	}
@@ -873,7 +1133,6 @@ public class SBL {
 		JButton copyPWButton = new
 		    JButton(localeString("copyPWButton"));
 
-
 		if (configFile == null) {
 		    addEntryButton.setEnabled(false);
 		    editEntriesButton.setEnabled(false);
@@ -924,8 +1183,11 @@ public class SBL {
 			} catch (IOException eio) {
 			    // System.err.println(eio.getMessage());
 			    SwingErrorMessage.format("%s",  eio.getMessage());
+			    if (stacktrace) {
+				eio.printStackTrace();
+				System.exit(1);
+			    }
 			    SwingErrorMessage.displayConsoleIfNeeded();
-			    System.exit(1);
 			}
 			addEntryButton.setEnabled(true);
 			editEntriesButton.setEnabled(true);
@@ -975,6 +1237,7 @@ public class SBL {
 		    }
 		    try {
 			cpe.loadFile(configFile);
+			ops = null; // so we get a new private key
 			checkConfig = false;
 			configTrust(frame);
 			fixupEntries(selectSiteCB);
@@ -1034,12 +1297,17 @@ public class SBL {
 			    entries.add(name);
 			    cpe.set(frame, name + ".description",
 				    entry.description.getText());
+			    String base = entry.base.getText().trim();
+			    if (!base.endsWith("/")) base = base + "/";
+			    cpe.set(frame, name + ".base", base);
+			    String uri = entry.uri.getText().trim();
+			    if (uri.startsWith("/")) uri = uri.substring(1);
 			    cpe.set(frame, name + ".uri",
-				    entry.uri.getText());
+				    "$(" + name + ".base)" + uri);
 			    cpe.set(frame, name + ".user",
 				    entry.user.getText());
-			    cpe.set(frame, name + ".password",
-				    entry.password.getText());
+			    cpe.set(frame, "ebase64." +  name + ".password",
+				    new String(genpw()));
 			    int ind = entry.modeCB.getSelectedIndex();
 			    if (ind < 0) ind = 0;
 			    cpe.set(frame, name + ".mode", "" + ind);
@@ -1146,8 +1414,18 @@ public class SBL {
 		copyPWButton.addActionListener((e) -> {
 			String name = getName(selectSiteCB);
 			if (name == null) return;
-			String value = cpe.getEncodedProperties()
-			    .getProperty(name + ".password");
+			Properties dprops = cpe.getDecodedProperties();
+			Component pwowner = cpe.getPWOwner();
+			// Not known if this is ebase64 encoded so we
+			// have to explicitly set the CPE owner component
+			cpe.setPWOwner(frame);
+			Object val = dprops.getProperty(name + ".password");
+			if (val == null) {
+			    val = dprops.get("ebase64." + name + ".password");
+			}
+			cpe.setPWOwner(pwowner);
+			String value = (val instanceof String)? (String) val:
+			    new String((char[])val);
 			Clipboard cb = panel.getToolkit()
 			    .getSystemClipboard();
 			StringSelection selection = new StringSelection(value);
@@ -1188,6 +1466,9 @@ public class SBL {
 			SwingErrorMessage.displayConsoleIfNeeded();
 			StringSelection s = new StringSelection("");
 			cb.setContents(s, s);
+			if (stacktrace) {
+			    ex.printStackTrace();
+			}
 		    }
 		};
 

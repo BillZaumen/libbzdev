@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -24,6 +25,8 @@ import javax.net.ssl.SSLSession;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.util.ACMatcher;
+import org.bzdev.util.ConfigPropUtilities;
 import org.bzdev.util.SafeFormatter;
 
 //@exbundle org.bzdev.swing.lpack.AuthenticationPane
@@ -58,7 +61,7 @@ public class AuthenticationPane extends JComponent {
 
     private static SecureBasicUtilities dops = new SecureBasicUtilities();
     private static SecureBasicUtilities ops = null;
-    private static File pemFile = null;
+    private static File defaultPemFile = null;
     private static final Charset utf8 = Charset.forName("UTF-8");
 
     /**
@@ -66,6 +69,10 @@ public class AuthenticationPane extends JComponent {
      * The file's extension should be ".pem", ".pem.gpg" when
      * the file is GPG encrypted, or ".sbl" if the file was created with
      * the program <STRONG>sbl</STRONG>.
+     * <P>
+     * This can be used for simple cases where an SBL file is not available,
+     * in which case the user will have to enter a user name and password
+     * in addition to a passphrase when necessary to decrypt the private key.
      * @param pemfile a file, possibly encrypted, in PEM format containing
      *        the private key; null to remove the default private key
      * @throws IllegalArgumentException if the argument is not an
@@ -75,14 +82,14 @@ public class AuthenticationPane extends JComponent {
 	throws IllegalArgumentException
     {
 	if (pemfile == null) {
-	    pemFile = null;
+	    defaultPemFile = null;
 	    return;
 	}
 	String name = pemfile.getName().toLowerCase();
 	boolean allowedSuffix = name.endsWith(".pem")
 	    || name.endsWith(".pem.gpg") || name.endsWith(".sbl");
 	if (allowedSuffix &&  pemfile.isFile() && pemfile.canRead()) {
-	    pemFile = pemfile;
+	    defaultPemFile = pemfile;
 	} else {
 	    name = pemfile.toString();
 	    String msg = errorMsg("notPrivateKeyFile", name);
@@ -90,10 +97,218 @@ public class AuthenticationPane extends JComponent {
 	}
     }
 
-    static ConcurrentHashMap<Authenticator,File> pemMap =
-	new ConcurrentHashMap<>();
+    public static class SBLEntry {
+	String key;
+	String base;
+	File sblFile;
+	Properties props;
+	SBLEntry(String key, String base, File sblFile, Properties props) {
+	    this.key = key;
+	    this.sblFile = sblFile;
+	    this.props = props;
+	    this.base = base;
+	}
+
+	URI getURI()
+	    throws URISyntaxException
+	{
+	    return new URI(props.getProperty(key +".uri"));
+	}
+    }
+
+    public static synchronized URI getLoginURI(URI uri)
+	throws URISyntaxException
+    {
+	SBLEntry entry = getSBLEntry(uri.toASCIIString());
+	return (entry == null)? null: entry.getURI();
+    }
+
+    static synchronized File getPemFile(URL url) {
+	SBLEntry entry = getSBLEntry(url.toString());
+	System.out.println("... getPemFile found "
+			   + ((entry == null)? "null":
+			      entry.sblFile.toString()));
+	return (entry == null)? null: entry.sblFile;
+    }
+
+    static ConcurrentHashMap<String,File> baseMap = new ConcurrentHashMap<>();
+    static ArrayList<SBLEntry> sblEntries = new ArrayList<>();
+    private static Set<String>baseSet = new HashSet<>();
+    private static ACMatcher matcher = null;
+
+    private static String gpgdir = null;
 
     /**
+     * Set the GPG home directory.
+     * The parameter is the directory name used as the --homedir argument
+     * for gpg commands.
+     * @param gpgdir the GPG home directory; null for the default
+     */
+    public static void setGPGDir(String gpgdir) {
+	AuthenticationPane.gpgdir = gpgdir;
+    }
+
+    static synchronized SBLEntry getSBLEntry(String url) {
+	int ind = url.indexOf("//");
+	url = url.substring(0, ind).toLowerCase() + url.substring(ind);
+	ind = -1;
+	int max = -1;
+	for (ACMatcher.MatchResult mr: matcher.iterableOver(url)) {
+	    if (mr.getStart() == 0 && max < mr.getEnd()) {
+		max = mr.getEnd();
+		ind = mr.getIndex();
+	    }
+	}
+	return (ind < 0)? null: sblEntries.get(ind);
+    }
+
+    /**
+     * Add an SBL file given an input stream.
+     * SBL files can be created by the program sbl and store
+     * private and public keys for creating and verifying
+     * secure one-time passwords. These files include some
+     * subsidiary data including URIs for logins, etc.
+     * @param is the input stream containing the SBL file
+     * @return the first URI to visit when logging in
+     */
+    public static synchronized URI addSBLFile(InputStream is)
+	throws IOException, URISyntaxException
+    {
+	return addSBLFile(is, null);
+    }
+    /**
+     * Add an SBL file given an input stream and a key.
+     * SBL files can be created by the program sbl and store private
+     * and public keys for creating and verifying secure one-time
+     * passwords. These files include some subsidiary data including
+     * URIs for logins, etc.
+     * <P>
+     * A key is the first component of a compound key in an SBL file,
+     * excluding an initial "base64" or "ebase64". This allows
+     * multiple web sites or portions of a web site to be handled by a
+     * single SBL file.
+     * @param is the input stream containing the SBL file
+     * @param key the key
+     * @return the first URI to visit when logging in
+     */
+    public static synchronized URI addSBLFile(InputStream is, String key)
+	throws IOException, URISyntaxException
+    {
+	// need the "." in the suffix because SBL files are
+	// expected to have an "sbl" file-name extension.
+	File sblfile = File.createTempFile("apcpe", ".sbl");
+	sblfile.deleteOnExit();
+	FileOutputStream fos = new FileOutputStream(sblfile);
+	is.transferTo(fos);
+	is.close();
+	fos.close();
+	try {
+	    return addSBLFile(sblfile, key);
+	} catch (IOException e) {
+	    sblfile.delete();
+	    throw e;
+	} catch (URISyntaxException e) {
+	    sblfile.delete();
+	    throw e;
+	} catch (RuntimeException e) {
+	    sblfile.delete();
+	    throw e;
+	}
+    }
+
+    /**
+     * Add an SBL file.
+     * SBL files can be created by the program sbl and store
+     * private and public keys for creating and verifying
+     * secure one-time passwords. These files include some
+     * subsidiary data including URIs for logins, etc.
+     * @param sblfile the SBL file
+     * @return the first URI to visit when logging in
+     */
+    public static synchronized URI addSBLFile(File sblfile)
+	throws IOException, URISyntaxException
+    {
+	return addSBLFile(sblfile, null);
+    }
+
+    /**
+     * Add an SBL file with a key.
+     * SBL files can be created by the program sbl and store
+     * private and public keys for creating and verifying
+     * secure one-time passwords. These files include some
+     * subsidiary data including URIs for logins, etc.
+     * See sections 1 and 5 of the manual for a description
+     * of sbl.
+     * <P>
+     * A key is the first component of a compound key, excluding
+     * an initial "base64" or "ebase64". This allows multiple
+     * web sites or portions of a web site to be handled by a
+     * single SBL file.
+     * @param sblfile the SBL file
+     * @param key the key
+     * @return the first URI to visit when logging in
+     */
+    public static synchronized URI addSBLFile(File sblfile,
+					      String key)
+	throws IOException, URISyntaxException
+    {
+	Properties props = ConfigPropUtilities
+	    .newInstance(sblfile,"application/vnd.bzdev.sblauncher");
+	int count = 0;
+	SBLEntry entry = null;
+	boolean modSBLEntries = false;
+	for (String k: props.stringPropertyNames()) {
+	    if (k.endsWith(".description")) {
+		int lastind = k.lastIndexOf(".");
+		String key1 = k.substring(0, lastind);
+		String base = props.getProperty(key1 + ".base");
+		if (!key1.contains(".")) {
+		    if (base != null) {
+			int ind = base.indexOf("//");
+			if (ind == -1) continue;
+			base = base.substring(0, ind).toLowerCase()
+			    + base.substring(ind);
+			SBLEntry entry1 = new SBLEntry(key1, base,
+						       sblfile, props);
+			if (baseSet.contains(base)) {
+			    // so we don't add the same thing twice
+			    if (key == null || key.equals(key1)) {
+				count++;
+				if (count == 1) {
+				    entry = entry1;
+				}
+			    }
+			    continue;
+			}
+			sblEntries.add(entry1);
+			modSBLEntries = true;
+			baseSet.add(base);
+			if (key == null || key.equals(key1)) {
+			    count++;
+			    if (count == 1) {
+				entry = entry1;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	if (modSBLEntries) {
+	    matcher = new ACMatcher((ent) -> {return ent.base;}, sblEntries);
+	}
+	if (count == 1) {
+	    return new URI(entry.props.getProperty(entry.key +".uri"));
+	} else {
+	    return null;
+	}
+    }
+
+    /*
+    static ConcurrentHashMap<Authenticator,File> pemMap =
+	new ConcurrentHashMap<>();
+    */
+
+    /*
      * Set the private key for secure basic authentication for a
      * specific authenticator.
      * This method should be used when there are multiple
@@ -113,7 +328,6 @@ public class AuthenticationPane extends JComponent {
      *        authenticator-specific key
      * @throws IllegalArgumentException if the second argument is not an
      *         ordinary file, is not readable, or has the wrong extension
-   */
     public static void setPrivateKey(Authenticator authenticator,
 				     File pemfile)
     {
@@ -132,6 +346,7 @@ public class AuthenticationPane extends JComponent {
 	    }
 	}
     }
+     */
 
     private static char[] password = null;
 
@@ -263,12 +478,17 @@ public class AuthenticationPane extends JComponent {
 	String nameLC = name.toLowerCase();
 	SecureBasicUtilities ops = null;
 	if (nameLC.endsWith(".gpg")) {
-	    ProcessBuilder pb = new
-		ProcessBuilder("gpg",
-			       "--pinentry-mode", "loopback",
-			       "--passphrase-fd", "0",
-			       "--batch", "-d",
-			       pemFile.getCanonicalPath());
+	    ProcessBuilder pb = (gpgdir == null)?
+		new ProcessBuilder("gpg",
+				   "--pinentry-mode", "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d",
+				   pemFile.getCanonicalPath()):
+		new ProcessBuilder("gpg", "--homedir", gpgdir,
+				   "--pinentry-mode", "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d",
+				   pemFile.getCanonicalPath());
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    try {
 		requestPassphrase(comp);
@@ -318,11 +538,17 @@ public class AuthenticationPane extends JComponent {
 		// Need to use --batch, etc. because when this runs in
 		// a dialog box, we don't have access to a terminal and
 		// GPG agent won't ask for a passphrase.
-		ProcessBuilder pb = new ProcessBuilder("gpg",
-						       "--pinentry-mode",
-						       "loopback",
-						       "--passphrase-fd", "0",
-						       "--batch", "-d");
+		ProcessBuilder pb = (gpgdir == null)?
+		    new ProcessBuilder("gpg",
+				       "--pinentry-mode",
+				       "loopback",
+				       "--passphrase-fd", "0",
+				       "--batch", "-d"):
+		    new ProcessBuilder("gpg", "--homedir", gpgdir,
+				       "--pinentry-mode",
+				       "loopback",
+				       "--passphrase-fd", "0",
+				       "--batch", "-d");
 		// pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 		ByteArrayOutputStream baos = new
 		    ByteArrayOutputStream(data.length);
@@ -380,7 +606,7 @@ public class AuthenticationPane extends JComponent {
 	URL context;
 	String userName;
 	char[] password;
-	Certificate cert;
+	Certificate[] certs;
 	SecureBasicUtilities ops;
     }
 
@@ -485,17 +711,15 @@ public class AuthenticationPane extends JComponent {
 
     /**
      * Get an authenticator for network authentication requests,
-     * optionally placing the authenticator in a map.
-     * <P>
-     * When the argument withMap is true, the user names and passwords
-     * entered in a dialog box will be saved for future use so that
-     * new secure-basic passwords can be generated as needed without
-     * querying the user.
+     * optionally requesting a map that stores data entered via
+     * a dialog box so that new secure-basic passwords can be
+     * generated without needlessly querying a user.
      * <P>
      * @param comp the component on which a dialog box should be centered
      *        when an authentication request is given to the user
-     * @param withMap true if the authenticator maps URLs to results;
-     *        false otherwise
+     * @param withMap true if the authenticator maps keys based on
+     *        schemes, hoste, ports, and realms with data that would
+     *        otherwise be obtained from a dialog box; false otherwise
      * @return an authenticator
      * @see Authenticator
      * @see SecureBasicUtilities
@@ -516,7 +740,7 @@ public class AuthenticationPane extends JComponent {
 		    .synchronizedList(new LinkedList<URLTimestamp>());
 
 
-		private Certificate getCertificate() {
+		private Certificate[] getCertificateChain() {
 		    // It would be better to get the certificate
 		    // from the SSL connection that is making this
 		    // authentication request
@@ -530,8 +754,11 @@ public class AuthenticationPane extends JComponent {
 			  factory.createSocket(host, port))) {
 			SSLSession session = socket.getSession();
 			Certificate[] chain = session.getPeerCertificates();
+			return chain;
+			/*
 			return (chain == null || chain.length == 0)? null:
 			    chain[0];
+			*/
 		    } catch (Exception e) {
 			return null;
 		    }
@@ -597,7 +824,7 @@ public class AuthenticationPane extends JComponent {
 			    } else {
 				try {
 				    char[] pw = udata.ops
-					.createPassword(udata.cert,
+					.createPassword(udata.certs,
 							udata.password);
 				    ulist.add(new URLTimestamp(reqURL));
 				    // System.out.println("... authenticated");
@@ -617,10 +844,53 @@ public class AuthenticationPane extends JComponent {
 			    ulist.clear();
 			}
 		    }
+		    // File pf1 = pemMap.get(authHolder.authenticator);
+		    File pf1 = getPemFile(reqURL);
+		    if (pf1 == null) pf1 = defaultPemFile;
+
+		    System.out.println("pf1 = " + pf1);
+		    boolean useSBL = (pf1 != null)
+			&& pf1.getName().toLowerCase().endsWith(".sbl");
+		    int sblcnt = 0;
+		    Properties props = null;
+		    ArrayList<String> dkeys = null;
+		    if (useSBL) {
+			try {
+			    props = ConfigPropUtilities
+				.newInstance(pf1,
+					     "application/"
+					     + "vnd.bzdev.sblauncher");
+			} catch (Exception e) {
+			    return null;
+			}
+			TreeSet<String> dkeySet = new
+			    TreeSet<String>(props.stringPropertyNames());
+			dkeys = new ArrayList<String>();
+			for (String key: dkeySet) {
+			    if (key.endsWith(".description")) {
+				int lastind = key.lastIndexOf(".");
+				dkeys.add(key.substring(0, lastind));
+			    }
+			}
+			sblcnt = dkeys.size();
+			if (sblcnt == 0) {
+			    props = null;
+			    dkeys = null;
+			}
+		    }
+		    final Properties ourprops = props;
+		    final ArrayList<String> ourdarray = dkeys;
+		    final String sblUser = (sblcnt == 0)? null:
+			props.getProperty(dkeys.get(0) + ".user");
+		    final char[] sblPw = (sblcnt == 0)? null:
+			props.getProperty(dkeys.get(0) + ".password")
+			.toCharArray();
+		    // System.out.println("sblUser = " + sblUser);
+
 		    Runnable r = new Runnable() {
 			    public void run() {
 				AuthenticationPane apane =
-				    new AuthenticationPane();
+				    new AuthenticationPane(ourprops, ourdarray);
 				String rtype = getRequestorType().toString();
 				String type = rtype;
 				try {
@@ -652,7 +922,8 @@ public class AuthenticationPane extends JComponent {
 				String name2 = "("
 				    + SecureBasicUtilities.iconedRealm(realm)
 				    + ")";
-				apane.setRequestor(name1, name2, null, null);
+				apane.setRequestor(name1, name2,
+						   sblUser, sblPw);
 				if (JOptionPane.showConfirmDialog
 				    (component, apane,
 				     localeString("title"),
@@ -660,20 +931,24 @@ public class AuthenticationPane extends JComponent {
 				     JOptionPane.QUESTION_MESSAGE) == 0) {
 				    char[] pw = apane.getPassword();
 				    String uname = apane.getUser();
+				    /*
 				    File pf = pemMap
 					.get(authHolder.authenticator);
-				    if (pf == null) pf = pemFile;
+				    */
+				    File pf = getPemFile(reqURL);
+				    if (pf == null) pf = defaultPemFile;
 				    try {
-					Certificate cert = null;
+					Certificate[] cert = null;
 					switch (mode) {
 					case DIGEST:
 					    if (udata != null) {
 						udata.userName = uname;
 						udata.password = pw;
-						udata.cert = cert;
+						udata.certs = cert;
 						udata.ops = dops;
 					    }
-					    pw = dops.createPassword(null, pw);
+					    pw = dops.createPassword(cert, pw);
+					    pemF = pf;
 					    break;
 					case SIGNATURE_WITHOUT_CERT:
 					    if (pf == null) {
@@ -684,14 +959,15 @@ public class AuthenticationPane extends JComponent {
 					    if (ops == null
 						|| !pf.equals(pemF)) {
 						ops = getOps(component, pf);
+						pemF = pf;
 					    }
 					    if (udata != null) {
 						udata.userName = uname;
 						udata.password = pw;
-						udata.cert = cert;
+						udata.certs = null;
 						udata.ops = ops;
 					    }
-					    pw = ops.createPassword(null, pw);
+					    pw = ops.createPassword(cert, pw);
 					    break;
 					case SIGNATURE_WITH_CERT:
 					    if (pf == null) {
@@ -704,11 +980,11 @@ public class AuthenticationPane extends JComponent {
 						ops = getOps(component, pf);
 						pemF = pf;
 					    }
-					    cert = getCertificate();
+					    cert = getCertificateChain();
 					    if (udata != null) {
 						udata.userName = uname;
 						udata.password = pw;
-						udata.cert = cert;
+						udata.certs = cert;
 						udata.ops = ops;
 					    }
 					    pw = ops.createPassword(cert, pw);
@@ -717,9 +993,10 @@ public class AuthenticationPane extends JComponent {
 					    if (udata != null) {
 						udata.userName = uname;
 						udata.password = pw;
-						udata.cert = null;
+						udata.certs = null;
 						udata.ops = null;
 					    }
+					    pemF = pf;
 					    break;
 					}
 				    } catch (Exception e) {
@@ -790,6 +1067,12 @@ public class AuthenticationPane extends JComponent {
 	pwf.setText((pw == null)?"": new String(pw));
     }
 
+
+    private Properties ourprops = null;
+    private ArrayList<String> darray = null;
+
+
+
     String getUser() {
 	return utf.getText();
     }
@@ -799,9 +1082,19 @@ public class AuthenticationPane extends JComponent {
     }
 
     AuthenticationPane() {
+	this(null, null);
+    }
+
+    AuthenticationPane(Properties props,final ArrayList<String> darray) {
 	super();
 	echoChar = pwf.getEchoChar();
-	setLayout(new GridLayout(7, 1));
+	if (darray == null || darray.size() == 0) {
+	    setLayout(new GridLayout(7, 1));
+	} else if (darray.size() == 1) {
+	    setLayout(new GridLayout(7, 1));
+	} else {
+	    setLayout(new GridLayout(8, 1));
+	}
 	add(name1Label);
 	add(name2Label);
 	add(usrl);
@@ -809,33 +1102,53 @@ public class AuthenticationPane extends JComponent {
 	add(pwl);
 	add(pwf);
 	add(pwcb);
-
-	// The user text field will not get the keyboard focus
-	// unless we are proactive: the OK button gets it instead.
-	utf.addFocusListener(new FocusAdapter() {
-		boolean retry = true;
-		public void focusLost(FocusEvent e) {
-		    Component other = e.getOppositeComponent();
-		    Window w1 = SwingUtilities.getWindowAncestor
-			(AuthenticationPane.this);
-		    Window w2 = (other == null)? null:
-			SwingUtilities.getWindowAncestor(other);
-		    if (retry && e.getCause() == FocusEvent.Cause.UNKNOWN
-			&& w1 == w2
-			&& !SwingUtilities.isDescendingFrom
-			(other, AuthenticationPane.this)) {
-			SwingUtilities.invokeLater(() -> {
-				utf.requestFocusInWindow();
-			    });
-		    } else {
-			retry = false;
+	if (darray != null && darray.size() > 1) {
+	    // add a combo box for canned choices of user name/password
+	    JComboBox<String> cbsbl = new JComboBox<String>();
+	    for (String k: darray) {
+		cbsbl.addItem(k + " ("
+			      + props.getProperty(k + ".description")
+			      + ")");
+	    }
+	    String key = darray.get(0);
+	    cbsbl.setSelectedIndex(0);
+	    utf.setText(props.getProperty(key +".user"));
+	    pwf.setText(props.getProperty(key + ".password"));
+	    cbsbl.addActionListener((e) -> {
+		    int ind = cbsbl.getSelectedIndex();
+		    if (ind >= 0) {
+			String k = darray.get(cbsbl.getSelectedIndex());
+			utf.setText(props.getProperty(k +".user"));
+			pwf.setText(props.getProperty(k + ".password"));
 		    }
-		}
-	    });
+		});
+	    add(cbsbl);
+	} else {
+	    // The user text field will not get the keyboard focus
+	    // unless we are proactive: the OK button gets it instead.
+	    utf.addFocusListener(new FocusAdapter() {
+		    boolean retry = true;
+		    public void focusLost(FocusEvent e) {
+			Component other = e.getOppositeComponent();
+			Window w1 = SwingUtilities.getWindowAncestor
+			    (AuthenticationPane.this);
+			Window w2 = (other == null)? null:
+			    SwingUtilities.getWindowAncestor(other);
+			if (retry && e.getCause() == FocusEvent.Cause.UNKNOWN
+			    && w1 == w2
+			    && !SwingUtilities.isDescendingFrom
+			    (other, AuthenticationPane.this)) {
+			    SwingUtilities.invokeLater(() -> {
+				    utf.requestFocusInWindow();
+				});
+			} else {
+			    retry = false;
+			}
+		    }
+		});
+	}
 	utf.setToolTipText(localeString("utfToolTip"));
 	pwf.setToolTipText(localeString("pwfToolTip"));
-
-
 	pwcb.addChangeListener(new ChangeListener() {
 		public void stateChanged(ChangeEvent e) {
 		    if (pwcb.isSelected()) {

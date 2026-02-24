@@ -1,21 +1,40 @@
 import org.bzdev.ejws.*;
 import org.bzdev.ejws.maps.*;
+import org.bzdev.net.SSLUtilities;
 import org.bzdev.util.ErrorMessage;
+import org.bzdev.util.ConfigPropUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.Properties;
+import javax.net.ssl.*;
 
 public class ATest4 {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
 	System.out.println(realm);
-	String publicKeyPem = Files.readString(Paths.get(argv[0]));
-	System.out.println(publicKeyPem);
+
+	// String publicKeyPem = Files.readString(Paths.get(argv[0]));
+	// System.out.println(publicKeyPem);
+
+	File sblFile = new File(argv[0]);
+	String key = argv[1];
+	Properties props = ConfigPropUtilities
+	    .newInstance(sblFile, "application/vnd.bzdev.sblauncher");
+	String user = ConfigPropUtilities
+	    .getProperty(props, key + ".user");
+	String password = ConfigPropUtilities
+	    .getProperty(props, key + ".password");
+	String publicKeyPem = ConfigPropUtilities
+	    .getProperty(props, "base64.keypair.publicKey");
+
+
 
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
 	System.out.println("server address:" + saddr.getAddress());
@@ -41,18 +60,27 @@ public class ATest4 {
 
 	EjwsSecureBasicAuth auth = null;
 	if (!argv[argv.length-1].equals("--noauth")) {
-	    Certificate[] certs = ews.getCertificates();
-	    System.out.println("Number of certificates = " + certs.length);
-	    auth = new EjwsSecureBasicAuth(realm, certs);
+	    Certificate[][] certs = ews.getCertificates();
+	    System.out.println("Number of certificates = " + certs[0].length);
+	    Certificate cert = certs[0][0];
+	    if (cert instanceof X509Certificate) {
+		X509Certificate xcert = (X509Certificate)cert;
+		System.out.println("by cert: " + xcert.getSubjectX500Principal()
+				   .getName("canonical").substring(3));
+	    }
+	    System.out.println("by addr: " + InetAddress.getLocalHost()
+			       .getHostName());
+	    auth = new EjwsSecureBasicAuth(ews, realm,
+					   EjwsSecureBasicAuth.getMode(certs));
 	    // We want to make it easy for the time limit to expire
 	    auth.setTimeLimits(-2 , 30, 45);
 	    System.out.println("auth mode = " + auth.getMode());
-	    auth.add("foo", publicKeyPem, "foo");
+	    auth.add(user, publicKeyPem, password);
 	    auth.setTracer(System.out);
 	}
-
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
 		true, true, true);
+
 
 	ews.add("/open/", DirWebMap.class, new File("../../BUILD/api/"), null,
 		true, true, true);
@@ -60,7 +88,7 @@ public class ATest4 {
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	if (!argv[argv.length-1].equals("--nologin")) {
 	    handler.setLoginAlias("login.html", "", true);
-	    URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
+	    URI logoutURI = (argv.length == 2 || !argv[2].startsWith("--"))?
 		new URI("https://www.google.com"): new URI(argv[1]);
 
 	    handler.setLogoutAlias("logout.html", logoutURI);
@@ -83,5 +111,28 @@ public class ATest4 {
 
 	ews.setTracer("/", System.out);
 	ews.start();
+
+	SSLUtilities
+	    .installTrustManager("TLS", new File("thelio-ts.jks"),
+				 "changeit".toCharArray(),
+				 (cert) -> {
+				     System.out.println
+					 ("saw self-signed certificate");
+				     return true;
+				 });
+	SSLUtilities.allowLoopbackHostname();
+	SSLSocketFactory factory = (SSLSocketFactory)
+	    SSLSocketFactory.getDefault();
+	try (SSLSocket socket = (SSLSocket)
+	     factory.createSocket("localhost", 8080)) {
+	    SSLSession session = socket.getSession();
+	    Certificate[] chain = session.getPeerCertificates();
+	    System.out.println("localhost provided a certificate chain"
+			       + " of length " + ((chain == null)? 0:
+						  chain.length));
+	    System.out.println("cert hash code = " + chain[0].hashCode());
+	} catch (Exception e) {
+	    System.err.println(e.getMessage());
+	}
     }
 }

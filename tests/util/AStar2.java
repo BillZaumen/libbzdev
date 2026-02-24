@@ -68,6 +68,8 @@ public class AStar2 {
 
     public static void main(String argv[]) throws Exception {
 
+	System.out.println(".... setting up graph");
+
 	DoubleRandomVariable rv = new UniformDoubleRV(0.0, true, 100.0, true);
 
 	int ind = 0;
@@ -130,6 +132,7 @@ public class AStar2 {
 		break;
 	    }
 	}
+	System.out.println("... greating image");
 	Graph graph = new Graph(1024, 1024);
 	graph.setRanges(0.0, 100.0, 0.0, 100.0);
 	graph.setBackgroundColor(Color.WHITE);
@@ -143,6 +146,8 @@ public class AStar2 {
 	    graph.draw(g2d, line);
 	}
 	graph.write("png", "astar2.png");
+
+	System.out.println(".... trying searches with various options");
 
 	AStarSearch<Node> search1 = new AStarSearch<>(AStar2::getNeighbors,
 						      AStar2::dist,
@@ -164,17 +169,19 @@ public class AStar2 {
 	for (Node n: result) {
 	    System.out.format("(%g, %g)\n", n.x, n.y);
 	}
-
 	System.out.println("--------");
 	result = search2.search(start,end,true);
 	for (Node n: result) {
 	    System.out.format("(%g, %g)\n", n.x, n.y);
 	}
+	System.out.println("-------- timing test ----------");
+	System.out.println("... repeat 10000 times for hotspot warmup");
 
 	for (int i = 0; i < 10000; i++) {
 	    result = search1.search(start,end);
 	    result = search2.search(start,end);
 	}
+	System.out.println ("... repeat each case 10000 times");
 	long time1 = System.nanoTime();
 	for (int i = 0; i < 10000; i++) {
 	    result = search1.search(start,end);
@@ -188,14 +195,20 @@ public class AStar2 {
 	    result = search2.search(start,end, true);
 	}
 	long time4 = System.nanoTime();
-	
-	System.out.println("time2 - time1: " + (time2 - time1));
-	System.out.println("time3 - time2: " + (time3 - time2));
-	System.out.println("time4 - time3: " + (time4 - time3));
-	System.out.println("ratio: " +
-			   ((double)(time2 - time1) / (double)(time3 - time2)));
-	System.out.println("ratio43: " +
-			   ((double)(time4 - time3) / (double)(time3 - time2)));
+
+	double tau1 = (time2 - time1)/10000;
+	double tau2 = (time3 - time2)/10000;
+	double tau3 = (time4 - time3)/10000;
+
+	tau1 /= 1000;
+	tau2 /= 1000;
+	tau3 /= 1000;
+
+	System.out.format("case 1 - search1: %5.3f \u03bcs\n", tau1);
+	System.out.format("case 2 - search2: %5.3f \u03bcs\n", tau2);
+	System.out.format("case 3 - search2 [narrow]: %5.3f \u03bcs\n", tau3);
+	System.out.println("ratio: " + (tau1/tau2));
+	System.out.println("ratio (case 3 / case 2): " + (tau3/tau2));
 
     }
 }

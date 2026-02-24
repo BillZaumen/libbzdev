@@ -8,16 +8,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.Format;
 import java.util.ArrayList;
+import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.regex.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -31,7 +35,11 @@ import javax.swing.table.*;
 import org.bzdev.io.AppendableWriter;
 import org.bzdev.lang.Callable;
 import org.bzdev.lang.UnexpectedExceptionError;
+import org.bzdev.net.WebEncoder;
+import org.bzdev.net.WebDecoder;
+import org.bzdev.util.ConfigPropUtilities;
 import org.bzdev.util.CopyUtilities;
+import org.bzdev.util.SymmetricCipher;
 import org.bzdev.swing.TextCellEditor;
 
 //@exbundle org.bzdev.swing.lpack.Swing
@@ -58,11 +66,12 @@ import org.bzdev.swing.TextCellEditor;
  * dashes (minus signs). There are treated as spacers and are ignored
  * when the properties are written or used outside of the editor.
  * <P>
- * Property values may be encrypted using GPG. The keys for these
- * properties start with the substring "ebase64." and the values are
- * stored in an encrypted form. GPG Agent should be configured so that
- * decryption can be used conveniently. To use GPG Agent on Debian
- * Linux systems, add the following lines to the .bashrc script:
+ * Property values may be encrypted using GPG or a symmetric cipher.
+ * The keys for these properties start with the substring "ebase64."
+ * and the values are stored in an encrypted form. When GPG is used,
+ * GPG Agent should be configured so that decryption can be used
+ * conveniently. To use GPG Agent on Debian Linux systems, add the
+ * following lines to the .bashrc script:
  * <BLOCKQUOTE><PRE><CODE>
  *     GPG_TTY=$(tty)
  *     export GPG_TTY
@@ -100,17 +109,20 @@ import org.bzdev.swing.TextCellEditor;
  *   <LI><STRONG>base64</STRONG>. This token indicates that the value
  *      is base-64 encoded.
  *   <LI><STRONG>ebase64</STRONG>. This token indicates that the value
- *      is first base64 encoded and then encrypted using GPG or PGP.
- *      One use of this field is to store passwords (e.g., for a
- *      database).  To encrypt, one will provide a list of recipients:
+ *      is first encrypted using GPG or PGP, or a symmetric cipher,
+ *      and then base-64 encoded. When a symmetric cipher is used, the
+ *      bass-64 encoded text is prefaced with "===".  One use of this
+ *      field is to store passwords (e.g., for a database).  To
+ *      encrypt one must provide a passphrase/password and
+ *      specifically with GPG, one must provide a list of recipients:
  *      when configuring a database, for instance, one can use this
- *      feature so that an administrator and a user can have access to
- *      the same password.
+ *      feature so that an administrator and another user can have
+ *      access to the same password.
  * </UL>
- * ConfigPropertyEditor will remove the encryption and encoding to allow
- * editing of such fields. To decrypt, the user will have to enter a
- * GPG passphrase. GPG Agent should be configured for this to work
- * properly
+ * ConfigPropertyEditor will remove the encryption and encoding to
+ * allow editing of such fields. To decrypt, the user will have to
+ * enter a symmetric-cipher password or a GPG passphrase. GPG Agent
+ * should be configured for GPG to work properly
  * <P>
  * Values that are not encoded or encrypted allow variable substitutions.
  * the expression
@@ -250,6 +262,21 @@ public abstract class ConfigPropertyEditor {
 	return Collections.unmodifiableList(iconList);
     }
 
+    private String gpgdir = null;
+
+    /**
+     * Set the GPG home directory.
+     * The parameter is the directory name used as the --homedir argument
+     * for gpg commands.
+     * @param gpgdir the GPG home directory; null for the default
+     * @return this object
+     */
+
+    public ConfigPropertyEditor setGPGDir(String gpgdir) {
+	this.gpgdir = gpgdir;
+	return this;
+    }
+
     /**
      * Constructor.
      */
@@ -279,12 +306,19 @@ public abstract class ConfigPropertyEditor {
      * Set the default value for a property.
      * If the key starts with "base64.", this method will apply the
      * Base-64 encoding.  If the key starts with "ebase64.", the
-     * value must be first encrypted with GPG and then Base-64 encoded.
+     * value must be first encrypted with either GPG or a symmetric
+     * cipher and then Base-64 encoded.
+     * <P>
+     * The method {#useGPG(boolean)} must be called before this method
+     * is called if a symmetric cipher was used.
      * @param key the property key
      * @param value the default value for the specified key
      */
     protected void setDefaultProperty(String key, String value) {
 	if (key.startsWith("base64.")) value = encode(value);
+	if (key.startsWith("ebase64.") && useGPG() == false) {
+	    value = "===" + value;
+	}
 	defaults.setProperty(key, value);
     }
 
@@ -363,13 +397,82 @@ public abstract class ConfigPropertyEditor {
 	return new String(data, UTF8);
     }
 
+    private boolean  useGPGFrozen = false;
+
+    private boolean useGPG = true;
+
+    /**
+     * Indicate if GPG encryption is to be used.
+     * @param value true if GPG encryption should be used; false if
+     *        symmetric encryption should be used
+     * @return this object
+     */
+    public ConfigPropertyEditor useGPG(boolean value) {
+	useGPG = value;
+	useGPGFrozen = true;
+	hasCheckKeyResult = true;
+	gpgCheckKeyResult = value;
+	return this;
+    }
+
+    String gpgCheckKey = null;
+    boolean hasCheckKeyResult = false;
+    boolean gpgCheckKeyResult = useGPG;
+
+    /**
+     * Provide a key to determine whether to use GPG or a symmetric
+     * cipher when this object is loaded from a file.
+     * @param key the key to check
+     * @return this object
+     */
+    public ConfigPropertyEditor setUseGPGOnLoad(String key)
+    {
+	if (key == null || !key.startsWith("ebase64.")) {
+	    gpgCheckKey = null;
+	    gpgCheckKeyResult = useGPG;
+	    hasCheckKeyResult = false;
+	} else {
+	    gpgCheckKey = key;
+	    hasCheckKeyResult = false;
+	}
+	return this;
+    }
+
+
+    /**
+     * Indicate if GPG encryption is being used.
+     * @return true if GPG encryption is used; false for symmetric enryption
+     */
+    public boolean useGPG() {
+	if (hasCheckKeyResult) {
+	    return gpgCheckKeyResult;
+	}
+	return useGPG;
+    }
+
     private static class  StringBuilderHolder {
 	StringBuilder sb = new StringBuilder();
     }
 
-    private String decrypt(String value) {
-	if (value == null || password == null) return EMPTY_STRING;
+    private String decrypt(String value)
+	throws GeneralSecurityException, IllegalStateException,
+	       UnsupportedEncodingException {
+	if (useGPG() == false) {
+	    if (value.startsWith("===")) {
+		value = value.substring(3);
+	    } else {
+		throw new IllegalStateException(errorMsg("unexpectedGPG"));
+	    }
+	} else {
+	    if (value.startsWith("===")) {
+		String msg = errorMsg("unexpectedSymmetricCipher");
+		throw new IllegalStateException(msg);
+	    }
+	}
 	byte[] data = Base64.getDecoder().decode(value);
+	if (useGPG() == false) {
+	    return SymmetricCipher.decryptToString(password, data);
+	}
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
 
 	try {
@@ -385,12 +488,17 @@ public abstract class ConfigPropertyEditor {
 	    // Need to use --batch, etc. because when this runs in
 	    // a dialog box, we don't have access to a terminal and
 	    // GPG agent won't ask for a passphrase.
-	    ProcessBuilder pb = new ProcessBuilder("gpg",
-						   "--pinentry-mode",
-						   "loopback",
-						   "--passphrase-fd", "0",
-						   "--batch", "-d"/*,
-						    tmpf.getCanonicalPath()*/);
+	    ProcessBuilder pb = (gpgdir == null)?
+		new ProcessBuilder("gpg",
+				   "--pinentry-mode",
+				   "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d"):
+		new ProcessBuilder("gpg", "--homedir", gpgdir,
+				   "--pinentry-mode",
+				   "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d");
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    StringBuilderHolder sbh = new StringBuilderHolder();
 	    Process p = pb.start();
@@ -452,11 +560,31 @@ public abstract class ConfigPropertyEditor {
     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
 
-    private char[] decryptToCharArray(String value) {
+    private char[] decryptToCharArray(String value)
+	throws GeneralSecurityException
+    {
 	if (value == null || password == null) return EMPTY_CHAR_ARRAY;
+	if (useGPG() == false) {
+	    if (value.startsWith("===")) {
+		value = value.substring(3);
+	    } else {
+		throw new IllegalStateException(errorMsg("unexpectedGPG"));
+	    }
+	} else {
+	    if (value.startsWith("===")) {
+		String msg = errorMsg("unexpectedSymmetricCipher");
+		throw new IllegalStateException(msg);
+	    }
+	}
 	byte[] data = Base64.getDecoder().decode(value);
-	ByteArrayInputStream is = new ByteArrayInputStream(data);
 
+	if (useGPG() == false) {
+	    // So we don't create a string that might contain a password.
+	    byte[] barray = SymmetricCipher.decrypt(password, data);
+	    return UTF8.decode(ByteBuffer.wrap(barray)).array();
+	}
+
+	ByteArrayInputStream is = new ByteArrayInputStream(data);
 	try {
 	    /*
 	    File tmpf = File.createTempFile("configPropEditor", "gpg");
@@ -469,12 +597,17 @@ public abstract class ConfigPropertyEditor {
 	    // Need to use --batch, etc. because when this runs in
 	    // a dialog box, we don't have access to a terminal and
 	    // GPG agent won't ask for a passphrase.
-	    ProcessBuilder pb = new ProcessBuilder("gpg",
-						   "--pinentry-mode",
-						   "loopback",
-						   "--passphrase-fd", "0",
-						   "--batch", "-d"/*,
-						   tmpf.getCanonicalPath()*/);
+	    ProcessBuilder pb = (gpgdir == null)?
+		new ProcessBuilder("gpg",
+				   "--pinentry-mode",
+				   "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d"):
+		new ProcessBuilder("gpg", "--homedir", gpgdir,
+				   "--pinentry-mode",
+				   "loopback",
+				   "--passphrase-fd", "0",
+				   "--batch", "-d");
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    ByteArrayOutputStream baos = new
 		ByteArrayOutputStream(data.length);
@@ -523,11 +656,23 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
-    private static String encrypt(String value, String[] recipients) {
+    private String encrypt(String value, String[] recipients) {
 	if (value == null || value.length() == 0) return EMPTY_STRING;
+	if (useGPG() == false) {
+	    try {
+		byte[] data = SymmetricCipher.encrypt(password, value);
+		data = Base64.getEncoder().encode(data);
+		StringBuilder sb1 = new StringBuilder(256);
+		return "===" + new String(data, UTF8);
+	    } catch (Exception e) {}
+	}
 	if (recipients.length == 0) return EMPTY_STRING;
 	LinkedList<String> args = new LinkedList<>();
 	args.add("gpg");
+	if (gpgdir != null) {
+	    args.add("--homedir");
+	    args.add(gpgdir);
+	}
 	args.add("-o");
 	args.add("-");
 	for (String recipient: recipients) {
@@ -593,7 +738,11 @@ public abstract class ConfigPropertyEditor {
      * @param c the component on which to center dialog boxes
      */
     public void setRecipients(Component c) {
-	recipientsList = getRecipients(c);
+	if (useGPG() == false) {
+	    recipientsList = null;
+	} else {
+	    recipientsList = getRecipients(c);
+	}
     }
 
     /**
@@ -603,7 +752,11 @@ public abstract class ConfigPropertyEditor {
      * @param list the recipient list; null to remove the recipients list
      */
     public void setRecipients(String[] list) {
-	recipientsList =  list.clone();
+	if (useGPG() == false) {
+	    recipientsList = null;
+	} else {
+	    recipientsList =  list.clone();
+	}
     }
 
     /**
@@ -613,8 +766,12 @@ public abstract class ConfigPropertyEditor {
      * @param list the recipient list; null to remove the recipients list
      */
     public void setRecipients(java.util.List<String> list) {
-	String[] array = new String[list.size()];
-	setRecipients(list.toArray(array));
+	if (useGPG() == false) {
+	    recipientsList = null;
+	} else {
+	    String[] array = new String[list.size()];
+	    setRecipients(list.toArray(array));
+	}
     }
 
     /**
@@ -628,24 +785,72 @@ public abstract class ConfigPropertyEditor {
 	recipientsList = null;
     }
 
-    static String[] getRecipients(Component frame) {
-	ArrayList<String> list = new ArrayList<>();
-	JPanel panel = new JPanel(new BorderLayout());
-	JCheckBox cb = new JCheckBox(localeString("addMoreKeys"));
-	panel.add(cb, BorderLayout.NORTH);
-	panel.add(new JLabel(localeString("nextGPG")), BorderLayout.SOUTH);
-	do {
-	    cb.setSelected(false);
-	    String next =
-		JOptionPane.showInputDialog(frame, panel);
-	    if (next != null) {
-		next = next.trim();
-		if (next.length() > 0) {
-		    list.add(next);
+    private String recipientsKey = null;
+
+    /**
+     * Set a key to use to get the recipients for a file that
+     * has already been created.
+     * @param key the key; null if none is defined.
+     */
+    public void setRecipientsKey(String key) {
+	recipientsKey = key;
+    }
+
+    private String[] getRecipients(Component frame) {
+	if (useGPG() == false
+	    || (hasCheckKeyResult && gpgCheckKeyResult == false)) {
+	    return null;
+	} else {
+	    ArrayList<String> list = new ArrayList<>();
+	    JPanel panel = new JPanel(new BorderLayout());
+	    JCheckBox cb = new JCheckBox(localeString("addMoreKeys"));
+	    panel.add(cb, BorderLayout.NORTH);
+	    panel.add(new JLabel(localeString("nextGPG")), BorderLayout.SOUTH);
+	    do {
+		cb.setSelected(false);
+		String next =
+		    JOptionPane.showInputDialog(frame, panel);
+		if (next != null) {
+		    next = next.trim();
+		    if (next.length() > 0) {
+			if (gpgHasKey(next, true) == ONEKEYID) {
+			    list.add(next);
+			} else {
+			    String msg = errorMsg("gpgKeyError");
+			    String title = errorMsg("gpgKeyErrorTitle");
+			    JOptionPane.showMessageDialog
+				(frame, msg, title,
+				 JOptionPane.ERROR_MESSAGE);
+			    // so we don't exit the 'do-while' loop
+			    cb.setSelected(true);
+			    continue;
+			}
+		    }
 		}
-	    }
-	} while (cb.isSelected());
-	return list.toArray(new String[list.size()]);
+		if (list.size() == 0 && !cb.isSelected()) {
+		    if (useGPGFrozen && useGPG == false) {
+			return null;
+		    }
+		    if (JOptionPane.OK_OPTION == JOptionPane
+			.showConfirmDialog(frame, localeString("useSymmetric"),
+					   localeString("useSymmetricTitle"),
+					   JOptionPane.YES_NO_OPTION)) {
+			gpgCheckKeyResult = false;
+			hasCheckKeyResult = true;
+			return null;
+		    } else {
+			continue;
+		    }
+		}
+	    } while (cb.isSelected());
+	    // Calling this method when useGPG(boolean) was not already called
+	    // and getting out of the loop indicates that GPG encryption,
+	    // set by default, is wanted.
+	    gpgCheckKeyResult = true;
+	    hasCheckKeyResult = true;
+	    String[] rarray =  list.toArray(new String[list.size()]);
+	    return rarray;
+	}
     }
 
     private static final int[] EMPTY_INT_ARRAY = new int[0];
@@ -686,6 +891,7 @@ public abstract class ConfigPropertyEditor {
 	    boolean first = true;
 	    for (String key: loop) {
 		if (first == false) {
+		    // long rightwards array
 		    sb.append("\u27F6");
 		} else {
 		    first = false;
@@ -960,6 +1166,22 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
+    private void addRecipientsIfNeeded(Properties properties) {
+	if (recipientsKey != null) {
+	    if (properties.containsKey(recipientsKey)) {
+		if (recipientsList == null) {
+		    properties.remove(recipientsKey);
+		}
+	    }
+	    if (recipientsList != null) {
+		properties.put(recipientsKey,
+			       ConfigPropUtilities
+			       .encodeRecipients(recipientsList));
+	    }
+	}
+    }
+
+
     /**
      * Save the configuration in a file.
      * @param f the file
@@ -972,9 +1194,73 @@ public abstract class ConfigPropertyEditor {
 	if (properties == null) {
 	    properties = new Properties();
 	}
+	addRecipientsIfNeeded(properties);
 	properties.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
     }
 
+    /**
+     * Convert this object to a JSON representation.
+     * @return the JSON representation of this object
+     */
+    public String toJSON() {
+	if (properties == null) {
+	    return "{}";
+	} else {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("{");
+	    Properties ourProps = getDecodedProperties();
+	    Set<String> keys = new
+		TreeSet<String>(ourProps.stringPropertyNames());
+	    int len = keys.size();
+	    int i = 0;
+	    for (String key: keys) {
+		sb.append("\"");
+		sb.append(key);
+		sb.append("\":");
+		String value = ourProps.getProperty(key);
+		if ( value == null) value = "";
+		value = WebEncoder.quoteEncode(value);
+		sb.append("\"");
+		sb.append(value);
+		sb.append("\"");
+		i++;
+		if (i < len) sb.append(",");
+	    }
+	    sb.append("}");
+	    return sb.toString();
+	}
+    }
+
+    public String toBase64() {
+	if (properties == null) {
+	    return new String(Base64.getEncoder().encode(new byte[0]),
+			      UTF8);
+	} else {
+	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	    try {
+		Writer w = new OutputStreamWriter(bos, UTF8);
+		w = new CRLFWriter(w);
+		if (recipientsKey != null) {
+		    if (properties.containsKey(recipientsKey)) {
+			if (recipientsList == null) {
+			    properties.remove(recipientsKey);
+			}
+		    }
+		    if (recipientsList != null) {
+			properties.put(recipientsKey,
+				       ConfigPropUtilities
+				       .encodeRecipients(recipientsList));
+		    }
+		}
+		addRecipientsIfNeeded(properties);
+		properties.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
+		return new String(Base64.getEncoder().encode(bos.toByteArray()),
+				  UTF8);
+	    } catch (IOException eio) {
+		throw new UnexpectedExceptionError(eio);
+	    }
+	}
+    }
 
     private void save(File f, InputTablePane table) throws IOException {
 	FileOutputStream os = new FileOutputStream(f);
@@ -1002,6 +1288,19 @@ public abstract class ConfigPropertyEditor {
 	    if (value.length() == 0) continue;
 	    props.setProperty(key, value);
 	}
+	if (recipientsKey != null) {
+	    if (properties.containsKey(recipientsKey)) {
+		if (recipientsList == null) {
+		    properties.remove(recipientsKey);
+		}
+	    }
+	    if (recipientsList != null) {
+		properties.put(recipientsKey,
+			       ConfigPropUtilities
+			       .encodeRecipients(recipientsList));
+	    }
+	}
+	addRecipientsIfNeeded(properties);
 	props.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
 	w.flush();
 	w.close();
@@ -1279,6 +1578,28 @@ public abstract class ConfigPropertyEditor {
 	}
 	properties.load(r);
 	r.close();
+	if (recipientsKey != null) {
+	    String[] rl = ConfigPropUtilities
+		.decodeRecipients(properties.getProperty(recipientsKey));
+	    if (rl == null) {
+		clearRecipients();
+	    } else {
+		setRecipients(rl);
+	    }
+	}
+	hasCheckKeyResult = false;
+	if (gpgCheckKey != null) {
+	    String value = properties.getProperty(gpgCheckKey);
+	    if (value == null) {
+		gpgCheckKeyResult = useGPG;
+		hasCheckKeyResult = true;
+	    } else {
+		// if the value of an epbas64 key starts with "===",
+		// then GPG is not used.
+		gpgCheckKeyResult = !value.startsWith("===");
+		hasCheckKeyResult = true;
+	    }
+	}
 	for (String key: defaults.stringPropertyNames()) {
 	    if (properties.getProperty(key) == null) {
 		properties.setProperty(key, defaults.getProperty(key));
@@ -1506,8 +1827,9 @@ public abstract class ConfigPropertyEditor {
 
     private char[] password = null;
 
-    /**
-     * Request a GPG passphrase when one has not already been provided.
+   /**
+     * Request a GPG passphrase or a symmetric cipher password when
+     * one has not already been provided.
      * This method will typically open a dialog box to request a GPG
      * passphrase for decryption if the passphrase is not already
      * known. However, if the argument is null, this method is not
@@ -1531,7 +1853,7 @@ public abstract class ConfigPropertyEditor {
      */
     public void requestPassphrase(Component owner) {
 	if (password == null) {
-	    password = requestGPGPassphrase(owner, false);
+	    password = requestPassphrase(owner, useGPG(), false);
 	}
     }
 
@@ -1563,14 +1885,14 @@ public abstract class ConfigPropertyEditor {
      */
     public void requestPassphrase(Component owner, boolean ignoreConsole) {
 	if (password == null) {
-	    password = requestGPGPassphrase(owner, ignoreConsole);
+	    password = requestPassphrase(owner, useGPG(), ignoreConsole);
 	}
     }
 
     /**
      * Create a supplier that can be used to ask for a GPG passphrase.
      * The supplier will call
-     * {@link #requestGPGPassphrase(Component,boolean)},
+     * {@link #requestPassphrase(Component,boolean)},
      * which will typically open a dialog box to request a GPG
      * passphrase. However, if the first argument is null, this method
      * is not called from the event dispatch thread, and a system
@@ -1579,18 +1901,21 @@ public abstract class ConfigPropertyEditor {
      * the current thread will block until a passphrase is provided
      * via a dialog box or the dialog box is canceled).
      * @param owner a component over which a dialog box should be displayed
+     * @param useGPG true if the supplier generates a GPG passphrase; false
+     *        if the supplier generates a symmetric-cipher password
      * @param ignoreConsole true if a console should always be ignored; false
      *        otherwise
      * @return the supplier
      * @see org.bzdev.net.SSLUtilities#configureUsingSBL
      */
     public static Supplier<char[]>
-	gpgPassphraseSupplier(final Component owner,
-			      final boolean ignoreConsole)
+	passphraseSupplier(final Component owner,
+			   final boolean useGPG,
+			   final boolean ignoreConsole)
     {
 	return new Supplier<char[]>() {
 	    public char[] get() {
-		return requestGPGPassphrase(owner, ignoreConsole);
+		return requestPassphrase(owner, useGPG, ignoreConsole);
 	    }
 	};
     }
@@ -1611,25 +1936,40 @@ public abstract class ConfigPropertyEditor {
      * <BLOCKQUOTE><PRE><CODE>
      * SwingUtilities.invokeAndWait(() -&gt; {
      *     char[] passphrase = ConfigPropertyEditor
-     *         .requestGPGPassphrase(null, true);
+     *         .requestPassphrase(null, true, true);
      * });
      * </BLOCKQUOTE></CODE></PRE>
+     * for a GPG passphrase or
+     * <BLOCKQUOTE><PRE><CODE>
+     * SwingUtilities.invokeAndWait(() -&gt; {
+     *     char[] passphrase = ConfigPropertyEditor
+     *         .requestPassphrase(null, false, true);
+     * });
+     * </BLOCKQUOTE></CODE></PRE>
+     * for a symmetric-cipher password
      * <P>
      * NOTE: tests indicate that in Java, a system console exists only when
      * both standard input and standard output are connected to a terminal.
+     * The argument useGPG only affects the text that appears in some
+     * prompts or dialog boxes.
      * @param owner a component over which a dialog box should be displayed
+     * @param useGPG true if the password is to be used by GPG; false if it
+     *        is to be used for a symmetric cipher
      * @param ignoreConsole true if a console should always be ignored; false
      *        otherwise
      */
-    public static char[] requestGPGPassphrase(Component owner,
+    public static char[] requestPassphrase(Component owner,
+					      boolean useGPG,
 					      boolean ignoreConsole)
     {
 	char[] passphrase = null;
 	if (!SwingUtilities.isEventDispatchThread()) {
 	    Console console = System.console();
 	    if (owner == null && console != null && ignoreConsole == false) {
-		passphrase = console
-		    .readPassword(localeString("enterPW2") + ":");
+		passphrase = useGPG?
+		    console.readPassword(localeString("enterPW2") + ":"):
+		    console.readPassword(localeString("enterPW4") + ":");
+
 		if (passphrase == null || passphrase.length == 0) {
 		    passphrase = null;
 		}
@@ -1637,7 +1977,8 @@ public abstract class ConfigPropertyEditor {
 		char[][] array = new char[1][];
 		try {
 		    SwingUtilities.invokeAndWait(() -> {
-			    array[0] = requestGPGPassphrase(owner, false);
+			    array[0] = requestPassphrase(owner, useGPG,
+							    false);
 			});
 		} catch (InterruptedException e) {
 		} catch (InvocationTargetException e) {
@@ -1681,7 +2022,9 @@ public abstract class ConfigPropertyEditor {
 
 	for (;;) {
 	    int status = JOptionPane
-		.showConfirmDialog(owner, pwf, localeString("enterPW"),
+		.showConfirmDialog(owner, pwf,
+				   (useGPG? localeString("enterPW"):
+				    localeString("enterPW3")),
 				   JOptionPane.OK_CANCEL_OPTION);
 	    if (status == JOptionPane.OK_OPTION) {
 		char[] pw = pwf.getPassword();
@@ -1711,7 +2054,7 @@ public abstract class ConfigPropertyEditor {
     }
 
     /**
-     * Remove the current GPG passphrase.
+     * Remove the current passphrase.
      * As a general rule, this method should be called as soon as
      * a passphrase is no longer needed, or will not be needed for
      * some time.
@@ -1724,6 +2067,49 @@ public abstract class ConfigPropertyEditor {
 	}
 	password = null;
     }
+
+    private static final int ONEKEYID = 0;
+    private static final int NOKEYIDS = 1;
+    private static final int MULTIPLEKEYIDS = 2;
+
+    private  int gpgHasKey(String keyid, boolean publicKey) {
+	String arg = publicKey? "-k": "-K";
+	ProcessBuilder pb = (gpgdir == null)?
+	    new ProcessBuilder("gpg", "--with-colons", arg, keyid):
+	    new ProcessBuilder("gpg", "--homedir", gpgdir, "--with-colons",
+			       arg, keyid);
+	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	try {
+	    Process p = pb.start();
+	    LineNumberReader r = new LineNumberReader
+		(new InputStreamReader(p.getInputStream()));
+	    String line;
+	    int cnt = 0;
+	    String start = publicKey? "pub:": "sec:";
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith(start)) {
+		    cnt++;
+		}
+	    }
+	    int status = p.waitFor();
+	    if (status == 0) {
+		if (cnt == 0) {
+		    return NOKEYIDS;
+		} else if (cnt == 1) {
+		    return ONEKEYID;
+		} else {
+		    return MULTIPLEKEYIDS;
+		}
+	    } else {
+		return NOKEYIDS;
+	    }
+	} catch (IOException e) {
+	    return NOKEYIDS;
+	} catch (InterruptedException e) {
+	    return NOKEYIDS;
+	}
+    }
+
 
     private class OurCellEditor2 extends TextCellEditor<String> {
 	HashSet<String> keys = null;
@@ -1772,13 +2158,19 @@ public abstract class ConfigPropertyEditor {
 		    return null;
 		}
 	    }
-	    if (key.startsWith("base64.")) {
+	    if (recipientsKey != null && key.equals(recipientsKey)) {
+		tag = 3;
+	    } else if (key.startsWith("base64.")) {
 		tag = 1;
 		// value = decode(oldvalue);
 	    } else if (key.startsWith("ebase64.")) {
 		tag = 2;
 		requestPassphrase(pwowner);
-		value = decrypt(oldvalue);
+		try {
+		    value = decrypt(oldvalue);
+		} catch (Exception e) {
+		    value = null;
+		}
 	    }
 
 	    TaggedTextField tf = (TaggedTextField)
@@ -1793,18 +2185,124 @@ public abstract class ConfigPropertyEditor {
 	public Object getCellEditorValue() {
 	    TaggedTextField tf = (TaggedTextField) getComponent();
 	    String value = tf.getText();
+	    String[] recipients;
 	    switch (tf.tag) {
 	    default:
 		return value;
 	    case 1:
 		return value;
 	    case 2:
-		String[] recipients = (recipientsList != null)? recipientsList:
+		recipients = (recipientsList != null)? recipientsList:
 		    getRecipients(tf.table);
-		if (recipients == null  || recipients.length == 0) {
-		    return tf.oldvalue;
+		if (useGPG()) {
+		    if (recipients == null  || recipients.length == 0) {
+			return tf.oldvalue;
+		    }
+		    return encrypt(value, recipients);
+		} else {
+		    return encrypt(value, null);
 		}
-		return encrypt(value, recipients);
+	    case 3:
+		if (value == null || value.length() <= 2) return null;
+		value = value.trim().substring(1);
+		value = value.substring(0, value.length() - 1);
+		recipients = value
+		    .replaceAll("[\"][ ]*[\"]", "\"\"")
+		    .split("\"\"");
+		boolean notchanged
+		    = (recipients.length == recipientsList.length);
+
+		boolean hasourkey = false;
+		int pstatus = NOKEYIDS;
+		String ourkey = null;
+		for (int i = 0; i < recipients.length; i++) {
+		    recipients[i] = WebDecoder.quoteDecode(recipients[i]);
+		    System.out.println("... " + recipients[i]);
+		    int status = gpgHasKey(recipients[i], true);
+		    if (status != ONEKEYID) {
+			// warn user about a bad key.
+			System.out.println("got here 1, status = " + status);
+			String msg;
+			if (status == NOKEYIDS) {
+			    msg = errorMsg("noGPGKey", recipients[i]);
+			} else {
+			    msg = errorMsg("multipleGPGKeys", recipients[i]);
+			}
+			String title;
+			if (status == NOKEYIDS) {
+			    title = errorMsg("noGPGKeyTitle");
+			} else {
+			    title = errorMsg("multipleGPGKeysTitle");
+			}
+			JOptionPane
+			.showMessageDialog(tf.table, msg, title,
+					   JOptionPane.ERROR_MESSAGE);
+			return tf.oldvalue;
+		    }
+		    if (hasourkey == false
+			&& (pstatus = gpgHasKey(recipients[i], false))
+			!= NOKEYIDS) {
+			hasourkey = true;
+			ourkey = recipients[i];
+		    }
+		    if (notchanged) {
+			notchanged = (recipients[i].equals(recipientsList[i]));
+		    }
+		}
+		if (hasourkey == false) {
+		    // warn user that we won't be able to decrypt encrypted
+		    // entries with an option to abort.
+		    if (JOptionPane.showConfirmDialog
+			(tf.table, localeString("noPrivateGPGKey"),
+			 localeString("noPrivateGPGKeyTitle"),
+			 JOptionPane.OK_CANCEL_OPTION)
+			!= JOptionPane.OK_OPTION) {
+			return tf.oldvalue;
+		    }
+
+		} else if (pstatus == MULTIPLEKEYIDS) {
+		    // found more than one key for a key id.
+		    String msg = errorMsg("multiplePrivateGPGKeys", ourkey);
+		    String title = errorMsg("multiplePrivateGPGKeysTitle");
+		    JOptionPane
+			.showMessageDialog(tf.table, msg, title,
+					   JOptionPane.ERROR_MESSAGE);
+		}
+		recipientsList = recipients;
+		try {
+		    StringBuilder sb = new StringBuilder();
+		    for (String s: recipients) {
+			sb.append("\"");
+			sb.append(WebEncoder.quoteEncode(s));
+			sb.append("\" ");
+		    }
+		    String result = sb.toString().trim();
+		    System.out.println("result = " + result);
+		    return result;
+		} finally {
+		    if (notchanged == false) {
+			// just in case
+			requestPassphrase(tf.table);
+			// fix up ebase64 properties.
+			int rowcnt = tf.table.getModel().getRowCount();
+			for (int i = 0; i < rowcnt; i++) {
+			    String key = (String)tf.table.getValueAt(i, 0);
+			    if (key == null) continue;
+			    if (key.startsWith(EB64KEY_START)) {
+				String val = (String)tf.table.getValueAt(i, 1);
+				if (val != null && val.length() != 0) {
+				    try {
+					val = decrypt(val);
+					val = encrypt(val, recipientsList);
+					tf.table.setValueAt(val, i, 1);
+				    } catch (Exception e) {
+					continue;
+				    }
+				}
+			    }
+			}
+		    }
+		}
 	    }
 	}
     }
@@ -2341,13 +2839,28 @@ public abstract class ConfigPropertyEditor {
 	    properties = new Properties();
 	}
 	if (key.startsWith(EB64KEY_START)) {
-	    String[] recipients = (recipientsList != null)? recipientsList:
-		getRecipients(owner);
-
-	    if (recipients == null || recipients.length == 0) return false;
-	    String evalue = encrypt(value, recipients);
-	    if (evalue == null) return false;
-	    properties.setProperty(key, evalue);
+	    if (useGPG) {
+		String[] recipients = (recipientsList != null)? recipientsList:
+		    getRecipients(owner);
+		if (recipients == null || recipients.length == 0) {
+		    if (useGPG() == false) {
+			requestPassphrase(owner);
+			String evalue = encrypt(value, null);
+			if (evalue == null) return false;
+			properties.setProperty(key, evalue);
+		    } else {
+			return false;
+		    }
+		}
+		String evalue = encrypt(value, recipients);
+		if (evalue == null) return false;
+		properties.setProperty(key, evalue);
+	    } else {
+		requestPassphrase(owner);
+		String evalue = encrypt(value, null);
+		if (evalue == null) return false;
+		properties.setProperty(key, evalue);
+	    }
 	} else if (key.startsWith(B64KEY_START)) {
 	    properties.setProperty(key, encode(value));
 	} else {
@@ -2357,6 +2870,26 @@ public abstract class ConfigPropertyEditor {
     }
 
     Component pwowner = null;
+
+    /**
+     * Get the component over which a password-request dialog box should
+     * appear.
+     * @return the component; null if there is none
+     */
+
+    public Component getPWOwner() {
+	return pwowner;
+    }
+
+    /**
+     * Get the component over which a password-request dialog box should
+     * appear.
+     * @param owner the component; null if there is none
+     */
+    public void setPWOwner(Component owner) {
+	pwowner = owner;
+    }
+
 
     /**
      * Prevent editing of specific rows and columns.
@@ -2376,6 +2909,7 @@ public abstract class ConfigPropertyEditor {
 	return false;
     }
 
+    Component savedpwowner = null;
     private void doEdit(final Component owner,  final Mode mode,
 			final Callable continuation,
 			final CloseMode quitCloseMode)
@@ -2428,6 +2962,7 @@ public abstract class ConfigPropertyEditor {
 			 Dialog.ModalityType.MODELESS));
 	 */
 
+	 savedpwowner = pwowner;
 	 pwowner = window;
 
 	Set<String> names = new HashSet<>(64);
@@ -2532,8 +3067,21 @@ public abstract class ConfigPropertyEditor {
 			value = defaultValue;
 		    }
 		}
-		if (key.startsWith("base64.")) {
+		if (recipientsKey  != null && key.equals(recipientsKey)
+		    && value != null) {
+		    String vals[] = ConfigPropUtilities.decodeRecipients(value);
+		    StringBuilder sb = new StringBuilder();
+		    for (String s: vals) {
+			sb.append("\"");
+			sb.append(WebEncoder.quoteEncode(s));
+			sb.append("\" ");
+		    }
+		    value = sb.toString().trim();
+		} else if (key.startsWith("base64.")) {
 		    value = decode(value);
+		} else if (recipientsKey != null
+			   && key.equals(recipientsKey)) {
+		    String val = decode(value);
 		}
 
 	    }
@@ -2616,6 +3164,10 @@ public abstract class ConfigPropertyEditor {
 		    String key = (String)tbl.getValueAt(row, 0);
 		    if (key == null) return null;
 		    if (key.startsWith("ebase64.")) return encryptedTCR;
+		    String ekey = "^" + key;
+		    if (hasRE(ekey)) {
+			return getR(ekey);
+		    }
 		    if (hasRE(key)) {
 			return getR(key);
 		    } else {
@@ -2641,7 +3193,10 @@ public abstract class ConfigPropertyEditor {
 		    String key = (String)tbl.getValueAt(row, 0);
 		    if (key == null) return null;
 		    if (key.startsWith("ebase64.")) return null;
-		    if (hasRE(key)) {
+		    String ekey = "^" + key;
+		    if (hasRE(ekey)) {
+			return getE(ekey);
+		    } else if (hasRE(key)) {
 			return getE(key);
 		    } else {
 			int ind;
@@ -2823,7 +3378,8 @@ public abstract class ConfigPropertyEditor {
 		    }
 		    window.setVisible(false);
 		    window.dispose();
-		    pwowner = null;
+		    pwowner = savedpwowner;
+		    savedpwowner = null;
 		    CloseMode qcm = quitCloseMode;
 		    if (qcm == CloseMode.BOTH) {
 			qcm = (e.getSource() == quitMenuItem)?
@@ -2948,6 +3504,8 @@ public abstract class ConfigPropertyEditor {
 			    // loops and these have to be fixed. to have
 			    // a consistent state.
 			    window.dispose();
+			    pwowner = savedpwowner;
+			    savedpwowner = null;
 			    SwingUtilities.invokeLater(() -> {
 				    doEdit(owner, mode, continuation,
 					   quitCloseMode);
@@ -2960,6 +3518,8 @@ public abstract class ConfigPropertyEditor {
 			    callable.call();
 			}
 			window.dispose();
+			pwowner = savedpwowner;
+			savedpwowner = null;
 		    }
 		    public void windowClosed() {
 			if (tmlAddedContainer.tmlAdded) {
@@ -3006,6 +3566,8 @@ public abstract class ConfigPropertyEditor {
 				// loops and these have to be fixed. to have
 				// a consistent state.
 				window.dispose();
+				pwowner = savedpwowner;
+				savedpwowner = null;
 				SwingUtilities.invokeLater(() -> {
 					doEdit(owner, mode, continuation,
 					       quitCloseMode);
@@ -3094,6 +3656,8 @@ public abstract class ConfigPropertyEditor {
 		// loops and these have to be fixed. to have
 		// a consistent state.
 		window.dispose();
+		pwowner = savedpwowner;
+		savedpwowner = null;
 		doEdit(owner, mode, continuation, quitCloseMode);
 	    } else if (continuationContainer.callable != null) {
 		continuationContainer.callable.call();
@@ -3284,8 +3848,12 @@ public abstract class ConfigPropertyEditor {
 			String key = (String) k;
 			if (key.startsWith("ebase64.")) {
 			    String encrypted = getProperty(key);
-			    requestPassphrase(null);
+			    requestPassphrase(pwowner);
+			    try {
 			    return decryptToCharArray(encrypted);
+			    } catch (Exception e) {
+				return null;
+			    }
 			} else {
 			    return super.get(k);
 			}
@@ -3377,7 +3945,7 @@ public abstract class ConfigPropertyEditor {
 //  LocalWords:  setRecipients indexWrap addReservedKeys altKeys cpe
 //  LocalWords:  IllegalArgumentException getBackground getForeground
 //  LocalWords:  getCaretColor getText stopCellEditing SwingUtilities
-//  LocalWords:  requestPassphrase ignoreConsole requestGPGPassphrase
+//  LocalWords:  requestPassphrase ignoreConsole requestPassphrase
 //  LocalWords:  boolean configureUsingSBL enterPW HelpMenuItem CTRL
 //  LocalWords:  helpMenuItem menuItem isBordered encryptedTCR qcl
 //  LocalWords:  textFunction textFunctionNeeded monitorProperty

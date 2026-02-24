@@ -101,6 +101,19 @@ config2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
 	$(JAVA) ConfigTest2
 
+config3:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ConfigTest3
+
+config3-ui:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar  *.java
+	$(JAVA) ConfigTest3 --systemUI $(ARG1)
+
+
 config-pw1:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -795,13 +808,17 @@ authtest1a:
 	     AuthPaneTest http://localhost:8080/resources/glass.png \
 			http://localhost:8080/resources/x.png
 
+# Test with ssl, sbl, etc.
+
 authtest2s:
 	(cd ../.. ; make jars)
 	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
 	java -Dssl.trustStore=../ejws/cacerts.jks \
              -Dssl.trustStorePassword=changeit \
 	     -classpath ../../BUILD/libbzdev.jar:classes \
-	     AuthPaneTest https://localhost:8080/resources/glass.png
+	     AuthPaneTest https://localhost:8080/resources/glass.png \
+	     https://localhost:8080/resources/glass.png \
+	     ~/.config/sbl/example3.sbl
 
 authtest2:
 	(cd ../.. ; make jars)
@@ -819,15 +836,6 @@ authtest2a:
 	     -classpath ../../BUILD/libbzdev.jar:classes \
 	     AuthPaneTest https://$(HOST):8080/resources/glass.png \
 			https://$(HOST):8080/resources/x.png
-
-authtest2t:
-	(cd ../.. ; make jars)
-	javac -d classes -classpath ../../BUILD/libbzdev.jar AuthPaneTest.java
-	java -Dssl.trustStore=../ejws/thelio-ts.jks \
-             -Dssl.trustStorePassword=changeit \
-	     -DHOST=$(HOST) \
-	     -classpath ../../BUILD/libbzdev.jar:classes \
-	     AuthPaneTest https://$(HOST):8080/resources/glass.png
 
 authtest2t:
 	(cd ../.. ; make jars)

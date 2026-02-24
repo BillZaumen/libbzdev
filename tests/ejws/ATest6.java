@@ -29,11 +29,15 @@ public class ATest6 {
 			      .truststore(new FileInputStream
 					  ("thelio-ts.jks")));
 
-	    Certificate[] certs = ews.getCertificates();
-	    System.out.println("Number of certificates = " + certs.length);
+	    Certificate[][] certs = ews.getCertificates();
+	    System.out.println("Number of certificates = " + certs[0].length);
 
-	    EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm, certs);
+	    EjwsSecureBasicAuth auth = new
+		EjwsSecureBasicAuth(ews, realm,
+				    EjwsSecureBasicAuth.getMode(certs));
 
+	    ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
+		    true, true, true);
 	    // We want to make it easy for the time limit to expire
 	    auth.setTimeLimits(-2 , 30, 45);
 	    System.out.println("auth mode = " + auth.getMode());
@@ -64,13 +68,11 @@ public class ATest6 {
 	    auth.add(user, publicKeyPem, password);
 	    auth.setTracer(System.out);
 
-	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), auth,
-		true, true, true);
 
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html", "", true);
-	URI logoutURI = (argv.length == 1)?
-	    new URI("https://www.google.com"): new URI(argv[1]);
+	URI logoutURI = (argv.length == 2)?
+	    new URI("https://www.google.com"): new URI(argv[2]);
 
 	handler.setLogoutAlias("logout.html", logoutURI);
 

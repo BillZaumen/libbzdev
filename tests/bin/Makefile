@@ -456,14 +456,44 @@ sbl:
 	chmod u-x sblrun
 
 sbl-test:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace -- ../test.sbl
+	chmod u-x sblrun
 
+sbl-test5:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace -- test5.sbl
+	chmod u-x sblrun
+
+
+sbl-example:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace -- ~/.config/sbl/example.sbl
+	chmod u-x sblrun
+
+sbl-stacktrace:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace --
+	chmod u-x sblrun
+
+sbl-stacktrace-test:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace -- ~/.config/sbl/test.sbl
+	chmod u-x sblrun
+
+
+sbl-test2:
 	(cd ../.. ; make )
 	chmod u+x sblrun
 	./sblrun -- sblconf/test.sbl
 	chmod u-x sblrun
 
 sbl-test2:
-
 	(cd ../.. ; make )
 	chmod u+x sblrun
 	./sblrun -- sblconf/test2.sbl
@@ -530,6 +560,22 @@ sbl-publickey:
 	chmod u+x sblrun
 	./sblrun --print publicKey sblconf/test.sbl
 	chmod u-x sblrun
+
+sbl-create:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --create --user nobody@gmail.com -n ouruser \
+		--uri https://nowhere.net \
+		-r wtz-email output1.sbl output2.sbl
+	chmod u-x sblrun
+
+sbl-json:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --create --user nobody@gmail.com -n ouruser \
+		--uri https://nowhere.net -r wtz-email
+	chmod u-x sblrun
+
 
 startup:
 	( cd ../.. ; make )

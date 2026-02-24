@@ -20,6 +20,7 @@ public class ATest8 {
 	System.out.println(realm);
 	File sblFile = new File(argv[1]);
 	String key = argv[2];
+	String alias = (argv.length > 3)? argv[3]: null;
 	
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
 
@@ -31,65 +32,53 @@ public class ATest8 {
 			      .truststore(new FileInputStream
 					  ("thelio-ts.jks")));
 
-	    Certificate[] certs = ews.getCertificates();
-	    System.out.println("Number of certificates = " + certs.length);
+	Certificate[][] certs = ews.getCertificates();
+	System.out.println("Number of certificates = " + certs[0].length);
 
-	    EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(realm, certs);
+	EjwsSecureBasicAuth auth = new
+	    EjwsSecureBasicAuth(ews, realm, EjwsSecureBasicAuth.getMode(certs));
+	if (alias != null) {
+	    auth.setCertificateChain(new FileInputStream("thelio-ks.jks"),
+				     "changeit".toCharArray(), alias);
+	}
 
-	    File dir = new File(argv[0]);
+	File dir = new File(argv[0]);
 
-	    // We want to make it easy for the time limit to expire
-	    auth.setTimeLimits(-60 , 120, 3600);
-	    System.out.println("auth mode = " + auth.getMode());
+	// We want to make it easy for the time limit to expire
+	auth.setTimeLimits(-60 , 120, 3600);
+	System.out.println("auth mode = " + auth.getMode());
 
-	    /*
-	    ConfigPropertyEditor cpe = new ConfigPropertyEditor() {
-		    @Override
-		    protected String errorTitle()
-		    {return "";}
-		    @Override
-		    protected String configTitle() {return "";}
-		    @Override
-		    protected String mediaType() {
-			return "application/vnd.bzdev.sblauncher";
-		    }
-		    @Override
-		    protected String extensionFilterTitle() {
-			return ("extensionFilterTitle");
-		    }
-		    @Override
-		    protected String extension() {return "sbl";}
-		};
+	Properties props = ConfigPropUtilities
+	    .newInstance(sblFile, "application/vnd.bzdev.sblauncher");
+	String user = ConfigPropUtilities
+	    .getProperty(props, key + ".user");
+	String password = ConfigPropUtilities
+	    .getProperty(props, key + ".password");
+	String publicKeyPem = ConfigPropUtilities
+	    .getProperty(props, "base64.keypair.publicKey");
 
-	    cpe.loadFile(sblFile);
-	    Properties props = cpe.getDecodedProperties();
-	    String user = props.getProperty(key + ".user");
-	    String password = props.getProperty(key + ".password");
-	    String publicKeyPem = props.getProperty("keypair.publicKey");
-	    */
-	    Properties props = ConfigPropUtilities
-		.newInstance(sblFile, "application/vnd.bzdev.sblauncher");
-	    String user = ConfigPropUtilities
-		.getProperty(props, key + ".user");
-	    String password = ConfigPropUtilities
-		.getProperty(props, key + ".password");
-	    String publicKeyPem = ConfigPropUtilities
-		.getProperty(props, "base64.keypair.publicKey");
+	System.out.println("user = " + user);
+	System.out.println("password = " + password);
+	System.out.println("publicKeyPem = " + publicKeyPem);
 
-	    auth.add(user, publicKeyPem, password);
-	    // auth.setTracer(System.out);
+	auth.setTracer(System.out);
+	URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
+	    new URI("https://www.google.com"): new URI(argv[1]);
 
-	    ews.add("/", DirWebMap.class, dir, auth, true, true, true);
+	ews.add("/", DirWebMap.class, dir, auth, true, true, true)
+	    .addWelcome("/index.html")
+	    .setLoginAlias("login.html", "", true)
+	    .setLogoutAlias("logout.html", logoutURI);
+	auth.add(user, publicKeyPem, password);
+	/*
 	WebMap webmap = ews.getWebMap("/");
 	webmap.addWelcome("/index.html");
 
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html", "", true);
-	URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
-	    new URI("https://www.google.com"): new URI(argv[1]);
 
 	handler.setLogoutAlias("logout.html", logoutURI);
-
+	*/
 	auth.setLoginFunction((p, t) -> {
 		System.out.println("login: " + p.getUsername());
 	    });

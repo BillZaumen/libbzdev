@@ -8,9 +8,12 @@ public class Test {
 	// ErrorMessage.setStackTrace(true);
 	EmbeddedWebServer ews = new EmbeddedWebServer(8080, 48, 2);
 	ews.add("/", DirWebMap.class, new File("../../BUILD/api/"), null,
-		true, true, true);
+		true, true, true)
+	    .setLoginAlias("login.html");
+	/*
 	FileHandler handler = (FileHandler) ews.getHttpHandler("/");
 	handler.setLoginAlias("login.html");
+	*/
 	ews.setTracer("/", System.out);
 	ews.start();
     }

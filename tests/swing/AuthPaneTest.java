@@ -193,15 +193,29 @@ public class AuthPaneTest {
 	System.out.println(pem2);
 	SecureBasicUtilities ops1 = new SecureBasicUtilities(pem1);
 	SecureBasicUtilities ops2 = new SecureBasicUtilities(pem2);
-	char[] passArray = ops1.createPassword(null, "foo".toCharArray());
+	char[] passArray = ops1.createPassword((Certificate[])null,
+					       "foo".toCharArray());
 	String password = new String(passArray);
 	byte[] sigarray = ops2.decodePassword(password);
-	if (ops2.checkPassword(sigarray, null, "foo") == false) {
+	if (ops2.checkPassword(sigarray, (Certificate[])null, "foo") == false) {
 	    throw new Exception("ops");
 	}
 
+	String urlString1 = argv.length > 0 ? argv[0]: null;
+	String urlString2 = argv.length > 1? argv[1]: null;
+	String pemName = argv.length > 2? argv[2]: null;
+	// String ksname = (argv.length > 3)? argv[3]: null;
+	// String alias = (argv.length> 4)? argv[4]: null;
+	final URL url1 = (urlString1 != null)? new URL (urlString1): null;
+	final URL url2 = (urlString2 != null)? new URL (urlString2): null;
+	File pemFile = (pemName != null)?new File(pemName): null;
+
+
 	String fn = System.getProperty("sblFile");
-	if (fn != null || fn.length() > 0) {
+	if (pemFile != null && pemName.endsWith(".sbl")) {
+	    System.out.println("configuring from " + fn);
+	    SSLUtilities.configureUsingSBL("TLS", pemFile, null);
+	} else if (fn != null && fn.length() > 0) {
 	    System.out.println("configuring from " + fn);
 	    SSLUtilities.configureUsingSBL("TLS", new File(fn), null);
 	} else {
@@ -219,10 +233,6 @@ public class AuthPaneTest {
 	    SSLUtilities.allowLoopbackHostname();
 	}
 
-	String urlString1 = argv.length > 0 ? argv[0]: null;
-	String urlString2 = argv.length > 1? argv[1]: null;
-	final URL url1 = (urlString1 != null)? new URL (urlString1): null;
-	final URL url2 = (urlString2 != null)? new URL (urlString2): null;
 
 	// Se we'll handle authentication before the frame is constructed.
 
@@ -244,28 +254,32 @@ public class AuthPaneTest {
 	    System.exit(1);
 	} catch (Exception e) {}
 
+	System.out.println("now test AuthenticationPane using a server");
 
 	AuthenticationPane.setPrivateKey(pkfile);
 	Authenticator auth =
-	    AuthenticationPane.getAuthenticator(null, true);
-	// AuthenticationPane.setPrivateKey(auth,pkfile);
+	    AuthenticationPane.getAuthenticator(null);
 
-	try {
-	    AuthenticationPane.setPrivateKey(auth, new File("junk.pem"));
-	    System.out.println("exception missing");
-	    System.exit(1);
-	} catch (Exception e) {}
+	// Reset auth so we are starting from a clean slate
+	// AuthenticationPane.setPrivateKey(auth, null);
+	AuthenticationPane.setPrivateKey(null);
+	auth = AuthenticationPane.getAuthenticator(null, true);
 
-	try {
-	    AuthenticationPane.setPrivateKey(auth,
-					     new File("AuthPaneTest.java"));
-	    System.out.println("exception missing");
-	    System.exit(1);
-	} catch (Exception e) {}
-
-
-	Authenticator.setDefault(auth);
-
+	if (true) {
+	    Authenticator.setDefault(auth);
+	    URI testURI =  AuthenticationPane
+		.addSBLFile(new FileInputStream(pemFile));
+	    System.out.println("uri = " + testURI);
+	    /*
+	    System.out.println("uri = "
+			       + AuthenticationPane.addSBLFile(pemFile));
+	    */
+	    testURI = testURI.resolve("api/index.html");
+	    System.out.println("find login for " + testURI);
+	    System.out.println(AuthenticationPane
+			       .getLoginURI(testURI));
+	    // AuthenticationPane.setPrivateKey(pemFile);
+	}
 	if (url1 != null) {
 	    System.out.println("connect to login alias");
 	    if (urlString1.startsWith("http://" + HOST + ":8080/")
@@ -274,8 +288,11 @@ public class AuthPaneTest {
 		URL url0 = new URL(urlString1.startsWith("https")?
 				   "https://" + HOST + ":8080/login.html":
 				   "http://" + HOST + ":8080/login.html");
+		System.out.println("... opening connection");
 		URLConnection urlc = url0.openConnection();
+		System.out.println("... connecting");
 		urlc.connect();
+		System.out.println("... checking status");
 		int status = (urlc instanceof HttpURLConnection)?
 		    ((HttpURLConnection) urlc).getResponseCode(): -1;
 		System.out.println("status = " + status);
