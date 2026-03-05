@@ -777,11 +777,29 @@ public class SBL {
 
     private static  boolean stacktrace = false;
 
+    private static File fnexpand(String fname) {
+	String sep = System.getProperty("file.separator");
+	if (fname == null) {
+	    return null;
+	} else if (fname.startsWith("~" + sep) ){
+	    String home = System.getProperty("user.home");
+	    if (home.endsWith(sep)) {
+		home = home.substring(0, home.length() - sep.length());
+	    }
+	    return new File(home + fname.substring(1));
+	} else if (fname.startsWith("..." + sep)) {
+	    fname = fname.substring(sep.length() + 3);
+	    return new File(configDir, fname);
+	} else {
+	    return new File(fname);
+	}
+    }
+
     public static void main(String argv[]) throws Exception {
 
 	configDir.mkdirs();
-	System.setProperty("user.dir", configDir.getCanonicalPath());
-	System.setProperty("user.home", configDir.getCanonicalPath());
+	// System.setProperty("user.dir", configDir.getCanonicalPath());
+	// System.setProperty("user.home", configDir.getCanonicalPath());
 
 	DarkmodeMonitor.setSystemPLAF();
 	DarkmodeMonitor.init();
@@ -850,6 +868,8 @@ public class SBL {
 		rlist.add(argv[indx]);
 	    } else if (argv[indx].equals("-f")) {
 		checkConfig = false;
+	    } else if (argv[indx].equals("--loopback")) {
+		allowLoopback = true;
 	    } else if (argv[indx].equals("-n")) {
 		indx++;
 		if (indx == argv.length) {
@@ -896,8 +916,26 @@ public class SBL {
 		    System.err.println("sbl: " + errorMsg("printerr", arg));
 		    System.exit(1);
 		}
+	    } else if (argv[indx].equals("--selfSigned")) {
+		allowSelfSigned = true;
 	    } else if (argv[indx].equals("--stacktrace")) {
 		stacktrace = true;
+	    } else if (argv[indx].equals("--truststore")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--truststore");
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		trustStore = new File(argv[indx]);
+	    } else if (argv[indx].equals("--truststorePW")) {
+		indx++;
+		if (indx == argv.length) {
+		    String msg = errorMsg("missingArg", "--truststorePW");
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		trustStorePW = argv[indx].toCharArray();
 	    } else if (argv[indx].startsWith("-")) {
 		System.err.println("sbl: " + errorMsg("badOption", argv[indx]));
 		System.exit(1);
@@ -906,13 +944,17 @@ public class SBL {
 	    }
 	    indx++;
 	}
-	configFile = (argv.length-indx == 1)? new
-	    File(configDir, argv[indx]): null;
+	String fname = (argv.length-indx == 1)? argv[indx]: null;
+	configFile = fnexpand(fname);
+	System.out.println("configFile = " + configFile);
 
 	if (create) {
+	    File stdoutFile = new File("-");
 	    File configFile1 = (argv.length-indx == 2)?
+		(argv[indx].equals("-"))? stdoutFile:
 		new File(argv[indx]): null;
 	    File configFile2 = (argv.length-indx == 2)?
+		(argv[indx].equals("-"))? stdoutFile:
 		new File(argv[indx+1]): null;
 	    boolean json = false;
 
@@ -923,13 +965,18 @@ public class SBL {
 		    System.err.println("sbl: " + errorMsg("noConfigFile"));
 		    System.exit(1);
 		}
-		if (configFile1.exists()) {
+		if (configFile1 != stdoutFile && configFile1.exists()) {
 		    String msg =  errorMsg("existingConfigFile", argv[indx]);
 		    System.err.println("sbl: " + msg);
 		    System.exit(1);
 		}
-		if (configFile2.exists()) {
+		if (configFile2 != stdoutFile && configFile2.exists()) {
 		    String msg =  errorMsg("existingConfigFile", argv[indx+1]);
+		    System.err.println("sbl: " + msg);
+		    System.exit(1);
+		}
+		if (configFile1 == stdoutFile && configFile2 == stdoutFile) {
+		    String msg = errorMsg("duplicateStdout");
 		    System.err.println("sbl: " + msg);
 		    System.exit(1);
 		}
@@ -975,12 +1022,29 @@ public class SBL {
 	    cpe2.set(null, "title", json? name: configFile2.getName());
 	    cpe.set(null, "base64.keypair.publicKey", keypair[1]);
 	    cpe2.set(null, "ebase64.keypair.privateKey", keypair[0]);
+	    if (trustStore != null) {
+		cpe2.set(null, "truststore.file",
+			 trustStore.getCanonicalPath());
+		if (trustStorePW == null) {
+		    cpe2.set(null, "ebase64.trustStore.password",
+			     "changeit");
+		} else {
+		    cpe2.set(null, "ebase64.trustStore.password",
+			     new String(trustStorePW));
+		}
+	    }
+	    if (allowLoopback) {
+		cpe2.set(null, "trust.allow.loopback", "true");
+	    }
+	    if (allowSelfSigned) {
+		cpe2.set(null, "trust.selfsigned", "true");
+	    }
 	    cpe.set(null, name +".user", usr);
 	    cpe.set(null, name +".mode", "2");
 	    String pw = genpw();
 	    cpe.set(null, "base64." + name +".password", pw);
 	    cpe.set(null, name +".base", baseS);
-	    cpe.set(null, name +".uri", uriS);
+	    // cpe.set(null, name +".uri", uriS);
 	    cpe.set(null, name +".description", "login data");
 	    cpe2.set(null, name +".user", usr);
 	    cpe2.set(null, name +".mode", "2");
@@ -1093,6 +1157,7 @@ public class SBL {
 	    System.exit(1);
 	}
 
+	final String ournm = nm;
 	SwingUtilities.invokeLater(() -> {
 		boolean loadedAtStart = false;
 		JPanel panel = new JPanel(new GridLayout(3, 3));
@@ -1382,13 +1447,25 @@ public class SBL {
 			}
 		    });
 
-		if (loadedAtStart && entries.size() == 1) {
-		    // If the configuration file was loaded from a file
-		    // specified on the command line and there is only
-		    // a single item to select, select that one automatically.
-		    // The use case is a user who opens a file provided by
-		    // a browser and there is only a single entry.
-		    selectSiteCB.setSelectedIndex(1);
+		if (loadedAtStart) {
+		    if (ournm != null) {
+			// allow the command line to specify the name
+			int len = selectSiteCB.getItemCount();
+			for (int i = 1; i < len; i++) {
+			    if (selectSiteCB.getItemAt(i).equals(ournm)) {
+				selectSiteCB.setSelectedIndex(i);
+				break;
+			    }
+			}
+		    } else if (entries.size() == 1) {
+			// If the configuration file was loaded from a file
+			// specified on the command line and there is only
+			// a single item to select, select that one
+			// automatically. The use case is a user who opens
+			// a file provided by a browser and there is only
+			// a single entry.
+			selectSiteCB.setSelectedIndex(1);
+		    }
 		}
 
 		copyUserButton.addActionListener((e) -> {

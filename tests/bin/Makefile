@@ -458,13 +458,26 @@ sbl:
 sbl-test:
 	(cd ../.. ; make )
 	chmod u+x sblrun
+	./sblrun --stacktrace -- test.sbl
+	chmod u-x sblrun
+
+sbl-test-2dot:
+	(cd ../.. ; make )
+	chmod u+x sblrun
 	./sblrun --stacktrace -- ../test.sbl
 	chmod u-x sblrun
+
 
 sbl-test5:
 	(cd ../.. ; make )
 	chmod u+x sblrun
-	./sblrun --stacktrace -- test5.sbl
+	./sblrun --stacktrace -- .../test5.sbl
+	chmod u-x sblrun
+
+sbl-test5-foo:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --stacktrace -n foo -- .../test5.sbl
 	chmod u-x sblrun
 
 
@@ -561,19 +574,22 @@ sbl-publickey:
 	./sblrun --print publicKey sblconf/test.sbl
 	chmod u-x sblrun
 
+# overridde
+RECIPIENT = foo
+
 sbl-create:
 	(cd ../.. ; make )
 	chmod u+x sblrun
 	./sblrun --create --user nobody@gmail.com -n ouruser \
 		--uri https://nowhere.net \
-		-r wtz-email output1.sbl output2.sbl
+		-r $(RECIPIENT) output1.sbl output2.sbl
 	chmod u-x sblrun
 
 sbl-json:
 	(cd ../.. ; make )
 	chmod u+x sblrun
 	./sblrun --create --user nobody@gmail.com -n ouruser \
-		--uri https://nowhere.net -r wtz-email
+		--uri https://nowhere.net -r $(RECIPIENT)
 	chmod u-x sblrun
 
 

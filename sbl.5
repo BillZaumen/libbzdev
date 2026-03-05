@@ -22,8 +22,14 @@ and then encoded using the URL-safe base-64 encoding.
 .PP
 There are several reserved keys (property names):
 .TP
+.B recipients
+A base-64 encoded value That consists of the GPG key IDs used to
+encrypt the values of
+.B ebase64
+keys, with each pair of GPG key IDs separated by a NEWLINE character.
+.TP
 .B title
-A user-specified title to display for this file
+A user-specified title to display for this file.
 .TP
 .B base64.keypair.publicKey
 The public key.
@@ -32,9 +38,10 @@ The public key.
 The GPG-encrypted private key
 .TP
 .B trustStore.file
-The file name for an additional trust store to use in addition to
-the default.  A trust store contains self-signed certificates that
-are deemed to be trusted for signing other certificates.
+The file name for an additional trust store to use in addition to the
+Java "cacerts" default.  A trust store contains self-signed
+certificates that are deemed to be trusted for signing other
+certificates. This entry is useful for software testing.
 .TP
 .B ebase64.trustStore.password
 The password for the trust store file.
@@ -42,7 +49,7 @@ The password for the trust store file.
 .B trust.selfsigned
 The value is
 .B true
-if a server's certificate can be self-signed;
+if a self-signed server's certificate can be automatically accepted;
 .B false
 otherwise.
 .TP
@@ -51,7 +58,7 @@ The value is
 .B true
 if the server can be found on the loopback interface;
 .B false
-otherwise.
+otherwise. This option was provided mainly for stand-alone testing.
 .PP
 The remaining keys are partially user-specified.  For each name
 .I NAME
@@ -67,11 +74,35 @@ The value is the type of the passphrase generate
 .BR PASSWORD_WITHOUT_CERT ,
 .BR PASSWORD_WITH_CERT ).
 .TP
-.B \fINAME\fB.password
-The value is the user-supplied password.
+.B ebase64.\fINAME\fB.password
+The value is the user-supplied password, which is automatically provided
+when
+.BR sbl \'s
+add-entry option is used.
+.TP
+.B \fINAME\fB.base
+The value is the URI used to find a protected part of a web site,
+a URL that represents a directory or some similar URL/URI path component.
+It should end with the character
+.BR /,
+which
+.B sbl
+will append if necessary when its "add entry" function is used to
+set up a new entry.
 .TP
 .B \fINAME\fB.uri
-The value is the URI used to find a web site.
+The value is the URI used to find a web site. It should start with
+the value of
+.BR \fINAME\fB.base :
+when generating this field, the program
+.B sbl
+will ask the user for a relative path and query, and that will be
+appended to the string
+.BR $(\fINAME\fB.base)\  ,
+which is expanded to the value of corresponding to the key
+\fINAME\fB.base\fR, when
+.BR sbl \'s
+"add entry" function is used to set up a new entry.
 .TP
 .B \fINAME\fB.user
 The value is the user's login name for this web site.
@@ -93,6 +124,59 @@ is treated as a single
 Substitutions are not performed when an SBL file is being edited by
 the program
 .BR sbl .
+.SH JSON
+When a  JSON object is produced by
+.BR sbl ,
+the object will be printed to standard output is a JSON object with
+two name-value pairs with the following keys:
+.TP
+.B serverInfo
+The value is a JSON object
+.TP
+.B clientInfo
+The value is an SBL file that is Base-64 encoded and contains the fields
+used by a client.
+.TP
+For the
+.B serverInfo
+key, the value is a JSON object with the following keys:
+.TP
+.B title
+A title for this object
+.TP
+.B base64.keypair.publicKey
+The base-64 encoded public key for a user. The decoded value specifies
+a signature algorithm and a PEM-encoded public key.
+.TP
+.B \fINAME\fB.user
+A user name, where
+.I NAME
+is an identifier specifying a group of entries.
+.TP
+.B base64.\fINAME\fB.password
+is a password, base64 encoded, where
+.I NAME
+is an identifier specifying a group of entries.
+.TP
+.B \fINAME\fB.base
+The base URI, where
+.I NAME
+is an identifier specifying a group of entries.
+.TP
+.B \fINAME\fB.description
+The description for this server + base, where
+.I NAME
+is an identifier specifying a group of entries.
+.TP
+.B \fINAME\fB.mode
+The mode as an integer (this will always be "2" indicating the
+enumeration constant
+.B SIGNATURE_WITH_CERT
+defined by the enumeration
+.BR SecureBasicUtilities.Mode ),
+where
+.I NAME
+is an identifier specifying a group of entries.
 .SH SEE ALSO
 .PP
 .BR sbl (1)

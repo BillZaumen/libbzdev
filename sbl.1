@@ -6,7 +6,8 @@ sbl \- create passphrases for use with secure basic authentication
 .br
 .B sbl\ \fICFILE
 .br
-.B sbl \fB[\fIOPTION\fB]...\fR \fICFILE
+.B sbl \fB[\fIOPTION\fB]...\fR \fICFILE\fB
+.B sbl\ \=\-create\ ]\fIOPTION\fB]...\ [\fICFILE1\ CFILE2\fB]
 .SH DESCRIPTION
 .PP
 The program
@@ -43,10 +44,18 @@ button, and then paste the user name and password.
 While there are
 some command-line options for specific tasks, typically
 .B sbl
-will be used to open a browser window with a specified web page,
-and simultaneously copy a secure basic authentication passphrase to
-the system clipboard, which can then be pasted into a dialog box
-or text field provided by a browser.
+will be used to open a browser window for a specific URI by
+clicking the
+.B Open\ Browser
+button, and simultaneously a user name and a a secure basic
+authentication passphrase will be copied to the system clipboard,
+which can then be pasted into a dialog box or text field provided by a
+browser.  Pasting in this case is handled specially: pasting alternates
+between pasting the user name and pasting the passphrase. The browser
+will typically pop up a dialog box asking for a user name and password,
+so the user can click on the user-name field, and paste a value from
+the clipboard, and then click on the passphrase/paswword field and paste
+from the clipboard again.
 .PP
 When
 .B sbl
@@ -61,7 +70,8 @@ specific operations.  These are
 .TP
 .B Load
 A new configuration file will be loaded. A "file chooser" dialog box
-will allow a configuration file to be selected.
+will allow a configuration file to be selected. If a file name that
+does not exist is entered, a new file will be created.
 .TP
 .B Select\ Site
 This will allow one to select a web page to visit, based on an
@@ -100,12 +110,76 @@ is used for two purposes: (1) to quickly reject bad authentication
 requests, and (2) so that passwords can differ when two web sites
 share the same certificate (web sites that are part of a larger
 organization sometimes share certificates).
+.PP
+When the SBL file is explicitly provided on the command line, a
+leading directory name of
+.B ...
+will be replaced with the default SBL directory.  On a Linux or Unix
+system, for example,
+.B .../example.sbl
+would be replaced with
+.BR ~/.config/sbl/example.sbl\  (
+the directory
+.B ~/.config/sbl
+is the directory the
+.B Load
+button's open-file dialog uses.
 
 .SH OPTIONS
 The options are
 .TP
 .B \-\-
-Terminate options. 
+Terminate options.
+.TP
+.BI \-\-base\  BASE_URI
+This option, used only with the
+.B \-\-create
+option, provides a base URI representing a portion of a website or server
+that is protected by an SBL-compatable authenticator.
+.TP
+.B \-c
+.TQ
+.B \-\-create
+Create a new SBL file. If the arguments
+.I CFILE1
+and
+.I CFILE2
+are present after the options, that will specify the name of
+the files to create. If one of these is "-", its output will be
+directed to standard output.  In all cases,
+.I CFILE1
+will contain the entries needed by a server and
+.I CFILE2
+will contain the entries needed by a client.
+If the arguments
+.I CFILE1
+and
+.I CFILE2
+are not provided, the file will be printed to standard output as
+A JSON object (see the man page
+.BR sbl (5)).  When the
+.B \-\-create
+option is used, Several options are mandatory:
+.BR \-\-base ,
+.BR \-n ,
+.BR
+.BR \-\-uri ,
+and
+.BR \-\-user .
+The optional options for
+.B \-\-create
+are
+.BR \-\-loopback ,
+.BR \-\-selfSigned ,
+.BR \-\-truststore ,
+and
+.BR  \-\-truststorePW .
+.TP
+.BI \-\-gpgdir\  DIRECTORY
+Use
+.I DIRECTORY
+as the GPG home directory. The option is useful when a server maintains
+its own GPG key ring.
 .TP
 .B \-f
 Suppress a dialog box that asks permission to use a trust store,
@@ -114,15 +188,31 @@ mill otherwise appear if an
 .B sbl
 file is provided as a command-line argument.
 .TP
-.BI \-n\   NAME
-The argument
-.I NAME
-is the identifier displayed when the
-.B Select\ Site
-box is used to choose a particular web page.  This identifier is
-used as a key to select particular options.
+.B \-\-loopback
+This option, used only with the
+.B \-\-create
+option, indicates that the loopback address denotes a valid host.
 .TP
-.B \-\-print\ \fIPOPTION
+.BI \-n\  NAME
+This option sets the identifier used to reference a particular
+entry in an SBL file that was passed to
+.B sbl
+as its only non-option argument. In this case, the argument
+.I NAME
+is the identifier that will be displayed by the
+.B Select\ Site
+box.
+.I NAME is also used with the
+.B \-\-create
+option to set the key for an entry - the identifier that will appear as
+part of a property key.  For the
+.B \-\-create
+option, a missing
+.B \-n
+option will result in an entry with the default key
+.BR user.
+.TP
+.B \-\-print\ \fIPOPTION\fB
 The argument
 .I POPTION
 can be
@@ -150,6 +240,41 @@ is
 a
 .B \-n
 option will also be needed.
+.TP
+.B \-\-selfSigned
+This option, used only with the
+.B \-\0 create
+option, indicates that a client should accept self-signed
+certificates. This option should be used only for testing.
+.TP
+.B \-\-stacktrace
+This option configures
+.B sbl
+so that it prints a stack trace if an exception that terminates
+the program is thrown.
+.TP
+.BI \-\-truststore\  FILE
+This option, used only with the
+.B \-\-truststore
+option, provides the name of a file containing a trust store.
+.TP
+.BI \-\-truststorePW\  PASSWORD
+This option, used only with the
+.B \-\-create
+option, provides the trust-store password
+.IR PASSWORD .
+.TP
+.BI \-\-uri\  URI
+This option, used only with the
+.B \-\-create
+option, provides the URI that should be visited when a user first
+logs in.
+
+.TP
+.BI \-\-user\  NAME
+This option provide a user name,
+.BR NAME ,
+used for a web site or server's login.
 .TP
 .BI \-r\  GPGKEY
 The argument

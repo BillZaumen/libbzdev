@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
 
+//@exbundle org.bzdev.util.lpack.Util
+
 /**
  * Convenience class used to create a {@link java.util.Properties} instance
  * formatted to match the {@link org.bzdev.swing.ConfigPropertyEditor}

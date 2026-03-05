@@ -1184,11 +1184,15 @@ public abstract class ConfigPropertyEditor {
 
     /**
      * Save the configuration in a file.
+     * If the file is not absolute and its name is "-", standard output
+     * is used instead of an actual file.
      * @param f the file
      * @throws IOException if an IO error occurred
      */
     public void save(File f) throws IOException {
-	FileOutputStream os = new FileOutputStream(f);
+	OutputStream os = (!f.isAbsolute() && f.getPath().equals("-"))?
+	    System.out:
+	    new FileOutputStream(f);
 	Writer w = new OutputStreamWriter(os, UTF8);
 	w = new CRLFWriter(w);
 	if (properties == null) {
@@ -1263,7 +1267,9 @@ public abstract class ConfigPropertyEditor {
     }
 
     private void save(File f, InputTablePane table) throws IOException {
-	FileOutputStream os = new FileOutputStream(f);
+	OutputStream os = (!f.isAbsolute() && f.getPath().equals("-"))?
+	    System.out:
+	    new FileOutputStream(f);
 	Writer w = new OutputStreamWriter(os, UTF8);
 	w = new CRLFWriter(w);
 	Properties props = new Properties();

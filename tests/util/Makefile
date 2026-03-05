@@ -144,6 +144,13 @@ all: compile
 	chmod u-x scrun
 	@echo --- shared-mime-info test ---
 	@$(JAVA) SMITest
+	@echo --- CipherTest ---
+	@$(JAVA) CipherTest
+	@echo ---- AStar1 ----
+	@$(JAVA) AStar1
+	@echo ---- AStar2 ----
+	@$(JAVA) AStar2
+
 	@echo --- run configProp test interactively '(make configProp)' ---
 
 actest: compile
@@ -544,6 +551,10 @@ astar2: compile
 	@echo ---- AStar2 ----
 	@$(JAVA) AStar2
 
+astar3: compile
+	@echo ---- AStar3 ----
+	@$(JAVA) AStar3
+
 
 blockTest:
 	@ (cd ../.. ; make jars)
@@ -610,7 +621,7 @@ cipher: compile
 	@$(JAVA) CipherTest
 
 clean:
-	rm -rf classes
+	rm -rf classes *.svg *.png
 	(cd rv ; make clean)
 	(cd units ; make clean)
 	rm -f sequence.txt

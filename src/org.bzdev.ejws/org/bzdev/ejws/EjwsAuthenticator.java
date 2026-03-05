@@ -14,7 +14,11 @@ import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.SecureBasicUtilities;
 import org.bzdev.util.ConfigProperties;
 
+//@exbundle org.bzdev.ejws.lpack.EmbeddedWebServer
 
+/**
+ * Base class for EJWS authenticators.
+ */
 public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
     static String errorMsg(String key, Object... args) {
