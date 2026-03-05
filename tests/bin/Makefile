@@ -503,12 +503,6 @@ sbl-stacktrace-test:
 sbl-test2:
 	(cd ../.. ; make )
 	chmod u+x sblrun
-	./sblrun -- sblconf/test.sbl
-	chmod u-x sblrun
-
-sbl-test2:
-	(cd ../.. ; make )
-	chmod u+x sblrun
 	./sblrun -- sblconf/test2.sbl
 	chmod u-x sblrun
 
