@@ -21,11 +21,7 @@ package org.bzdev.util;
  * For example,
  * <BLOCKQUOTE><PRE><CODE>
  * public class OurHeap extends CachedSkewHeap&lt;HeapEntry&gt; {
- *      protected int
- *      compareEntries(CachedSkewHeap.Entry&lt;HeapEntry&gt; e1,
- *                     CachedSkewHeap.Entry&lt;HeapEntry&gt; e2) {
- *        HeapEntry he1 = (HeapEntry)e1;
- *        HeapEntry he2 = (HeapEntry)e2;
+ *      protected int compareEntries(HeapEntry e1, HeapEntry e2)) {
  *        // now compare he1 and he2.
  *        ...
  *      }
@@ -43,9 +39,9 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
     private int esize = 0;
     private int nesize = 0;
 
-    Entry<E> entries = null;
-    Entry<E> newEntries = null; // uses the cache.
-    Entry<E> cache = null;
+    E entries = null;
+    E newEntries = null; // uses the cache.
+    E cache = null;
 
     /**
      * CachedSkewHeap entry.
@@ -60,11 +56,11 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
      * </CODE></PRE></BLOCKQUOTE>
      * @param <E> the type of a subclass of this class
      */
-    public abstract static class Entry<E extends Entry>
+    public abstract static class Entry<E extends Entry<E>>
     {
-	Entry<E> leftPQEntry = null;
-	Entry<E> rightPQEntry = null;
-	Entry<E> parentPQEntry = null;
+	E leftPQEntry = null;
+	E rightPQEntry = null;
+	E parentPQEntry = null;
     }
 
     /**
@@ -74,7 +70,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
      *         lower than, equal to, or greater than  entry2's order
      *         respectively.
      */
-    protected abstract int compareEntries(Entry<E> entry1, Entry<E> entry2);
+    protected abstract int compareEntries(E entry1, E entry2);
 
     /**
      * Check if this heap is empty.
@@ -85,8 +81,8 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
     }
 
 
-    private void mergeCached(Entry larger) {
-	Entry smaller = newEntries;
+    private void mergeCached(E larger) {
+	E smaller = newEntries;
 	// long itest;
 	int itest;
 	if (larger == null) {
@@ -125,7 +121,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
 	} else {
 	    cache = larger;	// cleared at end if doesn't work.
 	}
-	Entry tmp;
+	E tmp;
 	/*larger.value <= smaller.value*/
 	itest = compareEntries(larger, smaller);
 	/*
@@ -140,8 +136,8 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
 	    larger = smaller;
 	    smaller = tmp;
 	}
-	Entry last = smaller;
-	Entry result = last;
+	E last = smaller;
+	E result = last;
 	smaller = smaller.rightPQEntry;
 	for(;;) {
 	    if (smaller == null) {
@@ -232,7 +228,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
      */
     public E poll() {
 	merge();
-	Entry<E> entry = entries;
+	E entry = entries;
 	if (entries != null) {
 	    esize--;
 	    if (entries.leftPQEntry != null) {
@@ -253,7 +249,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
      * @param entry the entry to add
      * @return true if the entry was added; false otherwise.
      */
-    public boolean add(Entry<E> entry) {
+    public boolean add(E entry) {
 	if (entry == null || entry.parentPQEntry != null
 			  || entry.leftPQEntry != null
 			  || entry.rightPQEntry != null) {
@@ -275,7 +271,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
      * @param entry the entry
      * @return true on success; false otherwise
      */
-    public boolean remove(Entry<E> entry) {
+    public boolean remove(E entry) {
 	if (entry == null || (entry.parentPQEntry == null
 			      && entry.leftPQEntry == null
 			      && entry.rightPQEntry == null)) {
@@ -303,7 +299,7 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
 	    if (cache != null && cache.leftPQEntry != null) cache = null;
 	} else {
 	    merge(); // so we can handled esize and nsize properly & clear cache
-	    Entry parent = entry.parentPQEntry;
+	    E parent = entry.parentPQEntry;
 	    if (parent == null) {
 		if (entry == entries) {
 		    esize--;
@@ -344,16 +340,14 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
 	return true;
     }
 
-    private Entry merge(Entry smaller, 
-			Entry larger) 
-    {
+    private E merge(E smaller, E larger) {
 	if (larger == null) {
 	    return smaller;
 	}
 	if (smaller == null) {
 	    return larger;
 	}
-	Entry tmp;
+	E tmp;
 	// long itest;
 	int itest;
 	boolean test;
@@ -371,8 +365,8 @@ public abstract class CachedSkewHeap<E extends CachedSkewHeap.Entry<E>> {
 	    larger = smaller;
 	    smaller = tmp;
 	}
-	Entry last = smaller;
-	Entry result = last;
+	E last = smaller;
+	E result = last;
 	smaller = smaller.rightPQEntry;
 	for(;;) {
 	    if (smaller == null) {

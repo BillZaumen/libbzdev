@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
+import java.util.Set;
 
 //@exbundle org.bzdev.util.lpack.Util
 
@@ -69,6 +70,14 @@ public class ConfigProperties {
 
     /**
      * Constructor given a file.
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * @param f the file to load
      * @param mediaType the media (MIME) type
      * @throws IOException if an IO error occurred
@@ -81,6 +90,14 @@ public class ConfigProperties {
 
     /**
      * Constructor given an input stream.
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * @param is the input stream
      * @param mediaType the media (MIME) type
      * @throws IOException if an IO error occurred
@@ -95,8 +112,20 @@ public class ConfigProperties {
 	String comment = "#(!M.T " + mediaType.trim().toLowerCase() + ")\r\n";
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
-	int n = r.read(cbuf2);
-	if (n != cbuf2.length) {
+	// int n = r.read(cbuf2);
+	// handle the case where lines are terminated by LF instead of
+	// CRLF, which might happen if a file was opened with a text editor.
+	int n = r.read(cbuf2, 0, cbuf2.length-1);
+	if (cbuf2[cbuf2.length-2] == '\r') {
+	    n += r.read(cbuf2, n, 1);
+	} else if (cbuf2[cbuf2.length-2] == '\n') {
+	    cbuf2[n-1] = '\r';
+	    if (n < cbuf2.length) {
+		cbuf2[n] = '\n';
+		n++;
+	    }
+	}
+	if (n != cbuf1.length) {
 	    throw new IOException(errorMsg("wrongMediaType"));
 	}
 	for  (int i = 0; i < n; i++) {
@@ -118,7 +147,16 @@ public class ConfigProperties {
     }
 
     /**
-     * Constructor given a Base-64 encoded string.
+     * Constructor given a string containing Base64-encoded GZIPed
+     * {@link ConfigProperties} file.
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * @param b64data a Base-64 encoded string representing this object.
      * @param mediaType the media (MIME) type
      * @throws IOException if the media type does not match that of the
@@ -131,6 +169,13 @@ public class ConfigProperties {
 	this.mediaType = mediaType;
     }
 
+    /**
+     * Get the current property names.
+     * @return the property names
+     */
+    public Set<String> getKeys() {
+	return props.stringPropertyNames();
+    }
 
     /**
      * Get the value, decrypted if necessary, stored in this object
@@ -151,6 +196,8 @@ public class ConfigProperties {
      * under a given key and a GPG home directory.
      * The GPG home directory is the argument for the GPG --homedir
      * command-line option.
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param key the key
      * @param passphrase the GPG passphrase for decryption
      * @param gpgdir the GPG 'home' directory to use
@@ -187,11 +234,35 @@ public class ConfigProperties {
 	return ConfigPropUtilities.getProperty(props, key);
     }
 
+    /**
+     * Get the value stored in this object under a given key,
+     * optionally providing a literal value.
+     * <P>
+     * This method is provided primarily for use with
+     * {@link setProperty(String,String,boolean)}, and is useful when
+     * properties have to be copied "as is" between two instances of this
+     * class.
+     * @param key the key
+     * @param literal true if value of the property should be returned as is;
+     *        false for the behavior specified by {@link #getProperty(String)}
+     * @return the value for the given key; null if the key does not exist
+     */
+    public String getProperty(String key, boolean literal) {
+	if (literal) {
+	    return props.getProperty(key);
+	} else {
+	    return getProperty(key);
+	}
+    }
+
+
      /**
      * Set a property.
      * When decoded, each '$$' will be replaced with a single
      * '$' and substrings of the form "$(KEY)" will be replaced
-     * with the value for the specified KEY.
+     * with the value for the specified KEY, unless the key starts
+     * with "base64.", in which case the value will be base-64 encoded.
+     * for storage.
      * @param key the property key
      * @param value the property value
      * @throws IllegalArgumentException if the key starts with "ebase64."
@@ -228,6 +299,39 @@ public class ConfigProperties {
 	throws IllegalArgumentException
     {
 	ConfigPropUtilities.setProperty(props, key, value, literal);
+	return this;
+    }
+
+    /**
+     * Get GPG recipients that were stored using the specified key.
+     * @param key the property key
+     * @return the recipients
+     * @throws IllegalStateException if the object stored using the
+     *         specified key cannot be decoded
+     */
+    public String[] getRecipients(String key)
+	throws IllegalStateException
+    {
+	try {
+	    return ConfigPropUtilities.decodeRecipients(props.getProperty(key));
+	} catch (RuntimeException e) {
+	    String msg = errorMsg("illegalRecipients");
+	    throw new IllegalStateException(msg, e);
+	}
+    }
+
+
+    /**
+     * Set GPG recipients that were stored using the specified key.
+     * @param key the property key
+     * @param recipients the recipients
+     * @return this object
+     */
+    public ConfigProperties setRecipients(String key, String[] recipients) {
+	ConfigPropUtilities.setProperty(props, key,
+					ConfigPropUtilities
+					.encodeRecipients(recipients),
+					true);
 	return this;
     }
 
@@ -287,6 +391,9 @@ public class ConfigProperties {
      * either all encrypted entries should use either symmetric encryption
      * or public key encryption, but these should not be mixed. All
      * encrypted entries should use the same password or passphrase.
+     * <P>
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param key the property key
      * @param value the property value
      * @param gpgdir The GPG home directory used to store public an private
@@ -315,6 +422,9 @@ public class ConfigProperties {
      * either all encrypted entries should use either symmetric encryption
      * or public key encryption, but these should not be mixed. All
      * encrypted entries should use the same password or passphrase.
+     * <P>
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param key the property key
      * @param value the property value
      * @param gpgdir The GPG home directory used to store public an private
@@ -337,6 +447,10 @@ public class ConfigProperties {
     /**
      * Store this object, given an output file, using
      * the {@link org.bzdev.swing.ConfigPropertyEditor} format
+     * The file is created by using {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with CRLF line
+     * separators. The file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param file the file
      * @throws IOException if an IO error occurred
      */
@@ -350,6 +464,10 @@ public class ConfigProperties {
     /**
      * Store this object given an output stream, using
      * the {@link org.bzdev.swing.ConfigPropertyEditor} format.
+     * The output is created by using {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with CRLF line
+     * separators. The output will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param os the output stream
      * @throws IOException if an IO error occurred
      */
@@ -362,6 +480,15 @@ public class ConfigProperties {
 
     /**
      * Store this object as a Base-64 encoded string.
+     * A byte array is produced by in effect first creating a text
+     * file using the UTF-8 charset and with a CRLF sequence
+     * terminating each line, optionally compressing that file.  The
+     * text-file format is that produced by
+     * {@link Properties#store(Writer,String)}. This byte array is
+     * finally base-64 encoded and turned into a string using the UTF-8
+     * character set.
+     * The properties file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @return the Base-64 encoded string.
      */
     public String store() {
@@ -370,6 +497,13 @@ public class ConfigProperties {
 
     /**
      * Store this object as a byte array.
+     * The byte array is produced by in effect first creating a text
+     * file using the UTF-8 charset and with a CRLF sequence
+     * terminating each line, optionally compressing that file.  The
+     * text-file format is that produced by
+     * {@link Properties#store(Writer,String)}.
+     * The properties file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param gzip true if the result is compressed using GZIP
      * @return an array of bytes containing the properties
      */

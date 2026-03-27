@@ -309,7 +309,8 @@ atest8:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest8 /usr/share/doc/libbzdev-doc/api/ \
-		~/.config/sbl/example.sbl testUser
+		../bin/sblconf/test5.sbl user
+
 atest8-cert:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -327,8 +328,7 @@ atest8-sbl:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest8SBL /usr/share/doc/libbzdev-doc/api/ \
-		$(R)
-
+		test-gpgdir $(R)
 
 test8a:
 	(cd ../.. ; make jars)
@@ -532,6 +532,13 @@ cwstest4:
 	$(JAVA) CWSTest cwstest3.yaml  \
 		|| rm example.zip
 	rm -f example.zip
+
+authtest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) AuthTest test-gpgdir gpgkey.asc \
+		/usr/share/doc/libbzdev-doc/api/
 
 clean:
 	rm -rf classes

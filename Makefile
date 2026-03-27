@@ -31,7 +31,7 @@ PKG_VERSION = $(VERSION)$(PKG_BUILD)
 JROOT := $(shell while [ ! -d src -a `pwd` != / ] ; do cd .. ; done ; pwd)
 
 JAVA_VERSION = 11
-JAVAC = javac --release $(JAVA_VERSION)
+JAVAC = javac --release $(JAVA_VERSION) -Xlint:unchecked
 JAVADOC = javadoc --release $(JAVA_VERSION) -public -protected  \
 	-Xdoclint:all,-missing,-html --allow-script-in-comments
 

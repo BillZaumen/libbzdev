@@ -234,10 +234,14 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the map already contains the user
      */
     public void add(String username, String password)
-	throws UnsupportedOperationException
+	throws UnsupportedOperationException, IllegalStateException
     {
+	if (map.containsKey(username)) {
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	map.put(username, new Entry(password, null));
     }
 
@@ -250,21 +254,32 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the map already contains the user
      */
     public void add(String username, String password, Set<String> roles )
-	throws UnsupportedOperationException
+	throws UnsupportedOperationException, IllegalStateException
     {
+	if (map.containsKey(username)) {
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	map.put(username, new Entry(password, roles));
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void add (EjwsAuthenticator.UserInfo info) {
+    protected void add (EjwsAuthenticator.UserInfo info)
+	throws IllegalStateException
+    {
+	String userName = info.getUserName();
+	if (map.containsKey(userName)) {
+	    throw new IllegalStateException(errorMsg("hasUser", userName));
+	}
 	Entry entry = new Entry(info.getPassword(), info.getRoles());
+	entry.setActive(info.isActive());
 	entry.setSBLCompressed(info.isSBLCompressed());
 	entry.setSBL(info.getSBL());
-	map.put(info.getUserName(), entry);
+	map.put(userName, entry);
     }
 
 

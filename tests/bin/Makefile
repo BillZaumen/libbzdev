@@ -343,8 +343,6 @@ ytest-math:
 
 otest:
 	(cd ../.. ; make )
-	mkdir -p classes
-	javac -d classes OutTest.java
 	jar cf otest.jar -C classes OutTest.class
 	chmod u+x ./run
 	./run --classpathCodebase otest.jar otest.esp
@@ -449,10 +447,12 @@ ecircErr:
 	chmod u-x ecirc4
 	chmod u-x run
 
+FILE =
+
 sbl:
 	(cd ../.. ; make )
 	chmod u+x sblrun
-	./sblrun --
+	./sblrun --stacktrace -- $(FILE)
 	chmod u-x sblrun
 
 sbl-test:
@@ -597,6 +597,12 @@ startup2:
 	( cd ../.. ; make )
 	java -p ../../BUILD:$(MODULEDIR) -m org.bzdev.scrunner startupTest2.esp
 
+restore:
+	(cd ../../ ; make)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev-base.jar:classes \
+		RestoreTest.java
+	java -classpath ../../BUILD/libbzdev-base.jar:classes RestoreTest
 
 clean:
 	rm -fr junk raf tmp.png

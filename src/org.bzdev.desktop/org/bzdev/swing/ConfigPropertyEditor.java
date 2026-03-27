@@ -249,6 +249,15 @@ public abstract class ConfigPropertyEditor {
     File file = null;
     Properties properties = null;
 
+    /**
+     * Get the {@link Properties} that this object uses to store
+     * key-value pairs.
+     * @return the properties object
+     */    protected Properties getProperties() {
+	return properties;
+    }
+
+
     Properties defaults = new Properties();
 
     java.util.List<Image> iconList = new LinkedList<Image>();
@@ -265,8 +274,26 @@ public abstract class ConfigPropertyEditor {
     private String gpgdir = null;
 
     /**
-     * Set the GPG home directory.
-     * The parameter is the directory name used as the --homedir argument
+     * Set the GPG home directory given a file.
+     * The argument is the directory name used as the --homedir argument
+     * for gpg commands.
+     * @param gpgdir the GPG home directory; null for the default
+     * @return this object
+     * @throws IOException if an IO error occurs while constructing a
+     *         cannonical path
+     */
+
+    public ConfigPropertyEditor setGPGHome(File gpgdir)
+	throws IOException
+    {
+	this.gpgdir = (gpgdir == null)? null: gpgdir.getCanonicalPath();
+	return this;
+    }
+
+
+    /**
+     * Set the GPG home directory given a file name.
+     * The argument is the directory name used as the --homedir argument
      * for gpg commands.
      * @param gpgdir the GPG home directory; null for the default
      * @return this object
@@ -1186,6 +1213,11 @@ public abstract class ConfigPropertyEditor {
      * Save the configuration in a file.
      * If the file is not absolute and its name is "-", standard output
      * is used instead of an actual file.
+     * This method uses {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with
+     * CRLF as an end-of-line delimiter.
+     * The properties file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param f the file
      * @throws IOException if an IO error occurred
      */
@@ -1235,6 +1267,15 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
+    /**
+     * Convert this object to a base-64 endcoded string.
+     * This method uses {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with
+     * CRLF as an end-of-line delimiter. The writer produces a
+     * byte array that is then base-64 encoded, and the corresponding
+     * string is returned, assuming a UTF-8 encoding.
+     * @return the base-64 encoded string
+     */
     public String toBase64() {
 	if (properties == null) {
 	    return new String(Base64.getEncoder().encode(new byte[0]),
@@ -1560,8 +1601,19 @@ public abstract class ConfigPropertyEditor {
 	String comment = "#(!M.T " + mediaType().toLowerCase() + ")\r\n";
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
-	int n = r.read(cbuf2);
-	if (n != cbuf2.length) {
+	// handle the case where lines are terminated by LF instead of
+	// CRLF, which might happen if a file was opened with a text editor.
+	int n = r.read(cbuf2, 0, cbuf2.length-1);
+	if (cbuf2[cbuf2.length-2] == '\r') {
+	    n += r.read(cbuf2, n, 1);
+	} else if (cbuf2[cbuf2.length-2] == '\n') {
+	    cbuf2[n-1] = '\r';
+	    if (n < cbuf2.length) {
+		cbuf2[n] = '\n';
+		n++;
+	    }
+	}
+	if (n != cbuf1.length) {
 	    throw new IOException(errorMsg("wrongMediaType", f.toString()));
 	}
 	for  (int i = 0; i < n; i++) {
@@ -2057,6 +2109,18 @@ public abstract class ConfigPropertyEditor {
 	    }
 	}
 	return passphrase;
+    }
+
+    /**
+     * Determine if a passphrase is currently available.
+     * The program SBL uses this method (when not editing a table) to
+     * determine if there is no existing passphrase, in which case the
+     * passphrase will be obtained from a user and immediately cleared
+     * after use.
+     * @return true if a passphrase is available; false otherwise.
+     */
+    public boolean hasPassphrase() {
+	return (password != null);
     }
 
     /**
@@ -3830,7 +3894,7 @@ public abstract class ConfigPropertyEditor {
      * that is actually an array of characters and that contains the
      * decrypted data. For these keys, a new array will be returned
      * each time {@link Properties#get(Object)} is called. This is
-     * somewhat atypical &emdash; normally
+     * somewhat atypical&mdash;normally
      * {@link Properties#getProperty(String)} and
      * {@link Properties#get(Object)} return the same object but with
      * a different type. The rationale is that encrypted data is
@@ -3938,7 +4002,7 @@ public abstract class ConfigPropertyEditor {
 //  LocalWords:  loadFile MODELSS quitCloseMode noMode invokeAndWait
 //  LocalWords:  doEdit showLoadDialog decrypted substring bashrc EB
 //  LocalWords:  config getDecodedProperties addMoreKeys IOException
-//  LocalWords:  noFileSpecified wrongMediaType unencrypted emdash pb
+//  LocalWords:  noFileSpecified wrongMediaType unencrypted mdash pb
 //  LocalWords:  getProperty rawkey ProcessBuilder ot OutputStream os
 //  LocalWords:  getOutputStream transferTo eio getMessage buf sb AWT
 //  LocalWords:  CharArrayWriter toCharArray InputStreamReader addRE

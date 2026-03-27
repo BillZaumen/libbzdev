@@ -19,10 +19,7 @@ public class CSHTest {
 
 	CachedSkewHeap<TestEvent> heap = new CachedSkewHeap<>() {
 		protected int
-		    compareEntries(CachedSkewHeap.Entry<TestEvent> e1,
-				   CachedSkewHeap.Entry<TestEvent> e2) {
-		    TestEvent te1 = (TestEvent)e1;
-		    TestEvent te2 = (TestEvent)e2;
+		    compareEntries(TestEvent te1, TestEvent te2) {
 		    return ((te1.dist < te2.dist)? -1:
 			    (te1.dist == te2.dist)? 0:
 			    1);

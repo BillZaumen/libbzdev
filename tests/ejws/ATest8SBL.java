@@ -34,6 +34,8 @@ public class ATest8SBL {
 	System.out.println("Number of certificates = " + certs[0].length);
 
 	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, realm);
+	auth.setGPGHome(new File(argv[1]));
+	auth.setCanAddAccount(true);
 
 	File dir = new File(argv[0]);
 
@@ -42,6 +44,11 @@ public class ATest8SBL {
 	System.out.println("auth mode = " + auth.getMode());
 
 	auth.setTracer(System.out);
+	auth.setTruststore(System.getProperty("user.dir") + "/thelio-ts.jks");
+	auth.setTruststorePW("changeit".toCharArray());
+	auth.setAllowLoopback(true);
+	auth.setSelfSigned(true);
+
 	URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
 	    new URI("https://www.google.com"): new URI(argv[1]);
 
@@ -51,8 +58,8 @@ public class ATest8SBL {
 	    .setLogoutAlias("logout.html", logoutURI);
 
 
-	String recipients[] = {argv[1]};
-	auth.createUser("test-user", "Example", null, recipients)
+	String recipients[] = {argv[2]};
+	auth.createUser("test-user", "Example", recipients, null)
 	    .setDescription("Example")
 	    .setURI("login.html")
 	    .addUser(false);

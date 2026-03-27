@@ -52,8 +52,9 @@ public class ATest8 {
 	    .newInstance(sblFile, "application/vnd.bzdev.sblauncher");
 	String user = ConfigPropUtilities
 	    .getProperty(props, key + ".user");
-	String password = ConfigPropUtilities
-	    .getProperty(props, key + ".password");
+	// String password = ConfigPropUtilities
+	//    .getProperty(props, key + ".password");
+	String password = "test-password";
 	String publicKeyPem = ConfigPropUtilities
 	    .getProperty(props, "base64.keypair.publicKey");
 

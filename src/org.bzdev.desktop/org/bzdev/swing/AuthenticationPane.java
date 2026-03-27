@@ -139,8 +139,23 @@ public class AuthenticationPane extends JComponent {
     private static String gpgdir = null;
 
     /**
-     * Set the GPG home directory.
-     * The parameter is the directory name used as the --homedir argument
+     * Set the GPG home directory given a {@link File}.
+     * The argument is a file whose name is used as the --homedir argument
+     * for gpg commands.
+     * @param gpgdir the GPG home directory; null for the default
+     * @throws IOException if an IO error occurs while constructing a
+     *         cannonical path
+     */
+    public static void setGPGHome(File gpgdir)
+	throws IOException
+    {
+	AuthenticationPane.gpgdir = (gpgdir == null)? null:
+	    gpgdir.getCanonicalPath();
+    }
+
+    /**
+     * Set the GPG home directory given a file name.
+     * The argument  is the directory name used as the --homedir argument
      * for gpg commands.
      * @param gpgdir the GPG home directory; null for the default
      */

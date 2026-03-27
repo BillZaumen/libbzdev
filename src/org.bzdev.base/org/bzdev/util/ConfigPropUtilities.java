@@ -133,11 +133,14 @@ public class ConfigPropUtilities {
 				   "loopback",
 				   "--passphrase-fd", "0",
 				   "--batch", "-d"):
-		new ProcessBuilder("gpg", "-homedir", gpgdir,
+		new ProcessBuilder("gpg", "--homedir", gpgdir,
 				   "--pinentry-mode",
 				   "loopback",
 				   "--passphrase-fd", "0",
-				   "--batch", "-d");
+				   "--trust-model", "tofu",
+				   "--tofu-default-policy", "good",
+				   "--batch", "-d"
+				   );
 	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    ByteArrayOutputStream baos = new
 		ByteArrayOutputStream(data.length);
@@ -266,7 +269,8 @@ public class ConfigPropUtilities {
      * #(!M.T MEDIATYPE)
      * </CODE></PRE></BLOCKQUOTE>
      * where MEDIATYPE is the media (or MIME type) as defined in
-     * RFC 2045 and subsequent RFCs.
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * The stream is not automatically closed.
      * @param is the input stream from which to load properties
      * @param mediaType the expected media type for the file
@@ -282,10 +286,21 @@ public class ConfigPropUtilities {
 	}
 	Reader r = new InputStreamReader(is, UTF8);
 	String comment = "#(!M.T " + mediaType.trim().toLowerCase() + ")\r\n";
+
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
-	int n = r.read(cbuf2);
-	if (n != cbuf2.length) {
+	// int n = r.read(cbuf2);
+	int n = r.read(cbuf2, 0, cbuf2.length-1);
+	if (cbuf2[cbuf2.length-2] == '\r') {
+	    n += r.read(cbuf2, n, 1);
+	} else if (cbuf2[cbuf2.length-2] == '\n') {
+	    cbuf2[n-1] = '\r';
+	    if (n < cbuf2.length) {
+		cbuf2[n] = '\n';
+		n++;
+	    }
+	}
+	if (n != cbuf1.length) {
 	    throw new IOException(errorMsg("wrongMediaType"));
 	}
 	for  (int i = 0; i < n; i++) {
@@ -309,7 +324,15 @@ public class ConfigPropUtilities {
 
     /**
      * Create a new {@link Properties} object given Base-64 encoded data.
-     * @param b64data a string containing GZipped Base64-encoded data.
+     * @param b64data a string containing Base64-encoded GZIP data.
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * @param mediaType the expected media type for the file
      * @return a new instance of {@link Properties}
      * @throws IOException if the media type does not match that of the
@@ -327,6 +350,14 @@ public class ConfigPropUtilities {
     /**
      * Create a new {@link Properties} object given a byte array that
      * represents an instance of {@link Properties}.
+     * Media types are encoded in the first line of the file, which
+     * is expected to be
+     * <BLOCKQUOTE><PRE><CODE>
+     * #(!M.T MEDIATYPE)
+     * </CODE></PRE></BLOCKQUOTE>
+     * where MEDIATYPE is the media (or MIME type) as defined in
+     * RFC 2045 and subsequent RFCs.  The mediatype is converted to lower
+     * case for testing.
      * @param data the byte representation
      * @param mediaType the expected media (MIME) type
      * @param gzipped true if GZIP compression is used; false otherwise
@@ -381,10 +412,13 @@ public class ConfigPropUtilities {
      * {@link Properties} under a given key and a GPG home directory.
      * The GPG home directory is the argument for the GPG --homedir
      * command-line option.
+     * <P>
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param props the properties
      * @param key the key
      * @param passphrase the GPG passphrase for decryption
-     * @param gpgdir the GPG 'home' directory to use
+     * @param gpgdir the GPG 'home' directory to use; null for the default
      * @return the decrypted value
      * @throws GeneralSecurityException if decryption failed
      */
@@ -564,6 +598,10 @@ public class ConfigPropUtilities {
 	if (gpgdir != null) {
 	    args.add("--homedir");
 	    args.add(gpgdir);
+	    args.add("--trust-model");
+	    args.add("tofu");
+	    args.add("--tofu-default-policy");
+	    args.add("good");
 	}
 	args.add("-o");
 	args.add("-");
@@ -644,6 +682,10 @@ public class ConfigPropUtilities {
 	if (gpgdir != null) {
 	    args.add("--homedir");
 	    args.add(gpgdir);
+	    args.add("--trust-model");
+	    args.add("tofu");
+	    args.add("--tofu-default-policy");
+	    args.add("good");
 	}
 	args.add("-o");
 	args.add("-");
@@ -845,6 +887,9 @@ public class ConfigPropUtilities {
      * either all encrypted entries should use either symmetric encryption
      * or public key encryption, but these should not be mixed. All
      * encrypted entries should use the same password or passphrase.
+     * <P>
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param props the instance of {@link Properties}
      * @param key the property key
      * @param value the property value
@@ -882,6 +927,9 @@ public class ConfigPropUtilities {
      * either all encrypted entries should use either symmetric encryption
      * or public key encryption, but these should not be mixed. All
      * encrypted entries should use the same password or passphrase.
+     * <P>
+     * When gpgdir is non-null, a GPG TOFU (Trust On First Use) trust
+     * model is used.
      * @param props the instance of {@link Properties}
      * @param key the property key
      * @param value the property value
@@ -948,10 +996,12 @@ public class ConfigPropUtilities {
 	}
     }
 
-
     /**
      * Store a properties file given an output file, using
      * the {@link org.bzdev.swing.ConfigPropertyEditor} format.
+     * This method uses {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with
+     * CRLF as an end-of-line delimiter.
      * @param props the properties object
      * @param file the file
      * @param mediaType the media (or MIME) type
@@ -970,6 +1020,9 @@ public class ConfigPropUtilities {
     /**
      * Store a properties file given an output stream, using
      * the {@link org.bzdev.swing.ConfigPropertyEditor} format.
+     * This method uses {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with
+     * CRLF as an end-of-line delimiter.
      * @param props the properties object
      * @param os the output stream
      * @param mediaType the media (or MIME) type
@@ -988,9 +1041,15 @@ public class ConfigPropUtilities {
     /**
      * Store a properties file given an output stream, using
      * the {@link org.bzdev.swing.ConfigPropertyEditor} format.
-     * The string is produced by first creating a text file using
-     * the UTF-8 charset, compressing that file, and then Base-64
-     * encoding the compressed file.
+     * The string is produced by in effect first creating a text file
+     * using the UTF-8 charset and with a CRLF sequence terminating each
+     * line, compressing that file, and then base-64 encoding the
+     * compressed file. The text-file format is that produced by
+     * {@link Properties#store(Writer,String)}. This byte array is
+     * finally base-64 encoded and turned into a string using the UTF-8
+     * character set.
+     * The properties file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param props the properties object
      * @param mediaType the media (or MIME) type
      * @return a string representation of a Properties object
@@ -1001,6 +1060,8 @@ public class ConfigPropUtilities {
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    OutputStream os = new GZIPOutputStream(bos);
 	    store(props, os, mediaType);
+	    os.flush();
+	    os.close();
 	    byte[] data = Base64.getEncoder().encode(bos.toByteArray());
 	    return new String(data, UTF8);
 	} catch (IOException eio) {
@@ -1010,6 +1071,13 @@ public class ConfigPropUtilities {
 
     /**
      * Store a properties file as an array of bytes.
+     * The byte array is produced by in effect first creating a text
+     * file using the UTF-8 charset and with a CRLF sequence
+     * terminating each line, optionally compressing that file.  The
+     * text-file format is that produced by
+     * {@link Properties#store(Writer,String)}.
+     * The properties file will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
      * @param props the properties object
      * @param mediaType the media (or MIME) type
      * @param gzip true if GZIP compression is used; false otherwise
@@ -1022,6 +1090,8 @@ public class ConfigPropUtilities {
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    OutputStream os = gzip? new GZIPOutputStream(bos): bos;
 	    store(props, os, mediaType);
+	    os.flush();
+	    os.close();
 	    return bos.toByteArray();
 	} catch (IOException eio) {
 	    throw new UnexpectedExceptionError(eio);

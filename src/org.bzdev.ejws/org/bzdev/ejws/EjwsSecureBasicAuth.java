@@ -4,16 +4,21 @@ import com.sun.net.httpserver.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.zip.GZIPInputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -120,6 +125,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     }
      */
 
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
     private static ResourceBundle exbundle = ResourceBundle.getBundle
 	("org.bzdev.ejws.lpack.SecureBasicAuth");
 
@@ -127,6 +134,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	return (new SafeFormatter()).format(exbundle.getString(key), args)
 	    .toString();
     }
+
+    static final String SBLDATA = "application/vnd.bzdev.sblauncherdata";
 
     private static SecureBasicUtilities.Mode
 	proposedMode(EmbeddedWebServer ews)
@@ -150,6 +159,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
    public static class Entry extends EjwsBasicAuthenticator.Entry {
        // pw and roles defined by superclasses.
        SecureBasicUtilities keyops;
+       String pem = null;
        boolean sblCompressed = false;
        byte[] sbldata;
 	
@@ -173,6 +183,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
        public Entry(String pem, String pw, Set<String>roles) {
 	   super (pw, roles);
 	   try {
+	       this.pem = pem;
 	       this.keyops = new SecureBasicUtilities(pem);
 	   } catch (IOException eio) {
 	       String msg = "PEM";
@@ -204,6 +215,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	   this.sbldata = sbldata;
        }
 
+       /**
+	* Get the PEM encoded public key
+	* @return the PEM encoded key; null if there is none
+	*/
+       public String getPEM() {return pem;}
 
        /**
 	* Get the password stored in this entry.
@@ -537,10 +553,18 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the mode is not appropriate or
+     *         if the user has already been added
     */
     public void add(String username, String password)
-	throws UnsupportedOperationException
+	throws UnsupportedOperationException, IllegalStateException
     {
+	if (map.containsKey(username)) {
+	    if (password.equals(map.get(username).getPassword())) {
+		return;
+	    }
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
@@ -556,14 +580,26 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the mode is not appropriate or
+     *         if the user has already been added
      */
     public void add(String username, String password, Set<String> roles )
-	throws UnsupportedOperationException
+	throws UnsupportedOperationException, IllegalStateException
     {
+	if (map.containsKey(username)) {
+	    if (password.equals(map.get(username).getPassword())) {
+		return;
+	    }
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
-	map.put(username, new Entry(password, roles));
+	if (utable != null) {
+	    utable.addEntry(username, new Entry(password, roles));
+	} else {
+	    map.put(username, new Entry(password, roles));
+	}
     }
 
     /**
@@ -576,6 +612,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the mode is not appropriate or
+     *         if the user has already been added
      */
     public void add(String username, String pem, String password)
 	throws UnsupportedOperationException
@@ -595,30 +633,60 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
      *         exception)
+     * @throws IllegalStateException if the mode is not appropriate or
+     *         if the user has already been added
      */
     public void add(String username, String pem, String password,
-		    Set<String> roles )
+		    Set<String> roles)
 	throws UnsupportedOperationException
     {
+	if (map.containsKey(username)) {
+	    Entry entry = map.get(username);
+	    if (pem.equals(entry.getPEM())
+		&& password.equals(entry.getPassword())) {
+		return;
+	    }
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	if (mode == SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
-	map.put(username, new Entry(pem, password, roles));
+	if (utable != null) {
+	    utable.addEntry(username, new Entry(pem, password, roles));
+	} else {
+	    map.put(username, new Entry(pem, password, roles));
+	}
+    }
+
+    EjwsUserTable<EjwsSecureBasicAuth.Entry> utable = null;
+
+
+    public void setUserTable(EjwsUserTable<EjwsSecureBasicAuth.Entry> utable) {
+	this.utable = utable;
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void add(EjwsAuthenticator.UserInfo info) {
+    protected void add(EjwsAuthenticator.UserInfo info)
+	throws IllegalStateException
+    {
 	String username = info.getUserName();
+	if (map.containsKey(username)) {
+	    throw new IllegalStateException(errorMsg("hasUser", username));
+	}
 	Entry entry = new Entry(info.getPublicKey(),
 				info.getPassword(),
 				info.getRoles());
+	entry.setActive(info.isActive());
 	entry.setSBLCompressed(info.isSBLCompressed());
 	entry.setSBL(info.getSBL());
-	map.put(username, entry);
+	if (utable != null) {
+	    utable.addEntry(username, entry);
+	} else {
+	    map.put(username, entry);
+	}
     }
-
 
     private String loginPath = null;
     private boolean loginPathUsed = true;
@@ -725,12 +793,12 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	} else {
 	    certchain.set(null);
 	}
-
+	String alias = null;
 	if (loginPathUsed && loginPath == null) {
 	    HttpHandler handler = t.getHttpContext().getHandler();
 	    if (handler instanceof FileHandler) {
 		fileHandler = (FileHandler) handler;
-		String alias = fileHandler.getLoginAlias();
+		alias = fileHandler.getLoginAlias();
 		if (alias != null) {
 		    String root = t.getHttpContext().getPath();
 		    if (!root.endsWith("/")) root = root + "/";
@@ -750,12 +818,23 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    if (requestURI.getPath().equals(loginPath)) {
 		String query = requestURI.getRawQuery();
 		if (query != null  && map.size() > 0) {
-		    String username =
-			WebDecoder.formDecode(query, false).get("user");
+		    Map<String,String> fmap = WebDecoder.formDecode(query,
+								    false);
+		    String username =fmap.get("user");
+		    String type = fmap.get("uploadrequest");
+		    if (!getCanAddAccount() && type != null) {
+			type = "nouploads";
+		    }
 		    if (username != null) {
-			byte[] array = getSBL(username);
+			byte[] array = (type == null)? getSBL(username):
+			    (type.equals("pgpkey")
+			     || type.equals("sbl"))?
+			    requestFromUser(username,type):
+			    null;
 			if (array != null) {
-			    boolean isGZIP = isSBLCompressed(username);
+			    boolean isGZIP = (type == null)?
+				isSBLCompressed(username):
+				false;
 			    Headers rheaders = t.getResponseHeaders();
 			    rheaders.set("Content-Type",
 					 "application/vnd.bzdev.sblauncher");
@@ -774,10 +853,99 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				// continue along the filter chain, but this is
 				// not documented.
 			    } catch (IOException eio) {}
-				return null;
+			    return null;
 			}
-			// otherwise just continue as normal
+			// otherwise just continue as normal.
 		    }
+		} else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
+		    Headers hdrs = t.getRequestHeaders();
+		    String contentType = hdrs.getFirst("content-type");
+		    String contentLengthS = hdrs.getFirst("content-length");
+		    long length = 0;
+		    if (contentLengthS != null) {
+			try {
+			    length = Long.valueOf(contentLengthS);
+			} catch (Exception e) {
+			}
+		    }
+		    InputStream is = t.getRequestBody();
+		    try {
+			// for now just ignore the content
+			if (contentType.equals("application/pgp-keys")) {
+			    InputStreamReader r = new
+				InputStreamReader(is, UTF8);
+			    StringWriter w = new StringWriter();
+			    r.transferTo(w);
+			    String value = w.toString();
+			    try {
+				EjwsAuthenticator.GPGKeyIDs keyids
+				    = storeGPGKey(gpghome(), value);
+				if (getCanAddAccount()) {
+				    String email = keyids.getEmailAddress();
+				    String uriString = generateRequestURI(null);
+				    String recipients[] = {email};
+				    UserInfo ui = createUser(email,
+							     uriString,
+							     recipients,
+							     null)
+					.setURI(alias)
+					.addUser(true);
+				    uriString = generateRequestURI(email);
+				    Headers rhdrs = t.getResponseHeaders();
+				    rhdrs.set("Location", uriString);
+				    String msg =
+					errorMsg("pleaseVisit", uriString);
+				    byte[] data = msg.getBytes(UTF8);
+				    rhdrs.set("Content-type",
+					      "text/html; charset=utf-8");
+				    t.sendResponseHeaders(201, data.length);
+				    t.getResponseBody().write(data);
+				    return null;
+
+				} else {
+				    t.sendResponseHeaders(202, -1);
+				    return null;
+				}
+			    } catch (Exception e) {
+				String msg = e.getMessage();
+				byte[] response = (msg == null)?
+				    new byte[0]:
+				    msg.getBytes(UTF8);
+				int len = response.length == 0? -1:
+				    response.length;
+				t.getResponseHeaders()
+				    .set("content-type",
+					 "text/plain; charset=utf-8");
+				t.sendResponseHeaders(409, len);
+				t.getResponseBody().write(response);
+				return null;
+			    }
+			} else if (contentType.equals(SBLDATA)) {
+			    is = Base64.getDecoder().wrap(is);
+			    is = new GZIPInputStream(is);
+			    String mtype = "application/vnd.bzdev.sblauncher";
+			    ConfigProperties cprops =
+				new ConfigProperties(is, mtype);
+			    for (String key: cprops.getKeys()) {
+				System.out.println(key + ": "
+						   + cprops.getProperty(key));
+			    }
+			    /*
+			    InputStreamReader r = new
+				InputStreamReader(is, UTF8);
+			    StringWriter w = new StringWriter();
+			    r.transferTo(w);
+			    System.out.println(w.toString());
+			    */
+			    t.sendResponseHeaders(201, -1);
+			} else {
+			    t.sendResponseHeaders(415, -1);
+			}
+		    } catch (Exception eio){}
+		    try {
+			t.sendResponseHeaders(205, -1);
+		    } catch(IOException eio) {}
+		    return null;
 		}
 		foundLogin = true;
 	    }
@@ -791,7 +959,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    HttpHandler handler = t.getHttpContext().getHandler();
 	    if (handler instanceof FileHandler) {
 		fileHandler = (FileHandler) handler;
-		String alias = fileHandler.getLogoutAlias();
+		alias = fileHandler.getLogoutAlias();
 		if (alias != null) {
 		    String root = t.getHttpContext().getPath();
 		    if (!root.endsWith("/")) root = root + "/";
@@ -1037,6 +1205,10 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	Entry entry = map.get(username);
 	// System.out.println("entry = " + entry);
 	if (entry == null) return false;
+	if (!entry.isActive()) {
+	    flCode.set(403);
+	    return false;
+	}
 	SecureBasicUtilities ops = entry.keyops;
 	// System.out.println("ops = " + ops);
 	byte[] sigarray = SecureBasicUtilities.decodePassword(password);

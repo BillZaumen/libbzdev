@@ -163,18 +163,17 @@ public class AStarSearch<Node> {
      *         inclusive
      */
     public List<Node> search(Node start, Node goal, boolean pollOnce) {
-	HashMap<Node,OurNode> map = new HashMap();
+	HashMap<Node,OurNode> map = new HashMap<>();
 	OurNode ostart = new OurNode(start, 0.0, h.applyAsDouble(start, goal));
 	map.put(start, ostart);
 	// The Java class PriorityQueue is not a good choice here because
 	// removing a specific object from that priority queue is O(n).
 	CachedSkewHeap<OurNode> pq = new CachedSkewHeap<>() {
-		protected int compareEntries(CachedSkewHeap.Entry<OurNode> e1,
-					     CachedSkewHeap.Entry<OurNode> e2) {
-		    OurNode n1 = (OurNode)e1;
-		    OurNode n2 = (OurNode)e2;
-		    if (n1.f < n2.f) return -1;
-		    else if (n1.f == n2.f) return 0;
+		protected int compareEntries(OurNode e1, OurNode e2) {
+		    // OurNode n1 = (OurNode)e1;
+		    // OurNode n2 = (OurNode)e2;
+		    if (e1.f < e2.f) return -1;
+		    else if (e1.f == e2.f) return 0;
 		    else return 1;
 		}
 	    };

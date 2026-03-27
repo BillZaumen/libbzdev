@@ -1473,7 +1473,7 @@ abstract public class NamedObjectFactory<
 					  "</jdoc>"); // case 3
 	int cdepth = 0;
 	int adepth = 0;
-	ArrayList<Integer> alist = new ArrayList(1 + doc.length()/6);
+	ArrayList<Integer> alist = new ArrayList<>(1 + doc.length()/6);
 	String lcdoc = doc.toLowerCase(Locale.ENGLISH);
 	for (MatchResult mr: matcher.iterableOver(lcdoc)) {
 	    alist.add(mr.getStart());

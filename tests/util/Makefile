@@ -553,7 +553,8 @@ astar2: compile
 
 astar3: compile
 	@echo ---- AStar3 ----
-	@$(JAVA) AStar3
+	java -p ../../BUILD/:/usr/share/bzdev --add-modules org.bzdev \
+		-classpath classes AStar3
 
 
 blockTest:

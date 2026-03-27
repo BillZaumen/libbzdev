@@ -9353,6 +9353,7 @@ public class Model3D implements Shape3D, Model3DOps<Model3D.Triangle>
 			tp.processTemplate(rd, "UTF-8", out);
 			rd.close();
 			if (compress) {
+			    out.flush();
 			    out.close();
 			}
 			return (Void)null;
