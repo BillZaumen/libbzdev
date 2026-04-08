@@ -9,6 +9,8 @@ import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -73,16 +75,60 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     }
 
 
+    File sbldir = null;
+    private String date = LocalDate.now()
+	.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+    private static long sblIndex = 0;
+
+    public void setSBLDir(File sbldir) throws IllegalArgumentException {
+	if (sbldir != null) {
+	    if (!sbldir.isDirectory()) {
+		throw new IllegalArgumentException
+		    (errorMsg("sbldir", sbldir.toString()));
+	    }
+	}
+	this.sbldir = sbldir;
+    }
+
+    protected String storeSBLData(InputStream is)
+	throws IOException
+    {
+	Reader r = new InputStreamReader(is, UTF8);
+	StringWriter sw = new StringWriter();
+	r.transferTo(sw);
+	String result = sw.toString();
+	if (sbldir != null) {
+	    File ofile;
+	    synchronized(this) {
+		ofile = new  File(sbldir, date + "--" + (++sblIndex));
+	    }
+	    FileOutputStream os = new FileOutputStream(ofile);
+	    Writer w = new OutputStreamWriter(os, UTF8);
+	    w.write(result);
+	    w.flush();
+	    w.close();
+	}
+	return result;
+    }
+
+
     boolean defaultActive = true;
 
 
+    /**
+     * Get the default value for whether or not a user account is
+     * active or not. An account is active if the user is allowed
+     * to log in.
+     * @return true if the account is active; false otherwise
+     */
     public boolean isActiveDefault() {
 	return defaultActive;
     }
 
     /**
      * Set the default for whether new users are active or not.
-     * the value is used by the createUser methods.
+     * The value is used by the createUser methods.
      * @param value true if new users are active by default; false if
      *        not active by default
      */
@@ -118,6 +164,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
 
     private char[] truststorePW = null;
+    private static char[] defaultTrustStorePW = "changeit".toCharArray();
 
     public void setTruststorePW(char[] pw) {
 	this.truststorePW = pw;
@@ -219,7 +266,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	if (truststore != null) {
 	    ui.setTruststore(truststore);
 	}
-	if (truststorePW != null) {
+	if (truststorePW != null && truststorePW != defaultTrustStorePW) {
 	    ui.setTruststorePW(truststorePW);
 	}
 	if (selfSigned) {
@@ -346,6 +393,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    String userName = props.getProperty(key + ".user");
 	    String password = props.getProperty("base64." + key + ".password");
 	    String publicKeyPem = props.getProperty("base64.keypair.publicKey");
+	    if (userName == null || password == null || publicKeyPem == null) {
+		throw new IllegalArgumentException(errorMsg("badPropsFile"));
+	    }
 	    return createUser(userName, password, publicKeyPem, roles);
 	} else {
 	    throw new IllegalArgumentException(errorMsg("badPropsFile"));
@@ -390,6 +440,14 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	return createUser(props, roles);
     }
 
+    /**
+     * Generate a URI for a login request that will provide
+     * an SBL file for a user.
+     * The host name in the URI will be preferentially taken from
+     * the server's certificate when SSL is used.
+     * @param username the user name; null for just the login URL
+     * @return the URL
+     */
     protected String generateRequestURI(String username) {
 	String scheme = ews.usesHTTPS()? "https": "http";
 	InetSocketAddress saddr = ews.getAddress();
@@ -423,6 +481,17 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     }
 
 
+    /**
+     * Generate a sequence of bytes containing an SBL file that
+     * instructs the SBL program as to how to download data needed
+     * to create an account. The format is a UTF-8 encoded string,
+     * where the string is produced by
+     * {@link ConfigPropUtilities#store(Properities,String)} (which
+     * describes the string format in detail).
+     * @param username the user name
+     * @param type "pgpkey" when a PGP/GPG public key should be
+     *        downloaded; "sbl" if an SBL file should be downloaded
+     */
     protected byte[] requestFromUser(String username, String type) {
 	String scheme = ews.usesHTTPS()? "https": "http";
 	InetSocketAddress saddr = ews.getAddress();
@@ -449,6 +518,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	String uriSchemeAuthority = scheme + "://" + host + ":" + port;
 	FileHandler handler = ews.getFileHandler(prefix);
 	Properties props = new Properties();
+	props.setProperty("sbl.downloaded", "true");
 	props.setProperty("user", username);
 	String[] recipients = null;
 	String gpgdir = null;
@@ -481,7 +551,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	props.setProperty("need", type);
 	if (truststore != null) {
 	    props.setProperty("trustStore.file", truststore);
-	    if (truststorePW != null && recipients != null) {
+	    if (truststorePW != null
+		 && truststorePW != defaultTrustStorePW
+		&& recipients != null) {
 		ConfigPropUtilities.setProperty(props,
 						"ebase64.trustStore.password",
 						truststorePW,
@@ -557,10 +629,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 			    cnt++;
 			}
 		    }
-		    if (cnt != 1) {
+		    if (cnt > 1) {
 			String msg =
 			    errorMsg("duplicateRecipient", recipient);
-			System.err.println(msg);
 			throw new IllegalStateException(msg);
 		    }
 		} catch (IOException e) {
@@ -726,6 +797,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		throw new NullPointerException(errorMsg("noGPGHome"));
 	    }
 	    cpe = new ConfigProperties(mediaType);
+	    cpe.setProperty("sbl.downloaded", "true");
 	    this.auth = auth;
 	    this.key = key;
 	    this.recipients = recipients;
@@ -1621,9 +1693,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Add a user specified by an instance of {@link UserInfo}.
      * @param info the user data
      */
-    protected abstract void add(UserInfo info);
-
-    
+    public abstract void add(UserInfo info);
 }
 
 //  LocalWords:  EmbeddedWebServer authTwoServers authPrefix PRE auth

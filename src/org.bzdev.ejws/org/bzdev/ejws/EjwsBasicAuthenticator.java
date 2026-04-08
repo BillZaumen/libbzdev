@@ -268,7 +268,7 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
     /**
      * {@inheritDoc}
      */
-    protected void add (EjwsAuthenticator.UserInfo info)
+    public void add(EjwsAuthenticator.UserInfo info)
 	throws IllegalStateException
     {
 	String userName = info.getUserName();

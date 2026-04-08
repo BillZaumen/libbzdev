@@ -10,9 +10,9 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSession;
@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.zip.GZIPInputStream;
 
 import org.bzdev.io.AppendableWriter;
 import org.bzdev.net.SecureBasicUtilities;
@@ -50,6 +51,9 @@ import org.bzdev.util.SafeFormatter;
 //@exbundle org.bzdev.bin.sbl.lpack.SBL
 
 public class SBL {
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
     // resource bundle for messages used by exceptions and errors
     private static ResourceBundle exbundle = ResourceBundle.getBundle
 	("org.bzdev.bin.sbl.lpack.SBL");
@@ -67,7 +71,7 @@ public class SBL {
 	return org.bzdev.swing.keys.VirtualKeys.lookup(localeString(key));
     }
 
-    private static Charset utf8 = Charset.forName("UTF-8");
+    // private static Charset utf8 = Charset.forName("UTF-8");
 
 
     private static SecureBasicUtilities.Mode[] modes =
@@ -384,18 +388,23 @@ public class SBL {
     static HashSet<String> entries = new HashSet<>();
     
     static void fixupEntries(JComboBox<String>cb) {
-	int len = cb.getItemCount();
-	for (int i = len-1; i > 0; i--) {
-	    cb.removeItemAt(i);
+	fixupEntries(cb, cpe);
+    }
+    static void fixupEntries(JComboBox<String>cb, ConfigEditor ce) {
+	if (cb != null) {
+	    int len = cb.getItemCount();
+	    for (int i = len-1; i > 0; i--) {
+		cb.removeItemAt(i);
+	    }
+	    cb.setSelectedIndex(0);
 	}
 	entries.clear();
-	cb.setSelectedIndex(0);
 	for (String s:
 		 new TreeSet<String>
-		 (cpe.getEncodedProperties().stringPropertyNames())) {
+		 (ce.getEncodedProperties().stringPropertyNames())) {
 	    if (s.endsWith(".description")) {
 		String name = s.substring(0, s.lastIndexOf('.'));
-		cb.addItem(name);
+		if (cb != null) cb.addItem(name);
 		entries.add(name);
 	    }
 	}
@@ -450,31 +459,37 @@ public class SBL {
 
     static char[] getSecurePW(Component component, String name) {
 	if (ops == null) {
-	    cpe.requestPassphrase(component);
-	    char[] carray = (char[])cpe.getDecodedProperties()
-		.get("ebase64.keypair.privateKey");
-	    CharBuffer cbuf = CharBuffer.wrap(carray);
-	    ByteBuffer bbuf = utf8.encode(cbuf);
-	    byte[] barray;
-	    if (bbuf.hasArray() && bbuf.arrayOffset() == 0) {
-		barray = bbuf.array();
-	    } else {
-		barray = new byte[bbuf.limit()];
-		bbuf.get(barray);
-	    }
+	    Component saved = cpe.getPWOwner();
 	    try {
-		InputStream is = new ByteArrayInputStream(barray);
-		ops = new SecureBasicUtilities(is);
-	    } catch (IOException eio) {
-		// System.err.println(eio.getMessage());
-		SwingErrorMessage.format("%s",eio.getMessage());
-		SwingErrorMessage.displayConsoleIfNeeded();
-		return null;
-	    } catch (GeneralSecurityException egs) {
-		// System.err.println(egs.getMessage());
-		SwingErrorMessage.format("%s",egs.getMessage());
-		SwingErrorMessage.displayConsoleIfNeeded();
-		return null;
+		cpe.setPWOwner(component);
+		cpe.requestPassphrase(component);
+		char[] carray = (char[])cpe.getDecodedProperties()
+		    .get("ebase64.keypair.privateKey");
+		CharBuffer cbuf = CharBuffer.wrap(carray);
+		ByteBuffer bbuf = UTF8.encode(cbuf);
+		byte[] barray;
+		if (bbuf.hasArray() && bbuf.arrayOffset() == 0) {
+		    barray = bbuf.array();
+		} else {
+		    barray = new byte[bbuf.limit()];
+		    bbuf.get(barray);
+		}
+		try {
+		    InputStream is = new ByteArrayInputStream(barray);
+		    ops = new SecureBasicUtilities(is);
+		} catch (IOException eio) {
+		    // System.err.println(eio.getMessage());
+		    SwingErrorMessage.format("%s",eio.getMessage());
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		    return null;
+		} catch (GeneralSecurityException egs) {
+		    // System.err.println(egs.getMessage());
+		    SwingErrorMessage.format("%s",egs.getMessage());
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		    return null;
+		}
+	    } finally {
+		cpe.setPWOwner(saved);
 	    }
 	}
 	Properties props = cpe.getDecodedProperties();
@@ -679,13 +694,23 @@ public class SBL {
 		}
 	    };
 	    if (tname != null && tname.length() > 0) {
-		cpe.requestPassphrase(owner);
-		Object obj = p.get("ebase64.trustStore.password");
 		char[] pw = null;
-		File trustStore = new File(tname);
-		if (obj instanceof char[]) {
-		    pw = (char []) obj;
+		if (cpe.hasKey("ebase64.trustStore.password")) {
+		    Component saved = cpe.getPWOwner();
+		    try {
+			cpe.setPWOwner(owner);
+			cpe.requestPassphrase(owner);
+			Object obj = p.get("ebase64.trustStore.password");
+			if (obj instanceof char[]) {
+			    pw = (char []) obj;
+			}
+		    } finally {
+			cpe.setPWOwner(saved);
+		    }
+		} else {
+		    pw = "changeit".toCharArray();
 		}
+		File trustStore = new File(tname);
 		SSLUtilities.installTrustManager("TLS",
 						 trustStore, pw,
 						 /*
@@ -818,10 +843,14 @@ public class SBL {
     }
 
     private static KeyInfoPair getGPGPrivateKeyInfo(String keyid) {
+	return getGPGPrivateKeyInfo(keyid, true);
+    }
+    private static KeyInfoPair getGPGPrivateKeyInfo(String keyid,
+						    boolean quiet)
+    {
 	ProcessBuilder pb = (keyid == null)?
 	    new ProcessBuilder("gpg", "--with-colons", "-K"):
 	    new ProcessBuilder("gpg", "--with-colons", "-K", keyid);
-;
 	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	try {
 	    Process p = pb.start();
@@ -857,13 +886,17 @@ public class SBL {
 		fprs.toArray(fprsS);
 		return new KeyInfoPair(keyidsS, fprsS);
 	    } else {
-		SwingErrorMessage.format("%s", errorMsg("gpgFailed1"));
-		SwingErrorMessage.displayConsoleIfNeeded();
+		if (!quiet) {
+		    SwingErrorMessage.format("%s", errorMsg("gpgFailed1"));
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		}
 		return null;
 	    }
 	} catch (Exception e) {
-	    SwingErrorMessage.format("%s", e.getMessage());
-	    SwingErrorMessage.displayConsoleIfNeeded();
+	    if (!quiet) {
+		SwingErrorMessage.format("%s", e.getMessage());
+		SwingErrorMessage.displayConsoleIfNeeded();
+	    }
 	}
 	return null;
     }
@@ -903,11 +936,45 @@ public class SBL {
 		InputStream is = c.getInputStream();
 		OutputStream os = OutputStream.nullOutputStream();
 		is.transferTo(os);
+		while (is.read() != -1);
 		is.close();
 		os.flush();
 		os.close();
 	    }
 	} catch (Exception e) {}
+    }
+
+    private static void fetchSBL(URI location) throws IOException {
+	URL url = location.toURL();
+	URLConnection urlc = url.openConnection();
+	if (urlc instanceof HttpURLConnection) {
+	    HttpURLConnection c = (HttpURLConnection) urlc;
+	    c.setRequestMethod("GET");
+	    int rcode = c.getResponseCode();
+	    if (rcode == 200) {
+		String ct = c.getContentType();
+		String ce = c.getContentEncoding();
+		if (ct != null
+		    && ct.equals("application/vnd.bzdev.sblauncher")) {
+		    int len = c.getContentLength();
+		    InputStream is = c.getInputStream();
+		    if (ce != null && ce.equalsIgnoreCase("gzip")) {
+			is = new GZIPInputStream(is);
+		    }
+		    ConfigEditor old = cpe;
+		    cpe = new ConfigEditor();
+		    InputStreamReader r = new InputStreamReader(is, UTF8);
+		    cpe.loadReader(r);
+		    // part of a negotiation with the server so keep the
+		    // previous passphrase so the user is not asked for a
+		    // new one.
+		    cpe.requestPassphrase(old);
+		    configFile = null;
+		}
+	    }
+	} else {
+	    System.err.println("slb: not HttpURLConnection");
+	}
     }
 
     private static int
@@ -920,6 +987,10 @@ public class SBL {
 	String title = errorMsg("errorTitle");
 	switch(rcode) {
 	case 200:
+	    {
+		String contentType = c.getContentType();
+		int len = c.getContentLength();
+	    }
 	case 205:
 	    dumpResponse(c);
 	case 204:
@@ -932,9 +1003,43 @@ public class SBL {
 		if (Desktop.isDesktopSupported()) {
 		    try {
 			URI uri = new URI(location);
+			fetchSBL(uri);
+			String key = null;
+			for (String k: cpe.getProperties()
+				 .stringPropertyNames()) {
+			    if (k.endsWith(".description")) {
+				key = k;
+				break;
+			    }
+			}
+			if (key != null) {
+			    int ind = key.lastIndexOf('.');
+			    key = (ind == -1)? null: key.substring(0, ind);
+			}
+			Properties dprops = cpe.getDecodedProperties();
+			String user1 = dprops.getProperty(key + ".user");
+			if (!user.equals(user1)) {
+			    String msg = errorMsg("userConflict", user1, user);
+			    throw new IOException(msg);
+			}
+			String uriString = dprops.getProperty(key + ".uri");
+			uri = new URI(uriString);
+			Clipboard cb = frame.getToolkit().getSystemClipboard();
+			boolean hadPassphrase = cpe.hasPassphrase();
+			char[] passwd = getSecurePW(frame, key);
+			if (!hadPassphrase) cpe.clearPassphrase();
+			if (passwd == null) {
+			    throw new IOException(errorMsg("pwGenFailed"));
+			}
+			String password = new String(passwd);
+			StringSelection selection1 = new StringSelection(user);
+			StringSelection selection2 =
+			    new StringSelection(password);
+			StringSelection2 selection = new
+			    StringSelection2(selection1, selection2);
+			cb.setContents(selection, selection);
 			Desktop desktop = Desktop.getDesktop();
-			if (desktop.isSupported(Desktop.Action
-						.BROWSE)) {
+			if (desktop.isSupported(Desktop.Action.BROWSE)) {
 			    desktop.browse(uri);
 			}
 		    } catch (URISyntaxException urie) {
@@ -947,7 +1052,7 @@ public class SBL {
 		    }
 		} else {
 		    Clipboard cb = frame.getToolkit().getSystemClipboard();
-		    StringSelection selection = new StringSelection(location) {
+		    StringSelection selection = new StringSelection(location)/* {
 			    @Override
 			    public Object getTransferData(DataFlavor flavor)
 				throws UnsupportedFlavorException, IOException
@@ -962,7 +1067,7 @@ public class SBL {
 					});
 				}
 			    }
-			};
+			    }*/;
 		    cb.setContents(selection,selection);
 
 		    String msg = errorMsg("pleaseVisit", location);
@@ -1003,6 +1108,176 @@ public class SBL {
 	return rcode;
     }
 
+    private static String asBlank(String s) {
+	char[] array = new char[s.length()];
+	for (int i = 0; i < array.length; i++) {
+	    array[i] = ' ';
+	}
+	return new String(array);
+    }
+
+    private static class ServerResponse {
+	int rcode;
+	String msg;
+	ServerResponse(int rcode, String msg) {
+	    this.rcode = rcode;
+	    this.msg = msg;
+	}
+
+	public int getResponseCode() {return rcode;}
+	public String getMessage() {return msg;}
+    }
+
+    private static ServerResponse sendSBLToServer(URI serverURI, String key)
+	throws Exception
+    {
+	Properties cpeProps = cpe.getEncodedProperties();
+	Properties decoded = cpe.getDecodedProperties();
+	ConfigProperties props = new ConfigProperties
+	    ("application/vnd.bzdev.sblauncher");
+	/*
+	String key = (sendSBLDirectly)? sendSBLDirectlyKey:
+	    getName(selectSiteCB);
+	*/
+	String ourkeys[] = {
+	    "base64.keypair.publicKey",
+	    key + ".description",
+	    "ebase64." + key + ".password",
+	    key + ".base",
+	    key + ".uri",
+	    key + ".user",
+	    key + ".mode"
+	};
+	for (String k: ourkeys) {
+	    String value;
+	    String kk = null;
+	    if (k.startsWith("ebase64.")) {
+		value = new String((char[])decoded.get(k));
+		kk = k.substring(1);
+	    } else if (k.startsWith("base64.")) {
+		String kk2 = k.substring(7);
+		value = (String)decoded.get(kk2);
+	    } else {
+		value = cpeProps.getProperty(k);
+	    }
+	    // System.out.println(k + ": " + value);
+	    if (value != null) {
+		if (kk != null) {
+		    props.setProperty(kk, value);
+		} else {
+		    props.setProperty(k, value);
+		}
+	    }
+	}
+	String string = props.store();
+	byte[] arr = string.getBytes("UTF-8");
+	URL url = serverURI.toURL();
+	// System.out.println("server URL = " +url.toString());
+	URLConnection urlc = url.openConnection();
+	if (urlc instanceof HttpURLConnection) {
+	    HttpURLConnection c =
+		(HttpURLConnection) urlc;
+	    c.setRequestMethod("POST");
+	    String mediaType =
+		"application/vnd.bzdev.sblogindata";
+	    c.setRequestProperty("content-type",
+				 mediaType);
+	    c.setRequestProperty("content-length",
+				 "" + arr.length);
+	    c.setDoOutput(true);
+	    OutputStream os =
+		c.getOutputStream();
+	    os.write(arr);
+	    os.flush();
+	    os.close();
+	    String user = props
+		.getProperty(key + ".user");
+	    int rcode = c.getResponseCode();
+	    String contentType = c.getContentType();
+	    // System.out.println("contentType = " + contentType);
+	    int len = c.getContentLength();
+	    // System.out.println("content length = " + len);
+	    String msg = null;
+	    if (contentType == null) {
+		return new ServerResponse(rcode, null);
+	    }
+	    contentType = contentType.toLowerCase();
+	    if (contentType.equals("text/plain; charset=utf-8")) {
+		InputStream is = c.getInputStream();
+		InputStreamReader r = new InputStreamReader(is, UTF8);
+		char[] data = new char[len];
+		r.read(data, 0, len);
+		msg = new String(data);
+		return new ServerResponse(rcode, msg);
+	    } else if (contentType.equals("text/html; charset=utf-8")) {
+		InputStream is = c.getInputStream();
+		InputStreamReader r = new InputStreamReader(is, UTF8);
+		char[] data = new char[len];
+		int rdlen = r.read(data, 0, len);
+		r.close();
+		if (rdlen == len) {
+		    msg = new String(data);
+		    String lmsg = msg.toLowerCase();
+		    int ind1 = lmsg.indexOf("<body>");
+		    int ind2 = lmsg.lastIndexOf("</body>");
+		    if (ind1 < 0 || ind2 < 0 || ind2 < ind1) {
+			msg = null;
+		    } else {
+			msg = "<html>"
+			    + msg.substring(0, ind2).substring(ind1+6)
+			    + "</html>";
+		    }
+		}
+		return new ServerResponse(rcode, msg);
+	    } else {
+		throw new IOException(errorMsg("contentType", contentType));
+	    }
+	} else {
+	    throw new IOException(errorMsg("notHTTP"));
+	}
+    }
+
+    private static JButton button1 = null;
+    private static JButton button2 = null;
+    private static JButton button3 = null;
+    private static String button1User = null;
+    private static String button1Path = null;
+    private static URI button2URI = null;
+    private static byte[] button1Arr = null;
+
+    // used by "sbl" account-setup case.
+    private static URI button1URI = null;
+
+    private static String getRespErrorMsg(ServerResponse response) {
+	int rc = response.getResponseCode();
+	String msg = response.getMessage();
+	if (msg == null) {
+	    return errorMsg("sblFailed", rc);
+	} else {
+	    return errorMsg("sblFailed2", rc, msg);
+	}
+    }
+
+    private static void setupBrowser(JFrame frame, URI uri) {
+	Clipboard cb = frame.getToolkit().getSystemClipboard();
+	String user = cpe.getDecodedProperties().getProperty("user.user");
+	char[] passwd =  getSecurePW(frame, "user");
+	String password = new String(passwd);
+	StringSelection selection1 = new StringSelection(user);
+	StringSelection selection2 = new StringSelection(password);
+	StringSelection2 selection = new StringSelection2(selection1,
+							  selection2);
+	cb.setContents(selection, selection);
+	Desktop desktop = Desktop.getDesktop();
+	if (uri != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	    try {
+		desktop.browse(uri);
+	    } catch (Exception ee) {
+		SwingErrorMessage.format("%s", ee.getMessage());
+		SwingErrorMessage.displayConsoleIfNeeded();
+	    }
+	}
+    }
 
     public static void main(String argv[]) throws Exception {
 
@@ -1157,7 +1432,6 @@ public class SBL {
 	}
 	String fname = (argv.length-indx == 1)? argv[indx]: null;
 	configFile = fnexpand(fname);
-	// System.out.println("configFile = " + configFile);
 
 	if (create) {
 	    File stdoutFile = new File("-");
@@ -1349,8 +1623,6 @@ public class SBL {
 	    }
 	}
 
-
-
 	if (configFile != null && configFile.exists()) {
 	    if (rlist.size() > 0) {
 		// add a new keypair with a new list of recipients
@@ -1371,62 +1643,106 @@ public class SBL {
 		cpe3.loadFile(configFile);
 		Properties decoded = cpe3.getDecodedProperties();
 		String tmp = decoded.getProperty("recipients");
+		// System.out.println("tmp = " + tmp);
 		String[] recipients = (tmp == null)? new String[0]:
 		    ConfigPropUtilities.decodeRecipients(tmp);
 		String cemode = decoded.getProperty("need");
+		String dmode = decoded.getProperty("sbl.downloaded");
+		if (dmode == null) dmode = "falset";
+		if (dmode.equals("true")) {
+		    // if the "need" property is not null and
+		    // the "sbl.downloaded" property has the value "true",
+		    // then delete the config file when SBL exits.
+		    configFile.deleteOnExit();
+		    if (cemode == null) {
+			// signal that we should use the downloaded
+			// SBL file with a simplified UI as this is
+			// a standard case with only one login per file.
+			cemode = "usesbl";
+		    }
+		}
 		if (cemode == null) {
 		    // nothing to do - we just go on to the
 		    // normal case.
-		} else if (cemode.equals("pgpkey")) {
+		} else if (cemode.equals("pgpkey") || cemode.equals("usesbl")) {
 		    String uriS2 = decoded.getProperty("base");
 		    String titleText = errorMsg("titleText", uriS2);
-		    SwingUtilities.invokeLater(() -> {
-			    frame = new JFrame(errorMsg("title", titleText));
-			    SwingErrorMessage.setComponent(frame);
-			    JPanel panel = new JPanel(new GridLayout(2, 1));
-			    JPanel panel2 = null;
-			    String path = decoded.getProperty("loginAlias");
-			    String user = decoded.getProperty("user");
-			    KeyInfoPair kip = getGPGPrivateKeyInfo(user);
-			    String fpr = null;
-			    String gpgPublicKey = null;
-			    byte[] array = null;
-			    String errorMessage = null;
-			    String message = null;
-			    JLabel label = null;
-			    JButton button1 = new JButton(errorMsg("OK"));
-			    JButton button2 = new JButton(errorMsg("CANCEL"));
-			    button2.addActionListener((e) -> {
-				    System.exit(0);
-				});
-			    if (kip.fprs.length == 1) {
-				fpr = kip.fprs[0];
-				gpgPublicKey = getGPGPublicKey(fpr);
-				try {
-				    array = gpgPublicKey.getBytes("UTF-8");
-				} catch (UnsupportedEncodingException ec) {}
-				message = errorMsg("foundKey", user, fpr);
-				label = new JLabel(message);
-				panel2 = new JPanel(new GridLayout(1, 2));
-				panel2.add(button1);
-				panel2.add(button2);
-			    } else {
-				int len = kip.fprs.length;
-				errorMessage = errorMsg("foundKeys", len);
-				label = new JLabel(errorMessage);
-				panel2 = new JPanel(new GridLayout(1, 1));
-				panel2.add(button2);
-				// System.exit(1);
-			    }
-			    panel.add(label);
-			    panel.add(panel2);
-			    byte[] arr = array;
-			    button1.addActionListener((e) -> {
+		    boolean noUpload = cemode.equals("usesbl");
+		    ActionListener button1AL = new ActionListener() {
+			    boolean justCopy = noUpload;
+			    boolean visitBrowser = noUpload; // for justCopy
+			    public void actionPerformed(ActionEvent e) {
+				if (justCopy) {
+				    String key = null;
+				    for (String k: cpe.getProperties()
+					     .stringPropertyNames()) {
+					if (k.endsWith(".description")) {
+					    int ind = k.lastIndexOf('.');
+					    key = k.substring(0, ind);
+					    break;
+					}
+				    }
+				    Properties dprops =
+					cpe.getDecodedProperties();
+				    String user =
+					dprops.getProperty(key + ".user");
+				    String uriString =
+					dprops.getProperty(key + ".uri");
+				    if (noUpload) {
+					try {
+					    button2URI = new URI(uriString);
+					} catch (URISyntaxException euri) {}
+				    }
+				    Clipboard cb = frame.getToolkit()
+					.getSystemClipboard();
+				    boolean hadPassphrase = cpe.hasPassphrase();
+				    char[] passwd = getSecurePW(frame, key);
+				    if (!hadPassphrase) cpe.clearPassphrase();
+				    if (passwd == null) return;
+				    String password = new String(passwd);
+				    StringSelection selection1 =
+					new StringSelection(user);
+				    StringSelection selection2 =
+					new StringSelection(password);
+				    StringSelection2 selection = new
+					StringSelection2(selection1,
+							 selection2);
+				    cb.setContents(selection, selection);
+				    if (visitBrowser) {
+					// just do this once.
+					Desktop desktop = Desktop.getDesktop();
+					if (desktop.isSupported
+					    (Desktop.Action.BROWSE)) {
+					    try {
+						URI uri = new URI(uriString);
+						desktop.browse(uri);
+					    } catch (Exception ee) {
+						SwingErrorMessage
+						    .format("%s",
+							    ee.getMessage());
+						SwingErrorMessage
+						    .displayConsoleIfNeeded();
+					    }
+					}
+					button1.setText(errorMsg("COPY"));
+					if (noUpload) {
+					    button2.setText(errorMsg("LOGIN"));
+					    button2.setEnabled(true);
+					}
+					button3.setText(errorMsg("EXIT"));
+					visitBrowser = false;
+				    }
+				} else {
 				    try {
-					URL url = new URL(uriS2 + path);
+					String encodedUser =URLEncoder
+					    .encode(button1User, UTF8);
+					URL url = new URL(uriS2 + button1Path);
+					button2URI = new
+					    URI(uriS2 + button1Path);
 					URLConnection urlc =
 					    url.openConnection();
-					if (urlc instanceof HttpURLConnection) {
+					if (urlc instanceof
+					    HttpURLConnection) {
 					    HttpURLConnection c =
 						(HttpURLConnection) urlc;
 					    c.setRequestMethod("POST");
@@ -1435,18 +1751,23 @@ public class SBL {
 						 "application/pgp-keys");
 					    c.setRequestProperty
 						("content-length",
-						 "" + arr.length);
+						 "" + button1Arr.length);
 					    c.setDoOutput(true);
 					    OutputStream os =
 						c.getOutputStream();
-					    os.write(arr);
+					    os.write(button1Arr);
 					    os.flush();
 					    os.close();
+					    // processHttpURCL will set up
+					    // cpe if the status code is 201
+					    System.out.println("frame = "
+							       + frame);
 					    switch(processHttpURLC
-						   (frame,user, c,
+						   (frame, button1User, c,
 						    "pgpCnflct")) {
 					    case -1:
-						//Internal error; the rest are
+						//Internal error;
+						// the rest are
 						// HTTP status codes
 						System.exit(1);
 						break;
@@ -1458,9 +1779,16 @@ public class SBL {
 					    case 201:
 						// either new URI copied to
 						// clipboard or browser told
-						// which URI to visit.
-						System.exit(0);
-						break;
+						// which URI to visit and
+						// user name + password copied
+						// to clipboard.
+						justCopy = true;
+						button1
+						    .setText(errorMsg("COPY"));
+						button2.setEnabled(true);
+						button3
+						    .setText(errorMsg("EXIT"));
+						return;
 					    case 202:
 						System.exit(0);
 						break;
@@ -1472,19 +1800,126 @@ public class SBL {
 						break;
 					    }
 					} else {
-					    String msg = errorMsg("notHTTP");
+					    String msg =
+						errorMsg("notHTTP");
 					    String title =
 						errorMsg("errorTitle");
 					    JOptionPane.showMessageDialog
 						(frame, msg, title,
 						 JOptionPane.ERROR_MESSAGE);
-						System.exit(1);
+					    System.exit(1);
 					}
 				    } catch (Exception ee) {
 					System.err.println(ee.getMessage());
 					System.exit(1);
 				    }
+				}
+			    }
+			};
+		    ActionListener button2AL = (event) -> {
+			String key = null;
+			for (String k: cpe.getProperties()
+				 .stringPropertyNames()) {
+			    if (k.endsWith(".description")) {
+				int ind = k.lastIndexOf('.');
+				key = k.substring(0, ind);
+				break;
+			    }
+			}
+			Properties dprops = cpe.getDecodedProperties();
+			String user = dprops.getProperty(key + ".user");
+			Clipboard cb = frame.getToolkit().getSystemClipboard();
+			boolean hadPassphrase = cpe.hasPassphrase();
+			char[] passwd = getSecurePW(frame, key);
+			if (!hadPassphrase) cpe.clearPassphrase();
+			if (passwd == null) return;
+			String password = new String(passwd);
+			StringSelection selection1 =
+			new StringSelection(user);
+			StringSelection selection2 =
+			new StringSelection(password);
+			StringSelection2 selection = new
+			StringSelection2(selection1,
+					 selection2);
+			cb.setContents(selection, selection);
+
+			Desktop desktop = Desktop.getDesktop();
+			if (desktop.isSupported
+			    (Desktop.Action.BROWSE)) {
+			    try {
+				desktop.browse(button2URI);
+			    } catch (Exception ee) {
+				SwingErrorMessage
+				    .format("%s",
+					    ee.getMessage());
+				SwingErrorMessage
+				    .displayConsoleIfNeeded();
+			    }
+			}
+		    };
+		    SwingUtilities.invokeLater(() -> {
+			    frame = new JFrame(errorMsg("title", titleText));
+			    SwingErrorMessage.setComponent(frame);
+			    JPanel panel = new JPanel(new GridLayout(2, 1));
+			    JPanel panel2 = null;
+			    String key = null;
+			    if (noUpload) {
+				fixupEntries(null, cpe3);
+				if (entries.size() == 1) {
+				    for (String k: entries) {
+					key = k;
+				    }
+				}
+			    }
+			    String path = (key != null)?
+				decoded.getProperty(key + ".uri"):
+				decoded.getProperty("loginAlias");
+			    String user = (key != null)?
+				decoded.getProperty(key + ".user"):
+				decoded.getProperty("user");
+			    button1User = user;
+			    button1Path = path;
+			    KeyInfoPair kip = getGPGPrivateKeyInfo(user);
+			    String fpr = null;
+			    String gpgPublicKey = null;
+			    byte[] array = null;
+			    String errorMessage = null;
+			    String message = null;
+			    JLabel label = null;
+			    button1 = new JButton(errorMsg("OK"));
+			    button2 = new JButton(errorMsg("LOGIN"));
+			    button2.setEnabled(false);
+			    button2.addActionListener(button2AL);
+			    button3 = new JButton(errorMsg("CANCEL"));
+			    button3.addActionListener((e) -> {
+				    System.exit(0);
 				});
+			    if (kip.fprs.length == 1) {
+				fpr = kip.fprs[0];
+				gpgPublicKey = getGPGPublicKey(fpr);
+				try {
+				    array = gpgPublicKey.getBytes("UTF-8");
+				} catch (UnsupportedEncodingException ec) {}
+				message = errorMsg("foundKey", user, fpr);
+				label = new JLabel(message);
+				panel2 = new JPanel(new GridLayout(1, 3));
+				panel2.add(button1);
+				panel2.add(button2);
+				panel2.add(button3);
+			    } else {
+				int len = kip.fprs.length;
+				errorMessage = errorMsg("foundKeys", len);
+				label = new JLabel(errorMessage);
+				panel2 = new JPanel(new GridLayout(1, 1));
+				panel2.add(button3);
+				// System.exit(1);
+			    }
+			    panel.add(label);
+			    panel.add(panel2);
+			    // byte[] arr = array;
+			    button1Arr = array;
+
+			    button1.addActionListener(button1AL);
 			    frame.setLayout(new BorderLayout());
 			    frame.add(panel, BorderLayout.CENTER);
 			    frame.pack();
@@ -1496,6 +1931,10 @@ public class SBL {
 			    frame.setVisible(true);
 			    if (errorMessage == null) {
 				cpe = cpe3;
+				if (cpe.hasKey("ebase64.trustStore.password")) {
+				    cpe.requestPassphrase(frame);
+				}
+				cpe.setPWOwner(frame);
 				configTrust(frame);
 			    }
 			});
@@ -1505,7 +1944,6 @@ public class SBL {
 		    final Properties ourProps = cpe3.getProperties();
 		    init3Consumer = (key) -> {
 			Properties cpeProps = cpe.getProperties();
-			// System.out.println("cpeProps = " + cpeProps);
 			String keys[] = {
 			    "recipients",
 			    "trust.allow.loopback",
@@ -1513,6 +1951,34 @@ public class SBL {
 			    "trustStore.file",
 			    "ebase64.trustStore.password"
 			};
+
+			String tpw = cpeProps.getProperty
+			    ("ebase64.trustStore.password");
+			if (tpw != null) {
+			    // if the server has the user's GPG
+			    // public key, then we can use GPG.
+			    // This test works in the rare case
+			    // where a trust store file name and password is
+			    // provided by the server, which should
+			    // occur only during testing or some local use.
+			    cpe.useGPG(!tpw.startsWith("==="));
+			} else {
+			    String u = ourProps.getProperty("user");
+			    KeyInfoPair kpi = getGPGPrivateKeyInfo(u);
+			    if (kpi == null) {
+				cpe.useGPG(false);
+			    } else {
+				// To use GPG, the user name should
+				// be suitable for use as a key ID,
+				// and only one GPG key should match.
+				if (kpi.keyids.length == 1) {
+				    cpe.useGPG(true);
+				} else {
+				    cpe.useGPG(false);
+				}
+			    }
+			}
+			cpe.setPWOwner(frame);
 
 			cpe.set(frame, key + ".description",
 				"login for " + ourProps.getProperty("base"));
@@ -1539,8 +2005,10 @@ public class SBL {
 				new String(genpw()));
 			String base = ourProps.getProperty("base");
 			if (!base.endsWith("/")) base = base + "/";
+			cpe.set(frame, key + ".base", base);
 			String loginAlias = ourProps.getProperty("loginAlias");
-			cpe.set(frame, key +".uri", base + loginAlias);
+			cpe.set(frame, key +".uri",
+				"$(" + key + ".base)" + loginAlias);
 			try {
 			    String[] keypair = SecureBasicUtilities
 				.createPEMPair(null,null);
@@ -1548,16 +2016,136 @@ public class SBL {
 				    keypair[0]);
 			    cpe.set(frame, "base64.keypair.publicKey",
 				    keypair[1]);
+			    cpe.set(frame, "ebase64." + key + ".password",
+				    genpw());
 			} catch (GeneralSecurityException se) {
+			    System.out.println(se.getMessage());
 			}
 		    };
+		    SwingUtilities.invokeLater(() -> {
+			    // System.out.println("got here 2");
+			    String ourbase = decoded.getProperty("base");
+			    String ourlogin = decoded.getProperty("loginAlias");
+			    String titleText = errorMsg("titleText", ourbase);
+			    String user = decoded.getProperty("user");
+			    frame = new JFrame(errorMsg("title", titleText));
+			    SwingErrorMessage.setComponent(frame);
+			    JPanel panel = new JPanel(new GridLayout(2, 1));
+			    String message1 =
+				errorMsg("loginFor", user, ourbase);
+			    JLabel label = new JLabel(message1);
+			    panel.add(label);
+			    button1 = new JButton(errorMsg("OK"));
+			    configFile = null;
+			    button1.addActionListener((ae)-> {
+					if (configFile == null) {
+					    configFile = getFile(frame);
+					    if (configFile == null) {
+						System.exit(0);
+					    }
+					    try {
+						URI serverURI =
+						    new URI(ourbase + ourlogin);
+						button1URI = serverURI;
+						cpe.setPWOwner(frame);
+						ServerResponse resp =
+						    sendSBLToServer(serverURI,
+								    "user");
+						String title =
+						    errorMsg("rcodeTitle");
+						int rc = resp.getResponseCode();
+						String rmsg = resp.getMessage();
+						String msg = (rmsg != null)?
+						    rmsg:
+						    errorMsg("sblSuccess", rc);
+						switch(resp.rcode) {
+						case 200: // OK
+						case 201: // Created.
+						case 204: // No Content
+						    JOptionPane
+							.showMessageDialog
+							(frame, msg, title,
+							 JOptionPane
+							 .PLAIN_MESSAGE);
+						    cpe.save(configFile);
+						    String b1t =
+							errorMsg("COPY");
+						    String b3t =
+							errorMsg("EXIT");
+						    button1.setText(b1t);
+						    button2.setEnabled(true);
+						    button3.setText(b3t);
+						    setupBrowser(frame,
+								 button1URI);
+						    button2URI = button1URI;
+						    button1URI = null;
+						    break;
+						case 202: // Accepted.
+						    JOptionPane
+							.showMessageDialog
+							(frame, msg, title,
+							 JOptionPane
+							 .PLAIN_MESSAGE);
+						    cpe.save(configFile);
+						    System.exit(0);
+						    break;
+						default:
+						    msg = getRespErrorMsg
+							(resp);
+						    JOptionPane
+							.showMessageDialog
+							(frame, msg, title,
+							 JOptionPane
+							 .PLAIN_MESSAGE);
+						    System.exit(1);
+						}
+					    } catch (Exception e) {
+						System.err
+						    .println
+						    (e.getMessage());
+					    }
+					} else {
+					    // config file set so we just
+					    // visit the URL and set up
+					    // copy and paste.
+					    setupBrowser(frame, button1URI);
+					}
+			    });
+			    button2 = new JButton(errorMsg("LOGIN"));
+			    button2.setEnabled(false);
+			    button2.addActionListener((ae) -> {
+				    setupBrowser(frame, button2URI);
+				});
+			    button3 = new JButton(errorMsg("CANCEL"));
+			    button3.addActionListener((ae) -> {
+				    System.exit(0);
+				});
+			    JPanel panel2 = new JPanel(new GridLayout(1, 3));
+			    panel2.add(button1);
+			    panel2.add(button2);
+			    panel2.add(button3);
+			    panel.add(panel2);
+			    frame.add(panel);
+			    frame.pack();
+			});
 
 		    // String uriS2 = decoded.getProperty("base");
 		    // String titleText = errorMsg("titleText2", uriS2);
+		    // System.out.println("*** setting recipients");
 		    cpe.setRecipients(recipients);
+		    SwingUtilities.invokeAndWait(() -> {
+			    frame.setVisible(true);
+			});
+		    init3Consumer.accept("user");
+		    SwingUtilities.invokeLater(() -> {
+			    cpe.setPWOwner(frame);
+			    configTrust(frame);
+			});
+		    // See what we got for testing:
+		    // cpe.save(new File("output.sbl"));
 		    // System.exit(0);
-		} else if (cemode != null) {
-		    // System.out.println("cemode = " + cemode);
+		    return;
+		} else if (cemode != null && !cemode.equals("usesbl")) {
 		    System.exit(1);
 		}
 	    }
@@ -1654,6 +2242,7 @@ public class SBL {
 		    } else {
 			try {
 			    cpe.loadFile(configFile);
+			    cpe.setPWOwner(frame);
 			    configTrust(frame);
 			    fixupEntries(selectSiteCB);
 			    String txt =
@@ -1721,6 +2310,7 @@ public class SBL {
 			cpe.loadFile(configFile);
 			ops = null; // so we get a new private key
 			checkConfig = false;
+			cpe.setPWOwner(frame);
 			configTrust(frame);
 			fixupEntries(selectSiteCB);
 			addEntryButton.setEnabled(true);
@@ -1939,16 +2529,18 @@ public class SBL {
 		    console.addSeparatorIfNeeded();
 		    String name = getName(selectSiteCB);
 		    if (name == null) return;
+		    Component pwowner = cpe.getPWOwner();
+		    cpe.setPWOwner(frame);
 		    Properties props = cpe.getEncodedProperties();
 		    Properties dprops = cpe.getDecodedProperties();
 		    String user = dprops.getProperty(name + ".user");
 		    String uriString = dprops.getProperty(name + ".uri");
 		    URI uri = null;
-			
 		    Clipboard cb = panel.getToolkit().getSystemClipboard();
 		    boolean hadPassphrase = cpe.hasPassphrase();
 		    char[] passwd = getSecurePW(panel, name);
 		    if (!hadPassphrase) cpe.clearPassphrase();
+		    cpe.setPWOwner(pwowner);
 		    if (passwd == null) return;
 		    String password = new String(passwd);
 		    StringSelection selection1 = new StringSelection(user);
@@ -1980,6 +2572,8 @@ public class SBL {
 		visitSiteButton.addActionListener(visitAL);
 
 		ActionListener serverSBLAL = (e) -> {
+		    Component pwowner = cpe.getPWOwner();
+		    cpe.setPWOwner(frame);
 		    int ind = selectSiteCB.getSelectedIndex();
 		    if (sendSBLDirectly || ind > 0) {
 			Properties cpeProps = cpe.getEncodedProperties();
@@ -2018,6 +2612,7 @@ public class SBL {
 				}
 			    }
 			}
+			cpe.setPWOwner(pwowner);
 			String string = props.store();
 			if (sendSBLDirectly) {
 			    String uriS3 = props.getProperty(key + ".uri");
@@ -2030,7 +2625,7 @@ public class SBL {
 					(HttpURLConnection) urlc;
 				    c.setRequestMethod("POST");
 				    String mediaType =
-					"application/vnd.bzdev.sblauncherdata";
+					"application/vnd.bzdev.sblogindata";
 				    c.setRequestProperty("content-type",
 							 mediaType);
 				    c.setRequestProperty("content-length",
@@ -2124,12 +2719,15 @@ public class SBL {
 
 		generateButton.addActionListener((e) -> {
 			console.addSeparatorIfNeeded();
+			Component pwowner = cpe.getPWOwner();
+			cpe.setPWOwner(frame);
 			String name = getName(selectSiteCB);
 			String user = cpe.getEncodedProperties()
 			    .getProperty(name + ".user");
 			if (name == null) return;
 			boolean hadPassphrase = cpe.hasPassphrase();
 			char[] passwd = getSecurePW(panel, name);
+			cpe.setPWOwner(pwowner);
 			if (!hadPassphrase) cpe.clearPassphrase();
 			if (passwd == null) {
 			    return;
@@ -2235,8 +2833,9 @@ public class SBL {
 			if (f.exists()) {
 			    String fn = f.getName();
 			    String msg = errorMsg("fileExists", fn);
+			    String title = errorMsg("errorTitle");
 			    JOptionPane.showMessageDialog
-				(frame, msg, errorMsg("errorTitle"),
+				(frame, msg, title,
 				 JOptionPane.ERROR_MESSAGE);
 			} else {
 			    configFile = f;
@@ -2272,6 +2871,7 @@ public class SBL {
 		    try {
 			cpe.save(configFile);
 			cpe.loadFile(configFile);
+			cpe.setPWOwner(frame);
 			configTrust(frame);
 			loadButton.setEnabled(false);
 			openMenuItem.setEnabled(false);
@@ -2284,14 +2884,16 @@ public class SBL {
 			sendSBLDirectly = true;
 			sendSBLDirectlyKey = key;
 			String msg = errorMsg("init3Hint");
+			String title = errorMsg("hintTitle");
 			JOptionPane.showMessageDialog
-			    (frame, msg, errorMsg("hintTitle"),
+			    (frame, msg,title,
 			     JOptionPane.PLAIN_MESSAGE);
 		    } catch (IOException eio) {
 			String fn = configFile.getName();
 			String msg = errorMsg("canNotSave", fn);
+			String title = errorMsg("errorTitle");
 			JOptionPane.showMessageDialog
-			    (frame, msg, errorMsg("errorTitle"),
+			    (frame, msg, title,
 			     JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		    }

@@ -925,7 +925,24 @@ public class FileHandler implements HttpHandler {
     @Override
     public void handle(final HttpExchange t) throws IOException {
 	try {
+	    HttpContext context = t.getHttpContext();
+	    String base = context.getPath();
+	    String base1 = (base.endsWith("/"))? base: (base + "/");
+	    String loginpath = (loginAlias == null)? null:
+		base1 + loginAlias;
+	    URI uri = t.getRequestURI();
+	    String path = uri.getPath();
+	    String query = uri.getRawQuery();
 	    HttpMethod method = HttpMethod.forName(t.getRequestMethod());
+	    if (loginAlias != null && (method == HttpMethod.POST
+				       || query != null)) {
+		if (path.equals(loginpath) &&
+		    context.getAuthenticator() instanceof EjwsAuthenticator) {
+		    System.out.println("found a post/query to the login alias");
+		    // Already sent the response.
+		    return;
+		}
+	    }
 	    boolean favicon =
 		t.getRequestURI().getPath().startsWith("/favicon.ico");
 	    if (tracer != null) {
@@ -1032,13 +1049,13 @@ public class FileHandler implements HttpHandler {
 		return;
 	    }
 	    try {
-		URI uri = t.getRequestURI();
-		String path = uri.getPath();
+		// URI uri = t.getRequestURI();
+		// String path = uri.getPath();
 		adjustPendingCount(1);
-		String query = uri.getRawQuery();
+		// String query = uri.getRawQuery();
 		if (query == null || map.allowsQuery()) {
-		    String base = /*"/"*/t.getHttpContext().getPath();
-		    String base1 = (base.endsWith("/"))? base: (base + "/");
+		    // String base = /*"/"*/t.getHttpContext().getPath();
+		    // String base1 = (base.endsWith("/"))? base: (base + "/");
 		    // System.out.println("query null or allowed");
 		    if (loginAlias != null && path.equals(base1 + loginAlias)) {
 			String location = (loginTarget != null)?

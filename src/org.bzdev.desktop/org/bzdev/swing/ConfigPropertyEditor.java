@@ -18,6 +18,7 @@ import java.text.Format;
 import java.util.ArrayList;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -254,6 +255,9 @@ public abstract class ConfigPropertyEditor {
      * key-value pairs.
      * @return the properties object
      */    protected Properties getProperties() {
+	if (properties == null) {
+	    properties = new Properties();
+	}
 	return properties;
     }
 
@@ -425,14 +429,20 @@ public abstract class ConfigPropertyEditor {
     }
 
     private boolean  useGPGFrozen = false;
-
     private boolean useGPG = true;
 
     /**
-     * Indicate if GPG encryption is to be used.
+     * Indicate if GPG encryption is to be used by default instead of
+     * asking for each value that is saved.
+     * The value can be overriden when a file is loaded provided that
+     * the method {@link #setUseGPGOnLoad(String)} was called first.
+     * <P>
+     * If called, this method should be called before a call to
+     * {@link #setUseGPGOnLoad(String)}.
      * @param value true if GPG encryption should be used; false if
      *        symmetric encryption should be used
      * @return this object
+     * @see #setUseGPGOnLoad(String)
      */
     public ConfigPropertyEditor useGPG(boolean value) {
 	useGPG = value;
@@ -449,8 +459,13 @@ public abstract class ConfigPropertyEditor {
     /**
      * Provide a key to determine whether to use GPG or a symmetric
      * cipher when this object is loaded from a file.
+     * If a file has not been loaded, the default set by
+     * {@link #useGPG(boolean)} is used.  When a fiel is loaded, the
+     * value for the key is checked to determine if its value was
+     * encrypted using GPG or not. The key must start with "ebase64.".
      * @param key the key to check
      * @return this object
+     * @see #useGPG(boolean)
      */
     public ConfigPropertyEditor setUseGPGOnLoad(String key)
     {
@@ -498,7 +513,10 @@ public abstract class ConfigPropertyEditor {
 	}
 	byte[] data = Base64.getDecoder().decode(value);
 	if (useGPG() == false) {
-	    return SymmetricCipher.decryptToString(password, data);
+		String result =
+		    SymmetricCipher.decryptToString(password, data);
+		pwverified = true;
+		return result;
 	}
 	ByteArrayInputStream is = new ByteArrayInputStream(data);
 
@@ -570,7 +588,8 @@ public abstract class ConfigPropertyEditor {
 				       localeString("gpgFailedTitle"),
 				       JOptionPane.YES_NO_OPTION);
 		if (status == JOptionPane.OK_OPTION) {
-		    password = null;
+		    // password = null;
+		    clearPassphrase();
 		    requestPassphrase(pwowner);
 		    return decrypt(value);
 		} else {
@@ -608,6 +627,7 @@ public abstract class ConfigPropertyEditor {
 	if (useGPG() == false) {
 	    // So we don't create a string that might contain a password.
 	    byte[] barray = SymmetricCipher.decrypt(password, data);
+	    pwverified = true;
 	    return UTF8.decode(ByteBuffer.wrap(barray)).array();
 	}
 
@@ -673,7 +693,20 @@ public abstract class ConfigPropertyEditor {
 	    p.waitFor();
 	    if (p.exitValue() != 0) {
 		System.err.println(errorMsg("gpgFailed", p.exitValue()));
-		return EMPTY_CHAR_ARRAY;
+		int status = JOptionPane
+		    .showConfirmDialog(pwowner,
+				       localeString("pwTryAgain"),
+				       localeString("gpgFailedTitle"),
+				       JOptionPane.YES_NO_OPTION);
+		if (status == JOptionPane.OK_OPTION) {
+		    // password = null;
+		    clearPassphrase();
+		    requestPassphrase(pwowner);
+		    return decryptToCharArray(value);
+		} else {
+		    return EMPTY_CHAR_ARRAY;
+		}
+		// return EMPTY_CHAR_ARRAY;
 	    }
 	    return (UTF8.decode(ByteBuffer.wrap(baos.toByteArray())))
 		.array();
@@ -686,6 +719,44 @@ public abstract class ConfigPropertyEditor {
     private String encrypt(String value, String[] recipients) {
 	if (value == null || value.length() == 0) return EMPTY_STRING;
 	if (useGPG() == false) {
+	    requestPassphrase(pwowner); // in case not set.
+	    //pwconfirm = true;
+	    pwconfirm.incrementAndGet();
+	    if (!pwverified) {
+		do {
+		    char[] currentpw = password.clone();
+		    clearPassphrase();
+		    requestPassphrase(pwowner);
+		    // System.out.println("next pw = " + new String(password));
+		    if (currentpw.length == password.length) {
+			boolean pwv = true;
+			for (int i = 0; i < password.length; i++) {
+			    if (password[i] != currentpw[i]) {
+				/*
+				System.out.println("... i = " + i
+						   +", " + password[i]
+						   +  " != " +currentpw[i]);
+				*/
+				pwv = false;
+				break;
+			    }
+			}
+			if (pwv) {
+			    pwverified = true;
+			    // System.out.println("pwverified = " + pwverified);
+			    for (int i = 0; i < currentpw.length; i++) {
+				currentpw[i] = '\0';
+			    }
+			}
+		    } else {
+			// System.out.println("unequal lengths");
+			pwverified = false;
+		    }
+		} while (pwverified == false);
+		// System.out.println("got password " + new String(password));
+	    }
+	    // pwconfirm = false;
+	    pwconfirm.decrementAndGet();
 	    try {
 		byte[] data = SymmetricCipher.encrypt(password, value);
 		data = Base64.getEncoder().encode(data);
@@ -776,13 +847,31 @@ public abstract class ConfigPropertyEditor {
      * Set the list of recipients to use when values are encrypted, given
      * an array of recipients.
      * A recipient is a string acceptable to the '-r' argument for GPG.
+     * Recipients not in the public keyring are ignored. If there are
+     * no valid recipients, symmetric encryption may be used.
      * @param list the recipient list; null to remove the recipients list
      */
     public void setRecipients(String[] list) {
 	if (useGPG() == false) {
 	    recipientsList = null;
 	} else {
-	    recipientsList =  list.clone();
+	    ArrayList<String> ourlist = new ArrayList<>();
+	    for (String recipient: list) {
+		if (ONEKEYID == gpgHasKey(recipient, true)) {
+		    ourlist.add(recipient);
+		}
+	    }
+	    int sz = ourlist.size();
+	    if (sz == 0) {
+		recipientsList = null;
+	    } else if (sz != list.length) {
+		list = new String[sz];
+		ourlist.toArray(list);
+		recipientsList = list;
+	    } else {
+		ourlist.clear();
+		recipientsList =  list.clone();
+	    }
 	}
     }
 
@@ -790,6 +879,8 @@ public abstract class ConfigPropertyEditor {
      * Set the list of recipients to use when values are encrypted, given
      * a list of recipients.
      * A recipient is a string acceptable to the '-r' argument for GPG.
+     * Recipients not in the public keyring are ignored. If there are
+     * no valid recipients, symmetric encryption may be used.
      * @param list the recipient list; null to remove the recipients list
      */
     public void setRecipients(java.util.List<String> list) {
@@ -1235,6 +1326,27 @@ public abstract class ConfigPropertyEditor {
     }
 
     /**
+     * Save the configuration, writing it to an output stream.
+     * This method uses {@link Properties#store(Writer,String)}
+     * with a writer that uses the UTF-8 character set with
+     * CRLF as an end-of-line delimiter.
+     * The output stream will start with a comment
+     * "#(!M.T " MEDIATYPE)" where MEDIATYPE is the media type in lower case.
+     * @param os the output stream
+     * @throws IOException if an IO error occurred
+     */
+    public void save(OutputStream os) throws IOException {
+	Writer w = new OutputStreamWriter(os, UTF8);
+	w = new CRLFWriter(w);
+	if (properties == null) {
+	    properties = new Properties();
+	}
+	addRecipientsIfNeeded(properties);
+	properties.store(w, "(!M.T " + mediaType().toLowerCase() + ")");
+    }
+
+
+    /**
      * Convert this object to a JSON representation.
      * @return the JSON representation of this object
      */
@@ -1598,7 +1710,29 @@ public abstract class ConfigPropertyEditor {
 	file = f;
 	Reader r = new InputStreamReader(new FileInputStream(file),
 					 UTF8);
+	loadReader(r, f);
+    }
+
+    /**
+     * Load a file to set up this editor.
+     * This will be called before the editor's top-level window is
+     * created.
+     * <P>
+     * Calling this method directly will not result in the user being
+     * prompted to save changes if values are edited.
+     * @param r a reader
+     * @exception IOException an IO exception occurred
+     */
+    public void loadReader(Reader r) throws IOException {
+	loadReader(r, null);
+    }
+
+    private  void loadReader(Reader r, File f)
+	throws IOException
+    {
 	String comment = "#(!M.T " + mediaType().toLowerCase() + ")\r\n";
+	String riMsg = errorMsg("readerInput");
+	String ff = (f == null)? riMsg: f.toString();
 	char[] cbuf1 = comment.toCharArray();
 	char[] cbuf2 = new char[cbuf1.length];
 	// handle the case where lines are terminated by LF instead of
@@ -1614,18 +1748,18 @@ public abstract class ConfigPropertyEditor {
 	    }
 	}
 	if (n != cbuf1.length) {
-	    throw new IOException(errorMsg("wrongMediaType", f.toString()));
+	    throw new IOException(errorMsg("wrongMediaType", ff));
 	}
 	for  (int i = 0; i < n; i++) {
 	    if (i < 7) {
 		if (cbuf1[i] != cbuf2[i]) {
 		    throw new
-			IOException(errorMsg("wrongMediaType", f.toString()));
+			IOException(errorMsg("wrongMediaType", ff));
 		}
 	    } else {
 		if (cbuf1[i] != Character.toLowerCase(cbuf2[i])) {
 		    throw new
-			IOException(errorMsg("wrongMediaType", f.toString()));
+			IOException(errorMsg("wrongMediaType", ff));
 		}
 	    }
 	}
@@ -1645,6 +1779,7 @@ public abstract class ConfigPropertyEditor {
 		setRecipients(rl);
 	    }
 	}
+	boolean oldCheckKeyResult = gpgCheckKeyResult;
 	hasCheckKeyResult = false;
 	if (gpgCheckKey != null) {
 	    String value = properties.getProperty(gpgCheckKey);
@@ -1656,6 +1791,13 @@ public abstract class ConfigPropertyEditor {
 		// then GPG is not used.
 		gpgCheckKeyResult = !value.startsWith("===");
 		hasCheckKeyResult = true;
+	    }
+	    if (oldCheckKeyResult != gpgCheckKeyResult
+		|| gpgCheckKeyResult == false) {
+		// The configuration changed or we are using
+		// symmetric encryption, so assume we need a new
+		// passphrase.
+		clearPassphrase();
 	    }
 	}
 	for (String key: defaults.stringPropertyNames()) {
@@ -1884,6 +2026,9 @@ public abstract class ConfigPropertyEditor {
     }
 
     private char[] password = null;
+    private boolean pwverified = true;
+    // private static boolean pwconfirm = false;
+    private static AtomicInteger pwconfirm = new AtomicInteger(0);
 
    /**
      * Request a GPG passphrase or a symmetric cipher password when
@@ -1911,19 +2056,24 @@ public abstract class ConfigPropertyEditor {
      */
     public void requestPassphrase(Component owner) {
 	if (password == null) {
-	    password = requestPassphrase(owner, useGPG(), false);
+	    boolean useGPG = useGPG();
+	    Component saved = pwowner;
+	    pwowner = owner;
+	    password = requestPassphrase(owner, useGPG, false);
+	    pwowner = saved;
+	    pwverified = useGPG;
 	}
     }
 
     /**
-     * Request a GPG passphrase when one has not already been provided,
-     * optionally suppressing any use of the system console..
+     * Request a passphrase when one has not already been provided,
+     * optionally suppressing any use of the system console.
      * This method will typically open a dialog box to request a GPG
-     * passphrase for decryption if the passphrase is not already
-     * known. However, if the first argument is null, this method is not
-     * called from the event dispatch thread, and a system console
-     * exists, the system console will be used to obtain the
-     * passphrase unless the second argument true.
+     * or symmetric-key-encryption passphrase for decryption if the
+     * passphrase is not already known. However, if the first argument
+     * is null, this method is not called from the event dispatch
+     * thread, and a system console exists, the system console will be
+     * used to obtain the passphrase unless the second argument true.
      * <P>
      * To use a dialog box when 'owner' is null and a console exists,
      * use
@@ -1943,7 +2093,23 @@ public abstract class ConfigPropertyEditor {
      */
     public void requestPassphrase(Component owner, boolean ignoreConsole) {
 	if (password == null) {
-	    password = requestPassphrase(owner, useGPG(), ignoreConsole);
+	    boolean useGPG = useGPG();
+	    password = requestPassphrase(owner, useGPG, ignoreConsole);
+	    pwverified = useGPG;
+	}
+    }
+
+    /**
+     * Copy a passphrase from another editor.
+     * @param cpe an instance of {@link ConfigPropertyEditor}
+     */
+    public void requestPassphrase(ConfigPropertyEditor cpe) {
+	if (cpe != null) {
+	    char[] pw = cpe.password;
+	    if (pw != null) {
+		password = new char[pw.length];
+		System.arraycopy(pw, 0, password, 0, pw.length);
+	    }
 	}
     }
 
@@ -2026,6 +2192,8 @@ public abstract class ConfigPropertyEditor {
 	    if (owner == null && console != null && ignoreConsole == false) {
 		passphrase = useGPG?
 		    console.readPassword(localeString("enterPW2") + ":"):
+		    pwconfirm.get()>0?
+		    console.readPassword(localeString("enterPW6") + ":"):
 		    console.readPassword(localeString("enterPW4") + ":");
 
 		if (passphrase == null || passphrase.length == 0) {
@@ -2082,6 +2250,7 @@ public abstract class ConfigPropertyEditor {
 	    int status = JOptionPane
 		.showConfirmDialog(owner, pwf,
 				   (useGPG? localeString("enterPW"):
+				    pwconfirm.get()>0? localeString("enterPW5"):
 				    localeString("enterPW3")),
 				   JOptionPane.OK_CANCEL_OPTION);
 	    if (status == JOptionPane.OK_OPTION) {
@@ -2136,6 +2305,7 @@ public abstract class ConfigPropertyEditor {
 	    }
 	}
 	password = null;
+	pwverified = true;
     }
 
     private static final int ONEKEYID = 0;
@@ -2287,11 +2457,11 @@ public abstract class ConfigPropertyEditor {
 		String ourkey = null;
 		for (int i = 0; i < recipients.length; i++) {
 		    recipients[i] = WebDecoder.quoteDecode(recipients[i]);
-		    System.out.println("... " + recipients[i]);
+		    // System.out.println("... " + recipients[i]);
 		    int status = gpgHasKey(recipients[i], true);
 		    if (status != ONEKEYID) {
 			// warn user about a bad key.
-			System.out.println("got here 1, status = " + status);
+			// System.out.println("got here 1, status = " + status);
 			String msg;
 			if (status == NOKEYIDS) {
 			    msg = errorMsg("noGPGKey", recipients[i]);
@@ -2347,7 +2517,7 @@ public abstract class ConfigPropertyEditor {
 			sb.append("\" ");
 		    }
 		    String result = sb.toString().trim();
-		    System.out.println("result = " + result);
+		    // System.out.println("result = " + result);
 		    return result;
 		} finally {
 		    if (notchanged == false) {
@@ -2926,8 +3096,11 @@ public abstract class ConfigPropertyEditor {
 		if (evalue == null) return false;
 		properties.setProperty(key, evalue);
 	    } else {
+		// System.out.println("calling requestPassphrase");
 		requestPassphrase(owner);
+		// System.out.println("called requestPassphrase");
 		String evalue = encrypt(value, null);
+		// System.out.println("evalue = " +evalue);
 		if (evalue == null) return false;
 		properties.setProperty(key, evalue);
 	    }
@@ -2952,7 +3125,7 @@ public abstract class ConfigPropertyEditor {
     }
 
     /**
-     * Get the component over which a password-request dialog box should
+     * Set the component over which a password-request dialog box should
      * appear.
      * @param owner the component; null if there is none
      */
@@ -3918,12 +4091,28 @@ public abstract class ConfigPropertyEditor {
 			String key = (String) k;
 			if (key.startsWith("ebase64.")) {
 			    String encrypted = getProperty(key);
-			    requestPassphrase(pwowner);
-			    try {
-			    return decryptToCharArray(encrypted);
-			    } catch (Exception e) {
+			    if (encrypted == null) {
 				return null;
 			    }
+			    do {
+				requestPassphrase(pwowner);
+				try {
+				    return decryptToCharArray(encrypted);
+				} catch (Exception e) {
+				    if (SwingUtilities.isEventDispatchThread()
+					&&
+					JOptionPane.showConfirmDialog
+					(pwowner,localeString("pwfailed"),
+					 errorTitle(),
+					 JOptionPane.OK_CANCEL_OPTION,
+					 JOptionPane.QUESTION_MESSAGE)
+					== JOptionPane.OK_OPTION) {
+					clearPassphrase();
+				    } else {
+					return null;
+				    }
+				}
+			    } while (true);
 			} else {
 			    return super.get(k);
 			}
