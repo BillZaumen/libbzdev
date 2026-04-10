@@ -3,13 +3,23 @@ package org.bzdev.ejws;
 import java.net.InetAddress;
 import java.time.Instant;
 import com.sun.net.httpserver.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.net.WebDecoder;
 import org.bzdev.util.SafeFormatter;
+import org.bzdev.util.ConfigPropUtilities;
+import org.bzdev.util.ConfigProperties;
 
 
 //@exbundle org.bzdev.ejws.lpack.SecureBasicAuth
@@ -21,6 +31,8 @@ import org.bzdev.util.SafeFormatter;
  */
 public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
     private static ResourceBundle exbundle = ResourceBundle.getBundle
 	("org.bzdev.ejws.lpack.SecureBasicAuth");
 
@@ -28,6 +40,8 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	return (new SafeFormatter()).format(exbundle.getString(key), args)
 	    .toString();
     }
+
+    static final String SBLDATA = "application/vnd.bzdev.sblogindata";
 
 
     /**
@@ -277,10 +291,33 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	}
 	Entry entry = new Entry(info.getPassword(), info.getRoles());
 	entry.setActive(info.isActive());
-	entry.setSBLCompressed(info.isSBLCompressed());
-	entry.setSBL(info.getSBL());
+	// entry.setSBLCompressed(info.isSBLCompressed());
+	// entry.setSBL(info.getSBL());
 	map.put(userName, entry);
     }
+
+    public void handleError(HttpExchange t,  Exception e)
+	throws IOException
+    {
+	String msg = e.getMessage();
+	String prefix = errorMsg("Response409");
+	msg = (msg == null)? prefix:
+	    prefix + ": " + msg;
+	if (tracer != null) {
+	    String ct = "" + Thread.currentThread().getId();
+	    try {
+		tracer.append("(" + ct + ") " + msg + "\n");
+	    } catch (IOException e3) {}
+	} else {
+	    System.err.println(msg);
+	}
+	byte[] response =  msg.getBytes(UTF8);
+	int len = response.length;
+	t.getResponseHeaders().set("content-type", "text/plain; charset=utf-8");
+	t.sendResponseHeaders(409, len);
+	t.getResponseBody().write(response);
+    }
+
 
 
     FileHandler fileHandler = null;
@@ -319,9 +356,156 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	    }
 	}
 	boolean foundLogin = false;
-	if (loginPathUsed
-	    && t.getRequestURI().getPath().equals(loginPath)) {
-	    foundLogin = true;
+	if (loginPathUsed) {
+	    URI requestURI = t.getRequestURI();
+	    if (t.getRequestURI().getPath().equals(loginPath)) {
+		String query = requestURI.getRawQuery();
+		if (query != null) {
+		    Map<String,String> fmap = WebDecoder.formDecode(query,
+								    false);
+		    String username =fmap.get("user");
+		    String type = fmap.get("uploadtype");
+		    if (!getCanAddAccount() && type != null
+			&& !type.equals("login")) {
+			String msg;
+			if (type == "sbl") {
+			    msg = errorMsg("noAccountCreation");
+			} else {
+			    String uriS = requestURI.toString();
+			    msg = errorMsg("badAccountCreation", uriS);
+			}
+			byte[] data = msg.getBytes(UTF8);
+			try {
+			    t.sendResponseHeaders(403, data.length);
+			    t.getResponseBody().write(data);
+			} catch (IOException eio){}
+			return new Authenticator.Success(null);
+		    }
+		    if (username != null) {
+			if (type != null && type.equals("login")) type = null;
+			if (type != null && map.containsKey(username)) {
+			    // trying to add an existing user.
+			    String msg = errorMsg("accountExists", username);
+			    byte[] data = msg.getBytes(UTF8);
+			    try {
+				t.sendResponseHeaders(403, data.length);
+				t.getResponseBody().write(data);
+			    } catch (IOException eio){}
+			    return new Authenticator.Success(null);
+			}
+			byte[] array = (type == null)? getSBL(username):
+			    (type.equals("pgpkey") || type.equals("sbl"))?
+			    requestFromUser(username,type):
+			    null;
+			/*
+			System.out.println("array.length = " +
+					   ((array == null)? -1: array.length));
+			*/
+			if (array != null) {
+			    boolean isGZIP = (type == null)?
+				isSBLCompressed(username):
+				false;
+			    // System.out.println("isGZIP = " + isGZIP);
+			    Headers rheaders = t.getResponseHeaders();
+			    rheaders.set("Content-Type",
+					 "application/vnd.bzdev.sblauncher");
+			    rheaders.set("Cache-Control", "no-cache");
+			    if (isGZIP) {
+				rheaders.set("Content-Encoding", "gzip");
+			    }
+			    try {
+				t.sendResponseHeaders(200, array.length);
+				OutputStream os = t.getResponseBody();
+				os.write(array);
+				os.flush();
+				os.close();
+				// sent a response containing the SBL file.
+				// If we return null, the Auth filter will not
+				// continue along the filter chain, but this is
+				// not documented.
+			    } catch (IOException eio) {}
+			    // return null;
+			    return new Authenticator.Success(null);
+			} else {
+			    try {
+				String string = requestURI.toString();
+				String msg;
+				if (type == null || type.equals("login")) {
+				    msg =
+					errorMsg("noUserAccount", username);
+				} else {
+				    msg =
+					errorMsg("badAccountCreation", string);
+				}
+				byte[] data = msg.getBytes(UTF8);
+				Headers rhdrs = t.getResponseHeaders();
+				rhdrs.set("Content-type",
+					  "text/html; charset=utf-8");
+				t.sendResponseHeaders(403, data.length);
+				t.getResponseBody().write(data);
+			    } catch (IOException eio){}
+			    // return null;
+			    return new Authenticator.Success(null);
+			}
+		    }
+		    // otherwise just continue as normal.
+
+		} else if (t.getRequestMethod().equalsIgnoreCase("POST")) {
+		    // System.out.println("*** processing POST");
+		    Headers hdrs = t.getRequestHeaders();
+		    String contentType = hdrs.getFirst("content-type");
+		    String contentLengthS = hdrs.getFirst("content-length");
+		    long length = 0;
+		    if (contentLengthS != null) {
+			try {
+			    length = Long.valueOf(contentLengthS);
+			} catch (Exception e) {
+			}
+		    }
+		    InputStream is = t.getRequestBody();
+		    try {
+			if (contentType.equals(SBLDATA)) {
+			    // System.out.println("saw contentType " + SBLDATA);
+			    try {
+				String s = storeSBLData(is);
+				if (getCanAddAccount()) {
+				    createUser(s, null);
+				    String uriString = generateRequestURI(null);
+				    boolean active = isActiveDefault();
+				    String msg;
+				    if (active) {
+					msg=errorMsg("pleaseVisit", uriString);
+				    } else {
+					msg=errorMsg("processingAC", uriString);
+				    }
+				    byte[] bytes = msg.getBytes(UTF8);
+				    t.getResponseHeaders()
+					.set("content-type",
+					     "text/html; charset=utf-8");
+				    int rc = active? 201: 202;
+				    t.sendResponseHeaders(rc, bytes.length);
+				    OutputStream os = t.getResponseBody();
+				    os.write(bytes);
+				} else {
+				    t.sendResponseHeaders(404, -1);
+				}
+			    } catch (Exception e) {
+				handleError(t, e);
+			    }
+			} else {
+			    t.sendResponseHeaders(415, -1);
+			}
+		    } catch (Exception eio2) {
+			try {
+			    eio2.printStackTrace();
+			    t.sendResponseHeaders(205, -1);
+			} catch(IOException eio) {}
+		    }
+		    // return null;
+		    return new Authenticator.Success(null);
+		}
+		foundLogin = true;
+	    }
 	}
 	if (loginRequired) {
 	    foundLoginTL.set(foundLogin);
@@ -354,31 +538,6 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	    foundLogoutTL.set(foundLogout);
 	}
 
-	/*
-	Headers headers = t.getRequestHeaders();
-	String value = headers.getFirst("Authorization");
-	if (value != null) {
-	    value = value.trim();
-	    if (value.substring(0,6).equalsIgnoreCase("basic ")) {
-		value = value.substring(6).trim();
-		try {
-		    value = new
-			String(Base64.getDecoder().decode(value), "UTF-8");
-		} catch (Exception e) {
-		    System.out.println("decoding failed");
-		}
-		System.out.println(value);
-	    } else {
-		System.out.println(value);
-	    }
-	} else {
-	    System.out.println("--- all headers ----");
-	    for (String hdr: headers.keySet()) {
-		System.out.println(hdr);
-	    }
-	    System.out.println("--------------------");
-	}
-	*/
 	InetAddress iaddr = t.getRemoteAddress().getAddress();
 	addr.set(iaddr);
 	Authenticator.Result result = super.authenticate(t);

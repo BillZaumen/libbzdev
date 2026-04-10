@@ -458,7 +458,26 @@ public class SBL {
     static SecureBasicUtilities ops = null;
 
     static char[] getSecurePW(Component component, String name) {
-	if (ops == null) {
+	boolean nullResult = false;
+	Properties props = cpe.getDecodedProperties();
+	Properties rawProps = cpe.getProperties();
+	String pwstring = rawProps.getProperty("ebase64." + name + ".password");
+	if (pwstring != null) {
+	    cpe.useGPG(!pwstring.startsWith("==="));
+	}
+	SecureBasicUtilities.Mode mode = null;
+	try {
+	    mode = modes[Integer.valueOf(props.getProperty(name + ".mode"))];
+	} catch (Exception em) {
+	    // System.err.println(em.getMessage());
+	    SwingErrorMessage.format("%s: %s", em.getMessage(),
+				     name + ".mode");
+	    nullResult = true;
+	    // SwingErrorMessage.displayConsoleIfNeeded();
+	    // return null;
+	}
+	if (ops == null && !(mode == SecureBasicUtilities.Mode.PASSWORD
+			     || mode == SecureBasicUtilities.Mode.DIGEST)) {
 	    Component saved = cpe.getPWOwner();
 	    try {
 		cpe.setPWOwner(component);
@@ -492,8 +511,6 @@ public class SBL {
 		cpe.setPWOwner(saved);
 	    }
 	}
-	Properties props = cpe.getDecodedProperties();
-	boolean nullResult = false;
 	char[]  password = null;
 	try {
 	    Object val = props.get("ebase64." + name + ".password");
@@ -521,17 +538,6 @@ public class SBL {
 	} catch (Exception euri) {
 	    SwingErrorMessage.format("%s: %s", euri.getMessage(),
 				     name + ".uri");
-	    nullResult = true;
-	    // SwingErrorMessage.displayConsoleIfNeeded();
-	    // return null;
-	}
-	SecureBasicUtilities.Mode mode = null;
-	try {
-	    mode = modes[Integer.valueOf(props.getProperty(name + ".mode"))];
-	} catch (Exception em) {
-	    // System.err.println(em.getMessage());
-	    SwingErrorMessage.format("%s: %s", em.getMessage(),
-				     name + ".mode");
 	    nullResult = true;
 	    // SwingErrorMessage.displayConsoleIfNeeded();
 	    // return null;
@@ -1665,7 +1671,19 @@ public class SBL {
 		    // nothing to do - we just go on to the
 		    // normal case.
 		} else if (cemode.equals("pgpkey") || cemode.equals("usesbl")) {
-		    String uriS2 = decoded.getProperty("base");
+		    String uriStr = decoded.getProperty("base");
+		    if (uriStr == null) {
+			String key = null;
+			for (String k: decoded.stringPropertyNames()) {
+			    if (k.endsWith(".description")) {
+				int  ind = k.lastIndexOf('.');
+				key = k.substring(0, ind);
+				break;
+			    }
+			}
+			uriStr = decoded.getProperty(key +".base");
+		    }
+		    final String uriS2 = uriStr;
 		    String titleText = errorMsg("titleText", uriS2);
 		    boolean noUpload = cemode.equals("usesbl");
 		    ActionListener button1AL = new ActionListener() {
@@ -2009,17 +2027,27 @@ public class SBL {
 			String loginAlias = ourProps.getProperty("loginAlias");
 			cpe.set(frame, key +".uri",
 				"$(" + key + ".base)" + loginAlias);
+			SecureBasicUtilities.Mode mode = null;
 			try {
-			    String[] keypair = SecureBasicUtilities
-				.createPEMPair(null,null);
-			    cpe.set(frame, "ebase64.keypair.privateKey",
-				    keypair[0]);
-			    cpe.set(frame, "base64.keypair.publicKey",
-				    keypair[1]);
+			    mode = modes[Integer.valueOf
+					 (ourProps.getProperty("mode"))];
+			} catch (Exception e){
+			    mode = null;
+			}
+			try {
+			    if (mode != SecureBasicUtilities.Mode.PASSWORD
+				&& mode != SecureBasicUtilities.Mode.DIGEST) {
+				String[] keypair = SecureBasicUtilities
+				    .createPEMPair(null,null);
+				cpe.set(frame, "ebase64.keypair.privateKey",
+					keypair[0]);
+				cpe.set(frame, "base64.keypair.publicKey",
+					keypair[1]);
+			    }
 			    cpe.set(frame, "ebase64." + key + ".password",
 				    genpw());
 			} catch (GeneralSecurityException se) {
-			    System.out.println(se.getMessage());
+			    System.err.println(se.getMessage());
 			}
 		    };
 		    SwingUtilities.invokeLater(() -> {

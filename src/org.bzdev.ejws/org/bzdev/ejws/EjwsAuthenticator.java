@@ -392,11 +392,29 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	if (key != null) {
 	    String userName = props.getProperty(key + ".user");
 	    String password = props.getProperty("base64." + key + ".password");
+	    
 	    String publicKeyPem = props.getProperty("base64.keypair.publicKey");
-	    if (userName == null || password == null || publicKeyPem == null) {
+	    SecureBasicUtilities.Mode ourmode = getMode();
+	    if (userName == null || password == null
+		|| (ourmode != SecureBasicUtilities.Mode.PASSWORD
+		    && publicKeyPem == null)) {
 		throw new IllegalArgumentException(errorMsg("badPropsFile"));
 	    }
-	    return createUser(userName, password, publicKeyPem, roles);
+	    if (ourmode == SecureBasicUtilities.Mode.PASSWORD) {
+		UserInfo ui =  new
+		    UserInfo(ews, this, userName, password, null);
+		ui.setActive(defaultActive);
+		if (prefix != null) {
+		    ui.setBase(prefix);
+		} else {
+		    setBaseList.add(ui);
+		}
+		ui.setRoles(roles);
+		ui.addUser();
+		return ui;
+	    } else {
+		return createUser(userName, password, publicKeyPem, roles);
+	    }
 	} else {
 	    throw new IllegalArgumentException(errorMsg("badPropsFile"));
 	}

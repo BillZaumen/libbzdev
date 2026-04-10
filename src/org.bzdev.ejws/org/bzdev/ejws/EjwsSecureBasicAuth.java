@@ -784,6 +784,9 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	throws IOException
     {
 	String msg = e.getMessage();
+	String prefix = errorMsg("Response409");
+	msg = (msg == null)? prefix:
+	    prefix + ": " + msg;
 	if (tracer != null) {
 	    String ct = "" + Thread.currentThread().getId();
 	    try {
@@ -792,8 +795,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	} else {
 	    System.err.println(msg);
 	}
-	byte[] response = (msg == null)? new byte[0]: msg.getBytes(UTF8);
-	int len = response.length == 0? -1: response.length;
+	byte[] response =  msg.getBytes(UTF8);
+	int len = response.length;
 	t.getResponseHeaders().set("content-type", "text/plain; charset=utf-8");
 	t.sendResponseHeaders(409, len);
 	t.getResponseBody().write(response);
@@ -864,9 +867,22 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    Map<String,String> fmap = WebDecoder.formDecode(query,
 								    false);
 		    String username =fmap.get("user");
-		    String type = fmap.get("uploadrequest");
-		    if (!getCanAddAccount() && type != null) {
-			type = "nouploads";
+		    String type = fmap.get("uploadtype");
+		    if (!getCanAddAccount() && type != null
+			&& !type.equals("login")) {
+			String msg;
+			if (type =="pgpkey" || type == "sbl") {
+			    msg = errorMsg("noAccountCreation");
+			} else {
+			    String uriS = requestURI.toString();
+			    msg = errorMsg("badAccountCreation", uriS);
+			}
+			byte[] data = msg.getBytes(UTF8);
+			try {
+			    t.sendResponseHeaders(403, data.length);
+			    t.getResponseBody().write(data);
+			} catch (IOException eio){}
+			return new Authenticator.Success(null);
 		    }
 		    /*
 		    System.out.println("user = " + username
@@ -874,6 +890,16 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    */
 		    if (username != null) {
 			if (type != null && type.equals("login")) type = null;
+			if (type != null && map.containsKey(username)) {
+			    // trying to add an existing user.
+			    String msg = errorMsg("accountExists", username);
+			    byte[] data = msg.getBytes(UTF8);
+			    try {
+				t.sendResponseHeaders(403, data.length);
+				t.getResponseBody().write(data);
+			    } catch (IOException eio){}
+			    return new Authenticator.Success(null);
+			}
 			byte[] array = (type == null)? getSBL(username):
 			    (type.equals("pgpkey") || type.equals("sbl"))?
 			    requestFromUser(username,type):
@@ -910,13 +936,19 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			} else {
 			    try {
 				String string = requestURI.toString();
-				String msg =
-				    errorMsg("noAccountCreation", string);
+				String msg;
+				if (type == null || type.equals("login")) {
+				    msg =
+					errorMsg("noUserAccount", username);
+				} else {
+				    msg =
+					errorMsg("badAccountCreation", string);
+				}
 				byte[] data = msg.getBytes(UTF8);
 				Headers rhdrs = t.getResponseHeaders();
 				rhdrs.set("Content-type",
 					  "text/html; charset=utf-8");
-				t.sendResponseHeaders(404, data.length);
+				t.sendResponseHeaders(403, data.length);
 				t.getResponseBody().write(data);
 			    } catch (IOException eio){}
 			    // return null;
@@ -938,7 +970,6 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    }
 		    InputStream is = t.getRequestBody();
 		    try {
-			// for now just ignore the content
 			if (contentType.equals("application/pgp-keys")) {
 			    InputStreamReader r = new
 				InputStreamReader(is, UTF8);
@@ -977,6 +1008,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    return new Authenticator.Success(null);
 				    // return null;
 				} else {
+				    
 				    t.sendResponseHeaders(404, -1);
 				    // return null;
 				    return new Authenticator.Success(null);

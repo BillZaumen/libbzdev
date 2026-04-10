@@ -145,6 +145,7 @@ test8:
 	$(JAVA) Test8
 	rm example.zip
 
+
 test9:
 	(cd ../.. ; make jars)
 	mkdir -p classes
@@ -329,6 +330,13 @@ atest8-sbl:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) ATest8SBL /usr/share/doc/libbzdev-doc/api/ \
 		test-gpgdir $(R)
+
+test8-sbl:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) Test8SBL /usr/share/doc/libbzdev-doc/api/
+
 
 test8a:
 	(cd ../.. ; make jars)

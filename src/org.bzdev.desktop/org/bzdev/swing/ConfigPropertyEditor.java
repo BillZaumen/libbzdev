@@ -445,6 +445,13 @@ public abstract class ConfigPropertyEditor {
      * @see #setUseGPGOnLoad(String)
      */
     public ConfigPropertyEditor useGPG(boolean value) {
+	/*
+	try {
+	    throw new Exception ("test");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	*/
 	useGPG = value;
 	useGPGFrozen = true;
 	hasCheckKeyResult = true;
