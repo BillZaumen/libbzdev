@@ -571,6 +571,12 @@ sbl-publickey:
 # overridde
 RECIPIENT = foo
 
+firefox-account:
+	firefox https://localhost:8080/login.html?user=$(USER)'&'uploadtype=pgpkey
+
+firefox-login:
+	firefox https://localhost:8080/login.html?user=$(USER)
+
 sbl-create:
 	(cd ../.. ; make )
 	chmod u+x sblrun

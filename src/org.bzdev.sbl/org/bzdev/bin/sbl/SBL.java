@@ -458,6 +458,16 @@ public class SBL {
     static SecureBasicUtilities ops = null;
 
     static char[] getSecurePW(Component component, String name) {
+	if (component == null) {
+	    SwingErrorMessage.format("Swing component was null");
+	    StackTraceElement[] ste = Thread.currentThread()
+		.getStackTrace();
+	    if (ste.length > 1) {
+		SwingErrorMessage.format("... called from line %d"
+					 + " of SBL.java\n",
+					 ste[1].getLineNumber());
+	    }
+	}
 	boolean nullResult = false;
 	Properties props = cpe.getDecodedProperties();
 	Properties rawProps = cpe.getProperties();
@@ -484,6 +494,11 @@ public class SBL {
 		cpe.requestPassphrase(component);
 		char[] carray = (char[])cpe.getDecodedProperties()
 		    .get("ebase64.keypair.privateKey");
+		if (carray == null) {
+		    SwingErrorMessage.format("%s\n", errorMsg("noPrivateKey"));
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		    return null;
+		}
 		CharBuffer cbuf = CharBuffer.wrap(carray);
 		ByteBuffer bbuf = UTF8.encode(cbuf);
 		byte[] barray;
@@ -1268,20 +1283,25 @@ public class SBL {
 	Clipboard cb = frame.getToolkit().getSystemClipboard();
 	String user = cpe.getDecodedProperties().getProperty("user.user");
 	char[] passwd =  getSecurePW(frame, "user");
-	String password = new String(passwd);
-	StringSelection selection1 = new StringSelection(user);
-	StringSelection selection2 = new StringSelection(password);
-	StringSelection2 selection = new StringSelection2(selection1,
-							  selection2);
-	cb.setContents(selection, selection);
-	Desktop desktop = Desktop.getDesktop();
-	if (uri != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-	    try {
-		desktop.browse(uri);
-	    } catch (Exception ee) {
-		SwingErrorMessage.format("%s", ee.getMessage());
-		SwingErrorMessage.displayConsoleIfNeeded();
+	if (passwd != null) {
+	    String password = new String(passwd);
+	    StringSelection selection1 = new StringSelection(user);
+	    StringSelection selection2 = new StringSelection(password);
+	    StringSelection2 selection = new StringSelection2(selection1,
+							      selection2);
+	    cb.setContents(selection, selection);
+	    Desktop desktop = Desktop.getDesktop();
+	    if (uri != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+		try {
+		    desktop.browse(uri);
+		} catch (Exception ee) {
+		    SwingErrorMessage.format("%s\n", ee.getMessage());
+		    SwingErrorMessage.displayConsoleIfNeeded();
+		}
 	    }
+	} else {
+	    // don't pop up the console because the user may have canceled.
+	    SwingErrorMessage.format("%s\n", errorMsg("noPasswordAvailable"));
 	}
     }
 
@@ -1949,10 +1969,10 @@ public class SBL {
 			    frame.setVisible(true);
 			    if (errorMessage == null) {
 				cpe = cpe3;
+				cpe.setPWOwner(frame);
 				if (cpe.hasKey("ebase64.trustStore.password")) {
 				    cpe.requestPassphrase(frame);
 				}
-				cpe.setPWOwner(frame);
 				configTrust(frame);
 			    }
 			});

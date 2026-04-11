@@ -475,7 +475,13 @@ public class SecureBasicUtilities {
 	       GeneralSecurityException
     {
 	PemDecoder.Result result = PemDecoder.decode(is);
+	if (result == null) {
+	    throw new IOException(errorMsg("PEMDecode"));
+	}
 	String pemtype = result.getType();
+	if (pemtype == null) {
+	    throw new IOException(errorMsg("PEMType"));
+	}
 	if (pemtype.equalsIgnoreCase("CERTIFICATE")) {
 	    signatureAlgorithm = result.getHeaders()
 		.getFirst("signature-algorithm");

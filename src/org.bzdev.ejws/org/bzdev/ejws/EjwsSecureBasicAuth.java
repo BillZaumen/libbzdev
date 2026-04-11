@@ -983,26 +983,36 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    String email = keyids.getEmailAddress();
 				    String uriString = generateRequestURI(null);
 				    String recipients[] = {email};
-				    UserInfo ui = createUser(email,
-							     uriString,
-							     recipients,
-							     null)
-					.setURI(alias)
-					.addUser(true);
-				    uriString = generateRequestURI(email);
-				    Headers rhdrs = t.getResponseHeaders();
-				    rhdrs.set("Location", uriString);
-				    boolean active = isActiveDefault();
-				    String msg;
-				    if (active) {
-					msg=errorMsg("pleaseVisit", uriString);
-				    } else {
-					msg=errorMsg("processingAC", uriString);
+				    AddStatus status = getUserStatus(email);
+				    boolean active = true;
+				    String msg =
+					errorMsg("pleaseVisit", uriString);
+				    int rc = 201;
+				    switch(status) {
+				    case PENDING:
+					msg =
+					    errorMsg("processingAC", uriString);
+					rc = 202;
+					// fall through
+				    case OK:
+					createUser(email, uriString,
+						   recipients, null)
+					    .setURI(alias)
+					    .addUser(true);
+					uriString = generateRequestURI(email);
+					Headers rhdrs = t.getResponseHeaders();
+					rhdrs.set("Location", uriString);
+					break;
+				    case REJECTED:
+					rc = 403;
+					msg =
+					   errorMsg("badAccountCreation",email);
+					break;
 				    }
 				    byte[] data = msg.getBytes(UTF8);
+				    Headers rhdrs = t.getResponseHeaders();
 				    rhdrs.set("Content-type",
 					      "text/html; charset=utf-8");
-				    int rc = active? 201: 202;
 				    t.sendResponseHeaders(rc, data.length);
 				    t.getResponseBody().write(data);
 				    return new Authenticator.Success(null);
@@ -1014,27 +1024,38 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    return new Authenticator.Success(null);
 				}
 			    } catch (Exception e) {
-				handleError(t,  e);
+				handleError(t, e);
 			    }
 			} else if (contentType.equals(SBLDATA)) {
 			    // System.out.println("saw contentType " + SBLDATA);
 			    try {
 				String s = storeSBLData(is);
 				if (getCanAddAccount()) {
-				    createUser(s, null).addUser();
+				    String uname = getUserNameFromSBL(s);
+				    AddStatus status = getUserStatus(uname);
 				    String uriString = generateRequestURI(null);
-				    boolean active = isActiveDefault();
-				    String msg;
-				    if (active) {
-					msg=errorMsg("pleaseVisit", uriString);
-				    } else {
-					msg=errorMsg("processingAC", uriString);
+				    String msg =
+					errorMsg("pleaseVisit", uriString);
+				    int rc = 201;
+				    switch(status) {
+				    case PENDING:
+					msg =
+					    errorMsg("processingAC", uriString);
+					rc = 202;
+					// fall though
+				    case OK:
+					createUser(s, null).addUser();
+					break;
+				    case REJECTED:
+					rc = 403;
+					msg =
+					   errorMsg("badAccountCreation",uname);
+					break;
 				    }
 				    byte[] bytes = msg.getBytes(UTF8);
 				    t.getResponseHeaders()
 					.set("content-type",
 					     "text/html; charset=utf-8");
-				    int rc = active? 201: 202;
 				    t.sendResponseHeaders(rc, bytes.length);
 				    OutputStream os = t.getResponseBody();
 				    os.write(bytes);

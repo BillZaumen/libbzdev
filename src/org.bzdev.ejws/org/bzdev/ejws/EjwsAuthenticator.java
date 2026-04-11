@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.Properties;
 
 import org.bzdev.lang.UnexpectedExceptionError;
@@ -456,6 +457,33 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	ConfigProperties props = new
 	    ConfigProperties(propsString, "application/vnd.bzdev.sblauncher");
 	return createUser(props, roles);
+    }
+
+    protected String getUserNameFromSBL(String propsString) throws Exception {
+	ConfigProperties props = new
+	    ConfigProperties(propsString, "application/vnd.bzdev.sblauncher");
+	String key = null;
+	for (String k: props.getKeys()) {
+	    if (k.endsWith(".description")) {
+		int ind = k.lastIndexOf('.');
+		key = k.substring(0, ind);
+		// Just in case someone decides to base-64 encode
+		// the description.
+		if (key.startsWith("base64.")) {
+		    key = key.substring(7);
+		}
+		break;
+	    }
+	}
+	if (key != null) {
+	     String uname = props.getProperty(key + ".user");
+	     if (uname == null) {
+		 throw new Exception(errorMsg("missingUserName"));
+	     }
+	     return uname;
+	} else {
+	    throw new Exception(errorMsg("missingUserName"));
+	}
     }
 
     /**
@@ -1712,6 +1740,72 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * @param info the user data
      */
     public abstract void add(UserInfo info);
+
+    /**
+     * The status of user with regard to adding the user to
+     * an authenticator.
+     */
+    public enum AddStatus {
+	/**
+	 * It is OK to add a user and make the
+	 * user active.
+	 */
+	OK,
+	/**
+	 * It is OK to add a user but the user
+	 * should not be active.
+	 */
+	PENDING,
+	/**
+	 * Adding the user should be rejected.
+	 */
+	REJECTED
+    }
+
+    private Function<String,AddStatus> defaultUserStatusFunction
+	= (uname) -> {return null;};
+
+    private Function<String,AddStatus> userStatusFunction
+	= defaultUserStatusFunction;
+
+    /**
+     * Set the user-status function.
+     * A user status function takes a user name as its argument and
+     * returns
+     * <UL>
+     *   <LI><STRONG>AddStatus.OK</STRONG> if the user's account is to
+     *      be added and will be active.
+     *   <LI><STRONG>AddStatus.PENDING</STRONG> if the user's account is
+     *       to be added but will not be active.
+     *   <LI><STRONG>AddStatus.REJECTED</STRONG> if the user may not have
+     *       an account at this time.
+     *   <LI><STRONG>null</STRONG> if all users will be active or pending,
+     *       depending on the value returned by {@link #isActiveDefault()}.
+     * </UL>
+     * The default function simply returns null so that whether or not a
+     * user is active is determined by the value returned by
+     * {@link #isActiveDefault()}.
+     * @param function the user-status function; null for the default
+     * @see #getUserStatus(String)
+     */
+    public void setUserStatusFunction(Function<String,AddStatus> function) {
+	userStatusFunction = (function == null)? defaultUserStatusFunction:
+	    function;
+    }
+
+    protected AddStatus getUserStatus(String username) {
+	if (username == null) {
+	    return AddStatus.REJECTED;
+	} else {
+	    AddStatus result =  userStatusFunction.apply(username);
+	    if (result == null) {
+		return isActiveDefault()? AddStatus.OK: AddStatus.PENDING;
+	    } else {
+		return result;
+	    }
+	}
+    }
+
 }
 
 //  LocalWords:  EmbeddedWebServer authTwoServers authPrefix PRE auth

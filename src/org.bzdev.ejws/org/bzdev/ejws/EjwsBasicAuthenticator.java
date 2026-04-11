@@ -469,20 +469,31 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 			    try {
 				String s = storeSBLData(is);
 				if (getCanAddAccount()) {
-				    createUser(s, null);
+				    String uname = getUserNameFromSBL(s);
+				    AddStatus status = getUserStatus(uname);
 				    String uriString = generateRequestURI(null);
-				    boolean active = isActiveDefault();
-				    String msg;
-				    if (active) {
-					msg=errorMsg("pleaseVisit", uriString);
-				    } else {
-					msg=errorMsg("processingAC", uriString);
+				    String msg =
+					errorMsg("pleaseVisit", uriString);
+				    int rc = 201;
+				    switch(status) {
+				    case PENDING:
+					msg =
+					    errorMsg("processingAC", uriString);
+					rc = 202;
+					// fall though
+				    case OK:
+					createUser(s, null);
+					break;
+				    case REJECTED:
+					rc = 403;
+					msg =
+					   errorMsg("badAccountCreation",uname);
+					break;
 				    }
 				    byte[] bytes = msg.getBytes(UTF8);
 				    t.getResponseHeaders()
 					.set("content-type",
 					     "text/html; charset=utf-8");
-				    int rc = active? 201: 202;
 				    t.sendResponseHeaders(rc, bytes.length);
 				    OutputStream os = t.getResponseBody();
 				    os.write(bytes);
