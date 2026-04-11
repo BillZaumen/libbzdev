@@ -938,7 +938,9 @@ public class FileHandler implements HttpHandler {
 				       || query != null)) {
 		if (path.equals(loginpath) &&
 		    context.getAuthenticator() instanceof EjwsAuthenticator) {
+		    /*
 		    System.out.println("found a post/query to the login alias");
+		    */
 		    // Already sent the response.
 		    return;
 		}

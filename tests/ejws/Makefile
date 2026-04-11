@@ -319,6 +319,7 @@ atest8-cert:
 	$(JAVA) ATest8 /usr/share/doc/libbzdev-doc/api/ \
 		~/.config/sbl/example.sbl testUser thelio
 
+
 #
 #  To use, run make atest8-sbl R=... where R will be a GPG recipient
 #  Then start a browser with the URL
@@ -369,6 +370,31 @@ cert:
 		-storepass changeit -rfc \
 	| keytool -importcert -alias thelio  -keystore thelio-ts.jks \
 		-keypass changeit -storepass changeit -noprompt
+
+cert-pang:
+	rm -f pang-ks.jks pang-ts.jks
+	keytool -genkey -keyalg EC -groupname secp256r1 \
+		-sigalg SHA256withECDSA -keystore pang-ks.jks \
+		-keypass changeit -storepass changeit \
+		-dname CN=wtz-pang -alias pang -validity 365
+	keytool -keystore pang-ks.jks -alias pang -exportcert \
+		-storepass changeit -rfc \
+	| keytool -importcert -alias pang  -keystore pang-ts.jks \
+		-keypass changeit -storepass changeit -noprompt
+
+# Lets a demo run locally.
+cert-local:
+	rm -f local-ks.jks local-ts.jks
+	keytool -genkey -keyalg EC -groupname secp256r1 \
+		-sigalg SHA256withECDSA -keystore local-ks.jks \
+		-keypass changeit -storepass changeit \
+		-dname CN=localhost -alias local -validity 365
+	keytool -keystore local-ks.jks -alias local -exportcert \
+		-storepass changeit -rfc \
+	| keytool -importcert -alias local  -keystore local-ts.jks \
+		-keypass changeit -storepass changeit -noprompt
+
+
 
 # one day - we want the certificates to expire for testing purposes.
 cert2:
@@ -547,6 +573,27 @@ authtest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) AuthTest test-gpgdir gpgkey.asc \
 		/usr/share/doc/libbzdev-doc/api/
+
+# Change to pang or local for running demo on laptop
+HOST=thelio
+
+demo:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar Demo.java
+	$(JAVA)	Demo `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
+		`pwd`/test-gpgdir $(HOST)
+
+demo-local:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar Demo.java
+	$(JAVA)	Demo `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
+		`pwd`/test-gpgdir local
+
+
+firefox-demo:
+	firefox https://localhost:8443/
 
 clean:
 	rm -rf classes

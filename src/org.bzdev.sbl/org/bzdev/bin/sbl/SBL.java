@@ -458,16 +458,6 @@ public class SBL {
     static SecureBasicUtilities ops = null;
 
     static char[] getSecurePW(Component component, String name) {
-	if (component == null) {
-	    SwingErrorMessage.format("Swing component was null");
-	    StackTraceElement[] ste = Thread.currentThread()
-		.getStackTrace();
-	    if (ste.length > 1) {
-		SwingErrorMessage.format("... called from line %d"
-					 + " of SBL.java\n",
-					 ste[1].getLineNumber());
-	    }
-	}
 	boolean nullResult = false;
 	Properties props = cpe.getDecodedProperties();
 	Properties rawProps = cpe.getProperties();
@@ -486,9 +476,9 @@ public class SBL {
 	    // SwingErrorMessage.displayConsoleIfNeeded();
 	    // return null;
 	}
+	Component saved = cpe.getPWOwner();
 	if (ops == null && !(mode == SecureBasicUtilities.Mode.PASSWORD
 			     || mode == SecureBasicUtilities.Mode.DIGEST)) {
-	    Component saved = cpe.getPWOwner();
 	    try {
 		cpe.setPWOwner(component);
 		cpe.requestPassphrase(component);
@@ -528,6 +518,7 @@ public class SBL {
 	}
 	char[]  password = null;
 	try {
+	    cpe.setPWOwner(frame);
 	    Object val = props.get("ebase64." + name + ".password");
 	    if (val == null) {
 		val = props.get(name + ".password");
@@ -546,6 +537,8 @@ public class SBL {
 	    nullResult = true;
 	    // SwingErrorMessage.displayConsoleIfNeeded();
 	    // return null;
+	} finally {
+	    cpe.setPWOwner(saved);
 	}
 	String uriString = null;
 	try {

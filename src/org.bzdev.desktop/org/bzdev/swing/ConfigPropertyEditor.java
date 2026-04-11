@@ -2062,6 +2062,21 @@ public abstract class ConfigPropertyEditor {
      * @param owner a component over which a dialog box should be displayed
      */
     public void requestPassphrase(Component owner) {
+	/*
+	if (owner == null) {
+	    System.err.format("Swing component was null\n");
+	    StackTraceElement[] ste = Thread.currentThread()
+		.getStackTrace();
+	    int len = 8;
+	    if (ste.length < 8) len = ste.length;
+	    for (int i = 0; i < len; i++) {
+		System.err.format("... called from line %d"
+					 + " of %s\n",
+				  ste[i].getLineNumber(),
+				  ste[i].getFileName());
+	    }
+	}
+	*/
 	if (password == null) {
 	    boolean useGPG = useGPG();
 	    Component saved = pwowner;
