@@ -17,6 +17,7 @@ import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.HttpMethod;
 import org.bzdev.net.ServerCookie;
 import org.bzdev.net.HeaderOps;
+import org.bzdev.net.WebDecoder;
 import org.bzdev.util.ErrorMessage;
 import org.bzdev.util.TemplateProcessor;
 import org.bzdev.util.TemplateProcessor.KeyMap;
@@ -52,6 +53,7 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  *  <LI>100&mdash;Continue.
  *  <LI>200&mdash;OK.
  *  <LI>302&mdash;Found.
+ *  <LI>303&mdash;See Other.
  *  <LI>404&mdash;Not Found
  *  <LI>405&mdash;Method Not Allowed
  *  <LI>406&mdash;Not Accepted
@@ -61,6 +63,8 @@ import org.bzdev.util.TemplateProcessor.KeyMap;
  */
 
 public class FileHandler implements HttpHandler {
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     static String errorMsg(String key, Object... args) {
 	return EmbeddedWebServer.errorMsg(key, args);
@@ -326,6 +330,61 @@ public class FileHandler implements HttpHandler {
     private URL loginURL = null;
     private boolean loginRequired = false;
 
+    private String adminAlias = null;
+
+    /**
+     * Set this authenticator's admin alias.
+     * This string is the path component of a URL and may not contain
+     * a "/". An HTTP request whose path is the context path, followed
+     * by a "/" if the context path does not end in "/", followed by
+     * the admin-alias, is a URL that will be specially processed
+     * for managing user accounts managed internally.
+     * @param alias the alias
+     */
+    public void setAdminAlias(String alias) throws IllegalArgumentException {
+
+	if (alias != null) {
+	    if (alias.contains("/")) {
+		throw new IllegalArgumentException(errorMsg("aliasSlash"));
+	    } else if (alias.equals(logoutAlias)) {
+		throw new IllegalStateException(errorMsg("aliasConflict"));
+	    }
+	}
+	adminAlias = alias;
+	com.sun.net.httpserver.Authenticator authenticator = null;
+	for (String prefix: ews.getPrefixes()) {
+	    FileHandler h = ews.getFileHandler(prefix);
+	    if (this == h) {
+		authenticator = ews.getAuthenticator(prefix);
+		break;
+	    }
+	}
+	if (authenticator instanceof EjwsSecureBasicAuth) {
+	    EjwsSecureBasicAuth auth = (EjwsSecureBasicAuth) authenticator;
+	    Set<String> rset =  auth.getAdminUsers();
+	    if (rset.contains("keysigner")) rset.remove("keysigner");
+	    String[] recipients = rset.toArray(new String[rset.size()]);
+	    String uriString = auth.generateRequestURI(null);
+	    String loginAlias = getLoginAlias();
+	    try {
+		auth.createUser("admin", uriString, recipients, null)
+		    .setURI((loginAlias != null)? loginAlias: adminAlias)
+		    .setActive(true)
+		    .addUser(true);
+		auth.addToAdminMap("admin", "[No Fingerprint]");
+	    } catch (Exception e) {}
+	}
+    }
+
+    /**
+     * Get this authenticator's admin alias
+     * @return the admin alias; null if there isn't one
+     */
+    public String getAdminAlias() {
+	return adminAlias;
+    }
+
+
     /**
      * Determine if a login is required.
      * When a login is required, {@link EjwsSecureBasicAuth}
@@ -542,6 +601,7 @@ public class FileHandler implements HttpHandler {
     protected void setEWS(EmbeddedWebServer ews) {
 	this.ews = ews;
     }
+
 
     /**
      * Set the logout-alias string with a location to visit when the logout is
@@ -930,6 +990,8 @@ public class FileHandler implements HttpHandler {
 	    String base1 = (base.endsWith("/"))? base: (base + "/");
 	    String loginpath = (loginAlias == null)? null:
 		base1 + loginAlias;
+	    String adminPath = (adminAlias == null)? null:
+		base1 + adminAlias;
 	    URI uri = t.getRequestURI();
 	    String path = uri.getPath();
 	    String query = uri.getRawQuery();
@@ -945,6 +1007,226 @@ public class FileHandler implements HttpHandler {
 		    return;
 		}
 	    }
+	    if (adminAlias != null && adminPath.equals(path)) {
+
+		if (method == HttpMethod.GET && query == null) {
+		    var a = t.getHttpContext().getAuthenticator();
+		    HttpPrincipal p = t.getPrincipal();
+		    String uname = (p == null)? null: p.getUsername();
+		    if (a != null && a instanceof EjwsAuthenticator
+			&& uname != null) {
+			EjwsAuthenticator auth = (EjwsAuthenticator) a;
+			if (auth.getAdminFingerprint(uname) != null) {
+			    TemplateProcessor.KeyMap keymap =
+				new TemplateProcessor.KeyMap(2);
+			    keymap.put("lang", errorMsg("lang"));
+			    keymap.put("path", path);
+			    if (logoutAlias != null) {
+				String logoutpath = base1 + logoutAlias;
+				keymap.put("logout", logoutpath);
+			    }
+			    TemplateProcessor tp
+				= new TemplateProcessor(keymap);
+			    StringReader r =
+				new StringReader(errorMsg("AdminHTMLIntro"));
+			    ByteArrayOutputStream os =
+				new ByteArrayOutputStream();
+			    tp.processTemplate(r, "UTF-8", os);
+			    byte[] bytes = os.toByteArray();
+			    Headers hdrs = t.getResponseHeaders();
+			    hdrs.set("Content-Type",
+				     "text/html; charset=utf-8");
+			    hdrs.set("Cache-Control", "no-cache");
+			    t.sendResponseHeaders(200, bytes.length);
+			    t.getResponseBody().write(bytes);
+			}
+		    }
+		} else if (method == HttpMethod.GET && query != null) {
+		    var a = t.getHttpContext().getAuthenticator();
+		    HttpPrincipal p = t.getPrincipal();
+		    String uname = (p == null)? null: p.getUsername();
+		    if (a != null && a instanceof EjwsAuthenticator
+			&& uname != null) {
+			EjwsAuthenticator auth = (EjwsAuthenticator) a;
+			if (auth.getAdminFingerprint(uname) != null/*
+			     || uname.equals("admin")*/) {
+			    Map<String,String>parmMap = WebDecoder
+				.formDecode(query);
+			    String pmode = parmMap.get("list");
+			    TemplateProcessor.KeyMap keymap =
+				new TemplateProcessor.KeyMap(2);
+			    TemplateProcessor.KeyMapList kmlist
+				= new TemplateProcessor.KeyMapList();
+			    keymap.put("list", kmlist);
+			    keymap.put("action", adminPath);
+			    TemplateProcessor tp
+				= new TemplateProcessor(keymap);
+			    keymap.put("lang", errorMsg("lang"));
+			    if (pmode.equals("notActive")) {
+				keymap.put("title", errorMsg("Inactive"));
+				keymap.put("instr", errorMsg("MakeActive"));
+				keymap.put("options", "true");
+				Set<String> emails = auth.getGPGUsers(false);
+				for (String email: emails) {
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":d");
+				    km.put("hname", email+":p");
+				    km.put("value", email);
+				    kmlist.add(km);
+				}
+			    } else if (pmode.equals("active")) {
+				keymap.put("title", errorMsg("Active"));
+				keymap.put("instr", errorMsg("Delete"));
+				Set<String> emails = auth.getGPGUsers(true);
+				for (String email: emails) {
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":d");
+				    km.put("value", email);
+				    kmlist.add(km);
+				}
+			    } else {
+				pmode = "unknown";
+				keymap.put("title", errorMsg("pmodeTitle"));
+				keymap.put("instr", errorMsg("pmodeInstr"));
+			    }
+			    // String msg = errorMsg("AdminHTML");
+			    StringReader r;
+			    if (pmode.equals("unknown")) {
+				r = new StringReader
+				    (errorMsg("unknownAdminOption"));
+			    } else {
+				r = new StringReader(errorMsg("AdminHTML"));
+			    }
+			    ByteArrayOutputStream os =
+				new ByteArrayOutputStream();
+			    tp.processTemplate(r, "UTF-8", os);
+			    byte[] bytes = os.toByteArray();
+			    Headers hdrs = t.getResponseHeaders();
+			    hdrs.set("Content-Type",
+				     "text/html; charset=utf-8");
+			    hdrs.set("Cache-Control", "no-cache");
+			    t.sendResponseHeaders(200, bytes.length);
+			    t.getResponseBody().write(bytes);
+			} else {
+			    String msg = errorMsg("notAdmin", uname);
+			    byte[] response =  msg.getBytes(UTF8);
+			    int len = response.length;
+			    Headers headers = t.getResponseHeaders();
+			    headers.set("Content-Type",
+					"text/plain; charset=utf8");
+			    t.sendResponseHeaders(403, len);
+			    t.getResponseBody().write(response);
+			}
+		    } else if (uname == null) {
+			    String msg = errorMsg("notLoggedIn");
+			    byte[] response =  msg.getBytes(UTF8);
+			    int len = response.length;
+			    Headers headers = t.getResponseHeaders();
+			    headers.set("Content-Type",
+					"text/plain; charset=utf8");
+			    t.sendResponseHeaders(403, len);
+			    t.getResponseBody().write(response);
+		    }
+		} else if (method == HttpMethod.POST) {
+		    Headers hdrs = t.getRequestHeaders();
+		    String contentType = hdrs.getFirst("content-type");
+		    InputStream is = t.getRequestBody();
+		    try {
+			if (contentType
+			    .equals("application/x-www-form-urlencoded")) {
+			    Map<String,String> map = WebDecoder.formDecode(is);
+			    Set<String> deleteSet = new HashSet<String>();
+			    Set<String> activateSet = new HashSet<String>();
+			    Set<String> ignoreSet = new HashSet<String>();
+			    String[] keys = map.keySet()
+				.toArray(new String[map.size()]);
+			    Arrays.sort(keys);
+			    String option = "deleteSelected";
+			    if (map.containsKey("option")) {
+				option = map.get("option");
+			    }
+			    if (option.equals("deleteSelected")) {
+				for (String key: keys) {
+				    String email = map.get(key);
+				    if (key.endsWith(":d")) {
+					deleteSet.add(email);
+				    }
+				}
+			    } else if (option.equals("makeSelectedActive")) {
+				for (String key: keys) {
+				    String email = map.get(key);
+				    if (key.endsWith(":d")) {
+					activateSet.add(email);
+				    }
+				}
+			    } else if (option.equals("makeUnselectedActive")) {
+				for (String key: keys) {
+				    String email = map.get(key);
+				    if (key.endsWith(":d")) {
+					ignoreSet.add(email);
+				    } else if (!ignoreSet.contains(email)) {
+					activateSet.add(email);
+				    }
+				}
+			    } else if (option.equals("deleteUnselected")) {
+				for (String key: keys) {
+				    String email = map.get(key);
+				    if (key.endsWith(":d")) {
+					ignoreSet.add(email);
+				    } else if (!ignoreSet.contains(email)) {
+					deleteSet.add(email);
+				    }
+				}
+			    }
+			    var a = t.getHttpContext().getAuthenticator();
+			    if (a != null && a instanceof EjwsAuthenticator) {
+				EjwsAuthenticator auth = (EjwsAuthenticator) a;
+				/*
+				for (String email: deleteSet) {
+				    System.out.println("... delete " + email);
+				}
+				for (String email: activateSet) {
+				    System.out.println("... activate " + email);
+				}
+				*/
+				auth.processAdminRequests(deleteSet,
+							  activateSet);
+			    }
+			}
+		    } catch (Exception e){
+			e.printStackTrace();
+		    }
+		} else {
+		    String msg = errorMsg("wrongMethod", method);
+		    byte[] response =  msg.getBytes(UTF8);
+		    int len = response.length;
+		    Headers headers = t.getResponseHeaders();
+		    headers.set("Allow", "GET, POST");
+		    headers.set("Content-Type",
+				"text/html; charset=utf8");
+		    t.sendResponseHeaders(405, len);
+		    t.getResponseBody().write(response);
+		    return;
+		}
+		String admAlias = getAdminAlias();
+		if (admAlias != null) {
+		    String location = uri.resolve(base1 + admAlias).toString();
+		    Headers hdrs = t.getResponseHeaders();
+		    hdrs.set("Location", location);
+		    hdrs.set("Cache-Control", "no-cache");
+		    String proto = protocol.toUpperCase();
+		    int code = ((proto.startsWith("HTTP") &&
+				 proto.endsWith("/1.0")))?
+			302: 303;
+		    t.sendResponseHeaders(code, -1);
+		} else {
+		    t.sendResponseHeaders(201, -1);
+		}
+		return;
+	    }
+
 	    boolean favicon =
 		t.getRequestURI().getPath().startsWith("/favicon.ico");
 	    if (tracer != null) {
@@ -1060,9 +1342,38 @@ public class FileHandler implements HttpHandler {
 		    // String base1 = (base.endsWith("/"))? base: (base + "/");
 		    // System.out.println("query null or allowed");
 		    if (loginAlias != null && path.equals(base1 + loginAlias)) {
-			String location = (loginTarget != null)?
-			    uri.resolve(base1 + loginTarget).toString():
-			    loginURL.toExternalForm();
+			var a = t.getHttpContext().getAuthenticator();
+			HttpPrincipal p = t.getPrincipal();
+			String uname = (p == null)? null: p.getUsername();
+			if (a != null && a instanceof EjwsAuthenticator
+			    && uname != null) {
+			    EjwsAuthenticator auth = (EjwsAuthenticator) a;
+			    if (auth.inDeleteSet(uname)) {
+				auth.removeFromDeleteSet(uname);
+				auth.removeUser(uname);
+				if (logoutAlias != null && logoutURI != null) {
+				    String loc = logoutURI.toASCIIString();
+				    Headers hdrs = t.getResponseHeaders();
+				    hdrs.set("Cache-Control", "no-cache");
+				    hdrs.set("Location", loc);
+				    String proto = protocol.toUpperCase();
+				    int code = ((proto.startsWith("HTTP") &&
+						 proto.endsWith("/1.0")))?
+					302: 303;
+				    t.sendResponseHeaders(code, -1);
+				    return;
+				} else {
+				    // just in case there is no logout alias.
+				    t.sendResponseHeaders(204, -1);
+				}
+			    }
+			}
+
+			String ourLoginTarget = loginTarget;
+			URL ourLoginURL = loginURL;
+			String location = (ourLoginTarget != null)?
+			    uri.resolve(base1 + ourLoginTarget).toString():
+			    ourLoginURL.toExternalForm();
 			// System.out.println("location = " + location);
 			if (method == HttpMethod.PUT
 			    || method == HttpMethod.POST) {
@@ -1071,12 +1382,20 @@ public class FileHandler implements HttpHandler {
 			    is.transferTo(OutputStream.nullOutputStream());
 			    is.close();
 			}
+			// HttpPrincipal p = t.getPrincipal();
+			// String uname = (p == null)? null: p.getUsername();
+			String admAlias = getAdminAlias();
+			if (admAlias != null && uname != null
+			    && uname.equals("admin")) {
+			    location = uri.resolve(base1 + admAlias).toString();
+			}
 			Headers hdrs = t.getResponseHeaders();
 			hdrs.set("Location", location);
+			hdrs.set("Cache-Control", "no-cache");
 			String proto = protocol.toUpperCase();
 			int code = ((proto.startsWith("HTTP") &&
 				     proto.endsWith("/1.0")))?
-			    302: 307;
+			    302: 303;
 			sendResponseHeaders(t, code, -1);
 			return;
 		    } else if (logoutAlias != null
@@ -1111,15 +1430,23 @@ public class FileHandler implements HttpHandler {
 			    is.transferTo(OutputStream.nullOutputStream());
 			    is.close();
 			}
+			var a = t.getHttpContext().getAuthenticator();
+			if (a instanceof EjwsAuthenticator) {
+			    EjwsAuthenticator auth = (EjwsAuthenticator) a;
+			    HttpPrincipal p = t.getPrincipal();
+			    String uname = (p == null)? null: p.getUsername();
+			    auth.removePWInfo(uname);
+			}
 			String location = logoutURI.toASCIIString();
 			if (ok) {
 			    // System.out.println("location = " + location);
 			    Headers hdrs = t.getResponseHeaders();
 			    hdrs.set("Location", location);
+			    hdrs.set("Cache-Control", "no-cache");
 			    String proto = protocol.toUpperCase();
 			    int code = ((proto.startsWith("HTTP") &&
 					 proto.endsWith("/1.0")))?
-				302: 307;
+				302: 303;
 			    sendResponseHeaders(t, code, -1);
 			} else {
 			    KeyMap kmap = new KeyMap();

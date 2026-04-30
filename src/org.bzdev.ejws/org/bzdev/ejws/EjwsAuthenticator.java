@@ -6,19 +6,28 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.SecureBasicUtilities;
+import org.bzdev.net.ServerCookie;
 import org.bzdev.util.ConfigProperties;
 import org.bzdev.util.ConfigPropUtilities;
 
@@ -61,18 +70,50 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
     /**
      * Set the GPG home directory.
+     * If the directory does not exist, it will be created and
+     * its POSIX file permissions (if applicable) will be set to
+     * read, write, execute for the owner with no group or other
+     * permissions.  A key named keysigner will be automatically
+     * added if it does not already exist.
      * <P>
      * The methods
      * {@link #createUser(String,String,String[],Set)},
      * {@link #createUser(String,String,Set)},
-     * {@link #storeGPGKey(String)},
+     * {@link #storeGPGKey(String,EjwsAuthenticator.GPGKeyIDs)},
      * and {@link #trustGPGKey(String,boolean)} will throw a
      * {@link NullPointerException} if this method is not called
      * with a non-null argument.
      * @param gpghome the home directory that GPG will use
+     * @return true on success; false on failure.
      */
-    public void setGPGHome(File gpghome) {
+    public boolean setGPGHome(File gpghome) {
+	if (!gpghome.exists()) {
+	    try {
+		gpghome.mkdirs();
+	    } catch (Exception e) {
+		return false;
+	    }
+	    try {
+		Files.setPosixFilePermissions
+		    (gpghome.toPath(),
+		     EnumSet.of(PosixFilePermission.OWNER_READ,
+				PosixFilePermission.OWNER_WRITE,
+				PosixFilePermission.OWNER_EXECUTE));
+	    } catch (Exception e){}
+	}
 	this.gpghome = gpghome;
+	boolean result = setupKeySigner();
+	if (result) {
+	    try {
+		trustedKeyIDs = getTrustedKeyIDs();
+	    } catch (Exception e) {}
+	}
+	if (needGPGHomeForLoad) {
+	    loadFromDirs();
+	    needGPGHomeForLoad = false;
+	}
+
+	return result;
     }
 
 
@@ -90,6 +131,17 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    }
 	}
 	this.sbldir = sbldir;
+	if (needSBLDirForLoad) {
+	    loadFromDirs();
+	}
+    }
+
+    /**
+     * Get the SBL directory.
+     * @return the SBL directory
+     */
+    protected File getSBLDir() {
+	return sbldir;
     }
 
     protected String storeSBLData(InputStream is)
@@ -134,7 +186,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      *        not active by default
      */
     public void setDefaultActive(boolean value) {
-	defaultActive = true;
+	defaultActive = value;
     }
 
     private boolean canAddAccount = false;
@@ -201,6 +253,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	setBaseList = null;
     }
 
+    public String getLoginAlias() {
+	return ews.getFileHandler(prefix).getLoginAlias();
+    }
+
+
     private void configureUserInfo(UserInfo ui) {
     }
 
@@ -260,7 +317,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	}
 	ui.setDescription(errorMsg("description", userName));
 	ui.setRoles(roles);
-	ui.setActive(defaultActive);
+	boolean isActive = (getAdminFingerprint(userName) != null)?
+	    true: defaultActive;
+	ui.setActive(isActive);
 	// if we need to see these - e.g., for testing locally - all
 	// users for this authenticator are likely to need the same
 	// configuration.
@@ -313,6 +372,10 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     public UserInfo createUser(String email, String title, Set<String> roles)
 	throws IllegalStateException, IOException, NullPointerException
     {
+	if (!isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
 	String recipients[] = {email};
 	return createUser(email, title, recipients, roles);
     }
@@ -352,7 +415,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	if (roles != null && roles.size() > 0) {
 	    ui.setRoles(roles);
 	}
-	ui.setActive(defaultActive);
+	boolean isActive = (getAdminFingerprint(userName) != null)?
+	    true: defaultActive;
+	ui.setActive(isActive);
 
 	if (prefix != null) {
 	    ui.setBase(prefix);
@@ -404,7 +469,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    if (ourmode == SecureBasicUtilities.Mode.PASSWORD) {
 		UserInfo ui =  new
 		    UserInfo(ews, this, userName, password, null);
-		ui.setActive(defaultActive);
+		boolean isActive = (getAdminFingerprint(userName) != null)?
+		    true: defaultActive;
+		ui.setActive(isActive);
 		if (prefix != null) {
 		    ui.setBase(prefix);
 		} else {
@@ -522,6 +589,45 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	String loginAlias = handler.getLoginAlias();
 	String ourprefix = prefix.endsWith("/")? prefix: prefix + "/";
 	return uriSchemeAuthority + ourprefix + loginAlias
+	    + ((username == null)? "":
+	       "?user=" + URLEncoder.encode(username, UTF8));
+    }
+
+    /**
+     * Generate a URI for an admin page.
+     * The host name in the URI will be preferentially taken from
+     * the server's certificate when SSL is used.
+     * @param username the user name; null for just the login URL
+     * @return the URL
+     */
+    protected String generateAdminURI(String username) {
+	String scheme = ews.usesHTTPS()? "https": "http";
+	InetSocketAddress saddr = ews.getAddress();
+	Certificate[][] certs = ews.getCertificates();
+	String host;
+	if (certs != null && certs.length > 0) {
+	    Certificate cert = certs[0][0];
+	    if (cert instanceof X509Certificate) {
+		X509Certificate xcert = (X509Certificate)cert;
+		host = xcert.getSubjectX500Principal()
+		    .getName("canonical").substring(3);
+	    } else {
+		// not documented because this shouldn't ever happen.
+		throw new IllegalStateException(errorMsg("certError"));
+	    }
+	} else {
+	    try {
+		host = InetAddress.getLocalHost().getHostName();
+	    } catch (UnknownHostException e) {
+		host = InetAddress.getLoopbackAddress().getHostName();
+	    }
+	}
+	int port = saddr.getPort();
+	String uriSchemeAuthority = scheme + "://" + host + ":" + port;
+	FileHandler handler = ews.getFileHandler(prefix);
+	String adminAlias = handler.getAdminAlias();
+	String ourprefix = prefix.endsWith("/")? prefix: prefix + "/";
+	return uriSchemeAuthority + ourprefix + adminAlias
 	    + ((username == null)? "":
 	       "?user=" + URLEncoder.encode(username, UTF8));
     }
@@ -662,7 +768,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		try {
 		    Process p = pb.start();
 		    LineNumberReader r = new LineNumberReader
-			(new InputStreamReader(p.getInputStream()));
+			(new InputStreamReader(p.getInputStream(), UTF8));
 		    int cnt = 0;
 		    String line;
 		    // int status = -1;
@@ -847,7 +953,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    this.auth = auth;
 	    this.key = key;
 	    this.recipients = recipients;
-	    checkRecipients(gpghome, recipients);
+	    try {
+		checkRecipients(gpghome, recipients);
+	    } catch (Exception e) {
+		System.err.println("... check Recipients failed");
+	    }
 	    this.gpghome = gpghome;
 	    String scheme = ews.usesHTTPS()? "https": "http";
 	    InetSocketAddress saddr = ews.getAddress();
@@ -1185,7 +1295,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     /**
      * Container class for key ids.
      * Instances of this class is returned by calls
-     * {@link EjwsAuthenticator#storeGPGKey(File,String)}.
+     * {@link EjwsAuthenticator#storeGPGKey(String,GPGKeyIDs)}.
      */
     public static class GPGKeyIDs {
 	String email;
@@ -1215,23 +1325,38 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
 
     /**
-     * Store an ASCII-armored GPG public key for this authenticator.
+     * Store an ASCII-armored GPG public key for use by this authenticator.
      * The program SBL has an option under the File menu to copy the
-     * key to the system clipboard.
+     * key to the system clipboard. Alternatively, if a login alias is
+     * configured, a URL referencing the login alias with a query
+     * containing
+     * <UL>
+     *   <LI><B>user=</B><I>EMAIL_ADDRESS</I>
+     *   <LI><B>uploadtype=pgpkey</B>
+     * will return an SBL file that triggers a series of events that will
+     * download the corresponding public key and possibly set up a user
+     * account.
+     * <P>
+     * The second argument should be computed by calling
+     * {@link #showGPGKey(String) showGPGKey(key)}
+     * </UL>
      * @param key the public key
-     * @return an object containing the key's email address and fingerprint
+     * @param keyids and object containing the key's email address and
+     *        fingerprint
      * @throws NullPointerException if the GPG home directory had not been set
      * @throws IllegalArgumentException if the key is ill-formed
      * @throws IllegalStateException if the key cannot be stored
      * @throws IOException if an IO error occurs while constructing a
      *         cannonical path
      * @see #setGPGHome(File)
+     * @see #showGPGKey(String)
      */
-    public GPGKeyIDs storeGPGKey(String key)
+    public void storeGPGKey(String key, GPGKeyIDs keyids)
 	throws IllegalArgumentException, IllegalStateException, IOException
     {
-	return storeGPGKey(gpghome, key);
+	storeGPGKey(gpghome, key, keyids);
     }
+
     /**
      * Store an ASCII-armored GPG public key.
      * The program SBL has an option under the File menu to copy the
@@ -1245,21 +1370,26 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * @throws IOException if an IO error occurs while constructing a
      *         cannonical path
      */
-    public static GPGKeyIDs storeGPGKey(File gpghome, String key)
+    private static synchronized void
+	storeGPGKey(File gpghome, String key, GPGKeyIDs keyids)
 	throws IllegalArgumentException, IllegalStateException, IOException
     {
 	if (gpghome == null) {
 	    throw new NullPointerException(errorMsg("noGPGHome"));
 	}
-	ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
-					       gpghome.getCanonicalPath(),
-					       "--batch",
-					       "--with-colons",
-					       "--import-options",
-					       "show-only",
-					       "--import", "-");
-	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+
+	String email = keyids.getEmailAddress();
+	String fpr = keyids.getFingerprint();
 	try {
+	    /*
+	    ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--batch",
+						   "--with-colons",
+						   "--import-options",
+						   "show-only",
+						   "--import", "-");
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    Process p = pb.start();
 	    Thread thread = new Thread(() -> {
 		    try {
@@ -1272,7 +1402,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		    } catch (Exception e) {}
 	    });
 	    InputStream is = p.getInputStream();
-	    Reader isr = new InputStreamReader(is, "UTF-8");
+	    Reader isr = new InputStreamReader(is, UTF8);
 	    LineNumberReader r = new LineNumberReader(isr);
 	    thread.start();
 	    String line;
@@ -1284,7 +1414,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		    continue;
 		} else if (line.startsWith("pub:")) {
 		    status = 0;
-		} else if (status == 0 && line.startsWith("fpr")) {
+		} else if (status == 0 && line.startsWith("fpr:")) {
 		    String[] entries = line.split(":");
 		    fpr = entries[9];
 		    status = 1;
@@ -1308,32 +1438,35 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		String msg = errorMsg("missingEmail", fpr);
 		throw new IllegalArgumentException(msg);
 	    }
-	    pb = new ProcessBuilder("gpg", "--homedir",
-				    gpghome.getCanonicalPath(),
-				    "--batch", "--with-colons", "-k", email);
+	    */
+	    ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--batch", "--with-colons",
+						   "-k", email);
 	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    Process p1 = pb.start();
-	    is = p1.getInputStream();
-	    isr = new InputStreamReader(is, "UTF-8");
-	    r = new LineNumberReader(isr);
-	    status = -1;
+	    InputStream is = p1.getInputStream();
+	    InputStreamReader isr = new InputStreamReader(is, UTF8);
+	    LineNumberReader r = new LineNumberReader(isr);
+	    int status = -1;
 	    String fpr1 = "";
 	    String email1 = "";
+	    String line = null;
 	    while ((line = r.readLine()) != null) {
 		if (status == 2) {
 		    continue;
 		} else if (line.startsWith("pub:")) {
 		    status = 0;
-		} else if (status == 0 && line.startsWith("fpr")) {
+		} else if (status == 0 && line.startsWith("fpr:")) {
 		    String[] entries = line.split(":");
 		    fpr1 = entries[9];
 		    status = 1;
-		} else if (status == 1) {
+		} else if (status == 1 && line.startsWith("uid:")) {
 		    String[] entries = line.split(":");
 		    String userdata = entries[9];
 		    int ind1 = userdata.lastIndexOf("<");
 		    int ind2 = userdata.lastIndexOf(">");
-		    if (ind1 > -1) {
+		    if (ind1 > -1 && ind2 > -1) {
 			email1 = userdata.substring(ind1+1, ind2);
 		    }
 		    status = 2;
@@ -1382,8 +1515,121 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		String msg = errorMsg("keyConflict", email);
 		throw new IllegalStateException(msg);
 	    }
+	    // return new GPGKeyIDs(email, fpr);
+	} catch (Exception e) {
+	    System.err.println("in storeGPGKey");
+	    System.err.println(e.getMessage());
+	}
+	// return null;
+    }
+
+    /**
+     * Show an ASCII-armored GPG public key for use by this authenticator.
+     * The program SBL has an option under the File menu to copy the
+     * key to the system clipboard. Alternatively, if a login alias is
+     * configured, a URL referencing the login alias with a query
+     * containing
+     * <UL>
+     *   <LI><B>user=</B><I>EMAIL_ADDRESS</I>
+     *   <LI><B>uploadtype=pgpkey</B>
+     * will return an SBL file that triggers a series of events that will
+     * download the corresponding public key and possibly set up a user
+     * account.
+     * </UL>
+     * @param key the public key
+     * @return an object containing the key's email address and fingerprint
+     * @throws NullPointerException if the GPG home directory had not been set
+     * @throws IllegalArgumentException if the key is ill-formed
+     * @throws IllegalStateException if the key cannot be stored
+     * @throws IOException if an IO error occurs while constructing a
+     *         cannonical path
+     * @see #setGPGHome(File)
+     */
+    public GPGKeyIDs showGPGKey(String key)
+	throws IllegalArgumentException, IllegalStateException, IOException
+    {
+	return showGPGKey(gpghome, key);
+    }
+
+    /**
+     * Show an ASCII-armored GPG public key.
+     * The program SBL has an option under the File menu to copy the
+     * key to the system clipboard.
+     * @param gpghome the home directory that GPG will use
+     * @param key the public key
+     * @return an object containing the key's email address and fingerprint
+     * @throws NullPointerException if the GPG home directory is null
+     * @throws IllegalArgumentException if the key is ill-formed
+     * @throws IllegalStateException if the key cannot be stored
+     * @throws IOException if an IO error occurs while constructing a
+     *         cannonical path
+     */
+    private static synchronized GPGKeyIDs showGPGKey(File gpghome, String key)
+	throws IllegalArgumentException, IllegalStateException, IOException
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--batch",
+						   "--with-colons",
+						   "--import-options",
+						   "show-only",
+						   "--import", "-");
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    Thread thread = new Thread(() -> {
+		    try {
+			OutputStream os = p.getOutputStream();
+			OutputStreamWriter w = new OutputStreamWriter(os,
+								      "UTF-8");
+			w.write(key);
+			w.flush();
+			w.close();
+		    } catch (Exception e) {}
+	    });
+	    InputStream is = p.getInputStream();
+	    Reader isr = new InputStreamReader(is, UTF8);
+	    LineNumberReader r = new LineNumberReader(isr);
+	    thread.start();
+	    String line;
+	    int status = -1;
+	    String fpr = null;
+	    String email = null;
+	    while ((line = r.readLine()) != null) {
+		if (status == 2) {
+		    continue;
+		} else if (line.startsWith("pub:")) {
+		    status = 0;
+		} else if (status == 0 && line.startsWith("fpr:")) {
+		    String[] entries = line.split(":");
+		    fpr = entries[9];
+		    status = 1;
+		} else if (status == 1) {
+		    String[] entries = line.split(":");
+		    String userdata = entries[9];
+		    int ind1 = userdata.lastIndexOf("<");
+		    int ind2 = userdata.lastIndexOf(">");
+		    if (ind1 > -1) {
+			email = userdata.substring(ind1+1, ind2);
+		    }
+		    status = 2;
+		}
+	    }
+	    thread.join();
+	    if (p.waitFor() != 0 || fpr == null) {
+		throw new IllegalArgumentException(errorMsg("badGPGKey"));
+	    }
+
+	    if (email == null || email.strip().length() == 0) {
+		String msg = errorMsg("missingEmail", fpr);
+		throw new IllegalArgumentException(msg);
+	    }
 	    return new GPGKeyIDs(email, fpr);
 	} catch (Exception e) {
+	    System.err.println("in showGPGKey");
 	    System.err.println(e.getMessage());
 	}
 	return null;
@@ -1411,7 +1657,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     public void trustGPGKey(String email, boolean trust)
 	throws IllegalArgumentException, IllegalStateException, IOException
     {
-	trustGPGKey(gpghome, email, trust);
+	if (!isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
+	trustGPGKey(gpghome, email, trust, trustedKeyIDs);
     }
 
     /**
@@ -1433,34 +1683,43 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * @throws IOException if an IO error occurs while constructing a
      *         cannonical path
      */
-    public static void trustGPGKey(File gpghome, String email, boolean trust)
+    private static synchronized void
+	trustGPGKey(File gpghome, String email, boolean trust,
+		    Set<String>trustedKeyIDs)
 	throws IllegalArgumentException, IllegalStateException, IOException
     {
 	if (gpghome == null) {
 	    throw new NullPointerException(errorMsg("noGPGHome"));
 	}
-	ProcessBuilder pb =  new ProcessBuilder("gpg", "--homedir",
-						gpghome.getCanonicalPath(),
-						"--batch",
-						"--with-colons",
-						"--fingerprint",
-						email);
-	pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	if (!isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
 	try {
+	    ProcessBuilder pb =  new ProcessBuilder("gpg", "--homedir",
+						    gpghome.getCanonicalPath(),
+						    "--batch",
+						    "--with-colons",
+						    "--fingerprint",
+						    email);
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
 	    Process p = pb.start();
 	    InputStream is = p.getInputStream();
-	    Reader isr = new InputStreamReader(is, "UTF-8");
+	    Reader isr = new InputStreamReader(is, UTF8);
 	    LineNumberReader r = new LineNumberReader(isr);
 	    String line;
 	    int status = -1;
 	    String fpr = null;
+	    String kid = null;
 	    String email1 = null;
 	    while ((line = r.readLine()) != null) {
 		if (status == 2) {
 		    continue;
 		} else if (line.startsWith("pub:")) {
+		    String[] entries = line.split(":");
+		    kid = entries[4];
 		    status = 0;
-		} else if (status == 0 && line.startsWith("fpr")) {
+		} else if (status == 0 && line.startsWith("fpr:")) {
 		    String[] entries = line.split(":");
 		    fpr = entries[9];
 		    status = 1;
@@ -1469,7 +1728,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		    String userdata = entries[9];
 		    int ind1 = userdata.lastIndexOf("<");
 		    int ind2 = userdata.lastIndexOf(">");
-		    if (ind1 > -1) {
+		    if (ind1 > -1 && ind2 > -1) {
 			email1 = userdata.substring(ind1+1, ind2);
 		    }
 		    status = 2;
@@ -1502,13 +1761,23 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    w.write(trust? ":6:": ":1:");
 	    w.write("\n");
 	    w.close();
+	    if (trust) {
+		trustedKeyIDs.add(kid);
+	    } else {
+		trustedKeyIDs.remove(kid);
+	    }
 	    if (p.waitFor() != 0) {
 		String msg = errorMsg("trustUpdate", email);
 		throw new IllegalStateException(msg);
 	    }
 	} catch (IOException e) {
+	    System.err.println("in trustGPGKey");
 	    System.err.println(e.getMessage());
 	} catch (InterruptedException e) {
+	    System.err.println("in trustGPGKey");
+	    System.err.println(e.getMessage());
+	} catch (IllegalStateException e) {
+	    System.err.println("in trustGPGKey");
 	    System.err.println(e.getMessage());
 	}
     }
@@ -1536,7 +1805,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	public Entry() {
 	}
 
-	boolean active = true;
+	boolean active = false;
 
 
 	/**
@@ -1548,6 +1817,17 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	 */
 	public void setActive(boolean active) {
 	    this.active = active;
+	    return;
+	}
+
+	/**
+	 * Set whether or not this entry is active.
+	 * Authentication should fail if an entry is not active.
+	 * If this method was not called or overridden,
+	 * {@link #isActive()} will return true.
+	 */
+	public void makeActive() {
+	    this.active = true;
 	    return;
 	}
 
@@ -1634,6 +1914,22 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	this.ews = ews;
     }
 
+    public abstract boolean removeUser(String name);
+
+    public abstract boolean makeUserActive(String name);
+
+    // so we can set gpghome and sbldir after we call loadFromDirs()
+    private boolean needGPGHomeForLoad = false;
+    private boolean needSBLDirForLoad = true;
+
+    public  void loadFromDirs() throws UnsupportedOperationException {
+	if (gpghome == null) {
+	    needGPGHomeForLoad = true;
+	}
+	if (sbldir == null) {
+	    needSBLDirForLoad = true;
+	}
+    };
 
     /**
      * The {@link Appendable} used for tracing.
@@ -1793,6 +2089,27 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    function;
     }
 
+    private Map<String,String> adminMap = new HashMap<String,String>();
+
+    /**
+     * Add an entry to the map associating email addresses with
+     * the fingerprint of a corresponding GPG key.
+     * @param email the email address
+     * @param fingerprint the corresponding GPG key's fingerprint
+     */
+    public void addToAdminMap(String email, String fingerprint) {
+	adminMap.put(email, fingerprint);
+    }
+
+    public String getAdminFingerprint(String email) {
+	return adminMap.get(email);
+    }
+
+    public Set<String> getAdminUsers() {
+	return adminMap.keySet();
+    }
+
+
     protected AddStatus getUserStatus(String username) {
 	if (username == null) {
 	    return AddStatus.REJECTED;
@@ -1806,6 +2123,559 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	}
     }
 
+    private Set<String> deleteSet = new HashSet<>();
+
+    protected synchronized void addToDeleteSet(String uname) {
+	deleteSet.add(uname);
+    }
+
+    public synchronized void removeFromDeleteSet(String uname) {
+	deleteSet.remove(uname);
+    }
+
+    public synchronized boolean inDeleteSet(String uname) {
+	return deleteSet.contains(uname);
+    }
+
+    private Set<String> trustedKeyIDs = null;
+
+    public Set<String> getTrustedKeyIDs() throws Exception {
+	return getTrustedKeyIDs(gpghome);
+    }
+
+    private static synchronized Set<String> getTrustedKeyIDs(File gpghome)
+	throws Exception
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--with-colons",
+						   "--keyid-format", "LONG",
+						   "-k");
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    LineNumberReader r = new LineNumberReader
+		(new InputStreamReader(p.getInputStream(), UTF8));
+	    int cnt = -1;
+	    String line;
+	    Set<String> keyids = new HashSet<>();
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith("pub:u:")) {
+		    String[] entries = line.split(":");
+		    keyids.add(entries[4]);
+		}
+	    }
+	    int status = p.waitFor();
+	    if (status == 0) {
+		return keyids;
+	    } else {
+		return null;
+	    }
+	} catch (Exception e) {
+	    System.err.println("in getTrustedKeyIDs - returning null");
+	    return null;
+	}
+    }
+
+    public boolean isTrustedKey(String name) {
+	return isTrustedKey(gpghome, name);
+    }
+
+    private static synchronized boolean
+	isTrustedKey(File gpghome, String name)
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg", "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--with-colons",
+						   "--keyid-format", "LONG",
+						   "-k", name);
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    LineNumberReader r = new LineNumberReader
+		(new InputStreamReader(p.getInputStream(), UTF8));
+	    int cnt = -1;
+	    String line;
+	    boolean result = false;
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith("pub:u:")) {
+		    return true;
+		}
+	    }
+	    int status = p.waitFor();
+	    return result;
+	} catch (Exception e) {
+	    System.err.println("in isTrustedKey");
+	    return false;
+	}
+    }
+
+    public boolean hasGPGKey(String name) {
+	return hasGPGKey(gpghome, name);
+    }
+
+    public static synchronized boolean hasGPGKey(File gpghome, String name) {
+
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "-k", name);
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    return p.waitFor() == 0;
+	} catch (Exception e) {
+	    System.err.println("in hasGPGKey");
+	    return false;
+	}
+    }
+
+    protected boolean setupKeySigner() {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	if (!gpghome.isDirectory()) {
+	    return false;
+	}
+
+	synchronized(EjwsAuthenticator.class) {
+	    if (gpghome.listFiles().length > 0) {
+		if (hasGPGKey(gpghome, "keysigner")) {
+		    String fpr = getFingerprint("keysigner");
+		    if (fpr != null) {
+			addToAdminMap("keysigner", fpr);
+		    }
+		    return true;
+		}
+	    }
+
+	    try {
+		ProcessBuilder pb =
+		    new ProcessBuilder("gpg",
+				       "--homedir", gpghome.getCanonicalPath(),
+				       "--pinentry-mode", "loopback", "--batch",
+				       "--passphrase", "",
+				       "--quick-generate-key",
+				       "keysigner", "ed25519",
+				       "default", "never");
+		pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+		pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+		Process p = pb.start();
+		boolean result = (p.waitFor() == 0);
+		if (result) {
+		    String fpr = getFingerprint("keysigner");
+		    addToAdminMap("keysigner", fpr);
+		}
+		return result;
+	    } catch (Exception e) {
+		System.err.println("in setupKeysigner");
+		return false;
+	    }
+	}
+    }
+
+    public String getFingerprint(String email) {
+	return getFingerprint(gpghome, email);
+    }
+
+    private static synchronized String
+	getFingerprint(File gpghome, String email)
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	if (!email.equals("keysigner") && !isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--with-colons",
+						   "--keyid-format", "LONG",
+						   "-k", email);
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    InputStream is = p.getInputStream();
+	    Reader isr = new InputStreamReader(is, UTF8);
+	    LineNumberReader r = new LineNumberReader(isr);
+	    String line;
+	    int status = -1;
+	    String fpr = null;
+	    String email1 = null;
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith("pub:")) {
+		    status = 0;
+		    email1 = null;
+		} else if (status == 0 && line.startsWith("fpr:")) {
+		    String[] entries = line.split(":");
+		    fpr = entries[9];
+		    status = 1;
+		} else if (status == 1 && line.startsWith("uid:")) {
+		    String[] entries = line.split(":");
+		    String userdata = entries[9].trim();
+			    int ind1 = userdata.lastIndexOf("<");
+		    int ind2 = userdata.lastIndexOf(">");
+		    if (ind1 > -1 && ind2 > -1) {
+			email1 = userdata.substring(ind1+1, ind2);
+		    }
+		    if (email.equals(email1)) {
+			return fpr;
+		    } else if (userdata.equals("keysigner")) {
+			return fpr;
+		    } else {
+			status = -1;
+		    }
+		} else {
+		    status = -1;
+		}
+	    }
+	    p.waitFor();
+	    return null;
+	} catch (Exception e) {
+	    System.err.println("in Fingerprint");
+	    return null;
+	}
+    }
+
+    private static String p = "[^]\\[@.()<>,;:\"\\p{Space}\\p{Cntrl}\\\\]+";
+    private static Pattern emailAddressPattern = Pattern.compile
+	(p + "([.]" + p + ")*@" + p + "([.]" + p + ")*");
+
+    /**
+     * Determine if a string is a syntactically valid email address.
+     * The email address must be the local part of an email address,
+     * followed by an '@', in turn followed by a domain. For example,
+     * <CODE>user@example.com</CODE>.  This is often delimited by
+     * "&tl;" and "&gt;".  Those delimiters must not be included.
+     * @param string the string to check
+     * @return true if the argument is a syntactically valid email address;
+     *         false otherwise
+     */
+    public static boolean isEmailAddress(String string) {
+	if (string == null) return false;
+	return emailAddressPattern.matcher(string).matches();
+    }
+
+
+    public boolean signKey(String email) {
+	return signKey(gpghome, email);
+    }
+
+    private static synchronized boolean signKey(File gpghome, String email) {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	if (!isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
+	try {
+	    String fpr = getFingerprint(gpghome, email);
+	    if (fpr == null) return false;
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "-u", "keysigner",
+						   "--batch",
+						   "--quick-lsign-key",
+						   fpr, email);
+	    // pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    // pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+	    pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+	    pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+	    Process p = pb.start();
+	    return p.waitFor() == 0;
+	} catch (Exception e) {
+	    System.err.println("in signKey");
+	    System.err.println(e.getMessage());
+	    return false;
+	}
+    }
+
+    public boolean validGPGUser(String email) {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	if (!isEmailAddress(email)) {
+	    throw new IllegalArgumentException
+		(errorMsg("illformedEmail", email));
+	}
+	synchronized(EjwsAuthenticator.class) {
+	    try {
+		ProcessBuilder pb =
+		    new ProcessBuilder("gpg",
+				       "--homedir", gpghome.getCanonicalPath(),
+				       "--with-colons",
+				       "--keyid-format", "LONG",
+				       "--list-sigs", email);
+		pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+		Process p = pb.start();
+		LineNumberReader r = new LineNumberReader
+		    (new InputStreamReader(p.getInputStream(), UTF8));
+		int cnt = -1;
+		String line;
+		int status = 0;
+		boolean result = false;
+		while ((line = r.readLine()) != null) {
+		    if (line.startsWith("pub:u:")
+			|| line.startsWith("pub:f:")) {
+			status = 1;
+		    } else if (status == 1 && line.startsWith("fpr:")) {
+			status = 2;
+		    } else if (status == 2 && line.startsWith("uid:")) {
+			String[] entries = line.split(":");
+			String userdata = entries[9];
+			int ind1 = userdata.lastIndexOf("<");
+			int ind2 = userdata.lastIndexOf(">");
+			String email1 = null;
+			if (ind1 > -1 && ind2 > -1) {
+			    email1 = userdata.substring(ind1+1, ind2);
+			    if (email1.equals(email)) {
+				status = 3;
+			    } else {
+				return false;
+			    }
+			}
+		    } else if (status == 3 && line.startsWith("sig:")) {
+			String[] entries = line.split(":");
+			if(trustedKeyIDs.contains(entries[4])) {
+			    result = true;
+			    break;
+			}
+		    } else if (status == 3 && line.startsWith("sub:")) {
+			status = 0;
+		    }
+		}
+		status = p.waitFor();
+		if (status == 0) {
+		    return result;
+		} else {
+		    return false;
+		}
+	    } catch (Exception e) {
+		System.err.println("in validGPGUser");
+		return false;
+	    }
+	}
+    }
+
+    public Set<String> getGPGUsers(boolean signed) {
+	return getGPGUsers(gpghome, signed, trustedKeyIDs, adminMap);
+    }
+
+    private static synchronized Set<String>
+	getGPGUsers(File gpghome, boolean signed,
+		    Set<String>trustedKeyIDs, Map<String,String>adminMap)
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--with-colons",
+						   "--keyid-format", "LONG",
+						   "--list-sigs");
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    LineNumberReader r = new LineNumberReader
+		(new InputStreamReader(p.getInputStream(), UTF8));
+	    int cnt = -1;
+	    String line;
+	    int status = 0;
+	    Set<String> result = new TreeSet<String>();
+	    String fpr = null;
+	    String email = null;
+	    while ((line = r.readLine()) != null) {
+		if (line.startsWith("pub:u:") || line.startsWith("pub:f")) {
+		    status = 1;
+		    email = null;
+		    fpr = null;
+		} else if (signed == false && line.startsWith("pub:")) {
+		    // when signed is false, we'll accept everything
+		    // that contains what looks like an email address.
+		    email = null;
+		    fpr = null;
+		    status = 1;
+		} else if (line.startsWith("fpr:")) {
+		    String[] entries = line.split(":");
+		    fpr = entries[9];
+		    status = 2;
+		} else if (status == 2 && line.startsWith("uid:")) {
+		    String[] entries = line.split(":");
+		    String fullid = entries[9].trim();
+		    email = null;
+		    int ind = fullid.lastIndexOf('<');
+		    int lenm1 = fullid.length() -1;
+		    if (ind >= 0 && fullid.charAt(lenm1) == '>') {
+			email = fullid.substring(ind+1, lenm1);
+		    } else {
+			ind = fullid.indexOf('@');
+			if (ind > -1) {
+			    int ind2 = fullid.lastIndexOf('@');
+			    if (ind == ind2) {
+				email = fullid;
+			    }
+			}
+		    }
+		    if (email == null || fpr.equals(adminMap.get(email))) {
+			// Skip these - we don't want to modify them.
+			status = 0;
+		    } else {
+			status = 3;
+		    }
+		} else if (status == 3 && line.startsWith("sig:")) {
+		    String[] entries = line.split(":");
+		    if (email != null && trustedKeyIDs.contains(entries[4])) {
+			if (signed) {
+			    result.add(email);
+			    email = null;
+			    status = 0;
+			} else {
+			    // skip ones that were signed with a recognized key
+			    email = null;
+			    status = 0;
+			}
+		    }
+		} else if (status != 0 && line.startsWith("sub:")) {
+		    if (!signed && email != null) {
+			result.add(email);
+		    }
+		    email = null;
+		    status = 0;
+		}
+	    }
+	    status = p.waitFor();
+	    if (status == 0) {
+		return result;
+	    } else {
+		return null;
+	    }
+	} catch (Exception e) {
+	    System.err.println("in getGPGUsers");
+	    return null;
+	}
+    }
+
+    public void deleteWithFingerprint(String fpr) {
+	// called by processAdminRequests, so gpghome was checked.
+
+	try {
+	    ProcessBuilder pb = new ProcessBuilder("gpg",
+						   "--homedir",
+						   gpghome.getCanonicalPath(),
+						   "--batch",
+						   "--delete-keys", fpr);
+	    pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+	    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+	    Process p = pb.start();
+	    p.waitFor();
+	} catch (Exception e) {
+	    System.err.println("in deleteWithFingerprint");
+	}
+    }
+
+
+    private static String startTime = "" + System.currentTimeMillis();
+    private static long instance = 0;
+    private static final String COOKIE_NAME = "org.bzdev.ejws.auth";
+
+    protected static ServerCookie createServerCookie(HttpExchange t) {
+	String value = null;
+	synchronized(EjwsSecureBasicAuth.class) {
+	    value  = startTime + "-" + (++instance);
+	}
+	ServerCookie cookie = ServerCookie.newInstance(COOKIE_NAME,
+						       value);
+	cookie.setHttpOnly(true);
+	cookie.setVersion(1);
+	cookie.setMaxAge(-1);
+	cookie.setPath(t.getHttpContext().getPath());
+	Headers reqhdrs = t.getRequestHeaders();
+	String hs = reqhdrs.getFirst("host").trim();
+	int indv6e = hs.indexOf(']');
+	int ind = hs.lastIndexOf(':');
+	boolean hasPort = (ind >= 0 && ind > indv6e);
+	String host = hasPort? hs.substring(0, ind): hs;
+	if (indv6e > 0 && host.charAt(0) == '[') {
+	    host = host.substring(1, indv6e);
+	}
+	cookie.setDomain(host);
+	return cookie;
+    }
+
+    protected static ServerCookie findServerCookie(HttpExchange t) {
+
+	ServerCookie[] cookies = ServerCookie
+	    .fetchCookies(WebMap.asHeaderOps(t.getRequestHeaders()));
+	for (int i = 0; i < cookies.length; i++) {
+	    String name = cookies[i].getName();
+	    if (name != null && name.equals(COOKIE_NAME)) {
+		return cookies[i];
+	    }
+	}
+	return null;
+    }
+
+    protected static void setCookie(HttpExchange t, ServerCookie cookie) {
+	cookie.addToHeaders(WebMap.asHeaderOps(t.getResponseHeaders()));
+    }
+
+    /**
+     * Remove an entry from the password map.
+     * This is called when logging out.
+     * @param username the user name
+     */
+    public void removePWInfo(String username) {
+    }
+
+
+    public void processAdminRequests(Set<String> deleteSet,
+				     Set<String> activateSet)
+    {
+	if (gpghome == null) {
+	    throw new NullPointerException(errorMsg("noGPGHome"));
+	}
+	synchronized (EjwsAuthenticator.class) {
+	    if (deleteSet != null) {
+		for (String email: deleteSet) {
+		    if (!isEmailAddress(email)
+			&& getAdminFingerprint(email) != null) {
+			// don't delete an admin account!
+			continue;
+		    }
+		    if (isTrustedKey(email)) {
+			// Don't delete a key we might use for signing.
+			continue;
+		    }
+		    removeUser(email);
+		}
+	    }
+	    if (activateSet != null) {
+		for (String email: activateSet) {
+		    if (signKey(email)) {
+			makeUserActive(email);
+		    } else {
+			System.err.println("... could not sign key for "
+					   + email);
+		    }
+		}
+	    }
+	}
+    }
 }
 
 //  LocalWords:  EmbeddedWebServer authTwoServers authPrefix PRE auth

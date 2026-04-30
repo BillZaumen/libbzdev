@@ -1,5 +1,6 @@
 import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
 import org.bzdev.swing.*;
 
 public class ConfigTestPW {
@@ -53,17 +54,28 @@ public class ConfigTestPW {
 
 	ConfigEditor editor = new ConfigEditor();
 
+	JLabel label = new JLabel("hello");
+
+	System.out.println("check pushOwner");
+	try (var saved = editor.pushOwner(label)) {
+	    System.out.println(editor.getPWOwner());
+	}
+	System.out.println(editor.getPWOwner());
+	System.out.println("---");
+
+	JLabel nulllabel = null;
+
 	System.out.println("... requestPassphrase(null)");
-	editor.requestPassphrase(null);
+	editor.requestPassphrase(label);
 	editor.clearPassphrase();
 	System.out.println("... requestPassphrase(null) "
 			   + "on event dispatch thread");
 	SwingUtilities.invokeAndWait(() -> {
-	    editor.requestPassphrase(null);
+	    editor.requestPassphrase(nulllabel);
 	    });
 	editor.clearPassphrase();
 	System.out.println("... requestPassphrase(null, true)");
-	editor.requestPassphrase(null, true);
+	editor.requestPassphrase(label, true);
 	editor.clearPassphrase();
 	System.out.println("... requestPassphrase (null, true, false)");
 	char[] pw = ConfigPropertyEditor.requestPassphrase(null, true, false);

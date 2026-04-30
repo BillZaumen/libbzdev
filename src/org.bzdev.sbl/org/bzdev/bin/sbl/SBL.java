@@ -476,16 +476,19 @@ public class SBL {
 	    // SwingErrorMessage.displayConsoleIfNeeded();
 	    // return null;
 	}
-	Component saved = cpe.getPWOwner();
-	if (ops == null && !(mode == SecureBasicUtilities.Mode.PASSWORD
-			     || mode == SecureBasicUtilities.Mode.DIGEST)) {
-	    try {
-		cpe.setPWOwner(component);
+	try (var saved = cpe.pushOwner(component)) {
+	    // Component saved = cpe.getPWOwner();
+	    if (ops == null
+		&& !(mode == SecureBasicUtilities.Mode.PASSWORD
+		     || mode == SecureBasicUtilities.Mode.DIGEST)) {
+		// try {
+		//   cpe.setPWOwner(component);
 		cpe.requestPassphrase(component);
 		char[] carray = (char[])cpe.getDecodedProperties()
 		    .get("ebase64.keypair.privateKey");
 		if (carray == null) {
-		    SwingErrorMessage.format("%s\n", errorMsg("noPrivateKey"));
+		    SwingErrorMessage.format("%s\n",
+					     errorMsg("noPrivateKey"));
 		    SwingErrorMessage.displayConsoleIfNeeded();
 		    return null;
 		}
@@ -512,145 +515,153 @@ public class SBL {
 		    SwingErrorMessage.displayConsoleIfNeeded();
 		    return null;
 		}
-	    } finally {
-		cpe.setPWOwner(saved);
+		/*
+		  } finally {
+		  cpe.setPWOwner(saved);
+		  }
+		*/
 	    }
-	}
-	char[]  password = null;
-	try {
-	    cpe.setPWOwner(frame);
-	    Object val = props.get("ebase64." + name + ".password");
-	    if (val == null) {
-		val = props.get(name + ".password");
-	    }
-	    password = (val instanceof String)?
-		((String) val).toCharArray():
-		(char[]) val;
-	    if (password == null) {
-		SwingErrorMessage
-		    .format(errorMsg("noPassword", name + ".password"));
-		nullResult = true;
-	    }
-	} catch (Exception epw) {
-	    SwingErrorMessage.format("%s: %s", epw.getMessage(),
-				     name + ".password");
-	    nullResult = true;
-	    // SwingErrorMessage.displayConsoleIfNeeded();
-	    // return null;
-	} finally {
-	    cpe.setPWOwner(saved);
-	}
-	String uriString = null;
-	try {
-	    uriString = props.getProperty(name + ".uri");
-	} catch (Exception euri) {
-	    SwingErrorMessage.format("%s: %s", euri.getMessage(),
-				     name + ".uri");
-	    nullResult = true;
-	    // SwingErrorMessage.displayConsoleIfNeeded();
-	    // return null;
-	}
-	URI uri = null;
-	boolean uriException = false;
-	try {
-	    uri = new URI(uriString);
-	} catch (Exception e) {
-	    // System.err.println(e.getMessage());
-	    SwingErrorMessage.format("%s: %s", e.getMessage(),
-				     uriString);
-	    uriException = true;
-	    nullResult = true;
-	    // SwingErrorMessage.displayConsoleIfNeeded();
-	    // return null;
-	}
-	String scheme = uriException? null: uri.getScheme().toLowerCase();
-	String host = uriException? null: uri.getHost();
-	if (scheme == null || scheme.trim().length() == 0) {
-	    if (!uriException) {
-		SwingErrorMessage.format(errorMsg("noScheme"));
-		nullResult = true;
-	    }
-	}
-	if (host == null || host.trim().length() == 0) {
-	    if (!uriException) {
-		SwingErrorMessage.format(errorMsg("noHost"));
-		nullResult = true;
-	    }
-	}
-	int port = uri.getPort();
-	if (port < 0) {
-	    if (scheme.equalsIgnoreCase("http")) port = 80;
-	    else if (scheme.equalsIgnoreCase("https")) port = 443;
-	    else {
-		SwingErrorMessage.format(errorMsg("unsupportedScheme", scheme));
-		nullResult = true;
-	    }
-	} else if (!(scheme.equalsIgnoreCase("http")
-		     || scheme.equalsIgnoreCase("https"))) {
-		SwingErrorMessage.format(errorMsg("unsupportedScheme", scheme));
-		nullResult = true;
-	}
-	Certificate cert = null;
-	Certificate[] chain = null;
-	if (scheme.equals("https")) {
-	    SSLSocketFactory factory = (SSLSocketFactory)
-		SSLSocketFactory.getDefault();
-	    try (SSLSocket socket = (SSLSocket)
-		 factory.createSocket(host, port)) {
-		SSLSession session = socket.getSession();
-	        chain = session.getPeerCertificates();
-	        cert =  (chain == null || chain.length == 0)? null:
-		    chain[0];
-		if (cert == null)  {
-		    nullResult = true; // SSL: must have a certificate chain
-		    SwingErrorMessage.format(errorMsg("nocert", host, port));
+	    char[]  password = null;
+	    try {
+		// cpe.setPWOwner(frame);
+		Object val = props.get("ebase64." + name + ".password");
+		if (val == null) {
+		    val = props.get(name + ".password");
 		}
+		password = (val instanceof String)?
+		    ((String) val).toCharArray():
+		    (char[]) val;
+		if (password == null) {
+		    SwingErrorMessage
+			.format(errorMsg("noPassword", name + ".password"));
+		    nullResult = true;
+		}
+	    } catch (Exception epw) {
+		SwingErrorMessage.format("%s: %s", epw.getMessage(),
+					 name + ".password");
+		nullResult = true;
+		// SwingErrorMessage.displayConsoleIfNeeded();
+		// return null;
+	    } /*finally {
+		cpe.setPWOwner(saved);
+		}*/
+	    String uriString = null;
+	    try {
+		uriString = props.getProperty(name + ".uri");
+	    } catch (Exception euri) {
+		SwingErrorMessage.format("%s: %s", euri.getMessage(),
+					 name + ".uri");
+		nullResult = true;
+		// SwingErrorMessage.displayConsoleIfNeeded();
+		// return null;
+	    }
+	    URI uri = null;
+	    boolean uriException = false;
+	    try {
+		uri = new URI(uriString);
+	    } catch (Exception e) {
+		// System.err.println(e.getMessage());
+		SwingErrorMessage.format("%s: %s", e.getMessage(),
+					 uriString);
+		uriException = true;
+		nullResult = true;
+		// SwingErrorMessage.displayConsoleIfNeeded();
+		// return null;
+	    }
+	    String scheme = uriException? null: uri.getScheme().toLowerCase();
+	    String host = uriException? null: uri.getHost();
+	    if (scheme == null || scheme.trim().length() == 0) {
+		if (!uriException) {
+		    SwingErrorMessage.format(errorMsg("noScheme"));
+		    nullResult = true;
+		}
+	    }
+	    if (host == null || host.trim().length() == 0) {
+		if (!uriException) {
+		    SwingErrorMessage.format(errorMsg("noHost"));
+		    nullResult = true;
+		}
+	    }
+	    int port = uri.getPort();
+	    if (port < 0) {
+		if (scheme.equalsIgnoreCase("http")) port = 80;
+		else if (scheme.equalsIgnoreCase("https")) port = 443;
+		else {
+		    SwingErrorMessage
+			.format(errorMsg("unsupportedScheme", scheme));
+		    nullResult = true;
+		}
+	    } else if (!(scheme.equalsIgnoreCase("http")
+			 || scheme.equalsIgnoreCase("https"))) {
+		SwingErrorMessage.format(errorMsg("unsupportedScheme", scheme));
+		nullResult = true;
+	    }
+	    Certificate cert = null;
+	    Certificate[] chain = null;
+	    if (scheme.equals("https")) {
+		SSLSocketFactory factory = (SSLSocketFactory)
+		    SSLSocketFactory.getDefault();
+		try (SSLSocket socket = (SSLSocket)
+		     factory.createSocket(host, port)) {
+		    SSLSession session = socket.getSession();
+		    chain = session.getPeerCertificates();
+		    cert =  (chain == null || chain.length == 0)? null:
+			chain[0];
+		    if (cert == null)  {
+			nullResult = true; // SSL: must have a cert chain
+			SwingErrorMessage
+			    .format(errorMsg("nocert", host, port));
+		    }
+		} catch (Exception e) {
+		    // System.err.println(e.getMessage());
+		    SwingErrorMessage.format("%s", e.getMessage());
+		    Throwable ee = e.getCause();
+		    if (ee != null) {
+			// System.err.println(ee.getMessage());
+			SwingErrorMessage.format("... %s", ee.getMessage());
+		    }
+		    nullResult = true; // if SSL, there must be a cert chain
+		    cert = null;
+		}
+	    }
+	    if (nullResult) {
+		SwingErrorMessage.displayConsoleIfNeeded();
+		return null;
+	    }
+	    try {
+		// System.out.println("mode = " + mode);
+		switch(mode) {
+		case DIGEST:
+		    password = dops.createPassword((Certificate[])null,
+						   password);
+		    break;
+		case SIGNATURE_WITHOUT_CERT:
+		    password = ops.createPassword((Certificate[])null,
+						  password);
+		    break;
+		case SIGNATURE_WITH_CERT:
+		    if (cert == null) {
+			// System.err.println("no certificate");
+			SwingErrorMessage
+			    .format("%s", errorMsg("noCertificate"));
+			SwingErrorMessage.displayConsoleIfNeeded();
+			return null;
+		    }
+		    password = ops.createPassword(chain, password);
+		    break;
+		case PASSWORD:
+		    return password;
+		}
+		return password;
 	    } catch (Exception e) {
 		// System.err.println(e.getMessage());
 		SwingErrorMessage.format("%s", e.getMessage());
-		Throwable ee = e.getCause();
-		if (ee != null) {
-		    // System.err.println(ee.getMessage());
-		    SwingErrorMessage.format("... %s", ee.getMessage());
+		SwingErrorMessage.displayConsoleIfNeeded();
+		if (stacktrace) {
+		    e.printStackTrace();
 		}
-		nullResult = true; // if SSL, there must be a certificate chain
-		cert = null;
+		return null;
 	    }
-	}
-	if (nullResult) {
-	    SwingErrorMessage.displayConsoleIfNeeded();
-	    return null;
-	}
-	try {
-	    // System.out.println("mode = " + mode);
-	    switch(mode) {
-	    case DIGEST:
-		password = dops.createPassword((Certificate[])null, password);
-		break;
-	    case SIGNATURE_WITHOUT_CERT:
-		password = ops.createPassword((Certificate[])null, password);
-		break;
-	    case SIGNATURE_WITH_CERT:
-		if (cert == null) {
-		    // System.err.println("no certificate");
-		    SwingErrorMessage.format("%s", errorMsg("noCertificate"));
-		    SwingErrorMessage.displayConsoleIfNeeded();
-		    return null;
-		}
-		password = ops.createPassword(chain, password);
-		break;
-	    case PASSWORD:
-		return password;
-	    }
-	    return password;
-	} catch (Exception e) {
-	    // System.err.println(e.getMessage());
-	    SwingErrorMessage.format("%s", e.getMessage());
-	    SwingErrorMessage.displayConsoleIfNeeded();
-	    if (stacktrace) {
-		e.printStackTrace();
-	    }
-	    return null;
 	}
     }
 
@@ -1105,6 +1116,30 @@ public class SBL {
 		    new String(data);
 		JOptionPane.showMessageDialog(frame, msg, title,
 					      JOptionPane.PLAIN_MESSAGE);
+	    } else if(c.getContentType()
+	       .toLowerCase()
+	       .equals("text/html; charset=utf-8")) {
+		int len =  c.getContentLength();
+		InputStream is = c.getInputStream();
+		InputStreamReader r = new InputStreamReader
+		    (is, "UTF-8");
+		char data[] =new char[len];
+		r.read(data, 0, len);
+		String msg =
+		    new String(data);
+		int ind = msg.indexOf("<BODY>");
+		boolean msgOK = false;
+		if (ind > -1) {
+		    msg = "<HTML>" + msg.substring(ind+1);
+		    ind = msg.indexOf ("</BODY>");
+		    if (ind > -1) {
+			msg = msg.substring(0, ind) + "</HTML>";
+			msgOK = true;
+		    }
+		}
+		if (!msgOK) msg = errorMsg("status", rcode);
+		JOptionPane.showMessageDialog(frame, msg, title,
+					      JOptionPane.PLAIN_MESSAGE);
 	    }
 	    break;
 	case 409:
@@ -1352,7 +1387,7 @@ public class SBL {
 		indx++;
 		if (indx == argv.length) {
 		    String msg = errorMsg("missingArg", "--uri");
-			System.err.println("sbl: " + msg);;
+			System.err.println("sbl: " + msg);
 			System.exit(1);
 		}
 		uriS = argv[indx];
@@ -1360,7 +1395,7 @@ public class SBL {
 		indx++;
 		if (indx == argv.length) {
 		    String msg = errorMsg("missingArg", "--base");
-			System.err.println("sbl: " + msg);;
+			System.err.println("sbl: " + msg);
 			System.exit(1);
 		}
 		baseS = argv[indx];
@@ -1667,10 +1702,9 @@ public class SBL {
 		    ConfigPropUtilities.decodeRecipients(tmp);
 		String cemode = decoded.getProperty("need");
 		String dmode = decoded.getProperty("sbl.downloaded");
-		if (dmode == null) dmode = "falset";
+		if (dmode == null) dmode = "false";
 		if (dmode.equals("true")) {
-		    // if the "need" property is not null and
-		    // the "sbl.downloaded" property has the value "true",
+		    // if the "sbl.downloaded" property has the value "true",
 		    // then delete the config file when SBL exits.
 		    configFile.deleteOnExit();
 		    if (cemode == null) {
@@ -1765,7 +1799,7 @@ public class SBL {
 				    }
 				} else {
 				    try {
-					String encodedUser =URLEncoder
+					String encodedUser = URLEncoder
 					    .encode(button1User, UTF8);
 					URL url = new URL(uriS2 + button1Path);
 					button2URI = new
@@ -1791,8 +1825,6 @@ public class SBL {
 					    os.close();
 					    // processHttpURCL will set up
 					    // cpe if the status code is 201
-					    System.out.println("frame = "
-							       + frame);
 					    switch(processHttpURLC
 						   (frame, button1User, c,
 						    "pgpCnflct")) {
@@ -1890,6 +1922,7 @@ public class SBL {
 		    };
 		    SwingUtilities.invokeLater(() -> {
 			    frame = new JFrame(errorMsg("title", titleText));
+			    frame.setIconImages(getIconList());
 			    SwingErrorMessage.setComponent(frame);
 			    JPanel panel = new JPanel(new GridLayout(2, 1));
 			    JPanel panel2 = null;
@@ -1925,7 +1958,14 @@ public class SBL {
 			    button3.addActionListener((e) -> {
 				    System.exit(0);
 				});
-			    if (kip.fprs.length == 1) {
+			    if (kip == null) {
+				message = errorMsg("nonEmailLogin", user);
+				label = new JLabel(message);
+				panel2 = new JPanel(new GridLayout(1, 3));
+				panel2.add(button1);
+				panel2.add(button2);
+				panel2.add(button3);
+			    } else if (kip.fprs.length == 1) {
 				fpr = kip.fprs[0];
 				gpgPublicKey = getGPGPublicKey(fpr);
 				try {
@@ -1967,6 +2007,17 @@ public class SBL {
 				    cpe.requestPassphrase(frame);
 				}
 				configTrust(frame);
+			    }
+			    // Add shortcut - when we just downloaded an
+			    // SBL file from the server for a login, we
+			    // would want to run it immediately to reduce
+			    // the amount of user interaction.
+			    if (noUpload) {
+				button1AL.actionPerformed
+				    (new ActionEvent(button1,
+						     ActionEvent
+						     .ACTION_PERFORMED,
+						     "run"));
 			    }
 			});
 		    return;
@@ -2070,6 +2121,7 @@ public class SBL {
 			    String titleText = errorMsg("titleText", ourbase);
 			    String user = decoded.getProperty("user");
 			    frame = new JFrame(errorMsg("title", titleText));
+			    frame.setIconImages(getIconList());
 			    SwingErrorMessage.setComponent(frame);
 			    JPanel panel = new JPanel(new GridLayout(2, 1));
 			    String message1 =

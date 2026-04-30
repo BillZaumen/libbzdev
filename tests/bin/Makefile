@@ -610,6 +610,9 @@ restore:
 		RestoreTest.java
 	java -classpath ../../BUILD/libbzdev-base.jar:classes RestoreTest
 
+firefox-demo:
+	firefox https://localhost:8443/
+
 clean:
 	rm -fr junk raf tmp.png
 	chmod u-x ./run ./run1

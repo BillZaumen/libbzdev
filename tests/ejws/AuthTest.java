@@ -19,10 +19,6 @@ public class AuthTest {
 	    });
 	String key = sb.toString();
 
-	String email = EjwsAuthenticator.storeGPGKey(gpgdir, key)
-	    .getEmailAddress();
-	System.out.println("stored key for " + email);
-	
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
 
 	EmbeddedWebServer ews = new
@@ -36,6 +32,9 @@ public class AuthTest {
 	File dir = new File(argv[2]);
 	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, "realm");
 	auth.setGPGHome(gpgdir);
+	String email = auth.showGPGKey(key).getEmailAddress();
+	System.out.println("stored key for " + email);
+
 	ews.add("/", DirWebMap.class, dir, auth, true, true, true);
 	auth.createUser(email, "Example", null)
 	    .setURI("login.html")

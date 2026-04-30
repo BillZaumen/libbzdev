@@ -21,6 +21,10 @@ public class Demo {
  	
 	String host = argv[3];
 
+	String adminEmail = (argv.length > 5)? argv[4]: null;
+	String adminFpr = (argv.length > 5)? argv[5]: null;
+
+
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
 
 	String ksname = host + "-ks.jks";
@@ -39,26 +43,34 @@ public class Demo {
 	auth.setTruststore(System.getProperty("user.dir") + "/" + ksname);
 	auth.setAllowLoopback(true);
 	auth.setSelfSigned(true);
+	if (adminEmail != null) {
+	    auth.addToAdminMap(adminEmail, adminFpr);
+	}
 	auth.setCanAddAccount(true);
-	// auth.setCanAddAccount(false);
+	auth.setDefaultActive(false);
+
 
 	File tdir = new File(argv[0]);
 	File dir = new File(argv[1]);
+
 
 	System.out.println("auth mode = " + auth.getMode());
 
 	auth.setTracer(System.out);
 
-	URI logoutURI = (argv.length == 1 || !argv[1].startsWith("--"))?
-	    new URI("https://www.google.com"): new URI(argv[1]);
+	URI logoutURI = new URI("https://localhost:8443/loginpage.html");
 
 	ews.add("/", DirWebMap.class, tdir, null, true, true, true)
 	    .addWelcome("loginpage.html");
+	System.out.println("added /");
 
 	ews.add("/docs/", DirWebMap.class, dir, auth, true, true, true)
 	    .addWelcome("index.html")
-	    .setLoginAlias("login.html", "", true)
-	    .setLogoutAlias("logout.html", logoutURI);
+	    .setLoginAlias("login", "", true)
+	    .setLogoutAlias("logout", logoutURI)
+	    .setAdminAlias("admin");
+	System.out.println("added /docs/");
+	auth.loadFromDirs();
 
 	auth.setLoginFunction((p, t) -> {
 		System.out.println("login: " + p.getUsername());
@@ -76,6 +88,7 @@ public class Demo {
 	// cws.start();
 
 	ews.setTracer("/", System.out);
+	System.out.println("starting ews");
 	ews.start();
     }
 

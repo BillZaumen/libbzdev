@@ -574,6 +574,12 @@ authtest:
 	$(JAVA) AuthTest test-gpgdir gpgkey.asc \
 		/usr/share/doc/libbzdev-doc/api/
 
+authtest2:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) AuthTest2 test-gpgdir
+
 # Change to pang or local for running demo on laptop
 HOST=thelio
 
@@ -591,6 +597,18 @@ demo-local:
 	$(JAVA)	Demo `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
 		`pwd`/test-gpgdir local
 
+demo-noaccount:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar Demo.java
+	$(JAVA)	Demo `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
+		`pwd`/test-gpgdir local $(EMAIL) \
+		`make --no-print-directory fingerprint EMAIL=$(EMAIL)` \
+		2>&1
+
+fingerprint:
+	@gpg --fingerprint --with-colons $(EMAIL) | head -n 3 | \
+		grep fpr: | sed -e s/fpr:::::::::// | sed -e s/://
 
 firefox-demo:
 	firefox https://localhost:8443/

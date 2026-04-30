@@ -256,7 +256,11 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	if (map.containsKey(username)) {
 	    throw new IllegalStateException(errorMsg("hasUser", username));
 	}
-	map.put(username, new Entry(password, null));
+	if (utable != null) {
+	    utable.putEntry(username, new Entry(password, null));
+	} else {
+	    map.put(username, new Entry(password, null));
+	}
     }
 
     /**
@@ -276,8 +280,27 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	if (map.containsKey(username)) {
 	    throw new IllegalStateException(errorMsg("hasUser", username));
 	}
-	map.put(username, new Entry(password, roles));
+	if (utable != null) {
+	    utable.putEntry(username, new Entry(password, roles));
+	} else {
+	    map.put(username, new Entry(password, roles));
+	}
     }
+
+    EjwsUserTable<EjwsBasicAuthenticator,EjwsBasicAuthenticator.Entry>
+	utable = null;
+
+
+    public void
+	setUserTable(EjwsUserTable
+		     <EjwsBasicAuthenticator,EjwsBasicAuthenticator.Entry>
+		     utable)
+    {
+	this.utable = utable;
+	utable.setMap(map);
+	utable.setAuth(this);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -290,11 +313,62 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	    throw new IllegalStateException(errorMsg("hasUser", userName));
 	}
 	Entry entry = new Entry(info.getPassword(), info.getRoles());
-	entry.setActive(info.isActive());
+	// entry.setActive(info.isActive());
+	if (info.isActive()) entry.makeActive();
 	// entry.setSBLCompressed(info.isSBLCompressed());
 	// entry.setSBL(info.getSBL());
-	map.put(userName, entry);
+	if (utable != null) {
+	    utable.putEntry(userName, entry);
+	} else {
+	    map.put(userName, entry);
+	}
     }
+
+    public boolean removeUser(String name) {
+	try {
+	    if (utable != null) {
+		return utable.removeEntry(name);
+	    } else {
+		return (map.remove(name) != null);
+	    }
+	} catch (Exception e) {
+	    return false;
+	}
+    }
+
+    public boolean makeUserActive(String name) {
+	if (utable != null) {
+	    /*
+	    EjwsBasicAuthenticator.Entry entry = utable.getEntry(name);
+	    if (entry != null) {
+		boolean old = entry.isActive();
+		entry.setActive(true);
+		if(!utable.putEntry(name, entry)) {
+		    entry.setActive(old);
+		    return false;
+		}
+	    } else {
+		return false;
+	    }
+	    */
+	    return utable.makeActive(name);
+	} else {
+	    EjwsBasicAuthenticator.Entry entry = map.get(name);
+	    if (entry != null) {
+		// entry.setActive(true);
+		entry.makeActive();
+	    } else {
+		return false;
+	    }
+	    return true;
+	}
+    }
+
+    public void loadFromDirs() throws UnsupportedOperationException
+    {
+	throw new UnsupportedOperationException();
+    }
+
 
     public void handleError(HttpExchange t,  Exception e)
 	throws IOException
@@ -317,8 +391,6 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	t.sendResponseHeaders(409, len);
 	t.getResponseBody().write(response);
     }
-
-
 
     FileHandler fileHandler = null;
 

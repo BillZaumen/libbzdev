@@ -2079,11 +2079,10 @@ public abstract class ConfigPropertyEditor {
 	*/
 	if (password == null) {
 	    boolean useGPG = useGPG();
-	    Component saved = pwowner;
-	    pwowner = owner;
-	    password = requestPassphrase(owner, useGPG, false);
-	    pwowner = saved;
-	    pwverified = useGPG;
+	    try (var saved = pushOwner(owner)) {
+		password = requestPassphrase(owner, useGPG, false);
+		pwverified = useGPG;
+	    }
 	}
     }
 
@@ -3153,6 +3152,49 @@ public abstract class ConfigPropertyEditor {
      */
     public void setPWOwner(Component owner) {
 	pwowner = owner;
+    }
+
+    /**
+     * Data structure for temporarily saving a new password owner for the
+     * duration of a try-with-resource block.
+     */
+    public class SavedOwner implements AutoCloseable {
+	Component saved = pwowner;
+	SavedOwner(Component newOwner) {
+	    saved = pwowner;
+	    pwowner = newOwner;
+	}
+
+	/**
+	 * Restore the saved password owner.
+	 * This will typically be called automatically at the end of
+	 * a try-with-resource block.
+	 */
+	public void close() {
+	    pwowner = saved;
+	}
+    }
+
+    /**
+     * Temporarily set a new password owner for the duration of
+     * a try-with-resource block.
+     * The owner may be overridden if try-with-resource blocks are
+     * nested.
+     * <P>
+     * Example:
+     * <BLOCKQUOTE><PRE><CODE>
+     *  Component component = ...;
+     *  ConfigPropertyEditor cpe = ...;
+     *  try (var saved = cpe.puahsOwner(component)) {
+     *     ...;
+     *  }
+     * </BLOCKQUOTE></CODE></PRE>
+     * *@param newOwner the new password owner (the component over which
+     *         a dialog box will be centered)
+     * @return the object saving the previous password owner
+     */
+    public SavedOwner pushOwner(Component newOwner) {
+	return new SavedOwner(newOwner);
     }
 
 

@@ -396,6 +396,14 @@ abstract public class WebMap {
     }
 
 
+    public WebMap setAdminAlias(String alias)
+	throws IllegalArgumentException
+    {
+	fileHandler.setAdminAlias(alias);
+	return this;
+    }
+
+
 
     File root = null;
     URI rootURI = null;

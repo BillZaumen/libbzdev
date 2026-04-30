@@ -2,18 +2,24 @@
   <HEAD><TITLE>DEMO</TITLE>
  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<STYLE TYPE="text/css">
-	  BODY {background-color: rgb(10,10,25); color: rgb(255,255,255);}
+	  BODY {background-color: rgb(10,10,25); color: rgb(255,255,255);
+		font-size: 125%;
+	       }
 	</STYLE>
   </HEAD>
   <BODY>
-    <FORM action="/docs/login.html" method="get"
+    <H1>Login / Account Setup</H1>
+    <P>
+    <FORM action="/docs/login" method="get"
 	  enctype="application/x-www-form-urlencoded">
       <STRONG>Email Address:</STRONG>
-      <INPUT type="text" name="user" size="40"><BR>
+      <INPUT type="text" name="user" size="40"><BR><BR>
       <INPUT type="radio" name="uploadtype" value="login" checked>
       <STRONG>Login</STRONG><BR>
       <INPUT type="radio" name="uploadtype" value="pgpkey">
       <STRONG>New Account</STRONG><BR>
+      <INPUT type="radio" name="uploadtype" value="delete">
+      <STRONG>Delete Account</STRONG><BR><BR>
       <INPUT type="submit" value="Submit"><BR>
     </FORM>
   </BODY>

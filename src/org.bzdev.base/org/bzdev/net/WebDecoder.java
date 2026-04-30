@@ -251,6 +251,9 @@ public class WebDecoder {
 	throws IllegalArgumentException
     {
 	Map<String,String> map = new LinkedHashMap<String,String>();
+	if (string == null) {
+	    return map;
+	}
 
 	String delimiter = semicolonDelimiter? ";": "&";
 	StringTokenizer tk = new StringTokenizer(string, delimiter, false);
