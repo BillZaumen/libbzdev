@@ -613,6 +613,14 @@ public class SBL {
 		for (String k: keys) {
 		    cfProps.setProperty(k, ourProps.getProperty(k));
 		}
+		String fname = cf.getName();
+		if (fname != null) {
+		    if (fname.toLowerCase().endsWith(".sbl")) {
+			int last = fname.length() - ".sbl".length();
+			fname = fname.substring(0, last);
+		    }
+		}
+		cfProps.setProperty("title", errorMsg("standardTitle", fname));
 		break;
 	    }
 	}
@@ -2438,7 +2446,7 @@ public class SBL {
 			{
 			    String base = ourProps.getProperty("base");
 			    String msg = errorMsg("loginForDesc", base);
-			    cpe.set(frame, key + "description", msg);
+			    cpe.set(frame, key + ".description", msg);
 			}
 			/*
 			cpe.set(frame, key + ".description",
