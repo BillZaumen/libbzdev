@@ -1341,8 +1341,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				String string = requestURI.toString();
 				String msg;
 				if (type == null || type.equals("login")) {
-				    msg =
-					errorMsg("noUserAccount", username);
+				    if (map.containsKey(username)) {
+					msg =
+					    errorMsg("useSBL", username);
+				    } else {
+					msg =
+					    errorMsg("noUserAccount", username);
+				    }
 				} else {
 				    msg =
 					errorMsg("badAccountCreation", string);
