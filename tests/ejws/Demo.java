@@ -39,6 +39,7 @@ public class Demo {
 
 	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, realm);
 	auth.setGPGHome(new File(argv[2]));
+	auth.setSBLDir(new File(System.getProperty("user.dir") + "/sbldir"));
 	auth.setTracer(System.out);
 	auth.setTruststore(System.getProperty("user.dir") + "/" + ksname);
 	auth.setAllowLoopback(true);
@@ -58,7 +59,7 @@ public class Demo {
 
 	auth.setTracer(System.out);
 
-	URI logoutURI = new URI("https://localhost:8443/loginpage.html");
+	URI logoutURI = new URI("https://" + host + ":8443/loginpage.html");
 
 	ews.add("/", DirWebMap.class, tdir, null, true, true, true)
 	    .addWelcome("loginpage.html");

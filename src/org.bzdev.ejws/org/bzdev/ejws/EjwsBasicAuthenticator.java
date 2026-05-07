@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.time.Instant;
 import com.sun.net.httpserver.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +12,10 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -301,6 +306,12 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	utable.setAuth(this);
     }
 
+    public EjwsUserTable<EjwsBasicAuthenticator,EjwsBasicAuthenticator.Entry>
+	getUserTable()
+    {
+	return utable;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -324,43 +335,80 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 	}
     }
 
+    public boolean removeUser(String name, boolean gpg) {
+	if (gpg) {
+	    return false;
+	} else {
+	    File target = new File(sbldir, name +"--a");
+	    if (!target.exists()) {
+		target = new File(sbldir, name + "--p");
+	    }
+	    if (!target.exists()) {
+		target = new File(sbldir, name + "--r");
+	    }
+	    if (!target.exists()) {
+		target = new File(sbldir, name);
+		if (target.exists()) {
+		    // clean up only - a previous case failed.
+		    target.delete();
+		}
+		return false;
+	    }
+	    target.delete();
+	    boolean status = (map.remove(name) != null);
+	}
+	boolean status = (map.remove(name) != null);
+	return status;
+    }
+
     public boolean removeUser(String name) {
 	try {
 	    if (utable != null) {
 		return utable.removeEntry(name);
 	    } else {
-		return (map.remove(name) != null);
+		return removeUser(name, false);
 	    }
 	} catch (Exception e) {
 	    return false;
 	}
     }
 
+    public boolean makeUserActive(String name, boolean gpg) {
+	EjwsBasicAuthenticator.Entry entry = map.get(name);
+	if (entry == null) {
+	    return false;
+	}
+	if (gpg) {
+	    return false;
+	} else if (sbldir != null) {
+	    try {
+		File pending = new File(sbldir, name + "--p");
+		File target = new File(sbldir, name + "--a");
+		if (pending.exists()) {
+		    Path ppath = pending.toPath();
+		    Path tpath  = target.toPath();
+		    try {
+			Files.move(ppath, tpath,
+				   StandardCopyOption.ATOMIC_MOVE);
+		    } catch (AtomicMoveNotSupportedException e) {
+			Files.move(ppath, tpath);
+		    }
+		}
+	    } catch (Exception e) {
+		return false;
+	    }
+	} else {
+	    return false;
+	}
+	entry.makeActive();
+	return true;
+    }
+
     public boolean makeUserActive(String name) {
 	if (utable != null) {
-	    /*
-	    EjwsBasicAuthenticator.Entry entry = utable.getEntry(name);
-	    if (entry != null) {
-		boolean old = entry.isActive();
-		entry.setActive(true);
-		if(!utable.putEntry(name, entry)) {
-		    entry.setActive(old);
-		    return false;
-		}
-	    } else {
-		return false;
-	    }
-	    */
 	    return utable.makeActive(name);
 	} else {
-	    EjwsBasicAuthenticator.Entry entry = map.get(name);
-	    if (entry != null) {
-		// entry.setActive(true);
-		entry.makeActive();
-	    } else {
-		return false;
-	    }
-	    return true;
+	    return makeUserActive(name, false);
 	}
     }
 
@@ -539,10 +587,13 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 			if (contentType.equals(SBLDATA)) {
 			    // System.out.println("saw contentType " + SBLDATA);
 			    try {
-				String s = storeSBLData(is);
 				if (getCanAddAccount()) {
+				    String s = readSBLData(is);
 				    String uname = getUserNameFromSBL(s);
 				    AddStatus status = getUserStatus(uname);
+				    if (status != AddStatus.REJECTED) {
+					storeSBLData(s, status);
+				    }
 				    String uriString = generateRequestURI(null);
 				    String msg =
 					errorMsg("pleaseVisit", uriString);
@@ -552,9 +603,14 @@ public class EjwsBasicAuthenticator extends EjwsAuthenticator {
 					msg =
 					    errorMsg("processingAC", uriString);
 					rc = 202;
-					// fall though
+					createUser(s, null)
+					    .setActive(false)
+					    .addUser();
+					break;
 				    case OK:
-					createUser(s, null);
+					createUser(s, null)
+					    .setActive(true)
+					    .addUser();
 					break;
 				    case REJECTED:
 					rc = 403;

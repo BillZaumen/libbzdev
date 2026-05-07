@@ -1070,9 +1070,19 @@ public class FileHandler implements HttpHandler {
 				for (String email: emails) {
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
-				    km.put("name", email +":d");
-				    km.put("hname", email+":p");
+				    km.put("name", email +":s");
 				    km.put("value", email);
+				    km.put("hname", email+":t");
+				    km.put("hvalue", email);
+				    kmlist.add(km);
+				}
+				for (String email: auth.getSBLUsers(false)) {
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":s");
+				    km.put("value", email);
+				    km.put("hname", email+":t");
+				    km.put("hvalue", email+"--p");
 				    kmlist.add(km);
 				}
 			    } else if (pmode.equals("active")) {
@@ -1082,8 +1092,19 @@ public class FileHandler implements HttpHandler {
 				for (String email: emails) {
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
-				    km.put("name", email +":d");
+				    km.put("name", email +":s");
 				    km.put("value", email);
+				    km.put("hname", email + ":t");
+				    km.put("hvalue", email);
+				    kmlist.add(km);
+				}
+				for (String email: auth.getSBLUsers(true)) {
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":s");
+				    km.put("value", email);
+				    km.put("hname", email+":t");
+				    km.put("hvalue", email +"--a");
 				    kmlist.add(km);
 				}
 			    } else {
@@ -1137,8 +1158,10 @@ public class FileHandler implements HttpHandler {
 			if (contentType
 			    .equals("application/x-www-form-urlencoded")) {
 			    Map<String,String> map = WebDecoder.formDecode(is);
-			    Set<String> deleteSet = new HashSet<String>();
-			    Set<String> activateSet = new HashSet<String>();
+			    Map<String,String> deleteMap =
+				new HashMap<String,String>();
+			    Map<String,String> activateMap
+				= new HashMap<String,String>();
 			    Set<String> ignoreSet = new HashSet<String>();
 			    String[] keys = map.keySet()
 				.toArray(new String[map.size()]);
@@ -1149,34 +1172,56 @@ public class FileHandler implements HttpHandler {
 			    }
 			    if (option.equals("deleteSelected")) {
 				for (String key: keys) {
+				    String hkey = key
+					.substring(0, key.length()-2) +":t";
 				    String email = map.get(key);
-				    if (key.endsWith(":d")) {
-					deleteSet.add(email);
+				    String target = map.get(hkey);
+				    /*
+				    System.out.println("checking " + email
+						       +", " + target);
+				    */
+				    if (key.endsWith(":s")) {
+					deleteMap.put(email, target);
 				    }
 				}
 			    } else if (option.equals("makeSelectedActive")) {
 				for (String key: keys) {
+				    String hkey = key
+					.substring(0, key.length()-2) +":t";
 				    String email = map.get(key);
-				    if (key.endsWith(":d")) {
-					activateSet.add(email);
+				    String target = map.get(hkey);
+				    if (key.endsWith(":s")) {
+					activateMap.put(email, target);
 				    }
 				}
 			    } else if (option.equals("makeUnselectedActive")) {
 				for (String key: keys) {
 				    String email = map.get(key);
-				    if (key.endsWith(":d")) {
+				    if (key.endsWith(":s")) {
 					ignoreSet.add(email);
-				    } else if (!ignoreSet.contains(email)) {
-					activateSet.add(email);
+				    } else if (key.endsWith(":t")) {
+					String target = email;
+					String hkey = key;
+					email = hkey
+					    .substring(0, key.length()-2);
+					if (!ignoreSet.contains(email)) {
+					    activateMap.put(email, target);
+					}
 				    }
 				}
 			    } else if (option.equals("deleteUnselected")) {
 				for (String key: keys) {
 				    String email = map.get(key);
-				    if (key.endsWith(":d")) {
+				    if (key.endsWith(":s")) {
 					ignoreSet.add(email);
-				    } else if (!ignoreSet.contains(email)) {
-					deleteSet.add(email);
+				    } else if (key.endsWith(":t")) {
+					String target = email;
+					String hkey = key;
+					email = hkey
+					    .substring(0, key.length()-2);
+					if (!ignoreSet.contains(email)) {
+					    deleteMap.put(email, target);
+					}
 				    }
 				}
 			    }
@@ -1184,15 +1229,15 @@ public class FileHandler implements HttpHandler {
 			    if (a != null && a instanceof EjwsAuthenticator) {
 				EjwsAuthenticator auth = (EjwsAuthenticator) a;
 				/*
-				for (String email: deleteSet) {
+				for (String email: deleteMap.keySet()) {
 				    System.out.println("... delete " + email);
 				}
-				for (String email: activateSet) {
+				for (String email: activateMap.keySet()) {
 				    System.out.println("... activate " + email);
 				}
 				*/
-				auth.processAdminRequests(deleteSet,
-							  activateSet);
+				auth.processAdminRequests(deleteMap,
+							  activateMap);
 			    }
 			}
 		    } catch (Exception e){

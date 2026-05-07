@@ -723,6 +723,61 @@ public abstract class ConfigPropertyEditor {
 	}
     }
 
+    /**
+     * Request a new passphrase.
+     * This method will not have any effect when GPG is used.
+     */
+    public void requestNewPassphrase() {
+	requestNewPassphrase(pwowner);
+    }
+
+    /**
+     * Request a new passphrase given an owner component.
+     * This method will not have any effect when GPG is used.
+     * @param owner the component used to center a dialog box.
+     */
+    public void requestNewPassphrase(Component owner) {
+	if (useGPG() == false) {
+	    clearPassphrase();
+	    requestPassphrase(owner);
+	    pwconfirm.incrementAndGet();
+	    if (!pwverified) {
+		do {
+		    char[] currentpw = password.clone();
+		    clearPassphrase();
+		    requestPassphrase(owner);
+		    // System.out.println("next pw = " + new String(password));
+		    if (currentpw.length == password.length) {
+			boolean pwv = true;
+			for (int i = 0; i < password.length; i++) {
+			    if (password[i] != currentpw[i]) {
+				/*
+				System.out.println("... i = " + i
+						   +", " + password[i]
+						   +  " != " +currentpw[i]);
+				*/
+				pwv = false;
+				break;
+			    }
+			}
+			if (pwv) {
+			    pwverified = true;
+			    // System.out.println("pwverified = " + pwverified);
+			    for (int i = 0; i < currentpw.length; i++) {
+				currentpw[i] = '\0';
+			    }
+			}
+		    } else {
+			// System.out.println("unequal lengths");
+			pwverified = false;
+		    }
+		} while (pwverified == false);
+	    }
+	    pwconfirm.decrementAndGet();
+	}
+    }
+
+
     private String encrypt(String value, String[] recipients) {
 	if (value == null || value.length() == 0) return EMPTY_STRING;
 	if (useGPG() == false) {

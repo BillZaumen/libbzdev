@@ -2,6 +2,10 @@ package org.bzdev.ejws;
 
 import com.sun.net.httpserver.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +17,10 @@ import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -664,63 +672,218 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	}
     }
 
-    public boolean removeUser(String name) {
-	try {
-	    if (utable != null) {
-		return utable.removeEntry(name);
-	    } else {
+    public boolean removeUser(String name, boolean gpg) {
+	if (gpg) {
+	    if (hasGPGKey(name)) {
 		try {
 		    String fpr = getFingerprint(name);
 		    if (fpr != null) {
 			deleteWithFingerprint(fpr);
 		    }
 		} catch (Exception e) {
-		    System.err.println("GPG delete failed: " + e.getMessage());
+		    System.err.println("GPG delete failed: "
+				       + e.getMessage());
 		}
-		return (map.remove(name) != null);
+	    }
+	} else {
+	    File target = new File(sbldir, name +"--a");
+	    if (!target.exists()) {
+		target = new File(sbldir, name + "--p");
+	    }
+	    if (!target.exists()) {
+		target = new File(sbldir, name + "--r");
+	    }
+	    if (!target.exists()) {
+		target = new File(sbldir, name);
+		if (target.exists()) {
+		    // clean up only - a previous case failed.
+		    target.delete();
+		}
+		return false;
+	    }
+	    target.delete();
+	    boolean status = (map.remove(name) != null);
+	}
+	boolean status = (map.remove(name) != null);
+	return status;
+    }
+
+    public boolean removeUser(String name) {
+	boolean status = false;
+	File gpgdir = gpghome();
+	File sbldir = getSBLDir();
+	try {
+	    if (utable != null) {
+		status = utable.removeEntry(name);
+		return status;
+	    } else {
+		if (gpgdir != null && hasGPGKey(name)) {
+		    try {
+			String fpr = getFingerprint(name);
+			if (fpr != null) {
+			    deleteWithFingerprint(fpr);
+			}
+		    } catch (Exception e) {
+			System.err.println("GPG delete failed: "
+					   + e.getMessage());
+		    }
+		    status = (map.remove(name) != null);
+		    return status;
+		} else if (sbldir != null) {
+		    File target = new File(sbldir, name +"--a");
+		    if (!target.exists()) {
+			target = new File(sbldir, name + "--p");
+		    }
+		    if (!target.exists()) {
+			target = new File(sbldir, name + "--r");
+		    }
+		    if (!target.exists()) {
+			target = new File(sbldir, name);
+			if (target.exists()) {
+			    // clean up only - a previous case failed.
+			    target.delete();
+			}
+			status = false;
+			return status;
+		    }
+		    target.delete();
+		    status = (map.remove(name) != null);
+		    return status;
+		}
+		status = false;
+		return status;
 	    }
 	} catch (Exception e) {
-	    return false;
+	    status = false;
+	    return status;
+	} finally {
+	    if (onAccountRemoval != null) {
+		onAccountRemoval.accept(name, status);
+	    }
 	}
     }
 
-    public boolean makeUserActive(String name) {
-	if (utable != null) {
-	    return utable.makeActive(name);
-	} else {
-	    EjwsSecureBasicAuth.Entry entry = map.get(name);
-	    if (entry != null) {
-		try {
-		    if (!getTrustedKeyIDs().contains(name)) {
-			if (hasGPGKey(name)) {
-			    if (validGPGUser(name) == false) {
-				signKey(name);
-			    }
-			}
-		    }
-		} catch (Exception e){}
-		// entry.setActive(true);
-		entry.makeActive();
-	    } else {
-		try {
-		    if (hasGPGKey(name)) {
-			if (validGPGUser(name) == false) {
-			    signKey(name);
-			}
-			String alias = savedAlias;
-			String uriString = generateRequestURI(null);
-			String recipients[] = {name};
-			createUser(name, uriString, recipients, null)
-			    .setURI(alias)
-			    .setActive(true)
-			    .addUser(true);
-			return true;
-		    }
-		} catch (Exception e){};
+    public boolean makeUserActive(String name, boolean gpg) {
+	EjwsSecureBasicAuth.Entry entry = map.get(name);
+	if (entry == null) {
+	    return false;
+	}
+	if (gpg) {
+	    try {
+		if (!validGPGUser(name)
+		    && !getTrustedKeyIDs().contains(name)) {
+		    signKey(name, true);
+		}
+	    } catch (Exception e) {
 		return false;
 	    }
+	} else if (sbldir != null) {
+	    try {
+		File pending = new File(sbldir, name + "--p");
+		File target = new File(sbldir, name + "--a");
+		if (pending.exists()) {
+		    Path ppath = pending.toPath();
+		    Path tpath  = target.toPath();
+		    try {
+			Files.move(ppath, tpath,
+				   StandardCopyOption.ATOMIC_MOVE);
+		    } catch(AtomicMoveNotSupportedException e) {
+			Files.move(ppath, tpath);
+		    }
+		} else if (!target.exists()) {
+		    return false;
+		}
+	    } catch (IOException e) {
+		return false;
+	    }
+	} else {
+	    return false;
 	}
+	entry.makeActive();
 	return true;
+    }
+
+    public boolean makeUserActive(String name) {
+	boolean status = false;
+	try {
+	    if (utable != null) {
+		status =  utable.makeActive(name);
+		return status;
+	    } else {
+		EjwsSecureBasicAuth.Entry entry = map.get(name);
+		File sbldir = getSBLDir();
+		if (entry != null) {
+		    try {
+			if (!getTrustedKeyIDs().contains(name)) {
+			    if (hasGPGKey(name)) {
+				if (validGPGUser(name) == false) {
+				    signKey(name, true);
+				}
+			    } else if (sbldir != null) {
+				File pending = new File(sbldir, name + "--p");
+				File target = new File(sbldir, name + "--a");
+				if (pending.exists()) {
+				    Path ppath = pending.toPath();
+				    Path tpath  = target.toPath();
+				    try {
+					Files.move(ppath, tpath,
+						   StandardCopyOption
+						   .ATOMIC_MOVE);
+				    }catch(AtomicMoveNotSupportedException e) {
+					Files.move(ppath, tpath);
+				    }
+				}
+			    }
+			}
+		    } catch (Exception e){}
+		    // entry.setActive(true);
+		    entry.makeActive();
+		} else {
+		    try {
+			if (hasGPGKey(name)) {
+			    if (validGPGUser(name) == false) {
+				signKey(name, true);
+			    }
+			    String alias = savedAlias;
+			    String uriString = generateRequestURI(null);
+			    String recipients[] = {name};
+			    createUser(name, uriString, recipients, null)
+				.setURI(alias)
+				.setActive(true)
+				.addUser(true);
+			    status = true;
+			    return status;
+			} else if (sbldir != null) {
+			    File pending = new File(sbldir, name + "--p");
+			    File target = new File(sbldir, name + "--a");
+			    if (pending.exists()) {
+				Path ppath = pending.toPath();
+				Path tpath  = target.toPath();
+				try {
+				    Files.move(ppath, tpath,
+					       StandardCopyOption.ATOMIC_MOVE);
+				}catch(AtomicMoveNotSupportedException e) {
+				    Files.move(ppath, tpath);
+				}
+				String s =
+				    readSBLData(new FileInputStream(target));
+				createUser(s, null)
+				    .setActive(true)
+				    .addUser();
+			    }
+			}
+		    } catch (Exception e){};
+		    status = false;
+		    return status;
+		}
+	    }
+	    status = true;
+	    return status;
+	} finally {
+	    if (onAccountActive != null) {
+		onAccountActive.accept(name, status);
+	    }
+	}
     }
 
     private boolean notLoadedFromGPG = true;
@@ -766,8 +929,47 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		}
 	    }
 	}
-	if (notLoadedFromSBL && getSBLDir() != null) {
+	File sbldir = getSBLDir();
+	if (notLoadedFromSBL && sbldir != null) {
 	    notLoadedFromSBL = false;
+	    try {
+		for (File f: sbldir.listFiles()) {
+		    // System.out.println("... checking " + f.getName());
+		    if (f.getName().endsWith("--a")) {
+			FileReader r = new FileReader(f, UTF8);
+			StringWriter w = new StringWriter();
+			r.transferTo(w);
+			String s = w.toString();
+			// System.out.println("... creating user");
+			createUser(s, null)
+			    .setActive(true)
+			    .addUser();
+		    } else if (f.getName().endsWith("--p")) {
+			FileReader r = new FileReader(f, UTF8);
+			StringWriter w = new StringWriter();
+			r.transferTo(w);
+			String s = w.toString();
+			createUser(s, null)
+			    .setActive(false)
+			    .addUser();
+		    } else {
+			System.err.println(f.getCanonicalPath()
+					   + " should be deleted");
+		    }
+		}
+		/*
+		for (Map.Entry<String,Entry> ent: map.entrySet()) {
+		    System.out.println(ent.getKey());
+		    Entry entry = ent.getValue();
+		    System.out.println(getMode());
+		    System.out.println(entry.getPassword());
+		    System.out.println(entry.getPEM());
+		    System.out.println(entry.isActive());
+		}
+		*/
+	    } catch (IOException eio) {
+		System.err.println(eio.getMessage());
+	    }
 	}
     }
 
@@ -781,6 +983,12 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	this.utable = utable;
 	utable.setMap(map);
 	utable.setAuth(this);
+    }
+
+    public EjwsUserTable<EjwsSecureBasicAuth,EjwsSecureBasicAuth.Entry>
+	getUserTable()
+    {
+	return utable;
     }
 
     /**
@@ -893,6 +1101,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     }
      */
 
+    /**
+     * Handle exceptions by sending an error response
+     * @param t the {@link HttpExchange} being processed
+     * @param e an exception that is being handled
+     */
     public void handleError(HttpExchange t,  Exception e)
 	throws IOException
     {
@@ -1182,9 +1395,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				if (getCanAddAccount() || isAdmin) {
 				    String uriString = generateRequestURI(null);
 				    String recipients[] = {email};
-				    storeGPGKey(value, keyids);
 				    AddStatus status = isAdmin?
 					AddStatus.OK: getUserStatus(email);
+				    if (status != AddStatus.REJECTED) {
+					storeGPGKey(value, keyids);
+				    }
 				    // boolean active = isActiveDefault();
 				    String msg =
 					errorMsg("pleaseVisit", uriString);
@@ -1224,6 +1439,9 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    setCookie(t, cookie);
 				    t.sendResponseHeaders(rc, data.length);
 				    t.getResponseBody().write(data);
+				    if (onAccountRequest != null) {
+					onAccountRequest.accept(email, status);
+				    }
 				    return new Authenticator.Success(null);
 				    // return null;
 				} else {
@@ -1238,10 +1456,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			} else if (contentType.equals(SBLDATA)) {
 			    // System.out.println("saw contentType " + SBLDATA);
 			    try {
-				String s = storeSBLData(is);
 				if (getCanAddAccount()) {
+				    String s = readSBLData(is);
 				    String uname = getUserNameFromSBL(s);
 				    AddStatus status = getUserStatus(uname);
+				    if (status != AddStatus.REJECTED) {
+					storeSBLData(s, status);
+				    }
 				    String uriString = generateRequestURI(null);
 				    String msg =
 					errorMsg("pleaseVisit", uriString);
@@ -1275,6 +1496,9 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    t.sendResponseHeaders(rc, bytes.length);
 				    OutputStream os = t.getResponseBody();
 				    os.write(bytes);
+				    if (onAccountRequest != null) {
+					onAccountRequest.accept(uname, status);
+				    }
 				} else {
 				    setCookie(t, cookie);
 				    t.sendResponseHeaders(404, -1);
@@ -1297,6 +1521,16 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    return new Authenticator.Success(null);
 		}
 		foundLogin = true;
+		String cvalue = cookie.getValue();
+		// System.out.println("foundLogin: cookie = " + cvalue);
+		if (loginMap.containsKey(cvalue)) {
+		    // to log out of an existing login so that
+		    // the browser will ask for a user name and
+		    // password.
+		    String olduser = loginMap.get(cvalue);
+		    // System.out.println("removing " + olduser);
+		    removePWInfo(olduser);
+		}
 	    }
 	}
 	// System.out.println("... past special processing");
@@ -1368,7 +1602,14 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    logoutFunction.accept((EjwsPrincipal)p, t);
 		}
 		PWInfoKey key = new PWInfoKey(un, cookie);
-		pwmap.remove(key);
+		if (pwmap.containsKey(key)) {
+		    pwmap.remove(key);
+		    loginMap.remove(cookie);
+		    /*
+		    System.out.println("... loginMap removed "
+				       + cookie.getValue());
+		    */
+		}
 	    } else if (!foundLogin && !foundLogout && authFunction != null) {
 		authFunction.accept((EjwsPrincipal)p, t);
 	    }
@@ -1475,14 +1716,28 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     private Set<PWInfoKey> logoutSet = Collections
 	.synchronizedSet(new HashSet<PWInfoKey>());
 
+    private Map<String,String> loginMap = Collections.
+	synchronizedMap(new HashMap<String,String>());
+
+
     /**
      * Remove an entry from the password map.
      * This is called when logging out.
      * @param username the user name
      */
     public void removePWInfo(String username) {
-	PWInfoKey key = new PWInfoKey(username, cookieTL.get());
+	ServerCookie cookie = cookieTL.get();
+	/*
+	System.out.println("removePWInfo called: " + username + ", "
+			   + cookie.getValue());
+	*/
+	PWInfoKey key = new PWInfoKey(username, cookie);
 	pwmap.remove(key);
+	loginMap.remove(cookie.getValue());
+	/*
+	System.out.println("logoutSet adding " + username + ", "
+			   + cookie.getValue());
+	*/
 	logoutSet.add(key);
     }
 
@@ -1528,7 +1783,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	long now = Instant.now().getEpochSecond();
 	// System.out.println("checking " + username + ", " + password);
 	InetAddress iaddr = addr.get();
-	PWInfoKey key = new PWInfoKey(username, cookieTL.get());
+	ServerCookie cookie = cookieTL.get();
+	PWInfoKey key = new PWInfoKey(username, cookie);
 	if (logoutSet.contains(key)) {
 	    logoutSet.remove(key);
 	    return false;
@@ -1556,6 +1812,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    } else {
 		if (pwinfo.password.equals(password)) {
 		    pwmap.remove(key);
+		    loginMap.remove(cookie.getValue());
 		    if (tracer != null) {
 			String ct = "" + Thread.currentThread().getId();
 			try {
@@ -1609,6 +1866,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			  new PWInfo(now + ((passphraseTimeout == 0)?
 					    TOFFSET: passphraseTimeout),
 				     password));
+		loginMap.put(cookie.getValue(), username);
+		/*
+		System.out.println("loginMap.put " + username + ", "
+				   + cookie.getValue());
+		*/
 		if (tracer != null) {
 		    String ct = "" + Thread.currentThread().getId();
 		    try {

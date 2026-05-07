@@ -17,49 +17,6 @@ public class GPGSecureBasicUT
     {
 	EjwsSecureBasicAuth auth = getAuthenticator();
 	auth.loadFromDirs();
-	/*
-	Set<String> userSet = auth.getGPGUsers(true);
-	userSet.addAll(auth.getAdminUsers());
-	for (String email: userSet) {
-	    String recipients[] = {email};
-	    String uriString = auth.generateRequestURI(null);
-	    String alias = auth.getLoginAlias();
-	    try {
-		if (true) {
-		    System.out.println("... loadEntriesFromDB: " + email);
-		    continue;
-		}
-		auth.createUser(email, uriString,recipients, null)
-		    .setURI(alias)
-		    .setActive(true)
-		    .addUser(true);
-	    } catch (IOException eio) {
-	    }
-	}
-	if (auth.isActiveDefault()) {
-	    for (String email: auth.getGPGUsers(false)) {
-		if (userSet.contains(email)) {
-		    // an entry in auth.getAdminUsers may not have been
-		    // signed, but was added above regardless.
-		    continue;
-		}
-		String recipients[] = {email};
-		String uriString = auth.generateRequestURI(null);
-		String alias = auth.getLoginAlias();
-		try {
-		    if (true) {
-			System.out.println("... loadEntriesFromDB: " + email);
-			continue;
-		    }
-		    auth.createUser(email, uriString, recipients, null)
-			.setURI(alias)
-			.setActive(true)
-			.addUser(true);
-		} catch (IOException eio) {
-		}
-	    }
-	}
-	*/
     }
 
     
@@ -101,7 +58,7 @@ public class GPGSecureBasicUT
     protected void makeActiveInDB(String user) throws Exception {
 	if (true) {System.out.println("... makeActiveInDB: " + user); return;}
 	EjwsSecureBasicAuth auth = getAuthenticator();
-	if (!auth.signKey(user)) {
+	if (!auth.signKey(user, auth.hasGPGKey(user))) {
 	    throw new Exception("cannot sign key for " + user);
 	}
     }

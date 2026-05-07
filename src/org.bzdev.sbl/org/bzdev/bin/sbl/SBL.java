@@ -276,6 +276,164 @@ public class SBL {
 	}
     }
 
+    private static boolean newKeyCreated = false;
+    private static String newKey = "user";
+
+    private static String getNewKey(ConfigEditor newcpe, Component component) {
+	// Change
+	HashSet<String> entries = new HashSet<String>();
+	if (newcpe != null) {
+	    int dlen = ".description".length();
+	    for (String k: newcpe.getProperties().stringPropertyNames()) {
+		k = k.trim();
+		int ind = k.lastIndexOf(".description");
+		int klen = k.length() - dlen;
+		if (ind != -1 && ind == klen) {
+		    k = k.substring(0, klen);
+		    entries.add(k);
+		}
+	    }
+	}
+	String key;
+	do {
+	    key = newKeyCreated? newKey:
+		JOptionPane.showInputDialog(frame,
+					    localeString("name"),
+					    localeString("nameTitle"),
+					    JOptionPane.QUESTION_MESSAGE);
+	    if (key == null) {
+		return (entries.size() == 0)? "user": null;
+	    }
+	    newKeyCreated = false; // to try again if necessary
+	    int i = 0;
+	    boolean loop = false;
+	    key = key.trim();
+	    for (char ch: key.toCharArray()) {
+		if (!((i++ == 0)?
+		      Character.isJavaIdentifierStart(ch):
+		      Character.isJavaIdentifierPart(ch))) {
+		    loop = true;
+		    break;
+		}
+	    }
+	    if (loop) {
+		continue;
+	    }
+	} while (entries.contains(key));
+	newKeyCreated = true;
+	newKey = key;
+	return key;
+    }
+
+    private static String getNewKey(Component component) {
+	String key;
+	do {
+	    key = newKeyCreated? newKey:
+		JOptionPane.showInputDialog(frame,
+					    localeString("name"),
+					    localeString("nameTitle"),
+					    JOptionPane.QUESTION_MESSAGE);
+	    if (key == null) {
+		key = "user";
+	    }
+	    newKeyCreated = false; // to try again if necessary
+	    int i = 0;
+	    boolean loop = false;
+	    key = key.trim();
+	    for (char ch: key.toCharArray()) {
+		if (!((i++ == 0)?
+		      Character.isJavaIdentifierStart(ch):
+		      Character.isJavaIdentifierPart(ch))) {
+		    loop = true;
+		    break;
+		}
+	    }
+	    if (loop) {
+		continue;
+	    }
+	} while (entries.contains(key));
+	newKeyCreated = true;
+	newKey = key;
+	return key;
+    }
+
+    private static File getFile(ConfigEditor cpe, Component component) {
+	File cf = getFile(component);
+	boolean test = (cf != null);
+	String p1key = newKey;
+	int p1keyLen = p1key.length();
+	while (test) {
+	    if (cf.exists()) {
+		if (!cf.canRead()) {
+		    cf = getFile(component);
+		    test = (cf != null);
+		    continue;
+		}
+		boolean ok = true;
+		ConfigEditor newcpe = new ConfigEditor();
+		try {
+		    newcpe.loadFile(cf);
+		} catch (IOException eio) {
+		    cf = getFile(component);
+		    test = (cf != null);
+		    continue;
+		}
+		Properties p1 = cpe.getDecodedProperties();
+		Properties p2 = newcpe.getDecodedProperties();
+		String tname1 = p1.getProperty("trustStore.file");
+		String tname2 = p2.getProperty("trustStore.file");
+		if (tname1 != tname2) {
+		    if (tname1 != null && tname1.equals(tname2)) {
+			ok = true;
+		    } else {
+			ok = false;
+		    }
+		}
+		if (ok) {
+		    boolean ss1 =
+			Boolean.valueOf(p1.getProperty("trust.selfsigned"));
+		    boolean ss2 =
+			Boolean.valueOf(p2.getProperty("trust.selfsigned"));
+		    if (ss1 != ss2) ok = false;
+		    if (ok) {
+			boolean loopback1 = Boolean.valueOf
+			    (p1.getProperty("trust.allow.loopback"));
+			boolean loopback2 = Boolean.valueOf
+			    (p2.getProperty("trust.allow.loopback"));
+			ok = (loopback1 == loopback2);
+		    }
+		}
+		if (ok) {
+		    newKey = getNewKey(newcpe, component);
+		    if (newKey == null) return null;
+		    p1 = cpe.getProperties();
+		    p2 = newcpe.getProperties();
+		    for (String key: p1.stringPropertyNames()) {
+			if (key.startsWith(p1key +".")) {
+			    String newkey = newKey + key.substring(p1keyLen);
+			    p2.setProperty(newkey, p1.getProperty(key));
+			} else if (key.contains("." + p1key + ".")) {
+			    String newkey = key
+				.replaceFirst("[.]" + p1key + "[.]",
+					      "." + newKey + ".");
+			    p2.setProperty(newkey, p1.getProperty(key));
+			}
+		    }
+		    // because cpe is also an argument.
+		    SBL.cpe = newcpe;
+		    test = false;
+		} else {
+		    cf = getFile(component);
+		    test = (cf != null);
+		}
+	    } else {
+		test = false;
+		cpe.getProperties().setProperty("title", cf.getName());
+	    }
+	}
+	return cf;
+    }
+
     private static class Entry extends JPanel {
 	JTextField description = new JTextField(48);
 	JTextField base = new JTextField(48);
@@ -386,6 +544,136 @@ public class SBL {
     static JFrame frame;
     static File configFile;
     static HashSet<String> entries = new HashSet<>();
+
+    // For creating an SBL file based on server data.
+    // We want to minimize the requests for a password
+    // and the need to replace newKey.
+    static File providedConfigFile = null;
+    static ConfigEditor pce = null;
+    static HashSet<String> pcfEntries = new HashSet<>();
+
+    static void setupProvidedFile(Properties ourProps, Component frame) {
+	// ourProps are the properties we got from the server.
+        File cf = getFile(frame);
+	boolean test = (cf != null);
+	String pwkey = "ebase64.keypair.privateKey";
+	String keys[] = {
+	    "trustStore.file",
+	    "trust.selfsigned",
+	    "trust.allow.loopback"
+	};
+	while (test) {
+	    if (cf.exists()) {
+		if (!(cf.canRead() && cf.canWrite())) {
+		    cf = getFile(frame);
+		    test = (cf != null);
+		    continue;
+		}
+		pce = new ConfigEditor();
+		try {
+		    pce.loadFile(cf);
+		} catch (Exception e) {
+		    cf = getFile(frame);
+		    test = (cf != null);
+		    continue;
+		}
+		// check that data from the server is compatible.
+		Properties cfProps = pce.getProperties();
+		boolean ok = true;
+		for (String k: keys) {
+		    String value1 = cfProps.getProperty(k);
+		    String value2 = ourProps.getProperty(k);
+
+		    if ((value1 == null && value2 != value1)
+			|| (value1 != null &&  !value1.equals(value2))) {
+			ok = false;
+			break;
+		    }
+		}
+		if (!ok) {
+		    cf = getFile(frame);
+		    pce = null;
+		    test = (cf != null);
+		    continue;
+		}
+		for (String k: pce.getProperties().stringPropertyNames()) {
+		    String[] components = k.split("[.]");
+		    if (components != null && components.length == 2) {
+			if (components[1].equals("description")) {
+			    pcfEntries.add(components[0]);
+			}
+		    }
+		}
+		break;
+	    } else {
+		pce = new ConfigEditor();
+		// copy trust store, etc. if any so it has the
+		// same fields as an existing file.
+		Properties cfProps = pce.getProperties();
+		for (String k: keys) {
+		    cfProps.setProperty(k, ourProps.getProperty(k));
+		}
+		break;
+	    }
+	}
+	if (cf != null) {
+	    providedConfigFile = cf;
+	    if (cf.exists()) {
+		String key;
+		do {
+		    key = newKeyCreated? newKey:
+			JOptionPane
+			.showInputDialog(frame,
+					 localeString("name"),
+					 localeString("nameTitle"),
+					 JOptionPane.QUESTION_MESSAGE);
+		    if (key == null) {
+			key =  (entries.size() == 0)? "user": null;
+		    }
+		    newKeyCreated = false; // to try again if necessary
+		    int i = 0;
+		    boolean loop = false;
+		    key = key.trim();
+		    for (char ch: key.toCharArray()) {
+			if (!((i++ == 0)?
+			      Character.isJavaIdentifierStart(ch):
+			      Character.isJavaIdentifierPart(ch))) {
+			    loop = true;
+			    break;
+			}
+		    }
+		    if (loop) {
+			continue;
+		    }
+		} while (entries.contains(key));
+		newKeyCreated = true;
+		newKey = key;
+		if (pwkey != null) {
+		    String evalue = pce.getProperties().getProperty(pwkey);
+		    if (evalue != null && evalue.startsWith("===")) {
+			pce.useGPG(false);
+		    } else {
+			pce.useGPG(true);
+		    }
+		    boolean pwcont = true;
+		    pce.setPWOwner(frame);
+		    do {
+			try {
+			    pce.requestPassphrase(frame);
+			    pce.getDecodedProperties().get(pwkey);
+			    pwcont = false;
+			} catch (Exception ec) {}
+		    } while (pwcont);
+		}
+	    } else {
+		newKey = getNewKey(frame);
+		pce.useGPG(false);
+		pce.requestNewPassphrase(frame);
+	    }
+	} else {
+	    System.exit(0);
+	}
+    }
     
     static void fixupEntries(JComboBox<String>cb) {
 	fixupEntries(cb, cpe);
@@ -1197,7 +1485,18 @@ public class SBL {
 	    key + ".user",
 	    key + ".mode"
 	};
-	for (String k: ourkeys) {
+	String srvkeys[] = {
+	    "base64.keypair.publicKey",
+	    "user.description",
+	    "base64.user.password",
+	    "user.base",
+	    "user.uri",
+	    "user.user",
+	    "user.mode"
+	};
+	for (int i = 0; i < ourkeys.length; i++) {
+	    String k = ourkeys[i];
+	    String sk = srvkeys[i];
 	    String value;
 	    String kk = null;
 	    if (k.startsWith("ebase64.")) {
@@ -1211,11 +1510,14 @@ public class SBL {
 	    }
 	    // System.out.println(k + ": " + value);
 	    if (value != null) {
+		/*
 		if (kk != null) {
 		    props.setProperty(kk, value);
 		} else {
 		    props.setProperty(k, value);
 		}
+		*/
+		props.setProperty(sk, value);
 	    }
 	}
 	String string = props.store();
@@ -1310,7 +1612,8 @@ public class SBL {
     private static void setupBrowser(JFrame frame, URI uri) {
 	Clipboard cb = frame.getToolkit().getSystemClipboard();
 	String user = cpe.getDecodedProperties().getProperty("user.user");
-	char[] passwd =  getSecurePW(frame, "user");
+	// char[] passwd =  getSecurePW(frame, "user");
+	char[] passwd =  getSecurePW(frame, newKey);
 	if (passwd != null) {
 	    String password = new String(passwd);
 	    StringSelection selection1 = new StringSelection(user);
@@ -1352,12 +1655,19 @@ public class SBL {
 
 	boolean print = false;
 	boolean printPassword = false;
+	boolean printRecipients = false;
 	boolean printUser = false;
+	boolean printBase = false;
 	boolean printURI = false;
 	boolean printDescription = false;
 	boolean printMode = false;
 	boolean printPublicKey = false;
 	boolean printList = false;
+	boolean printTrustStore = false;
+	boolean printTrustStorePW = false;
+	boolean printAllowLoopback = false;
+	boolean printAllowSelfsigned = false;
+	boolean printTitle = false;
 	String nm = null;
 	boolean create = false;
 	String usr = null;
@@ -1439,16 +1749,30 @@ public class SBL {
 		}
 		if (argv[indx].equals("user")) {
 		    printUser = true;
+		} else if (argv[indx].equals("base")) {
+		    printBase = true;
 		} else if (argv[indx].equals("uri")) {
 		    printURI = true;
 		} else if (argv[indx].equals("description")) {
 		    printDescription = true;
+		} else if (argv[indx].equals("recipients")) {
+		    printRecipients = true;
 		} else if (argv[indx].equals("password")) {
 		    printPassword = true;
 		} else if (argv[indx].equals("mode")) {
 		    printMode = true;
 		} else if (argv[indx].equals("publicKey")) {
 		    printPublicKey = true;
+		} else if (argv[indx].equals("truststore")) {
+		    printTrustStore = true;
+		} else if (argv[indx].equals("truststorePW")) {
+		    printTrustStorePW = true;
+		} else if (argv[indx].equals("allowSelfsigned")) {
+		    printAllowSelfsigned = true;
+		} else if (argv[indx].equals("allowLoopback")) {
+		    printAllowLoopback = true;
+		} else if (argv[indx].equals("title")) {
+		    printTitle = true;
 		} else if (argv[indx].equals("list")) {
 		    printList = true;
 		} else {
@@ -1614,12 +1938,34 @@ public class SBL {
 	    try {
 		cpe.loadFile(configFile);
 		Properties props = cpe.getDecodedProperties();
+		if (printRecipients) {
+		    if (nm == null) {
+			System.err.println("sbl: " + errorMsg("noName"));
+			System.exit(1);
+		    }
+		    String s = props.getProperty("recipients");
+		    if (s == null) {
+			System.out.println("null");
+		    } else {
+			String[] recipients = ConfigPropUtilities
+			    .decodeRecipients(s);
+			if (recipients.length == 0) {
+			    System.out.println(errorMsg("noRecipients"));
+			} else {
+			    System.out.print(recipients[0]);
+			    for (int i = 1; i < recipients.length; i++) {
+				System.out.print(", " + recipients[i]);
+			    }
+			    System.out.println();
+			}
+		    }
+		}
 		if (printPassword) {
 		    if (nm == null) {
 			System.err.println("sbl: " + errorMsg("noName"));
 			System.exit(1);
 		    }
-		    Object val = props.getProperty(nm + ".password");
+		    Object val = props.get("ebase64."+nm + ".password");
 		    val = (val instanceof String)? val:
 			new String((char[]) val);
 		    System.out.println(val);
@@ -1630,6 +1976,12 @@ public class SBL {
 			System.exit(1);
 		    }
 		    System.out.println(props.getProperty(nm + ".user"));
+		}
+		if (printBase) {
+		    if (nm == null) {
+			System.err.println("sbl: " + errorMsg("noName"));
+		    }
+		    System.out.println(props.getProperty(nm + ".base"));
 		}
 		if (printURI) {
 		    if (nm == null) {
@@ -1657,6 +2009,26 @@ public class SBL {
 		if (printPublicKey) {
 		    String pk = props.getProperty("keypair.publicKey");
 		    System.out.println(pk);
+		}
+		if (printTrustStore) {
+		    System.out.println(props.getProperty("trustStore.file"));
+		}
+		if (printTrustStorePW) {
+		    Object val = props.get("ebase64.trustStore.password");
+		    val = (val == null)? "changeit":
+			(val instanceof String)? val:
+			new String((char[]) val);
+		    System.out.println(val);
+		}
+		if (printAllowLoopback) {
+		    System.out.println(props
+				       .getProperty("trust.allow.loopback"));
+		}
+		if (printAllowSelfsigned) {
+		    System.out.println(props.getProperty("trust.selfsigned"));
+		}
+		if (printTitle) {
+		    System.out.println(props.getProperty("title"));
 		}
 		if (printList) {
 		    for (String key: props.stringPropertyNames()) {
@@ -2026,6 +2398,7 @@ public class SBL {
 		    final Properties ourProps = cpe3.getProperties();
 		    init3Consumer = (key) -> {
 			Properties cpeProps = cpe.getProperties();
+			/*
 			String keys[] = {
 			    "recipients",
 			    "trust.allow.loopback",
@@ -2061,16 +2434,25 @@ public class SBL {
 			    }
 			}
 			cpe.setPWOwner(frame);
-
+			*/
+			{
+			    String base = ourProps.getProperty("base");
+			    String msg = errorMsg("loginForDesc", base);
+			    cpe.set(frame, key + "description", msg);
+			}
+			/*
 			cpe.set(frame, key + ".description",
 				"login for " + ourProps.getProperty("base"));
+			*/
 
+			/*
 			for (String k: keys) {
 			    String s = ourProps.getProperty(k);
 			    if (s != null) {
 				cpeProps.setProperty(k, s);
 			    }
 			}
+			*/
 			String keys2[] = {
 			    "user",
 			    "base",
@@ -2100,7 +2482,8 @@ public class SBL {
 			}
 			try {
 			    if (mode != SecureBasicUtilities.Mode.PASSWORD
-				&& mode != SecureBasicUtilities.Mode.DIGEST) {
+				&& mode != SecureBasicUtilities.Mode.DIGEST
+				&& !cpe.hasKey("base64.keypair.publicKey")) {
 				String[] keypair = SecureBasicUtilities
 				    .createPEMPair(null,null);
 				cpe.set(frame, "ebase64.keypair.privateKey",
@@ -2132,7 +2515,8 @@ public class SBL {
 			    configFile = null;
 			    button1.addActionListener((ae)-> {
 					if (configFile == null) {
-					    configFile = getFile(frame);
+					    // configFile = getFile(cpe, frame);
+					    configFile = providedConfigFile;
 					    if (configFile == null) {
 						System.exit(0);
 					    }
@@ -2143,7 +2527,7 @@ public class SBL {
 						cpe.setPWOwner(frame);
 						ServerResponse resp =
 						    sendSBLToServer(serverURI,
-								    "user");
+								    newKey);
 						String title =
 						    errorMsg("rcodeTitle");
 						int rc = resp.getResponseCode();
@@ -2225,13 +2609,17 @@ public class SBL {
 		    // String uriS2 = decoded.getProperty("base");
 		    // String titleText = errorMsg("titleText2", uriS2);
 		    // System.out.println("*** setting recipients");
-		    cpe.setRecipients(recipients);
+		    // cpe.setRecipients(recipients);
 		    SwingUtilities.invokeAndWait(() -> {
 			    frame.setVisible(true);
+			    // newKey = getNewKey(cpe, frame);
+			    setupProvidedFile(ourProps, frame);
+			    pce.setRecipients(recipients);
+			    cpe = pce;
 			});
-		    init3Consumer.accept("user");
+		    init3Consumer.accept(newKey);
 		    SwingUtilities.invokeLater(() -> {
-			    cpe.setPWOwner(frame);
+			    //cpe.setPWOwner(frame);
 			    configTrust(frame);
 			});
 		    // See what we got for testing:

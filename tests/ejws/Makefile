@@ -359,16 +359,19 @@ cmtest:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) CMTest
 
+# Change to wtz-pang or wtz-thelio unless running locally
+HOST=localhost
+ALIAS=local
 
 cert:
 	rm -f thelio-ks.jks thelio-ts.jks
 	keytool -genkey -keyalg EC -groupname secp256r1 \
-		-sigalg SHA256withECDSA -keystore thelio-ks.jks \
+		-sigalg SHA256withECDSA -keystore $(HOST)-ks.jks \
 		-keypass changeit -storepass changeit \
-		-dname CN=wtz-thelio -alias thelio -validity 365
-	keytool -keystore thelio-ks.jks -alias thelio -exportcert \
+		-dname CN=$(HOST) -alias $(ALIAS) -validity 365
+	keytool -keystore $(HOST)-ks.jks -alias $(ALIAS) -exportcert \
 		-storepass changeit -rfc \
-	| keytool -importcert -alias thelio  -keystore thelio-ts.jks \
+	| keytool -importcert -alias $(ALIAS)  -keystore $(HOST)-ts.jks \
 		-keypass changeit -storepass changeit -noprompt
 
 cert-pang:
@@ -381,6 +384,8 @@ cert-pang:
 		-storepass changeit -rfc \
 	| keytool -importcert -alias pang  -keystore pang-ts.jks \
 		-keypass changeit -storepass changeit -noprompt
+
+
 
 # Lets a demo run locally.
 cert-local:
@@ -580,8 +585,6 @@ authtest2:
 	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
 	$(JAVA) AuthTest2 test-gpgdir
 
-# Change to pang or local for running demo on laptop
-HOST=thelio
 
 demo:
 	(cd ../.. ; make jars)
@@ -602,7 +605,7 @@ demo-noaccount:
 	mkdir -p classes
 	javac -d classes -classpath ../../BUILD/libbzdev.jar Demo.java
 	$(JAVA)	Demo `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
-		`pwd`/test-gpgdir local $(EMAIL) \
+		`pwd`/test-gpgdir $(HOST) $(EMAIL) \
 		`make --no-print-directory fingerprint EMAIL=$(EMAIL)` \
 		2>&1
 

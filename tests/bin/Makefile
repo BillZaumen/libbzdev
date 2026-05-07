@@ -455,6 +455,19 @@ sbl:
 	./sblrun --stacktrace -- $(FILE)
 	chmod u-x sblrun
 
+sbl-print:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun -n $(NAME) --print $(FIELD) `pwd`/sblconf/$(FILE)
+	chmod u-x sblrun
+
+sbl-print-nn:
+	(cd ../.. ; make )
+	chmod u+x sblrun
+	./sblrun --print $(FIELD) `pwd`/sblconf/$(FILE)
+	chmod u-x sblrun
+
+
 sbl-test:
 	(cd ../.. ; make )
 	chmod u+x sblrun

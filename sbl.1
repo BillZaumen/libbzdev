@@ -218,16 +218,30 @@ The argument
 can be
 .B user
 (to print the user name to use when logging into the web site),
+.B base
+(to print the URI for the protected portion of the web site
 .B uri
-(to print the URI for the web page),
+(to print the URI for the login web page),
 .B description
 (to print the description of the web page),
+.B recipients
+(to print the GPG recipients listed, if any),
 .B password
 (to print the user-supplied password),
 .B mode
 (to print the type of authentication used),
 .B publicKey
 (to print the public key for this configuration file),
+.B truststore
+(to print the trust-store file, if any),
+.B truststorePW
+(to print the trust-store password, if any),
+.B allowSelfsigned
+(to print whether or not self-signed certificates are allowed),
+.B allowLoopback
+(to print whether or not a loopback interface can be used).
+.B title
+(to print the title for an SBL file)
 .B list
 (to print a list of the identifiers used to select a web page.)
 .PP
@@ -235,8 +249,15 @@ For the
 .B \-\-print
 option, except when its argument
 .I POPTION
-is
+is either
 .BR list ,
+.BR publicKey ,
+.BR truststore ,
+.BR truststorePW ,
+.BR allowSelfsigned ,
+.BR allowLoopback ,
+or
+.BR title ,
 a
 .B \-n
 option will also be needed.
