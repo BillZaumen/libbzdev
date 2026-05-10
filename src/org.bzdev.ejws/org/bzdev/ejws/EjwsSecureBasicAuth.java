@@ -16,13 +16,14 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.net.URI;
 import java.net.URLEncoder;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSession;
 import java.nio.charset.Charset;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import javax.net.ssl.SSLSession;
 import org.bzdev.lang.UnexpectedExceptionError;
@@ -555,6 +557,83 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	}
     }
 
+    /**
+     * Set a default certificate chain by using a proxy's certificate chain.
+     * This method allows passwords to be checked or generated when a
+     * reverse proxy provides SSL encryption.  When HTTPS is used and
+     * this method is called with a non-null argument, that
+     * certificate chain will override the certificate provided by an
+     * SSL connection.
+     * <P>
+     * Note: the current implementation assumes that the proxy's certificate
+     * can be obtained by opening a TCP connection the proxy itself based
+     * on its host and port. In addition, the certificate must be available
+     * before the server used by this authenticator has started.
+     * <P>
+     * If there is an error, the certificate chain will be set to null;
+     * @param proxy the URI of the proxy
+     * @return this authenticator
+     * @throws CertificateException if the certificate chain could not be
+     *         computed or obtained
+     * @throws IllegalArgumentException if an argument was incorrect
+     */
+    public EjwsSecureBasicAuth setCertificateChain(URI proxy) throws
+	CertificateException, IllegalArgumentException
+    {
+	if (proxy == null) return this;
+	String scheme = proxy.getScheme();
+	if (scheme == null) {
+	    throw new IllegalArgumentException("noScheme");
+	}
+	scheme = scheme.trim().toLowerCase();
+
+	if (scheme == null || !scheme.equals("https")) {
+	    throw new IllegalArgumentException("notHttps");
+	}
+	String host = proxy.getHost();
+	if (host == null) {
+	    throw new IllegalArgumentException("noHost");
+	}
+	host = host.trim();
+	if (host.length() == 0) {
+	    throw new IllegalArgumentException("noHost");
+	}
+	int port = proxy.getPort();
+	if (port < 0) {
+	    if (scheme.equals("https")) {
+		port = 443;
+	    } else {
+		throw new IllegalArgumentException("noPort");
+	    }
+	}
+	Certificate[] chain = null;
+	SSLSocketFactory factory = (SSLSocketFactory)
+	    SSLSocketFactory.getDefault();
+	try (SSLSocket socket = (SSLSocket)factory.createSocket(host, port)) {
+	    SSLSession session = socket.getSession();
+	    chain = session.getPeerCertificates();
+	    if (chain.length == 0) {
+		throw new CertificateException("noChain");
+	    }
+	} catch (CertificateException ec) {
+	    throw ec;
+	} catch (Exception e) {
+	    throw new CertificateException("noChain");
+	}
+	defaultCertChain = chain;
+	return this;
+    }
+
+    /**
+     * Get the default certificate chain.
+     * <P>
+     * This method is provided mainly for debugging.
+     * @return the default certificate chain; null if there is none
+     */
+    public Certificate[] getDefaultCertChain() {
+	if (defaultCertChain == null) return null;
+	return defaultCertChain.clone();
+    }
 
     /**
      * Add a user name and password for this authenticator's HTTP realm.

@@ -806,6 +806,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    .storeBytes(props, "application/vnd.bzdev.sblauncher", false);
     }
 
+    static SecureRandom random = new SecureRandom();
 
     /**
      * Class to generate user info.
@@ -890,8 +891,6 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    return active;
 	}
 
-	private static SecureRandom random = new SecureRandom();
-
 	static String genpw() {
 	    char[] pw = new char[16];
 	    for (int i = 0; i < 16; i++) {
@@ -900,6 +899,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    }
 	    return new String(pw);
 	}
+
 	String gpghome;
 	String[] recipients;
 
@@ -2956,6 +2956,16 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     private static long instance = 0;
     private static final String COOKIE_NAME = "org.bzdev.ejws.auth";
 
+
+    private static String genInt() {
+	char[] pw = new char[16];
+	for (int i = 0; i < 16; i++) {
+	    char ch = (char)(random.nextInt(10) + '0');
+	    pw[i] = ch;
+	}
+	return new String(pw);
+    }
+
     /**
      * Create a server cookie
      * @param t the instance of {@link com.sun.net.httpserver.HttpExchange}
@@ -2965,7 +2975,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     protected static ServerCookie createServerCookie(HttpExchange t) {
 	String value = null;
 	synchronized(EjwsSecureBasicAuth.class) {
-	    value  = startTime + "-" + (++instance);
+	    value  = startTime + "-" + (++instance) + "-" + genInt();
 	}
 	ServerCookie cookie = ServerCookie.newInstance(COOKIE_NAME,
 						       value);

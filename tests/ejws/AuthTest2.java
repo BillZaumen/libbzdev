@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.security.cert.CertificateException;
 import java.util.Map;
 import org.bzdev.ejws.*;
 import org.bzdev.ejws.maps.*;
@@ -17,12 +20,13 @@ public class AuthTest2 {
 	    EmbeddedWebServer(saddr.getAddress(),
 			      8080, 48, 10,
 			      (new EmbeddedWebServer.SSLSetup("TLS"))
-			      .keystore(new FileInputStream("thelio-ks.jks"))
+			      .keystore(new FileInputStream("local-ks.jks"))
 			      .truststore(new FileInputStream
-					  ("thelio-ts.jks")));
+					  ("local-ts.jks")));
 
 	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, "realm");
 	auth.setGPGHome(gpgdir);
+	auth.setCertificateChain(new URI("https://google.com"));
 	
 	for (String id: auth.getTrustedKeyIDs()) {
 	    System.out.println("trusted key id: " + id);
@@ -38,5 +42,15 @@ public class AuthTest2 {
 	    System.out.println(name);
 	}
 
+	Certificate[] chain = auth.getDefaultCertChain();
+	System.out.println("chain.length = " + chain.length);
+	for (Certificate cert: chain) {
+	    if (cert instanceof X509Certificate) {
+		X509Certificate xcert = (X509Certificate) cert;
+		System.out.println("... "
+				   + xcert.getSubjectX500Principal()
+				   .getName("canonical").substring(3));
+	    }
+	}
     }
 }
