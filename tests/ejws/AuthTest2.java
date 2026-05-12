@@ -26,7 +26,7 @@ public class AuthTest2 {
 
 	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, "realm");
 	auth.setGPGHome(gpgdir);
-	auth.setCertificateChain(new URI("https://google.com"));
+	auth.setCertificateChain(new URI("https://google.com/foo"));
 	
 	for (String id: auth.getTrustedKeyIDs()) {
 	    System.out.println("trusted key id: " + id);

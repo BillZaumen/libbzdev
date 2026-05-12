@@ -563,7 +563,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * reverse proxy provides SSL encryption.  When HTTPS is used and
      * this method is called with a non-null argument, that
      * certificate chain will override the certificate provided by an
-     * SSL connection.
+     * SSL connection.  In addition, when a reverse proxy is
+     * configured, the ".base" field in an SBL file provided by the
+     * server will be a URI whose host name and port matches that of
+     * the reverse proxy and whose path starts with the reverse
+     * proxy's path.
      * <P>
      * Note: the current implementation assumes that the proxy's certificate
      * can be obtained by opening a TCP connection the proxy itself based
@@ -580,6 +584,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     public EjwsSecureBasicAuth setCertificateChain(URI proxy) throws
 	CertificateException, IllegalArgumentException
     {
+	setReverseProxy(proxy);
 	if (proxy == null) return this;
 	String scheme = proxy.getScheme();
 	if (scheme == null) {

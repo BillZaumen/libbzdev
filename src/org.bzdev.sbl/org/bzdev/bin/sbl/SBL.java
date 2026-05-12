@@ -17,6 +17,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSession;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import javax.swing.*;
@@ -25,6 +26,7 @@ import javax.swing.table.*;
 import javax.swing.filechooser.*;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Vector;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -753,6 +755,91 @@ public class SBL {
     static SecureBasicUtilities dops =  new SecureBasicUtilities();
     static SecureBasicUtilities ops = null;
 
+    static boolean checkDigest(Component component, String name) {
+	try {
+	    Properties props = cpe.getDecodedProperties();
+	    Object obj = props.get("ebase64." + name + ".digest");
+	    if (obj == null) return false;
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	    char[] carray = (obj instanceof char[])? (char[]) obj: null;
+	    String digestS = new String(carray);
+	    Base64.Decoder decoder = Base64.getDecoder();
+	    byte[] digest = decoder.decode(digestS);
+	    obj = props.get("ebase64.keypair.privateKey");
+	    carray = (obj instanceof char[])? (char[]) obj: null;
+	    byte[] barray;
+	    CharBuffer cbuf;
+	    ByteBuffer bbuf;
+	    if (carray != null) {
+		cbuf = CharBuffer.wrap(carray);
+		bbuf = UTF8.encode(cbuf);
+		/*
+		// NOT WORKING RELIABLY - sometimes null padding
+		if (bbuf.hasArray() && bbuf.arrayOffset() == 0) {
+		barray = bbuf.array();
+		} else {
+		barray = new byte[bbuf.limit()];
+		bbuf.get(barray);
+		}
+		*/
+		barray = new byte[bbuf.limit()];
+		bbuf.get(barray);
+		md.update(barray);
+	    }
+
+	    obj = props.get("ebase64." + name + ".password");
+	    carray = (obj instanceof char[])? (char[])obj: null;
+	    cbuf = CharBuffer.wrap(carray);
+	    bbuf = UTF8.encode(cbuf);
+	    /*
+	    if (bbuf.hasArray() && bbuf.arrayOffset() == 0) {
+		barray = bbuf.array();
+	    } else {
+		barray = new byte[bbuf.limit()];
+		bbuf.get(barray);
+	    }
+	    */
+	    barray = new byte[bbuf.limit()];
+	    bbuf.get(barray);
+	    md.update(barray);
+
+	    String modeS = props.getProperty(name +".mode");
+	    md.update(modeS.getBytes(UTF8));
+
+	    md.update(props.getProperty(name + ".user").getBytes(UTF8));
+	    md.update(props.getProperty(name + ".base").getBytes(UTF8));
+	    md.update(props.getProperty(name + ".uri").getBytes(UTF8));
+	    byte[] adigest = md.digest();
+	    boolean result = (adigest.length == digest.length);
+	    if (result) {
+		for (int i = 0; i < digest.length; i++) {
+		    if (adigest[i] != digest[i]) {
+			result = false;
+			break;
+		    }
+		}
+	    }
+	    /*
+	    if (result == false) {
+		System.out.print("adigest");
+		for (int i = 0; i < adigest.length; i++) {
+		    System.out.print(": " + adigest[i]);
+		}
+		System.out.println();
+		System.out.print("digest");
+		for (int i = 0; i < digest.length; i++) {
+		    System.out.print(": " + digest[i]);
+		}
+		System.out.println();
+	    }
+	    */
+	    return result;
+	} catch (Exception e) {
+	    // System.err.println("checkDigest failed: " + e.getMessage());
+	    return false;
+	}
+    }
+
     static char[] getSecurePW(Component component, String name) {
 	boolean nullResult = false;
 	Properties props = cpe.getDecodedProperties();
@@ -791,12 +878,16 @@ public class SBL {
 		CharBuffer cbuf = CharBuffer.wrap(carray);
 		ByteBuffer bbuf = UTF8.encode(cbuf);
 		byte[] barray;
+		/*
 		if (bbuf.hasArray() && bbuf.arrayOffset() == 0) {
 		    barray = bbuf.array();
 		} else {
 		    barray = new byte[bbuf.limit()];
 		    bbuf.get(barray);
 		}
+		*/
+		barray = new byte[bbuf.limit()];
+		bbuf.get(barray);
 		try {
 		    InputStream is = new ByteArrayInputStream(barray);
 		    ops = new SecureBasicUtilities(is);
@@ -2141,6 +2232,19 @@ public class SBL {
 				    Clipboard cb = frame.getToolkit()
 					.getSystemClipboard();
 				    boolean hadPassphrase = cpe.hasPassphrase();
+				    if (!checkDigest(frame, key)) {
+					String digestMsg =
+					    errorMsg("digestMsg");
+					String digestTitle =
+					    errorMsg("digestTitle");
+					int status = JOptionPane
+					    .showConfirmDialog
+					    (frame, digestMsg, digestTitle,
+					     JOptionPane.OK_CANCEL_OPTION);
+					if (status != JOptionPane.OK_OPTION) {
+					    return;
+					}
+				    }
 				    char[] passwd = getSecurePW(frame, key);
 				    if (!hadPassphrase) cpe.clearPassphrase();
 				    if (passwd == null) return;

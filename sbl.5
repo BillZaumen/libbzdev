@@ -5,7 +5,8 @@ sbl \- sbl input file
 .PP
 .B SBL
 (Secure Basic Launcher) configuration files are stylized Java property
-files using the UTF-8 character set.  While the file name extension is
+files using the UTF-8 character set with an end of line indicated by
+a carriage return followed by a line feed.  While the file name extension is
 .BR sbl ,
 the file type can be determined by their first line:
 .br
@@ -68,17 +69,18 @@ that user chooses, the corresponding keys are
 The value is a textual description for this entry.
 .TP
 .B \fINAME\fB.mode
-The value is the type of the passphrase generate 
+The value is the type of the passphrase generated
 .BR \fR(\fBDIGEST ,
-.BR PASSWORD ,
 .BR PASSWORD_WITHOUT_CERT ,
-.BR PASSWORD_WITH_CERT ).
+.BR PASSWORD_WITH_CERT ,
+.BR PASSWORD ).
 .TP
 .B ebase64.\fINAME\fB.password
 The value is the user-supplied password, which is automatically provided
 when
 .BR sbl \'s
-add-entry option is used.
+add-entry option is used. In an SBL file, these values are encoded
+as the integers 0, 1, 2, or 3 respectively.
 .TP
 .B \fINAME\fB.base
 The value is the URI used to find a protected part of a web site,
@@ -169,7 +171,7 @@ The description for this server + base, where
 is an identifier specifying a group of entries.
 .TP
 .B \fINAME\fB.mode
-The mode as an integer (this will always be "2" indicating the
+The mode as an integer (this will frequently be "2" indicating the
 enumeration constant
 .B SIGNATURE_WITH_CERT
 defined by the enumeration
@@ -177,6 +179,70 @@ defined by the enumeration
 where
 .I NAME
 is an identifier specifying a group of entries.
+.SH SBL FILES FROM SERVERS
+.PP
+When an SBL file is provided by a server, it will contain two
+additional fields
+.TP
+.B sbl.downloaded
+This field will have the value
+.B true
+indicating that the file was download from a server, will generally
+not be modified, and that SBL can use a simplified user interface.
+.TP
+.B ebase64.user.digest
+This field contains a Base-64 encoded SHA-256 message digest covering
+the PEM formated private key (including the signature algoritm), the
+password, the mode (as a small integer as described above), the user
+name, the base URI, and the URI to visit when logging in. The digest
+is encrypted using GPG or PGP.  Since the digest covers fields that a
+third party cannot read, a "man in the middle" cannot alter the fields
+in an SBL file used to estabilish a connection and authorize a user
+without the alteration being detected.
+.PP
+When an account is being created, one can request data from the server,
+and that data will be returned as an SBL file.  In this case, the
+fields in this SBL file are
+.TP
+.B mode
+The values are described above.
+.TP
+.B sbl.downloaded
+When present, the value will always be
+.BR true .
+.TP
+.B need
+The value is either
+.BR pgpkey ,
+in which case a GPG key should be uploaded or
+.BR sbl ,
+in which case an SBL file providing the user name, password, and
+public key should be uploaded.
+.TP
+.B recipients
+This field lists the recipients that can decrypt a GPG encrypted value.
+.TP
+.B user
+This field provides the user name
+.TP
+.B base
+This provides the 'base' URL - basically the common portion of URLs
+that should be authenticated
+.TP
+.B loginAlias
+This field provides the remainder of a path to add to the base to
+indicate the URL to use to log in or set up an account.
+(a '/' will be automatically added to the base URL if the base URL
+does not end in a '/').
+.PP
+Fields such as
+.BR trust.allow.loobpack ,
+.BR trust.selfsigned ,
+.BR trustStore.file ,
+and/or
+.BR ebase64.trustStore.password
+may also be present, primarily during testing, and a digest field
+is not provided.
 .SH SEE ALSO
 .PP
 .BR sbl (1)

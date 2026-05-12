@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -11,12 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.HashMap;
@@ -806,6 +809,34 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    .storeBytes(props, "application/vnd.bzdev.sblauncher", false);
     }
 
+     private URI proxy = null;
+
+    /**
+     * Get the reverse proxy.
+     * When a reverse proxy is configured, the ".base" field
+     * in an SBL file provided by the server will be a URI whose
+     * host name and port matches that of the reverse proxy and
+     * whose path starts with the reverse proxy's path.
+     * @return the reverse proxy; null if there isn't one
+     */
+    public URI getReverseProxy() {
+	return proxy;
+    }
+
+    /**
+     * Set the reverse proxy.
+     * When a reverse proxy is configured, the ".base" field
+     * in an SBL file provided by the server will be a URI whose
+     * host name and port matches that of the reverse proxy and
+     * whose path starts with the reverse proxy's path.
+     * @param proxy the reverse proxy; null if there isn't one
+     */
+    protected void setReverseProxy(URI proxy) {
+	this.proxy = proxy;
+    }
+
+
+
     static SecureRandom random = new SecureRandom();
 
     /**
@@ -1008,6 +1039,34 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
 	EjwsAuthenticator auth;
 
+	MessageDigest md = null;
+	private void setDigest() {
+	    if (gpghome != null) {
+		if (username != null) {
+		    md.update(username.getBytes(UTF8));
+		}
+		if (base != null) {
+		    md.update(base.getBytes(UTF8));
+		}
+		if (uriS != null) {
+		    md.update(uriS.getBytes(UTF8));
+		}
+		byte[] digest = md.digest();
+		/*
+		System.out.print(username);
+		for (int i = 0; i < digest.length; i++) {
+		    System.out.print(":" + digest[i]);
+		}
+		System.out.println();
+		*/
+		Base64.Encoder enc = Base64.getEncoder();
+		String digestS = enc.encodeToString(digest);
+		// System.out.println(username + " digest = " + digestS);
+		cpe.setProperty("ebase64." + key + ".digest",
+				digestS, gpghome, recipients);
+	    }
+	}
+
 	/**
 	 * Constructor.
 	 * The key is an identifier acceptable for use as a Java
@@ -1042,29 +1101,38 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		System.err.println("... check Recipients failed");
 	    }
 	    this.gpghome = gpghome;
-	    String scheme = ews.usesHTTPS()? "https": "http";
-	    InetSocketAddress saddr = ews.getAddress();
-	    int port = saddr.getPort();
-	    Certificate[][] certs = ews.getCertificates();
-	    String host;
-	    if (certs != null && certs.length > 0) {
-		Certificate cert = certs[0][0];
-		if (cert instanceof X509Certificate) {
-		    X509Certificate xcert = (X509Certificate)cert;
-		    host = xcert.getSubjectX500Principal()
-			.getName("canonical").substring(3);
+	    if (auth.proxy == null) {
+		String scheme = ews.usesHTTPS()? "https": "http";
+		InetSocketAddress saddr = ews.getAddress();
+		int port = saddr.getPort();
+		Certificate[][] certs = ews.getCertificates();
+		String host;
+		if (certs != null && certs.length > 0) {
+		    Certificate cert = certs[0][0];
+		    if (cert instanceof X509Certificate) {
+			X509Certificate xcert = (X509Certificate)cert;
+			host = xcert.getSubjectX500Principal()
+			    .getName("canonical").substring(3);
+		    } else {
+			// not documented because this shouldn't ever happen.
+			throw new IllegalStateException(errorMsg("certError"));
+		    }
 		} else {
-		    // not documented because this shouldn't ever happen.
-		    throw new IllegalStateException(errorMsg("certError"));
+		    try {
+			host = InetAddress.getLocalHost().getHostName();
+		    } catch (UnknownHostException e) {
+			host = InetAddress.getLoopbackAddress().getHostName();
+		    }
 		}
+		uriSchemeAuthority = scheme + "://" + host + ":" + port;
 	    } else {
-		try {
-		    host = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-		    host = InetAddress.getLoopbackAddress().getHostName();
+		uriSchemeAuthority = auth.proxy.toString();
+		if (uriSchemeAuthority.endsWith("/")) {
+		    int len = uriSchemeAuthority.length();
+		    uriSchemeAuthority =
+			uriSchemeAuthority.substring(0, len-1);
 		}
 	    }
-	    uriSchemeAuthority = scheme + "://" + host + ":" + port;
 
 	    String[] keypair;
 	    try {
@@ -1086,7 +1154,15 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		if (mode.equals(modes[i])) break;
 		i++;
 	    }
-	    cpe.setProperty(key + ".mode", ""+i);
+	    String modeS = ""+i;
+	    cpe.setProperty(key + ".mode", modeS);
+	    try {
+		md = MessageDigest.getInstance("SHA-256");
+		md.update(keypair[0].getBytes(UTF8));
+		md.update(password.getBytes(UTF8));
+		md.update(modeS.getBytes(UTF8));
+	    } catch (Exception e) {
+	    }
 	}
 	
 	/**
@@ -1108,29 +1184,38 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 			   String publicKeyPEM)
 	{
 	    this.auth = auth;
-	    String scheme = ews.usesHTTPS()? "https": "http";
-	    InetSocketAddress saddr = ews.getAddress();
-	    int port = saddr.getPort();
-	    Certificate[][] certs = ews.getCertificates();
-	    String host;
-	    if (certs != null && certs.length > 0) {
-		Certificate cert = certs[0][0];
-		if (cert instanceof X509Certificate) {
-		    X509Certificate xcert = (X509Certificate)cert;
-		    host = xcert.getSubjectX500Principal()
-			.getName("canonical").substring(3);
+	    if (auth.proxy == null) {
+		String scheme = ews.usesHTTPS()? "https": "http";
+		InetSocketAddress saddr = ews.getAddress();
+		int port = saddr.getPort();
+		Certificate[][] certs = ews.getCertificates();
+		String host;
+		if (certs != null && certs.length > 0) {
+		    Certificate cert = certs[0][0];
+		    if (cert instanceof X509Certificate) {
+			X509Certificate xcert = (X509Certificate)cert;
+			host = xcert.getSubjectX500Principal()
+			    .getName("canonical").substring(3);
+		    } else {
+			// not documented because this shouldn't ever happen.
+			throw new IllegalStateException(errorMsg("certError"));
+		    }
 		} else {
-		    // not documented because this shouldn't ever happen.
-		    throw new IllegalStateException(errorMsg("certError"));
+		    try {
+			host = InetAddress.getLocalHost().getHostName();
+		    } catch (UnknownHostException e) {
+			host = InetAddress.getLoopbackAddress().getHostName();
+		    }
 		}
+		uriSchemeAuthority = scheme + ":" + host + ":" + port;
 	    } else {
-		try {
-		    host = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-		    host = InetAddress.getLoopbackAddress().getHostName();
+		uriSchemeAuthority = auth.proxy.toString();
+		if (uriSchemeAuthority.endsWith("/")) {
+		    int len = uriSchemeAuthority.length();
+		    uriSchemeAuthority =
+			uriSchemeAuthority.substring(0, len-1);
 		}
 	    }
-	    uriSchemeAuthority = scheme + ":" + host + ":" + port;
 	    this.username = user;
 	    this.password = (password == null)? genpw(): password;
 	    this.publicKeyPEM = publicKeyPEM;
@@ -1348,6 +1433,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    }
 	    addUserNeeded = false;
 	    sblcompressed = gzip;
+	    setDigest();
 	    sbldata = cpe.storeBytes(gzip);
 	    auth.add(this);
 	    frozen = true;
