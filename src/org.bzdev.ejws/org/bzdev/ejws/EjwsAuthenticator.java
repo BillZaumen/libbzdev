@@ -1134,21 +1134,28 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		}
 	    }
 
-	    String[] keypair;
-	    try {
-		keypair = SecureBasicUtilities.createPEMPair(null,null);
-	    } catch (Exception e) {
-		throw new UnexpectedExceptionError(e);
-	    }
-	    this.publicKeyPEM = keypair[1];
 	    cpe.setProperty("title", title);
-	    cpe.setProperty("ebase64.keypair.privateKey", keypair[0],
-			    gpghome, recipients);
-	    cpe.setProperty(key +".mode", "2");
+	    mode = auth.getMode();
+	    String[] keypair = null;
+	    switch (mode) {
+	    case SIGNATURE_WITHOUT_CERT:
+	    case SIGNATURE_WITH_CERT:
+		try {
+		    keypair = SecureBasicUtilities.createPEMPair(null,null);
+		} catch (Exception e) {
+		    throw new UnexpectedExceptionError(e);
+		}
+		this.publicKeyPEM = keypair[1];
+		cpe.setProperty("ebase64.keypair.privateKey", keypair[0],
+				gpghome, recipients);
+		break;
+	    default:
+		break;
+	    }
+	    // cpe.setProperty(key +".mode", "2");
 	    password = genpw();
 	    cpe.setProperty("ebase64." + key +".password", password,
 			    gpghome, recipients);
-	    mode = auth.getMode();
 	    int i = 0;
 	    while (i < modes.length) {
 		if (mode.equals(modes[i])) break;
@@ -1158,7 +1165,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    cpe.setProperty(key + ".mode", modeS);
 	    try {
 		md = MessageDigest.getInstance("SHA-256");
-		md.update(keypair[0].getBytes(UTF8));
+		if (keypair != null) {
+		    md.update(keypair[0].getBytes(UTF8));
+		}
 		md.update(password.getBytes(UTF8));
 		md.update(modeS.getBytes(UTF8));
 	    } catch (Exception e) {

@@ -659,7 +659,7 @@ public class SecureBasicUtilities {
 
     /**
      * Create a password based on digital signatures or message digests.
-     * This method should not be used when the user-supplied password is
+     * This method must not be used when the user-supplied password is
      * used as is.
      * @param certs certificates; null when certificates are not used.
      * @param password the user-supplied password
@@ -901,6 +901,7 @@ public class SecureBasicUtilities {
 
     /**
      * Determine if a password is valid given a certificate chain.
+     * This method is not appropriate for basic password authentication.
      * @param sigarray the decoded password
      * @param certs the certificate chain used when a password is created;
      *        null for digest authentication
