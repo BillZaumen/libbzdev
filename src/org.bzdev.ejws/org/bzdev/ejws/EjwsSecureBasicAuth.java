@@ -1580,7 +1580,9 @@ public class EjwsSecureBasicAuth
 			String dest = fileHandler.getLogoutURI()
 			    .toASCIIString();
 			if (dest == null) dest = "/";
-			msg = errorMsg(msg, dest);
+			// msg = errorMsg(msg, dest);
+			msg = (new SafeFormatter()).format
+			    (exbundle.getString(msg), dest).toString();
 			byte[] data = msg.getBytes(UTF8);
 			Headers rhdrs = t.getResponseHeaders();
 			rhdrs.set("Content-type",
@@ -1726,9 +1728,19 @@ public class EjwsSecureBasicAuth
 			} else if (type.equals("password")) {
 			    String un = WebEncoder.htmlEncode(username);
 			    String a = authorization;
+			    /*
 			    String msg = (authorization != null)?
-				errorMsg("setPasswordAuth", un, loginPath, a):
-				errorMsg("setPassword", un, loginPath);
+				errormsg("setPasswordAuth", un, loginPath, a):
+				errormsg("setPassword", un, loginPath);
+			    */
+			    String msg;
+			    if (authorization != null) {
+				msg =
+				    errorMsg("setPasswordAuth",un,loginPath,a);
+			    } else {
+				msg =
+				    errorMsg("setPassword", un, loginPath);
+			    }
 			    byte[] data = msg.getBytes(UTF8);
 			    Headers rhdrs = t.getResponseHeaders();
 			    rhdrs.set("Content-type",
@@ -1966,12 +1978,25 @@ public class EjwsSecureBasicAuth
 				} else {
 				    status = getUserStatus(un);
 				    String une = WebEncoder.htmlEncode(un);
+				    if (status == AddStatus.REJECTED
+					|| status == null) {
+					msg =
+					    errorMsg("badAccountCreation", une);
+				    } else if (status == AddStatus.PENDING) {
+					msg =
+					    errorMsg("processingAC", uriString);
+				    } else {
+					msg =
+					    errorMsg("pleaseVisit", uriString);
+				    }
+				    /*
 				    msg = (status == AddStatus.REJECTED
 					   || status == null)?
-					errorMsg("badAccountCreation", une):
+					errormsg("badAccountCreation", une):
 					(status == AddStatus.PENDING)?
-					errorMsg("processingAC", uriString):
-					errorMsg("pleaseVisit", uriString);
+					errormsg("processingAC", uriString):
+					errormsg("pleaseVisit", uriString);
+				    */
 				}
 				SBLStore store = getSBLStore();
 				boolean authorized = false;

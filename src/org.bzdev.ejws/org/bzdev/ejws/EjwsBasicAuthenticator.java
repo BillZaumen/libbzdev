@@ -1401,9 +1401,18 @@ public class EjwsBasicAuthenticator
 			} else if (type.equals("password")) {
 			    String un = WebEncoder.htmlEncode(username);
 			    String a = authorization;
+			    /*
 			    String msg = (authorization != null)?
-				errorMsg("setPasswordAuth", un, loginPath, a):
-				errorMsg("setPassword", un, loginPath);
+				errormsg("setPasswordAuth", un, loginPath, a):
+				errormsg("setPassword", un, loginPath);
+			    */
+			    String msg;
+			    if (authorization != null) {
+				msg =
+				    errorMsg("setPasswordAuth",un,loginPath,a);
+			    } else {
+				msg = errorMsg("setPassword", un, loginPath);
+			    }
 			    byte[] data = msg.getBytes(UTF8);
 			    Headers rhdrs = t.getResponseHeaders();
 			    rhdrs.set("Content-type",
@@ -1656,12 +1665,25 @@ public class EjwsBasicAuthenticator
 				} else {
 				    status = getUserStatus(un);
 				    String une = WebEncoder.htmlEncode(un);
+				    /*
 				    msg = (status == AddStatus.REJECTED
 					   || status == null)?
-					errorMsg("badAccountCreation", une):
+					errormsg("badAccountCreation", une):
 					(status == AddStatus.PENDING)?
-					errorMsg("processingAC", uriString):
-					errorMsg("pleaseVisit", uriString);
+					errormsg("processingAC", uriString):
+					errormsg("pleaseVisit", uriString);
+				    */
+				    if (status == AddStatus.REJECTED
+					|| status == null) {
+					msg =
+					    errorMsg("badAccountCreation", une);
+				    } else if (status == AddStatus.PENDING) {
+					msg =
+					    errorMsg("processingAC", uriString);
+				    } else {
+					msg =
+					    errorMsg("pleaseVisit", uriString);
+				    }
 				}
 				SBLStore store = getSBLStore();
 				boolean authorized = false;
