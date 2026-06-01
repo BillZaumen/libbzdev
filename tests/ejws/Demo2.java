@@ -12,8 +12,8 @@ import java.util.Properties;
 // import org.bzdev.swing.ConfigPropertyEditor;
 import org.bzdev.util.ConfigPropUtilities;
 
-// use to test SBL with an actual login page.
-public class Demo {
+// use to test SBL with an actual login page but without SSL
+public class Demo2 {
     public static void main(String argv[]) throws Exception {
 	// ErrorMessage.setStackTrace(true);
 	String realm = "realm";
@@ -29,30 +29,21 @@ public class Demo {
 
 	InetSocketAddress saddr = new InetSocketAddress("0.0.0.0", 8080);
 
-	String ksname = host + "-ks.jks";
-	String tsname = host + "-ts.jks";
-
 	EmbeddedWebServer ews = new
-	    EmbeddedWebServer(saddr.getAddress(),
-			      8443, 48, 10,
-			      (new EmbeddedWebServer.SSLSetup("TLS"))
-			      .keystore(new FileInputStream(ksname))
-			      .truststore(new FileInputStream(tsname)));
+	    EmbeddedWebServer(saddr.getAddress(), 8080, 48, 10);
 
-	EjwsSecureBasicAuth auth = new EjwsSecureBasicAuth(ews, realm)
-	    .setGPGHome(new File(argv[2]))
-	    .setSBLStore(new File(System.getProperty("user.dir") + "/sbldata"))
-	    .createAuthCode("test secret")
-	    .setTracer(System.out)
-	    .setTruststore(System.getProperty("user.dir") + "/" + ksname)
-	    .setAllowLoopback(true)
-	    .setSelfSigned(true);
+	EjwsBasicAuthenticator auth = new
+	    EjwsBasicAuthenticator(ews, realm);
+	auth.setGPGHome(new File(argv[2]));
+	auth.createAuthCode("test secret");
+	auth.setSBLStore(new File(System.getProperty("user.dir")
+				  + "/sbldata2"));
+	auth.setTracer(System.out);
 	if (adminEmail != null) {
 	    auth.addToAdminMap(adminEmail, adminFpr);
 	}
-	auth.setCanAddAccount(true)
-	    .setDefaultActive(false)
-	    .setTimeLimits(-10, 150, 300);
+	auth.setCanAddAccount(true);
+	auth.setDefaultActive(false);
 
 
 	File tdir = new File(argv[0]);
@@ -60,10 +51,9 @@ public class Demo {
 
 
 	System.out.println("auth mode = " + auth.getMode());
-
 	auth.setTracer(System.out);
 
-	URI logoutURI = new URI("https://" + host + ":8443/loginpage.html");
+	URI logoutURI = new URI("http://" + host + ":8080/loginpage.html");
 
 	ews.add("/", DirWebMap.class, tdir, null, true, true, true)
 	    .addWelcome("loginpage.html");
@@ -76,26 +66,20 @@ public class Demo {
 	    .setAdminAlias("admin");
 	System.out.println("added /docs/");
 	auth.add("user", "password");
-	// auth.makeUserActive("user");
-	auth.loadFromDirs()
-	    .setLoginFunction((p, t) -> {
-		    System.out.println("login: " + p.getUsername());
-		})
-	    .setAuthorizedFunction((p, t) -> {
-		    System.out.println("logged in: " + p.getUsername());
-		})
-	    .setLogoutFunction((p, t) -> {
-		    System.out.println("logout: " + p.getUsername());
-		})
-	    .setOnAccountRequest((u,s) -> {
-		    System.out.println("account request: " + u + ", " + s);
-		})
-	    .setOnAccountActive((u,s) -> {
-		    System.out.println("account active: " + u + ", " + s);
-		})
-	    .setOnAccountRemoval((u,s) -> {
-		    System.out.println("account removal: " + u + ", " + s);
-		});
+	auth.makeUserActive("user");
+	auth.loadFromDirs();
+
+	auth.setLoginFunction((p, t) -> {
+		System.out.println("login: " + p.getUsername());
+	    });
+
+	auth.setAuthorizedFunction((p, t) -> {
+		System.out.println("logged in: " + p.getUsername());
+	    });
+
+	auth.setLogoutFunction((p, t) -> {
+		System.out.println("logout: " + p.getUsername());
+	    });
 
 	// CloseWaitService cws = new CloseWaitService(120, 30, saddr);
 	// cws.start();

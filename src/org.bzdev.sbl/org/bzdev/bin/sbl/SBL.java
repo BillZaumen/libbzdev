@@ -613,7 +613,10 @@ public class SBL {
 		// same fields as an existing file.
 		Properties cfProps = pce.getProperties();
 		for (String k: keys) {
-		    cfProps.setProperty(k, ourProps.getProperty(k));
+		    String value = ourProps.getProperty(k);
+		    if (value != null) {
+			cfProps.setProperty(k, value);
+		    }
 		}
 		String fname = cf.getName();
 		if (fname != null) {
@@ -1564,7 +1567,8 @@ public class SBL {
 	public String getMessage() {return msg;}
     }
 
-    private static ServerResponse sendSBLToServer(URI serverURI, String key)
+    private static ServerResponse sendSBLToServer(URI serverURI, String key,
+						  String authcode)
 	throws Exception
     {
 	Properties cpeProps = cpe.getEncodedProperties();
@@ -1634,6 +1638,9 @@ public class SBL {
 				 mediaType);
 	    c.setRequestProperty("content-length",
 				 "" + arr.length);
+	    if (authcode != null) {
+		c.setRequestProperty("x-org-bzdev-authcode", authcode);
+	    }
 	    c.setDoOutput(true);
 	    OutputStream os =
 		c.getOutputStream();
@@ -1710,7 +1717,10 @@ public class SBL {
 
     private static void setupBrowser(JFrame frame, URI uri) {
 	Clipboard cb = frame.getToolkit().getSystemClipboard();
-	String user = cpe.getDecodedProperties().getProperty("user.user");
+	String user = (newKey == null)?
+	    cpe.getDecodedProperties().getProperty("user.user"):
+	    cpe.getDecodedProperties().getProperty(newKey + ".user");
+	System.out.println("newKey = " + newKey + ", user = " + user);
 	// char[] passwd =  getSecurePW(frame, "user");
 	char[] passwd =  getSecurePW(frame, newKey);
 	if (passwd != null) {
@@ -2173,6 +2183,7 @@ public class SBL {
 		    ConfigPropUtilities.decodeRecipients(tmp);
 		String cemode = decoded.getProperty("need");
 		String dmode = decoded.getProperty("sbl.downloaded");
+		String authcode = decoded.getProperty("authcode");
 		if (dmode == null) dmode = "false";
 		if (dmode.equals("true")) {
 		    // if the "sbl.downloaded" property has the value "true",
@@ -2202,7 +2213,13 @@ public class SBL {
 			uriStr = decoded.getProperty(key +".base");
 		    }
 		    final String uriS2 = uriStr;
-		    String titleText = errorMsg("titleText", uriS2);
+		    String ttxt;
+		    if (cemode.equals("usesbl")) {
+			ttxt  = errorMsg("titleText1", uriS2);
+		    } else {
+			ttxt = errorMsg("titleText", uriS2);
+		    }
+		    String titleText = ttxt;
 		    boolean noUpload = cemode.equals("usesbl");
 		    ActionListener button1AL = new ActionListener() {
 			    boolean justCopy = noUpload;
@@ -2295,6 +2312,11 @@ public class SBL {
 					    HttpURLConnection c =
 						(HttpURLConnection) urlc;
 					    c.setRequestMethod("POST");
+					    if (authcode != null) {
+						c.setRequestProperty
+						    ("x-org-bzdev-authcode",
+						     authcode);
+					    }
 					    c.setRequestProperty
 						("content-type",
 						 "application/pgp-keys");
@@ -2639,7 +2661,8 @@ public class SBL {
 						cpe.setPWOwner(frame);
 						ServerResponse resp =
 						    sendSBLToServer(serverURI,
-								    newKey);
+								    newKey,
+								    authcode);
 						String title =
 						    errorMsg("rcodeTitle");
 						int rc = resp.getResponseCode();

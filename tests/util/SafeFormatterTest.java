@@ -55,6 +55,33 @@ public class SafeFormatterTest {
 			       + " = " 
 			       + SafeFormatter.getDirectiveCount
 			       ("%%%n%<s%<,8.3g%4$,3.8g"));
+	    System.out.println("format counts fo "
+			       + "\"%1$s%1$s\""
+			       + " = "
+			       + SafeFormatter.getDirectiveCount
+			       ("%1$s%1$s"));
+	    System.out.println("format counts fo "
+			       + "\"%1$s%s%1$s\""
+			       + " = "
+			       + SafeFormatter.getDirectiveCount
+			       ("%1$s%s%1$s"));
+	    System.out.println("format counts fo "
+			       + "\"%3$s%1$s\""
+			       + " = "
+			       + SafeFormatter.getDirectiveCount
+			       ("%3$s%1$s"));
+	    System.out.println("format counts fo "
+			       + "\"%3$s%s%1$s\""
+			       + " = "
+			       + SafeFormatter.getDirectiveCount
+			       ("%3$s%s%1$s"));
+
+	    System.out.println("format counts fo "
+			       + "\"%1$s%3$s\""
+			       + " = "
+			       + SafeFormatter.getDirectiveCount
+			       ("%1$s%3$s"));
+
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    System.exit(1);

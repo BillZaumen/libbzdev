@@ -373,6 +373,21 @@ public class FileHandler implements HttpHandler {
 		    .addUser(true);
 		auth.addToAdminMap("admin", "[No Fingerprint]");
 	    } catch (Exception e) {}
+	} else if (authenticator instanceof EjwsBasicAuthenticator) {
+	    EjwsBasicAuthenticator auth = (EjwsBasicAuthenticator)
+		authenticator;
+	    Set<String> rset =  auth.getAdminUsers();
+	    if (rset.contains("keysigner")) rset.remove("keysigner");
+	    String[] recipients = rset.toArray(new String[rset.size()]);
+	    String uriString = auth.generateRequestURI(null);
+	    String loginAlias = getLoginAlias();
+	    try {
+		auth.createUser("admin", uriString, recipients, null)
+		    .setURI((loginAlias != null)? loginAlias: adminAlias)
+		    .setActive(true)
+		    .addUser(true);
+		auth.addToAdminMap("admin", "[No Fingerprint]");
+	    } catch (Exception e) {}
 	}
     }
 
@@ -1047,7 +1062,9 @@ public class FileHandler implements HttpHandler {
 		    String uname = (p == null)? null: p.getUsername();
 		    if (a != null && a instanceof EjwsAuthenticator
 			&& uname != null) {
-			EjwsAuthenticator auth = (EjwsAuthenticator) a;
+			EjwsAuthenticator<? extends EjwsAuthenticator>
+			    auth = (EjwsAuthenticator
+				    <? extends EjwsAuthenticator>) a;
 			if (auth.getAdminFingerprint(uname) != null/*
 			     || uname.equals("admin")*/) {
 			    Map<String,String>parmMap = WebDecoder
@@ -1057,10 +1074,7 @@ public class FileHandler implements HttpHandler {
 				new TemplateProcessor.KeyMap(2);
 			    TemplateProcessor.KeyMapList kmlist
 				= new TemplateProcessor.KeyMapList();
-			    keymap.put("list", kmlist);
 			    keymap.put("action", adminPath);
-			    TemplateProcessor tp
-				= new TemplateProcessor(keymap);
 			    keymap.put("lang", errorMsg("lang"));
 			    if (pmode.equals("notActive")) {
 				keymap.put("title", errorMsg("Inactive"));
@@ -1077,12 +1091,27 @@ public class FileHandler implements HttpHandler {
 				    kmlist.add(km);
 				}
 				for (String email: auth.getSBLUsers(false)) {
+				    emails.add(email);
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
 				    km.put("name", email +":s");
 				    km.put("value", email);
 				    km.put("hname", email+":t");
 				    km.put("hvalue", email+"--p");
+				    kmlist.add(km);
+				}
+				emails.addAll(auth.getGPGUsers(true));
+				emails.addAll(auth.getSBLUsers(true));
+				for (String email: auth
+					 .getUsersExcept(emails)) {
+				    if (auth.isActive(email)) continue;
+				    System.out.println("... listing " + email);
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":s");
+				    km.put("value", email);
+				    km.put("hname", email +":t");
+				    km.put("hvalue", auth.JUST_IN_MAP);
 				    kmlist.add(km);
 				}
 			    } else if (pmode.equals("active")) {
@@ -1099,6 +1128,7 @@ public class FileHandler implements HttpHandler {
 				    kmlist.add(km);
 				}
 				for (String email: auth.getSBLUsers(true)) {
+				    emails.add(email);
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
 				    km.put("name", email +":s");
@@ -1107,11 +1137,38 @@ public class FileHandler implements HttpHandler {
 				    km.put("hvalue", email +"--a");
 				    kmlist.add(km);
 				}
+				emails.addAll(auth.getGPGUsers(false));
+				emails.addAll(auth.getSBLUsers(false));
+				for (String email:
+					 auth.getUsersExcept(emails)) {
+				    if (!auth.isActive(email)) continue;
+				    System.out.println("... listing " + email);
+				    TemplateProcessor.KeyMap km =
+					new TemplateProcessor.KeyMap();
+				    km.put("name", email +":s");
+				    km.put("value", email);
+				    km.put("hname", email +":t");
+				    km.put("hvalue", auth.JUST_IN_MAP);
+				    kmlist.add(km);
+				}
 			    } else {
 				pmode = "unknown";
 				keymap.put("title", errorMsg("pmodeTitle"));
 				keymap.put("instr", errorMsg("pmodeInstr"));
 			    }
+			    // sort by lexical order of user names
+			    Collections.sort(kmlist, (km1, km2) -> {
+				    String s1 = (String)km1.get("value");
+				    String s2 = (String)km2.get("value");
+				    int i1 = s1.indexOf('@');
+				    int i2 = s1.indexOf('@');
+				    if (i1 < 0 && i2 >= 0) return -1;
+				    if (i1 >= 0 && i2 < 0) return 1;
+				    return s1.compareTo(s2);
+				});
+			    keymap.put("list", kmlist);
+			    TemplateProcessor tp
+				= new TemplateProcessor(keymap);
 			    // String msg = errorMsg("AdminHTML");
 			    StringReader r;
 			    if (pmode.equals("unknown")) {
@@ -1181,6 +1238,9 @@ public class FileHandler implements HttpHandler {
 						       +", " + target);
 				    */
 				    if (key.endsWith(":s")) {
+					System.out.println("email = " + email
+							   + ", target =  "
+							   + target);
 					deleteMap.put(email, target);
 				    }
 				}
@@ -1227,7 +1287,9 @@ public class FileHandler implements HttpHandler {
 			    }
 			    var a = t.getHttpContext().getAuthenticator();
 			    if (a != null && a instanceof EjwsAuthenticator) {
-				EjwsAuthenticator auth = (EjwsAuthenticator) a;
+				EjwsAuthenticator<? extends EjwsAuthenticator>
+				    auth = (EjwsAuthenticator
+					    <? extends EjwsAuthenticator>) a;
 				/*
 				for (String email: deleteMap.keySet()) {
 				    System.out.println("... delete " + email);
@@ -1236,6 +1298,7 @@ public class FileHandler implements HttpHandler {
 				    System.out.println("... activate " + email);
 				}
 				*/
+				System.out.println("got here");
 				auth.processAdminRequests(deleteMap,
 							  activateMap);
 			    }

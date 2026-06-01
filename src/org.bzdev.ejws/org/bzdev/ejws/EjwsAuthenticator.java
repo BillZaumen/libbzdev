@@ -53,7 +53,16 @@ import org.bzdev.util.ConfigPropUtilities;
 /**
  * Base class for EJWS authenticators.
  */
-public abstract class EjwsAuthenticator extends BasicAuthenticator {
+public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
+    extends BasicAuthenticator
+{
+
+    private E thisObject;
+
+    protected void setThisObject(E thisObject) {
+	this.thisObject = thisObject;
+    }
+
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -88,17 +97,18 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * {@link #storeGPGKey(String,EjwsAuthenticator.GPGKeyIDs)},
      * and {@link #trustGPGKey(String,boolean)} will throw a
      * {@link NullPointerException} if this method is not called
-     * with a non-null argument.
+     * with a non-null argument.  This method should be called
+     * before any call to {@link WebMap#setAdminAlias(String)} because,
+     * when {@link WebMap#setAdminAlias(String)} is called, a "keysigner"
+     * entry in the admin map is not needed and will be removed as an
+     * "admin" entry is added.
      * @param gpghome the home directory that GPG will use
-     * @return true on success; false on failure.
+     * @return this object
+     * @throws IOException if an IO error occurs
      */
-    public boolean setGPGHome(File gpghome) {
+    public E setGPGHome(File gpghome) throws IOException {
 	if (!gpghome.exists()) {
-	    try {
-		gpghome.mkdirs();
-	    } catch (Exception e) {
-		return false;
-	    }
+	    gpghome.mkdirs();
 	    try {
 		Files.setPosixFilePermissions
 		    (gpghome.toPath(),
@@ -118,8 +128,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    loadFromDirs();
 	    needGPGHomeForLoad = false;
 	}
-
-	return result;
+	return thisObject;
     }
 
 
@@ -129,7 +138,54 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
     private static long sblIndex = 0;
 
+
+    SBLStore store = null;
+
     /**
+     * Set persistent storage for SBL files and/or passwords.
+     * @param store the {@link SBLStore}
+     * @return this object
+     */
+    public E setSBLStore(SBLStore store) {
+	this.store = store;
+	if (needSBLDirForLoad) {
+	    loadFromDirs();
+	    needSBLDirForLoad = false;
+	}
+	return thisObject;
+    }
+
+    /**
+     * Set persistent storage for SBL files and/or passwords given a file.
+     * @param file the file used for storage
+     * @return this object
+     * @throws IOException if an an IO exception occurred
+     * @see SBLStore#SBLStore(File)
+     */
+    public E setSBLStore(File file) throws IOException {
+	store = new SBLStore(file);
+	if (needSBLDirForLoad) {
+	    loadFromDirs();
+	    needSBLDirForLoad = false;
+	}
+	return thisObject;
+    }
+
+    /**
+     * Close persistent storage.
+     * @see SBLStore#close()
+     */
+    public void closeSBLStore() {
+	if (store != null) {
+	    try {
+		store.close();
+		store = null;
+	    } catch (IOException eio) {}
+	}
+    }
+
+
+    /*
      * Set the directory used to store SBL user-specific configuration files.
      * The file names in this directory will be an email address
      * (e.g., user@example.com), followed by either "--a", "--p", or "--r".
@@ -140,7 +196,6 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * @param sbldir the directory; null to disable
      * @throws IllegalArgumentException if sbldir is not null and is not
      *         a directory
-     */
     public void setSBLDir(File sbldir) throws IllegalArgumentException {
 	if (sbldir != null) {
 	    if (!sbldir.isDirectory()) {
@@ -154,14 +209,26 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    needSBLDirForLoad = false;
 	}
     }
+     */
 
     /**
+     * Get the SBL store.
+     * An SBL store is persistent storage for passwords and SBL
+     * files, with a user as a key and an indication of whether or not
+     * a user is active.
+     * @return the SBL store; null if one has not been configured
+     */
+    protected SBLStore getSBLStore() {
+	return store;
+    }
+
+    /*
      * Get the SBL directory.
      * @return the SBL directory
-     */
     protected File getSBLDir() {
 	return sbldir;
     }
+     */
 
     public EjwsUserTable
 	<? extends EjwsAuthenticator,? extends EjwsAuthenticator.Entry>
@@ -198,6 +265,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     protected void storeSBLData(String s, AddStatus status)
 	throws Exception
     {
+	if (store != null) {
+	    if (status == null || status == AddStatus.REJECTED)  return;
+	    String uname = getUserNameFromSBL(s);
+	    Boolean flag = (status == AddStatus.OK)? true: false;
+	    store.append(uname, false, s, flag);
+	}
+	/*
 	if (sbldir != null) {
 	    String uname = getUserNameFromSBL(s);
 	    String suffix =
@@ -221,11 +295,35 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		Files.move(opath, tpath);
 	    }
 	}
+	*/
     }
 
 
-    boolean defaultActive = true;
+    AuthCode authCode = null;
 
+    /**
+     * Add an authorization code.
+     * This method will create an object that can generate
+     * authorization codes, which are useful when users are emailed
+     * links to allow them to set up accounts.
+     * @param secret an initialization string.
+     * @return this object
+     */
+    public E createAuthCode(String secret) {
+	authCode = new AuthCode(secret);
+	return thisObject;
+    }
+
+    /**
+     * Get the current authorization-code generator.
+     * @return an instance of {@link AuthCode}; null if one was not
+     *         configured.
+     */
+    protected AuthCode getAuthCode() {
+	return authCode;
+    }
+
+    boolean defaultActive = true;
 
     /**
      * Get the default value for whether or not a user account is
@@ -242,9 +340,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * The value is used by the createUser methods.
      * @param value true if new users are active by default; false if
      *        not active by default
+     * @return this object
      */
-    public void setDefaultActive(boolean value) {
+    public E setDefaultActive(boolean value) {
 	defaultActive = value;
+	return thisObject;
     }
 
     private boolean canAddAccount = false;
@@ -261,9 +361,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     /**
      * Set whether or not this authenticator can add a user account.
      * @param value true if an account can be added; false otherwise.
+     * @return this object
      */
-    public void setCanAddAccount(boolean value) {
+    public E setCanAddAccount(boolean value) {
 	canAddAccount = value;
+	return thisObject;
     }
 
 
@@ -273,9 +375,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Set the name of the truststore file.
      * The value may be sent to clients setting up an account.
      * @param truststore the name of the truststore file
+     * @return this object
      */
-    public void setTruststore(String truststore) {
+    public E setTruststore(String truststore) {
 	this.truststore = truststore;
+	return thisObject;
     }
 
 
@@ -286,9 +390,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Set the truststore password.
      * The value may be sent to clients setting up an account.
      * @param pw the password
+     * @return this object
      */
-    public void setTruststorePW(char[] pw) {
+    public E setTruststorePW(char[] pw) {
 	this.truststorePW = pw;
+	return thisObject;
     }
 
     private boolean selfSigned = false;
@@ -298,9 +404,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * The value may be sent to clients setting up an account.
      * @param selfSigned true if certificates can be self-signed; false if
      *        a certificate chain ends at a root certificate
+     * @return this object
      */
-    public void setSelfSigned(boolean selfSigned) {
+    public E setSelfSigned(boolean selfSigned) {
 	this.selfSigned = selfSigned;
+	return thisObject;
     }
 
     private boolean allowLoopback = false;
@@ -310,9 +418,11 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * The value may be sent to clients setting up an account.
      * @param allowLoopback true if a looback interface may be used;
      *        false otherwise
+     * @return this object
      */
-    public void setAllowLoopback(boolean allowLoopback) {
+    public E setAllowLoopback(boolean allowLoopback) {
 	this.allowLoopback = allowLoopback;
+	return thisObject;
     }
 
     // Called by EmbeddedWebServer when a prefix is added.
@@ -341,6 +451,22 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      */
     public String getLoginAlias() {
 	return ews.getFileHandler(prefix).getLoginAlias();
+    }
+
+
+    /**
+     * Get the login path.
+     * @return the login path; null if one was not configured
+     */
+    public String getLoginPath() {
+	String alias = getLoginAlias();
+	if (alias != null) {
+	    String ourPrefix = (prefix.endsWith("/"))? prefix:
+		prefix + "/";
+	    return prefix + getLoginAlias();
+	} else {
+	    return null;
+	}
     }
 
 
@@ -729,8 +855,12 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * @param username the user name
      * @param type "pgpkey" when a PGP/GPG public key should be
      *        downloaded; "sbl" if an SBL file should be downloaded
+     * @param auth the authorization string; null if there is none
+     * @return the SBL file's contents
      */
-    protected byte[] requestFromUser(String username, String type) {
+    protected byte[] requestFromUser(String username, String type,
+				     String auth)
+    {
 	String scheme = ews.usesHTTPS()? "https": "http";
 	InetSocketAddress saddr = ews.getAddress();
 	Certificate[][] certs = ews.getCertificates();
@@ -787,6 +917,9 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	props.setProperty("loginAlias", handler.getLoginAlias());
 	props.setProperty("mode", "" + getMode().ordinal());
 	props.setProperty("need", type);
+	if (auth != null) {
+	    props.setProperty("authcode", auth);
+	}
 	if (truststore != null) {
 	    props.setProperty("trustStore.file", truststore);
 	    if (truststorePW != null
@@ -2012,7 +2145,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
 	/**
 	 * Determine whether or not this entry is active.
-	 * Authentication should fail if an entry is not active.
+	 * qAuthentication should fail if an entry is not active.
 	 * @return  true if the entry is active; false otherwise
 	 */
 	public boolean isActive() {
@@ -2082,6 +2215,14 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     }
 
     /**
+     * Determine if a user is currently active.
+     * The authenticator's internal tables are tested, not values in
+     * persistent storage.
+     * @return true if the user exists and is active; false otherwise
+     */
+    public abstract boolean isActive(String user);
+
+    /**
      * Constructor.
      * Realms are strings denoting a name space for users.
      * @param ews the {@link EmbeddedWebServer}
@@ -2099,13 +2240,29 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     public abstract boolean removeUser(String name);
 
     /**
-     * Make a user active
+     * Make a user active.
      * @param name the user's name
      */
     public abstract boolean makeUserActive(String name);
 
     /**
-     * Make a user active, specifying if the user is one for whom
+     * Make a user active, modifying only the authenticator's map.
+     * @param name the user name
+     * @return true on success; false if there is no such user
+     */
+    protected abstract boolean makeUserActiveInMap(String name);
+
+    /**
+     * Remove a user, modifying only the authenticator's map.
+     * @param name the user name
+     * @return true on success; false if there is no such user
+     */
+    protected abstract boolean removeUserFromMap(String name);
+
+
+
+    /**
+     * Remove a user, specifying if the user is one for whom
      * GPG is used to provide the data needed to log in.
      * @param name the user's name
      * @param gpg true if GPG is used; false if an SBL directory is
@@ -2124,11 +2281,19 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
 
     private boolean removeUser(String name, String target) {
-	return removeUser(name, name.equals(target));
+	if (target != null && target.equals(JUST_IN_MAP)) {
+	    return removeUserFromMap(name);
+	} else {
+	    return removeUser(name, name.equals(target));
+	}
     }
 
     private boolean makeUserActive (String name, String target) {
-	return makeUserActive(name, name.equals(target));
+	if (target != null && target.equals(JUST_IN_MAP)) {
+	    return makeUserActiveInMap(name);
+	} else {
+	    return makeUserActive(name, name.equals(target));
+	}
     }
 
 
@@ -2138,18 +2303,25 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
     /**
      * Load user-account data obtained from GPG or an SBL directory
+     * @return this object
      * @see #gpghome()
      * @see #setGPGHome(File)
-     * @see #getSBLDir()
-     * @see #setSBLDir(File)
+     * @see #getSBLStore()
+     * @see #setSBLStore(File)
      */
-    public  void loadFromDirs() throws UnsupportedOperationException {
+    public  E loadFromDirs() throws UnsupportedOperationException {
 	if (gpghome == null) {
 	    needGPGHomeForLoad = true;
 	}
+	if (store == null) {
+	    needSBLDirForLoad = true;
+	}
+	return thisObject;
+	/*
 	if (sbldir == null) {
 	    needSBLDirForLoad = true;
 	}
+	*/
     };
 
     /**
@@ -2160,10 +2332,12 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     /**
      * Set an Appendable for tracing.
      * This method should be used only for debugging.
-     * @param tracer the Appendable for tracing requests and responses
+     * @param tracer the Appendable for tracing request and responses
+     * @return this object
      */
-    public void setTracer(Appendable tracer) {
+    public E setTracer(Appendable tracer) {
 	this.tracer = tracer;
+	return thisObject;
     }
 
     /**
@@ -2215,11 +2389,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Its second argument is the status of the request
      * (OK, PENDING, or REJECTED).
      * @param function the function; null to disable
+     * @return this object
      */
-    public void setOnAccountRequest
+    public E setOnAccountRequest
 	(BiConsumer<String,AddStatus> function)
     {
 	onAccountRequest = function;
+	return thisObject;
     }
 
     /**
@@ -2229,11 +2405,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Its second argument is the status this operation (true for
      * success; false for failure).
      * @param function the function; null to disable
+     * @return this object
      */
-    public void setOnAccountActive
+    public E setOnAccountActive
 	(BiConsumer<String,Boolean> function)
     {
 	onAccountActive = function;
+	return thisObject;
     }
 
     /**
@@ -2243,11 +2421,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * Its second argument is the status this operation (true for
      * success; false for failure).
      * @param function the function; null to disable
+     * @return this object
      */
-    public void setOnAccountRemoval
+    public E setOnAccountRemoval
 	(BiConsumer<String,Boolean> function)
     {
 	onAccountRemoval = function;
+	return thisObject;
     }
 
     /**
@@ -2263,14 +2443,16 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
      * @param function the function; null to disable
+     * @return this object
      * @see FileHandler#setLoginAlias(String)
      * @see FileHandler#setLoginAlias(String,String)
      * @see FileHandler#setLoginAlias(String,URI)
      */
-    public void setLoginFunction
+    public E setLoginFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	loginFunction = function;
+	return thisObject;
     }
 
     /**
@@ -2281,11 +2463,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
      * @param function the 'authorized' function.
+     * @return this object
      */
-    public void setAuthorizedFunction
+    public E setAuthorizedFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	authFunction = function;
+	return thisObject;
     }
 
     /**
@@ -2302,12 +2486,14 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * In any transaction, at most one of the login, logout, and
      * authorized functions will be called.
      * @param function the function; null to disable
+     * @return this object
      * @see FileHandler#setLogoutAlias(String,URI)
      */
-     public void setLogoutFunction
+     public E setLogoutFunction
 	(BiConsumer<EjwsPrincipal,HttpExchange> function)
     {
 	logoutFunction = function;
+	return thisObject;
     }
 
     /**
@@ -2367,11 +2553,13 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      * user is active is determined by the value returned by
      * {@link #isActiveDefault()}.
      * @param function the user-status function; null for the default
+     * @return this object
      * @see #getUserStatus(String)
      */
-    public void setUserStatusFunction(Function<String,AddStatus> function) {
+    public E setUserStatusFunction(Function<String,AddStatus> function) {
 	userStatusFunction = (function == null)? defaultUserStatusFunction:
 	    function;
+	return thisObject;
     }
 
     private Map<String,String> adminMap = new HashMap<String,String>();
@@ -2379,11 +2567,21 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     /**
      * Add an entry to the map associating email addresses with
      * the fingerprint of a corresponding GPG key.
+     * <P>
+     * Note: normally this is called explicitly as the web server
+     * is being configured. The method
+     * {@link FileHandler#setAdminAlias(String)}, which is called by
+     * {@link WebMap#setAdminAlias(String)}, will add an entry for
+     * "admin" and remove any entries for "keyserver". An entry for
+     * "keysigner" will be added when
+     * {@link EjwsAuthenticator#setGPGHome(File)} is called.
      * @param email the email address
      * @param fingerprint the corresponding GPG key's fingerprint
+     * @return this object
      */
-    public void addToAdminMap(String email, String fingerprint) {
+    public E addToAdminMap(String email, String fingerprint) {
 	adminMap.put(email, fingerprint);
+	return thisObject;
     }
 
     /**
@@ -2725,42 +2923,66 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 
     /**
      * Sign a key given an email address.
-     * The methods {@link #setGPGHome(File)} and/or {@link #setSBLDir(File)}
+     * The methods {@link #setGPGHome(File)} and/or {@link #setSBLStore(File)}
      * should be called before this method is used.
      * @param email the email address
      * @param gpg true if a GPG key will be signed; false if
      *        a directory containing SBL data will be manipulated
      * @see #setGPGHome(File)
-     * @see #setSBLDir(File)
+     * @see #setSBLStore(File)
      */
     public boolean signKey(String email, boolean gpg) {
 	if (gpg) {
 	    return signKeyGPG(gpghome, email);
 	} else {
-	    return signKeySBL(sbldir, email);
+	    if (store.containsUser(email)) {
+		try {
+		    store.makeActive(email);
+		    return true;
+		} catch (Exception e) {
+		    return false;
+		}
+	    } else {
+		return false;
+	    }
+	    // return signKeySBL(sbldir, email);
 	}
     }
 
     /**
      * Sign a key given an email address and target.
-     * The methods {@link #setGPGHome(File)} and/or {@link #setSBLDir(File)}
+     * The methods {@link #setGPGHome(File)} and/or {@link #setSBLStore(File)}
      * should be called before this method is used.
      * This is a convenience method.
      * @param email the email address
      * @param target the email address if GPG is used; a file name for
      *        a file in the SBL directory otherwise.
      * @see #setGPGHome(File)
-     * @see #setSBLDir(File)
+     * @see #setSBLStore(File)
      */
     protected boolean signKey(String email, String target) {
 	if (email.equals(target)) {
 	    return signKeyGPG(gpghome, email);
 	} else {
-	    return signKeySBL(sbldir, email);
+	    if (store.containsUser(email)) {
+		try{
+		    store.makeActive(email);
+		    return true;
+		} catch (Exception e) {
+		    return false;
+		}
+	    } else {
+		return false;
+	    // return signKeySBL(sbldir, email);
+	    }
 	}
     }
 
+    /*
     private static synchronized boolean signKeySBL(File sbldir, String email) {
+	if (store == null) {
+	    throw new NullPointerException(errorMsg("noSBLStore"));
+	}
 	if (sbldir == null) {
 	    throw new NullPointerException(errorMsg("noSBLDir"));
 	}
@@ -2779,7 +3001,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	    return false;
 	}
     }
-
+    */
     private static synchronized boolean signKeyGPG(File gpghome, String email) {
 	if (gpghome == null) {
 	    throw new NullPointerException(errorMsg("noGPGHome"));
@@ -2889,6 +3111,43 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     }
 
     /**
+     * Get the names of all users known to this authenticator.
+     * The value returned is an unmodifiable set.
+     * @return the users
+     */
+    public abstract Set<String> getUsers();
+
+    /**
+     * Get selected users known to this authenticator.
+     * @param active true if the users are active; false if they are not
+     *               active
+     */
+    public abstract Set<String>getUsers(boolean active);
+
+
+    /**
+     * Get all users except those in an exception set.
+     * @param exceptions a set of users to ignore
+     * @return the users not in the exception set
+     */
+    public Set<String> getUsersExcept(Set<String>exceptions) {
+	Set<String> allUsers = getUsers();
+	int size =  allUsers.size();
+	HashSet<String> result = new HashSet<>(size);
+	for (String user: allUsers) {
+	    if (exceptions.contains(user)) {
+		continue;
+	    }
+	    if (adminMap.containsKey(user)) {
+		continue;
+	    }
+	    result.add(user);
+	}
+	return result;
+    }
+
+
+    /**
      * Get GPG user names.
      * {@link #setGPGHome(File)} must have been called before this
      * method is used.
@@ -2995,17 +3254,25 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	}
     }
 
+    protected abstract Map<String, ? extends Entry> getAuthMap();
+
     /**
      * Get the users whose data is kept in the SBL directory
-     * The method {@link #setSBLDir(File)} should be called before
-     * this method is used.
-     * @param signed true if the data was signed; false otherwise
+     * The method {@link #setSBLStore(File)} or {@link #setSBLStore(SBLStore)}
+     * should be called before this method is used.
+     * @param active true to list active users; false to list inactive ones
      * @return the user names
      */
-    public synchronized Set<String> getSBLUsers(boolean signed) {
-	return getSBLUsers(sbldir, signed);
+    public synchronized Set<String> getSBLUsers(boolean active) {
+	if (store == null) {
+	    throw new NullPointerException(errorMsg("noSBLStore"));
+	}
+	// signed is the same as active.
+	return store.getUsers(getAuthMap(), active);
+	// return getSBLUsers(sbldir, signed);
     }
 
+    /*
     private static Set<String> getSBLUsers(File sbldir, boolean signed) {
 	if (sbldir == null) {
 	    throw new NullPointerException(errorMsg("noGPGHome"));
@@ -3020,7 +3287,7 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	}
 	return result;
     }
-
+    */
     /**
      * Delete a GPG key given the key's fingerprint.
      * {@link #setGPGHome(File)} must have been called before this
@@ -3050,6 +3317,8 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     private static String startTime = "" + System.currentTimeMillis();
     private static long instance = 0;
     private static final String COOKIE_NAME = "org.bzdev.ejws.auth";
+    private static final String AUTH_COOKIE_NAME = "org.bzdev.ejws.authcode";
+
 
 
     private static String genInt() {
@@ -3091,8 +3360,32 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 	return cookie;
     }
 
+    protected ServerCookie createAuthCookie(HttpExchange t,
+					    String username)
+    {
+	if (authCode == null) return null;
+	String value = authCode.getCode(username);
+
+	ServerCookie cookie = ServerCookie.newInstance(AUTH_COOKIE_NAME, value);
+	cookie.setHttpOnly(true);
+	cookie.setVersion(1);
+	cookie.setMaxAge(-1);
+	cookie.setPath(t.getHttpContext().getPath());
+	Headers reqhdrs = t.getRequestHeaders();
+	String hs = reqhdrs.getFirst("host").trim();
+	int indv6e = hs.indexOf(']');
+	int ind = hs.lastIndexOf(':');
+	boolean hasPort = (ind >= 0 && ind > indv6e);
+	String host = hasPort? hs.substring(0, ind): hs;
+	if (indv6e > 0 && host.charAt(0) == '[') {
+	    host = host.substring(1, indv6e);
+	}
+	cookie.setDomain(host);
+	return cookie;
+    }
+
     /**
-     * Find a server cookie
+     * Find a server cookie.
      * @param t the instance of {@link com.sun.net.httpserver.HttpExchange}
      *        used for the current connection
      * @return the  cookie
@@ -3111,7 +3404,28 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     }
 
     /**
-     * Set a server cookie
+     * Find an authorization server cookie.
+     * This is used for password-authentication account creation, where
+     * the browser handles the request directly.
+     * @param t the instance of {@link com.sun.net.httpserver.HttpExchange}
+     *        used for the current connection
+     * @return the  cookie
+     */
+    protected static ServerCookie findAuthServerCookie(HttpExchange t) {
+
+	ServerCookie[] cookies = ServerCookie
+	    .fetchCookies(WebMap.asHeaderOps(t.getRequestHeaders()));
+	for (int i = 0; i < cookies.length; i++) {
+	    String name = cookies[i].getName();
+	    if (name != null && name.equals(AUTH_COOKIE_NAME)) {
+		return cookies[i];
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * Set a server cookie.
      * @param t the instance of {@link com.sun.net.httpserver.HttpExchange}
      *        used for the current connection
      * @param cookie the cookie
@@ -3128,6 +3442,8 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
     public void removePWInfo(String username) {
     }
 
+    // String is one that will not match a target.
+    static final String JUST_IN_MAP = "*{[(map only)]}*";
 
     /**
      * Process a request to remove or active user accounts
@@ -3141,20 +3457,30 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
      *        and whose values are either the same or a file name, where
      *        the map is used to determine which users shoudl be deleted
      * @param activateMap a map whose keys are user names or email addresses
-     *        and whose values are either the same or a file name, where
+     *        and whose values are either the samg2e or a file name, where
      *        the map is used to determine which users should be activated
      */
     public void processAdminRequests(Map<String,String> deleteMap,
 				     Map<String,String> activateMap)
     {
+	if (gpghome == null && store == null) {
+	    throw new NullPointerException(errorMsg("noDirs"));
+	}
+	/*
 	if (gpghome == null && sbldir == null) {
 	    throw new NullPointerException(errorMsg("noDirs"));
 	}
+	*/
 	synchronized (EjwsAuthenticator.class) {
 	    if (deleteMap != null) {
+		System.out.println("deleteMap.size() = " + deleteMap.size());
 		for (Map.Entry<String,String> entry: deleteMap.entrySet()) {
 		    String email = entry.getKey();
 		    String target = entry.getValue();
+		    if (target.equals(JUST_IN_MAP)) {
+			System.out.println("modified JUST_IN_MAP:  found "
+					   + email);
+		    }
 		    if (false) {
 			System.out.println("deleteMap: " + email + " "
 					   + target);
@@ -3176,13 +3502,18 @@ public abstract class EjwsAuthenticator extends BasicAuthenticator {
 		for (Map.Entry<String,String> entry: activateMap.entrySet()) {
 		    String email = entry.getKey();
 		    String target = entry.getValue();
+		    if (target.equals(JUST_IN_MAP)) {
+			System.out.println("JUST_IN_MAP: found " + email );
+			makeUserActive(email, target);
+			continue;
+		    }
 		    if (false) {
 			System.out.println("activateSet: " + email
 					   + " " + target);
 			continue;
 		    }
 		    if (signKey(email, target)) {
-			makeUserActive(email, target);
+			makeUserActiveInMap(email);
 		    } else {
 			System.err.println("... could not sign key for "
 					   + email);

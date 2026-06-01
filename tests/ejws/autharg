@@ -1,0 +1,9 @@
+#!./scrun -sEPT:true,S:uname,S:type
+
+import org.bzdev.ejws.AuthCode;
+import java.net.URLEncoder;
+
+var authcode = new AuthCode("test secret");
+"https://localhost:8443/docs/login?user="
+	+ encode(uname) + "&uploadtype=" + type
+	+ "&authcode=" +authcode.getCode(uname)

@@ -6768,7 +6768,7 @@ public class Functions {
      * $\mathrm{erf}(x) = \frac{2}{\sqrt{\pi}}\int_{t=0}^{x} e^{-t^2} dt$.
      * <!--erf(x) = (2/&pi;<sup>1/2</sup>);&int;<sub>0</sub><sup>x</sup>e<sup>-t<sup>2</sup></sup>dt.-->
      * <P>
-     * The implementation uses Equation 7.1.5 (Abramowitz and Stegun) and
+     * The implementation uses Equation 7.1.5 (Abramowitz and Stegun)
      * and when x &ge; 3.5, uses 1-erfc(x).
      * @param x the argument to the error function
      * @return the value erf(x)

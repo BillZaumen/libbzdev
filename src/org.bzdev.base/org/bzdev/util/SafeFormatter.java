@@ -452,12 +452,17 @@ public final class SafeFormatter {
     }
 
     /**
-     * Get a count of the number of formatting directivves in a format string
-     * @param format the format string
+     * Get a count of the number of formatting directives in a format string
+     * Positional directives (which contain a number followed by '$') are
+     * skipped unless in the current position. Of positional directives,
+     * the position of the one with the highest value is returned when
+     * that value exceeds the number of positions counted.
+    * @param format the format string
      * @return the number of formatting directives
      */
     public static int getDirectiveCount(String format) {
 	int count = 0;
+	int max = 0;
 	Matcher m = p.matcher(format);
 	while (m.find()) {
 	    String full = m.group(0);
@@ -465,7 +470,17 @@ public final class SafeFormatter {
 	    if (!full.endsWith("n") && (group == null|| group.length() == 0)) {
 		count++;
 	    }
+	    String posString = m.group(6);
+	    if (posString != null) {
+		int pos = Integer
+		    .parseInt(posString.substring(0, posString.length()-1));
+		if (pos > 0) {
+		    max = (pos > max)? pos: max;
+		    if (pos != count) count--;
+		}
+	    }
 	}
+	if (max > count) count = max;
 	return count;
     }
 

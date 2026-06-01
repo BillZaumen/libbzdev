@@ -42,6 +42,7 @@ import javax.net.ssl.SSLSession;
 import org.bzdev.lang.UnexpectedExceptionError;
 import org.bzdev.net.SecureBasicUtilities;
 import org.bzdev.net.ServerCookie;
+import org.bzdev.net.WebEncoder;
 import org.bzdev.net.WebDecoder;
 import org.bzdev.util.SafeFormatter;
 import org.bzdev.util.ConfigPropUtilities;
@@ -124,7 +125,9 @@ is
  * file is to be compatible with openssl.
  * @see SecureBasicUtilities
  */
-public class EjwsSecureBasicAuth extends EjwsAuthenticator {
+public class EjwsSecureBasicAuth
+    extends EjwsAuthenticator<EjwsSecureBasicAuth>
+{
 
     // private Appendable tracer = null;
 
@@ -148,6 +151,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     }
 
     static final String SBLDATA = "application/vnd.bzdev.sblogindata";
+    static final String FORMDATA = "application/x-www-form-urlencoded";
+
 
     private static SecureBasicUtilities.Mode
 	proposedMode(EmbeddedWebServer ews)
@@ -182,13 +187,14 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	*/
        public Entry(String pw, Set<String>roles) {
 	   super(pw, roles);
-	   this.keyops = new SecureBasicUtilities();
+	   this.keyops = null;
        }
 
        /**
 	* Constructor with a PEM-encoded public-key.
 	* @param pem the PEM encoded public key or a certificate
-	*        containing that public key.
+	*        containing that public key; null for secure-basic digest
+	*        authentication.
 	* @param pw a password for a user
 	* @param roles a set of roles that a user may have
 	*/
@@ -196,7 +202,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	   super (pw, roles);
 	   try {
 	       this.pem = pem;
-	       this.keyops = new SecureBasicUtilities(pem);
+	       this.keyops = (pem == null)? null:
+		   new SecureBasicUtilities(pem);
 	   } catch (IOException eio) {
 	       String msg = "PEM";
 	       throw new IllegalArgumentException(msg, eio);
@@ -259,6 +266,43 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 
     Map<String,Entry>map = null;
 
+    /**
+     * {@inheritDoc}
+     */
+    protected Map<String, ? extends EjwsAuthenticator.Entry> getAuthMap() {
+	return map;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> getUsers() {
+	return Collections.unmodifiableSet(map.keySet());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> getUsers(boolean active) {
+	TreeSet<String>userSet = new TreeSet<>();
+	for (Map.Entry<String,Entry> entry: map.entrySet()) {
+	    if (entry.getValue().isActive() == active) {
+		userSet.add(entry.getKey());
+	    }
+	}
+	return userSet;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActive(String user) {
+	Entry entry = map.get(user);
+	return (entry == null)? false: entry.isActive();
+    }
+
 
     /**
      * {@inheritDoc}
@@ -296,7 +340,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	return mode;
     }
 
-    private String unencodedRealm ;
+    private String unencodedRealm;
 
     // allow a small but ample time window for clocks to be
     // out of sync, plus propagation delay.
@@ -330,14 +374,15 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @param passphraseTimeout the time interval in seconds for which a
      *        password is valid (the default is 1200); 0 to disable this
      *        timeout
+     * @return this authenticator
      * @throws IllegalArgumentException if the first argument is larger
      *         than zero, if the second argument is less than zero,
      *         or if the third argument, when not zero, is less than
      *         the second argument
      */
-    public void setTimeLimits(int lowerTimeDiffLimit,
-			      int upperTimeDiffLimit,
-			      int passphraseTimeout)
+    public EjwsSecureBasicAuth setTimeLimits(int lowerTimeDiffLimit,
+					     int upperTimeDiffLimit,
+					     int passphraseTimeout)
 	throws IllegalArgumentException
     {
 	if (lowerTimeDiffLimit > 0) {
@@ -357,6 +402,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	this.lowerTimeDiffLimit = lowerTimeDiffLimit;
 	this.upperTimeDiffLimit = upperTimeDiffLimit;
 	this.passphraseTimeout = passphraseTimeout;
+	return this;
     }
 
     /**
@@ -499,6 +545,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			       Map<String,Entry> map)
     {
 	super(ews, SecureBasicUtilities.encodeRealm(realm, mode));
+	setThisObject(this);
 	unencodedRealm = realm;
 	this.map = map;
 	this.mode = mode;
@@ -642,6 +689,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 
     /**
      * Add a user name and password for this authenticator's HTTP realm.
+     * The new entry will use password authentication.
      * @param username the user name
      * @param password the password
      * @throws UnsupportedOperationException if the map does not allow
@@ -659,9 +707,12 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    }
 	    throw new IllegalStateException(errorMsg("hasUser", username));
 	}
+	/*
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
+	*/
+
 	if (utable != null) {
 	    utable.putEntry(username, new Entry(password, null));
 	} else {
@@ -672,6 +723,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     /**
      * Add a user name, the user's password and the user's roles for
      * this authenticator's HTTP realm.
+     * The new entry will use password authentication.
      * @param username the user name
      * @param password the user's password
      * @param roles the user's roles
@@ -681,7 +733,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * @throws IllegalStateException if the mode is not appropriate or
      *         if the user has already been added
      */
-    public void add(String username, String password, Set<String> roles )
+    public void add(String username, String password, Set<String> roles)
 	throws UnsupportedOperationException, IllegalStateException
     {
 	if (map.containsKey(username)) {
@@ -690,9 +742,12 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    }
 	    throw new IllegalStateException(errorMsg("hasUser", username));
 	}
+	/*
 	if (mode != SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
+	*/
+
 	if (utable != null) {
 	    utable.putEntry(username, new Entry(password, roles));
 	} else {
@@ -703,9 +758,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     /**
      * Add a user name, the user's password, the user's public key,
      * and the user's signature algorithm for this authenticator's HTTP realm.
+     * If the argument pem is not null, the type of authentication used
+     * is determined by the default authentication mode configured for
+     * this authenticator.
      * @param username the user name
      * @param pem A PEM file providing the signature algorithm and
-     *            the user's certificate or public key
+     *            the user's certificate or public key; null for
+     *             secure-basic digest authentication
      * @param password the user's password
      * @throws UnsupportedOperationException if the map does not allow
      *         entries to be added (the default map does not throw this
@@ -723,9 +782,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
      * Add a user name, the user's password, the user's public key,
      * the user's signature algorithm and the user's roles for
      * this authenticator's HTTP realm.
+     * If the argument pem is not null, the type of authentication used
+     * is determined by the default authentication mode configured for
+     * this authenticator.
      * @param username the user name
      * @param pem A PEM file providing the signature algorithm and
-     *            the user's certificate or public key
+     *            the user's certificate or public key; null for
+     *            secure-basic digest authentication
      * @param password the user's password
      * @param roles the user's roles
      * @throws UnsupportedOperationException if the map does not allow
@@ -746,9 +809,11 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    }
 	    throw new IllegalStateException(errorMsg("hasUser", username));
 	}
+	/*
 	if (mode == SecureBasicUtilities.Mode.DIGEST) {
 	    throw new IllegalStateException(errorMsg("wrongMode", mode));
 	}
+	*/
 	if (utable != null) {
 	    utable.putEntry(username, new Entry(pem, password, roles));
 	} else {
@@ -756,46 +821,87 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	}
     }
 
+    /**
+     * Remove a user.
+     * @param name the user name
+     * @param gpg true to delete GPG permanent entries;
+     *        false for SBL permanent entries
+     */
     public boolean removeUser(String name, boolean gpg) {
-	if (gpg) {
-	    if (hasGPGKey(name)) {
-		try {
-		    String fpr = getFingerprint(name);
-		    if (fpr != null) {
-			deleteWithFingerprint(fpr);
+	boolean status = false;
+	SBLStore store = getSBLStore();
+	try {
+	    if (gpg) {
+		File gpgdir = gpghome();
+		if (gpgdir != null && hasGPGKey(name)) {
+		    try {
+			String fpr = getFingerprint(name);
+			if (fpr != null) {
+			    deleteWithFingerprint(fpr);
+			}
+		    } catch (Exception e) {
+			status = false;
+			System.err.println("GPG delete failed: "
+					   + e.getMessage());
+			return status;
 		    }
-		} catch (Exception e) {
-		    System.err.println("GPG delete failed: "
-				       + e.getMessage());
+		    status = (map.remove(name) != null);
+		    return status;
+		} else {
+		    status = (map.remove(name) != null);
+		    return status;
 		}
-	    }
-	} else {
-	    File target = new File(sbldir, name +"--a");
-	    if (!target.exists()) {
-		target = new File(sbldir, name + "--p");
-	    }
-	    if (!target.exists()) {
-		target = new File(sbldir, name + "--r");
-	    }
-	    if (!target.exists()) {
-		target = new File(sbldir, name);
-		if (target.exists()) {
-		    // clean up only - a previous case failed.
+	    } else if (store != null) {
+		if (store.containsUser(name)) {
+		    try {
+			store.removeUser(name);
+		    } catch (Exception e) {
+		    }
+		}
+		status = (map.remove(name) != null);
+		return status;
+	    /*
+	    } else if (sbldir != null) {
+		File target = new File(sbldir, name +"--a");
+		if (!target.exists()) {
+		    target = new File(sbldir, name + "--p");
+		}
+		if (!target.exists()) {
+		    File f = new File(sbldir, name + "--r");
+		    f.delete();
+		}
+		if (!target.exists()) {
+		    target = new File(sbldir, name);
+		    if (target.exists()) {
+			// clean up only - a previous case failed.
+			target.delete();
+		    }
+		} else {
 		    target.delete();
 		}
-		return false;
+		status = (map.remove(name) != null);
+		return status;
+	    */
+	    } else {
+		status = (map.remove(name) != null);
+		return status;
 	    }
-	    target.delete();
-	    boolean status = (map.remove(name) != null);
+	} finally {
+	    if (onAccountRemoval != null) {
+		onAccountRemoval.accept(name, status);
+	    }
 	}
-	boolean status = (map.remove(name) != null);
-	return status;
     }
 
+    /**
+     * Remove a user.
+     * @param name the name of the user
+     */
     public boolean removeUser(String name) {
 	boolean status = false;
 	File gpgdir = gpghome();
-	File sbldir = getSBLDir();
+	SBLStore store = getSBLStore();
+	// File sbldir = getSBLDir();
 	try {
 	    if (utable != null) {
 		status = utable.removeEntry(name);
@@ -810,16 +916,28 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    } catch (Exception e) {
 			System.err.println("GPG delete failed: "
 					   + e.getMessage());
+			map.remove(name);
+			status = false;
+			return status;
 		    }
 		    status = (map.remove(name) != null);
 		    return status;
+		} else if (store != null) {
+		    if (store.containsUser(name)) {
+			store.removeUser(name);
+		    }
+		    status = (map.remove(name) != null);
+		    return status;
+		    /*
 		} else if (sbldir != null) {
 		    File target = new File(sbldir, name +"--a");
 		    if (!target.exists()) {
 			target = new File(sbldir, name + "--p");
 		    }
 		    if (!target.exists()) {
-			target = new File(sbldir, name + "--r");
+			File f = new File(sbldir, name + "--r");
+			// just in case: a --r should not have been created
+			f.delete();
 		    }
 		    if (!target.exists()) {
 			target = new File(sbldir, name);
@@ -827,15 +945,18 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			    // clean up only - a previous case failed.
 			    target.delete();
 			}
+			map.remove(name);
 			status = false;
 			return status;
 		    }
 		    target.delete();
 		    status = (map.remove(name) != null);
 		    return status;
+		    */
+		} else {
+		    status = (map.remove(name) != null);
+		    return status;
 		}
-		status = false;
-		return status;
 	    }
 	} catch (Exception e) {
 	    status = false;
@@ -847,55 +968,124 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	}
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean makeUserActive(String name, boolean gpg) {
 	EjwsSecureBasicAuth.Entry entry = map.get(name);
-	if (entry == null) {
-	    return false;
-	}
-	if (gpg) {
-	    try {
-		if (!validGPGUser(name)
-		    && !getTrustedKeyIDs().contains(name)) {
-		    signKey(name, true);
-		}
-	    } catch (Exception e) {
-		return false;
+	boolean status = false;
+	SBLStore store = getSBLStore();
+	try {
+	    if (entry == null) {
+		status = false;
+		return status;
 	    }
-	} else if (sbldir != null) {
-	    try {
-		File pending = new File(sbldir, name + "--p");
-		File target = new File(sbldir, name + "--a");
-		if (pending.exists()) {
-		    Path ppath = pending.toPath();
-		    Path tpath  = target.toPath();
-		    try {
-			Files.move(ppath, tpath,
-				   StandardCopyOption.ATOMIC_MOVE);
-		    } catch(AtomicMoveNotSupportedException e) {
-			Files.move(ppath, tpath);
+	    if (gpg) {
+		try {
+		    if (!validGPGUser(name)
+			&& !getTrustedKeyIDs().contains(name)) {
+			signKey(name, true);
 		    }
-		} else if (!target.exists()) {
-		    return false;
+		} catch (Exception e) {
+		    status = false;
+		    return status;
 		}
-	    } catch (IOException e) {
-		return false;
+	    } else if (store != null) {
+		if (store.containsUser(name)) {
+		    try {
+			store.makeActive(name);
+		    } catch (Exception e) {}
+		}
+		/*
+	    } else if (sbldir != null) {
+		try {
+		    File pending = new File(sbldir, name + "--p");
+		    File target = new File(sbldir, name + "--a");
+		    if (pending.exists()) {
+			Path ppath = pending.toPath();
+			Path tpath  = target.toPath();
+			try {
+			    Files.move(ppath, tpath,
+				       StandardCopyOption.ATOMIC_MOVE);
+			} catch(AtomicMoveNotSupportedException e) {
+			    Files.move(ppath, tpath);
+			}
+		    } else if (!target.exists()) {
+			status = false;
+			return status;
+		    }
+		} catch (IOException e) {
+		    status = false;
+		    return status;
+		}
+		*/
+	    } else {
+		status = false;
+		return status;
 	    }
-	} else {
-	    return false;
+	    entry.makeActive();
+	    status = true;
+	    return status;
+	} finally {
+	    if (onAccountActive != null) {
+		onAccountActive.accept(name, status);
+	    }
 	}
-	entry.makeActive();
-	return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean makeUserActiveInMap(String name) {
+	boolean status = false;
+	try {
+	    Entry entry = map.get(name);
+	    if (entry != null) {
+		entry.makeActive();
+		status = true;
+		return status;
+	    } else {
+		status = false;
+		return status;
+	    }
+	} finally {
+	    if (onAccountActive != null) {
+		onAccountActive.accept(name, status);
+	    }
+	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean removeUserFromMap(String name) {
+	boolean status = false;
+	try {
+	    status =  map.remove(name) != null;
+	    return status;
+	} finally {
+	    if (onAccountRemoval != null) {
+		onAccountRemoval.accept(name, status);
+	    }
+	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean makeUserActive(String name) {
 	boolean status = false;
 	try {
+	    EjwsSecureBasicAuth.Entry entry = map.get(name);
+	    if (entry != null && entry.isActive()) {
+		return status;
+	    }
 	    if (utable != null) {
 		status =  utable.makeActive(name);
 		return status;
 	    } else {
-		EjwsSecureBasicAuth.Entry entry = map.get(name);
-		File sbldir = getSBLDir();
+		// File sbldir = getSBLDir();
+		SBLStore store = getSBLStore();
 		if (entry != null) {
 		    try {
 			if (!getTrustedKeyIDs().contains(name)) {
@@ -903,6 +1093,12 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				if (validGPGUser(name) == false) {
 				    signKey(name, true);
 				}
+			    } else if (store != null) {
+				if (!entry.isActive()
+				    && store.containsUser(name)) {
+				    store.makeActive(name);
+				}
+				/*
 			    } else if (sbldir != null) {
 				File pending = new File(sbldir, name + "--p");
 				File target = new File(sbldir, name + "--a");
@@ -917,11 +1113,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 					Files.move(ppath, tpath);
 				    }
 				}
+				*/
 			    }
+			    entry.makeActive();
+			    status = true;
+			    return status;
 			}
 		    } catch (Exception e){}
-		    // entry.setActive(true);
-		    entry.makeActive();
 		} else {
 		    try {
 			if (hasGPGKey(name)) {
@@ -937,6 +1135,19 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				.addUser(true);
 			    status = true;
 			    return status;
+			} else if (store != null) {
+			    if (store.containsUser(name)) {
+				String s = store.getSBLData(name);
+				if (s != null) {
+				    store.makeActive(name);
+				    createUser(s, null)
+					.setActive(true)
+					.addUser();
+				    status = true;
+				}
+			    }
+			    return status;
+			    /*
 			} else if (sbldir != null) {
 			    File pending = new File(sbldir, name + "--p");
 			    File target = new File(sbldir, name + "--a");
@@ -954,14 +1165,16 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				createUser(s, null)
 				    .setActive(true)
 				    .addUser();
+				status = true;
+				return status;
 			    }
+			    */
 			}
 		    } catch (Exception e){};
 		    status = false;
 		    return status;
 		}
 	    }
-	    status = true;
 	    return status;
 	} finally {
 	    if (onAccountActive != null) {
@@ -972,19 +1185,34 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 
     private boolean notLoadedFromGPG = true;
     private boolean notLoadedFromSBL = true;
-    public void loadFromDirs() throws UnsupportedOperationException
+
+    /**
+     * {@inheritDoc}
+     */
+    public EjwsSecureBasicAuth loadFromDirs()
+	throws UnsupportedOperationException
     {
 	super.loadFromDirs();
+	System.out.println("got here");
 	String alias = getLoginAlias();
 	if (alias != null && notLoadedFromGPG && gpghome() != null) {
 	    notLoadedFromGPG = false;
 	    Set<String> userSet = getGPGUsers(true);
+	    /*
+	    for (String usr: userSet) {
+		System.out.println("userSet contains " + usr);
+	    }
+	    for (String usr: getAdminUsers()) {
+		System.out.println("admin users contains " + usr);
+	    }
+	    */
 	    userSet.addAll(getAdminUsers());
 	    String uriString = generateRequestURI(null);
 	    for (String email: userSet) {
 		String recipients[] = {email};
 		try {
-		    if (email.equals("admin")) {
+		    // System.out.println("email = " + email);
+		    if (email.equals("admin") || email.equals("keysigner")) {
 			continue;
 		    }
 		    createUser(email, uriString, recipients, null)
@@ -1013,7 +1241,36 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		}
 	    }
 	}
-	File sbldir = getSBLDir();
+	// File sbldir = getSBLDir();
+	SBLStore store = getSBLStore();
+	if (notLoadedFromSBL && store != null) {
+	    notLoadedFromSBL = false;
+	    store.mapStream().forEach((ent) -> {
+		    try {
+			String name = ent.getKey();
+			SBLStore.Entry value = ent.getValue();
+			if (value.getPWMode() == false) {
+			    String s = value.getData();
+			    System.out.println("user = " + name
+					       + ", isActive = "
+					       + value.isActive());
+			    createUser(s, null)
+				.setActive(value.isActive())
+				.addUser();
+			} else {
+			    System.out.println("pwmode = true for " + name);
+			    String pw = value.getData();
+			    add(name, pw);
+			    if (value.isActive()) {
+				map.get(name).setActive(value.isActive());
+			    }
+			}
+		    } catch (IOException eio) {
+			System.err.println(eio.getMessage());
+		    }
+		});
+	}
+	/*
 	if (notLoadedFromSBL && sbldir != null) {
 	    notLoadedFromSBL = false;
 	    try {
@@ -1041,34 +1298,36 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 					   + " should be deleted");
 		    }
 		}
-		/*
-		for (Map.Entry<String,Entry> ent: map.entrySet()) {
-		    System.out.println(ent.getKey());
-		    Entry entry = ent.getValue();
-		    System.out.println(getMode());
-		    System.out.println(entry.getPassword());
-		    System.out.println(entry.getPEM());
-		    System.out.println(entry.isActive());
-		}
-		*/
 	    } catch (IOException eio) {
 		System.err.println(eio.getMessage());
 	    }
 	}
+	*/
+	return this;
     }
 
 
     EjwsUserTable<EjwsSecureBasicAuth,EjwsSecureBasicAuth.Entry> utable = null;
 
 
-    public void setUserTable
+    /**
+     * Set this authenticator's user table.
+     * @param utable the user table
+     * @return this authenticator
+     */
+    public EjwsSecureBasicAuth setUserTable
 	(EjwsUserTable<EjwsSecureBasicAuth,EjwsSecureBasicAuth.Entry> utable)
     {
 	this.utable = utable;
 	utable.setMap(map);
 	utable.setAuth(this);
+	return this;
     }
 
+    /**
+     * Get this authenticator's user table
+     * @return the user table.
+     */
     public EjwsUserTable<EjwsSecureBasicAuth,EjwsSecureBasicAuth.Entry>
 	getUserTable()
     {
@@ -1097,7 +1356,13 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				info.getPassword(),
 				info.getRoles());
 	// entry.setActive(info.isActive());
-	if (info.isActive()) entry.makeActive();
+	if (info.isActive()) {
+	    entry.makeActive();
+	    if (onAccountActive != null) {
+		onAccountActive.accept(username, true);
+	    }
+
+	}
 	entry.setSBLCompressed(info.isSBLCompressed());
 	entry.setSBL(info.getSBL());
 	if (utable != null) {
@@ -1122,6 +1387,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
     // private BiConsumer<EjwsPrincipal,HttpExchange> logoutFunction = null;
     private ThreadLocal<Boolean> foundLogoutTL = new ThreadLocal<>();
     private ThreadLocal<String> usernameTL = new ThreadLocal<>();
+    private ThreadLocal<String> msgTL = new ThreadLocal<>();
 
     // private BiConsumer<EjwsPrincipal,HttpExchange> authFunction = null;
 
@@ -1294,15 +1560,43 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		if (query != null /* && map.size() > 0*/) {
 		    Map<String,String> fmap = WebDecoder.formDecode(query,
 								    false);
-		    String username =fmap.get("user");
+		    String username = fmap.get("user");
 		    String afpr = getAdminFingerprint(username);
 		    String type = fmap.get("uploadtype");
+		    String authorization = fmap.get("authcode");
+		    if (authorization != null) {
+			AuthCode ac = getAuthCode();
+			if (ac != null) {
+			    if (!authorization.equals(ac.getCode(username))) {
+				authorization = null;
+			    }
+			}
+		    }
 
-		    if (!(getCanAddAccount() || afpr != null)
+		    if (type != null && type.equals("no-upload")) {
+			// Just send a message to the user, typically
+			// after certain authentication failures.
+			String msg = fmap.get("msg");
+			String dest = fileHandler.getLogoutURI()
+			    .toASCIIString();
+			if (dest == null) dest = "/";
+			msg = errorMsg(msg, dest);
+			byte[] data = msg.getBytes(UTF8);
+			Headers rhdrs = t.getResponseHeaders();
+			rhdrs.set("Content-type",
+				  "text/html; charset=utf-8");
+			try {
+			    setCookie(t, cookie);
+			    t.sendResponseHeaders(202, data.length);
+			    t.getResponseBody().write(data);
+			} catch (Exception e) {}
+			return new Authenticator.Success(null);
+		    } else if (!(getCanAddAccount() || afpr != null)
 			&& type != null
 			&& !type.equals("login")) {
 			String msg;
-			if (type =="pgpkey" || type == "sbl") {
+			if (type =="pgpkey" || type == "sbl"
+			    || type == "password") {
 			    msg = errorMsg("noAccountCreation");
 			} else {
 			    String uriS = requestURI.toString();
@@ -1379,7 +1673,7 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			}
 			byte[] array = (type == null)? getSBL(username):
 			    (type.equals("pgpkey") || type.equals("sbl"))?
-			    requestFromUser(username,type):
+			    requestFromUser(username,type,authorization):
 			    null;
 			/*
 			System.out.println("array.length = " +
@@ -1391,6 +1685,15 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				false;
 			    // System.out.println("isGZIP = " + isGZIP);
 			    Headers rheaders = t.getResponseHeaders();
+			    /*
+			    if (authorization != null) {
+				// in case SBL functionality is put into
+				// the browser.
+				ServerCookie acookie =
+				    createAuthCookie(t, username);
+				setCookie(t, acookie);
+			    }
+			    */
 			    rheaders.set("Content-Type",
 					 "application/vnd.bzdev.sblauncher");
 			    rheaders.set("Cache-Control", "no-cache");
@@ -1419,6 +1722,22 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				// not documented.
 			    } catch (IOException eio) {}
 			    // return null;
+			    return new Authenticator.Success(null);
+			} else if (type.equals("password")) {
+			    String un = WebEncoder.htmlEncode(username);
+			    String a = authorization;
+			    String msg = (authorization != null)?
+				errorMsg("setPasswordAuth", un, loginPath, a):
+				errorMsg("setPassword", un, loginPath);
+			    byte[] data = msg.getBytes(UTF8);
+			    Headers rhdrs = t.getResponseHeaders();
+			    rhdrs.set("Content-type",
+				      "text/html; charset=utf-8");
+			    try {
+				setCookie(t, cookie);
+				t.sendResponseHeaders(200, data.length);
+				t.getResponseBody().write(data);
+			    } catch (Exception e) {}
 			    return new Authenticator.Success(null);
 			} else {
 			    try {
@@ -1455,6 +1774,9 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 		    Headers hdrs = t.getRequestHeaders();
 		    String contentType = hdrs.getFirst("content-type");
 		    String contentLengthS = hdrs.getFirst("content-length");
+		    String authorization = hdrs
+			.getFirst("x-org-bzdev-authcode");
+		    System.out.println("authorization = " + authorization);
 		    long length = 0;
 		    if (contentLengthS != null) {
 			try {
@@ -1488,6 +1810,18 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 					AddStatus.OK: getUserStatus(email);
 				    if (status != AddStatus.REJECTED) {
 					storeGPGKey(value, keyids);
+				    }
+				    if (status == AddStatus.PENDING
+					&& authorization != null) {
+					if (authorization
+					    .equals(authCode.getCode(email))) {
+					    System.out.println("signing key for"
+							       + email);
+					    signKey(email, true);
+					    status = AddStatus.OK;
+					    System.out.println
+						("authorization processed");
+					}
 				    }
 				    // boolean active = isActiveDefault();
 				    String msg =
@@ -1552,6 +1886,14 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				    if (status != AddStatus.REJECTED) {
 					storeSBLData(s, status);
 				    }
+				    if (status == AddStatus.PENDING
+					&& authorization != null) {
+					if (authorization
+					    .equals(authCode.getCode(uname))) {
+					    signKey(uname, false);
+					    status = AddStatus.OK;
+					}
+				    }
 				    String uriString = generateRequestURI(null);
 				    String msg =
 					errorMsg("pleaseVisit", uriString);
@@ -1594,6 +1936,115 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 				}
 			    } catch (Exception e) {
 				handleError(t, e);
+			    }
+			} else if(contentType.equals(FORMDATA)) {
+			    if (getCanAddAccount()) {
+				// InputStream is = t.getRequestBody();
+				Map<String,String> qmap =
+				    WebDecoder.formDecode(is);
+				String un = qmap.get("user");
+				String authcode = qmap.get("authcode");
+				String pw1 = qmap.get("pw1");
+				String pw2 = qmap.get("pw2");
+				/*
+				ServerCookie authCookie =
+				    findAuthServerCookie(t);
+				*/
+				AddStatus status = AddStatus.OK;
+				String uriString = generateRequestURI(null);
+				String msg = null;
+				if (un == null || pw1 == null || pw2 == null) {
+				    msg = errorMsg("badPWSetup");
+				    status = AddStatus.REJECTED;
+				} else if (!pw1.equals(pw2)) {
+				    msg = errorMsg("badPasswords");
+				    status = AddStatus.REJECTED;
+				}  else if (map.containsKey(un)) {
+				    String une = WebEncoder.htmlEncode(un);
+				    msg = errorMsg("accountExists", une);
+				    status = AddStatus.REJECTED;
+				} else {
+				    status = getUserStatus(un);
+				    String une = WebEncoder.htmlEncode(un);
+				    msg = (status == AddStatus.REJECTED
+					   || status == null)?
+					errorMsg("badAccountCreation", une):
+					(status == AddStatus.PENDING)?
+					errorMsg("processingAC", uriString):
+					errorMsg("pleaseVisit", uriString);
+				}
+				SBLStore store = getSBLStore();
+				boolean authorized = false;
+				if (status == AddStatus.PENDING
+				    && authcode != null) {
+				    if (authcode.equals(authCode.getCode(un))) {
+					status = AddStatus.OK;
+					authorized = true;
+					// For this case, skip asking the
+					// user for the password just provided.
+					// just replicate what we did in
+					// checkCredentials.
+					long now = Instant.now()
+					    .getEpochSecond();
+					PWInfoKey key = new
+					    PWInfoKey(un, cookie);
+					pwmap.put(key, new PWInfo
+						  (now+passphraseTimeout, pw1));
+					loginMap.put(cookie.getValue(), un);
+				    }
+				}
+				int rc = 201;
+				switch(status) {
+				case PENDING:
+				    rc = 202;
+				    add(un, pw1);
+				    map.get(un).setActive(false);
+				    if (store != null) {
+					store.append(un, true, pw1, false);
+				    }
+				    break;
+				case OK:
+				    add(un, pw1);
+				    map.get(un).setActive(true);
+				    if (store != null) {
+					store.append(un, true, pw1, true);
+				    }
+				    t.getResponseHeaders()
+					.set("Location", uriString);
+				    if (authorized) {
+					uriString = generateRequestURI(null);
+					String proto = t.getProtocol()
+					    .toUpperCase();
+					rc = ((proto.startsWith("HTTP") &&
+					       proto.endsWith("/1.0")))?
+					    302: 303;
+				    } else {
+					uriString = generateRequestURI(un);
+				    }
+				    System.out.println("uriString = "
+						       + uriString);
+				    break;
+				case REJECTED:
+				    rc = 403;
+				    break;
+				}
+				byte[] data = msg.getBytes(UTF8);
+				Headers rhdrs = t.getResponseHeaders();
+				rhdrs.set("Content-type",
+					  "text/html; charset=utf-8");
+				rhdrs.set("Cache-Control", "no-cache");
+				setCookie(t, cookie);
+				t.sendResponseHeaders(rc, data.length);
+				t.getResponseBody().write(data);
+				if (onAccountRequest != null) {
+				    onAccountRequest.accept(un, status);
+				}
+
+				HttpPrincipal p = authorized?
+				    new EjwsPrincipal(un, unencodedRealm,
+						      map.get(un).roles):
+				    null;
+				return new Authenticator.Success(p);
 			    }
 			} else {
 			    setCookie(t, cookie);
@@ -1669,8 +2120,8 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	*/
 
 	addr.set(iaddr);
+	msgTL.set(null);
 	Authenticator.Result result = super.authenticate(t);
-	// System.out.println("result.class = " + result.getClass());
 	if (result instanceof Authenticator.Success) {
 	    // System.out.println("success");
 	    HttpPrincipal p = ((Authenticator.Success)result).getPrincipal();
@@ -1705,15 +2156,6 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    setCookie(t, cookie);
 	    return new Authenticator.Success(p);
 	} else {
-	    /*
-	    int code = -1;
-	    if (result instanceof Authenticator.Retry) {
-		code = ((Authenticator.Retry)result).getResponseCode();
-	    } else if (result instanceof Authenticator.Failure) {
-		code = ((Authenticator.Failure)result).getResponseCode();
-	    }
-	    System.out.println("authentication failed, code = " + code);
-	    */
 	    if (tracer != null) {
 		String ct = "" + Thread.currentThread().getId();
 		try {
@@ -1722,15 +2164,37 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	    }
 	    if (loginRequired) {
 		int code = flCode.get();
+		System.out.println("login path: " + loginPath);
 		if (code != 0) {
-		    if (code == 307) {
+		    if (code == 403) {
+			Headers rhdrs = t.getResponseHeaders();
+			/*
+			rhdrs.set("Location",
+				  fileHandler.getLogoutURI().toASCIIString());
+			*/
+			if (loginPath != null && msgTL.get() != null) {
+			    rhdrs.set("Location",
+				      loginPath + "?uploadtype=no-upload&msg="
+				      +msgTL.get());
+			    rhdrs.set("Cache-Control", "no-cache");
+			    String proto = t.getProtocol().toUpperCase();
+			    code = ((proto.startsWith("HTTP") &&
+				     proto.endsWith("/1.0")))?
+				302: 303;
+			}
+		    } else if (code == 307) {
 			String proto = t.getProtocol().toUpperCase();
 			code = ((proto.startsWith("HTTP") &&
 				 proto.endsWith("/1.0")))?
 			    302: 303;
 			Headers rhdrs = t.getResponseHeaders();
+			/*
 			rhdrs.set("Location",
 				  fileHandler.getLogoutURI().toASCIIString());
+			*/
+			rhdrs.set("Location",
+				  loginPath + "?uploadtype=no-upload&msg="
+				  +msgTL.get());
 			rhdrs.set("Cache-Control", "no-cache");
 			String un = usernameTL.get();
 			EjwsPrincipal p = new EjwsPrincipal(un,
@@ -1741,7 +2205,10 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			}
 		    }
 		    setCookie(t, cookie);
-		    return new Authenticator.Failure(code);
+		    return (code == 302 || code == 303)?
+			new Authenticator.Failure(code):
+			result;
+		    // return result;
 		}
 	    }
 	    setCookie(t, cookie);
@@ -1855,7 +2322,6 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 	}
     }
 
-
     /**
      * Check credentials.
      * This method is called for each incoming request to verify
@@ -1913,28 +2379,64 @@ public class EjwsSecureBasicAuth extends EjwsAuthenticator {
 			// the login timed out, so send the user
 			// to the logout page.
 			flCode.set(307);
+			msgTL.set("loginTimedout");
 			usernameTL.set(username);
+			// We want to log out, but without putting the
+			// key into logoutSet, the browser won't ask
+			// for new login credentials.
+			logoutSet.add(key);
 		    }
 		    return false;
 		}
-	    }
+	   }
 	} else if (loginRequired) {
 	    boolean foundLogin = foundLoginTL.get();
 	    boolean foundLogout = foundLogoutTL.get();
 	    if (!foundLogin && !foundLogout) {
 		flCode.set(403);
+		msgTL.set("loginLocation");
+		logoutSet.add(key);
 		return false;
 	    }
 	}
 	Entry entry = map.get(username);
 	// System.out.println("entry = " + entry);
-	if (entry == null) return false;
+	if (entry == null) {
+	    if (tracer != null) {
+		String ct = "" + Thread.currentThread().getId();
+		try {
+		    tracer.append("(" + ct + ") ... no entry for user \""
+				  + username +"\"\n");
+		} catch (IOException e){}
+	    }
+	    return false;
+	}
 	if (!entry.isActive()) {
+	    if (entry.keyops == null && !password.equals(entry.pw)) {
+		// authentication mode is PASSWORD, so if this is wrong,
+		// we should just fail without specifying a response code,
+		// in which case the user should be asked for a new user name
+		// and password.
+		return false;
+	    }
 	    flCode.set(403);
+	    if (loginRequired) {
+		msgTL.set("pending0");
+		logoutSet.add(key);
+	    }
 	    return false;
 	}
 	SecureBasicUtilities ops = entry.keyops;
-	// System.out.println("ops = " + ops);
+	if (ops == null) {
+	    // the user was configured with just a password
+	    boolean result = password.equals(entry.pw);
+	    if (result == true && passphraseTimeout > 0) {
+		pwmap.put(key, new PWInfo(now + passphraseTimeout,
+					  password));
+		loginMap.put(cookie.getValue(), username);
+	    }
+	    return result;
+	}
 	byte[] sigarray = SecureBasicUtilities.decodePassword(password);
 	if (sigarray == null) return false;
 	int timediff = SecureBasicUtilities.getTimeDiff(sigarray);

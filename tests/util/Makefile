@@ -156,6 +156,11 @@ all: compile
 actest: compile
 	$(JAVA) ACTest
 
+safetest: compile
+	@$(JAVA) SafeFormatterTest
+
+
+
 not: compile
 	chmod u+x scrun
 	./scrun not.esp
@@ -518,6 +523,10 @@ estest15: compile
 estest16: compile
 	@echo - ExpressionParser Test '( stream test)' -
 	@$(JAVA) ExprScriptTest16
+
+estest16a: compile
+	@echo - ExpressionParser Test '( method-reference test)' -
+	@$(JAVA) ExprScriptTest16a
 
 estest17: compile
 	@echo - ExpressionParser Test '( <=> operator)' -

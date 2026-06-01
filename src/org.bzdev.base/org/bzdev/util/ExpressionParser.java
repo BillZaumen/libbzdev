@@ -2252,6 +2252,11 @@ public class ExpressionParser implements ObjectParser<Object>
 	    private Object object = null;
 	    int nargs = -2;
 
+	    private boolean checkModifier(Method method) {
+		boolean isStatic = Modifier.isStatic(method.getModifiers());
+		return isStatic == (object == null);
+	    }
+
 	    public int numberOfArguments() {
 		if (nargs < -1) {
 		    synchronized(ExpressionParser.this) {
@@ -2261,6 +2266,14 @@ public class ExpressionParser implements ObjectParser<Object>
 					Method[] methods =
 					    clasz.getMethods();
 					for (Method meth: methods) {
+					    if (!checkModifier(meth)) {
+						// if object is not null
+						// we have to skip static
+						// methods and if object is
+						// null, we should consider
+						// only static methods
+						continue;
+					    }
 					    if (meth.getName().equals(method)) {
 						nargs =
 						    meth.getParameterCount();
@@ -4478,7 +4491,8 @@ public class ExpressionParser implements ObjectParser<Object>
 	{
 	    /*
 	    System.out.format("findMethod: fname=%s, targetClass=%s\n",
-			      fname, targetClass.getName());
+			      fname, ((targetClass == null)? "null":
+				      targetClass.getName()));
 	    if (argcount == null) {
 		System.out.println("... argcount = " + argcount);
 	    } else {
@@ -4490,7 +4504,6 @@ public class ExpressionParser implements ObjectParser<Object>
 		System.out.println("]");
 	    }
 	    */
-
 	    for (int i = 0;  i < argclasses.length; i++) {
 		if (argclasses[i] == null) {
 		    continue;

@@ -16,6 +16,24 @@ all:
 	@echo -------------------------
 	$(JAVA) WebxmlParserTest example junk
 	rm junk
+	echo -------------------------
+	$(JAVA) SBLStoreTest
+	rm sblstoretest
+
+storetest:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	rm -f sblstoretest
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) SBLStoreTest
+	rm sblstoretest
+
+authcode:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	rm -f sblstoretest
+	javac -d classes -classpath ../../BUILD/libbzdev.jar *.java
+	$(JAVA) AuthCodeTest
 
 modtest:
 	(cd ../.. ; make jars)
@@ -609,12 +627,35 @@ demo-noaccount:
 		`make --no-print-directory fingerprint EMAIL=$(EMAIL)` \
 		2>&1
 
+demo2-noaccount:
+	(cd ../.. ; make jars)
+	mkdir -p classes
+	javac -d classes -classpath ../../BUILD/libbzdev.jar Demo2.java
+	$(JAVA)	Demo2 `pwd`/demo.dir /usr/share/doc/libbzdev-doc/api/ \
+		`pwd`/test-gpgdir $(HOST) $(EMAIL) \
+		`make --no-print-directory fingerprint EMAIL=$(EMAIL)` \
+		2>&1
+
 fingerprint:
 	@gpg --fingerprint --with-colons $(EMAIL) | head -n 3 | \
 		grep fpr: | sed -e s/fpr:::::::::// | sed -e s/://
 
 firefox-demo:
 	firefox https://localhost:8443/
+
+# need USER=[user name]
+
+firefox-demo-authcode-pw:
+	firefox `./autharg $(USER) password`
+
+firefox-demo-authcode-gpg:
+	firefox `./autharg $(USER) pgpkey`
+
+firefox-demo-authcode-sbl:
+	firefox `./autharg $(USER) sbl`
+
+firefox-demo2:
+	firefox http://localhost:8080/
 
 clean:
 	rm -rf classes

@@ -1,0 +1,12 @@
+import org.bzdev.math.stats.GaussianDistr;
+import org.bzdev.math.GLQuadrature;
+import org.bzdev.math.Functions;
+var normalDistr = new GaussianDistr(0.0, 1.0);
+var glq = GLQuadrature.newInstance(normalDistr::pd, 8);
+var integral = glq.integrate(0.0, 3.0, 20);
+var expecting = (erf(3.0) - erf(0.0))/2;
+global.getWriter().format("integral = %s, expecting %s\n",
+			  integral, expecting);
+global.getWriter().flush();
+
+integral

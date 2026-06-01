@@ -9,5 +9,6 @@ module org.bzdev.scrunner {
     requires org.bzdev.base;
     requires org.bzdev.math;
     requires org.bzdev.obnaming;
+    requires org.bzdev.ejws;
     opens org.bzdev.bin.scrunner.lpack;
 }
