@@ -59,6 +59,10 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 
     private E thisObject;
 
+    /**
+     * Set this object so that we can always get the actual type.
+     * @param thisObject this object
+     */
     protected void setThisObject(E thisObject) {
 	this.thisObject = thisObject;
     }
@@ -230,12 +234,13 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
     }
      */
 
-    public EjwsUserTable
+    /**
+     * Get this authenticator's user table.
+     * @return this authenticator's user table
+     */
+    public abstract EjwsUserTable
 	<? extends EjwsAuthenticator,? extends EjwsAuthenticator.Entry>
-	getUserTable()
-    {
-	return null;
-    }
+	getUserTable();
 
     /**
      * Read SBL data from an input stream, storing it as a string
@@ -738,6 +743,12 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 	return createUser(props, roles);
     }
 
+    /**
+     * Get the name of a user from an SBL file.
+     * @param propsString the string representation of an SBL file
+     * @return the user name
+     * @throws Exception if there is an error
+     */
     protected String getUserNameFromSBL(String propsString) throws Exception {
 	ConfigProperties props = new
 	    ConfigProperties(propsString, "application/vnd.bzdev.sblauncher");
@@ -2107,6 +2118,9 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
      */
     public abstract boolean isSBLCompressed(String user);
 
+    /**
+     * Base class entries in a map whose key is a user name.
+     */
     public static class Entry {
 	Set<String> roles = null;
 
@@ -3254,6 +3268,11 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 	}
     }
 
+    /**
+     * Get the authentication map association user names with
+     * authentication data..
+     * @return the map
+     */
     protected abstract Map<String, ? extends Entry> getAuthMap();
 
     /**
@@ -3360,6 +3379,11 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 	return cookie;
     }
 
+    /**
+     * Create an authentication cookie given a user name.
+     * @param t the {@link HttpExchange} for an HTTP trasaction
+     * @param username the user name
+     */
     protected ServerCookie createAuthCookie(HttpExchange t,
 					    String username)
     {
@@ -3477,7 +3501,7 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 		for (Map.Entry<String,String> entry: deleteMap.entrySet()) {
 		    String email = entry.getKey();
 		    String target = entry.getValue();
-		    if (target.equals(JUST_IN_MAP)) {
+		    if (false && target.equals(JUST_IN_MAP)) {
 			System.out.println("modified JUST_IN_MAP:  found "
 					   + email);
 		    }
@@ -3502,7 +3526,7 @@ public abstract class EjwsAuthenticator<E extends EjwsAuthenticator>
 		for (Map.Entry<String,String> entry: activateMap.entrySet()) {
 		    String email = entry.getKey();
 		    String target = entry.getValue();
-		    if (target.equals(JUST_IN_MAP)) {
+		    if (false && target.equals(JUST_IN_MAP)) {
 			System.out.println("JUST_IN_MAP: found " + email );
 			makeUserActive(email, target);
 			continue;

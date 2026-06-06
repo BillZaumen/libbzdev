@@ -1,4 +1,5 @@
 package org.bzdev.ejws;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ import java.util.Set;
  * user name, often an email address.
  * 
  */
-public class EjwsUserTable
+public abstract class EjwsUserTable
     <A extends EjwsAuthenticator, E extends EjwsAuthenticator.Entry>
 {
 
@@ -53,6 +54,8 @@ public class EjwsUserTable
      * Set the user-table's map.
      * This method is called by {@link EjwsBasicAuthenticator#setUserTable}
      * and {@link EjwsSecureBasicAuth#setUserTable}.
+     * One of those methods should be called before an instance of this
+     * class is used.
      * @param map the map
      */
     public void setMap(Map<String,E> map) {
@@ -74,6 +77,8 @@ public class EjwsUserTable
      * Set the authenticator that uses this {@link EjwsUserTable}.
      * This method is called by {@link EjwsBasicAuthenticator#setUserTable}
      * and {@link EjwsSecureBasicAuth#setUserTable}.
+     * One of those methods should be called before an instance of this
+     * class is used.
      * @param auth the authenticator;
      */
     public void setAuth(A auth) {
@@ -126,7 +131,8 @@ public class EjwsUserTable
      * @param entry the new entry
      * @return true if successful; false if the operation failed.
      */
-    public final boolean putEntry(String user, E entry) {
+    public final E putEntry(String user, E entry) {
+	/*
 	E old = map.put(user, entry);
 	try {
 	    copyEntryToDB(user, entry, (old == null));
@@ -135,8 +141,21 @@ public class EjwsUserTable
 	    map.put(user, old);
 	    return false;
 	}
+	*/
+	return map.put(user, entry);
     }
 
+    /*
+    public abstract EjwsAuthenticator.UserInfo
+	createUser(String email, String alias, boolean active);
+    */
+
+    /**
+     * Make a user active.
+     * @param user the user
+     * @return true on success; false on error
+
+     */
     public final boolean makeActive(String user) {
 	/*
 	E existing = map.get(user);
@@ -154,20 +173,59 @@ public class EjwsUserTable
 	    return false;
 	}
 	*/
+	A auth = getAuthenticator();
 	try {
 	    E entry = map.get(user);
 	    if (entry != null) {
-		makeActiveInDB(user);
-		entry.makeActive();
+		if (entry.isActive()) return false;
+		if (!auth.getTrustedKeyIDs().contains(user)) {
+		    if (hasDB()) {
+			makeActiveInDB(user);
+		    }
+		    entry.makeActive();
+		}
+		return true;
 	    } else {
-		makeActiveInDB(user);
-		createEntryFromDB(user);
+		if (hasDB()) {
+		    createEntryFromDB(user);
+		}
+		entry = map.get(user);
+		if (entry != null) {
+		    if (entry.isActive()) return false;
+		    if (hasDB()) {
+			makeActiveInDB(user);
+		    }
+		    entry.makeActive();
+		    return true;
+		} else {
+		    return false;
+		}
 	    }
-	    return true;
 	} catch (Exception e) {
 	    return false;
 	}
     }
+
+    /**
+     *
+     */
+    public abstract void storeGPGKey(String value,
+				     EjwsAuthenticator.GPGKeyIDs keyids)
+	throws IllegalArgumentException, IllegalStateException, IOException;
+
+    /**
+     *
+     */
+    public abstract void storeSBLData(String s,
+				      EjwsAuthenticator.AddStatus status)
+	throws Exception;
+
+    /**
+     *
+     */
+    public abstract void storePW(String un, String pw, boolean isActive)
+	throws Exception;
+
 
     /**
      * Update an entry in the map.
@@ -221,6 +279,7 @@ public class EjwsUserTable
 	    map.remove(user);
 	    return true;
 	} catch (Exception e) {
+	    map.remove(user);
 	    return false;
 	}
     }
@@ -242,9 +301,13 @@ public class EjwsUserTable
      * must override this method.
      * @param user the user name
      */
-    protected void createEntryFromDB(String user) throws Exception {
-	return;
-    }
+    protected void createEntryFromDB(String user)
+	throws Exception
+    {
+	if (getEntry(user) != null) {
+	    throw new IllegalStateException("entry exists: " + user);
+	}
+   }
 
 
     /**
@@ -259,6 +322,11 @@ public class EjwsUserTable
 	throw new UnsupportedOperationException();
     }
 
+    /**
+     * Make an entry active in persistent storage.
+     * @param user the user name
+     * @throws Exception if there is an error
+     */
     protected void makeActiveInDB(String user) throws Exception {
 	return;
     }

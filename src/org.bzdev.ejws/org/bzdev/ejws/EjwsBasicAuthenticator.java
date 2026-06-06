@@ -75,6 +75,9 @@ public class EjwsBasicAuthenticator
 	byte[] sbldata;
 
 
+	/**
+	 * The password
+	 */
 	protected String pw;
 
 	/**
@@ -1123,15 +1126,17 @@ public class EjwsBasicAuthenticator
 			SBLStore.Entry value = ent.getValue();
 			if (value.getPWMode() == false) {
 			    String s = value.getData();
+			    /*
 			    System.out.println("user = " + name
 					       + ", isActive = "
 					       + value.isActive());
+			    */
 			    createUser(s, null)
 				.setActive(value.isActive())
 				.addUser();
-			} else {
+			} /*else {
 			    System.out.println("pwmode = true for " + name);
-			}
+			    }*/
 		    } catch (IOException eio) {
 			System.err.println(eio.getMessage());
 		    }
@@ -1498,12 +1503,16 @@ public class EjwsBasicAuthenticator
 					&& authorization != null) {
 					if (authorization
 					    .equals(authCode.getCode(email))) {
+					    /*
 					    System.out.println("signing key for"
 							       + email);
+					    */
 					    signKey(email, true);
 					    status = AddStatus.OK;
+					    /*
 					    System.out.println
 						("authorization processed");
+					    */
 					}
 				    }
 				    // boolean active = isActiveDefault();
@@ -1733,8 +1742,10 @@ public class EjwsBasicAuthenticator
 				    } else {
 					uriString = generateRequestURI(un);
 				    }
+				    /*
 				    System.out.println("uriString = "
 						       + uriString);
+				    */
 				    break;
 				case REJECTED:
 				    rc = 403;

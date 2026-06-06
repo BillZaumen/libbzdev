@@ -1193,7 +1193,6 @@ public class EjwsSecureBasicAuth
 	throws UnsupportedOperationException
     {
 	super.loadFromDirs();
-	System.out.println("got here");
 	String alias = getLoginAlias();
 	if (alias != null && notLoadedFromGPG && gpghome() != null) {
 	    notLoadedFromGPG = false;
@@ -1251,14 +1250,16 @@ public class EjwsSecureBasicAuth
 			SBLStore.Entry value = ent.getValue();
 			if (value.getPWMode() == false) {
 			    String s = value.getData();
+			    /*
 			    System.out.println("user = " + name
 					       + ", isActive = "
 					       + value.isActive());
+			    */
 			    createUser(s, null)
 				.setActive(value.isActive())
 				.addUser();
 			} else {
-			    System.out.println("pwmode = true for " + name);
+			    // System.out.println("pwmode = true for " + name);
 			    String pw = value.getData();
 			    add(name, pw);
 			    if (value.isActive()) {
@@ -1788,7 +1789,7 @@ public class EjwsSecureBasicAuth
 		    String contentLengthS = hdrs.getFirst("content-length");
 		    String authorization = hdrs
 			.getFirst("x-org-bzdev-authcode");
-		    System.out.println("authorization = " + authorization);
+		    // System.out.println("authorization = " + authorization);
 		    long length = 0;
 		    if (contentLengthS != null) {
 			try {
@@ -1821,18 +1822,26 @@ public class EjwsSecureBasicAuth
 				    AddStatus status = isAdmin?
 					AddStatus.OK: getUserStatus(email);
 				    if (status != AddStatus.REJECTED) {
-					storeGPGKey(value, keyids);
+					if (utable != null && utable.hasDB()) {
+					    utable.storeGPGKey(value, keyids);
+					} else {
+					    storeGPGKey(value, keyids);
+					}
 				    }
 				    if (status == AddStatus.PENDING
 					&& authorization != null) {
 					if (authorization
 					    .equals(authCode.getCode(email))) {
+					    /*
 					    System.out.println("signing key for"
 							       + email);
+					    */
 					    signKey(email, true);
 					    status = AddStatus.OK;
+					    /*
 					    System.out.println
 						("authorization processed");
+					    */
 					}
 				    }
 				    // boolean active = isActiveDefault();
@@ -1896,7 +1905,11 @@ public class EjwsSecureBasicAuth
 				    String uname = getUserNameFromSBL(s);
 				    AddStatus status = getUserStatus(uname);
 				    if (status != AddStatus.REJECTED) {
-					storeSBLData(s, status);
+					if (utable != null && utable.hasDB()) {
+					    utable.storeSBLData(s, status);
+					} else {
+					    storeSBLData(s, status);
+					}
 				    }
 				    if (status == AddStatus.PENDING
 					&& authorization != null) {
@@ -2024,14 +2037,18 @@ public class EjwsSecureBasicAuth
 				    rc = 202;
 				    add(un, pw1);
 				    map.get(un).setActive(false);
-				    if (store != null) {
+				    if (utable != null && utable.hasDB()) {
+					utable.storePW(un, pw1, false);
+				    } else if (store != null) {
 					store.append(un, true, pw1, false);
 				    }
 				    break;
 				case OK:
 				    add(un, pw1);
 				    map.get(un).setActive(true);
-				    if (store != null) {
+				    if (utable != null && utable.hasDB()) {
+					utable.storePW(un, pw1, true);
+				    } else if (store != null) {
 					store.append(un, true, pw1, true);
 				    }
 				    t.getResponseHeaders()
@@ -2046,8 +2063,10 @@ public class EjwsSecureBasicAuth
 				    } else {
 					uriString = generateRequestURI(un);
 				    }
+				    /*
 				    System.out.println("uriString = "
 						       + uriString);
+				    */
 				    break;
 				case REJECTED:
 				    rc = 403;
@@ -2189,7 +2208,7 @@ public class EjwsSecureBasicAuth
 	    }
 	    if (loginRequired) {
 		int code = flCode.get();
-		System.out.println("login path: " + loginPath);
+		// System.out.println("login path: " + loginPath);
 		if (code != 0) {
 		    if (code == 403) {
 			Headers rhdrs = t.getResponseHeaders();

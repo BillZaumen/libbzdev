@@ -1720,7 +1720,7 @@ public class SBL {
 	String user = (newKey == null)?
 	    cpe.getDecodedProperties().getProperty("user.user"):
 	    cpe.getDecodedProperties().getProperty(newKey + ".user");
-	System.out.println("newKey = " + newKey + ", user = " + user);
+	// System.out.println("newKey = " + newKey + ", user = " + user);
 	// char[] passwd =  getSecurePW(frame, "user");
 	char[] passwd =  getSecurePW(frame, newKey);
 	if (passwd != null) {

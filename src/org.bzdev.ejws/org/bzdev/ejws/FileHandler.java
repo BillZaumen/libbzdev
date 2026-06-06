@@ -1105,7 +1105,7 @@ public class FileHandler implements HttpHandler {
 				for (String email: auth
 					 .getUsersExcept(emails)) {
 				    if (auth.isActive(email)) continue;
-				    System.out.println("... listing " + email);
+				    // System.out.println("... listing " + email);
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
 				    km.put("name", email +":s");
@@ -1142,7 +1142,7 @@ public class FileHandler implements HttpHandler {
 				for (String email:
 					 auth.getUsersExcept(emails)) {
 				    if (!auth.isActive(email)) continue;
-				    System.out.println("... listing " + email);
+				    // System.out.println("... listing " + email);
 				    TemplateProcessor.KeyMap km =
 					new TemplateProcessor.KeyMap();
 				    km.put("name", email +":s");
@@ -1238,9 +1238,11 @@ public class FileHandler implements HttpHandler {
 						       +", " + target);
 				    */
 				    if (key.endsWith(":s")) {
+					/*
 					System.out.println("email = " + email
 							   + ", target =  "
 							   + target);
+					*/
 					deleteMap.put(email, target);
 				    }
 				}
@@ -1298,7 +1300,6 @@ public class FileHandler implements HttpHandler {
 				    System.out.println("... activate " + email);
 				}
 				*/
-				System.out.println("got here");
 				auth.processAdminRequests(deleteMap,
 							  activateMap);
 			    }

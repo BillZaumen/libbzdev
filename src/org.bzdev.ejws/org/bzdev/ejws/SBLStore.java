@@ -113,7 +113,6 @@ public class SBLStore implements AutoCloseable {
 	public boolean isActive() {
 	    return isActive;
 	}
-
     }
 
     TreeMap<String,Entry> map = new TreeMap<>();
@@ -270,6 +269,15 @@ public class SBLStore implements AutoCloseable {
 
     public synchronized boolean containsUser(String name) {
 	return set.contains(name);
+    }
+
+    public synchronized boolean isActive(String name) {
+	Entry entry = map.get(name);
+	if (entry != null) {
+	    return entry.isActive();
+	} else {
+	    return false;
+	}
     }
 
     /**
